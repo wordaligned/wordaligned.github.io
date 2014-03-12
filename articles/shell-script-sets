@@ -1,0 +1,612 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<link rel="icon" href="/images/favicon.png" type="image/png"/>
+<link href="/styles/application.css" media="all" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="/scripts/prettify.js"></script>
+<script type="text/javascript" src="/scripts/lang-lisp.js"></script>
+<script type="text/javascript" src="http://www.haloscan.com/load/wordaligned"></script>
+
+<title>He Sells Shell Scripts to Intersect Sets</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="author" content="Thomas Guest" />
+<meta name="description" content="The Unix command shell contains a lot of what I like in a programming environment: it&#8217;s dynamic, high-level, interpreted, flexible, succinct. This article shows the Unix tools in action. A Word Aligned article posted 2007-08-18, tagged C++, ACCU, Shell, Streams." />
+<meta name="keywords" content="C++, ACCU, Shell, Streams" />
+<link rel="alternate" type="application/rss+xml" title="Feed" href="http://feeds.wordaligned.org/wordaligned" />
+</head>
+
+<body onload="prettyPrint()">
+<div id="container">
+  <div id="header">
+<h1><span><a accesskey="h" href="/">Word Aligned</a></span></h1>
+<h2>sweating the small stuff</h2>
+<a class="button" href="http://feeds.wordaligned.org/wordaligned" title="Subscribe to Word Aligned"><img style="float: right;" src="/images/feed.png" alt="Feed Logo" height="28" width="28"/></a>
+</div>
+
+  <div id="page">
+    <div id="content">
+      <div class="atomentry" id="shell-script-sets">
+<h2 class="title"><a href="/articles/shell-script-sets">He Sells Shell Scripts to Intersect Sets</a></h2>
+<p class="meta"><abbr class="published" title="2007-08-18">2007-08-18</abbr> &bull; <a href="/tag/c++" rel="tag">C++</a>, <a href="/tag/accu" rel="tag">ACCU</a>, <a href="/tag/shell" rel="tag">Shell</a>, <a href="/tag/streams" rel="tag">Streams</a> &bull; <a href="/articles/shell-script-sets#disqus_thread">Comments</a></p>
+<div class="toc">
+<h2>Contents</h2>
+<ul>
+ <li><a href="#tocintroduction" name="toc0" id="toc0">Introduction</a>
+ </li>
+
+ <li><a href="#tocan-example-apache-server-logs" name="toc1" id="toc1">An Example: Apache Server Logs</a>
+ </li>
+
+ <li><a href="#tocset-creation" name="toc2" id="toc2">Set Creation</a>
+ </li>
+
+ <li><a href="#tocmultiset-creation" name="toc3" id="toc3">Multiset Creation</a>
+ </li>
+
+ <li><a href="#tocset-union" name="toc4" id="toc4">Set Union</a>
+ </li>
+
+ <li><a href="#tocset-intersection" name="toc5" id="toc5">Set Intersection</a>
+ </li>
+
+ <li><a href="#tocset-symmetric-difference" name="toc6" id="toc6">Set Symmetric Difference</a>
+ </li>
+
+ <li><a href="#tocset-subtraction" name="toc7" id="toc7">Set Subtraction</a>
+ </li>
+
+ <li><a href="#tocsets-of-sets" name="toc8" id="toc8">Sets of Sets</a>
+ </li>
+
+ <li><a href="#tocmore-set-operations" name="toc9" id="toc9">More Set Operations</a>
+ </li>
+
+ <li><a href="#tocextending-the-toolset" name="toc10" id="toc10">Extending the Toolset</a>
+ </li>
+
+ <li><a href="#toca-scripts-got-to-know-its-limitations" name="toc11" id="toc11">A Script&#8217;s Got to Know its Limitations</a>
+ </li>
+
+ <li><a href="#tocconclusion" name="toc12" id="toc12">Conclusion</a>
+ </li>
+
+ <li><a href="#toccredits" name="toc13" id="toc13">Credits</a>
+ </li>
+</ul>
+</div><p>A short article of mine promoting shell scripting has appeared in the excellent <a href="http://accu.org">ACCU</a> publication, <a href="http://accu.org/index.php/overloadonline">Overload</a>. Since Overload is available online, you can read the original version <a href="http://accu.org/index.php/journals/1410">there</a>. Alternatively, I&#8217;ve republished it here, and added a couple of important revisions based on reader comments, so just keep reading &#8230;
+</p>
+
+<h3><a href="#toc0" name="tocintroduction" id="tocintroduction">Introduction</a></h3>
+<p><span id="excerpt0"/>The Unix command shell contains a lot of what I like in a programming environment: it&#8217;s dynamic, high-level, interpreted, flexible, succinct. It&#8217;s even reasonably portable now that bash seems to have become the shell of choice. Although there&#8217;s much about shell scripting I don&#8217;t like, on many occasions it turns out to be the best tool for the job.
+</p>
+<p>In this article we shall demonstrate how simple shell scripts can be used to implement sets, providing one line recipes for set creation, set union, set intersection and more. Having explored the power of the Unix shell we&#8217;ll consider its limitations, before finally  discussing the more general lessons we can learn from the Unix tools.
+</p>
+<span id="continue-reading"/>
+
+
+<h3><a href="#toc1" name="tocan-example-apache-server-logs" id="tocan-example-apache-server-logs">An Example: Apache Server Logs</a></h3>
+<p>As an example, let&#8217;s suppose we want to analyse sets of IP addresses contained in a couple of Apache HTTP Server <a href="http://httpd.apache.org/docs/2.0/logs.html#accesslog">access logs</a>, <code>access_log1</code> and <code>access_log2</code>. Each log file contains many thousands of lines which look something like this:
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">65.214.44.29 - - [25/Jun/2007:00:03:21 +0000] ...
+74.6.87.40 - - [25/Jun/2007:00:03:24 +0000] ...
+65.214.44.29 - - [25/Jun/2007:00:03:24 +0000] ...
+74.6.86.212 - - [25/Jun/2007:00:03:36 +0000] ...
+...
+
+</pre>
+
+</div>
+
+<p>We can <code>cut</code> this file down to leave just the IP address at the start of each line. <code>Cut</code> is a simple tool which we&#8217;ll be using again later, and here we pass it options <code>-f1</code> to select the first field from each line and <code>-d" "</code> to use the space character as a field separator.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">$ cut -f1 -d" " access_log1
+65.214.44.29
+74.6.87.40
+65.214.44.29
+74.6.86.212
+...
+
+</pre>
+
+</div>
+
+
+<h3><a href="#toc2" name="tocset-creation" id="tocset-creation">Set Creation</a></h3>
+<p>The output from this command is likely to be full of duplicates. Regular site visitors typically hit the web server a few times; web spiders and robots are much more hungry. To obtain the <strong>sets</strong> of unique IP addresses contained in each log file, we could do this:
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">$ cut -f1 -d" " access_log1 | sort | uniq &gt; IP1
+$ cut -f1 -d" " access_log2 | sort | uniq &gt; IP2
+
+</pre>
+
+</div>
+
+<p>Here <code>cut</code> picks out the IP addresses, <code>sort</code> orders the results, <code>uniq</code> eliminates duplicates, and we&#8217;ve redirected the output into files IP1 and IP2. By the way, we could have eliminated a link from the pipeline using the <code>-u</code> option to sort. The Unix shell tools aren&#8217;t entirely orthogonal!
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">$ cut -f1 -d" " access_log1 | sort -u &gt; IP1
+
+</pre>
+
+</div>
+
+<p>The resulting sets are ordered &#8212; a set implementation which should be familiar to C++ programmers. The IP addresses will be lexicographically rather than numerically ordered, since we went with the <code>sort</code> defaults. This means that, for example, <code>122.152.128.10</code> appears before <code>58.167.213.128</code> because <code>1</code> alphabetically precedes <code>5</code>. With a little more effort, we could probably persuade <code>sort</code> to yield a numeric ordering (no, <code>sort -n</code> isn&#8217;t good enough).
+</p>
+
+<h3><a href="#toc3" name="tocmultiset-creation" id="tocmultiset-creation">Multiset Creation</a></h3>
+<p>If instead we wanted a <strong>multiset</strong> &#8212; that is, a set in which elements may appear more than once, we could count the number of times items are repeated in the sorted output using the <code>-c</code> option to <code>uniq</code>.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">$ cut -f1 -d" " access_log1 | sort | uniq -c
+   8 12.153.20.132
+   2 12.217.178.11
+  14 12.30.66.226
+   1 122.152.128.49
+  ...
+
+</pre>
+
+</div>
+
+<p>Here, each IP address is prefixed by the number of times it occurred in the log file, so our multiset contains <code>12.153.20.132</code> 8 times, etc. This will be useful later when we come to intersection operations.
+</p>
+
+<h3><a href="#toc4" name="tocset-union" id="tocset-union">Set Union</a></h3>
+<p>Let&#8217;s assume we&#8217;ve followed the steps above and IP1 and IP1 contain the set of IP addresses in the two access logs.  Forming the <strong>union</strong> of these sets is simple.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">$ sort -m IP1 IP2 | uniq &gt; IP1_union_IP2
+
+</pre>
+
+</div>
+
+<p>The <code>-m</code> <em>merge</em> option to <code>sort</code> is purely for efficiency and the result would be equally correct without it. Since the inputs are already sorted, we can just merge them together, line by line. For C++ users, it&#8217;s the difference between the <code>std::sort</code> and <code>std::merge</code> algorithms.
+</p>
+
+<h3><a href="#toc5" name="tocset-intersection" id="tocset-intersection">Set Intersection</a></h3>
+<p>Finding the <strong>intersection</strong> of IP1 and IP2 can be done in a similar fashion. We merge them together then use the <code>-d</code> option to <code>uniq</code> to pick out duplicates. Since the original sets contained no duplicates, the elements output by this command are those common to both inputs; the set intersection, that is.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">$ sort -m IP1 IP2 | uniq -d &gt; IP1_intersection_IP2
+
+</pre>
+
+</div>
+
+<p>Brief though this command is, we needn&#8217;t type it all in. Exploiting its similarity to the previous command and using the magic of shell history, we just hit the up arrow key &uarr; and edit the previous line.
+</p>
+<p>A more succinct alternative would be to use <code>comm</code>, a specialised tool for selecting or rejecting lines common to two files.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">$ comm -12 IP1 IP2 &gt; IP1_intersection_IP2
+
+</pre>
+
+</div>
+
+<p><code>Comm</code> requires the input text files to be lexically sorted, and by default outputs three columns: lines only in the first file; lines only in the second file; and lines common to both files. By supplying the <code>-12</code> option we choose to select just the third column, again generating the desired intersection.
+</p>
+
+<h3><a href="#toc6" name="tocset-symmetric-difference" id="tocset-symmetric-difference">Set Symmetric Difference</a></h3>
+<p>We can tweak the first intersection recipe to find the <strong>set symmetric difference</strong> between IP1 and IP2 (the IP addresses in just one of IP1 and IP2 that is). Again, the up arrow key &uarr; recalls the command, and this time we use <code>uniq</code>&#8217;s <code>-u</code> option to suppress repeated elements.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">$ sort -m IP1 IP2 | uniq -u &gt; IP1_symmetric_diff_IP2
+
+</pre>
+
+</div>
+
+<p>We could also have used <code>comm -3 | tr -d "\t"</code> (note the use of <code>tr</code> to delete unwanted tab characters from <code>comm</code>&#8217;s output).
+</p>
+
+<h3><a href="#toc7" name="tocset-subtraction" id="tocset-subtraction">Set Subtraction</a></h3>
+<p>What about the elements in IP1 but not IP2? Again, <code>comm</code> does the job. This time, we suppress columns 2 and 3.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">$ comm -23 IP1 IP2 &gt; IP1_subtract_IP2
+
+</pre>
+
+</div>
+
+
+<h3><a href="#toc8" name="tocsets-of-sets" id="tocsets-of-sets">Sets of Sets</a></h3>
+<p>Uniting a set of sets is easy. <code>Sort</code> handles as many files as you pass it.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">$ sort -mu IP1 IP2 IP3 .... IPN &gt; IP_unite_all
+
+</pre>
+
+</div>
+
+<p>To intersect N sets we could iterate through them, maintaining their cumulative intersection so far by using pair-wise intersection at each step. An alternative approach does away with the explicit iteration by forming their multiset union, then extracting elements which appear N times. Here&#8217;s an example when N is 3.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">$ sort -m IP1 IP2 IP3 | uniq -c | grep "^ *3" \
+    | tr -s " " | cut -f3 -d" "
+
+</pre>
+
+</div>
+
+<p>Let&#8217;s unpick this pipeline. First, <code>sort -m IP1 IP2 IP3 | uniq -c</code> generates the multiset of IP addresses in IP1, IP2 and IP2. Since IP1, IP2 and IP3 are sets and therefore <em>individually</em> contain no repeats, the resulting multiset looks something like this:
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">$ sort -m IP1 IP2 IP3 | uniq -c
+   1 12.30.66.226
+   3 122.152.128.10
+   2 122.152.128.49
+   1 122.152.129.54
+   ...
+
+</pre>
+
+</div>
+
+<p>Each line in the output starts with a count which <em>must</em> be either 1, 2 or 3. Lines starting with 3 correspond to IP addresses common to all three files &#8212;  and these are the IP addresses which form the intersection of IP1, IP2 and IP3. Now we can use some standard pattern matching and extraction techniques to pick out the desired fields.
+</p>
+<p>First <code>grep</code> picks out lines starting with any number of spaces followed by a <code>3</code>. Next <code>tr -s " "</code> squeezes repeated spaces from each line, making the output suitable for use with <code>cut</code> using the space character as a field delimiter. Finally <code>cut</code> itself extracts the column we want (the one with the IP address).
+</p>
+<p>This approach generalises to the following shell script.
+</p>
+<div class="typocode"><div class="codetitle">intersect</div>
+
+<pre class="prettyprint">#! /bin/sh
+# Intersect a collection of lexicographically sorted input sets
+sort -m $@ | uniq -c | grep "^ *$# " | tr -s " " | cut -f3 -d" "
+
+</pre>
+
+</div>
+
+<p>The rather cryptic looking <code>$@</code> and <code>$#</code> which appear in this script are special shell parameters: the first expands to the parameters passed to <code>intersect</code>, the second to the number of these parameters. This function generates output on <code>stdout</code>, and is ready for use in yet bigger shell scripts.
+</p>
+<p>If you call this function with no inputs, it appears to hang &#8212; that&#8217;s because <code>sort</code>, given no input files, processes <code>stdin</code>. This breaks <code>intersect</code>. We can fix the problem in a couple of ways. 
+</p>
+<p>We could add a conditional check that callers have supplied at least one file, printing usage information and returning an error code if not. 
+</p>
+<div class="typocode"><div class="codetitle">intersect</div>
+
+<pre class="prettyprint">#! /bin/sh
+if [ $# -eq 0 ]
+then
+    echo 1&gt;&amp;2 "Usage: $0 SET1 SET2..."
+    exit 127
+fi
+sort -m $@ | uniq -c | grep "^ *$# " | tr -s " " | cut -f3 -d" "
+
+</pre>
+
+</div>
+
+<p>Alternatively, we could take the view that intersecting the empty set of sets is fine and should yield the empty set. We can avoid a conditional check by using the shell&#8217;s own version of the <a href="http://www.cs.oberlin.edu/~jwalker/nullObjPattern/">Null Object pattern</a>.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">sort -m /dev/null $@ | ....
+
+</pre>
+
+</div>
+
+
+<h3><a href="#toc9" name="tocmore-set-operations" id="tocmore-set-operations">More Set Operations</a></h3>
+<p>One of the nice things about set operations is there aren&#8217;t many of them. We&#8217;ve already covered the important ones, and these can easily be extended. Try and work out what set operations are going on in the the command history shown below.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">$ comm -13 S1 S2
+$ comm -23 S1 S2
+$ diff S1 S2
+$ head -1 S1
+$ sort -m S1 S2 S3 | uniq -c | grep -c "^ *3"
+$ tail -1 S2
+$ wc -l S1
+
+</pre>
+
+</div>
+
+<p>As a hint, the answers in lexicographical order are:
+</p>
+<ul>
+ <li>
+     are two sets disjoint?
+ </li>
+
+ <li>
+     are two sets the same?
+ </li>
+
+ <li>
+     how big is the intersection of three sets?
+ </li>
+
+ <li>
+     how many elements in a set?
+ </li>
+
+ <li>
+     is a subset of?
+ </li>
+
+ <li>
+     largest element of a set
+ </li>
+
+ <li>
+     smallest element of a set
+ </li>
+</ul>
+
+<h3><a href="#toc10" name="tocextending-the-toolset" id="tocextending-the-toolset">Extending the Toolset</a></h3>
+<p>The command shell is a powerful, dynamic and extensible programming environment. Even these simple one-line scripts can be stored as functions which can be sourced when a new shell is started; you can add command-line help to them, you can find them using tab-completion, you can keep them in your source control system. In this way you can create your own customised shell working environment and port it from platform to platform just by <a href="/articles/personal-version-control.html">checking it out</a>.
+</p>
+
+<h3><a href="#toc11" name="toca-scripts-got-to-know-its-limitations" id="toca-scripts-got-to-know-its-limitations">A Script&#8217;s Got to Know its Limitations</a></h3>
+<p>Apache server logs are no more and no less than line oriented text. Each record in the log is terminated by a newline character, and each field within each record is delimited in an obvious way: by brackets, spaces, quotation marks, whatever &#8212; who needs XML? This is the kind of format shell scripts handle well. Conversely, anything more complicated, XML for example, or records which span multiple lines, is likely to push the shell tools too far. Maybe <code>awk</code> could cope, but I don&#8217;t think many people bother learning <code>awk</code> these days: it&#8217;s better to use one of the popular high-level languages when basic shell commands won&#8217;t do.
+</p>
+<p>Shell scripts tend not to fail safely. For example, the following command is meant to clear out files in a temporary directory:
+</p>
+<div class="typocode">
+
+<pre class="prettyprint"># Don't try this at home!
+$ rm -rf $TEMP_WORK_DIR/*
+
+</pre>
+
+</div>
+
+<p>You can imagine what happens if TEMP_WORK_DIR has not been set. In general, the Unix commands build on a couple of dangerous assumptions: that programmers know what they are doing; and that the show must go on &#8212; by which I mean that, given malformed input, a shell script will not throw an exception. The IP filters we discussed in this article work quite happily with any old text file as input &#8212; if it wasn&#8217;t an Apache http server log, the only indication of failure may well be smaller sets than expected.
+</p>
+<p>I&#8217;ll admit that I personally avoid writing any shell scripts much longer than the ones shown here. As with Makefiles, I admire and respect the technology but I&#8217;d rather have someone else deal with the details. The <code>bash</code> manual may be brief to a fault, but I&#8217;ve yet to get to grips with its finer details. Sometimes it&#8217;s just too subtle.
+</p>
+<p>On the subject of details, earlier in this article I said that by default <code>sort</code> uses lexicographical ordering, which isn&#8217;t perhaps the ordering we&#8217;d prefer for IP addresses; and I also said that a numeric <code>sort -n</code> wouldn&#8217;t do the job either: IP addresses aren&#8217;t really numbers, they&#8217;re dot separated number quartets. You <em>can</em> use <code>sort</code> to place IP addresses in a more natural order, but the command you&#8217;ll need is anything but natural.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint"># "Natural" ordering of IP addresses
+$ sort -t. +0n -1n +1n -2n +2n -3n +3n IP
+
+</pre>
+
+</div>
+
+<p>If you want to know how this works you&#8217;ll have to read the manual. The code, on its own, is <a href="/articles/readable-code.html">unreadable</a>. If you don&#8217;t know where the manual is, just open a shell window and type <code>man</code>. If the output from this command doesn&#8217;t help, try <code>man man</code>, and if you don&#8217;t know how to open a shell window, I&#8217;m surprised you&#8217;re even reading this sentence!
+</p>
+
+<h3><a href="#toc12" name="tocconclusion" id="tocconclusion">Conclusion</a></h3>
+<p>Modern graphical development environments tend to hide the shell and the command line, probably with good reason, and I don&#8217;t suppose this article will persuade anyone they&#8217;re worth hunting out. And yet the Unix shell embodies so much which is modern and, I suspect, future, best practice.
+</p>
+<p><span id="excerpt1"/>For me, it&#8217;s not just what the shell tools can do, it&#8217;s the example they set. Look again at some of the recipes presented in this article and you&#8217;ll see container operations without explicit loops. You&#8217;ll see flexible and generic algorithms. You&#8217;ll see functional programming. You&#8217;ll see programs which can parallel-process data without a thread or a mutex in sight; no chance of shared memory corruption or race conditions here. The original design of the shell tools may have become somewhat polluted &#8212; we&#8217;ve already seen that <code>sort</code> does some of what <code>uniq</code> can do &#8212; but I think the intent shines through as clearly as ever: <span id="excerpt2"/>we have a compact suite of tools, each with its own responsibility, which cooperate using simple interfaces. We would do well to emulate this model in our own software designs.
+</p>
+
+<h3><a href="#toc13" name="toccredits" id="toccredits">Credits</a></h3>
+<p>I would like to thank the Overload editorial team for their help with this article. I would also like to thank <a href="http://drj11.wordpress.com/">David Jones</a> and Don for their suggestions.
+</p>
+</div>
+
+<h5><a name="feedback">Feedback</a></h5>
+<div id="feedback_div">
+<ol id="feedback" class="feedback">
+
+<li class="feedbackitem" id="feedback-1406">
+<div class="author">   
+<cite><a href="http://drj11.wordpress.com/">David Jones</a></cite>
+2007-09-18
+</div>
+<div class="content">
+<p>I think this is a really good article on the spirit of shell programming.</p>
+
+<p>Intersection is «comm -12 a b», subtraction is «comm -23 a b», symmetric difference is (almost) «comm -2 a b».</p>
+
+<p>«| sort | uniq | sort -nr» is one of my favourites.  sort in popularity order.</p>
+
+</div>
+</li>
+
+
+<li class="feedbackitem" id="feedback-1407">
+<div class="author">   
+<cite><a href="http://wordaligned.org">Thomas Guest</a></cite>
+2007-09-18
+</div>
+<div class="content">
+<blockquote>
+    <p>I think this is a really good article on the spirit of shell programming.</p>
+</blockquote>
+
+<p>Thanks David, much appreciated.</p>
+
+<blockquote>
+    <p>Intersection is «comm -12 a b» ...</p>
+</blockquote>
+
+<p>I wish I'd discovered <code>comm</code> before I wrote the article! It's much neater than the combination of <code>grep</code> and <code>cut</code>. One of the problems I have with the shell tools, though, is that it takes time to discover them. Thus <code>man comm</code> points me to related functions <code>sort</code>, <code>diff</code>, <code>cmp</code> etc, but (e.g.) <code>man sort</code> doesn't have anything to say about <code>comm</code>.</p>
+
+</div>
+</li>
+
+
+<li class="feedbackitem" id="feedback-1409">
+<div class="author">   
+<cite><a href="http://drj11.wordpress.com/">David Jones</a></cite>
+2007-09-20
+</div>
+<div class="content">
+<p>Totally agree about time to discover shell tools (and the traditionally bad organisation of the man pages).  In the good old days a Unix system was simple enough that you could just «ls /usr/bin» and go through each one to see what it did.  That's not so feasible any more.</p>
+
+<p>There's a certain learning value to seeing how to build up the tools from other parts though.</p>
+
+</div>
+</li>
+
+
+<li class="feedbackitem" id="feedback-1410">
+<div class="author">   
+<cite><a href="http://wordaligned.org">Thomas Guest</a></cite>
+2007-09-20
+</div>
+<div class="content">
+<p>I've realised the other thing about the <code>uniq</code>, <code>grep</code>, <code>tr</code>, <code>cut</code> pipeline is that it's a bit more flexible -- so you can easily tweak the recipe to (e.g.) intersect N sets. Unlike most of the shell tools, <code>comm</code> has a very limited role (but thanks again for pointing it out).</p>
+
+</div>
+</li>
+
+
+<li class="feedbackitem" id="feedback-1411">
+<div class="author">   
+<cite>Don</cite>
+2007-09-24
+</div>
+<div class="content">
+<p>Here is how i did it with cat, sort, and uniq:</p>
+
+<p>(shell script)</p>
+
+take 2 input files and output 2 files: unique.txt and duplicate.txt
+
+<p>if [ $# -ne 2 ]; then 
+    echo 1>&amp;2 Usage: $0 file1 file2
+    exit 127 
+fi</p>
+
+<p>cat $1 $2>tmp.tmp
+sort tmp.tmp>sort.tmp
+uniq -u sort.tmp unique.txt
+uniq -d sort.tmp duplicate.txt
+rm *.tmp 2>/dev/null
+wc *.txt
+exit 0</p>
+
+</div>
+</li>
+
+
+<li class="feedbackitem" id="feedback-1414">
+<div class="author">   
+<cite><a href="http://wordaligned.org">Thomas Guest</a></cite>
+2007-09-26
+</div>
+<div class="content">
+<pre>
+if [ $# -ne 2 ]
+then 
+    echo 1>&2 Usage: $0 file1 file2
+    exit 127 
+fi
+
+cat $1 $2 > tmp.tmp
+sort tmp.tmp > sort.tmp
+uniq -u sort.tmp > unique.txt 
+uniq -d sort.tmp > duplicate.txt
+rm *.tmp 2>/dev/null
+wc *.txt
+exit 0
+</pre>
+
+<p>Don, I've tried to reformat your comment -- I think linebreaks got mangled. It assumes each input file contains no duplicates, right? I think <code>rm *.tmp</code> is a little risky! </p>
+
+</div>
+</li>
+
+</ol>
+</div>
+
+<div class="comments"><hr/><div id="disqus_thread"></div><script type="text/javascript" src="http://disqus.com/forums/wordaligned/embed.js"></script></div>
+      
+<div id="comments"><script type="text/javascript">
+//<![CDATA[
+(function() {
+    var links = document.getElementsByTagName('a');
+    var query = '?';
+    for(var i = 0; i < links.length; i++) {
+        if(links[i].href.indexOf('#disqus_thread') >= 0) {
+            query += 'url' + i + '=' + encodeURIComponent(links[i].href) + '&amp;';
+        }
+    }
+    document.write('<script type="text/javascript" src="http://disqus.com/forums/wordaligned/get_num_replies.js' + query + '"></' + 'script>');
+})();
+//]]>
+</script></div>
+
+    </div>
+    <div id="sidebar">
+      <div class="sidebar-node">
+<h3>Excerpts</h3>
+<p><a href="#excerpt0">The Unix command shell contains a lot of what I like in a programming environment: it's dynamic, high-level, interpreted, flexible, succinct.</a></p>
+<p><a href="#excerpt1">For me, it's not just what the shell tools can do, it's the example they set.</a></p>
+<p><a href="#excerpt2">We have a compact suite of tools, each with its own responsibility, which cooperate using simple interfaces.</a></p>
+
+</div>
+
+<div class="sidebar-node">
+<h3>Tagged</h3>
+<ul id="categories"><li><a href="/tag/c++" rel="tag">C++</a></li>
+<li><a href="/tag/accu" rel="tag">ACCU</a></li>
+<li><a href="/tag/shell" rel="tag">Shell</a></li>
+<li><a href="/tag/streams" rel="tag">Streams</a></li></ul>
+
+</div>
+
+<div class="sidebar-node">
+<h3>Chain</h3>
+<ul>
+<li><a accesskey="n" href="/articles/shameful-names" title="Next article">&laquo; Shameful Names</a></li>
+<li><a accesskey="p" href="/articles/collaborative-documentation-tools" title="Previous article">&raquo; Collaborative documentation tools</a></li>
+</ul>
+
+
+</div>
+
+<div class="sidebar-node">
+<h3>Feeds</h3>
+
+<ul>
+<li><a href="http://feeds.wordaligned.org/wordaligned"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Articles</a></li>
+<li><a href="http://feeds.wordaligned.org/wordaligned/comments"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Comments</a></li>
+</ul>
+
+
+</div>
+
+    </div>
+  </div>
+  <div id="footer">
+<hr />
+<p><a href="http://tag.wordaligned.org">Thomas Guest</a></p>
+</div>
+
+</div>
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-3373724-1']);
+  _gaq.push(['_trackPageview']);
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ga);
+  })();
+</script>
+</body>
+
+</html>

@@ -1,0 +1,1166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" >
+<channel>
+<title>Word Aligned</title>
+<link>http://wordaligned.org</link>
+<description>tales from the code face</description>
+<dc:creator>tag@wordaligned.org</dc:creator>
+<language>en-gb</language>
+<item>
+<title>Stop the clock, squash the bug</title>
+<description>&lt;div class="toc"&gt;
+&lt;h2&gt;Contents&lt;/h2&gt;
+&lt;ul&gt;
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/stop-the-clock-squash-the-bug.html#tocsoftware-bugs" name="toc0" id="toc0"&gt;Software Bugs&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/stop-the-clock-squash-the-bug.html#tocleaks-and-races" name="toc1" id="toc1"&gt;Leaks and Races&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/stop-the-clock-squash-the-bug.html#toc75-correct-vs-50-correct" name="toc2" id="toc2"&gt;75% correct vs 50% correct&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/stop-the-clock-squash-the-bug.html#tocprobabilistic-algorithms" name="toc3" id="toc3"&gt;Probabilistic algorithms&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/stop-the-clock-squash-the-bug.html#tocfixing-isfprime" name="toc4" id="toc4"&gt;Fixing is_fprime&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/stop-the-clock-squash-the-bug.html#tocdefensive-programming" name="toc5" id="toc5"&gt;Defensive programming&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/stop-the-clock-squash-the-bug.html#tocdefect-halflife" name="toc6" id="toc6"&gt;Defect halflife&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/stop-the-clock-squash-the-bug.html#tochow-did-that-code-ever-work" name="toc7" id="toc7"&gt;How did that code ever work?&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/stop-the-clock-squash-the-bug.html#tocconclusions" name="toc8" id="toc8"&gt;Conclusions&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/stop-the-clock-squash-the-bug.html#tocsource-code" name="toc9" id="toc9"&gt;Source code&lt;/a&gt;
+ &lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;&lt;p&gt;Which clock is the best?
+&lt;/p&gt;
+&lt;p&gt;&lt;img src="http://wordaligned.org/images/stopped-clock.gif" alt="Stopped clock"/&gt;
+   &lt;img src="http://wordaligned.org/images/slow-clock.gif" alt="Slow clock"/&gt;
+   &lt;img src="http://wordaligned.org/images/fast-clock.gif" alt="Fast clock"/&gt;
+&lt;/p&gt;
+&lt;p&gt;We can easily rule the one which has stopped &amp;#8230; 
+&lt;/p&gt;
+&lt;p&gt;Or can we? In &amp;#8220;The Rectory Umbrella&amp;#8221; Lewis Carroll &lt;a href="http://www.gavagai.de/themen/HHPT02.htm"&gt;argues otherwise&lt;/a&gt;.
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;Which is better, a clock that is right only once a year, or a clock that is right twice every day?
+&lt;/p&gt;
+&lt;p&gt;&amp;#8220;The latter,&amp;#8221; you reply, &amp;#8220;unquestionably.&amp;#8221;
+&lt;/p&gt;
+&lt;p&gt;Very good, now attend.
+   I have two clocks: one doesn&amp;#8217;t go at all, and the other loses a minute a day: which would you prefer? &amp;#8220;The losing one,&amp;#8221; you answer, &amp;#8220;without a doubt.&amp;#8221; Now observe: the one which loses a minute a day has to lose twelve hours, or seven hundred and twenty minutes before it is right again, consequently it is only right once in two years, whereas the other is evidently right as often as the time it points to comes round, which happens twice a day. 
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;span id="continue-reading"/&gt;
+
+&lt;p&gt;It&amp;#8217;s an amusing diversion, but not really that puzzling: &lt;em&gt;of course&lt;/em&gt; the clock which loses time is of more practical use, even if, somewhat paradoxically, the less time it loses the less often it tells the right time. A clock which loses just a second a day only tells the right time every 118 years or so.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/stop-the-clock-squash-the-bug.html#toc0" name="tocsoftware-bugs" id="tocsoftware-bugs"&gt;Software Bugs&lt;/a&gt;&lt;/h3&gt;
+&lt;img style="float:right;" src="http://wordaligned.org/images/buttons/spider.jpg" alt="Bug"/&gt;
+
+&lt;p&gt;I mention these defective clocks because I&amp;#8217;m thinking about bugs in software and how we go about finding and fixing them. 
+&lt;/p&gt;
+&lt;p&gt;Code which is obviously wrong is easier to spot than code which is almost right, and spotting bugs is the precursor to fixing them. This implies &amp;#8212; building on Carroll&amp;#8217;s terminology &amp;#8212; that we&amp;#8217;re unlikely to ship many stopped clocks but if we&amp;#8217;re not careful we may end up delivering a few which lose time. And, in general, code which is obviously wrong is easier to fix than code which is almost right. A badly-broken function clearly needs a rethink; whereas one which &lt;em&gt;almost&lt;/em&gt; works may simply get tweaked until it &lt;em&gt;appears&lt;/em&gt; to work, often resulting in a more subtle bug.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/stop-the-clock-squash-the-bug.html#toc1" name="tocleaks-and-races" id="tocleaks-and-races"&gt;Leaks and Races&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;C and C++ provide a good example of what I&amp;#8217;m talking about. Consider a program which misuses memory. An attempt to allocate workspace of 4294967295 bytes fails instantly&lt;a id="fn1link" href="http://wordaligned.org/articles/stop-the-clock-squash-the-bug.html#fn1"&gt;&lt;sup&gt;[1]&lt;/sup&gt;&lt;/a&gt;; a slow memory leak, like a slow running clock, may cause no perceptible damage for an extended period.
+&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://valgrind.org"&gt;Decent tools&lt;/a&gt; detect memory leaks. Race conditions in multi-threaded code are harder to track and may prove elusive during system testing. More than once I&amp;#8217;ve left a program running under a debugger, being fed random inputs, in the hope some rare and apparently random condition will trigger a break in execution. Give me truly broken code any day!
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/stop-the-clock-squash-the-bug.html#toc2" name="toc75-correct-vs-50-correct" id="toc75-correct-vs-50-correct"&gt;75% correct vs 50% correct&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Here are two implementations of a C function to find an integer midway between a pair of ordered, positive integer values, truncating downwards. Before reading on, ask yourself which is better.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;int midpoint1(int low, int high)
+{
+    return low/2 + high/2;
+}
+
+int midpoint2(int low, int high)
+{
+    return (low + high)/2;
+}
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;&lt;code&gt;Midpoint1&lt;/code&gt; is a &amp;#8220;stopped clock&amp;#8221;, returning 3 instead of 4 as the mid-point of 3 and 5, for example. It gets the wrong answer 25% of the time &amp;#8212; fatally wrong were it to be used at the heart of, say, a binary search. I think we&amp;#8217;d quickly detect the problem.
+&lt;/p&gt;
+&lt;p&gt;An obvious fix would be the one shown in &lt;code&gt;midpoint2&lt;/code&gt; which does indeed return 4 as the mid-point of 3 and 5. 
+&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;Midpoint2&lt;/code&gt; turns out to be a losing clock, though. If the sum &lt;code&gt;low + high&lt;/code&gt; overflows then the result is undefined. On my implementation I get a negative value &amp;#8212; a dangerous thing to use as an array index. This is a notorious and very real defect, nicely documented in a &lt;a href="http://googleresearch.blogspot.com/2006/06/extra-extra-read-all-about-it-nearly.html"&gt;note by Joshua Bloch&lt;/a&gt; subtitled &amp;#8220;Nearly all Binary Searches and Mergesorts are broken&amp;#8221;. 
+&lt;/p&gt;
+&lt;p&gt;Bloch offers more than one fix so I&amp;#8217;ll just note here that:
+&lt;/p&gt;
+&lt;ul&gt;
+ &lt;li&gt;
+     this defect simply doesn&amp;#8217;t exist in a high-level language like Python or Haskell, where integers are bounded only by machine resources
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     I think Bloch is unfair to suggest Jon Bentley&amp;#8217;s analysis in chapter 4 of Programming Pearls is wrong. The pseudo-code in this chapter is written in a C-like language somewhere between C and Python, and in fact one of Bentley&amp;#8217;s exercises is to examine what effect word size has on this analysis.
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     in a sense, &lt;code&gt;midpoint2&lt;/code&gt; is more broken than &lt;code&gt;midpoint1&lt;/code&gt;: over the range of possible low and high inputs, the sum overflows and triggers the defect 50% of the time.
+ &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/stop-the-clock-squash-the-bug.html#toc3" name="tocprobabilistic-algorithms" id="tocprobabilistic-algorithms"&gt;Probabilistic algorithms&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Computers are supposed to be predictable and we typically aim for correct programs. There&amp;#8217;s no reason why we shouldn&amp;#8217;t consider aiming for programs which are good enough, though, and indeed many programs which are good enough to be useful are also flawed. Google adverts, for example, analyse the contents of web pages and serve up related links. The algorithm used is secret, clever and quick, but often results in &lt;a href="http://wordaligned.org/articles/mistargeted-ads.html"&gt;semantic blunders&lt;/a&gt; and, on occasion, &lt;a href="http://www.bofh.org.uk/articles/2008/04/15/ads-are-gone"&gt;offensive mistakes&lt;/a&gt;. Few could deny how useful to Google this program has been, though.
+&lt;/p&gt;
+&lt;p&gt;Here&amp;#8217;s a more interesting example of an algorithm which, like a losing clock, is nearly right.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;def is_fprime(n):
+    """Use Fermat's little theorem to guess if n is prime.
+    """
+    from random import randrange
+    tries = 3
+    xs = (randrange(1, n) for _ in range(tries))
+    return all((x ** n) % n == x for x in xs)
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;We won&amp;#8217;t go into the &lt;a href="http://mathworld.wolfram.com/FermatsLittleTheorem.html"&gt;mathematics&lt;/a&gt; here. A quick play with this function looks promising.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; all(is_fprime(n) for n in [2, 3, 5, 7, 11, 13, 17, 19])
+True
+&amp;gt;&amp;gt;&amp;gt; any(is_fprime(n) for n in [4, 6, 8, 9, 10, 12, 14, 15])
+False
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;In fact, if we give it a real work-out on some large numbers, it does well. I used it to guess which of the numbers between 100000 and 102000 were prime, comparing the answer with the correct result (the code is at the end of this article). It had a better than 99% success rate (in clock terms, it lost around 8 minutes a day) and increasing &lt;code&gt;tries&lt;/code&gt; will boost its performance.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/stop-the-clock-squash-the-bug.html#toc4" name="tocfixing-isfprime" id="tocfixing-isfprime"&gt;Fixing is_fprime&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;The better &lt;code&gt;is_fprime&lt;/code&gt; performs, the less likely we are to spot that it&amp;#8217;s wrong. What&amp;#8217;s worse, though, is that &lt;em&gt;it cannot be fixed&lt;/em&gt; by simple tweaking. However high we set &lt;code&gt;tries&lt;/code&gt; we won&amp;#8217;t have a correct function. We could even take the random probing out of the function and shove every single value of &lt;code&gt;x&lt;/code&gt; in the range 1 to n into the predicate:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;def exhaustive_is_fprime(n):
+    return all((x ** n) % n == x for x in range(1, n))
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;&lt;code&gt;Exhaustive_is_fprime&lt;/code&gt; is expensive to run and will (very) occasionally return &lt;code&gt;True&lt;/code&gt; for a composite number&lt;a id="fn2link" href="http://wordaligned.org/articles/stop-the-clock-squash-the-bug.html#fn2"&gt;&lt;sup&gt;[2]&lt;/sup&gt;&lt;/a&gt;. If you want to know more, &lt;a href="http://www.google.com/search?q=carmichael+numbers"&gt;search for Carmichael numbers&lt;/a&gt;. 
+&lt;/p&gt;
+&lt;p&gt;The point I&amp;#8217;m making is that code which is almost right can be dangerous. We are tempted to fix it by adjusting the existing implementation, even if, as in this case, a complete overhaul is required. By contrast, we all know what needs doing with code which is plainly wrong.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/stop-the-clock-squash-the-bug.html#toc5" name="tocdefensive-programming" id="tocdefensive-programming"&gt;Defensive programming&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;We&amp;#8217;ve all seen nervous functions which go beyond their stated interface in an attempt to protect themselves from careless users.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;/**
+ * Return the maximum value found in the input array.
+ * Pre-condition: the input array must not be empty.
+ */
+int nervy_maximum_value(int const * items, size_t count)
+{
+    int M = -INT_MAX;
+    
+    if (items == NULL || count == 0)
+    {
+        return M;
+    }
+    for ( ; count-- != 0; ++items)
+    {
+        if (*items &amp;gt; M)
+        {
+            M = *items;
+        }
+    }
+    return M;
+}
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;What&amp;#8217;s really wanted is both simpler and easier for clients to code against.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;int maximum_value(int const * items, size_t count)
+{
+    int const * const end = items + count;
+    int M = *items++;
+    
+    for ( ; items != end; ++items)
+    {
+        if (*items &amp;gt; M)
+        {
+            M = *items;
+        }
+    }
+    return M;
+}
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Did you spot the subtle bug in &lt;code&gt;nervy_maximum_value&lt;/code&gt;? It uses &lt;code&gt;-INT_MAX&lt;/code&gt; instead of &lt;code&gt;INT_MIN&lt;/code&gt; which will cause trouble if clients code against this undocumented behaviour; if &lt;code&gt;nervy_maximum_value&lt;/code&gt; is subsequently fixed, this client code back-fires.
+&lt;/p&gt;
+&lt;p&gt;Note that I&amp;#8217;m not against the use of assertions to check pre-conditions, and a simple &lt;code&gt;assert(items != NULL &amp;amp;&amp;amp; count != 0)&lt;/code&gt; works well in &lt;code&gt;maximum_value&lt;/code&gt;; it&amp;#8217;s writing code which swallows these failed pre-conditions I consider wrong.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/stop-the-clock-squash-the-bug.html#toc6" name="tocdefect-halflife" id="tocdefect-halflife"&gt;Defect halflife&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;The occurrence of defects in complex software systems can be modelled in the same way as radioactive decay. I haven&amp;#8217;t studied this theory and my physics is rusty&lt;a id="fn3link" href="http://wordaligned.org/articles/stop-the-clock-squash-the-bug.html#fn3"&gt;&lt;sup&gt;[3]&lt;/sup&gt;&lt;/a&gt;, but the basic idea is that the population of bugs in some software is rather like a population of radioactive particles. Any given bug fires (any given particle decays) at random, so we can&amp;#8217;t predict when this event will happen, but it is equally likely to fire at any particular time. This gives each defect an average lifetime: a small lifetime for howling defects, such as dereferencing NULL pointers, and a longer one for more subtle problems, such as accumulated rounding errors. Assuming we fix a bug once it occurs, the population of defects decays exponentially, and we get the classic tailing-off curve.
+&lt;/p&gt;
+&lt;img src="http://chart.apis.google.com/chart?
+cht=lc
+&amp;amp;chtt=Exponential+Defect+Decay
+&amp;amp;chs=500x200
+&amp;amp;chxt=x,y
+&amp;amp;chxl=0:||Time|1:||Bugs
+&amp;amp;chd=t:95.0,70.3,52.1,38.6,28.6,21.1,15.7,11.6,8.61,6.38
+&amp;amp;chco=ff0000
+&amp;amp;chm=B,dddddd,0,0,0
+&amp;amp;chls=3,1,0" alt="Classic exponential decay curve"/&gt;
+
+&lt;p&gt;&lt;span /&gt;Anyone who has ever tried to release a software product knows how it feels to slide down the slope of this curve. We system test, find bugs, fix them, repeat. At the start it can be exhilarating as bugs with short half-lives fall out and get squashed, but the end game is demoralising as defects get reported which then cannot be reproduced, and we find ourselves clawing out progress. When we eventually draw the line and ship the product we do so suspecting the worst problems are yet to be found. To put it more succinctly&lt;a id="fn4link" href="http://wordaligned.org/articles/stop-the-clock-squash-the-bug.html#fn4"&gt;&lt;sup&gt;[4]&lt;/sup&gt;&lt;/a&gt;.
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;Ship happens!
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;A combination of techniques can help us escape this depressing picture. The most obvious one would be to avoid it: rather than aim for &amp;#8220;big-bang&amp;#8221; releases every few years, we can move towards continual and incremental delivery. A modular, decoupled architecture helps. So does insistence on unit testing. Rather than shake the system and sweep up the bugs which fall off we should develop a suite of automated tests which actively seek the various paths through the code, and exercise edge cases. Within the code-base, as already mentioned, &lt;span /&gt;defensive programming can cause defects to become entrenched. Instead, we should adopt a more confident style, where code fails hard and fast.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/stop-the-clock-squash-the-bug.html#toc7" name="tochow-did-that-code-ever-work" id="tochow-did-that-code-ever-work"&gt;How did that code ever work?&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Have you ever fixed a defect and wondered how the code ever even appeared to work before your fix? It&amp;#8217;s an important question and one which requires investigation. Perhaps the bug you&amp;#8217;ve fixed is compensated for by defensive programming elsewhere. Or perhaps there are vast routes through the code which have yet to be exercised.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/stop-the-clock-squash-the-bug.html#toc8" name="tocconclusions" id="tocconclusions"&gt;Conclusions&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;&lt;img src="http://wordaligned.org/images/stopped-clock.gif" alt="Stopped clock"/&gt;
+   &lt;img src="http://wordaligned.org/images/slow-clock.gif" alt="Slow clock"/&gt;
+   &lt;img src="http://wordaligned.org/images/fast-clock.gif" alt="Fast clock"/&gt;
+&lt;/p&gt;
+&lt;p&gt;None of these clocks is much good. The first has stopped, the second loses a second every minute, the third gains a second every minute. At least it&amp;#8217;s easy to see the problem with the first: we won&amp;#8217;t be tempted to patch it.
+&lt;/p&gt;
+&lt;p&gt;We should never expect our code to work first time and we should be suspicious if it appears to do so. Defensive programming seems to mean different things to different people. If I&amp;#8217;ve misused the term here, I&amp;#8217;m sorry. Our best defence is to assume code is broken until we&amp;#8217;ve tested it, to assume it will break in future if our tests are not automated, and to fail hard and fast when we detect errors.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/stop-the-clock-squash-the-bug.html#toc9" name="tocsource-code" id="tocsource-code"&gt;Source code&lt;/a&gt;&lt;/h3&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;import math
+from itertools import islice, count
+from random import randrange
+
+def primes(lo, hi):
+    '''Return the list of primes in the range [lo, hi).
+    
+    &amp;gt;&amp;gt;&amp;gt; primes(0, 19)
+    [2, 3, 5, 7, 11, 13, 17]
+    &amp;gt;&amp;gt;&amp;gt; primes(5, 10)
+    [5, 7]
+    '''
+    sqrt_hi = int(math.sqrt(hi))
+    sieve = range(hi)
+    zeros = [0] * hi
+    sieve[1] = 0
+    for i in islice(count(2), sqrt_hi):
+        if sieve[i] != 0:
+            remove = slice(i * i, hi, i)
+            sieve[remove] = zeros[remove]
+    return [p for p in sieve[lo:] if p != 0]
+
+def is_fprime(n, tries=3):
+    '''Use Fermat little theorem to guess if n is prime.
+    '''
+    xs = (randrange(1, n) for _ in range(tries))
+    return all((x ** n) % n == x for x in xs)
+
+def fprimes(lo, hi, tries=10):
+    '''Alternative implementation of primes.
+    '''
+    return filter(is_fprime, range(lo, hi))
+
+if __name__ == '__main__':
+    import doctest
+    doctest.testmod()
+    lo, hi = 100000, 102000
+    primes_set = set(primes(lo, hi))
+    fprimes_set = set(fprimes(lo, hi))
+    print "Range [%r, %r)" % (lo, hi)
+    print "Actual number of primes", len(primes_set)
+    print "Number of fprimes", len(fprimes_set)
+    print "Primes missed", primes_set - fprimes_set
+    print "False fprimes", fprimes_set - primes_set
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Running this program produced output:
+&lt;/p&gt;
+&lt;pre&gt;
+Range [100000, 102000)
+Actual number of primes 174
+Number of fprimes 175
+Primes missed set([])
+False fprimes set([101101])
+&lt;/pre&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;&lt;a id="fn1" href="http://wordaligned.org/articles/stop-the-clock-squash-the-bug.html#fn1link"&gt;[1]&lt;/a&gt; In the first version of this article I wrote that an attempt to allocate 4294967295 bytes would cause the program to crash, which isn&amp;#8217;t quite right. &lt;code&gt;Malloc&lt;/code&gt; returns NULL in the event of failure; standard C++ operator new behaviour is to throw a &lt;code&gt;bad_alloc&lt;/code&gt; exception. My thanks to R Samuel Klatchko for the &lt;a href="http://www.haloscan.com/comments/wordaligned/stop_the_clock_squash_the_bug/#16928"&gt;correction&lt;/a&gt;.
+&lt;/p&gt;
+&lt;p&gt;&lt;a id="fn2" href="http://wordaligned.org/articles/stop-the-clock-squash-the-bug.html#fn2link"&gt;[2]&lt;/a&gt;
+   &lt;a href="http://mitpress.mit.edu/sicp"&gt;&amp;#8220;Structure and Interpretation of Computer Programs&amp;#8221;&lt;/a&gt; discusses Carmichael numbers in a &lt;a href="http://mitpress.mit.edu/sicp/full-text/book/book-Z-H-11.html#call_footnote_Temp_80"&gt;footnote&lt;/a&gt;
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;Numbers that fool the Fermat test are called &lt;em&gt;Carmichael numbers&lt;/em&gt;, and little is known about them other than that they are extremely rare. There are 255 Carmichael numbers below 100,000,000. The smallest few are 561, 1105, 1729, 2465, 2821, and 6601. In testing primality of very large numbers chosen at random, the chance of stumbling upon a value that fools the Fermat test is less than the chance that cosmic radiation will cause the computer to make an error in carrying out a &amp;#8220;correct&amp;#8221; algorithm. Considering an algorithm to be inadequate for the first reason but not for the second illustrates the difference between mathematics and engineering.
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;&lt;a id="fn3" href="http://wordaligned.org/articles/stop-the-clock-squash-the-bug.html#fn3link"&gt;[3]&lt;/a&gt;
+   Being lazy and online I thought I&amp;#8217;d search for a nice radioactive decay graphic rather than draw my own. I found a real gem on the &lt;a href="http://www.colorado.edu/physics/2000/isotopes/radioactive_decay3.html"&gt;University of Colarado site&lt;/a&gt;, where Kyla and Bob discuss radioactive decay.
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;&lt;img src="http://www.colorado.edu/physics/2000/images/kyla-set/kyla3.jpg" alt="Kyla" style="float:left;"/&gt;&lt;/p&gt;&lt;p&gt;Hmmm&amp;#8230;so a lot of decays happen really fast when there are lots of atoms, and then things slow down when there aren&amp;#8217;t so many. The halflife is always the same, but the &lt;i&gt;half&lt;/i&gt; gets smaller and smaller.&lt;/p&gt;
+&lt;p&gt;&lt;img src="http://www.colorado.edu/physics/2000/images/bob-set/bob2.jpg" alt="Bob" style="float:left;"/&gt;&lt;/p&gt;&lt;p&gt;That&amp;#8217;s exactly right.  Here&amp;#8217;s another applet that illustrates radioactive decay in action.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;&lt;a href="http://www.colorado.edu/physics/2000/isotopes/radioactive_decay3.html"&gt;Visit the site&lt;/a&gt; to play with the applet Bob mentions. You&amp;#8217;ll find more Kyla and Bob pictures there too.
+&lt;/p&gt;
+&lt;p&gt;&lt;a id="fn4" href="http://wordaligned.org/articles/stop-the-clock-squash-the-bug.html#fn4link"&gt;[4]&lt;/a&gt;
+   I&amp;#8217;m unable to provide a definitive attribution for the &amp;#8220;Ship happens!&amp;#8221; quotation. I first heard it from &lt;a href="http://erdani.org"&gt;Andrei Alexandrescu&lt;/a&gt; at an &lt;a href="http://accu.org/index.php/conferences"&gt;ACCU conference&lt;/a&gt;, who in turn thinks he got it from Erich Gamma. I haven&amp;#8217;t managed to contact Erich Gamma. Matthew B. Doar &lt;a href="http://www.haloscan.com/comments/wordaligned/stop_the_clock_squash_the_bug/#17002"&gt;reports&lt;/a&gt; using the term back in 2002, and it appears as a &lt;a href="http://www.oreilly.com/catalog/practicalde/toc.html"&gt;section heading&lt;/a&gt; in his book &lt;a href="http://www.oreilly.com/catalog/practicalde"&gt;&amp;#8220;Practical Development Environments&amp;#8221;&lt;/a&gt;.
+&lt;/p&gt;</description>
+<dc:date>2008-04-16</dc:date>
+<guid>http://wordaligned.org/articles/stop-the-clock-squash-the-bug.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/stop-the-clock-squash-the-bug.html</link>
+<category>SICP</category>
+</item>
+
+<item>
+<title>Animated pair streams</title>
+<description>&lt;div class="toc"&gt;
+&lt;h2&gt;Contents&lt;/h2&gt;
+&lt;ul&gt;
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/animated-pair-streams.html#tocname-that-series" name="toc0" id="toc0"&gt;Name that Series&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/animated-pair-streams.html#tocbounded-pairs" name="toc1" id="toc1"&gt;Bounded Pairs&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/animated-pair-streams.html#tocstreams-of-pairs" name="toc2" id="toc2"&gt;Streams of Pairs&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/animated-pair-streams.html#toca-recursive-scheme" name="toc3" id="toc3"&gt;A Recursive Scheme&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/animated-pair-streams.html#tocinterleaving" name="toc4" id="toc4"&gt;Interleaving&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/animated-pair-streams.html#tocdouble-trouble" name="toc5" id="toc5"&gt;Double Trouble&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/animated-pair-streams.html#tocmemory-use" name="toc6" id="toc6"&gt;Memory Use&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/animated-pair-streams.html#tocproblem-solved" name="toc7" id="toc7"&gt;Problem Solved?&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/animated-pair-streams.html#toctying-up" name="toc8" id="toc8"&gt;Tying up&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/animated-pair-streams.html#toccredits" name="toc9" id="toc9"&gt;Credits&lt;/a&gt;
+ &lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/animated-pair-streams.html#toc0" name="tocname-that-series" id="tocname-that-series"&gt;Name that Series&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;What&amp;#8217;s going on in the animation below?
+&lt;/p&gt;
+&lt;img src="http://wordaligned.org/files/animated-pair-stream.gif" alt="Pair stream slideshow"/&gt;
+
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/animated-pair-streams.html#toc1" name="tocbounded-pairs" id="tocbounded-pairs"&gt;Bounded Pairs&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;While you&amp;#8217;re waiting for the graphic to load, recall a problem we encountered while hunting for &lt;a href="http://wordaligned.org/articles/the-maximum-subsequence-problem.html#programming-pearl"&gt;maximum subsequences&lt;/a&gt;:
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;Given a number n, generate all the pairs (i, j) such that i and j are in the range 0 to n and j is greater than i.
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;A Python solution reads:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;def generate_pairs(n):
+    "Generate all pairs (i, j) such that 0 &amp;lt;= i &amp;lt;= j &amp;lt; n"
+    for i in range(n):
+        for j in range(i, n):
+            yield i, j
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;We can extend this to solve a more general version of the problem:
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;Given two sequences (S, T), generate all pairs (S&lt;sub&gt;i&lt;/sub&gt;, T&lt;sub&gt;j&lt;/sub&gt;) such that j is greater than i.
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;def generate_pairs(s, t):
+    "Generate all pairs s[i], t[j]  such that 0 &amp;lt;= i &amp;lt;= j"
+    s_count = len(s)
+    t_count = len(t)
+    for i in xrange(s_count):
+        for j in xrange(i, t_count):
+            yield s[i], t[j]
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Note:
+&lt;/p&gt;
+&lt;ol&gt;
+ &lt;li&gt;&lt;p&gt;This function requires complete and bounded collections as inputs since it asks for their lengths and accesses elements by index &amp;#8212; think &amp;#8220;lists&amp;#8221; or &amp;#8220;tuples&amp;#8221;. Yet it generates results lazily, giving clients control over just how many pairs they require. This is why I&amp;#8217;ve chosen &lt;code&gt;xrange&lt;/code&gt; in preference to &lt;code&gt;range&lt;/code&gt;, since it too generates numbers, rather than returning a complete list. (Python 3000 simplifies things: &lt;code&gt;range&lt;/code&gt; becomes &lt;code&gt;xrange&lt;/code&gt; and &lt;code&gt;xrange&lt;/code&gt; disappears.)
+&lt;/p&gt;
+
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;p&gt;There&amp;#8217;s no need for extra logic to handle &lt;code&gt;S&lt;/code&gt; being shorter than &lt;code&gt;T&lt;/code&gt; or vice-versa: &lt;code&gt;xrange(start, stop)&lt;/code&gt; is smart enough to handle the case when &lt;code&gt;stop&lt;/code&gt; is less than &lt;code&gt;start&lt;/code&gt;. I&amp;#8217;d say adding such extra logic would count as premature optimisation.
+&lt;/p&gt;
+
+ &lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Here&amp;#8217;s an example of this function in action. We run the generator to exhaustion collecting its output in a list.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; pairs = list(generate_pairs('ABC', (1, 2, 3, 4)))
+&amp;gt;&amp;gt;&amp;gt; print pairs
+[('A', 1), ('A', 2), ('A', 3), ('A', 4), ('B', 2), ('B', 3), ('B', 4), ('C', 3), ('C', 4)]
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;A second example builds a &lt;a href="http://docs.python.org/ref/genexpr.html"&gt;generator expression&lt;/a&gt; from &lt;code&gt;generate_pairs()&lt;/code&gt;. We plug this expression into the built in &lt;code&gt;any&lt;/code&gt; function to determine whether the pair &lt;code&gt;('A', 2)&lt;/code&gt; is in the pair sequence. Note that &lt;code&gt;any&lt;/code&gt; only pulls two elements from the sequence to produce an answer.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; any((p == 'A', 2) for p in generate_pairs('ABC', (1, 2, 3, 4)))
+True
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;So far, so what? For the toy examples shown, lazy evaluation isn&amp;#8217;t an important consideration. But what if our input sequences were very large? What if they were infinite?
+&lt;/p&gt;
+&lt;span id="continue-reading"/&gt;
+
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/animated-pair-streams.html#toc2" name="tocstreams-of-pairs" id="tocstreams-of-pairs"&gt;Streams of Pairs&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;&lt;code&gt;Generate_pairs()&lt;/code&gt; yields results row by row. Here&amp;#8217;s a slideshow for the case when &lt;code&gt;S&lt;/code&gt; and &lt;code&gt;T&lt;/code&gt; have 5 and 20 elements respectively. Brightness indicates age, so the white circle represents the current head of the generated sequence, and the greying circles represent previous elements &amp;#8212; the older the greyer. Remember, it&amp;#8217;s up to clients just how many grey pairs to hold: the generator only ever yields a shiny white new pair.
+&lt;/p&gt;
+&lt;img src="http://wordaligned.org/files/animated-pair-list.gif" alt="Pair list slideshow"/&gt;
+
+&lt;p&gt;A text representation would be as follows, where, as usual, we read top to bottom, left to right.
+&lt;/p&gt;
+&lt;pre&gt;
+S&lt;sub&gt;0&lt;/sub&gt;T&lt;sub&gt;0&lt;/sub&gt;, S&lt;sub&gt;0&lt;/sub&gt;T&lt;sub&gt;1&lt;/sub&gt;, S&lt;sub&gt;0&lt;/sub&gt;T&lt;sub&gt;2&lt;/sub&gt; ...                             S&lt;sub&gt;0&lt;/sub&gt;T&lt;sub&gt;20&lt;/sub&gt;
+      S&lt;sub&gt;1&lt;/sub&gt;T&lt;sub&gt;1&lt;/sub&gt;, S&lt;sub&gt;1&lt;/sub&gt;T&lt;sub&gt;2&lt;/sub&gt;, ...                            S&lt;sub&gt;1&lt;/sub&gt;T&lt;sub&gt;20&lt;/sub&gt;
+            S&lt;sub&gt;2&lt;/sub&gt;T&lt;sub&gt;2&lt;/sub&gt;, ...                           S&lt;sub&gt;2&lt;/sub&gt;T&lt;sub&gt;20&lt;/sub&gt;
+                  ...
+&lt;/pre&gt;
+
+&lt;p&gt;It&amp;#8217;s clear this mode of traversal isn&amp;#8217;t suitable for generating pairs from very large inputs: we don&amp;#8217;t advance through S quickly enough. In fact, if T were infinite, we&amp;#8217;d be stuck on the top row, forever generating pairs of the form &lt;code&gt;S&lt;sub&gt;0&lt;/sub&gt;T&lt;sub&gt;i&lt;/sub&gt;&lt;/code&gt;.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/animated-pair-streams.html#toc3" name="toca-recursive-scheme" id="toca-recursive-scheme"&gt;A Recursive Scheme&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;&lt;a href="http://mitpress.mit.edu/sicp/full-text/book/book.html"&gt;&amp;#8220;Structure and Interpretation of Computer Programs&amp;#8221;&lt;/a&gt; describes an elegant recursive scheme for &lt;a href="http://mitpress.mit.edu/sicp/full-text/book/book-Z-H-24.html#%_sec_Temp_476"&gt;generating pairs&lt;/a&gt;:
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;Call the general stream of pairs (pairs S T), and consider it to be composed of three parts: the pair (S&lt;sub&gt;0&lt;/sub&gt;,T&lt;sub&gt;0&lt;/sub&gt;), the rest of the pairs in the first row, and the remaining pairs:&lt;br/&gt;&lt;br/&gt;
+   &lt;img src="http://mitpress.mit.edu/sicp/full-text/book/ch3-Z-G-47.gif" alt="Stream of pairs structure"/&gt;
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;Based on this insight, we can generate our stream of pairs:
+&lt;/p&gt;
+&lt;ol&gt;
+ &lt;li&gt;
+     yielding the pair, (S&lt;sub&gt;0&lt;/sub&gt;,T&lt;sub&gt;0&lt;/sub&gt;)
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     yield pairs from the first row combined with the stream of remaining pairs
+ &lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Note the recursion: the definition of the pairs stream refers to itself. That&amp;#8217;s not a problem so long as we&amp;#8217;re lazy about evaluating the tail of the stream. Since we always know how to pull the first pair from the stream, we can both bootstrap the process and keep going forever.
+&lt;/p&gt;
+&lt;p&gt;All we now need is a suitable method of combining two the first row and the remaining pairs.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/animated-pair-streams.html#toc4" name="tocinterleaving" id="tocinterleaving"&gt;Interleaving&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;The simplest way to combine the two streams is just to interleave them, pulling elements from each in turn. A simple (too simple!) implementation of &lt;code&gt;interleave()&lt;/code&gt; reads:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;Simple interleave&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;def interleave(s, t):
+    while True:
+        yield s.next()
+        yield t.next()
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;(The problem here is that &lt;code&gt;interleave()&lt;/code&gt; stops as soon as either of the the input streams is exhausted, which isn&amp;#8217;t an issue for infinite streams, but isn&amp;#8217;t ideal in the case when either of the inputs are bounded. You get the idea. I&amp;#8217;ll provide better implementation &lt;a href="http://wordaligned.org/articles/animated-pair-streams.html#tying-up"&gt;later&lt;/a&gt;.)
+&lt;/p&gt;
+&lt;p&gt;We can now code our pairs generator:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;Pairs generator&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;import itertools
+
+def pairs(s, t):
+    """ Generate a stream of pairs taken from s, t.
+    
+    Yields a stream of pairs (si, tj) where i &amp;lt;= j.
+    The input streams may be finite or bounded, but must be iterable.
+    """
+    first = s.next(), t.next()
+    yield first
+    t, t_top = itertools.tee(t)
+    s0 = first[0]
+    top_row = ((s0, tt) for tt in t_top)
+    for st in interleave(top_row, pairs(s, t)):
+        yield st
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Here&amp;#8217;s a slideshow of this algorithm in action.
+&lt;/p&gt;
+&lt;img src="http://wordaligned.org/files/animated-pair-stream.gif" alt="Pair stream slideshow"/&gt;
+
+&lt;p&gt;Even though Python (CPython, to be specific) and recursion don&amp;#8217;t generally get along well (unlike in a proper functional programming language), this implementation doesn&amp;#8217;t &lt;em&gt;appear&lt;/em&gt; to fall foul of CPython&amp;#8217;s maximum recursion limits &lt;strong&gt;even though pairs() repeatedly calls itself&lt;/strong&gt;.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;No maximum recursion depth exceeded error here!&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; integers = itertools.count
+&amp;gt;&amp;gt;&amp;gt; for ij in pairs(integers, integers):
+... 	print ij
+... 
+(0, 0)
+(0, 1)
+(1, 1)
+(0, 2)
+(1, 2)
+(0, 3)
+(2, 2)
+....
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;When I dug a little deeper, I started to understand why: the function can&amp;#8217;t run indefinitely since it eats up memory. It continually tees up iterators over &lt;code&gt;t&lt;/code&gt; and creates new generator expressions.
+&lt;/p&gt;
+&lt;p&gt;That said, I was surprised just how quickly it consumes memory. After all, generator expressions and iterators shouldn&amp;#8217;t take up much space. For the purposes of comparison, I compared how it fared against a Scheme program designed to do the same thing. Both had consumed a gigabyte of memory after running just a few minutes (and, for what it&amp;#8217;s worth, the Python program had generated an order of magnitude more pairs by this point).
+&lt;/p&gt;
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;Scheme pair generator&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;(require (lib "40.ss" "srfi")) ;; Scheme stream support
+
+(define (interleave s1 s2)
+  (if (stream-null? s1)
+      s2
+      (stream-cons (stream-car s1)
+                   (interleave s2 (stream-cdr s1)))))
+
+(define (pairs s t)
+  (stream-cons
+   (list (stream-car s) (stream-car t))
+   (interleave
+    (stream-map (lambda (x) (list (stream-car s) x))
+                (stream-cdr t))
+    (pairs (stream-cdr s) (stream-cdr t)))))
+
+(define ones (stream-cons 1 ones))
+
+(define (stream-add s t) (stream-map + s t))
+
+(define integers
+  (stream-cons 0 (stream-add ones integers)))
+
+(stream-for-each
+  (lambda (x) (newline) (display x))
+  (pairs integers integers))
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/animated-pair-streams.html#toc5" name="tocdouble-trouble" id="tocdouble-trouble"&gt;Double Trouble&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Let&amp;#8217;s look a little further into the stream. Here&amp;#8217;s the genesis of the first 120 pairs.
+&lt;/p&gt;
+&lt;img src="http://wordaligned.org/files/animated-pair-stream-120.gif" alt="Pair stream slideshow"/&gt;
+
+&lt;p&gt;Now the pattern becomes clear. Evidently the interleave strategy gives a heavy bias towards advancing rightwards; downwards motion is relatively slow.
+&lt;/p&gt;
+&lt;p&gt;Let&amp;#8217;s filter out the &lt;code&gt;i == j&lt;/code&gt; diagonal to try and quantify this.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; ints = itertools.count
+&amp;gt;&amp;gt;&amp;gt; izip = itertools.izip
+&amp;gt;&amp;gt;&amp;gt; pp = pairs(ints(), ints())
+&amp;gt;&amp;gt;&amp;gt; diagonal = ((ix, (i, j))
+...             for ix, (i, j) in izip(ints(1), pp) if i == j))
+&amp;gt;&amp;gt;&amp;gt; for d in itertools.islice(diagonal, 10):
+...     print d
+...
+(1, (0, 0))
+(3, (1, 1))
+(7, (2, 2))
+(15, (3, 3))
+(31, (4, 4))
+(63, (5, 5))
+(127, (6, 6))
+(255, (7, 7))
+(511, (8, 8))
+(1023, (9, 9))
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;The output shows that pair (0, 0) is the 1&lt;sup&gt;st&lt;/sup&gt; element of the stream, (1, 1) the 3&lt;sup&gt;rd&lt;/sup&gt;, (2, 2) the 7&lt;sup&gt;th&lt;/sup&gt;, and so on.
+&lt;/p&gt;
+&lt;p&gt;Any computer scientist ought to quickly spot the pattern, and any mathematician ought to be able to prove why diagonal advances are exponentially infrequent.
+&lt;/p&gt;
+&lt;p&gt;Loosely speaking, if D&lt;sub&gt;i&lt;/sub&gt; is the stream of positions in the pairs stream of elements which lie on the diagonal (i.e. the stream 1, 3, 7, 15, &amp;#8230; shown in the interpreted Python session), then the elements of D must satisfy the recurrence relation:
+&lt;/p&gt;
+&lt;pre&gt;
+D&lt;sub&gt;i+1&lt;/sub&gt; = 1 + 2&amp;times;D&lt;sub&gt;i&lt;/sub&gt;
+&lt;/pre&gt;
+
+&lt;p&gt;This relation derives directly from the recursive definition of &lt;code&gt;pairs()&lt;/code&gt;: yield a single element, then alternate the rest of yourself with the generated top row.
+&lt;/p&gt;
+&lt;p&gt;Here are some slides showing the points at which the first 5 diagonal elements appear. Watch the recursive pattern emerge.
+&lt;/p&gt;
+&lt;p&gt;&lt;img src="http://wordaligned.org/files/pairs-1.png" alt="diagonal pairs image"/&gt;
+   &lt;img src="http://wordaligned.org/files/pairs-3.png" alt="diagonal pairs image"/&gt;
+   &lt;img src="http://wordaligned.org/files/pairs-7.png" alt="diagonal pairs image"/&gt;
+   &lt;img src="http://wordaligned.org/files/pairs-15.png" alt="diagonal pairs image"/&gt;
+   &lt;img src="http://wordaligned.org/files/pairs-31.png" alt="diagonal pairs image"/&gt;
+&lt;/p&gt;
+&lt;p&gt;The solution to the recurrence relation is &lt;code&gt;D&lt;sub&gt;i&lt;/sub&gt; = 2&lt;sup&gt;i&lt;/sup&gt; &amp;minus; 1&lt;/code&gt;. These diagonal advances correspond to recursive calls to &lt;code&gt;pairs()&lt;/code&gt;. So if our Python session has a recursion limit set to 1000 (try &lt;code&gt;sys.getrecursionlimit()&lt;/code&gt;), and our pairs generator were to yield a result every nanosecond, and we had a machine with infinite memory, it would take quite a few millenia before we run into this limit.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;How many millenia until we hit the recursion limit?&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; (2 ** 1000 - 1)/(1.e9 * 60 * 60 * 24 * 365 * 1000) 
+3.3977315042689856e+281
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/animated-pair-streams.html#toc6" name="tocmemory-use" id="tocmemory-use"&gt;Memory Use&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;It should also now be clear why this particular algorithm burns memory. Teeing an iterator doesn&amp;#8217;t magically mean we don&amp;#8217;t have to store any elements we&amp;#8217;ve iterated past. The greater the distance between the teed iterators, the more that need storing.
+&lt;/p&gt;
+&lt;p&gt;If that&amp;#8217;s not clear, run the following Python session and keep an eye on memory consumption (and be ready to interrupt the infinite loop!). You&amp;#8217;ll see memory use rapidly increase as &lt;code&gt;i&lt;/code&gt; and &lt;code&gt;j&lt;/code&gt; diverge, since &lt;code&gt;j&lt;/code&gt; needs to remember everything &lt;code&gt;i&lt;/code&gt; produces.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; from itertools import *
+&amp;gt;&amp;gt;&amp;gt; i, j = tee(repeat(0))
+&amp;gt;&amp;gt;&amp;gt; for x in i: pass
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;By contrast, if we zip through &lt;code&gt;i&lt;/code&gt; and &lt;code&gt;j&lt;/code&gt; in parallel, memory use is stable.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; i, j = tee(repeat(0))
+&amp;gt;&amp;gt;&amp;gt; for ij in izip(i, j): pass
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Our pair generator has to remember more and more elements from the &lt;code&gt;T&lt;/code&gt; stream (and also, to a lesser extent, from the &lt;code&gt;S&lt;/code&gt; stream). That&amp;#8217;s why it&amp;#8217;s so hungry. Any general purpose infinite pair generator function must suffer this problem, I think, since we &lt;strong&gt;have&lt;/strong&gt; to accumulate increasing portions of the streams into memory, but if it&amp;#8217;s just integer pairs we want we can work around the issue:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;def integer_pairs(i=0):
+    "Generate a stream of integer pairs (i, j) with i &amp;lt;= j"
+    yield i, i
+    top_row = ((i, j) for j in itertools.count(i + 1))
+    for ij in interleave(top_row, integer_pairs(i + 1)):
+        yield ij
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Here, rather than &lt;code&gt;tee()&lt;/code&gt; streams of integers, we use &lt;code&gt;itertools.count()&lt;/code&gt; to create new ones as required. This pair generator will run happily for extended periods. It will very gradually ask for more memory, as numbers get bigger and the number of rows increases. As before, it won&amp;#8217;t hit any embarrassing recursion limits in the lifetime of this galaxy.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/animated-pair-streams.html#toc7" name="tocproblem-solved" id="tocproblem-solved"&gt;Problem Solved?&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;So, does &lt;code&gt;integer_pairs()&lt;/code&gt; solve the problem of generating an infinite stream of pairs for the special case when both input streams are integers? 
+&lt;/p&gt;
+&lt;p&gt;Not really, no!
+&lt;/p&gt;
+&lt;p&gt;The interleave strategy for combining the top row with the remaining pairs has the great merit of simplicity, but is otherwise far from ideal. I don&amp;#8217;t think a one-size-fits-all strategy for streaming pairs exists, so we should allow clients to supply one. And that will have to be the subject of another article.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/animated-pair-streams.html#toc8" name="toctying-up" id="toctying-up"&gt;Tying up&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;It&amp;#8217;s not hard to fix the problem we noticed with &lt;code&gt;interleave()&lt;/code&gt;.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;def interleave(s, t):
+    """Generate an interleaved stream of elements from s and t.
+    
+    If one of the streams finishes, elements continue to be generated
+    from the other until it too is finished. 
+    """
+    for ss, tt in itertools.izip(s, t):
+        yield ss
+        yield tt
+    for s_or_t in itertools.chain(s, t):
+        yield s_or_t
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Here&amp;#8217;s the script I used to generate the animated GIFs. Although it&amp;#8217;s very much geared to doing the single job which it was designed to do, it&amp;#8217;s short enough to be used as a basis for similar tasks. I hope this article helps demonstrate the merits of visualising an algorithm in action.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;pairs-animation.py&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;#! /usr/bin/env python
+"""Script which accepts a list of (i, j) pairs, creating slides and
+   an animated GIF showing the positions of these pairs.
+
+Example use:
+$ echo '((0, 0) (0, 1) (1, 1) (0, 2) (1, 2) (0, 3) (2, 2)' | pairs-animation.py
+
+Dependencies:
+- Python Imaging Library (PIL), http://effbot.org/imagingbook/
+- aggdraw, anti-aliased graphics drawing package,
+  http://effbot.org/zone/pythondoc-aggdraw.htm
+- ImageMagick, http://www.imagemagick.org
+"""
+import Image
+import aggdraw
+import itertools
+
+# Script wide drawing configuration
+block_w = 16
+block_pad = 2
+
+def fading_brushes():
+    "Generate a sequence of fading grey brushes."
+    darkgrey = itertools.repeat(16)
+    greyscale = itertools.chain(range(255, 0, -16), darkgrey)
+    def brush(g):
+        "Return a grey brush."
+        return aggdraw.Brush('rgb(%d,%d,%d)' % (g, g, g))
+    return itertools.imap(brush, greyscale)
+
+def block_start(i):
+    "Return the coordinate (X or Y) at which the ith block starts."
+    return (block_w + block_pad) * i + block_pad
+
+def read_ij(data):
+    """Return pairs of integers found in the input string.
+    
+    Note: this function is extremely unfussy about the string format!
+    &amp;gt;&amp;gt;&amp;gt; read_ij('1 2 3 4')
+    [(1, 2), (3, 4)]
+    &amp;gt;&amp;gt;&amp;gt; read_ij('(1, 2), (3, 4)')
+    [(1, 2), (3, 4)]
+    """
+    import re
+    ij = itertools.imap(int, re.compile(r'-?\d+').findall(data))
+    return zip(ij, ij)
+
+def dimensions(ij):
+    "Return dimensions of an image big enough to contain blocks at ij positions."
+    import operator
+    max_i = max(map(operator.itemgetter(0), ij))
+    max_j = max(map(operator.itemgetter(1), ij))
+    return block_start(max_j + 1), block_start(max_i + 1)
+
+def block_xy(ij):
+    "Return the left, top, right, bottom coords of a block at ij."
+    ylo, xlo = map(block_start, ij)
+    return xlo, ylo, xlo + block_w, ylo + block_w
+
+def draw_blocks(image, blocks):
+    "Draws the supplied blocks onto the input image."
+    draw = aggdraw.Draw(image)
+    brushes = fading_brushes()
+    # Reverse the blocks so the newest are brightest
+    for block, brush in itertools.izip(reversed(blocks), brushes):
+        # The 'ellipse' will be circular since the block is square
+        draw.ellipse(block_xy(block), brush)
+    draw.flush()
+
+def main(ij_data):
+    "Creates slides and an animation from the ij block positions."
+    import os
+    ij = read_ij(ij_data)
+    dims = dimensions(ij)
+    # Create the slides
+    slides = ['pairs-%d.gif' % n for n in range(len(ij) + 1)]
+    for n, slide in enumerate(slides):
+        image = Image.new('L', dims)
+        draw_blocks(image, ij[:n])
+        image.save(slide)
+    # Use ImageMagick to create an animation
+    # -loop 0 =&amp;gt; loop forever, -delay units are .01 seconds
+    os.system('convert -delay 100 -loop 0 %s animation.gif'
+              % ' '.join(slides))
+
+if __name__ == '__main__':
+    import sys
+    main(sys.stdin.read())
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/animated-pair-streams.html#toc9" name="toccredits" id="toccredits"&gt;Credits&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;The inspiration for this article comes directly from &lt;a href="http://mitpress.mit.edu/sicp/full-text/book/book-Z-H-24.html#%_sec_Temp_476"&gt;&amp;#8220;Structure and Interpretation of Computer Programs&amp;#8221;&lt;/a&gt;, which presents some great examples of how to develop and use these pair streams.
+&lt;/p&gt;</description>
+<dc:date>2008-01-13</dc:date>
+<guid>http://wordaligned.org/articles/animated-pair-streams.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/animated-pair-streams.html</link>
+<category>SICP</category>
+</item>
+
+<item>
+<title>Drawing Software Designs</title>
+<description>&lt;p&gt;Here&amp;#8217;s &lt;a href="http://mitpress.mit.edu/sicp/full-text/book/book-Z-H-28.html#%_thm_4.45"&gt;Exercise 4.45&lt;/a&gt; from the &lt;a href="http://mitpress.mit.edu/sicp/"&gt;Wizard Book&lt;/a&gt;.
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;The following sentence can be parsed in five different ways: &amp;#8220;The
+   professor lectures to the student in the class with the cat.&amp;#8221;
+   Give the five parses and explain the differences in shades of
+   meaning among them.
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;You can find a formal representation of the five parses at the end of
+   this post. I found it easiest to describe the different shades of
+   meaning with a diagram.
+&lt;/p&gt;
+&lt;span id="continue-reading"/&gt;
+
+
+&lt;h2&gt;The Different Shades of Meaning&lt;/h2&gt;
+&lt;img src="http://wordaligned.org/images/ex4.45.jpg" width="100%" alt="The cat, the class, the student, the professor"/&gt;
+
+
+&lt;h2&gt;Drawing as a Design Tool&lt;/h2&gt;
+&lt;p&gt;I use drawings all the time when I&amp;#8217;m writing software. Pencil and
+   paper are good enough for many jobs; whiteboard and pen are perfect
+   for others. I enjoy using these tools and they allow me to communicate
+   ideas very efficiently &amp;#8212; when you work in this way, you soon build a
+   &lt;a href="http://www.hasbro.com/default.cfm?page=browse&amp;amp;product_id=9475"&gt;Pictionary&lt;/a&gt;-style rapport with colleagues, and a simple rectangle becomes a
+   class, or a server, or an item on a queue, or anything else you want it to be.
+&lt;/p&gt;
+&lt;p&gt;Often, the drawings themselves are ephemeral. It&amp;#8217;s the act of
+   producing the picture which shapes the design. There&amp;#8217;s never been any
+   question of feeding the drawing into the computer and having it
+   generate code. (Though the reverse trip sometimes works: given source
+   code, a computer can sketch a hyper-linked class heirarchy, for
+   example). Similarly, I&amp;#8217;ve never seen real benefits from the various 
+   corners of the UML syntax. Please, keep it simple.
+&lt;/p&gt;
+&lt;p&gt;If you hit on a drawing you do want to save, there&amp;#8217;s no need to transpose
+   it into a computer drawing package; that&amp;#8217;s sure to take time and risks
+   stifling the picture. Instead, just scan in or photograph the original
+   and put it on the wiki.
+&lt;/p&gt;
+
+&lt;h2&gt;Computer Drawing Packages&lt;/h2&gt;
+&lt;p&gt;Computer drawing packages generally leave me cold. They really don&amp;#8217;t
+   seem to have moved on since the version of Mac Draw I encountered over
+   twenty years ago, back when a mouse was a novel input device. It took
+   me about 10 minutes to draw the picture above by hand, of which most
+   of the time was spent thinking. Using a computer, I should think it
+   would have taken well over an hour, of which most of my time would
+   have been spent cursing.
+&lt;/p&gt;
+&lt;p&gt;The one thing I &lt;em&gt;do&lt;/em&gt; like about computer drawing packages is that they
+   allow you to animate a drawing &amp;#8212; for example to replay it, starting from 
+   a blank page, adding features in turn. I&amp;#8217;ve seen this technique used very effectively
+   in presentations. Building these pictures is, however, a painful process.
+&lt;/p&gt;
+
+&lt;h2&gt;The Five Parses&lt;/h2&gt;
+&lt;p&gt;For the record, the five different parses are:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;;; 1st parse
+(sentence
+  (simple-noun-phrase
+    (article the) (noun professor))
+  (verb-phrase
+    (verb-phrase
+      (verb-phrase
+        (verb lectures)
+        (prep-phrase
+          (prep to)
+          (simple-noun-phrase (article the) (noun student))))
+      (prep-phrase
+        (prep in)
+        (simple-noun-phrase (article the) (noun class))))
+    (prep-phrase
+      (prep with)
+      (simple-noun-phrase (article the) (noun cat)))))
+
+;; 2nd parse
+(sentence
+  (simple-noun-phrase (article the) (noun professor))
+  (verb-phrase
+    (verb-phrase
+      (verb lectures)
+      (prep-phrase
+        (prep to)
+        (simple-noun-phrase (article the) (noun student))))
+    (prep-phrase
+      (prep in)
+      (noun-phrase
+        (simple-noun-phrase (article the) (noun class))
+        (prep-phrase 
+           (prep with) 
+           (simple-noun-phrase (article the) (noun cat)))))))
+
+;; 3rd parse
+(sentence
+  (simple-noun-phrase (article the) (noun professor))
+  (verb-phrase
+    (verb-phrase
+      (verb lectures)
+      (prep-phrase
+        (prep to)
+        (noun-phrase
+          (simple-noun-phrase (article the) (noun student))
+          (prep-phrase
+            (prep in)
+            (simple-noun-phrase (article the) (noun class))))))
+    (prep-phrase
+      (prep with)
+      (simple-noun-phrase (article the) (noun cat)))))
+
+;; 4th parse
+(sentence
+  (simple-noun-phrase (article the) (noun professor))
+  (verb-phrase
+    (verb lectures)
+    (prep-phrase
+      (prep to)
+      (noun-phrase
+        (noun-phrase
+          (simple-noun-phrase (article the) (noun student))
+          (prep-phrase 
+            (prep in)
+            (simple-noun-phrase (article the) (noun class))))
+        (prep-phrase 
+          (prep with) 
+          (simple-noun-phrase (article the) (noun cat)))))))
+
+;; 5th parse
+(sentence
+  (simple-noun-phrase (article the) (noun professor))
+  (verb-phrase
+    (verb lectures)
+    (prep-phrase
+      (prep to)
+      (noun-phrase
+        (simple-noun-phrase (article the) (noun student))
+        (prep-phrase
+          (prep in)
+          (noun-phrase
+            (simple-noun-phrase (article the) (noun class))
+            (prep-phrase
+              (prep with)
+              (simple-noun-phrase (article the) (noun cat)))))))))
+
+&lt;/pre&gt;
+
+&lt;/div&gt;</description>
+<dc:date>2007-03-04</dc:date>
+<guid>http://wordaligned.org/articles/drawing-software-designs.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/drawing-software-designs.html</link>
+<category>SICP</category>
+</item>
+
+<item>
+<title>Readable Code</title>
+<description>&lt;p&gt;In an &lt;a href="http://wordaligned.org/articles/my-test-first-ruby-program.html"&gt;earlier post&lt;/a&gt; I described how I got started with &lt;a href="http://www.ruby-lang.org" title="Ruby home"&gt;Ruby&lt;/a&gt;
+   not by studying the language, but by reading then adapting some
+   existing code. Of course I was lucky in that the code I started from
+   was good. (At least I&amp;#8217;m pretty sure it was: it came from a trusted
+   source, it had unit tests, looked clean &amp;#8212; I think I can recognise
+   good code even without knowing the language it&amp;#8217;s been written in.)
+   &lt;span /&gt;This approach of learning how to program by reading code is far from
+   radical but is perhaps better suited to some languages than others.
+&lt;/p&gt;
+&lt;span id="continue-reading"/&gt;
+
+
+&lt;h4&gt;Learning to Program by Reading&lt;/h4&gt;
+&lt;p&gt;The suggestion that we can learn how to program by reading code is far
+   from original. In his essay &lt;a href="http://catb.org/~esr/faqs/hacker-howto.html"&gt;How to Become a
+Hacker&lt;/a&gt; &lt;a href="http://catb.org/~esr/" title="Eric Raymond"&gt;Eric
+Raymond&lt;/a&gt; says:
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;Learning to program is like learning to write good natural
+   language. &lt;em&gt;The best way to do it is to read some stuff written by masters of the form&lt;/em&gt;,
+   write some things yourself, read a lot more,
+   write a little more, read a lot more, write some more &amp;#8230; and repeat
+   until your writing begins to develop the kind of strength and
+   economy you see in your models.
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;In &lt;a href="http://www.norvig.com/21-days.html"&gt;Teach Yourself Programming in Ten Years&lt;/a&gt;
+   &lt;a href="http://www.norvig.com"&gt;Peter Norvig&lt;/a&gt; recommends:
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;Talk to other programmers; &lt;em&gt;read other programs&lt;/em&gt;. This is more
+   important than any book or training course.
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;We must also remember &lt;a href="http://allankelly.net" title="No single link here, but Allan has lots to say about learning"&gt;learning&lt;/a&gt; never stops
+   &amp;#8212; meaning that we should always be reading good code.
+&lt;/p&gt;
+
+&lt;h4&gt;Finding Good Code&lt;/h4&gt;
+&lt;p&gt;Where, then, do we find good code to read? Maybe you&amp;#8217;re lucky enough
+   to work with some excellent programmers &amp;#8212; I guess many of us put in
+   more time reading code written by colleagues than by anyone else, since
+   that&amp;#8217;s what we&amp;#8217;re paid to do. Aside from that, you&amp;#8217;re probably looking at
+   code you found somewhere on the internet.
+&lt;/p&gt;
+&lt;p&gt;Of course, the code will have to be open source (meaning, in this
+   case, that you have access to source code, not compiled binaries) and,
+   if you wish to adapt it, suitably licensed.
+&lt;/p&gt;
+
+&lt;h4&gt;Dynamic Languages&lt;/h4&gt;
+&lt;p&gt;One thing I like about the dynamic languages (&lt;a href="http://python.org" title="Python home"&gt;Python&lt;/a&gt;, &lt;a href="http://www.ruby-lang.org" title="Ruby home"&gt;Ruby&lt;/a&gt;,
+   &lt;a href="http://www.perl.org" title="The Perl directory"&gt;Perl&lt;/a&gt;, etc.) is their open nature. It may be possible to scramble a
+   &lt;a href="http://python.org" title="Python home"&gt;Python&lt;/a&gt; program so it can&amp;#8217;t be read but I don&amp;#8217;t know how to
+   do it &amp;#8212; and it&amp;#8217;s certainly not part of the language tradition.
+&lt;/p&gt;
+&lt;p&gt;Another thing I like is the tradition of, and indeed support for, unit
+   testing in these languages. Some form of reflection makes unit testing
+   much easier. As does the ability to &lt;a href="http://docs.python.org/lib/module-doctest.html" title="doctest"&gt;dynamically execute
+code&lt;/a&gt;.
+   Unit tests actually make code easy to read: if you want to know how to
+   use a library, look at its unit tests. &lt;a href="http://docs.python.org/lib/module-doctest.html" title="doctest"&gt;Python&amp;#8217;s doctest&lt;/a&gt; presses this
+   point home by blurring the boundaries between code, tests and documentation.
+&lt;/p&gt;
+&lt;p&gt;So, if, for example, you want to learn how to program using &lt;a href="http://python.org" title="Python home"&gt;Python&lt;/a&gt;,
+   the Python standard library is a great starting point. You&amp;#8217;ll find it in your
+   Python installation. It&amp;#8217;s the code you actually run when you use
+   Python, it&amp;#8217;s of excellent quality, and of course there are
+   comprehensive unit tests.
+&lt;/p&gt;
+&lt;p&gt;Finally, dynamic languages are terse, so there&amp;#8217;s less code to read.
+   Have a look, for example, at Peter Norvig&amp;#8217;s &lt;a href="http://norvig.com/sudoku.html"&gt;Sudoku
+solver&lt;/a&gt; &amp;#8212; or even &lt;a href="http://wordaligned.org/sudoku.cgi"&gt;my
+own&lt;/a&gt;!
+&lt;/p&gt;
+
+&lt;h4&gt;Not So Dynamic Languages&lt;/h4&gt;
+&lt;p&gt;To be fair, &lt;a href="http://java.sun.com"&gt;Java&lt;/a&gt; also has a fine tradition of
+   openness.  It&amp;#8217;s far from my favourite language but you don&amp;#8217;t have to
+   look to hard to find superb Java source code published by the likes of
+   &lt;a href="http://www.sun.com"&gt;Sun&lt;/a&gt; and &lt;a href="http://www.apache.org"&gt;Apache&lt;/a&gt;.
+&lt;/p&gt;
+&lt;p&gt;You can also find good C code without trouble. C has been around long
+   enough that:
+&lt;/p&gt;
+&lt;ol&gt;
+ &lt;li&gt;
+     the language is stable, and
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     we know how to use it
+ &lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;C is often used as a portability layer for open source projects. Good
+   starting points to find good, readable C code would be
+   &lt;a href="http://www.gnu.org/"&gt;GNU&lt;/a&gt;, the Linux kernel, the C-Python
+   implementation.
+&lt;/p&gt;
+
+&lt;h4&gt;Readable C++&lt;/h4&gt;
+&lt;p&gt;Good C++ is rather harder to find &amp;#8212; or at least C++ which is both
+   good and readable. Part of the reason for this is that there&amp;#8217;s no
+   single way to write good C++. A C++ program which looked OK ten years
+   ago probably looks dated now (_&amp;#8221;That&amp;#8217;s not exception safe!&amp;#8221;_,
+   &lt;em&gt;&amp;#8220;Why ever didn&amp;#8217;t they use the STL?&amp;#8221;&lt;/em&gt;,
+   &lt;em&gt;&amp;#8220;Surely we need a bit of template metaprograming here?&amp;#8221;&lt;/em&gt;).
+   If the code hasn&amp;#8217;t been actively maintained,
+   it probably doesn&amp;#8217;t even compile: even though the standard is mature,
+   different implementations interpret it in different ways &amp;#8212; and their
+   interpretations are subject to change.
+&lt;/p&gt;
+&lt;p&gt;You can probably examine much of your standard library implementation
+   &amp;#8212; much of it is templated code delivered in header files &amp;#8212; but some
+   of the platform specific ifs and buts may make it hard to read. This
+   stuff is heavily optimised, and, when optimisation and readability are
+   in opposition, as they often are, your standard library implementation
+   is likely to prefer the former.
+&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://boost.org"&gt;Boost&lt;/a&gt; is packed
+   with superb, peer-reviewed, tested, open-source C++ code; but I
+   wouldn&amp;#8217;t describe it as an easy read: certainly, it&amp;#8217;s not for
+   beginners.
+&lt;/p&gt;
+
+&lt;h4&gt;And Finally&lt;/h4&gt;
+&lt;p&gt;I&amp;#8217;m going to return to this subject. For now, I&amp;#8217;ll close with a
+   favourite quotation, taken from the preface to &lt;a href="http://mitpress.mit.edu/sicp/full-text/book/book.html"&gt;the Wizard
+Book&lt;/a&gt;.
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;Programs should be written for people to read, and only incidentally
+   for machines to execute.
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;Happy reading!
+&lt;/p&gt;</description>
+<dc:date>2006-08-06</dc:date>
+<guid>http://wordaligned.org/articles/readable-code.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/readable-code.html</link>
+<category>SICP</category>
+</item>
+
+</channel>
+</rss>

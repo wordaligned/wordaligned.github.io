@@ -1,0 +1,681 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<link rel="icon" href="/images/favicon.png" type="image/png"/>
+<link href="/styles/application.css" media="all" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="/scripts/prettify.js"></script>
+<script type="text/javascript" src="/scripts/lang-lisp.js"></script>
+<title>Hiding iterator boilerplate behind a Boost facade</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="author" content="Thomas Guest" />
+<meta name="description" content="A Word Aligned article posted 2010-07-07, tagged C++, Python, Boost." />
+<meta name="keywords" content="C++, Python, Boost" />
+<link rel="alternate" type="application/rss+xml" title="Feed" href="http://feeds.wordaligned.org/wordaligned" />
+</head>
+
+<body onload="prettyPrint()">
+<div id="container">
+  <div id="header">
+<h1><span><a accesskey="h" href="/">Word Aligned</a></span></h1>
+<h2>sweating the small stuff</h2>
+<a class="button" href="http://feeds.wordaligned.org/wordaligned" title="Subscribe to Word Aligned"><img style="float: right;" src="/images/feed.png" alt="Feed Logo" height="28" width="28"/></a>
+</div>
+
+  <div id="page">
+    <div id="content">
+      <div class="atomentry" id="boost-iterator-facade">
+<h2 class="title"><a href="/articles/boost-iterator-facade">Hiding iterator boilerplate behind a Boost facade</a></h2>
+<p class="meta"><abbr class="published" title="2010-07-07">2010-07-07</abbr> &bull; <a href="/tag/c++" rel="tag">C++</a>, <a href="/tag/python" rel="tag">Python</a>, <a href="/tag/boost" rel="tag">Boost</a> &bull; <a href="/articles/boost-iterator-facade#disqus_thread">Comments</a></p>
+<div class="toc">
+<h2>Contents</h2>
+<ul>
+ <li><a href="#tocfilling-in-missing-methods-python" name="toc0" id="toc0">Filling in missing methods. Python</a>
+ </li>
+
+ <li><a href="#tocfilling-in-missing-methods-c" name="toc1" id="toc1">Filling in missing methods. C++</a>
+ </li>
+
+ <li><a href="#tocenter-boost-iterators" name="toc2" id="toc2">Enter Boost iterators</a>
+ </li>
+
+ <li><a href="#tocusing-boostiteratorfacade" name="toc3" id="toc3">Using boost::iterator_facade</a>
+ </li>
+
+ <li><a href="#toctemplates-and-traits" name="toc4" id="toc4">Templates and Traits</a>
+ </li>
+
+ <li><a href="#tocconstructors-destructors-and-operators" name="toc5" id="toc5">Constructors, destructors and operators</a>
+ </li>
+
+ <li><a href="#tocwrinkles" name="toc6" id="toc6">Wrinkles</a>
+ </li>
+
+ <li><a href="#tocless-code-more-software" name="toc7" id="toc7">Less code, more software</a>
+ </li>
+
+ <li><a href="#tocperformance" name="toc8" id="toc8">Performance</a>
+ </li>
+</ul>
+</div><p><a href="http://www.flickr.com/photos/davehamster/2336911145/" title="SS Great Britain by Dave Hamster, on Flickr"><img src="http://farm3.static.flickr.com/2379/2336911145_5275811ec0_m.jpg" width="240" height="160" alt="SS Great Britain"/></a>
+</p>
+
+<h3><a href="#toc0" name="tocfilling-in-missing-methods-python" id="tocfilling-in-missing-methods-python">Filling in missing methods. Python</a></h3>
+<p>Here&#8217;s another wholesome <a href="http://code.activestate.com/recipes/576685" title="Total ordering class decorator, by Raymond Hettinger">recipe</a> served up by Raymond Hettinger.
+</p>
+<div class="typocode"><div class="codetitle">Total ordering class decorator</div>
+
+<pre class="prettyprint">def total_ordering(cls):
+    'Class decorator that fills-in missing ordering methods'    
+    convert = {
+        '__lt__': [('__gt__', lambda self, other: other &lt; self),
+                   ('__le__', lambda self, other: not other &lt; self),
+                   ('__ge__', lambda self, other: not self &lt; other)],
+        '__le__': [('__ge__', lambda self, other: other &lt;= self),
+                   ('__lt__', lambda self, other: not other &lt;= self),
+                   ('__gt__', lambda self, other: not self &lt;= other)],
+        '__gt__': [('__lt__', lambda self, other: other &gt; self),
+                   ('__ge__', lambda self, other: not other &gt; self),
+                   ('__le__', lambda self, other: not self &gt; other)],
+        '__ge__': [('__le__', lambda self, other: other &gt;= self),
+                   ('__gt__', lambda self, other: not other &gt;= self),
+                   ('__lt__', lambda self, other: not self &gt;= other)]
+    }
+    roots = set(dir(cls)) &amp; set(convert)
+    assert roots, 'must define at least one ordering operation: &lt; &gt; &lt;= &gt;='
+    root = max(roots)       # prefer __lt__ to __le__ to __gt__ to __ge__
+    for opname, opfunc in convert[root]:
+        if opname not in roots:
+            opfunc.__name__ = opname
+            opfunc.__doc__ = getattr(int, opname).__doc__
+            setattr(cls, opname, opfunc)
+    return cls
+
+</pre>
+
+</div>
+
+<p>If you have a class, <code>X</code>, which implements one or more of the ordering operators, <code>&lt;, &lt;=, &gt;, &gt;=</code> then <code>total_ordering(X)</code> adapts and returns the class with the missing operators filled-in. Alternatively, use standard decorator syntax to adapt a class. If we apply <code>@total_ordering</code> to a <code>Point</code> class
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">@total_ordering
+class Point:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+    def __lt__(self, other):
+        return (self.x, self.y) &lt; (other.x, other.y)
+
+</pre>
+
+</div>
+
+<p>then we can compare points however we like
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">&gt;&gt;&gt; p = Point(1,2)
+&gt;&gt;&gt; q = Point(1,3)
+&gt;&gt;&gt; p &lt; q, p &gt; q, p &gt;= q, p &lt;= q
+(True, False, False, True)
+
+</pre>
+
+</div>
+
+<p>Here&#8217;s a nice touch: the freshly-baked methods even have documentation!
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">&gt;&gt;&gt; help(Point)
+Help on class Point in module __main__:
+
+class Point
+ |  Methods defined here:
+ |  
+ |  __ge__(self, other)
+ |      x.__ge__(y) &lt;==&gt; x&gt;=y
+ |  
+ |  __gt__(self, other)
+ |      x.__gt__(y) &lt;==&gt; x&gt;y
+ |  
+ |  __init__(self, x, y)
+ |  
+ |  __le__(self, other)
+ |      x.__le__(y) &lt;==&gt; x&lt;=y
+ |  
+ |  __lt__(self, other)
+
+</pre>
+
+</div>
+
+<p>Writing class decorators may not be the first thing a new Python programmer attempts, but once you&#8217;ve discovered the relationship between Python&#8217;s special method names and the more familiar operator symbols, I think this recipe is remarkably straightforward.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">convert = {
+    '__lt__': [('__gt__', lambda self, other: other &lt; self),
+               ('__le__', lambda self, other: not other &lt; self),
+               ('__ge__', lambda self, other: not self &lt; other)],
+    '__le__': [('__ge__', lambda self, other: other &lt;= self),
+               ('__lt__', lambda self, other: not other &lt;= self),
+               ('__gt__', lambda self, other: not self &lt;= other)],
+    '__gt__': [('__lt__', lambda self, other: other &gt; self),
+               ('__ge__', lambda self, other: not other &gt; self),
+               ('__le__', lambda self, other: not self &gt; other)],
+    '__ge__': [('__le__', lambda self, other: other &gt;= self),
+               ('__gt__', lambda self, other: not other &gt;= self),
+               ('__lt__', lambda self, other: not self &gt;= other)]
+}
+
+</pre>
+
+</div>
+
+<p>Before moving on to something more challenging, look again at one of the recipe&#8217;s key ingredients, the <code>convert</code> dict, which helps create the missing ordering functions from existing ones. As you can see, there&#8217;s much repetition here, and plenty of opportunities for cut-and-paste errors.
+</p>
+<p>This block of code is an example of what programmers term <a href="http://en.wikipedia.org/wiki/Boilerplate_(text)#Boilerplate_code">boilerplate</a>. By using the total ordering decorator, we can avoid boilerplating our own code.<a id="fn1link" href="#fn1"><sup>[1]</sup></a>
+</p>
+
+<h3><a href="#toc1" name="tocfilling-in-missing-methods-c" id="tocfilling-in-missing-methods-c">Filling in missing methods. C++</a></h3>
+<p>Python is dynamic and self-aware, happy to expose its internals for this kind of tinkering.  It takes real wizardry to achieve similar results with a <a href="http://sites.google.com/site/steveyegge2/tour-de-babel" title="C++ is the dumbest language on earth ... doesn't know about itself. It is not introspective">less flexible language, such as C++</a> &#8212; but it can be done.
+</p>
+<span id="continue-reading"/>
+
+<p>In a <a href="/articles/binary-search-revisited.html">previous article</a> we developed a random access file iterator in C++. At its heart, this iterator simply repositioned itself using file-seeks and dereferenced itself using file-reads. There wasn&#8217;t much to it.
+</p>
+<p>Unfortunately we had to fill-out the iterator with the various members required to make it comply with the standard random access iterator requirements (which was the whole point, since we wanted something we could use with standard binary search algorithms).
+</p>
+<p>We had to expose standard typedefs:
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">typedef std::random_access_iterator_tag iterator_category;
+typedef item value_type;
+typedef std::streamoff difference_type;
+typedef item * pointer;
+typedef item &amp; reference;
+
+</pre>
+
+</div>
+
+<p>Worse, we had to implement a full set of comparison, iteration, step and access functions. Please, page down past the following code block! I only include it here so you can see how long it goes on for.
+</p>
+<div class="typocode"><div class="codetitle">Iterator boilerplate</div>
+
+<pre class="prettyprint">public: // Comparison
+    bool operator&lt;(iter const &amp; other) const
+    {
+        return pos &lt; other.pos;
+    }
+    
+    bool operator&gt;(iter const &amp; other) const
+    {
+        return pos &gt; other.pos;
+    }
+    
+    bool operator==(iter const &amp; other) const
+    {
+        return pos == other.pos;
+    }
+    
+    bool operator!=(iter const &amp; other) const
+    {
+        return pos != other.pos;
+    }
+    
+public: // Iteration
+    iter &amp; operator++()
+    {
+        return *this += 1;
+    }
+    
+    iter &amp; operator--()
+    {
+        return *this -= 1;
+    }
+    
+    iter operator++(int)
+    {
+        iter tmp(*this);
+        ++(*this);
+        return tmp;
+    }
+    
+    iter operator--(int)
+    {
+        iter tmp(*this);
+        --(*this);
+        return tmp;
+    }
+    
+public: // Step
+    iter &amp; operator+=(difference_type n)
+    {
+        advance(n);
+        return *this;
+    }
+    
+    iter &amp; operator-=(difference_type n)
+    {
+        advance(-n);
+        return *this;
+    }
+    
+    iter operator+(difference_type n)
+    {
+        iter result(*this);
+        return result += n;
+    }
+    
+    iter operator-(difference_type n)
+    {
+        iter result(*this);
+        return result -= n;
+    }
+    
+public: // Distance
+    difference_type operator-(iter &amp; other)
+    {
+        return pos - other.pos;
+    }
+    
+public: // Access
+    value_type operator*()
+    {
+        return (*this)[0];
+    }
+
+value_type operator[](difference_type n)
+    {
+        std::streampos restore = getpos();
+        advance(n);
+        value_type const result = read();
+        setpos(restore);
+        return result;
+    }
+    ....
+
+</pre>
+
+</div>
+
+<p>How tiresome! Most of these member functions are directly and unsurprisingly implemented in a standard way. It would be nice if we could write (and test!) what we actually needed to and have a decorator fill in the rest.
+</p>
+<p><a href="http://www.flickr.com/photos/chr1sp/3997724676/" title="Library - Ephesus by Chris. P, on Flickr"><img src="http://farm3.static.flickr.com/2554/3997724676_bf73106637.jpg" width="500" height="334" alt="Library - Ephesus"/></a>
+</p>
+
+<h3><a href="#toc2" name="tocenter-boost-iterators" id="tocenter-boost-iterators">Enter Boost iterators</a></h3>
+<p>Actually, we can! I&#8217;m grateful to proggitor dzorz for <a href="http://www.reddit.com/r/programming/comments/c8fsk/binary_search_revisited/c0quxr0">telling me how</a>.
+</p>
+<blockquote><p>A nicer solution would use boost::iterator_facade and just implement dereference, equal, increment, decrement, advance and distance_to.
+</p>
+</blockquote><p>Like many programmers I have mixed feelings about C++ &#8212; when it&#8217;s good it&#8217;s very very good, but when it&#8217;s bad it&#8217;s horrid &#8212; and these feelings are only amplified by the <a href="http://www.boost.org" title="Boost library home page">Boost</a> library. Boost is superb, so long as you stick to the good parts.
+</p>
+<p>So which parts are good? It depends. On you, who you work with, and the platforms you&#8217;re working on.
+</p>
+<p>In my previous article I used an ingenious iterator adaptor from the <a href="http://www.boost.org/doc/libs/release/libs/spirit/index.html">Boost.Spirit</a> parser library to disastrous effect. If only I&#8217;d looked a little more carefully I&#8217;d have discovered something more useful in a more obvious place. <a href="http://www.boost.org/doc/libs/release/libs/iterator/">Boost.Iterator</a> could have helped.
+</p>
+<p>As dzorz points out, <code>boost::iterator_facade</code> can work with any C++ iterable. Implement whatever subset of 
+</p>
+<ul>
+ <li>
+     dereference
+ </li>
+
+ <li>
+     equal
+ </li>
+
+ <li>
+     increment 
+ </li>
+
+ <li>
+     decrement
+ </li>
+
+ <li>
+     advance
+ </li>
+
+ <li>
+     distance_to
+ </li>
+</ul>
+<p>is appropriate and <code>iterator_facade</code> will fill in the boilerplate required to standardise your iterator.
+</p>
+<p>In our case, we&#8217;ll need the full set. That&#8217;s because we&#8217;re after a random access iterator. Other iterators need rather less. Here&#8217;s a <a href="http://www.boost.org/doc/libs/1_43_0/libs/iterator/doc/iterator_facade.html#iterator-facade-requirements">table</a> showing the relationship between core operations and iterator concepts.
+</p>
+<p><a href="http://www.boost.org/doc/libs/1_43_0/libs/iterator/doc/iterator_facade.html#iterator-facade-requirements"><img src="/images/iterator-facade.png" alt="iterator_facade Core Operations"/></a>
+</p>
+
+<h3><a href="#toc3" name="tocusing-boostiteratorfacade" id="tocusing-boostiteratorfacade">Using boost::iterator_facade</a></h3>
+<p>The <a href="http://www.boost.org/doc/libs/release/libs/iterator/">Boost.Iterator</a> documentation is well-written but daunting. Read it from top-to bottom and you&#8217;ll get:
+</p>
+<ul>
+ <li>
+     rationale and theory
+ </li>
+
+ <li>
+     plans for standardisation (which don&#8217;t seem correct <a id="fn2link" href="#fn2"><sup>[2]</sup></a>)
+ </li>
+
+ <li>
+     <strong>usage notes</strong>
+ </li>
+
+ <li>
+     some subtle points on the implementation and its predecessor
+ </li>
+
+ <li>
+     a namecheck for the curiously recurring template pattern
+ </li>
+
+ <li>
+     a fat reference section detailing the boilerplate which this library allows you to forget
+ </li>
+
+ <li>
+     a <strong>tutorial</strong>
+ </li>
+</ul>
+<p>If you&#8217;re tempted to skip to the end of the page, you&#8217;ll see this code block.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">#include &lt;boost/type_traits/is_convertible.hpp&gt;
+#include &lt;boost/utility/enable_if.hpp&gt;
+  
+  ....
+  
+private:
+  struct enabler {};
+  
+public:
+  template &lt;class OtherValue&gt;
+  node_iter(
+      node_iter&lt;OtherValue&gt; const&amp; other
+    , typename boost::enable_if&lt;
+          boost::is_convertible&lt;OtherValue*,Value*&gt;
+        , enabler
+      &gt;::type = enabler()
+  )
+    : m_node(other.m_node) {}
+
+</pre>
+
+</div>
+
+<p>According to the surrounding documentation this is &#8220;magic&#8221;. I find it scary.
+</p>
+<p>Luckily it turns out the library is straightforward to use. What you really want, as a newcomer, are the <a href="http://www.boost.org/doc/libs/1_43_0/libs/iterator/doc/iterator_facade.html#usage">usage notes</a> and the <a href="http://www.boost.org/doc/libs/1_43_0/libs/iterator/doc/iterator_facade.html#tutorial-example">tutorial example</a>.
+</p>
+<p>The tutorial walks through the process of skinning a singly-linked list with a forwards iterator facade. This is a different use case to ours: the tutorial shows a basic class which implements what it should, and the facade allows it to be treated as a forwards iterator. In our case we&#8217;ve already created a full-blown random access iterator. We can retrospectively apply <code>iterator_facade</code> to strip our class back to basics.
+</p>
+
+<h3><a href="#toc4" name="toctemplates-and-traits" id="toctemplates-and-traits">Templates and Traits</a></h3>
+<p>Where we had:
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">template &lt;typename item&gt;
+class text_file_iter
+{
+public: // Traits typedefs, which make this class usable with
+        // algorithms which need a random access iterator.
+    typedef std::random_access_iterator_tag iterator_category;
+    typedef item value_type;
+    typedef std::streamoff difference_type;
+    typedef item * pointer;
+    typedef item &amp; reference;
+....
+};
+
+</pre>
+
+</div>
+
+<p>We now need (my thanks here to Giuseppe for correcting the code I originally posted here):
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">template &lt;typename value&gt;
+class text_file_iter
+    : public boost::iterator_facade&lt;
+      text_file_iter&lt;value&gt;
+    , value
+    , std::random_access_iterator_tag
+    , value
+    , std::streamoff
+    &gt;
+....
+};
+
+</pre>
+
+</div>
+
+<p>(Yes, the class accepts itself as a template parameter. That&#8217;s the curious recursion.)
+</p>
+
+<h3><a href="#toc5" name="tocconstructors-destructors-and-operators" id="tocconstructors-destructors-and-operators">Constructors, destructors and operators</a></h3>
+<p>We still need iterator constructors and destructors &#8212; these are unchanged &#8212; but <strong>we can eliminate every single operator</strong> shown in the &#8220;Iterator boilerplate&#8221; code block above.
+</p>
+<p>Here&#8217;s what we need instead, to ensure <code>iterator_facade</code> can do its job. The <code>read()</code> member function we had before doesn&#8217;t need changing.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">    ....
+private: // Everything Boost's iterator facade needs
+    friend class boost::iterator_core_access;
+    
+    value dereference() const
+    {
+        return read();
+    }
+    
+    bool equal(iter const &amp; other) const
+    {
+        return pos == other.pos;
+    }
+    
+    void increment()
+    {
+        advance(1);
+    }
+    
+    void decrement()
+    {
+        advance(-1);
+    }
+    
+    void advance(std::streamoff n)
+    {
+        in.seekg(n, std::ios_base::cur);
+        pos = in.tellg();
+    }
+    
+    std::streamoff distance_to(iter const &amp; other) const
+    {
+        return other.pos - pos;
+    }
+
+</pre>
+
+</div>
+
+<p>And that really is all there is to it. I&#8217;m impressed.
+</p>
+<p>Notice, by the way, that <code>friend</code> is used to expose the primitive, private member functions for use by the <code>boost::iterator_core_access</code> class. This follows the example set by the tutorial. I&#8217;ve written enough C and Python to question C++&#8217;s sophisticated access rules &#8212; you have <code>public</code>, <code>protected</code> and <code>private</code>, but that&#8217;s <strong>still</strong> not enough, so you need <code>friend</code> declaration to cut through it all &#8212; which tempts me to simply make <code>dereference()</code>, <code>equal()</code> etc. public, but then the facade wouldn&#8217;t be a proper facade. Users should treat the final class exactly as they would any other random access iterator, and designating these members as <code>private</code> means they&#8217;ll have to.
+</p>
+
+<h3><a href="#toc6" name="tocwrinkles" id="tocwrinkles">Wrinkles</a></h3>
+<p>You&#8217;ll notice the <code>dereference()</code> member function has a <code>const</code> signature. However, the <code>read()</code> member function is non-const.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">    // Return the item at the current position
+    value_type read()
+    {
+        value_type n = 0;
+        
+        // Reverse till we hit whitespace or the start of the file
+        while (in &amp;&amp; !isspace(in.peek()))
+        {
+            in.unget();
+        }
+        in.clear();
+        
+        in &gt;&gt; n;
+        return n;
+    }
+
+</pre>
+
+</div>
+
+<p>Here, <code>in</code> is a data member of type <code>std::ifstream</code>, and clearly the read call modifies it. That&#8217;s what this alarming compiler error is trying to tell us.
+</p>
+<pre>
+boost_binary_search_text_file.cpp: In member function 'value text_file_iter&lt;value&gt;::read() const [with value = long long int]':
+boost_binary_search_text_file.cpp:90:   instantiated from 'value text_file_iter&lt;value&gt;::dereference() const [with value = long long int]'
+/opt/local/include/boost/iterator/iterator_facade.hpp:516:   instantiated from 'static typename Facade::reference boost::iterator_core_access::dereference(const Facade&amp;) [with Facade = text_file_iter&lt;long long int&gt;]'
+/opt/local/include/boost/iterator/iterator_facade.hpp:634:   instantiated from 'Reference boost::iterator_facade&lt;I, V, TC, R, D&gt;::operator*() const [with Derived = text_file_iter&lt;long long int&gt;, Value = long long int, CategoryOrTraversal = boost::random_access_traversal_tag, Reference = long long int, Difference = long long int]'
+/usr/include/c++/4.2.1/bits/stl_algo.h:4240:   instantiated from 'bool std::binary_search(_ForwardIterator, _ForwardIterator, const _Tp&amp;) [with _ForwardIterator = text_file_iter&lt;long long int&gt;, _Tp = main::number]'
+boost_binary_search_text_file.cpp:203:   instantiated from here
+boost_binary_search_text_file.cpp:174: error: passing 'const std::basic_ifstream&lt;char, std::char_traits&lt;char&gt; &gt;' as 'this' argument of 'typename std::basic_istream&lt;_CharT, _Traits&gt;::int_type std::basic_istream&lt;_CharT, _Traits&gt;::peek() [with _CharT = char, _Traits = std::char_traits&lt;char&gt;]' discards qualifiers
+boost_binary_search_text_file.cpp:176: error: passing 'const std::basic_ifstream&lt;char, std::char_traits&lt;char&gt; &gt;' as 'this' argument of 'std::basic_istream&lt;_CharT, _Traits&gt;&amp; std::basic_istream&lt;_CharT, _Traits&gt;::unget() [with _CharT = char, _Traits = std::char_traits&lt;char&gt;]' discards qualifiers
+boost_binary_search_text_file.cpp:178: error: passing 'const std::basic_ifstream&lt;char, std::char_traits&lt;char&gt; &gt;' as 'this' argument of 'void std::basic_ios&lt;_CharT, _Traits&gt;::clear(std::_Ios_Iostate) [with _CharT = char, _Traits = std::char_traits&lt;char&gt;]' discards qualifiers
+boost_binary_search_text_file.cpp:180: error: passing 'const std::basic_ifstream&lt;char, std::char_traits&lt;char&gt; &gt;' as 'this' argument of 'std::basic_istream&lt;_CharT, _Traits&gt;&amp; std::basic_istream&lt;_CharT, _Traits&gt;::operator&gt;&gt;(long long int&amp;) [with _CharT = char, _Traits = std::char_traits&lt;char&gt;]' discards qualifiers
+</pre>
+
+<p>Related to this, the <code>Reference</code> template parameter (shown in bold in the listing below) is actually a <code>value</code>, rather than the (default) <code>value &amp;</code>. As we originally implemented it, our file iterator reads values lazily, only when clients request them. We have no reference to return.
+</p>
+<pre>
+template &lt;typename value&gt;
+class text_file_iter
+    : public boost::iterator_facade&lt;
+      text_file_iter&lt;value&gt;
+    , value
+    , std::random_access_iterator_tag
+    , <strong>value</strong>
+    , std::streamoff
+    &gt;
+};
+</pre>
+
+<p>I faced a dilemma here. Either I could modify my original file iterator, including a current value data member, which I would take care to update every time we repositioned the file read position. Then our references could be real references and <code>read()</code> would naturally be <code>const</code>, simply returning a reference to this member. Or, I could make the <code>in</code> input stream data member <code>mutable</code>.
+</p>
+<p><code>Mutable</code> makes me uneasy for the same reason that <code>friend</code> does &#8212; if you can shake off the rigours of const-correctness so easily, then why bother with it? &#8212; and for this reason the first option appealed. However, a read-only file is an unusual container: we do not change it, but we cannot supply const references to its elements without reading them in, and that will mean changes to the file input stream. The easier option, involving the smallest code change, was to make <code>in</code> mutable. So that&#8217;s what I did.
+</p>
+
+<h3><a href="#toc7" name="tocless-code-more-software" id="tocless-code-more-software">Less code, more software</a></h3>
+<p>By employing two of my least favourite C++ keywords I now had a class which provided the functions it should, and, thanks to the magic worked by Boost&#8217;s iterator facade, I also had a class which I could use as a standard random access iterator. Most of the code changes were the deletion of boilerplate &#8212; very satisfying. I added code too, since I decided to invest a little more effort in tests. I didn&#8217;t have any doubts about the Boost library&#8217;s correctness but I thought I might not have been using it correctly. Happily these tests all passed.
+</p>
+
+<h3><a href="#toc8" name="tocperformance" id="tocperformance">Performance</a></h3>
+<p>Let&#8217;s not forget why we originally wanted a random access file iterator: we had a large sorted file, too large to read into memory, and we wanted to test for the presence of the number in this file.
+</p>
+<p>For test purposes I created a file just over 4GB in size. A simple linear search through this file took around 180 seconds on my (aging laptop) computer, and was light on memory use. By creating a random access file iterator, boilerplate and all, we took advantage of the standard binary search algorithm and reduced the time to around 4 milliseconds.
+</p>
+<p>How would our version using Boost iterator facade do? I wasn&#8217;t expecting it to be faster than the original, but I wouldn&#8217;t have been surprised if it gave it a close run: using Boost doesn&#8217;t usually involve compromise. In fact, over repeated runs of my performance tests there was no significant difference between the two iterator versions &#8212; or at least there wasn&#8217;t once a helpful reader had discovered and fixed a bug in my program, which was causing it to run correctly but slowly.
+</p>
+<p>To trust a facade I guess you need some knowledge of what lies behind it.
+</p>
+<p style="text-align:center">&sect;</p>
+
+<p><strong>Note</strong>: During my original performance tests, reported in the first version of this article, the Boost iterator performed woefully, far slower even than a linear search. By this time I&#8217;d lost patience, and it was left up to a reader, Giuseppe, to <a href="#comment-60988668">point out my mistake</a>. I&#8217;d been using a <code>boost::random_access_traversal_tag</code> template parameter, with the result that <code>std::distance()</code> was using repeated increments rather than calling <code>distance_to()</code> to get an immediate result, and consequently ran very slowly. I should have used <code>std::random_access_iterator_tag</code>. I modified my code accordingly and confirmed that the Boost version does indeed perform on a par with the original version.
+</p>
+<hr />
+
+<p>My thanks to <a href="http://www.flickr.com/photos/chr1sp/" title="Chris. P on Flickr">Chris P</a> for permission to use his <a href="http://www.flickr.com/photos/chr1sp/3997724676">photograph</a> of the <a href="http://en.wikipedia.org/wiki/Library_of_Celsus" title="Library of Celsus, Wikipedia">Library of Celsus</a> at Ephesus, or at rather its beautiful facade. Ephesus is famous for the Temple of Artemis, one of the seven wonders of the ancient world, of which only fragments remain. Thanks too to <a href="http://www.flickr.com/photos/davehamster/">Dave Hamster</a> for the boilerplate <a href="http://www.flickr.com/photos/davehamster/2336911145/">photo</a> &#8212; actually a detail from the hull of the <a href="http://www.ssgreatbritain.org">SS Great Britain</a>.
+</p>
+<p>If you&#8217;d like to continue this experiment the code and the tests I used are available via anonymous SVN access from <a href="http://svn.wordaligned.org/svn/etc/search_text_file">http://svn.wordaligned.org/svn/etc/search_text_file</a>.
+</p>
+<hr />
+
+<p><a id="fn1" href="#fn1link">[1]</a>: As of Python 2.7 and 3.2, the standard library will include a version of this recipe. It&#8217;s in the <a href="http://docs.python.org/dev/py3k/library/functools.html#functools.total_ordering" title="functools.total_ordering decorator documentation">functools module</a>. For some reason, your class &#8220;should supply an __eq__()&#8221; method.
+</p>
+<p><a id="fn2" href="#fn2link">[2]</a>: According to the Boost.Iterator documentation:
+</p>
+<blockquote><p>Both <code>iterator_facade</code> and <code>iterator_adaptor</code> as well as many of the specialized adaptors mentioned below have been proposed for standardization, and accepted into the first C++ technical report; see our [Standard Proposal For Iterator Facade and Adaptor (PDF)][tr1proposal] for more details.
+</p>
+</blockquote><p>I assumed this meant there&#8217;d be <code>tr1::iterator_(facade|adaptor)</code> classes, but I don&#8217;t think that&#8217;s the case. Unlike other (good) bits of Boost, the Iterator library doesn&#8217;t seem likely to be part of the next C++ release.
+</p>
+</div>
+
+<div class="comments"><hr/><div id="disqus_thread"></div><script type="text/javascript" src="http://disqus.com/forums/wordaligned/embed.js"></script></div>
+      
+<div id="comments"><script type="text/javascript">
+//<![CDATA[
+(function() {
+    var links = document.getElementsByTagName('a');
+    var query = '?';
+    for(var i = 0; i < links.length; i++) {
+        if(links[i].href.indexOf('#disqus_thread') >= 0) {
+            query += 'url' + i + '=' + encodeURIComponent(links[i].href) + '&amp;';
+        }
+    }
+    document.write('<script type="text/javascript" src="http://disqus.com/forums/wordaligned/get_num_replies.js' + query + '"></' + 'script>');
+})();
+//]]>
+</script></div>
+
+    </div>
+    <div id="sidebar">
+      
+<div class="sidebar-node">
+<h3>Tagged</h3>
+<ul id="categories"><li><a href="/tag/c++" rel="tag">C++</a></li>
+<li><a href="/tag/python" rel="tag">Python</a></li>
+<li><a href="/tag/boost" rel="tag">Boost</a></li></ul>
+
+</div>
+
+<div class="sidebar-node">
+<h3>Chain</h3>
+<ul>
+<li><a accesskey="n" href="/articles/define-pedantic.html" title="Next article">&laquo; Define pedantic</a></li>
+<li><a accesskey="p" href="/articles/equals-equals" title="Previous article">&raquo; Equality and Equivalence</a></li>
+</ul>
+
+
+</div>
+
+<div class="sidebar-node">
+<h3>Feeds</h3>
+
+<ul>
+<li><a href="http://feeds.wordaligned.org/wordaligned"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Articles</a></li>
+<li><a href="http://feeds.wordaligned.org/wordaligned/comments"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Comments</a></li>
+</ul>
+
+
+</div>
+
+    </div>
+  </div>
+  <div id="footer">
+<hr />
+<p><a href="http://tag.wordaligned.org">Thomas Guest</a></p>
+</div>
+
+</div>
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-3373724-1']);
+  _gaq.push(['_trackPageview']);
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ga);
+  })();
+</script>
+</body>
+
+</html>

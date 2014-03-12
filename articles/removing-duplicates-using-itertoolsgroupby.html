@@ -1,0 +1,277 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<link rel="icon" href="/images/favicon.png" type="image/png"/>
+<link href="/styles/application.css" media="all" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="/scripts/prettify.js"></script>
+<script type="text/javascript" src="/scripts/lang-lisp.js"></script>
+<script type="text/javascript" src="http://www.haloscan.com/load/wordaligned"></script>
+
+<title>Removing duplicates using itertools.groupby</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="author" content="Thomas Guest" />
+<meta name="description" content="An interpreted Python session showing itertools in action. A Word Aligned article posted 2008-10-07, tagged Python, Streams." />
+<meta name="keywords" content="Python, Streams" />
+<link rel="alternate" type="application/rss+xml" title="Feed" href="http://feeds.wordaligned.org/wordaligned" />
+</head>
+
+<body onload="prettyPrint()">
+<div id="container">
+  <div id="header">
+<h1><span><a accesskey="h" href="/">Word Aligned</a></span></h1>
+<h2>space sensitive programming</h2>
+<a class="button" href="http://feeds.wordaligned.org/wordaligned" title="Subscribe to Word Aligned"><img style="float: right;" src="/images/feed.png" alt="Feed Logo" height="28" width="28"/></a>
+</div>
+
+  <div id="page">
+    <div id="content">
+      <div class="atomentry" id="removing-duplicates-using-itertoolsgroupby.html">
+<h2 class="title"><a href="/articles/removing-duplicates-using-itertoolsgroupby.html">Removing duplicates using itertools.groupby</a></h2>
+<p class="meta"><abbr class="published" title="2008-10-07">2008-10-07</abbr> &bull; <a href="/tag/python" rel="tag">Python</a>, <a href="/tag/streams" rel="tag">Streams</a> &bull; <a href="/articles/removing-duplicates-using-itertoolsgroupby.html#disqus_thread">Comments</a></p>
+<h3>Eliminating duplicates</h3>
+<p><a href="/articles/merging-sorted-streams-in-python.html">Previously</a> I discussed merging sorted streams using Python; a call to a standard library <a href="http://docs.python.org/library/heapq.html#heapq.merge">function</a> for those who&#8217;ve updated to 2.6.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">&gt;&gt;&gt; from heapq import merge
+&gt;&gt;&gt; from itertools import count, imap, islice
+&gt;&gt;&gt; m2, m3, m5 = [imap(n.__mul__, count(1)) for n in (2, 3, 5)]
+&gt;&gt;&gt; m235 = merge(m2, m3, m5)
+&gt;&gt;&gt; list(islice(m235, 10))
+[2, 3, 4, 5, 6, 6, 8, 9, 10, 10]
+
+</pre>
+
+</div>
+
+<p>Here, we merge positive multiples of 2, 3 and 5 into a single stream. 6 appears twice in the output, being a multiple of both 2 and 3. 10 is similarly duplicated and 30 would feature three times.
+</p>
+<p><a href="http://docs.python.org/library/itertools#itertools.groupby">Itertools.groupby</a> can remove the repeated entries.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">&gt;&gt;&gt; from itertools import groupby
+&gt;&gt;&gt; help(groupby)
+Help on class groupby in module itertools:
+
+class groupby(__builtin__.object)
+ |  groupby(iterable[, keyfunc]) -&gt; create an iterator which returns
+ |  (key, sub-iterator) grouped by each value of key(value).
+
+</pre>
+
+</div>
+
+<p>If the key function is not specified or is <code>None</code> it defaults to an identity function, and <code>groupby</code> partitions an iterable into subiterators over equal valued elements.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">&gt;&gt;&gt; from operator import itemgetter
+&gt;&gt;&gt; first = itemgetter(0)
+&gt;&gt;&gt; m235 = merge(*(imap(n.__mul__, count(1)) for n in (2, 3, 5)))
+&gt;&gt;&gt; u235 = imap(first, groupby(m235))
+&gt;&gt;&gt; list(islice(u235, 10))
+[2, 3, 4, 5, 6, 8, 9, 10, 12, 14]
+
+</pre>
+
+</div>
+
+<span id="continue-reading"/>
+
+<p>Groupby is very like the Unix <a href="http://www.gnu.org/software/coreutils/manual/html_node/uniq-invocation.html#uniq-invocation">uniq</a> tool.
+</p>
+<p>Generally (the <a href="http://docs.python.org/library/itertools#itertools.groupby">documentation</a> goes on to say) &#8220;the iterable needs to already be sorted on the same key function&#8221; but <code>groupby</code> is perfectly well defined when this isn&#8217;t the case. Here&#8217;s an artificial example showing groupby turning a random sequence into an alternating one.
+</p>
+
+<h3>Random sequence</h3>
+<p>Let&#8217;s toss a coin to generate a random sequence of heads and tails.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">&gt;&gt;&gt; def toss_a_coin():
+...     import random
+...     return random.choice("HT")
+...
+&gt;&gt;&gt; from itertools import repeat
+&gt;&gt;&gt; def call(f):
+...     return f()
+...
+&gt;&gt;&gt; tosses = imap(call, repeat(toss_a_coin))
+&gt;&gt;&gt; spacer = ' '.join
+&gt;&gt;&gt; spacer(list(islice(tosses, 7)))
+'T T H T H H H'
+
+</pre>
+
+</div>
+
+<p><img src="/images/tails.jpg" alt="tails"/><img src="/images/tails.jpg" alt="tails"/><img src="/images/heads.jpg" alt="heads"/><img src="/images/tails.jpg" alt="tails"/><img src="/images/heads.jpg" alt="heads"/><img src="/images/heads.jpg" alt="heads"/><img src="/images/heads.jpg" alt="heads"/>
+</p>
+
+<h3>Alternating sequence</h3>
+<p>We can filter the unique values from this random sequence of coin tosses to generate an alternating sequence.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">&gt;&gt;&gt; def uniq(seq):
+...     return imap(first, groupby(seq))
+... 
+&gt;&gt;&gt; spacer(list(islice(uniq(tosses), 7)))
+'H T H T H T H'
+
+</pre>
+
+</div>
+
+<p><img src="/images/heads.jpg" alt="heads"/><img src="/images/tails.jpg" alt="tails"/><img src="/images/heads.jpg" alt="heads"/><img src="/images/tails.jpg" alt="tails"/><img src="/images/heads.jpg" alt="heads"/><img src="/images/tails.jpg" alt="tails"/><img src="/images/heads.jpg" alt="heads"/>
+</p>
+
+<h3>Constant sequence</h3>
+<p>Every other element of this filtered sequence will be the same.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">&gt;&gt;&gt; tails = islice(uniq(tosses), 0, None, 2)
+&gt;&gt;&gt; spacer(list(islice(tails, 7)))
+'T T T T T T T'
+
+</pre>
+
+</div>
+
+<p><img src="/images/tails.jpg" alt="tails"/><img src="/images/tails.jpg" alt="tails"/><img src="/images/tails.jpg" alt="tails"/><img src="/images/tails.jpg" alt="tails"/><img src="/images/tails.jpg" alt="tails"/><img src="/images/tails.jpg" alt="tails"/><img src="/images/tails.jpg" alt="tails"/>
+</p>
+<p>Applying <code>uniq</code> again gives a single element infinitely repeated.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">&gt;&gt;&gt; tt = uniq(tails)
+&gt;&gt;&gt; tt.next()
+'T'
+&gt;&gt;&gt; tt.next()
+  C-c C-cTraceback (most recent call last):
+  File "&lt;stdin&gt;", line 1, in &lt;module&gt;
+  File "&lt;stdin&gt;", line 2, in call
+  File "&lt;stdin&gt;", line 2, in toss_a_coin
+KeyboardInterrupt
+
+</pre>
+
+</div>
+
+<img src="/images/tails.jpg" alt="tails"/>
+
+
+<h3>Uniq -c</h3>
+<p>Imitating <code>uniq -c</code>, we can yield a repeat count paired to each unique value.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">&gt;&gt;&gt; def ilen(it):
+...     return sum(1 for _ in it)
+... 
+&gt;&gt;&gt; def counted_uniq(seq):
+...     return ((ilen(i), k) for k, i in groupby(seq))
+... 
+&gt;&gt;&gt; ht = counted_uniq(tosses)
+&gt;&gt;&gt; list(islice(ht, 5))
+[(1, 'H'), (3, 'T'), (1, 'H'), (3, 'T'), (3, 'H')]
+
+</pre>
+
+</div>
+
+<p>How long before we see a run of 7 equal throws?
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">&gt;&gt;&gt; from itertools import takewhile
+&gt;&gt;&gt; tosses = imap(call, repeat(toss_a_coin))
+&gt;&gt;&gt; counts = imap(first, counted_uniq(tosses))
+&gt;&gt;&gt; sum(takewhile(lambda n: n &lt; 7, counts))
+44
+
+</pre>
+
+</div>
+
+<p><img src="/images/tails.jpg" alt="tails"/><img src="/images/tails.jpg" alt="tails"/><img src="/images/tails.jpg" alt="tails"/><img src="/images/tails.jpg" alt="tails"/><img src="/images/tails.jpg" alt="tails"/><img src="/images/tails.jpg" alt="tails"/><img src="/images/tails.jpg" alt="tails"/>
+</p>
+
+<h3>Progression</h3>
+<p>The coin illustrating this note is a 1956 <a href="http://24carat.co.uk/farthingstoryframe.html">farthing</a>, a small coin with a value of just &frac14; of a penny dating from a time when there were 240 pence in every pound. The reverse features a wren, the obverse Queen Elizabeth II. The farthing was demonetised in 1960. In 1971 British currency went decimal and now, 37 years later, the 1971 coin designs are <a href="http://news.bbc.co.uk/1/hi/uk/7326491.stm">being revamped</a>. Hiding amongst the loose change in my pocket today I noticed a couple of shiny new 2008 pennies. It&#8217;s about time we got euros.
+</p>
+<p><a href="http://www.royalmint.com/newdesigns/designsRevealed.aspx"><img src="/images/2008-change.jpg" alt="2008 small change"/></a>
+</p>
+</div>
+
+<div class="comments"><hr/><div id="disqus_thread"></div><script type="text/javascript" src="http://disqus.com/forums/wordaligned/embed.js"></script></div>
+      
+<div id="comments"><script type="text/javascript">
+//<![CDATA[
+(function() {
+    var links = document.getElementsByTagName('a');
+    var query = '?';
+    for(var i = 0; i < links.length; i++) {
+        if(links[i].href.indexOf('#disqus_thread') >= 0) {
+            query += 'url' + i + '=' + encodeURIComponent(links[i].href) + '&amp;';
+        }
+    }
+    document.write('<script type="text/javascript" src="http://disqus.com/forums/wordaligned/get_num_replies.js' + query + '"></' + 'script>');
+})();
+//]]>
+</script></div>
+
+    </div>
+    <div id="sidebar">
+      
+<div class="sidebar-node">
+<h3>Tagged</h3>
+<ul id="categories"><li><a href="/tag/python" rel="tag">Python</a></li>
+<li><a href="/tag/streams" rel="tag">Streams</a></li></ul>
+
+</div>
+
+<div class="sidebar-node">
+<h3>Chain</h3>
+<ul>
+<li><a accesskey="n" href="/articles/big-g-little-g.html" title="Next article">&laquo; BIG G little g - What begins with G?</a></li>
+<li><a accesskey="p" href="/articles/merging-sorted-streams-in-python.html" title="Previous article">&raquo; Merging sorted streams in Python</a></li>
+</ul>
+
+
+</div>
+
+<div class="sidebar-node">
+<h3>Feeds</h3>
+
+<ul>
+<li><a href="http://feeds.wordaligned.org/wordaligned"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Articles</a></li>
+<li><a href="http://feeds.wordaligned.org/wordaligned/comments"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Comments</a></li>
+</ul>
+
+
+</div>
+
+    </div>
+  </div>
+  <div id="footer">
+<hr />
+<p><a href="http://tag.wordaligned.org">Thomas Guest</a></p>
+</div>
+
+</div>
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-3373724-1']);
+  _gaq.push(['_trackPageview']);
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ga);
+  })();
+</script>
+</body>
+
+</html>

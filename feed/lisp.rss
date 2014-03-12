@@ -1,0 +1,633 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" >
+<channel>
+<title>Word Aligned</title>
+<link>http://wordaligned.org</link>
+<description>tales from the code face</description>
+<dc:creator>tag@wordaligned.org</dc:creator>
+<language>en-gb</language>
+<item>
+<title>Angle brackets hurt my eyes</title>
+<description>&lt;blockquote&gt;&lt;p&gt;&amp;#8220;All these angle brackets, they&amp;#8217;re hurting my eyes.&amp;#8221;
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;I&amp;#8217;m quoting a colleague who sits next to me and I sympathise. Perhaps a section from a build file was causing him pain?
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;lt;target name="all" description="Build product."&amp;gt;
+  &amp;lt;mkdir dir="build" if="${not directory::exists('build')}" /&amp;gt;
+   ....
+&amp;lt;/target&amp;gt;
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Or maybe it was some XSL to generate XML by applying XML to XML?
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;lt;xsl:if test="$index-make or @index!='false'"&amp;gt;
+  &amp;lt;xsl:if test="//index"&amp;gt;
+    &amp;lt;fo:block text-align-last="justify" space-before="5pt"&amp;gt;
+      &amp;lt;fo:basic-link internal-destination="index-page"&amp;gt;
+        &amp;lt;xsl:choose&amp;gt;
+          &amp;lt;xsl:when test="(/doc/@lang = 'ja') or (/doc/@lang = '')&amp;lt;/xsl:when&amp;gt;
+          &amp;lt;xsl:otherwise&amp;gt;INDEX&amp;lt;/xsl:otherwise&amp;gt;
+        &amp;lt;/xsl:choose&amp;gt;
+      &amp;lt;/fo:basic-link&amp;gt;
+      &amp;lt;fo:page-number-citation ref-id="index-page"/&amp;gt;
+    &amp;lt;/fo:block&amp;gt;
+  &amp;lt;/xsl:if&amp;gt;
+&amp;lt;/xsl:if&amp;gt;
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Or perhaps he was wrestling with a C++ compile error.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;print.cpp: In function 'void print(const
+std::map&amp;lt;std::basic_string&amp;lt;char, std::char_traits&amp;lt;char&amp;gt;,
+std::allocator&amp;lt;char&amp;gt; &amp;gt;, int, std::less&amp;lt;std::basic_string&amp;lt;char,
+std::char_traits&amp;lt;char&amp;gt;, std::allocator&amp;lt;char&amp;gt; &amp;gt; &amp;gt;,
+std::allocator&amp;lt;std::pair&amp;lt;const std::basic_string&amp;lt;char,
+std::char_traits&amp;lt;char&amp;gt;, std::allocator&amp;lt;char&amp;gt; &amp;gt;, int&amp;gt; &amp;gt; &amp;gt;&amp;amp;)':
+print.cpp:7: error: no match for 'operator&amp;lt;&amp;lt;' in 'std::cout &amp;lt;&amp;lt;
+details' /usr/include/c++/4.2.1/ostream:112: note: candidates are:
+std::basic_ostream&amp;lt;_CharT, _Traits&amp;gt;&amp;amp; std::basic_ostream&amp;lt;_CharT,
+_Traits&amp;gt;::operator&amp;lt;&amp;lt;(std::basic_ostream&amp;lt;_CharT, _Traits&amp;gt;&amp;amp;
+(*)(std::basic_ostream&amp;lt;_CharT, _Traits&amp;gt;&amp;amp;)) [with _CharT = char,
+_Traits = std::char_traits&amp;lt;char&amp;gt;]
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;What makes angle brackets so vexatious. Could it be their sharp corners?
+&lt;/p&gt;
+&lt;p&gt;Lisp is as elegant as XML is prickly, yet it too is famous for brackets, &lt;a href="http://en.wikipedia.org/wiki/S-expression"&gt;albeit round ones&lt;/a&gt; &amp;#8212; and lots of them.
+&lt;/p&gt;
+&lt;blockquote class="twitter-tweet"&gt;&lt;p&gt;It&amp;#8217;s not that Clojure/Lisp has a lot of parentheses. Its just that we removed everything else.&lt;/p&gt;&amp;mdash; Alex Miller (@puredanger) &lt;a href="https://twitter.com/puredanger/status/313507982623268865"&gt;March 18, 2013&lt;/a&gt;&lt;/blockquote&gt;
+&lt;script async src="http://wordaligned.org//platform.twitter.com/widgets.js" charset="utf-8"&gt;&lt;/script&gt;
+
+Imagine a parallel universe with angle-bracket Lisp. I wonder if the language would have proved so enduring?
+
+
+
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;Not so pretty now?&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;lt;define &amp;lt;euler-transform s&amp;gt;
+  &amp;lt;let &amp;lt;&amp;lt;s0 &amp;lt;stream-ref s 0&amp;gt;&amp;gt;
+        &amp;lt;s1 &amp;lt;stream-ref s 1&amp;gt;&amp;gt;    
+        &amp;lt;s2 &amp;lt;stream-ref s 2&amp;gt;&amp;gt;&amp;gt;
+    &amp;lt;cons-stream &amp;lt;- s2 &amp;lt;/ &amp;lt;square &amp;lt;- s2 s1&amp;gt;&amp;gt;
+                          &amp;lt;+ s0 &amp;lt;* -2 s1&amp;gt; s2&amp;gt;&amp;gt;&amp;gt;
+                 &amp;lt;euler-transform &amp;lt;stream-cdr s&amp;gt;&amp;gt;&amp;gt;&amp;gt;&amp;gt;
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+
+
+Looking more closely at the first code snippet, the section from a build file, we can see the problem isn&amp;#8217;t so much the angle brackets as all the others.
+
+
+
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;lt;mkdir dir="build" if="${not directory::exists('build')}" /&amp;gt;
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+
+
+The braces and parentheses may be embedded in a double quoted string but that only makes things worse. The nested levels hurt my eyes and, if you can bear to look at the code long enough, you&amp;#8217;ll realise there&amp;#8217;s a simpler message trying to get out: &lt;tt&gt;mkdir -p build&lt;/tt&gt;.</description>
+<dc:date>2013-05-01</dc:date>
+<guid>http://wordaligned.org/articles/angle-brackets-hurt-my-eyes.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/angle-brackets-hurt-my-eyes.html</link>
+<category>Lisp</category>
+</item>
+
+<item>
+<title>Power programming</title>
+<description>&lt;div class="toc"&gt;
+&lt;h2&gt;Contents&lt;/h2&gt;
+&lt;ul&gt;
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/power-programming.html#tocpowerful-or-dangerous" name="toc0" id="toc0"&gt;Powerful or dangerous?&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/power-programming.html#tocdecision-trees" name="toc1" id="toc1"&gt;Decision trees&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/power-programming.html#toccuteness-calculator" name="toc2" id="toc2"&gt;Cuteness calculator&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/power-programming.html#toceval" name="toc3" id="toc3"&gt;Eval&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/power-programming.html#tocdynamic-or-hacky" name="toc4" id="toc4"&gt;Dynamic or hacky?&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/power-programming.html#tocjam-to-golf" name="toc5" id="toc5"&gt;Jam to golf&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/power-programming.html#toccode-vs-data" name="toc6" id="toc6"&gt;Code vs data&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/power-programming.html#tocpowerful-language-vs-power-user" name="toc7" id="toc7"&gt;Powerful language vs power user?&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/power-programming.html#tocappendix-a-first-impressions-of-arc" name="toc8" id="toc8"&gt;Appendix A: First impressions of Arc&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/power-programming.html#tocappendix-b-c-solution" name="toc9" id="toc9"&gt;Appendix B: C++ solution&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/power-programming.html#tocappendix-c-a-python-solution" name="toc10" id="toc10"&gt;Appendix C: A Python Solution&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/power-programming.html#tocnotes" name="toc11" id="toc11"&gt;Notes&lt;/a&gt;
+ &lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/power-programming.html#toc0" name="tocpowerful-or-dangerous" id="tocpowerful-or-dangerous"&gt;Powerful or dangerous?&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Recently I &lt;a href="http://wordaligned.org/articles/next-permutation.html" title="Next permutation: when C++ gets it right"&gt;wrote about&lt;/a&gt; one of the &lt;a href="http://code.google.com/codejam/"&gt;Google Code Jam&lt;/a&gt; challenges, where, perhaps surprisingly, the best answer &amp;#8212; the most elegant and obviously correct answer, requiring the fewest lines of code, with virtually zero space overhead, and running the quickest &amp;#8212; the very best answer was coded in C++.
+&lt;/p&gt;
+&lt;p&gt;Why should this be surprising? C++ is a powerful language.
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;In my experience there is almost no limit to the damage that a sufficiently ingenious fool can do with C++. But there is also almost no limit to the degree of complexity that a skillful library designer can hide behind a simple, safe, and elegant C++ interface. 
+&lt;/p&gt;
+&lt;p&gt;&amp;#8212; Greg Colvin, &lt;a href="http://www.artima.com/cppsource/spiritofc2.html" title="Greg Colvin, In the Spirit of C"&gt;&amp;#8220;In the Spirit of C&amp;#8221;&lt;/a&gt;
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;Yes. And yes! But in this article I wanted to discuss something C++ &lt;strong&gt;can&amp;#8217;t&lt;/strong&gt; do. Let&amp;#8217;s start with another &lt;a href="http://code.google.com/codejam/contest/dashboard?c=186264#" title="Decision Tree, Google Code Jam 2009"&gt;challenge&lt;/a&gt; from the same round of the 2009 Google Code Jam.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/power-programming.html#toc1" name="tocdecision-trees" id="tocdecision-trees"&gt;Decision trees&lt;/a&gt;&lt;/h3&gt;
+&lt;blockquote&gt;&lt;p&gt;Decision trees &amp;#8212; in particular, a type called classification trees &amp;#8212; are data structures that are used to classify &lt;i&gt;items&lt;/i&gt; into &lt;i&gt;categories&lt;/i&gt; using &lt;i&gt;features&lt;/i&gt; of those items. For example, each animal is either &amp;#8220;cute&amp;#8221; or not. For any given animal, we can decide whether it is cute by looking at the animal&amp;#8217;s features and using the following decision tree.&lt;/p&gt;
+&lt;pre&gt;(0.2 furry
+  (0.81 fast
+    (0.3)
+    (0.2)
+  )
+  (0.1 fishy
+    (0.3 freshwater
+      (0.01)
+      (0.01)
+    )
+    (0.1)
+  )
+)
+&lt;/pre&gt;&lt;p&gt;&amp;mdash; &lt;a href="http://code.google.com/codejam/contest/dashboard?c=186264#"&gt;Decision Trees, Google Code Jam 2009&lt;/a&gt;&lt;/p&gt;&lt;/blockquote&gt;
+
+&lt;p&gt;&lt;a href="http://www.zazzle.com/cute_beaver_magnet-147411069592023743"&gt;&lt;img src="http://wordaligned.org/images/cute-beaver.png" alt="Cute beaver!" width="227px" height="193px" style="float:right;margin:25px 25px"/&gt;&lt;/a&gt;
+&lt;/p&gt;
+&lt;p&gt;The challenge goes on to describe the structure more formally, then steps through an example calculation. What is the probability, &lt;code&gt;p&lt;/code&gt;, that a beaver is cute?
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;For example, a beaver is an animal that has two features: &lt;code&gt;furry&lt;/code&gt; and &lt;code&gt;freshwater&lt;/code&gt;. We start at the root with &lt;code&gt;p&lt;/code&gt; equal to &lt;code&gt;1&lt;/code&gt;. We multiply &lt;code&gt;p&lt;/code&gt; by &lt;code&gt;0.2&lt;/code&gt;, the weight of the root and move into the first sub-tree because the beaver has the &lt;code&gt;furry&lt;/code&gt; feature. There, we multiply &lt;code&gt;p&lt;/code&gt; by &lt;code&gt;0.81&lt;/code&gt;, which makes &lt;code&gt;p&lt;/code&gt; equal to &lt;code&gt;0.162&lt;/code&gt;. From there we move further down into the second sub-tree because the beaver does not have the fast feature. Finally, we multiply &lt;code&gt;p&lt;/code&gt; by &lt;code&gt;0.2&lt;/code&gt; and end up with &lt;code&gt;0.0324&lt;/code&gt; &amp;#8212; the probability that the beaver is cute. 
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;img src="http://wordaligned.org/images/decision-tree.png" alt="Decision tree calculation"/&gt;
+
+&lt;p&gt;The challenge itself involves processing input comprising a number of test cases. Each test case consists of a decision tree followed by a number of animals. A solution should parse the input and output the calculated cuteness probabilities.
+&lt;/p&gt;
+&lt;span id="continue-reading"/&gt;
+
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/power-programming.html#toc2" name="toccuteness-calculator" id="toccuteness-calculator"&gt;Cuteness calculator&lt;/a&gt;&lt;/h3&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;def cuteness(decision_tree, features):
+    """Return the probability an animal is cute.
+    
+    - decision_tree, the decision tree
+    - features, the animal's features,
+    """
+    p = 1.0
+    dt = decision_tree
+    has_feature = features.__contains__
+    while dt:
+        weight, *dt = dt
+        p *= weight
+        if dt:
+            feat, lt, rt = dt
+            dt = lt if has_feature(feat) else rt
+    return p
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Calculating an animal&amp;#8217;s cuteness given a decision tree and the animal&amp;#8217;s features isn&amp;#8217;t hard. In Python we don&amp;#8217;t need to code up a specialised decision tree class &amp;#8212; a nested tuple does just fine. The &lt;code&gt;cuteness()&lt;/code&gt; function shown above descends the decision tree, switching left or right according to each feature&amp;#8217;s presence or absence. The efficiency of this algorithm is proportional to the depth of the tree multiplied by the length of the feature list; as far as the code jam challenge goes, it&amp;#8217;s not a concern.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; decision_tree = (
+...     0.2, 'furry',
+...         (0.81, 'fast',
+...             (0.3,),
+...             (0.2,),
+...         ),
+...         (0.1, 'fishy',
+...             (0.3, 'freshwater',
+...                  (0.01,),
+...                  (0.01,),
+...             ),
+...             (0.1,),
+...         ),
+...     )
+&amp;gt;&amp;gt;&amp;gt; beaver = ('furry', 'freshwater')
+&amp;gt;&amp;gt;&amp;gt; cuteness(decision_tree, beaver)
+0.032400000000000005
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;No, the real problem here is how to parse the input data to create the decision trees and feature sets. As you can see, though, the textual specification of a decision tree closely resembles a Python representation of that decision tree. Just add punctuation.
+&lt;/p&gt;
+&lt;table&gt;&lt;thead&gt;&lt;tr&gt;&lt;td&gt;Specification&lt;/td&gt;&lt;td&gt;Python&lt;/td&gt;&lt;/tr&gt;&lt;/thead&gt;
+&lt;tr&gt;&lt;td&gt;&lt;pre&gt;(0.2 furry
+  (0.81 fast
+    (0.3)
+    (0.2)
+  )
+  (0.1 fishy
+    (0.3 freshwater
+      (0.01)
+      (0.01)
+    )
+    (0.1)
+  )
+)&lt;/pre&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;(0.2, 'furry',
+  (0.81, 'fast',
+    (0.3,),
+    (0.2,),
+  ),
+  (0.1, 'fishy',
+    (0.3, 'freshwater',
+      (0.01,),
+      (0.01,),
+      ),
+      (0.1,),
+  ),
+)&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+
+&lt;p&gt;Rather than parse the decision tree definition by hand, why not tweak it so that it &lt;strong&gt;is&lt;/strong&gt; a valid Python nested tuple? Then we can just let the Python interpreter &lt;a href="http://docs.python.org/library/functions.html#eval"&gt;&lt;tt&gt;eval&lt;/tt&gt;&lt;/a&gt; the tuple and use it directly.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/power-programming.html#toc3" name="toceval" id="toceval"&gt;Eval&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;A program&amp;#8217;s ability to read and execute source code at run-time is one of the things which makes &lt;a href="http://en.wikipedia.org/wiki/Dynamic_programming_language#Eval"&gt;dynamic languages&lt;/a&gt; dynamic. You can&amp;#8217;t do it in C and C++ &amp;#8212; no, sneaking instructions &lt;a href="http://en.wikipedia.org/wiki/Buffer_overrun"&gt;past the end of a buffer&lt;/a&gt; doesn&amp;#8217;t count. Should you do it in Python? Well, it won&amp;#8217;t hurt to give it a try.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;spec = '''\
+(0.2 furry
+  (0.81 fast
+    (0.3)
+    (0.2)
+  )
+  (0.1 fishy
+    (0.3 freshwater
+      (0.01)
+      (0.01)
+    )
+    (0.1)
+  )
+)
+'''
+
+tuple_rep = re.sub(r'([\.\d]+|\))', r'\1,', spec)
+tuple_rep = re.sub(r'([a-z]+)', r'"\1",', tuple_rep)
+decision_tree = eval(tuple_rep)[0]
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Here, we start with the input specification of the decision tree (imagine this has been read directly from standard input). The first regex substitution inserts commas after numbers, and right parentheses. The second substitution quotes and inserts a comma after feature strings. This turns the decision tree&amp;#8217;s specification into a textual representation of a nested Python tuple. We then &lt;code&gt;eval&lt;/code&gt; that tuple and assign the result to &lt;code&gt;decision_tree&lt;/code&gt; &amp;#8212; a Python decision tree we can go on and use in the rest of our program. And that&amp;#8217;s the code jam challenge cracked, pretty much.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; from pprint import pprint
+&amp;gt;&amp;gt;&amp;gt; pprint(decision_tree)
+(0.2,
+ 'furry',
+ (0.81, 'fast', (0.3,), (0.2,)),
+ (0.1, 'fishy', (0.3, 'freshwater', (0.01,), (0.01,)), (0.1,)))
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;(Minor wrinkle: you&amp;#8217;ll have spotted the final decision tree is the first element of the evaluated tuple. That&amp;#8217;s because the regex substitution puts a trailing comma after the right parenthesis which closes the decision tree specification, which turns &lt;code&gt;tuple_rep&lt;/code&gt; into a one-tuple. The single element contained in this one-tuple is what we need.)
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/power-programming.html#toc4" name="tocdynamic-or-hacky" id="tocdynamic-or-hacky"&gt;Dynamic or hacky?&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;As you can see, it doesn&amp;#8217;t take much code to pull the decision tree in ready for use. Python allows us to convert between text and code and to execute code within the current environment: you just need to keep a clear head and remember where you are. Regular expressions may not have the first class language support they enjoy in Perl and Ruby, but they are well supported, and the raw string syntax makes them more readable.
+&lt;/p&gt;
+&lt;p&gt;Certainly, this code snippet is easier to put together than a full blown &lt;a href="http://code.google.com/codejam/contest/dashboard?c=186264#s=a&amp;amp;a=0" title="Google's analysis of the decision tree challenge, including a parser"&gt;parser&lt;/a&gt;, but I think it will take more than this to convince a C++ programmer that Python is a powerful language, rather than a dangerous tool for ingenious fools. It fails to convince me. I can&amp;#8217;t remember ever using &lt;code&gt;eval&lt;/code&gt; or &lt;code&gt;exec&lt;/code&gt; in production code, where keeping a separation between layers is more important than speed of coding.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/power-programming.html#toc5" name="tocjam-to-golf" id="tocjam-to-golf"&gt;Jam to golf&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;&lt;a href="http://codegolf.com"&gt;&lt;img src="http://codegolf.com/images/logo.png" alt="Code Golf logo" width="332px" height="75px"/&gt;&lt;/a&gt;
+&lt;/p&gt;
+&lt;p&gt;That said, Python is a fine language for scripting, and speed of coding &lt;strong&gt;is&lt;/strong&gt; what matters in this particular challenge. Just for fun, what if there were &lt;a href="http://stackoverflow.com/questions/1433263/decision-tree-code-golf" title="Decision tree code golf on Stack Overflow"&gt;a prize for brevity&lt;/a&gt;? Then of course Perl would &lt;a href="http://stackoverflow.com/questions/1433263/decision-tree-code-golf/1442392#1442392" title="gnibbler's winning Perl entry"&gt;win&lt;/a&gt;!
+&lt;/p&gt;
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;Code Jam golf, by gnibbler, Stack Overflow&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;say("Case #$_:"),
+$_=eval"''".'.&amp;lt;&amp;gt;'x&amp;lt;&amp;gt;,
+s:[a-z]+:*(/ $&amp;amp;\\s/?:g,s/\)\s*\(/):/g,
+eval"\$_=&amp;lt;&amp;gt;;say$_;"x&amp;lt;&amp;gt;for 1..&amp;lt;&amp;gt;
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Note that this does more than simply parse a decision tree &amp;#8212; it&amp;#8217;s a complete solution to the code jam &lt;a href="http://code.google.com/codejam/contest/dashboard?c=186264#" title="Decision Tree, Google Code Jam 2009"&gt;challenge&lt;/a&gt;, reading trees, features, calculating cutenesses, and producing output in the required format. Sadly that&amp;#8217;s all I can say about it because the details of its operation are beyond me.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/power-programming.html#toc6" name="toccode-vs-data" id="toccode-vs-data"&gt;Code vs data&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Using Python to dynamically execute code may not generally be needed or welcomed in Python production code, and over-reliance on the same trick risks reinforcing Perl&amp;#8217;s  &amp;#8220;write only&amp;#8221; reputation, but Python and Perl aren&amp;#8217;t the only contenders. &lt;span /&gt;The equivalence of code and data marks Lisp&amp;#8217;s apotheosis. Take a look at a &lt;a href="http://stackoverflow.com/questions/1433263/decision-tree-code-golf/1540845#1540845" title="Arc solution to decision tree"&gt;Lisp solution&lt;/a&gt; to the challenge. This one is coded up in &lt;a href="http://arclanguage.org" title="Arc, a new dialect of Lisp"&gt;Arc&lt;/a&gt;.
+&lt;/p&gt;
+&lt;pre class="prettyprint lang-lisp"&gt;
+(def r () (read))
+(for i 1 (r)
+  (prn "Case #" i ":")
+  (r)
+  (= z (r))
+  (repeat (r)
+    (r)
+    (loop (= g (n-of (r) (r))
+             c z
+             p 1)
+       c
+       (= p (* (pop c) p)
+          c (if (pos (pop c) g)
+                (c 0)
+                (cadr c))))
+    (prn p)))
+&lt;/pre&gt;
+
+&lt;p&gt;Which challenge does this solve? 
+&lt;/p&gt;
+&lt;p&gt;I meant the code golf challenge, of solving the decision tree problem using the fewest keystrokes. At 154 characters this Arc program is nearly half as long again as the winning Perl entry, but it&amp;#8217;s hardly flabby. What really impresses me, though, is that the code is (almost) as readable as it is succinct. It&amp;#8217;s elegant code. The only real scars left by the battle for brevity are the one character variable names. Here&amp;#8217;s the same code with improved variable names and some comments added. It&amp;#8217;s the &lt;code&gt;(read)&lt;/code&gt; calls which evaluate expressions on standard input. The &lt;code&gt;(for ...)&lt;/code&gt; and &lt;code&gt;(repeat ...)&lt;/code&gt; expressions operate as you might expect. The third looping construct, &lt;code&gt;(loop ...)&lt;/code&gt; initialises, tests and proceeds, much like a C for loop.
+&lt;/p&gt;
+&lt;pre class="prettyprint lang-lisp"&gt;
+(for i 1 (read)               ; Read N, # test cases, and loop
+  (prn "Case #" i ":")
+  
+  (read)                      ; Skip L, # lines taken by decision tree
+  (= dtree (read))            ; and read the tree in directly
+  
+  (repeat (read)              ; Repeat over A, # animals
+    (read)                    ; Skip animal name
+    ; Read in the animal's features and walk down the 
+    ; decision tree calculating p, the cuteness probability
+    (loop (= features (n-of (read) (read)) 
+             dt dtree
+             p 1)
+       dt
+       (= p (* (pop dt) p)
+          dt (if (pos (pop dt) features)
+                (car dt)
+                (cadr dt))))
+    (prn p)))
+&lt;/pre&gt;
+
+&lt;p&gt;You could argue the elegance of this solution is due to the fact the input comprises a sequence of tokens and &lt;a href="http://en.wikipedia.org/wiki/S-expression" title="S-expressions, Wikipedia"&gt;S-expressions&lt;/a&gt;. If commas had been used to separate input elements and the text fields had been enclosed in quotes, then maybe a Python solution would have been equally clean. Or if the input had been in XML, then we&amp;#8217;d be looking to a library rather than &lt;code&gt;eval&lt;/code&gt; for parsing the input.
+&lt;/p&gt;
+&lt;p&gt;It&amp;#8217;s a fair point, but the equivalence of code and data counts as Lisp&amp;#8217;s biggest idea. Where Python&amp;#8217;s &lt;code&gt;eval&lt;/code&gt; is workable but rarely needed, Lisp&amp;#8217;s &lt;code&gt;(read)&lt;/code&gt; is fundamental.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/power-programming.html#toc7" name="tocpowerful-language-vs-power-user" id="tocpowerful-language-vs-power-user"&gt;Powerful language vs power user?&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;So, the most elegant answer to the code jam decision tree challenge would also be the quickest to write, and it would be written in Lisp. Did code jam champion, &lt;a href="http://www.go-hero.net/jam/09/name/ACRush" title="ACRush's code jam solutions"&gt;ACRush&lt;/a&gt;, submit a Lisp solution?
+&lt;/p&gt;
+&lt;p&gt;Absolutely not!
+&lt;/p&gt;
+&lt;p&gt;Another fundamental thing about Lisp is that it&amp;#8217;s straightforward to parse. A C++ expert can knock up an input parser for decision trees and features to order. ACRush brushed this round aside with a perfect score, taking just 45 minutes to code up working C++ solutions to this question &lt;strong&gt;and two others&lt;/strong&gt;. I&amp;#8217;ve reproduced his solution to the &lt;a href="http://code.google.com/codejam/contest/dashboard?c=186264#" title="Decision Tree, Google Code Jam 2009"&gt;decision tree challenge&lt;/a&gt; at the end of this article. It&amp;#8217;s plain and direct. Given the time constraints, I think it exhibits astonishing fluency &amp;#8212; the work of someone who can think in C++.
+&lt;/p&gt;
+&lt;p&gt;In this article we&amp;#8217;ve encountered four programming languages:
+&lt;/p&gt;
+&lt;ul&gt;
+ &lt;li&gt;
+     Python
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     Perl
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     Lisp
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     C++
+ &lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;These languages are very different but they share features too. They are all mature, popular and well-supported&lt;a id="fn1link" href="http://wordaligned.org/articles/power-programming.html#fn1"&gt;&lt;sup&gt;[1]&lt;/sup&gt;&lt;/a&gt;. Each is a powerful general purpose programming language. &lt;span /&gt;But ultimately, the power of the programmer is what matters.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/power-programming.html#toc8" name="tocappendix-a-first-impressions-of-arc" id="tocappendix-a-first-impressions-of-arc"&gt;Appendix A: First impressions of Arc&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Here&amp;#8217;s another revision of the Arc solution, this time decomposed into subfunctions. I found no complete formal documentation of &lt;a href="http://arclanguage.org" title="Arc, a new dialect of Lisp"&gt;Arc&lt;/a&gt;. You&amp;#8217;ll have to read the source and follow the forum, and to actually run any code you&amp;#8217;ll have to download a an old version of MzScheme. The official line is: by all means have a play, but expect things to change. That said, the language looks delightful, practical, and quite &lt;a href="http://www.paulgraham.com/arcll1.html" title="No onions in the varnish, says Paul Graham"&gt;onion free&lt;/a&gt;. The &lt;a href="http://ycombinator.com/arc/tut.txt"&gt;tutorial&lt;/a&gt; made me smile. Recommended reading.
+&lt;/p&gt;
+&lt;pre class="prettyprint lang-lisp"&gt;
+; The input is a sequence of valid Arc expressions.
+; Create some read aliases to execute these.
+(= skip read
+   decision-tree read
+   n-features read 
+   n-tests read
+   n-animals read)
+
+(def animal-features ()
+     ; Get an animal's features
+     (skip) ; animal name
+     (n-of (n-features) (read)))
+
+(def cuteness (dtree features)
+     ; Calculate cuteness from a decision tree and feature set
+     (= dt dtree
+        p 1.0)
+     (while dt
+          (= p (* (pop dt) p)
+             dt (if (pos (pop dt) features)
+                (car dt)
+                (cadr dt))))
+     p)
+
+; Loop through the tests, printing results
+(for i 1 (n-tests)
+     (prn "Case #" i ":")
+     (skip) ; # lines the tree specification takes
+     (= dtree (decision-tree))
+     (repeat 
+         (n-animals)
+         (prn (cuteness dtree (animal-features)))))
+&lt;/pre&gt;
+
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/power-programming.html#toc9" name="tocappendix-b-c-solution" id="tocappendix-b-c-solution"&gt;Appendix B: C++ solution&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Here&amp;#8217;s champion ACRush&amp;#8217;s C++ solution. I&amp;#8217;ve removed some general purpose macros from the top of the file. You can download the &lt;a href="http://code.google.com/codejam/contest/scoreboard/do?cmd=GetSourceCode&amp;amp;contest=186264&amp;amp;problem=171116&amp;amp;io_set_id=1&amp;amp;username=ACRush"&gt;original here&lt;/a&gt;.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;#include &amp;lt;set&amp;gt;
+#include &amp;lt;string&amp;gt;
+#include &amp;lt;vector&amp;gt;
+#include &amp;lt;sstream&amp;gt;
+#include &amp;lt;cstdio&amp;gt;
+#include &amp;lt;cstdlib&amp;gt;
+
+using namespace std;
+
+vector&amp;lt;string&amp;gt; A;
+vector&amp;lt;int&amp;gt; P;
+set&amp;lt;string&amp;gt; M;
+
+#define SIZE(X) ((int)(X.size()))
+
+double solve(int H,int T)
+{
+    H++;T--;
+    double p=atof(A[H].c_str());
+    if (H==T) return p;
+    if (M.find(A[H+1])!=M.end())
+        return p*solve(H+2,P[H+2]);
+    else
+        return p*solve(P[T],T);
+}
+int main()
+{
+    freopen("A-large.in","r",stdin);freopen("A-large.out","w",stdout);
+    int testcase;
+    scanf("%d",&amp;amp;testcase);
+    for (int caseId=1;caseId&amp;lt;=testcase;caseId++)
+    {
+        int nline;
+        scanf("%d",&amp;amp;nline);
+        A.clear();
+        char str[1024];
+        gets(str);
+        for (int i=0;i&amp;lt;nline;i++)
+        {
+            gets(str);
+            string s="";
+            for (int k=0;str[k];k++)
+                if (str[k]=='(' || str[k]==')')
+                    s+=" "+string(1,str[k])+" ";
+                else
+                    s+=str[k];
+            istringstream sin(s);
+            for (;sin&amp;gt;&amp;gt;s;A.push_back(s));
+        }
+        P.resize(SIZE(A),-1);
+        vector&amp;lt;int&amp;gt; stack;
+        for (int i=0;i&amp;lt;SIZE(A);i++)
+            if (A[i]=="(")
+                stack.push_back(i);
+            else if (A[i]==")")
+            {
+                int p=stack[SIZE(stack)-1];
+                P[i]=p;
+                P[p]=i;
+                stack.pop_back();
+            }
+        int cnt;
+        printf("Case #%d:\n",caseId);
+        for (scanf("%d",&amp;amp;cnt);cnt&amp;gt;0;cnt--)
+        {
+            scanf("%s",str);
+            M.clear();
+            int length;
+            for (scanf("%d",&amp;amp;length);length&amp;gt;0;length--)
+            {
+                scanf("%s",str);
+                M.insert(str);
+            }
+            double r=solve(0,SIZE(A)-1);
+            printf("%.12lf\n",r);
+        }
+    }
+    return 0;
+}
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/power-programming.html#toc10" name="tocappendix-c-a-python-solution" id="tocappendix-c-a-python-solution"&gt;Appendix C: A Python Solution&lt;/a&gt;&lt;/h3&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;import re
+from itertools import islice
+
+def cuteness(decision_tree, features):
+    p = decision_tree[0]
+    if len(decision_tree) &amp;gt; 1:
+        _, feat, lt, rt = decision_tree
+        p *= cuteness(lt if feat in features else rt, features)
+    return p
+
+def read_decision_tree(spec):
+    tuple_rep = re.sub(r'([\.\d]+|\))', r'\1,', spec)
+    tuple_rep = re.sub(r'([a-z]+)', r'"\1",', tuple_rep)
+    return eval(tuple_rep)[0]
+
+def take_lines(lines, n):
+    return ''.join(islice(lines, n))
+
+def main(fp):
+    lines = iter(fp)
+    n_tests = int(next(lines))
+    for tc in range(1, n_tests + 1):
+        print("Case #%d:" % tc)
+        tree_spec = take_lines(lines, int(next(lines)))
+        dtree = read_decision_tree(tree_spec)
+        n_animals = int(next(lines))
+        for line in islice(lines, n_animals):
+            features = set(line.split()[2:])
+            print(cuteness(dtree, features))
+
+import sys
+main(sys.stdin)
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;hr /&gt;
+
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/power-programming.html#toc11" name="tocnotes" id="tocnotes"&gt;Notes&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;&lt;a id="fn1" href="http://wordaligned.org/articles/power-programming.html#fn1link"&gt;[1]&lt;/a&gt; (Arc may not be mature, popular or well-supported; but Lisp certainly is.)
+&lt;/p&gt;</description>
+<dc:date>2010-01-26</dc:date>
+<guid>http://wordaligned.org/articles/power-programming.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/power-programming.html</link>
+<category>Lisp</category>
+</item>
+
+<item>
+<title>Metaprogramming is Your Friend</title>
+<description>&lt;p&gt;An &lt;a href="http://wordaligned.org/docs/metaprogramming/index.html"&gt;investigation&lt;/a&gt; into metaprogramming techniques used by lazy C, C++, Lisp and Python programmers. This &lt;a href="http://wordaligned.org/docs/metaprogramming/index.html"&gt;article&lt;/a&gt; first appeared in &lt;a href="http://accu.org/index.php/journals/c146/"&gt;Overload 66&lt;/a&gt;.
+&lt;/p&gt;
+&lt;div class="extended"&gt;&lt;p&gt;&lt;a href="http://wordaligned.org/docs/metaprogramming/index.html"&gt;Continue reading&amp;#8230;&lt;/a&gt;&lt;/p&gt;&lt;/div&gt;</description>
+<dc:date>2005-04-01</dc:date>
+<guid>http://wordaligned.org/articles/metaprogramming.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/metaprogramming.html</link>
+<category>Lisp</category>
+</item>
+
+</channel>
+</rss>

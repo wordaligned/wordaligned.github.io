@@ -1,0 +1,246 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<link rel="icon" href="/images/favicon.png" type="image/png"/>
+<link href="/styles/application.css" media="all" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="/scripts/prettify.js"></script>
+<script type="text/javascript" src="/scripts/lang-lisp.js"></script>
+<script type="text/javascript" src="http://www.haloscan.com/load/wordaligned"></script>
+
+<title>Getting started with Typo</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="author" content="Thomas Guest" />
+<meta name="description" content="A Word Aligned article posted 2006-07-17, tagged Web Applications, Ruby." />
+<meta name="keywords" content="Web Applications, Ruby" />
+<link rel="alternate" type="application/rss+xml" title="Feed" href="http://feeds.wordaligned.org/wordaligned" />
+</head>
+
+<body onload="prettyPrint()">
+<div id="container">
+  <div id="header">
+<h1><span><a accesskey="h" href="/">Word Aligned</a></span></h1>
+<h2>driving down the road of innovation with the parking brake on</h2>
+<a class="button" href="http://feeds.wordaligned.org/wordaligned" title="Subscribe to Word Aligned"><img style="float: right;" src="/images/feed.png" alt="Feed Logo" height="28" width="28"/></a>
+</div>
+
+  <div id="page">
+    <div id="content">
+      <div class="atomentry" id="getting-started-with-typo.html">
+<h2 class="title"><a href="/articles/getting-started-with-typo.html">Getting started with Typo</a></h2>
+<p class="meta"><abbr class="published" title="2006-07-17">2006-07-17</abbr> &bull; <a href="/tag/web-applications" rel="tag">Web Applications</a>, <a href="/tag/ruby" rel="tag">Ruby</a> &bull; <a href="/articles/getting-started-with-typo.html#disqus_thread">Comments</a></p>
+<p><a href="http://www.typosphere.org">Typo</a> is a
+   <a href="http://www.rubyonrails.org/">Ruby on Rails</a> blogging application.
+   I&#8217;d already installed one Rails application on
+   <a href="http://www.textdrive.com">Textdrive</a> before, when I set up a
+   <a href="http://wiki.wordaligned.org/sicp">Wiki</a>, and this time it was even easier.
+   It took no more than half an hour to get the thing up and running.
+   The steps were:
+</p>
+<p>The steps were:
+   <em> log into my server
+</em> obtain the latest version of <a href="http://www.typosphere.org">Typo</a>
+   * create a production database
+   <em> edit the database configuration file
+</em> tweak the example <a href="http:/www.lighttpd.net">lighttpd</a> server configuration to use my assigned port
+   * start up <a href="http://www.typosphere.org">Typo</a>
+   <em> log in and configure using the Typo admin interface
+</em> shutdown <a href="http://www.typosphere.org">Typo</a>
+   * reconfigure my main <a href="http:/www.lighttpd.net">lighttpd</a>
+   * restart <a href="http:/www.lighttpd.net">lighttpd</a>
+   * &#8230; and we&#8217;re done!
+</p>
+<p><span id="continue-reading"/>
+   Here are the details. Note that my domain is <code>wordaligned.org</code> and my user name is
+   <code>wordaligned</code> &#8212; adjust as required.
+   You&#8217;ll also need a two port numbers: one for running <a href="http://www.typosphere.org">Typo</a>
+   standalone, and one for running <a href="http:/www.lighttpd.net">lighttpd</a>.
+   <a href="http://www.textdrive.com">Textdrive</a> can supply these on request.
+</p>
+
+<h4>Obtaining Typo</h4>
+<p>Apparently the trunk is good and stable and upgrading as simple as
+   <code>svn update</code> so let&#8217;s log in to the server and go for it:
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">svn checkout svn://typosphere.org/typo/trunk typo
+
+</pre>
+
+</div>
+
+
+<h4>Database Configuration</h4>
+<p>First, create and initialise a <code>mysql</code> production database.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">mysql -u wordaligned -p
+mysql&gt; create database wordaligned_typo;
+mysql&gt; quit;
+cat typo/db/schema.mysql.sql | mysql -u wordaligned -p wordaligned_typo
+
+</pre>
+
+</div>
+
+<p>Now configure Typo to use this database by creating a <code>database.yml</code>
+   file which points at your production database, the mysql adapter,
+   and the correct user/password credentials.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">cd typo/config
+cp database.yml.example database.yml
+vi database.yml                     # edit as required
+
+</pre>
+
+</div>
+
+
+<h4>Starting Typo Standalone</h4>
+<p>Do you have a port number to run Typo standlone? I&#8217;d obtained 2508 for
+   <a href="http://instiki.org">Instiki</a>
+   which I no longer required (now that I&#8217;m using
+   [lighttpd](http:/www.lighttpd.net to serve my <a href="http://wiki.wordaligned.org/sicp">wiki</a>), so I just used that.
+   I edited the lighttpd configuration file in <tt>config/lighttpd.conf</tt>
+   to use this port number and my Typo production environment:
+</p>
+<div class="typocode">
+
+<pre class="prettyprint"># Default configuration file for the lighttpd web server
+# Start using ./script/server lighttpd
+server.port = 2508
+....
+# Change *-procs to 2 if you need to use Upload Progress or other tasks that
+# *need* to execute a second request while the first is still pending.
+fastcgi.server = ( ".fcgi" =&gt;
+  ( "localhost" =&gt;
+      (
+        "min-procs" =&gt; 2,
+        "max-procs" =&gt; 2,
+        "socket"    =&gt; CWD + "/tmp/sockets/fcgi.socket",
+        "bin-path"  =&gt; CWD + "/public/dispatch.fcgi",
+        "bin-environment" =&gt; ( "RAILS_ENV" =&gt; "production" )
+      )
+  )
+)
+
+</pre>
+
+</div>
+
+<p>I also edited the shebang line in both <code>public/dispatch.rb</code>,
+   <code>public/dispatch.fcgi</code> to explicitly reference <code>ruby</code> at
+   <code>/usr/local/bin/ruby</code>. Now I started Typo with: <code>script/serverlighttpd</code>,
+   logged in at <code>http://wordaligned.org:2508</code>, which put me
+   directly into the Typo administration section.
+</p>
+<p>Having done this, I shutdown Typo with <code>CTRL-C</code>.
+</p>
+
+<h4>Reconfigure lighttpd</h4>
+<p>Now I merged the example <a href="http:/www.lighttpd.net">lighttpd</a>
+   configuration with my main one, which now reads something like:
+</p>
+<div class="typocode">
+
+<pre class="prettyprint"># Making sure file uploads above 64k always work when using IE or Safari
+# For more information, see http://trac.lighttpd.net/trac/ticket/360
+$HTTP["useragent"] =~ "^(.*MSIE.*)|(.*AppleWebKit.*)$" {
+  server.max-keep-alive-requests = 0
+}
+
+$HTTP["host"] =~ "\.wordaligned\.org" {
+  server.document-root = "/users/home/wordaligned/web/public/"
+  ....
+}
+
+$HTTP["host"] =~ "wiki\.wordaligned\.org" {
+  server.document-root = "/users/home/wordaligned/instiki/public/"
+  ....
+}
+$HTTP["host"] =~ "blog\.wordaligned\.org" {
+  server.document-root =  "/users/home/wordaligned/typo/public/"
+  ....
+}
+$HTTP["host"] == "projects.wordaligned.org" {
+  server.document-root = "/users/home/wordaligned/trac/"
+  ....
+}
+
+</pre>
+
+</div>
+</div>
+
+<div class="comments"><hr/><div id="disqus_thread"></div><script type="text/javascript" src="http://disqus.com/forums/wordaligned/embed.js"></script></div>
+      
+<div id="comments"><script type="text/javascript">
+//<![CDATA[
+(function() {
+    var links = document.getElementsByTagName('a');
+    var query = '?';
+    for(var i = 0; i < links.length; i++) {
+        if(links[i].href.indexOf('#disqus_thread') >= 0) {
+            query += 'url' + i + '=' + encodeURIComponent(links[i].href) + '&amp;';
+        }
+    }
+    document.write('<script type="text/javascript" src="http://disqus.com/forums/wordaligned/get_num_replies.js' + query + '"></' + 'script>');
+})();
+//]]>
+</script></div>
+
+    </div>
+    <div id="sidebar">
+      
+<div class="sidebar-node">
+<h3>Tagged</h3>
+<ul id="categories"><li><a href="/tag/web-applications" rel="tag">Web Applications</a></li>
+<li><a href="/tag/ruby" rel="tag">Ruby</a></li></ul>
+
+</div>
+
+<div class="sidebar-node">
+<h3>Chain</h3>
+<ul>
+<li><a accesskey="n" href="/articles/my-test-first-ruby-program.html" title="Next article">&laquo; My (Test) First Ruby Program</a></li>
+<li><a accesskey="p" href="/articles/posting-using-mtsend.html" title="Previous article">&raquo; Posting from the command line using mtsend</a></li>
+</ul>
+
+
+</div>
+
+<div class="sidebar-node">
+<h3>Feeds</h3>
+
+<ul>
+<li><a href="http://feeds.wordaligned.org/wordaligned"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Articles</a></li>
+<li><a href="http://feeds.wordaligned.org/wordaligned/comments"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Comments</a></li>
+</ul>
+
+
+</div>
+
+    </div>
+  </div>
+  <div id="footer">
+<hr />
+<p><a href="http://tag.wordaligned.org">Thomas Guest</a></p>
+</div>
+
+</div>
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-3373724-1']);
+  _gaq.push(['_trackPageview']);
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ga);
+  })();
+</script>
+</body>
+
+</html>

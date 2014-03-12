@@ -1,0 +1,188 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<link rel="icon" href="/images/favicon.png" type="image/png"/>
+<link href="/styles/application.css" media="all" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="/scripts/prettify.js"></script>
+<script type="text/javascript" src="/scripts/lang-lisp.js"></script>
+<title>Life on Canvas</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="author" content="Thomas Guest" />
+<meta name="description" content="A Word Aligned article posted 2012-06-27, tagged Algorithms, Graphics, Self." />
+<meta name="keywords" content="Algorithms, Graphics, Self" />
+<link rel="alternate" type="application/rss+xml" title="Feed" href="http://feeds.wordaligned.org/wordaligned" />
+</head>
+
+<body onload="prettyPrint()">
+<div id="container">
+  <div id="header">
+<h1><span><a accesskey="h" href="/">Word Aligned</a></span></h1>
+<h2>whatsoever I do, it&#8217;s got to be funky</h2>
+<a class="button" href="http://feeds.wordaligned.org/wordaligned" title="Subscribe to Word Aligned"><img style="float: right;" src="/images/feed.png" alt="Feed Logo" height="28" width="28"/></a>
+</div>
+
+  <div id="page">
+    <div id="content">
+      <div class="atomentry" id="life-on-canvas.html">
+<h2 class="title"><a href="/articles/life-on-canvas.html">Life on Canvas</a></h2>
+<p class="meta"><abbr class="published" title="2012-06-27">2012-06-27</abbr> &bull; <a href="/tag/algorithms" rel="tag">Algorithms</a>, <a href="/tag/graphics" rel="tag">Graphics</a>, <a href="/tag/self" rel="tag">Self</a> &bull; <a href="/articles/life-on-canvas.html#disqus_thread">Comments</a></p>
+<p>I was lucky enough to be taught maths by <a href="http://www.math.princeton.edu/directory/john-conway" title="John Conway, now at Princeton University">John Horton Conway</a>, if only for an hour a week for a single term. He was lucky enough to be teaching number theory: a subject packed with treasures picked from the full history of mathematics.
+</p>
+<p>I remember him as animated and unkempt. He bustled into that first lecture with a carrier bag and started pulling out groceries one by one. How many items were in the bag, he wondered? Could he count them all &#8212; it was a <em>very</em> large bag &#8212; and what exactly did <a href="http://mathworld.wolfram.com/Aleph-0.html" title="The 'small' infinite set of integers">infinity</a> mean? Later I would see him pacing along Kings Parade dragging a shopping tolley, lost in thought.
+</p>
+<p>Number theory may be as old as mathematics but it remains very much alive. Some 40 years ago Professor Conway discovered a primitive and novel mathematical life form: the Game of Life. 
+</p>
+<p>The rules are simple. A colony of cells inhabits a two dimensional grid. At any one time each cell is either alive or dead, and as time advances the fate of a cell is determined entirely by its immediate 8 neighbours:
+</p>
+<ul>
+ <li>
+     reproduction: a dead cell with exactly 3 live neighbours becomes alive
+ </li>
+
+ <li>
+     survival: a live cell with 2 or 3 live neighbours lives on
+ </li>
+
+ <li>
+     overcrowding or loneliness: in all other cases the cell dies or stays dead
+ </li>
+</ul>
+<p>In code, we might represent the colony as a two dimensional array filled with <code>1</code>&#8217;s and <code>0</code>&#8217;s for live and dead cells and code up the rules like this:
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">// Determine the fate of cell i, j in the next generation.
+// Return 1 for "lives", 0 for "dies"
+function fate(cells, i, j) {
+    var neighbours = [[-1,-1],[-1,0],[-1,1],
+                      [0,-1],        [0,1],
+                      [1,-1], [1,0], [1,1]];
+        live_neighbours = 0;
+    neighbours.forEach(function(n) { 
+        live_neighbours += cells[i + n[0]][j + n[1]];
+    });
+    return (live_neighbours == 3 || 
+            cells[i][j] == 1 &amp;&amp; live_neighbours == 2) ? 1 : 0;
+}
+
+</pre>
+
+</div>
+
+<p>It turns out these simple rules generate an astonishing ecosystem. Simple patterns flourish, evolving into complex patterns which, many generations later may decay into stable forms and repeating patterns, or, occasionally, become extinct. 
+</p>
+<p>Can a finite pattern grow indefinitely? Conway originally conjectured no, this was impossible, offering $50 to the first person who could prove or disprove the his conjecture before the end of 1970. In November of that year a team from MIT led by Bill Gosper claimed the prize, disproving the conjecture with a glider gun pattern which spits out a new spaceship every 30 generations.
+</p>
+<img src=http://upload.wikimedia.org/wikipedia/commons/e/e5/Gospers_glider_gun.gif alt="Gosper's glider gun, Wikimedia commons" style="border:1px solid black;">
+
+<span id="continue-reading"/>
+
+<p>A 2 dimensional array can naturally be represented on the most basic computer screen &#8212; think raster graphics, pixels &#8212; and the parallel emergence and development of the personal computer helps explain life&#8217;s continuing appeal<a id="fn1link" href="#fn1"><sup>[1]</sup></a>. The game of life has become the <a href="http://programmer.97things.oreilly.com/wiki/index.php/Learn_to_Say_%22Hello%2C_World%22" title="Laern to say Hello, world">hello world</a> of graphics frameworks. In 2012 we can use the HTML5 canvas, a 2 dimensional surface for drawing on.
+</p>
+<p><canvas id="lifecanvas" width="480" height="320" style="border:1px solid black;">Unfortunately your client does not support the <a href="http://www.w3.org/TR/html5/the-canvas-element.html#the-canvas-element">HTML5 canvas element</a>. If you are using a feed reader, try visiting the <a href="/articles/life-on-canvas.html">original page</a>.</canvas>
+   <div>
+   <button type="button" id="random" title="Random pattern" style="vertical-align:top;width:50px;height:50px;"><img src="/images/glyphicons_322_playing_dices.png" /></button>
+   <button type="button" id="clear" title="Clear screen" style="vertical-align:top;width:50px;height:50px;"><img src="/images/glyphicons_192_circle_remove.png" /></button>
+   <button type="button" id="toggle" title="Play/Pause" style="vertical-align:top;width:50px;height:50px;"><img src="/images/glyphicons_174_pause.png" /></button>
+   <button type="button" id="step" title="Single step" style="vertical-align:top;width:50px;height:50px;"><img src="/images/glyphicons_178_step_forward.png" /></button>
+   <button type="button" id="info" title="Help" style="vertical-align:top;width:50px;height:50px;"><img src="/images/glyphicons_195_circle_info.png" /></button>
+   </div>
+   <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+   <script type="text/javascript" src="/scripts/simple-life.js"></script>
+</p>
+<p>After a little experimentation you&#8217;re sure to uncover life&#8217;s three main domains: still lives, which remain unchanged; oscillators, which repeat; and spaceships, which move across the board. Then there are methuselahs, puffers, guns &#8230;
+</p>
+<p>Here&#8217;s a pulsar, an oscillator with period 3.
+</p>
+<img src="/images/pulsar.gif" alt="Pulsar"/>
+
+<p>And here&#8217;s a glider, classed as a diagonal spaceship, <a href="http://www.catb.org/hacker-emblem/" title="When you put the glider emblem on your web page, or wear it on clothing, or display it in some other way, you are visibly associating yourself with the hacker culture">a pattern chosen</a> by Eric S Raymond as a hackers&#8217; emblem.
+</p>
+<img src="/images/glider.gif" alt="Glider, an orthogonal spaceship"/>
+
+<p>Here&#8217;s another 5 cell pattern &#8212; the R-pentomino. Clear the canvas, pick out an R-pentomino cluster of cells with the mouse, click play, and watch what evolves!
+</p>
+<img src="/images/Rpentomino.png" alt="Rpentomino"/>
+
+<p><a href="http://www.conwaylife.com/wiki/Turtle" title="An orthogonal c/3 spaceship">Turtle</a>, <a href="http://www.conwaylife.com/wiki/Garden_of_Eden" title="A pattern that has no parents and thus can only occur in generation 0">garden</a>, <a href="http://www.conwaylife.com/wiki/Unicycle" title="Unicycle is a period 6 oscillator made up of four copies of unix">unicycle</a>: animal, vegetable, mineral. The kingdom of life is inclusive and extensive, a delight for naturalists and taxonomists alike. It&#8217;s seduced logophiles and lexicographers too: reading through Stephen A. Silver&#8217;s comprehensive <a href="http://www.argentum.freeserve.co.uk/lex.htm" title="A lexicon of terms relating to John Horton Conway's Game of Life, by Stephen Silver">Life Lexicon</a>, I learned that an anteater consumes ants, a <a href="http://www.argentum.freeserve.co.uk/lex_c.htm#caterpillar">caterpillar</a> works by laying tracks at its front end, a baker&#8217;s dozen is a loaf <a href="http://www.argentum.freeserve.co.uk/lex_h.htm#hassler">hassled</a> by two blocks and two caterers, and an <a href="http://www.argentum.freeserve.co.uk/lex_a.htm#ak47reaction">AK47</a> reaction occurs when a honey farm predecessor, catalysed by an eater and a block, reappears at another location 47 generations later, having produced a glider and a traffic light. I could go on&#8230;
+</p>
+<hr />
+
+<p><a id="fn1" href="#fn1link">[1]</a>: I&#8217;m glossing over details here. The true game of life is played out on an infinite grid, and patterns such as <a href="http://en.wikipedia.org/wiki/Gun_(cellular_automaton)">Gosper&#8217;s glider gun</a> show that it really does have to be infinite. Computers have trouble with such an unconstrained requirement, and a computer animation might try and adapt the screen as the pattern grows, or limit the region of interest. Another approach is to wrap the canvas, left to right, top to bottom, so the game of life is played out on what&#8217;s topologically a toriodal surface. That&#8217;s what the canvas shown here does.
+</p>
+<p style="text-align:center">&sect;</p>
+
+<p>The icons used on this page were downloaded from <a href="http://glyphicons.com">http://glyphicons.com</a> and are licensed under the <a href=http://creativecommons.org/licenses/by/3.0/deed.en>CC BY 3.0</a> terms. The animated gifs were placed in the public domain by their authors.
+</p>
+</div>
+
+<div class="comments"><hr/><div id="disqus_thread"></div><script type="text/javascript" src="http://disqus.com/forums/wordaligned/embed.js"></script></div>
+      
+<div id="comments"><script type="text/javascript">
+//<![CDATA[
+(function() {
+    var links = document.getElementsByTagName('a');
+    var query = '?';
+    for(var i = 0; i < links.length; i++) {
+        if(links[i].href.indexOf('#disqus_thread') >= 0) {
+            query += 'url' + i + '=' + encodeURIComponent(links[i].href) + '&amp;';
+        }
+    }
+    document.write('<script type="text/javascript" src="http://disqus.com/forums/wordaligned/get_num_replies.js' + query + '"></' + 'script>');
+})();
+//]]>
+</script></div>
+
+    </div>
+    <div id="sidebar">
+      
+<div class="sidebar-node">
+<h3>Tagged</h3>
+<ul id="categories"><li><a href="/tag/algorithms" rel="tag">Algorithms</a></li>
+<li><a href="/tag/graphics" rel="tag">Graphics</a></li>
+<li><a href="/tag/self" rel="tag">Self</a></li></ul>
+
+</div>
+
+<div class="sidebar-node">
+<h3>Chain</h3>
+<ul>
+<li><a accesskey="n" href="/articles/life-goes-on.html" title="Next article">&laquo; Life goes on</a></li>
+<li><a accesskey="p" href="/articles/desktop-preferences.html" title="Previous article">&raquo; Desktop preferences</a></li>
+</ul>
+
+
+</div>
+
+<div class="sidebar-node">
+<h3>Feeds</h3>
+
+<ul>
+<li><a href="http://feeds.wordaligned.org/wordaligned"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Articles</a></li>
+<li><a href="http://feeds.wordaligned.org/wordaligned/comments"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Comments</a></li>
+</ul>
+
+
+</div>
+
+    </div>
+  </div>
+  <div id="footer">
+<hr />
+<p><a href="http://tag.wordaligned.org">Thomas Guest</a></p>
+</div>
+
+</div>
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-3373724-1']);
+  _gaq.push(['_trackPageview']);
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ga);
+  })();
+</script>
+</body>
+
+</html>

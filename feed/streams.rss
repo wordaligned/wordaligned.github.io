@@ -1,0 +1,3391 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" >
+<channel>
+<title>Word Aligned</title>
+<link>http://wordaligned.org</link>
+<description>tales from the code face</description>
+<dc:creator>tag@wordaligned.org</dc:creator>
+<language>en-gb</language>
+<item>
+<title>Run-length encoding in Python</title>
+<description>&lt;p&gt;Recently I discussed &lt;a href="http://wordaligned.org/articles/deflate-runlength-encoding-but-better.html" title="DEFLATE: run-length encoding, but better"&gt;run-length encoding and DEFLATE&lt;/a&gt; compression. I never actually showed a Python implementation of a run-length encoder, so here&amp;#8217;s one now.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;import itertools as its
+
+def ilen(it):
+    '''Return the length of an iterable.
+    
+    &amp;gt;&amp;gt;&amp;gt; ilen(range(7))
+    7
+    '''
+    return sum(1 for _ in it)
+
+def runlength_enc(xs):
+    '''Return a run-length encoded version of the stream, xs.
+    
+    The resulting stream consists of (count, x) pairs.
+    
+    &amp;gt;&amp;gt;&amp;gt; ys = runlength_enc('AAABBCCC')
+    &amp;gt;&amp;gt;&amp;gt; next(ys)
+    (3, 'A')
+    &amp;gt;&amp;gt;&amp;gt; list(ys)
+    [(2, 'B'), (3, 'C')]
+    '''
+    return ((ilen(gp), x) for x, gp in its.groupby(xs))
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;The decoder is equally simple. &lt;code&gt;Itertools.repeat&lt;/code&gt; expands a &lt;code&gt;(count, value)&lt;/code&gt; pair into an iterable which will generate &lt;code&gt;count&lt;/code&gt; elements. &lt;code&gt;Itertools.chain&lt;/code&gt; flattens these iterables into a single stream.
+&lt;/p&gt;
+&lt;span id="continue-reading"/&gt;
+
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;def runlength_dec(xs):
+    '''Expand a run-length encoded stream.
+    
+    Each element of xs is a pair, (count, x).
+    
+    &amp;gt;&amp;gt;&amp;gt; ys = runlength_dec(((3, 'A'), (2, 'B')))
+    &amp;gt;&amp;gt;&amp;gt; next(ys)
+    'A'
+    &amp;gt;&amp;gt;&amp;gt; ''.join(ys)
+    'AABB'
+    '''
+    return its.chain.from_iterable(its.repeat(x, n) for n, x in xs)
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;If you haven&amp;#8217;t seen &lt;code&gt;&lt;a href="http://docs.python.org/library/itertools.html#itertools.itertools.chain.from_iterable"&gt;itertools.chain.from_iterable()&lt;/a&gt;&lt;/code&gt; yet, it was introduced at Python 3.0/2.6. The important feature here is that it lazily works its way through a single iterable argument. If instead we&amp;#8217;d written:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;def runlength_dec(xs):
+    ....
+    return its.chain(*(its.repeat(x, n) for n, x in xs))
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;then our run-length decoder would need to consume all of &lt;code&gt;xs&lt;/code&gt; before yielding results (which is why we must interrupt the interpreter&amp;#8217;s execution below).
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; xs = its.cycle((3, 'A'), (2, 'B'))
+&amp;gt;&amp;gt;&amp;gt; runlength_dec(xs)
+  C-c C-cTraceback (most recent call last):
+  File "&amp;lt;stdin&amp;gt;", line 1, in &amp;lt;module&amp;gt;
+  File "&amp;lt;string&amp;gt;", line 25, in runlength_dec
+  File "&amp;lt;string&amp;gt;", line 25, in &amp;lt;genexpr&amp;gt;
+KeyboardInterrupt
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+
+&lt;h3&gt;Named tuples for clarity&lt;/h3&gt;
+&lt;p&gt;Streams of pairs (as shown above) are perfectly Pythonic. If we run-length encode a stream of numbers, clients will just have to read the manual and remember that &lt;code&gt;item[0]&lt;/code&gt; is a repeat count and &lt;code&gt;item[1]&lt;/code&gt; is a value.
+&lt;/p&gt;
+&lt;p&gt;If this seems fragile, a new-ish member of the &lt;a href="http://docs.python.org/dev/library/collections.html"&gt;collections module&lt;/a&gt; can give the pair more structure.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; from collections import namedtuple
+&amp;gt;&amp;gt;&amp;gt; Run = namedtuple('Run', 'count value') 
+&amp;gt;&amp;gt;&amp;gt; run1 = Run(count=10, value=2)
+&amp;gt;&amp;gt;&amp;gt; run2 = Run(value=2, count=10)
+&amp;gt;&amp;gt;&amp;gt; run1
+Run(count=10, value=2)
+&amp;gt;&amp;gt;&amp;gt; run2
+Run(count=10, value=2)
+&amp;gt;&amp;gt;&amp;gt; run1.count
+10
+&amp;gt;&amp;gt;&amp;gt; run1[0]
+10
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Here&amp;#8217;s how we&amp;#8217;d change &lt;code&gt;runlength_enc()&lt;/code&gt; to use the new type.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;def runlength_enc(xs):
+    '''Return a run-length encoded version of the stream, xs.
+    
+    &amp;gt;&amp;gt;&amp;gt; ys = runlength_enc('AAABBCCC')
+    &amp;gt;&amp;gt;&amp;gt; next(ys)
+    Run(count=3, value='A')
+    &amp;gt;&amp;gt;&amp;gt; list(ys)
+    [Run(count=2, value='B'), Run(count=3, value='C')]
+    '''
+    return (Run(ilen(gp), x) for x, gp in its.groupby(xs))
+
+&lt;/pre&gt;
+
+&lt;/div&gt;</description>
+<dc:date>2009-06-01</dc:date>
+<guid>http://wordaligned.org/articles/runlength-encoding-in-python.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/runlength-encoding-in-python.html</link>
+<category>Streams</category>
+</item>
+
+<item>
+<title>DEFLATE: run-length encoding, but better</title>
+<description>&lt;h3&gt;Run-length encoding&lt;/h3&gt;
+&lt;p&gt;&lt;a href="http://en.wikipedia.org/wiki/Run-length_encoding"&gt;Run-length encoding&lt;/a&gt; is a simple compression scheme in which runs of equal values are represented by the value and a repeat count. For example, a supermarket cashier might process this line of shopping
+&lt;/p&gt;
+&lt;img src="http://wordaligned.org/images/fruit-line.png" alt="Fruit salad"/&gt;
+
+&lt;p&gt;as
+&lt;/p&gt;
+&lt;ul&gt;
+ &lt;li&gt;
+     4 bananas
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     3 apples
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     2 bananas
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     1 pineapple
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     3 apples
+ &lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Unix packs in its very own run length encoder, &lt;code&gt;uniq -c&lt;/code&gt;. It works just fine &amp;#8212; so long as the values you want to encode are newline separated byte strings, that is.
+&lt;/p&gt;
+&lt;p&gt;Let&amp;#8217;s use a sequence of coin tosses as an example stream. &lt;code&gt;$RANDOM&lt;/code&gt; generates random numbers. We use the least significant bit of these numbers as an index into an array containing the values &lt;code&gt;heads&lt;/code&gt;, &lt;code&gt;tails&lt;/code&gt;.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;$ HT=(heads tails)
+$ toss() { echo ${HT[$RANDOM&amp;amp;1]}; }
+$ toss; toss; toss
+heads
+tails
+tails
+$ tosses() { while [ 1 ]; do toss; done; }
+$ tosses | head
+tails
+tails
+tails
+heads
+tails
+heads
+heads
+heads
+tails
+tails
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;&lt;img src="http://wordaligned.org/images/tails.jpg" alt="tails"/&gt;
+   &lt;img src="http://wordaligned.org/images/tails.jpg" alt="tails"/&gt;
+   &lt;img src="http://wordaligned.org/images/tails.jpg" alt="tails"/&gt;
+   &lt;img src="http://wordaligned.org/images/heads.jpg" alt="heads"/&gt;
+   &lt;img src="http://wordaligned.org/images/tails.jpg" alt="tails"/&gt;
+   &lt;img src="http://wordaligned.org/images/heads.jpg" alt="heads"/&gt;
+   &lt;img src="http://wordaligned.org/images/heads.jpg" alt="heads"/&gt;
+   &lt;img src="http://wordaligned.org/images/heads.jpg" alt="heads"/&gt;
+   &lt;img src="http://wordaligned.org/images/tails.jpg" alt="tails"/&gt;
+   &lt;img src="http://wordaligned.org/images/tails.jpg" alt="tails"/&gt;
+&lt;/p&gt;
+&lt;span id="continue-reading"/&gt;
+
+&lt;p&gt;Passing a fresh sample from this same stream through our run-length encoder we get:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;$ tosses | uniq -c | head
+   2 heads
+   1 tails
+   1 heads
+   1 tails
+   1 heads
+   6 tails
+   3 heads
+   1 tails
+   4 heads
+   1 tails
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;An &lt;code&gt;awk&lt;/code&gt; script can be used as a run-length decoder. (There must be a neater way, using &lt;code&gt;sed&lt;/code&gt; maybe?)
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;$ runlendec() { awk '{ while ($1--) print $2 }'; }
+$ tosses | head | tee orig.log | uniq -c | runlendec | tee encdec.log
+heads
+tails
+heads
+tails
+heads
+heads
+tails
+tails
+heads
+heads
+$ diff orig.log encdec.log
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Here, we toss a coin 10 times teeing the original sequence to a file. The next two links in the pipeline compress and decompress the sequence, teeing the results to another file. Finally, as a sanity check, we confirm the round trip results are the same.
+&lt;/p&gt;
+
+&lt;h3&gt;Run-length encoding in Python&lt;/h3&gt;
+&lt;p&gt;This Unix run-length codec is fun, but of limited practical use. One good feature, though, is the way it operates on streams of data (including infinite streams), leaving clients free to decide how best to slice and buffer these streams.
+&lt;/p&gt;
+&lt;p&gt;Python has a fine library of high-level &lt;a href="http://docs.python.org/library/itertools.html"&gt;stream transformation tools&lt;/a&gt; from which we can build a generic and flexible run-length codec in just a few lines. Since I want to progress from run-length coding to something more advanced, I&amp;#8217;ll leave discussing how to implement this codec for now, but if you&amp;#8217;d like to write your own version, here&amp;#8217;s a description suitable for &lt;a href="http://docs.python.org/library/doctest#simple-usage-checking-examples-in-a-text-file"&gt;doctesting&lt;/a&gt;.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;Import the run-length codec functions and compress a short string.
+&amp;gt;&amp;gt;&amp;gt; from runlength import compress, decompress
+&amp;gt;&amp;gt;&amp;gt; comp = compress('AABBBACC')
+
+The returned compressor is a stream (an iterable).
+&amp;gt;&amp;gt;&amp;gt; next(comp)
+(2, 'A')
+
+Pull the rest of the stream into memory.
+&amp;gt;&amp;gt;&amp;gt; rest = list(comp)
+&amp;gt;&amp;gt;&amp;gt; rest
+[(3, 'B'), (1, 'A'), (2, 'C')]
+
+Simple decompress example.
+&amp;gt;&amp;gt;&amp;gt; concat = ''.join
+&amp;gt;&amp;gt;&amp;gt; concat(decompress(rest))
+'BBBACC'
+
+Compress, decompress also work with infinite streams, like the 
+a2b3 stream, which repeatedly cycles two pairs. 
+&amp;gt;&amp;gt;&amp;gt; from itertools import cycle, islice
+&amp;gt;&amp;gt;&amp;gt; a2b3 = cycle([(2, 'a'), (3, 'b')])
+&amp;gt;&amp;gt;&amp;gt; dec = decompress(a2b3)
+
+Pull 8 values from the decompressed stream.
+&amp;gt;&amp;gt;&amp;gt; concat(islice(dec, 8))
+'aabbbaab'
+
+Now compress the decompressed stream, and explore a few items.
+&amp;gt;&amp;gt;&amp;gt; comp = compress(dec)
+&amp;gt;&amp;gt;&amp;gt; next(comp)
+(2, 'b')
+&amp;gt;&amp;gt;&amp;gt; list(islice(comp, 2))
+[(2, 'a'), (3, 'b')]
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+
+&lt;h3&gt;DEFLATE&lt;/h3&gt;
+&lt;img style="border: 2px solid #ccc;" src="http://wordaligned.org/images/chessboard-monochrome.png" alt="Chessboard"/&gt;
+
+&lt;p&gt;The Wikipedia page on &lt;a href="http://en.wikipedia.org/wiki/Run-length_encoding"&gt;run-length encoding&lt;/a&gt; identifies monochrome images as good candidates for run-length compression. The white and black pixels typically group into long runs. Indeed, any simple image using a limited palette should reduce well using this compression scheme.
+&lt;/p&gt;
+&lt;p&gt;The chessboard above is 256&amp;times;256 pixels, each square being 32&amp;times;32 pixels. We &lt;em&gt;could&lt;/em&gt; run-length encode this 64K pixel image as 256&amp;times;8 = 2K runs of 32 pixels, a decent saving. (Actually, we should do slightly better, noting that there are runs of length 64 at the chessboard rank boundaries, but  you get the idea.)
+&lt;/p&gt;
+&lt;pre&gt;
+(32,W)(32,B)(32,W)(32,B)(32,W)(32,B)(32,W)(32,B),
+(32,W)(32,B)(32,W)(32,B)(32,W)(32,B)(32,W)(32,B),
+....
+(32,B)(32,W)(32,B)(32,W)(32,B)(32,W)(32,B)(32,W)
+&lt;/pre&gt;
+
+&lt;p&gt;Like a paletted image, a block of text &amp;#8212; the web page you&amp;#8217;re reading now, for example &amp;#8212; employs a limited alphabet. Although the characters in this text don&amp;#8217;t usually group into long runs there&amp;#8217;s plenty of repetition, especially in the raw HTML: all the occurrences of &lt;code&gt;&amp;lt;div&amp;gt;&lt;/code&gt;, &lt;code&gt;&amp;lt;span&amp;gt;&lt;/code&gt; and &lt;code&gt;class&lt;/code&gt; used for CSS styling, for example. The &lt;a href="http://en.wikipedia.org/wiki/DEFLATE"&gt;DEFLATE&lt;/a&gt; compression algorithm uses a clever twist on run-length encoding to remove this redundancy:
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;The compressed data consists of a series of elements of two types: literal bytes (of strings that have not been detected as duplicated within the previous 32K input bytes), and pointers to duplicated strings, where a pointer is represented as a pair &amp;lt;length, backward distance&amp;gt;. (&lt;a href="http://tools.ietf.org/html/rfc1951"&gt;RFC-1951&lt;/a&gt;)
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;(In addition, a multiple-level dynamic Huffman encoding scheme reduces the space needed for the strings, distances and lengths themselves.)
+&lt;/p&gt;
+&lt;p&gt;There&amp;#8217;s more to these pointer elements than first appears: the length can exceed the backward distance. Thus the sequence:
+&lt;/p&gt;
+&lt;pre&gt;
+heads
+heads
+heads
+heads
+heads
+&lt;/pre&gt;
+
+&lt;p&gt;can be deflated as the literal type &lt;code&gt;heads\n&lt;/code&gt; followed by the pointer type &lt;code&gt;&amp;lt;24, 6&amp;gt;&lt;/code&gt;. 
+&lt;/p&gt;
+&lt;p&gt;If you&amp;#8217;ve spotted the potential for recursion, good! The inflating stream can reference itself, which can reference itself, which can &amp;#8230; &lt;a href="http://steike.com/code/useless/zip-file-quine/" title="Best ever Quine!"&gt;Confusing?&lt;/a&gt;
+&lt;/p&gt;
+
+&lt;h3&gt;Zipping pixels&lt;/h3&gt;
+&lt;p&gt;&lt;a href="http://www.libpng.org/pub/png/" title="Check out the graphics on the PNG home page!"&gt;PNG&lt;/a&gt; images use DEFLATE compression (as implemented by &lt;a href="http://www.zlib.net"&gt;zlib&lt;/a&gt;) to save on pixel storage space. Here&amp;#8217;s a binary view of the raw data in the chessboard graphic shown above, all &lt;strong&gt;137 bytes&lt;/strong&gt; of it. The 64K pixels themselves compress into a 88 byte IDAT chunk, of which the final 8 bytes are a checksum and (I think?) some padding. Maybe the image could be &lt;a href="http://drj11.wordpress.com/2009/02/20/i-crush-optipng/"&gt;squeezed harder&lt;/a&gt;, but I&amp;#8217;m impressed!
+&lt;/p&gt;
+&lt;pre&gt;
+8950 4e47 0d0a 1a0a 0000 000d 4948 4452  .&lt;b&gt;PNG&lt;/b&gt;........&lt;b&gt;IHDR&lt;/b&gt;
+0000 0100 0000 0100 0100 0000 0074 0995  .............t..
+cb00 0000 5049 4441 5468 81ed ceb1 0d00  ....P&lt;b&gt;IDAT&lt;/b&gt;h......
+200c 0341 f65f 1a58 803a 2f74 6e52 e424   ..A._.X.:/tnR.$
+7bed 9b75 f3ba cf07 0000 df83 ca0e 0000  {..u............
+7a60 ba1f 0080 2ea8 ec00 00a0 07a6 fb01  z`..............
+00e8 82ca 0e00 007a 60ba 1f00 802e a8ec  .......z`.......
+0000 2007 0e8a 69f0 e2b9 9471 c700 0000  .. ...i....q....
+0049 454e 44ae 4260 82                   .&lt;b&gt;IEND&lt;/b&gt;.B`.
+&lt;/pre&gt;
+
+&lt;p&gt;Here&amp;#8217;s a trace of how zlib inflates the compressed pixels in this &lt;a href="http://www.libpng.org/pub/png/spec/1.2/PNG-Chunks.html"&gt;IDAT chunk&lt;/a&gt;. (Source code available via anonymous SVN at &lt;a href="http://wordaligned.org/svn/etc/zlib_trace"&gt;http://wordaligned.org/svn/etc/zlib_trace&lt;/a&gt;.)
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;inflate: allocated
+inflate: reset
+inflate:   zlib header ok
+inflate:     dynamic codes block (last)
+inflate:       table sizes ok
+inflate:       code lengths ok
+inflate:       codes ok
+inflate:         literal 0x00
+inflate:         literal 0xff
+inflate:         length 3
+inflate:         distance 1
+inflate:         literal 0x00
+inflate:         length 3
+inflate:         distance 1
+inflate:         length 24
+inflate:         distance 8
+inflate:         length 25
+inflate:         distance 25
+inflate:         length 258
+inflate:         distance 33
+....
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;I&amp;#8217;ve attempted to show the first few stages of the genesis of the uncompressed stream in the picture below. The way the stream recursively inflates itself is quite beautiful.
+&lt;/p&gt;
+&lt;img style="border: 2px solid #ccc;" src="http://wordaligned.org/images/inflate.png" alt="Inflating pixels"/&gt;
+
+&lt;ol&gt;
+ &lt;li&gt;
+     put 00
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     put ff
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     go back 1 (to ff), put 3
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     put 00
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     go back 1 (to 00), put 3
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     go back 8 (to 00 00 00 00 ff ff ff ff)
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     put 24
+ &lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Two elements later, and the repeat length has grown to 258. In fact, the entire chessboard is generated from just 3 literal and 43 pointer elements.
+&lt;/p&gt;
+&lt;p&gt;(Not all graphics have such a regular pattern, of course, so we can&amp;#8217;t always achieve such dramatic compression.)
+&lt;/p&gt;
+
+&lt;h3&gt;Deflated HTML&lt;/h3&gt;
+&lt;p&gt;Web servers can and do save on band-width by transferring &lt;a href="http://www.gzip.org/"&gt;gzip&lt;/a&gt; compressed HTML to gzip capable clients. (Gzip is a simple wrapper around DEFLATE.) Any PNG images transferred will also have their pixels DEFLATE compressed.
+&lt;/p&gt;
+&lt;pre&gt;
+$ curl http://wordaligned.org --head --compress
+HTTP/1.1 200 OK
+Date: Sun, 17 May 2009 17:41:53 GMT
+Server: lighttpd | Word Aligned
+Content-Type: text/html; charset=UTF-8
+....
+Vary: Accept-Encoding
+&lt;b&gt;Content-Encoding: gzip&lt;/b&gt;
+Content-Length: 20
+&lt;/pre&gt;
+
+&lt;p&gt;The Word Aligned &lt;a href="http://wordaligned.org/"&gt;front page&lt;/a&gt; contains about 75Kb of HTML, which gzips to just 16Kb &amp;#8212; a decent saving. Relevant lines from the &lt;a href="http://redmine.lighttpd.net/projects/lighttpd/wiki/Docs:ModCompress"&gt;lighttpd configuration file&lt;/a&gt; read:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;lighttpd mod_compress&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;server.modules = (
+    ....
+    "mod_compress"
+)
+compress.cache-dir = basedir + "lighttpd/cache/compress/"
+compress.filetype  = ("text/plain", "text/html", "text/css")
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;I uphold Gzip (built on zlib, which implements DEFLATE) as a hero of the web. As we&amp;#8217;ve seen, it implements a powerful and elegant algorithm, but perhaps the best thing about it is that it&amp;#8217;s free to use, a freedom worth fighting for. Check out this battle report from the &lt;a href="http://www.gzip.org/#faq"&gt;FAQ&lt;/a&gt;.
+&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;h3&gt;What about patents?&lt;/h3&gt;
+&lt;p&gt;&lt;em&gt;gzip&lt;/em&gt; was developed as a replacement for compress because of the UNISYS and IBM &lt;a href="http://www.faqs.org/faqs/compression-faq/part1/section-6.html"&gt;patents&lt;/a&gt; covering the &lt;a href="http://www.faqs.org/faqs/compression-faq/part2/section-1.html"&gt;LZW&lt;/a&gt; algorithm used by compress.
+&lt;/p&gt;
+&lt;p&gt;I have probably spent more time studying data compression patents than actually implementing data compression algorithms. I maintain a list of several hundred patents on lossless data compression algorithms, and I made sure that &lt;em&gt;gzip&lt;/em&gt; isn&amp;#8217;t covered by any of them. In particular, the &lt;code&gt;--fast&lt;/code&gt; option of gzip is not as fast it could, precisely to avoid a patented technique.  &amp;#8212; Jean-Loup Gailly, &lt;a href="http://www.gzip.org/#faq11"&gt;Gzip FAQ&lt;/a&gt;
+&lt;/p&gt;
+&lt;/blockquote&gt;</description>
+<dc:date>2009-05-21</dc:date>
+<guid>http://wordaligned.org/articles/deflate-runlength-encoding-but-better.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/deflate-runlength-encoding-but-better.html</link>
+<category>Streams</category>
+</item>
+
+<item>
+<title>Copy, load, redirect and tee using C++ streambufs</title>
+<description>&lt;div class="toc"&gt;
+&lt;h2&gt;Contents&lt;/h2&gt;
+&lt;ul&gt;
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/cpp-streambufs.html#toccout-or-printf" name="toc0" id="toc0"&gt;Cout or printf?&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/cpp-streambufs.html#tocexposed-buffers" name="toc1" id="toc1"&gt;Exposed buffers&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/cpp-streambufs.html#toccopy-streams" name="toc2" id="toc2"&gt;Copy streams&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/cpp-streambufs.html#tocload-streams" name="toc3" id="toc3"&gt;Load streams&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/cpp-streambufs.html#tocredirect-streams" name="toc4" id="toc4"&gt;Redirect streams&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/cpp-streambufs.html#toctee-streams" name="toc5" id="toc5"&gt;Tee streams&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/cpp-streambufs.html#toca-generic-version" name="toc6" id="toc6"&gt;A generic version&lt;/a&gt;
+ &lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;out &amp;lt;&amp;lt; std::setw(3) &amp;lt;&amp;lt; place &amp;lt;&amp;lt; ". "
+    &amp;lt;&amp;lt; "Name " &amp;lt;&amp;lt; name
+    &amp;lt;&amp;lt; ", Score " 
+    &amp;lt;&amp;lt; std::fixed &amp;lt;&amp;lt; std::setprecision(2) 
+    &amp;lt;&amp;lt; score &amp;lt;&amp;lt; '\n';
+
+fprintf(out, "%3d. Name %s, Score %.2f\n", 
+        place, name, score);
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/cpp-streambufs.html#toc0" name="toccout-or-printf" id="toccout-or-printf"&gt;Cout or printf?&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Towards the end of an interview I was asked:
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;&amp;#8220;Cout or printf?&amp;#8221;
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;The question made me smile. It signalled that I&amp;#8217;d done well enough in the technical section and now we&amp;#8217;d be moving on to a more relaxed discussion. Similar tailing-off questions include:
+&lt;/p&gt;
+&lt;ul&gt;
+ &lt;li&gt;
+     &lt;a href="http://wordaligned.org/articles/accidental-emacs.html" title="Emacs, of course!"&gt;Which editor&lt;/a&gt; do you use?
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     Tabs or spaces?
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     Are &lt;a href="http://code.activestate.com/recipes/66531/" title="Yes, and borgs are no better"&gt;singletons evil&lt;/a&gt;?
+ &lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;(Come to think of it, the correct answer to the &lt;code&gt;cout&lt;/code&gt; vs. &lt;code&gt;printf&lt;/code&gt; question is probably &amp;#8220;No!&amp;#8221; Both provide global access to the standard output stream, and globals, like singletons, are dangerous. &lt;a href="http://accu.org/index.php/journals/1411"&gt;Parametrise from above&lt;/a&gt;, pass down &lt;code&gt;ostreams&lt;/code&gt; or &lt;code&gt;FILE *&lt;/code&gt; handles as needed. Do the right thing! Anyway&amp;#8230;)
+&lt;/p&gt;
+&lt;div class="amazon"&gt;&lt;a href="http://www.amazon.com/gp/product/0201379260?ie=UTF8&amp;amp;tag=wordalig-20"&gt;&lt;img src="http://wordaligned.org/images/books/josuttis-cpp-book.jpg" alt="The C++ Standard Library: A Tutorial and Reference cover"/&gt;&lt;/a&gt;&lt;/div&gt;
+
+&lt;p&gt;I answered something suitably vague. The interview moved on. The truth is, the C++ iostream library may be technically superior to its C predecessor &amp;#8212; safer to use, easier to extend &amp;#8212; but it&amp;#8217;s failed to supplant it. Does anyone truly find all those chained shift operators and manipulators easier to read than a succinct format string? Does the &lt;code&gt;char&lt;/code&gt;, &lt;code&gt;wchar_t&lt;/code&gt;, &lt;code&gt;&amp;lt;your-char&amp;gt;&lt;/code&gt; dimension really help? Even Nicolai Josuttis&amp;#8217; excellent book, &lt;a href="http://www.amazon.com/gp/product/0201379260?ie=UTF8&amp;amp;tag=wordalig-20"&gt;The C++ Standard Library: A Tutorial and Reference&lt;/a&gt;, shies away:
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;This chapter does not attempt to discuss all aspects of the IOStream library in detail; to do that would take an entire book by itself.
+&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/cpp-streambufs.html#toc1" name="tocexposed-buffers" id="tocexposed-buffers"&gt;Exposed buffers&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;I&amp;#8217;m not the only person to find iostream formatting &lt;a href="http://www.fastformat.org/" title="Ultimate robustness! Unlimited flexibility! Unbeatable performance! (a Matthew Wilson production)"&gt;somewhat&lt;/a&gt; &lt;a href="http://www.boost.org/doc/libs/1_39_0/libs/format/index.html" title="Boost format - featuring operator %"&gt;clunky&lt;/a&gt;, but input/output is more than just formatting. There&amp;#8217;s also buffering and synchronising, for example. One under-appreciated feature of the iostream library is that the low-level read and write operations are delegated to separate stream buffer objects. 
+&lt;/p&gt;
+&lt;p&gt;C++ streams allow direct access to their underlying buffers. You can customise these buffers. You can swap them around. In some ways, C++ goes in at a lower level than C. Poke around in the &lt;a href="http://www.cplusplus.com/reference/iostream/streambuf/"&gt;streambuf&lt;/a&gt; class, and you&amp;#8217;ll find the member function names even sound like assembler instructions: &lt;code&gt;egptr&lt;/code&gt;, &lt;code&gt;xsputn&lt;/code&gt;, &lt;code&gt;pbump&lt;/code&gt;, &lt;code&gt;epptr&lt;/code&gt;, for example.
+&lt;/p&gt;
+&lt;p&gt;The remainder of this article works through some examples which use &lt;code&gt;std::streambuf&lt;/code&gt;s to copy, load, redirect and tee streams.
+&lt;/p&gt;
+&lt;span id="continue-reading"/&gt;
+
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/cpp-streambufs.html#toc2" name="toccopy-streams" id="toccopy-streams"&gt;Copy streams&lt;/a&gt;&lt;/h3&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;void stream_copy(std::ostream &amp;amp; dst, std::istream &amp;amp; src)
+{
+    dst &amp;lt;&amp;lt; src.rdbuf();
+}
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;How does this work? &lt;code&gt;Std::stream&lt;/code&gt; derives from &lt;code&gt;std::ios&lt;/code&gt;, and &lt;code&gt;&lt;a href="http://www.cplusplus.com/reference/iostream/ios/rdbuf/"&gt;ios::rdbuf()&lt;/a&gt;&lt;/code&gt; returns a pointer to the source stream&amp;#8217;s buffer. A suitable specialisation of &lt;code&gt;&lt;a href="http://www.cplusplus.com/reference/iostream/ostream/operator%3C%3C/"&gt;ostream::operator&amp;lt;&amp;lt;()&lt;/a&gt;&lt;/code&gt; reads from this buffer until the source stream empties. Note that &lt;code&gt;stream_copy&lt;/code&gt; typically does &lt;strong&gt;not&lt;/strong&gt; result in the entire contents of either the source or destination stream being held in memory at any one time &amp;#8212; everything goes through the stream buffers in the usual way. Except, of course, if we&amp;#8217;re using an in-memory &lt;code&gt;std::stringstream&lt;/code&gt;, used below to load the contents of a file into a string.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/cpp-streambufs.html#toc3" name="tocload-streams" id="tocload-streams"&gt;Load streams&lt;/a&gt;&lt;/h3&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;// Return a named file's contents as a string
+std::string load_file(char const * filepath)
+{
+    std::ifstream src(filepath);
+    std::ostringstream buf;
+    buf &amp;lt;&amp;lt; src.rdbuf();
+    return buf.str();
+}
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;I&amp;#8217;ve used this simple recipe in test code to load binary data from a file.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/cpp-streambufs.html#toc4" name="tocredirect-streams" id="tocredirect-streams"&gt;Redirect streams&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Everyone knows how to use a command shell to redirect the output of a program to a log file.
+&lt;/p&gt;
+&lt;pre&gt;
+$ echo Hello, world! &amp;gt; hello-world.log
+$ cat hello-world.log
+Hello, world!
+&lt;/pre&gt;
+
+&lt;p&gt;Stream buffers allow for more flexible stream redirection from &lt;strong&gt;within&lt;/strong&gt; the program, once again using &lt;code&gt;ios::rdbuf()&lt;/code&gt;, this time to both get and set a stream&amp;#8217;s buffer.
+&lt;/p&gt;
+&lt;p&gt;Here&amp;#8217;s a simple redirecter class, designed for use on the stack, allowing the constructor and destructor to &lt;a href="http://c2.com/cgi-bin/wiki?ExecuteAroundMethod" title="Execute around sounds better than RAII to me"&gt;execute around&lt;/a&gt; a block of code.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;#include &amp;lt;ostream&amp;gt;
+
+// Stream redirecter.
+class redirecter
+{
+public:
+    // Constructing an instance of this class causes
+    // anything written to the source stream to be redirected
+    // to the destination stream.
+    redirecter(std::ostream &amp;amp; dst, std::ostream &amp;amp; src)
+        : src(src)
+        , srcbuf(src.rdbuf())
+    {
+        src.rdbuf(dst.rdbuf());
+    }
+    
+    // The destructor restores the original source stream buffer
+    ~redirecter()
+    {
+        src.rdbuf(srcbuf);
+    }
+private:
+    std::ostream &amp;amp; src;
+    std::streambuf * const srcbuf;
+};
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Incidentally, when ios.rdbuf() is used in set mode it returns the original value of the stream&amp;#8217;s buffer, allowing us to write a slightly more compact constructor as shown in the complete program below.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;#include &amp;lt;fstream&amp;gt;
+#include &amp;lt;iostream&amp;gt;
+
+class redirecter
+{
+public:
+    redirecter(std::ostream &amp;amp; dst, std::ostream &amp;amp; src)
+        : src(src), sbuf(src.rdbuf(dst.rdbuf())) {}
+    ~redirecter() { src.rdbuf(sbuf); }
+private:
+    std::ostream &amp;amp; src;
+    std::streambuf * const sbuf;
+};
+
+void hello_world()
+{
+    std::cout &amp;lt;&amp;lt; "Hello, world!\n";
+}
+
+int main()
+{
+    std::ofstream log("hello-world.log");
+    redirecter redirect(log, std::cout);
+    hello_world();
+    return 0;
+}
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Running this program prints nothing to standard output. Instead the file &lt;code&gt;hello-world.log&lt;/code&gt; contains the redirected output, &lt;code&gt;Hello, world!&lt;/code&gt;.
+&lt;/p&gt;
+&lt;p&gt;Note that &lt;code&gt;redirect&lt;/code&gt; will be destroyed before &lt;code&gt;log&lt;/code&gt;, thus restoring &lt;code&gt;std::cout&lt;/code&gt;&amp;#8217;s original buffer. This detail is crucial, since destroying the file closes it and destroys its stream buffer, so we must not allow &lt;code&gt;std::cout&lt;/code&gt; to continue using this buffer.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;A bus error on my platform&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;#include &amp;lt;fstream&amp;gt;
+#include &amp;lt;iostream&amp;gt;
+
+int main()
+{
+    std::ofstream log("oops.log");
+    std::cout.rdbuf(log.rdbuf());
+    std::cout &amp;lt;&amp;lt; "Oops!\n";
+    return 0;
+}
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/cpp-streambufs.html#toc5" name="toctee-streams" id="toctee-streams"&gt;Tee streams&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;You could argue the redirection example is somewhat contrived. If &lt;code&gt;hello_world()&lt;/code&gt; had been properly written to accept an &lt;code&gt;ostream&lt;/code&gt; as a function argument, rather than rely on the global &lt;code&gt;std::cout&lt;/code&gt;, then we could simply pass it the &lt;code&gt;ofstream&lt;/code&gt; of our choice and be done. We could equally pass it an &lt;code&gt;ostringstream&lt;/code&gt; and check the contents of this stream to test that &lt;code&gt;hello_world()&lt;/code&gt; does indeed print what it&amp;#8217;s supposed to&lt;a id="fn1link" href="http://wordaligned.org/articles/cpp-streambufs.html#fn1"&gt;&lt;sup&gt;[1]&lt;/sup&gt;&lt;/a&gt;.
+&lt;/p&gt;
+&lt;p&gt;How about teeing streams? In a command shell the standard &lt;a href="http://www.gnu.org/software/coreutils/manual/html_node/tee-invocation.html"&gt;tee&lt;/a&gt; connector allows us to replicate a stream. The snippet below shows the output from &lt;a href="http://www.gnu.org/software/coreutils/manual/html_node/echo-invocation.html#echo-invocation"&gt;echo&lt;/a&gt; appearing on standard output and teed to a log file.
+&lt;/p&gt;
+&lt;pre&gt;
+$ echo Hello, world! | tee hello-world.log
+Hello, world!
+$ cat hello-world.log 
+Hello, world!
+&lt;/pre&gt;
+
+&lt;p&gt;Within a program, a clever stream buffer customisation can do the same job. Here&amp;#8217;s the declaration of a minimal teebuf class, which specialises a standard streambuf. The idea is that we can assign such a teebuf to a stream, causing anything written to the stream to be diverted through both teed output buffers.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;#include &amp;lt;streambuf&amp;gt;
+
+class teebuf: public std::streambuf
+{
+public:
+    // Construct a streambuf which tees output to both input
+    // streambufs.
+    teebuf(std::streambuf * sb1, std::streambuf * sb2);
+protected:
+    virtual int overflow(int char);
+private:
+    std::streambuf * sb1;
+    std::streambuf * sb2;
+};
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Before fleshing out the implementation, I&amp;#8217;d like to discuss what lies beneath the surface of this simple declaration. We&amp;#8217;re specialising a &lt;code&gt;std::streambuf&lt;/code&gt;, which is itself a typedef for &lt;code&gt;basic_streambuf&amp;lt;char&amp;gt;&lt;/code&gt;. We&amp;#8217;ll show how to make this code more generic &lt;a href="http://wordaligned.org/articles/cpp-streambufs.html#toca-generic-solution"&gt;later&lt;/a&gt;.
+&lt;/p&gt;
+&lt;p&gt;The base class, &lt;code&gt;std::streambuf&lt;/code&gt;, despite its name, has no buffer. This base class provides two public member functions for outputting character data, &lt;code&gt;sputc&lt;/code&gt; and &lt;code&gt;sputn&lt;/code&gt;, which output a single character and a run of characters respectively. If the internal buffer is full (always the case here, since there is no buffer) then the virtual overflow method ends up being called. Thus a suitable override of this method will do the job.
+&lt;/p&gt;
+&lt;p&gt;For details, consult a good reference. On my platform the actual (GNU) header files are well written and, of course, 100% accurate. The HTML documents generated from them can also be found &lt;a href="http://gcc.gnu.org/onlinedocs/libstdc++/libstdc++-html-USERS-4.4/a00216.html"&gt;online&lt;/a&gt;.
+&lt;/p&gt;
+&lt;p&gt;You may wonder why &lt;code&gt;overflow&lt;/code&gt; deals in &lt;code&gt;int&lt;/code&gt;s and not &lt;code&gt;char&lt;/code&gt;s. That&amp;#8217;s because, in the case of an error, it returns a sentinel value, &lt;code&gt;EOF&lt;/code&gt;, which does not fit in a &lt;code&gt;char&lt;/code&gt;. (More generically, it deals with &lt;code&gt;traits::int_type&lt;/code&gt;s and returns a &lt;code&gt;traits::eof()&lt;/code&gt; to indicate an error condition).
+&lt;/p&gt;
+&lt;p&gt;Actually, I can understand why &lt;code&gt;overflow&lt;/code&gt; returns an &lt;code&gt;int_type&lt;/code&gt; but I&amp;#8217;m unsure why it should accept an &lt;code&gt;int_type&lt;/code&gt; argument when external clients only put characters into the stream. A footnote in the &lt;a href="http://www.open-std.org/jtc1/sc22/wg21/docs/standards"&gt;standard&lt;/a&gt; reads:
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;Typically, &lt;code&gt;overflow&lt;/code&gt; returns c to indicate success, except when &lt;code&gt;traits::eq_int_type(c,traits::eof())&lt;/code&gt; returns &lt;code&gt;true&lt;/code&gt;, in which case it returns &lt;code&gt;traits::not_eof(c)&lt;/code&gt;.
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;I&amp;#8217;m not sure that helps me much.
+&lt;/p&gt;
+&lt;p&gt;Nonetheless, here&amp;#8217;s a &lt;code&gt;teebuf&lt;/code&gt; implementation. I&amp;#8217;ve changed both &lt;code&gt;overflow&lt;/code&gt; to be private which stops anyone deriving from this class. Any actual buffering will be delegated to the teed buffers. We&amp;#8217;ve also over-ridden the virtual &lt;code&gt;sync()&lt;/code&gt; method: the default implementation does nothing, but here we sync the teed buffers. I can&amp;#8217;t see any way the &lt;code&gt;(c == EOF)&lt;/code&gt; test could ever return &lt;code&gt;true&lt;/code&gt; for instances of this class but I&amp;#8217;ve followed the advice from the footnote in the standard anyway.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;#include &amp;lt;streambuf&amp;gt;
+
+class teebuf: public std::streambuf
+{
+public:
+    // Construct a streambuf which tees output to both input
+    // streambufs.
+    teebuf(std::streambuf * sb1, std::streambuf * sb2)
+        : sb1(sb1)
+        , sb2(sb2)
+    {
+    }
+private:
+    // This tee buffer has no buffer. So every character "overflows"
+    // and can be put directly into the teed buffers.
+    virtual int overflow(int c)
+    {
+        if (c == EOF)
+        {
+            return !EOF;
+        }
+        else
+        {
+            int const r1 = sb1-&amp;gt;sputc(c);
+            int const r2 = sb2-&amp;gt;sputc(c);
+            return r1 == EOF || r2 == EOF ? EOF : c;
+        }
+    }
+    
+    // Sync both teed buffers.
+    virtual int sync()
+    {
+        int const r1 = sb1-&amp;gt;pubsync();
+        int const r2 = sb2-&amp;gt;pubsync();
+        return r1 == 0 &amp;amp;&amp;amp; r2 == 0 ? 0 : -1;
+    }   
+private:
+    std::streambuf * sb1;
+    std::streambuf * sb2;
+};
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Here&amp;#8217;s a simple helper class to create a tee stream from two input streams. (My thanks to Tony Yu for pointing out a problem with the code originally posted here.)
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;class teestream : public std::ostream
+{
+public:
+    // Construct an ostream which tees output to the supplied
+    // ostreams.
+    teestream(std::ostream &amp;amp; o1, std::ostream &amp;amp; o2);
+private:
+    teebuf tbuf;
+};
+
+teestream::teestream(std::ostream &amp;amp; o1, std::ostream &amp;amp; o2)
+  : std::ostream(&amp;amp;tbuf)
+  , tbuf(o1.rdbuf(), o2.rdbuf())
+{
+}
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;And here&amp;#8217;s a short program showing how to use these elements.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;#include &amp;lt;fstream&amp;gt;
+#include &amp;lt;iostream&amp;gt;
+#include &amp;lt;teestream&amp;gt;
+
+int main()
+{
+    std::ofstream log("hello-world.log");
+    teestream tee(std::cout, log);
+    tee &amp;lt;&amp;lt; "Hello, world!\n";
+    return 0;
+}
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Running this program prints the message &lt;code&gt;Hello, world!&lt;/code&gt; followed by a newline to standard output, and the file &lt;code&gt;hello-world.log&lt;/code&gt; contains this same output.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/cpp-streambufs.html#toc6" name="toca-generic-version" id="toca-generic-version"&gt;A generic version&lt;/a&gt;&lt;/h3&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;template &amp;lt;typename char_type,
+          typename traits = std::char_traits&amp;lt;char_type&amp;gt; &amp;gt;
+class basic_teebuf:
+    public std::basic_streambuf&amp;lt;char_type, traits&amp;gt;
+{
+public:
+    typedef typename traits::int_type int_type;
+    
+    basic_teebuf(std::basic_streambuf&amp;lt;char_type, traits&amp;gt; * sb1,
+                 std::basic_streambuf&amp;lt;char_type, traits&amp;gt; * sb2)
+      : sb1(sb1)
+      , sb2(sb2)
+    {
+    }
+    
+private:    
+    virtual int sync()
+    {
+        int const r1 = sb1-&amp;gt;pubsync();
+        int const r2 = sb2-&amp;gt;pubsync();
+        return r1 == 0 &amp;amp;&amp;amp; r2 == 0 ? 0 : -1;
+    }
+    
+    virtual int_type overflow(int_type c)
+    {
+        int_type const eof = traits::eof();
+        
+        if (traits::eq_int_type(c, eof))
+        {
+            return traits::not_eof(c);
+        }
+        else
+        {
+            char_type const ch = traits::to_char_type(c);
+            int_type const r1 = sb1-&amp;gt;sputc(ch);
+            int_type const r2 = sb2-&amp;gt;sputc(ch);
+            
+            return
+                traits::eq_int_type(r1, eof) ||
+                traits::eq_int_type(r2, eof) ? eof : c;
+        }
+    }
+    
+private:
+    std::basic_streambuf&amp;lt;char_type, traits&amp;gt; * sb1;
+    std::basic_streambuf&amp;lt;char_type, traits&amp;gt; * sb2;
+};
+
+typedef basic_teebuf&amp;lt;char&amp;gt; teebuf;
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;I am placing the code samples presented here in the public domain.
+&lt;/p&gt;
+&lt;hr /&gt;
+
+&lt;p&gt;&lt;a id="fn1" href="http://wordaligned.org/articles/cpp-streambufs.html#fn1link"&gt;[1]&lt;/a&gt; This demonstrates one reason why globals such as &lt;code&gt;cout&lt;/code&gt; are a bad idea &amp;#8212; it becomes harder to test code which accesses them. 
+&lt;/p&gt;</description>
+<dc:date>2009-05-13</dc:date>
+<guid>http://wordaligned.org/articles/cpp-streambufs.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/cpp-streambufs.html</link>
+<category>Streams</category>
+</item>
+
+<item>
+<title>Patience sort and the Longest increasing subsequence</title>
+<description>&lt;a href="http://wordaligned.org/articles/patience-sort.html"&gt;&lt;img src="http://wordaligned.org/images/patience-sort.gif" alt="Patience sort and longest increasing subsequence"/&gt;&lt;/a&gt;&lt;p&gt;This article relies on Javascript and CSS for graphical content and I don&amp;#8217;t trust a feed reader to render it properly, which is why I&amp;#8217;m posting a teaser here rather than the full content. To find out how a simple card game provides an efficient algorithm for finding the longest increasing subsequence of a sequence, please &lt;a href="http://wordaligned.org/articles/patience-sort.html"&gt;visit the original&lt;/a&gt;.&lt;/p&gt;</description>
+<dc:date>2009-03-26</dc:date>
+<guid>http://wordaligned.org/articles/patience-sort.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/patience-sort.html</link>
+<category>Streams</category>
+</item>
+
+<item>
+<title>Removing duplicates using itertools.groupby</title>
+<description>&lt;h3&gt;Eliminating duplicates&lt;/h3&gt;
+&lt;p&gt;&lt;a href="http://wordaligned.org/articles/merging-sorted-streams-in-python.html"&gt;Previously&lt;/a&gt; I discussed merging sorted streams using Python; a call to a standard library &lt;a href="http://docs.python.org/library/heapq.html#heapq.merge"&gt;function&lt;/a&gt; for those who&amp;#8217;ve updated to 2.6.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; from heapq import merge
+&amp;gt;&amp;gt;&amp;gt; from itertools import count, imap, islice
+&amp;gt;&amp;gt;&amp;gt; m2, m3, m5 = [imap(n.__mul__, count(1)) for n in (2, 3, 5)]
+&amp;gt;&amp;gt;&amp;gt; m235 = merge(m2, m3, m5)
+&amp;gt;&amp;gt;&amp;gt; list(islice(m235, 10))
+[2, 3, 4, 5, 6, 6, 8, 9, 10, 10]
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Here, we merge positive multiples of 2, 3 and 5 into a single stream. 6 appears twice in the output, being a multiple of both 2 and 3. 10 is similarly duplicated and 30 would feature three times.
+&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://docs.python.org/library/itertools#itertools.groupby"&gt;Itertools.groupby&lt;/a&gt; can remove the repeated entries.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; from itertools import groupby
+&amp;gt;&amp;gt;&amp;gt; help(groupby)
+Help on class groupby in module itertools:
+
+class groupby(__builtin__.object)
+ |  groupby(iterable[, keyfunc]) -&amp;gt; create an iterator which returns
+ |  (key, sub-iterator) grouped by each value of key(value).
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;If the key function is not specified or is &lt;code&gt;None&lt;/code&gt; it defaults to an identity function, and &lt;code&gt;groupby&lt;/code&gt; partitions an iterable into subiterators over equal valued elements.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; from operator import itemgetter
+&amp;gt;&amp;gt;&amp;gt; first = itemgetter(0)
+&amp;gt;&amp;gt;&amp;gt; m235 = merge(*(imap(n.__mul__, count(1)) for n in (2, 3, 5)))
+&amp;gt;&amp;gt;&amp;gt; u235 = imap(first, groupby(m235))
+&amp;gt;&amp;gt;&amp;gt; list(islice(u235, 10))
+[2, 3, 4, 5, 6, 8, 9, 10, 12, 14]
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;span id="continue-reading"/&gt;
+
+&lt;p&gt;Groupby is very like the Unix &lt;a href="http://www.gnu.org/software/coreutils/manual/html_node/uniq-invocation.html#uniq-invocation"&gt;uniq&lt;/a&gt; tool.
+&lt;/p&gt;
+&lt;p&gt;Generally (the &lt;a href="http://docs.python.org/library/itertools#itertools.groupby"&gt;documentation&lt;/a&gt; goes on to say) &amp;#8220;the iterable needs to already be sorted on the same key function&amp;#8221; but &lt;code&gt;groupby&lt;/code&gt; is perfectly well defined when this isn&amp;#8217;t the case. Here&amp;#8217;s an artificial example showing groupby turning a random sequence into an alternating one.
+&lt;/p&gt;
+
+&lt;h3&gt;Random sequence&lt;/h3&gt;
+&lt;p&gt;Let&amp;#8217;s toss a coin to generate a random sequence of heads and tails.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; def toss_a_coin():
+...     import random
+...     return random.choice("HT")
+...
+&amp;gt;&amp;gt;&amp;gt; from itertools import repeat
+&amp;gt;&amp;gt;&amp;gt; def call(f):
+...     return f()
+...
+&amp;gt;&amp;gt;&amp;gt; tosses = imap(call, repeat(toss_a_coin))
+&amp;gt;&amp;gt;&amp;gt; spacer = ' '.join
+&amp;gt;&amp;gt;&amp;gt; spacer(list(islice(tosses, 7)))
+'T T H T H H H'
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;&lt;img src="http://wordaligned.org/images/tails.jpg" alt="tails"/&gt;&lt;img src="http://wordaligned.org/images/tails.jpg" alt="tails"/&gt;&lt;img src="http://wordaligned.org/images/heads.jpg" alt="heads"/&gt;&lt;img src="http://wordaligned.org/images/tails.jpg" alt="tails"/&gt;&lt;img src="http://wordaligned.org/images/heads.jpg" alt="heads"/&gt;&lt;img src="http://wordaligned.org/images/heads.jpg" alt="heads"/&gt;&lt;img src="http://wordaligned.org/images/heads.jpg" alt="heads"/&gt;
+&lt;/p&gt;
+
+&lt;h3&gt;Alternating sequence&lt;/h3&gt;
+&lt;p&gt;We can filter the unique values from this random sequence of coin tosses to generate an alternating sequence.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; def uniq(seq):
+...     return imap(first, groupby(seq))
+... 
+&amp;gt;&amp;gt;&amp;gt; spacer(list(islice(uniq(tosses), 7)))
+'H T H T H T H'
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;&lt;img src="http://wordaligned.org/images/heads.jpg" alt="heads"/&gt;&lt;img src="http://wordaligned.org/images/tails.jpg" alt="tails"/&gt;&lt;img src="http://wordaligned.org/images/heads.jpg" alt="heads"/&gt;&lt;img src="http://wordaligned.org/images/tails.jpg" alt="tails"/&gt;&lt;img src="http://wordaligned.org/images/heads.jpg" alt="heads"/&gt;&lt;img src="http://wordaligned.org/images/tails.jpg" alt="tails"/&gt;&lt;img src="http://wordaligned.org/images/heads.jpg" alt="heads"/&gt;
+&lt;/p&gt;
+
+&lt;h3&gt;Constant sequence&lt;/h3&gt;
+&lt;p&gt;Every other element of this filtered sequence will be the same.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; tails = islice(uniq(tosses), 0, None, 2)
+&amp;gt;&amp;gt;&amp;gt; spacer(list(islice(tails, 7)))
+'T T T T T T T'
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;&lt;img src="http://wordaligned.org/images/tails.jpg" alt="tails"/&gt;&lt;img src="http://wordaligned.org/images/tails.jpg" alt="tails"/&gt;&lt;img src="http://wordaligned.org/images/tails.jpg" alt="tails"/&gt;&lt;img src="http://wordaligned.org/images/tails.jpg" alt="tails"/&gt;&lt;img src="http://wordaligned.org/images/tails.jpg" alt="tails"/&gt;&lt;img src="http://wordaligned.org/images/tails.jpg" alt="tails"/&gt;&lt;img src="http://wordaligned.org/images/tails.jpg" alt="tails"/&gt;
+&lt;/p&gt;
+&lt;p&gt;Applying &lt;code&gt;uniq&lt;/code&gt; again gives a single element infinitely repeated.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; tt = uniq(tails)
+&amp;gt;&amp;gt;&amp;gt; tt.next()
+'T'
+&amp;gt;&amp;gt;&amp;gt; tt.next()
+  C-c C-cTraceback (most recent call last):
+  File "&amp;lt;stdin&amp;gt;", line 1, in &amp;lt;module&amp;gt;
+  File "&amp;lt;stdin&amp;gt;", line 2, in call
+  File "&amp;lt;stdin&amp;gt;", line 2, in toss_a_coin
+KeyboardInterrupt
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;img src="http://wordaligned.org/images/tails.jpg" alt="tails"/&gt;
+
+
+&lt;h3&gt;Uniq -c&lt;/h3&gt;
+&lt;p&gt;Imitating &lt;code&gt;uniq -c&lt;/code&gt;, we can yield a repeat count paired to each unique value.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; def ilen(it):
+...     return sum(1 for _ in it)
+... 
+&amp;gt;&amp;gt;&amp;gt; def counted_uniq(seq):
+...     return ((ilen(i), k) for k, i in groupby(seq))
+... 
+&amp;gt;&amp;gt;&amp;gt; ht = counted_uniq(tosses)
+&amp;gt;&amp;gt;&amp;gt; list(islice(ht, 5))
+[(1, 'H'), (3, 'T'), (1, 'H'), (3, 'T'), (3, 'H')]
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;How long before we see a run of 7 equal throws?
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; from itertools import takewhile
+&amp;gt;&amp;gt;&amp;gt; tosses = imap(call, repeat(toss_a_coin))
+&amp;gt;&amp;gt;&amp;gt; counts = imap(first, counted_uniq(tosses))
+&amp;gt;&amp;gt;&amp;gt; sum(takewhile(lambda n: n &amp;lt; 7, counts))
+44
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;&lt;img src="http://wordaligned.org/images/tails.jpg" alt="tails"/&gt;&lt;img src="http://wordaligned.org/images/tails.jpg" alt="tails"/&gt;&lt;img src="http://wordaligned.org/images/tails.jpg" alt="tails"/&gt;&lt;img src="http://wordaligned.org/images/tails.jpg" alt="tails"/&gt;&lt;img src="http://wordaligned.org/images/tails.jpg" alt="tails"/&gt;&lt;img src="http://wordaligned.org/images/tails.jpg" alt="tails"/&gt;&lt;img src="http://wordaligned.org/images/tails.jpg" alt="tails"/&gt;
+&lt;/p&gt;
+
+&lt;h3&gt;Progression&lt;/h3&gt;
+&lt;p&gt;The coin illustrating this note is a 1956 &lt;a href="http://24carat.co.uk/farthingstoryframe.html"&gt;farthing&lt;/a&gt;, a small coin with a value of just &amp;frac14; of a penny dating from a time when there were 240 pence in every pound. The reverse features a wren, the obverse Queen Elizabeth II. The farthing was demonetised in 1960. In 1971 British currency went decimal and now, 37 years later, the 1971 coin designs are &lt;a href="http://news.bbc.co.uk/1/hi/uk/7326491.stm"&gt;being revamped&lt;/a&gt;. Hiding amongst the loose change in my pocket today I noticed a couple of shiny new 2008 pennies. It&amp;#8217;s about time we got euros.
+&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://www.royalmint.com/newdesigns/designsRevealed.aspx"&gt;&lt;img src="http://wordaligned.org/images/2008-change.jpg" alt="2008 small change"/&gt;&lt;/a&gt;
+&lt;/p&gt;</description>
+<dc:date>2008-10-07</dc:date>
+<guid>http://wordaligned.org/articles/removing-duplicates-using-itertoolsgroupby.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/removing-duplicates-using-itertoolsgroupby.html</link>
+<category>Streams</category>
+</item>
+
+<item>
+<title>Merging sorted streams in Python</title>
+<description>&lt;h3&gt;Problem&lt;/h3&gt;
+&lt;div class="amazon"&gt;&lt;a href="http://www.amazon.com/gp/product/0596007973?ie=UTF8&amp;amp;tag=wordalig-20&amp;amp;linkCode=as2&amp;amp;camp=1789&amp;amp;creative=9325&amp;amp;creativeASIN=0596007973"&gt;&lt;img src="http://wordaligned.org/images/books/python-cookbook.jpg" alt="Python Cookbook cover"/&gt;&lt;/a&gt;&lt;/div&gt;
+
+&lt;p&gt;In a post on his &lt;a href="http://drj11.wordpress.com/2008/09/25/i-learn-python/"&gt;Code Monk blog&lt;/a&gt; David Jones offers up some Python tidbits he&amp;#8217;s only recently discovered and invites readers to share similar discoveries. I&amp;#8217;d like to respond here by talking about &lt;a href="http://www.ubookcase.com/book/Oreilly/Python.Cookbook.2nd.edition/0596007973/pythoncook2-chp-19-sect-14.html"&gt;a recipe&lt;/a&gt; from the Python Cookbook.
+&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;h3&gt;Problem&lt;/h3&gt;
+&lt;p&gt;You have several sorted sequences (iterables) and need to iterate on the overall sorted sequence that results from &amp;#8220;merging&amp;#8221; these sequences.
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;For example, we could merge multiples of 2, 3 and 5.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; from itertools import count, imap, islice
+&amp;gt;&amp;gt;&amp;gt; m2, m3, m5 = [imap(n.__mul__, count(1)) for n in (2, 3, 5)]
+&amp;gt;&amp;gt;&amp;gt; m235 = merge(m2, m3, m5)
+&amp;gt;&amp;gt;&amp;gt; list(islice(m235, 10))
+[2, 3, 4, 5, 6, 6, 8, 9, 10, 10]
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Here, 6 appears twice in the merged stream since it&amp;#8217;s a multiple of 2 and also of 3, and similarly 10 makes a double appearance.
+&lt;/p&gt;
+&lt;p&gt;This example merges three infinite streams. If we were sure all our inputs were finite, we might well simply chain them together and sort the whole thing.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; from itertools import chain
+&amp;gt;&amp;gt;&amp;gt; def merge(*seqs):
+&amp;gt;&amp;gt;&amp;gt;     return sorted(chain(*seqs))
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;An algorithm which deals with a (potential) mix of finite and infinite sequences is a little more interesting. We might consider an approach which repeatedly peeks at the head element of each sequence, finds the smallest of these, then pops and yields it. The &lt;a href="http://www.ubookcase.com/book/Oreilly/Python.Cookbook.2nd.edition/0596007973/pythoncook2-chp-19-sect-14.html"&gt;recipe&lt;/a&gt; in the Cookbook improves on this idea.
+&lt;/p&gt;
+&lt;span id="continue-reading"/&gt;
+
+
+&lt;h3&gt;Solution&lt;/h3&gt;
+&lt;p&gt;The ingenious &lt;a href="http://www.ubookcase.com/book/Oreilly/Python.Cookbook.2nd.edition/0596007973/pythoncook2-chp-19-sect-14.html"&gt;merge implementation&lt;/a&gt; shown below is credited to S&amp;eacute;bastien Keim, Raymond Hettinger and Danny Yoo (the same Raymond Hettinger who appears on &lt;a href="http://drj11.wordpress.com/2008/09/25/i-learn-python/"&gt;Code Monk&lt;/a&gt; to point out that zip can unzip).
+&lt;/p&gt;
+&lt;p&gt;The algorithm uses a priority queue as a staging area. This priority queue is initialised to hold a collection of pairs comprising the head value from each input stream and the tail of that stream. We then pop the first element from this queue, yielding its value, and queue the next (head, tail) pair from the stream it came from. At all times the priority queue contains a (head, tail) pair from each input stream.
+&lt;/p&gt;
+&lt;p&gt;This all works sweetly when the inputs are all infinite. The complication occurs when a finite sequence reaches its end.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;import heapq
+
+def merge(*subsequences):
+    # prepare a priority queue whose items are pairs of the form
+    # (current-value, iterator), one each per (non-empty) subsequence
+    heap = [  ]
+    for subseq in subsequences:
+        iterator = iter(subseq)
+        for current_value in iterator:
+            # subseq is not empty, therefore add this subseq's pair
+            # (current-value, iterator) to the list
+            heap.append((current_value, iterator))
+            break
+    # make the priority queue into a heap
+    heapq.heapify(heap)
+    while heap:
+        # get and yield lowest current value (and corresponding iterator)
+        current_value, iterator = heap[0]
+        yield current_value
+        for current_value in iterator:
+            # subseq is not finished, therefore add this subseq's pair
+            # (current-value, iterator) back into the priority queue
+            heapq.heapreplace(heap, (current_value, iterator))
+            break
+        else:
+            # subseq has been exhausted, therefore remove it from the queue
+            heapq.heappop(heap)
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;I had to look twice at this code despite the copious comments. There&amp;#8217;s nothing unusual about the two outer loops, a &lt;code&gt;for&lt;/code&gt; loop and a &lt;code&gt;while&lt;/code&gt; loop. The first sets up the priority queue, visiting each input to do so; the second actually generates the output results while items remain in this queue.
+&lt;/p&gt;
+&lt;p&gt;It&amp;#8217;s the inner &lt;code&gt;for&lt;/code&gt; loops which are less standard: execution of the body of each will &lt;code&gt;break&lt;/code&gt; as soon as a single item has been processed, except when the body is never executed because the iterable is empty, which, in the first case means that iterable needn&amp;#8217;t be queued, and in the second case means the &lt;code&gt;for&lt;/code&gt;&amp;#8217;s &lt;code&gt;else&lt;/code&gt; clause executes, dequeuing the iterable. These are for loops which actually do something at most once.
+&lt;/p&gt;
+&lt;p&gt;You did remember that for loops, in Python, have an &lt;a href="http://docs.python.org/tutorial/controlflow.html#break-and-continue-statements-and-else-clauses-on-loops"&gt;else clause&lt;/a&gt;, right?
+&lt;/p&gt;
+&lt;p&gt;I confess that if I ever knew that, I&amp;#8217;d certainly forgotten it! The else clause executes if the loop is not broken out of, whether or not the iterable is empty&lt;a id="fn1link" href="http://wordaligned.org/articles/merging-sorted-streams-in-python.html#fn1"&gt;&lt;sup&gt;[1]&lt;/sup&gt;&lt;/a&gt;. There&amp;#8217;s nothing very else-y about it! I&amp;#8217;d be interested to learn of any other C-family languages with a similar construct?
+&lt;/p&gt;
+&lt;p&gt;I&amp;#8217;m a fan of the Python Cookbook because it teaches Python idioms by example. Here&amp;#8217;s how it explains this one.
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;Note the idiom that we use to advance an iterator by one step, dealing with the possibility that the iterator is exhausted:&lt;/p&gt;
+&lt;pre&gt;for current_value in iterator:
+    # if we get here the iterator was not empty, current_value was
+    # its first value, and the iterator has been advanced one step
+    ...use pair (current_value, iterator)...
+    # we break at once as we only wanted the first item of iterator
+    break
+else:
+    # if we get here the break did not execute, so the iterator
+    # was empty (exhausted)
+    # deal with the case of iterator being exhausted...
+&lt;/pre&gt;&lt;/blockquote&gt;
+
+&lt;p&gt;I have to admit the code still looks odd to me but it&amp;#8217;s just about the perfect construct for this particular use case, eliminating any mention of &lt;code&gt;iterator.next()&lt;/code&gt; and &lt;code&gt;StopIteration&lt;/code&gt;.
+&lt;/p&gt;
+
+&lt;h3&gt;Batteries Included&lt;/h3&gt;
+&lt;p&gt;&lt;a href="http://wiki.tcl.tk/2352"&gt;&lt;img src="http://www.python.org/pics/batteries-included.jpg" alt="Batteries included"/&gt;&lt;/a&gt;
+&lt;/p&gt;
+&lt;p&gt;Python 2.6 includes merge as standard in the &lt;a href="http://docs.python.org/library/heapq.html#heapq.merge"&gt;heapq module&lt;/a&gt;. Here&amp;#8217;s the &lt;a href="http://svn.python.org/view/python/tags/r26/Lib/heapq.py?rev=66716&amp;amp;view=markup"&gt;implementation&lt;/a&gt;. You&amp;#8217;ll notice it doesn&amp;#8217;t use the for-break-else idiom, hence the explicit exception catching. It also packs triples rather than pairs into the staging queue, presumably to guarantee a stable merge of the inputs.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;def merge(*iterables):
+    '''Merge multiple sorted inputs into a single sorted output.
+    
+    Similar to sorted(itertools.chain(*iterables)) but returns a generator,
+    does not pull the data into memory all at once, and assumes that each of
+    the input streams is already sorted (smallest to largest).
+    
+    &amp;gt;&amp;gt;&amp;gt; list(merge([1,3,5,7], [0,2,4,8], [5,10,15,20], [], [25]))
+    [0, 1, 2, 3, 4, 5, 5, 7, 8, 10, 15, 20, 25]
+    
+    '''
+    _heappop, _heapreplace, _StopIteration = heappop, heapreplace, StopIteration
+    
+    h = []
+    h_append = h.append
+    for itnum, it in enumerate(map(iter, iterables)):
+        try:
+            next = it.next
+            h_append([next(), itnum, next])
+        except _StopIteration:
+            pass
+    heapify(h)
+    
+    while 1:
+        try:
+            while 1:
+                v, itnum, next = s = h[0]   # raises IndexError when h is empty
+                yield v
+                s[0] = next()               # raises StopIteration when exhausted
+                _heapreplace(h, s)          # restore heap condition
+        except _StopIteration:
+            _heappop(h)                     # remove empty iterator
+        except IndexError:
+            return
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+
+&lt;h3&gt;What else?&lt;/h3&gt;
+&lt;p&gt;Personally I&amp;#8217;ve only really used &lt;code&gt;else&lt;/code&gt; alongside &lt;code&gt;if&lt;/code&gt;&lt;a id="fn2link" href="http://wordaligned.org/articles/merging-sorted-streams-in-python.html#fn2"&gt;&lt;sup&gt;[2]&lt;/sup&gt;&lt;/a&gt;. As shown here, it also pairs up with &lt;code&gt;for&lt;/code&gt; and &lt;code&gt;while&lt;/code&gt;. It also also appears (optionally) towards the end of a &lt;a href="http://docs.python.org/ref/try.html"&gt;try statement&lt;/a&gt;. From &lt;a href="http://docs.python.org/tutorial/errors.html#handling-exceptions"&gt;the documentation&lt;/a&gt;: 
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;The &lt;strong&gt;try &amp;#8230; except&lt;/strong&gt; statement has an optional &lt;i&gt;else clause&lt;/i&gt;, which, when present, must follow all except clauses. It is useful for code that must be executed if the try clause does not raise an exception. For example:&lt;/p&gt;
+&lt;pre&gt;    for arg in sys.argv[1:]:
+        try:
+            f = open(arg, 'r')
+        except IOError:
+            print 'cannot open', arg
+        else:
+            print arg, 'has', len(f.readlines()), 'lines'
+            f.close()
+&lt;/pre&gt;&lt;p&gt; The use of the &lt;strong&gt;else&lt;/strong&gt; clause is better than adding additional code to the &lt;strong&gt;try&lt;/strong&gt; clause because it avoids accidentally catching an exception that wasn&amp;#8217;t raised by the code being protected by the &lt;strong&gt;try &amp;#8230; except&lt;/strong&gt; statement.&lt;/p&gt;&lt;/blockquote&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;&lt;a id="fn1" href="http://wordaligned.org/articles/merging-sorted-streams-in-python.html#fn1link"&gt;[1]&lt;/a&gt; Coincidentally, the &lt;code&gt;for ... else&lt;/code&gt; construct gets a &lt;a href="http://blog.cdleary.com/2008/10/idiomatic-python-refactoring-for-else-in-contains-operator/"&gt;mention&lt;/a&gt; today in Christopher Leary&amp;#8217;s VaporWarning blog.
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;The for-else statement looks a little strange when you first encounter it, but I&amp;#8217;ve come to love it.
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;More breaking news &amp;#8230; &lt;a href="http://docs.python.org/whatsnew/2.6.html"&gt;Python 2.6&lt;/a&gt; officially released about 4 hours after I posted this article. I&amp;#8217;ve tweaked a couple of links accordingly, and will tweak a couple more once the 2.6 documentation appears directly under &lt;a href="http://docs.python.org"&gt;http://docs.python.org&lt;/a&gt;.
+&lt;/p&gt;
+&lt;p&gt;&lt;a id="fn2" href="http://wordaligned.org/articles/merging-sorted-streams-in-python.html#fn2link"&gt;[2]&lt;/a&gt; If and else appear together in traditional &lt;a href="http://docs.python.org/ref/if.html#tok-if_stmt"&gt;if statements&lt;/a&gt; and the newer &lt;a href="http://docs.python.org/ref/Booleans.html"&gt;conditional expressions&lt;/a&gt;. The latter render one of the Cookbook &lt;a href="http://www.ubookcase.com/book/Oreilly/Python.Cookbook.2nd.edition/0596007973/pythoncook2-chp-18-sect-9.html"&gt;recipes&lt;/a&gt; obsolete.
+&lt;/p&gt;</description>
+<dc:date>2008-10-01</dc:date>
+<guid>http://wordaligned.org/articles/merging-sorted-streams-in-python.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/merging-sorted-streams-in-python.html</link>
+<category>Streams</category>
+</item>
+
+<item>
+<title>Running Sums in Python</title>
+<description>&lt;p&gt;Suppose we want to generate the running sum series &lt;code&gt;r&lt;/code&gt; formed by sums of &lt;code&gt;n&lt;/code&gt; consecutive elements taken from a series &lt;code&gt;s&lt;/code&gt;. For example, to sum consecutive pairs taken from the first 6 integers:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; n = 2
+&amp;gt;&amp;gt;&amp;gt; s = 0, 1, 2, 3, 4, 5
+&amp;gt;&amp;gt;&amp;gt; running_sum(s, 2)
+[1, 3, 5, 7, 9]
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;One approach would be to combine the &lt;code&gt;sum&lt;/code&gt; built-in function with list slices and comprehensions.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; def running_sum(s, n):
+... 	return [sum(s[lo:lo + n]) for lo in range(len(s) - n + 1)]
+... 
+&amp;gt;&amp;gt;&amp;gt; running_sum([0, 1, 2, 3, 4, 5], 2)
+[1, 3, 5, 7, 9]
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;This is fine if:
+&lt;/p&gt;
+&lt;ol&gt;
+ &lt;li&gt;
+     &lt;code&gt;s&lt;/code&gt; is finite
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     &lt;code&gt;s&lt;/code&gt; supports slice access (i.e. &lt;code&gt;s[lo:hi]&lt;/code&gt; doesn&amp;#8217;t raise a &lt;code&gt;TypeError&lt;/code&gt;)
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     &lt;code&gt;n&lt;/code&gt; isn&amp;#8217;t too big
+ &lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;With just a little extra thought we can address all these issues.
+&lt;/p&gt;
+&lt;span id="continue-reading"/&gt;
+
+&lt;p&gt;To deal with the first two points we return to the specification. What exactly do we require of &lt;code&gt;s&lt;/code&gt; in order to generate &lt;code&gt;r&lt;/code&gt;? Well, all that&amp;#8217;s really needed is for &lt;code&gt;s&lt;/code&gt; to be iterable &amp;#8212; which is to say we can advance along it &amp;#8212; then our running sum function can arrange to buffer &lt;code&gt;n&lt;/code&gt; items from &lt;code&gt;s&lt;/code&gt; and yield their sums. For maximum flexibility the result series &lt;code&gt;r&lt;/code&gt; should also be iterable, allowing clients to choose how to consume it&lt;a id="fn1link" href="http://wordaligned.org/articles/running-sums-in-python.html#fn1"&gt;&lt;sup&gt;[1]&lt;/sup&gt;&lt;/a&gt;.
+&lt;/p&gt;
+&lt;p&gt;In Python an object, &lt;code&gt;o&lt;/code&gt;, becomes iterable by implementing the &lt;a href="http://docs.python.org/lib/typeiter.html"&gt;iterator protocol&lt;/a&gt;: &lt;code&gt;o.__iter__()&lt;/code&gt; should return an iterator, &lt;code&gt;i&lt;/code&gt;, over the container, which &lt;code&gt;i.next()&lt;/code&gt; advances, raising a &lt;code&gt;StopIteration&lt;/code&gt; exception when done.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; r = [1, 2, 3]
+&amp;gt;&amp;gt;&amp;gt; i = r.__iter__()
+&amp;gt;&amp;gt;&amp;gt; i.next()
+1
+&amp;gt;&amp;gt;&amp;gt; i.next()
+2
+&amp;gt;&amp;gt;&amp;gt; i.next()
+3
+&amp;gt;&amp;gt;&amp;gt; i.next()
+Traceback (most recent call last):
+  File "&amp;lt;stdin&amp;gt;", line 1, in &amp;lt;module&amp;gt;
+StopIteration
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Python programs typically don&amp;#8217;t expose this protocol directly since we can build more convenient looping constructs on top of it. By using the &lt;a href="http://docs.python.org/ref/yield.html"&gt;yield statement&lt;/a&gt; our running sum filter needn&amp;#8217;t implement the iterator protocol directly either. Here&amp;#8217;s a generator function which uses &lt;code&gt;itertools.islice&lt;/code&gt; in place of the original list slices.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;Running sum for infinite series&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;import itertools
+
+def running_sum(s, n):
+    while True:
+        r, s = itertools.tee(s)
+        yield sum(itertools.islice(r, n))
+        s.next()
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;As you can see, objects returned by this function implement the iterator protocol.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;# Running sum of pairs from 0, 1, 2, 3, ...
+&amp;gt;&amp;gt;&amp;gt; rs = running_sum(itertools.count(), 2)
+&amp;gt;&amp;gt;&amp;gt; i = rs.__iter__()
+&amp;gt;&amp;gt;&amp;gt; i.next()
+1
+&amp;gt;&amp;gt;&amp;gt; i.next()
+3
+&amp;gt;&amp;gt;&amp;gt; for s in rs: print s
+... 
+5
+7
+9
+11
+13
+....
+Traceback (most recent call last):
+  File "&amp;lt;stdin&amp;gt;", line 1, in &amp;lt;module&amp;gt;
+KeyboardInterrupt
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;We have to kill the for loop by interrupting it since &lt;code&gt;rs&lt;/code&gt;, being infinite (in this particular case), never raises a &lt;code&gt;StopIteration&lt;/code&gt;. In fact, this particular version of &lt;code&gt;running_sum()&lt;/code&gt; fails badly on finite inputs for reasons we&amp;#8217;ll touch on later.
+&lt;/p&gt;
+&lt;p&gt;I won&amp;#8217;t dwell on this flawed variant of &lt;code&gt;running_sum()&lt;/code&gt;, except to note in passing that the built-in sum function doesn&amp;#8217;t buffer &lt;code&gt;n&lt;/code&gt; items from its input stream &amp;#8212; it&amp;#8217;s a lazy function which accumulates these items one at a time. There&amp;#8217;s no magic here, though: behind the scenes, as the teed iterators &lt;code&gt;r&lt;/code&gt; and &lt;code&gt;s&lt;/code&gt; diverge, the in-between values must be stored somewhere!
+&lt;/p&gt;
+&lt;p&gt;Each slice of items from &lt;code&gt;s&lt;/code&gt; overlaps the one before: if we visualise the sliced range sliding along the series, at each stage an element gets pushed in at the top and an element gets popped out from the bottom. Rather than repeatedly summing all the elements of these slices, we can calculate a single sum at the start of the series then adjust it as we progress&lt;a id="fn2link" href="http://wordaligned.org/articles/running-sums-in-python.html#fn2"&gt;&lt;sup&gt;[2]&lt;/sup&gt;&lt;/a&gt;.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;def running_sum(s, n):
+    lo, hi = itertools.tee(s)
+    rs = sum(itertools.islice(hi, n))
+    while True:
+        yield rs
+        rs += hi.next() - lo.next()
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Before we sign this function off, there&amp;#8217;s a bug to fix. What if &lt;code&gt;n&lt;/code&gt; is larger than the length of the input series? We&amp;#8217;d expect the output series to be empty, but:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; list(running_sum([1, 2, 3], 4))
+[6]
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Oops! The problem here is in passing an &lt;code&gt;itertools.islice&lt;/code&gt; series to &lt;code&gt;sum()&lt;/code&gt;, which happily swallows the &lt;code&gt;StopIteration&lt;/code&gt; exception without knowing if the sliced stream reached its end or if we reached the end of the slice, or indeed both.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; i = itertools.islice([1, 2, 3], 4)
+&amp;gt;&amp;gt;&amp;gt; i.next(), i.next(), i.next()
+(1, 2, 3)
+&amp;gt;&amp;gt;&amp;gt; i.next()
+Traceback (most recent call last):
+  File "&amp;lt;stdin&amp;gt;", line 1, in &amp;lt;module&amp;gt;
+StopIteration
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;A fix is to pass &lt;code&gt;sum&lt;/code&gt; a list comprehension. If &lt;code&gt;n&lt;/code&gt; is too big a &lt;code&gt;StopIteration&lt;/code&gt; exception gets raised before &lt;code&gt;sum&lt;/code&gt; ever sees this list.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;def running_sum(s, n):
+    lo, hi = itertools.tee(s)
+    rs = sum([hi.next() for _ in range(n)])
+    while True:
+        yield rs
+        rs += hi.next() - lo.next()
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;As a final tweak, we can make &lt;code&gt;lo&lt;/code&gt; and &lt;code&gt;hi&lt;/code&gt; iterator.next functions rather than iterators, which saves a few attribute access calls.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;def running_sum(s, n):
+    '''Generate the series of running sums of n elements of s.
+    
+    &amp;gt;&amp;gt;&amp;gt; list(running_sum([1, 2, 3, 4], 2))
+    [3, 5, 7]
+    &amp;gt;&amp;gt;&amp;gt; rs = running_sum(itertools.count(), 3)
+    &amp;gt;&amp;gt;&amp;gt; rs.next(), rs.next(), rs.next()
+    (3, 6, 9)
+    &amp;gt;&amp;gt;&amp;gt; list(running_sum([1, 2], 3))
+    []
+    '''
+    lo, hi = [i.next for i in itertools.tee(s)]
+    rs = sum([hi() for _ in range(n)])
+    while True:
+        yield rs
+        rs += hi() - lo()
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;Thanks to &lt;a href="http://www.reddit.com/r/programming/info/6otfp/comments/"&gt;doubtingthomas&lt;/a&gt; for pointing out an off-by-one error in the original version of this article.
+&lt;/p&gt;
+&lt;p&gt;&lt;a id="fn1" href="http://wordaligned.org/articles/running-sums-in-python.html#fn1link"&gt;[1]&lt;/a&gt; In a recent &lt;a href="http://geekrant.wordpress.com/2008/06/23/misconceptions/"&gt;post on his blog&lt;/a&gt;, Jake clears up some misconceptions about &lt;a href="http://haskell.org"&gt;Haskell&lt;/a&gt;. In doing so he analyses the difference between lazy and strict types with clarity and insight. Recommended reading!
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;This parallel indicates pretty clearly that recursively operating on each element of a stream is an infinite loop. &lt;code&gt;Stream&lt;/code&gt; is a &lt;em&gt;control structure&lt;/em&gt;. It doesn&amp;#8217;t exist to persist data across many parts of a program. It exists to feed data into a function one element at a time. In contrast, a &lt;code&gt;Vector&lt;/code&gt; exists to persist an intermediate or final &lt;em&gt;result&lt;/em&gt; of some 3-dimensional computation. In short, &lt;code&gt;Stream&lt;/code&gt; is for &lt;em&gt;controlling computation&lt;/em&gt;, and &lt;code&gt;Vector&lt;/code&gt; is for &lt;em&gt;storing data&lt;/em&gt;. This generalizes to lazy and strict types, respectively.
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;&lt;a id="fn2" href="http://wordaligned.org/articles/running-sums-in-python.html#fn2link"&gt;[2]&lt;/a&gt; There may be situations where we really want each running sum to be generated directly from &lt;code&gt;n&lt;/code&gt; consecutive elements of the source stream: for example, if we are dealing with a series of floating point numbers, then addition is not exact and we must take care to avoid accumulated errors.
+&lt;/p&gt;</description>
+<dc:date>2008-06-24</dc:date>
+<guid>http://wordaligned.org/articles/running-sums-in-python.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/running-sums-in-python.html</link>
+<category>Streams</category>
+</item>
+
+<item>
+<title>Takewhile drops one</title>
+<description>&lt;p&gt;Here&amp;#8217;s some naughty code.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;from itertools import takewhile
+    
+def take_some(pred, xs):
+    while True:
+        for x in takewhile(pred, xs):
+            yield x
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;This code abuses the &amp;#8220;iterator building block&amp;#8221; foundations of Python&amp;#8217;s &lt;a href="http://docs.python.org/lib/module-itertools.html"&gt;itertools module&lt;/a&gt;. Once you&amp;#8217;ve chopped a stream&amp;#8217;s head off using &lt;code&gt;takewhile&lt;/code&gt; you can&amp;#8217;t resume processing its tail &amp;#8230; Or can you?
+&lt;/p&gt;
+&lt;span id="continue-reading"/&gt;
+
+&lt;p&gt;A casual inspection of this function &lt;em&gt;suggests&lt;/em&gt; it does little more than heat up the machine: we return elements, &lt;code&gt;x&lt;/code&gt;, from a stream, &lt;code&gt;xs&lt;/code&gt;, for which &lt;code&gt;pred(x)&lt;/code&gt; holds, then we spin at the first element for which the predicate does not hold.
+&lt;/p&gt;
+&lt;p&gt;When we actually run the code, things turn out rather differently:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; from itertools import count, islice
+&amp;gt;&amp;gt;&amp;gt; def is_even(x):
+... 	return x % 2 == 0
+... 
+&amp;gt;&amp;gt;&amp;gt; xs = take_some(is_even, count())
+&amp;gt;&amp;gt;&amp;gt; xs.next()
+0
+&amp;gt;&amp;gt;&amp;gt; xs.next()
+2
+&amp;gt;&amp;gt;&amp;gt; xs.next()
+4
+&amp;gt;&amp;gt;&amp;gt; list(islice(xs, 10))
+[6, 8, 10, 12, 14, 16, 18, 20, 22, 24]
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+
+&lt;h3&gt;Dropwhile, ifilter, izip&lt;/h3&gt;
+&lt;p&gt;Nothing overheats. In fact &lt;code&gt;take_some&lt;/code&gt; behaves suspiciously like &lt;code&gt;ifilter&lt;/code&gt;. Let&amp;#8217;s explore that hypothesis by zipping together an &lt;code&gt;ifilter&lt;/code&gt; stream and a &lt;code&gt;take_some&lt;/code&gt; stream and seeing if they diverge.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; from itertools import dropwhile, ifilter, izip
+&amp;gt;&amp;gt;&amp;gt; xs = take_some(is_even, count())
+&amp;gt;&amp;gt;&amp;gt; ys = ifilter(is_even, count())
+&amp;gt;&amp;gt;&amp;gt; diverge = dropwhile(lambda xy: xy[0] == xy[1], izip(xs, ys))
+&amp;gt;&amp;gt;&amp;gt; diverge.next()
+  C-c C-cTraceback (most recent call last):
+  ...
+KeyboardInterrupt
+&amp;gt;&amp;gt;&amp;gt;
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Here &lt;code&gt;itertools.dropwhile&lt;/code&gt; iterates through the zipped stream yielding items as soon as it detects a difference in the first and second element of a pair. This time, as you can see, we &lt;em&gt;do&lt;/em&gt; start spinning, and we have to interrupt execution to regain control.
+&lt;/p&gt;
+
+&lt;h3&gt;Small print&lt;/h3&gt;
+&lt;p&gt;Our casual interpretation of &lt;code&gt;take_some&lt;/code&gt; was wrong. The actual documentation for &lt;code&gt;itertools.takewhile&lt;/code&gt; reads:
+&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;b&gt;takewhile&lt;/b&gt;(&lt;i&gt;predicate, iterable&lt;/i&gt;)&lt;/p&gt;
+&lt;p&gt;Make an iterator that returns elements from the iterable as long as the predicate is true. Equivalent to:&lt;/p&gt;
+&lt;pre&gt;
+     def takewhile(predicate, iterable):
+         for x in iterable:
+             if predicate(x):
+                 yield x
+             else:
+                 break
+&lt;/pre&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;There you have it! Once a stream returned by &lt;code&gt;takewhile&lt;/code&gt; has run its course, the original &lt;code&gt;iterable&lt;/code&gt; is poised to yield the element immediately after the first element for which the predicate fails. That is, we drop the first element for which the predicate fails. So repeatedly applying &lt;code&gt;takewhile&lt;/code&gt; to a stream drops the elements for which the predicate doesn&amp;#8217;t hold, which is to say it generates the elements for which the predicate holds, which is of course &lt;code&gt;ifilter&lt;/code&gt;.
+&lt;/p&gt;
+
+&lt;h3&gt;Bug fixes&lt;/h3&gt;
+&lt;p&gt;Yes, kind of. I could point out a couple of bugs in &lt;code&gt;take_some&lt;/code&gt;. First, it doesn&amp;#8217;t work for lists. Give it a list and each application of &lt;code&gt;takewhile&lt;/code&gt; resumes iteration from the beginning of the list, meaning &lt;code&gt;take_some&lt;/code&gt; either repeats the first element of the list forever, or it spins without yielding anything:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; ys = take_some(is_even, [1, 2, 3, 4])
+&amp;gt;&amp;gt;&amp;gt; ys.next()
+ ...
+KeyboardInterrupt
+&amp;gt;&amp;gt;&amp;gt; ys = take_some(is_even, [0, 1, 2, 3])
+&amp;gt;&amp;gt;&amp;gt; ys.next()
+0
+&amp;gt;&amp;gt;&amp;gt; ys.next()
+0
+&amp;gt;&amp;gt;&amp;gt; set(islice(ys, 1000000))
+set([0])
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;We can fix that defect easily by applying &lt;code&gt;iter&lt;/code&gt; to the input iterable, but that exposes the second bug, that &lt;code&gt;take_some&lt;/code&gt; only works for infinite streams. Once we bang into the end of an iterable, we stay there, stuck in the while loop. To fix both defects we might end up with something like:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;from itertools import takewhile, tee
+    
+def take_some(pred, xs):
+    while True:
+        xs, ys = tee(xs)
+        try:
+            ys.next()
+        except StopIteration:
+            return
+        for x in takewhile(pred, xs):
+            yield x
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+
+&lt;h3&gt;The real bug fix&lt;/h3&gt;
+&lt;p&gt;Actually, the real bug, which I admitted to at the outset, is in our thinking. This code abuses the iterator-building-blocks paradigm at the heart of the &lt;a href="http://docs.python.org/lib/module-itertools.html"&gt;itertools module&lt;/a&gt;. &lt;code&gt;Takewhile&lt;/code&gt; converts one stream into another stream; the original stream has gone and if we wanted it we should have teed it first.
+&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://wordaligned.org/tag/shell/" title="Articles about shell"&gt;&lt;img style="float:right;" src="http://wordaligned.org/images/buttons/crab.jpg" alt="Picture of a crab"/&gt;&lt;/a&gt;
+&lt;/p&gt;
+&lt;p&gt;The Unix shell embeds this concept at the core of the language to great effect. &lt;span /&gt;Once again our building block is the stream but our connector, the pipeline operator, |, doesn&amp;#8217;t allow this kind of abuse; all you can do is put a stream to its left and another to its right. The syntax won&amp;#8217;t allow you to get the head and tail of the same stream in a single pipeline.
+&lt;/p&gt;
+&lt;p&gt;Here&amp;#8217;s an awkless variant of the recent &lt;a href="http://www.google.com/search?q=shell+history+meme"&gt;shell history meme&lt;/a&gt; which shows a shell pipeline in action.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;$ history | tr -s ' ' | cut -f 3 -d ' ' | sort | uniq -c | sort -rn
+    172 cd
+    147 svn
+     73 bin/mheg
+     57 make
+     54 ls
+     40 emacs
+     37 pwd
+     ...
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Here&amp;#8217;s a slightly more interesting variant which only shows commands appearing after a pipeline operator. (It&amp;#8217;s not bombproof, but it&amp;#8217;ll do for now.)
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;$ history | grep -Eo '\| *\w+' | tr -d '| ' | sort | uniq -c | sort -rn
+     10 head
+      8 cut
+      7 grep
+      6 tr
+      5 xargs
+      4 sort
+      3 wc
+      3 uniq
+      3 less
+      ...
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+
+&lt;h3&gt;Pipe Links&lt;/h3&gt;
+&lt;p&gt;By way of an apology for wasting your time, here are some solid gold links.
+&lt;/p&gt;
+&lt;ol&gt;
+ &lt;li&gt;&lt;p&gt;&lt;a href="http://www.dabeaz.com/generators/"&gt;&amp;#8220;Generator Tricks for Systems Programmers&amp;#8221;&lt;/a&gt;, a presentation made by David M. Beazley at PyCon&amp;#8217;08. I wasn&amp;#8217;t there, but for once &lt;a href="http://www.dabeaz.com/generators/Generators.pdf"&gt;the slides (PDF)&lt;/a&gt; standalone well, and despite the title it&amp;#8217;s neither tricksy nor just for systems programmers. Experienced Python programmers might choose to skip over the first few slides; by the end of the presentation, the material gets much more advanced&lt;a id="fn1link" href="http://wordaligned.org/articles/takewhile-drops-one.html#fn1"&gt;&lt;sup&gt;[1]&lt;/sup&gt;&lt;/a&gt;.
+&lt;/p&gt;
+
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;p&gt;&lt;a href="http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/276960"&gt;&amp;#8220;Shell-like data processing&amp;#8221;&lt;/a&gt; by Maxim Krikun in the online Python Cookbook, which overloads the bitwise or operator, &lt;code&gt;|&lt;/code&gt;, to implement a Pythonic pipeline, an idea you can find  extended in &lt;a href="http://egofile.com/blog/python/pipes.html"&gt;&amp;#8220;Assembly Line Syntax&amp;#8221;&lt;/a&gt; by Patrick Roberts and &lt;a href="http://www.voidspace.org.uk/python/weblog/arch_d7_2008_03_22.shtml#e954"&gt;revised by Michael Foord&lt;/a&gt;, this time using the right shift operator as a connector.
+&lt;/p&gt;
+
+ &lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h3&gt;Pipelined Python&lt;/h3&gt;
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;Apache httpd log&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;81.107.39.38 -  ... "GET /ply/ HTTP/1.1" 200 7587 
+81.107.39.38 -  ... "GET /favicon.ico HTTP/1.1" 404 133 
+81.107.39.38 -  ... "GET /ply/bookplug.gif HTTP/1.1" 200 23903 
+81.107.39.38 -  ... "GET /ply/ply.html HTTP/1.1" 200 97238 
+81.107.39.38 -  ... "GET /ply/example.html HTTP/1.1" 200 2359 
+66.249.72.134 - ... "GET /index.html HTTP/1.1" 200 4447 
+...
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;In his presentation David Beazley shows some elegant and idiomatic Python code to sum the total number of bytes transferred in an &lt;a href="http://httpd.apache.org/docs/trunk/logs.html"&gt;Apache httpd server log&lt;/a&gt; (the final field on each line of the log file shown above). You&amp;#8217;ll notice how clean and declarative it is. Each generator expression builds upon the one on the preceding line. The source of the stream, &lt;code&gt;wwwlog&lt;/code&gt;, is a file object which, in the iterable context shown here, yields lines on demand. Nothing really happens until the final reduction, &lt;code&gt;sum&lt;/code&gt;, at which point data flows smoothly through. Stream elements &amp;#8212; lines, words, ints &amp;#8212; are processed one at a time, and nothing accumulates except the final total. 
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;wwwlog     = open("access-log") 
+bytecolumn = (line.rsplit(None,1)[1] for line in wwwlog) 
+bytes      = (int(x) for x in bytecolumn if x != '-') 
+print "Total", sum(bytes)
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Here&amp;#8217;s an alternative using the Python pipeline approach mentioned in the previous section. Note that in my &lt;a href="http://trac.lighttpd.net/trac/wiki/Docs%3AModAccessLog"&gt;server access logs&lt;/a&gt; it&amp;#8217;s the 9th field (whitespace separated, counting from zero) which gives the number of bytes transferred, and for variety I&amp;#8217;m pattern matching this field to a string of digits.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;wwwlog = open("access-log") 
+bytes = wwwlog | cut(9) | grep(r'\d+') | xlate(int)
+print "Total", sum(bytes)
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;&lt;code&gt;Cut&lt;/code&gt;, &lt;code&gt;grep&lt;/code&gt; and &lt;code&gt;xlate&lt;/code&gt; are simple classes which implement the numeric &lt;a href="http://docs.python.org/ref/numeric-types.html"&gt;__ror__ method&lt;/a&gt;.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;import itertools
+import re
+
+class xlate(object):
+    "Translate the input stream by applying a function to each item". 
+    def __init__(self, fn):
+        self.fn = fn
+    def __ror__(self, stream):
+        return itertools.imap(self.fn, stream)
+    
+class cut(xlate):
+    "Cuts a whitespace separated column from a stream of lines."
+    def __init__(self, column):
+        super(cut, self).__init__(lambda s: s.split()[column])
+
+class grep(object):
+    "Grep lines which match an re from a stream of lines."
+    def __init__(self, pattern):
+        self.match = re.compile(pattern).match
+    def __ror__(self, stream):
+        return itertools.ifilter(self.match, stream)
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;&lt;a id="fn1" href="http://wordaligned.org/articles/takewhile-drops-one.html#fn1link"&gt;[1]&lt;/a&gt; It could be that I&amp;#8217;m reading too much into the pipe metaphor, but I&amp;#8217;m intrigued by the caption to the photo on &lt;a href="http://www.dabeaz.com"&gt;David M. Beazley&amp;#8217;s homepage&lt;/a&gt;. What can he mean?
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;&lt;a href="http://www.dabeaz.com" title="Is David working on Tubes?"&gt;&lt;img src="http://www.dabeaz.com/images/Davetubes.jpg" alt="David Beazley"/&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;Dave working on his latest project &amp;#8212; &amp;#8220;you know, it&amp;#8217;s a series of tubes.&amp;#8221;&lt;/p&gt;&lt;/blockquote&gt;</description>
+<dc:date>2008-04-23</dc:date>
+<guid>http://wordaligned.org/articles/takewhile-drops-one.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/takewhile-drops-one.html</link>
+<category>Streams</category>
+</item>
+
+<item>
+<title>Sugar Pie</title>
+<description>&lt;p&gt;&lt;strong&gt;Question:&lt;/strong&gt; in the code snippet bleow, what does the result stream, &lt;code&gt;rs&lt;/code&gt;, approximate?
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;from itertools import count, ifilter, izip
+from random import random as xy
+from math import hypot
+    
+pt = lambda: (xy(), xy())
+on = ifilter(lambda n: hypot(*pt()) &amp;lt; 1., count(1))
+rs = (4. * j / i for i, j in izip(on, count(1)))
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;The code isn&amp;#8217;t wilfully obscure but I&amp;#8217;ll admit it&amp;#8217;s unusual. Although written in a functional style, the source of the stream, &lt;code&gt;pt&lt;/code&gt;, is utterly impure, generating a sequence of random results: it sprinkles points in a unit square. Despite this random input the results stream always tends to the same value. Well, in theory it should!
+&lt;/p&gt;
+&lt;p&gt;Here&amp;#8217;s a picture of a round pie on a square baking tray being dusted with sugar.    &lt;br /&gt;
+&lt;/p&gt;
+&lt;img alt="Dusting a pie" src="http://wordaligned.org/images/sugar-pie.gif"/&gt;
+
+&lt;p&gt;Thanks again to &lt;a href="http://gedmin.as"&gt;Marius Gedminas&lt;/a&gt; for pointing me at
+   &lt;code&gt;math.hypot&lt;/code&gt;, the best way to find the length of a 2D vector. (The
+   previous version of this note used &lt;code&gt;abs(complex(*pt())&lt;/code&gt;, which it
+   claimed to be better than &lt;code&gt;math.sqrt(x * x + y * y)&lt;/code&gt;).
+&lt;/p&gt;</description>
+<dc:date>2008-03-06</dc:date>
+<guid>http://wordaligned.org/articles/sugar-pie.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/sugar-pie.html</link>
+<category>Streams</category>
+</item>
+
+<item>
+<title>Animated pair streams</title>
+<description>&lt;div class="toc"&gt;
+&lt;h2&gt;Contents&lt;/h2&gt;
+&lt;ul&gt;
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/animated-pair-streams.html#tocname-that-series" name="toc0" id="toc0"&gt;Name that Series&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/animated-pair-streams.html#tocbounded-pairs" name="toc1" id="toc1"&gt;Bounded Pairs&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/animated-pair-streams.html#tocstreams-of-pairs" name="toc2" id="toc2"&gt;Streams of Pairs&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/animated-pair-streams.html#toca-recursive-scheme" name="toc3" id="toc3"&gt;A Recursive Scheme&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/animated-pair-streams.html#tocinterleaving" name="toc4" id="toc4"&gt;Interleaving&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/animated-pair-streams.html#tocdouble-trouble" name="toc5" id="toc5"&gt;Double Trouble&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/animated-pair-streams.html#tocmemory-use" name="toc6" id="toc6"&gt;Memory Use&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/animated-pair-streams.html#tocproblem-solved" name="toc7" id="toc7"&gt;Problem Solved?&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/animated-pair-streams.html#toctying-up" name="toc8" id="toc8"&gt;Tying up&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/animated-pair-streams.html#toccredits" name="toc9" id="toc9"&gt;Credits&lt;/a&gt;
+ &lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/animated-pair-streams.html#toc0" name="tocname-that-series" id="tocname-that-series"&gt;Name that Series&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;What&amp;#8217;s going on in the animation below?
+&lt;/p&gt;
+&lt;img src="http://wordaligned.org/files/animated-pair-stream.gif" alt="Pair stream slideshow"/&gt;
+
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/animated-pair-streams.html#toc1" name="tocbounded-pairs" id="tocbounded-pairs"&gt;Bounded Pairs&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;While you&amp;#8217;re waiting for the graphic to load, recall a problem we encountered while hunting for &lt;a href="http://wordaligned.org/articles/the-maximum-subsequence-problem.html#programming-pearl"&gt;maximum subsequences&lt;/a&gt;:
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;Given a number n, generate all the pairs (i, j) such that i and j are in the range 0 to n and j is greater than i.
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;A Python solution reads:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;def generate_pairs(n):
+    "Generate all pairs (i, j) such that 0 &amp;lt;= i &amp;lt;= j &amp;lt; n"
+    for i in range(n):
+        for j in range(i, n):
+            yield i, j
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;We can extend this to solve a more general version of the problem:
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;Given two sequences (S, T), generate all pairs (S&lt;sub&gt;i&lt;/sub&gt;, T&lt;sub&gt;j&lt;/sub&gt;) such that j is greater than i.
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;def generate_pairs(s, t):
+    "Generate all pairs s[i], t[j]  such that 0 &amp;lt;= i &amp;lt;= j"
+    s_count = len(s)
+    t_count = len(t)
+    for i in xrange(s_count):
+        for j in xrange(i, t_count):
+            yield s[i], t[j]
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Note:
+&lt;/p&gt;
+&lt;ol&gt;
+ &lt;li&gt;&lt;p&gt;This function requires complete and bounded collections as inputs since it asks for their lengths and accesses elements by index &amp;#8212; think &amp;#8220;lists&amp;#8221; or &amp;#8220;tuples&amp;#8221;. Yet it generates results lazily, giving clients control over just how many pairs they require. This is why I&amp;#8217;ve chosen &lt;code&gt;xrange&lt;/code&gt; in preference to &lt;code&gt;range&lt;/code&gt;, since it too generates numbers, rather than returning a complete list. (Python 3000 simplifies things: &lt;code&gt;range&lt;/code&gt; becomes &lt;code&gt;xrange&lt;/code&gt; and &lt;code&gt;xrange&lt;/code&gt; disappears.)
+&lt;/p&gt;
+
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;p&gt;There&amp;#8217;s no need for extra logic to handle &lt;code&gt;S&lt;/code&gt; being shorter than &lt;code&gt;T&lt;/code&gt; or vice-versa: &lt;code&gt;xrange(start, stop)&lt;/code&gt; is smart enough to handle the case when &lt;code&gt;stop&lt;/code&gt; is less than &lt;code&gt;start&lt;/code&gt;. I&amp;#8217;d say adding such extra logic would count as premature optimisation.
+&lt;/p&gt;
+
+ &lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Here&amp;#8217;s an example of this function in action. We run the generator to exhaustion collecting its output in a list.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; pairs = list(generate_pairs('ABC', (1, 2, 3, 4)))
+&amp;gt;&amp;gt;&amp;gt; print pairs
+[('A', 1), ('A', 2), ('A', 3), ('A', 4), ('B', 2), ('B', 3), ('B', 4), ('C', 3), ('C', 4)]
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;A second example builds a &lt;a href="http://docs.python.org/ref/genexpr.html"&gt;generator expression&lt;/a&gt; from &lt;code&gt;generate_pairs()&lt;/code&gt;. We plug this expression into the built in &lt;code&gt;any&lt;/code&gt; function to determine whether the pair &lt;code&gt;('A', 2)&lt;/code&gt; is in the pair sequence. Note that &lt;code&gt;any&lt;/code&gt; only pulls two elements from the sequence to produce an answer.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; any((p == 'A', 2) for p in generate_pairs('ABC', (1, 2, 3, 4)))
+True
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;So far, so what? For the toy examples shown, lazy evaluation isn&amp;#8217;t an important consideration. But what if our input sequences were very large? What if they were infinite?
+&lt;/p&gt;
+&lt;span id="continue-reading"/&gt;
+
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/animated-pair-streams.html#toc2" name="tocstreams-of-pairs" id="tocstreams-of-pairs"&gt;Streams of Pairs&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;&lt;code&gt;Generate_pairs()&lt;/code&gt; yields results row by row. Here&amp;#8217;s a slideshow for the case when &lt;code&gt;S&lt;/code&gt; and &lt;code&gt;T&lt;/code&gt; have 5 and 20 elements respectively. Brightness indicates age, so the white circle represents the current head of the generated sequence, and the greying circles represent previous elements &amp;#8212; the older the greyer. Remember, it&amp;#8217;s up to clients just how many grey pairs to hold: the generator only ever yields a shiny white new pair.
+&lt;/p&gt;
+&lt;img src="http://wordaligned.org/files/animated-pair-list.gif" alt="Pair list slideshow"/&gt;
+
+&lt;p&gt;A text representation would be as follows, where, as usual, we read top to bottom, left to right.
+&lt;/p&gt;
+&lt;pre&gt;
+S&lt;sub&gt;0&lt;/sub&gt;T&lt;sub&gt;0&lt;/sub&gt;, S&lt;sub&gt;0&lt;/sub&gt;T&lt;sub&gt;1&lt;/sub&gt;, S&lt;sub&gt;0&lt;/sub&gt;T&lt;sub&gt;2&lt;/sub&gt; ...                             S&lt;sub&gt;0&lt;/sub&gt;T&lt;sub&gt;20&lt;/sub&gt;
+      S&lt;sub&gt;1&lt;/sub&gt;T&lt;sub&gt;1&lt;/sub&gt;, S&lt;sub&gt;1&lt;/sub&gt;T&lt;sub&gt;2&lt;/sub&gt;, ...                            S&lt;sub&gt;1&lt;/sub&gt;T&lt;sub&gt;20&lt;/sub&gt;
+            S&lt;sub&gt;2&lt;/sub&gt;T&lt;sub&gt;2&lt;/sub&gt;, ...                           S&lt;sub&gt;2&lt;/sub&gt;T&lt;sub&gt;20&lt;/sub&gt;
+                  ...
+&lt;/pre&gt;
+
+&lt;p&gt;It&amp;#8217;s clear this mode of traversal isn&amp;#8217;t suitable for generating pairs from very large inputs: we don&amp;#8217;t advance through S quickly enough. In fact, if T were infinite, we&amp;#8217;d be stuck on the top row, forever generating pairs of the form &lt;code&gt;S&lt;sub&gt;0&lt;/sub&gt;T&lt;sub&gt;i&lt;/sub&gt;&lt;/code&gt;.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/animated-pair-streams.html#toc3" name="toca-recursive-scheme" id="toca-recursive-scheme"&gt;A Recursive Scheme&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;&lt;a href="http://mitpress.mit.edu/sicp/full-text/book/book.html"&gt;&amp;#8220;Structure and Interpretation of Computer Programs&amp;#8221;&lt;/a&gt; describes an elegant recursive scheme for &lt;a href="http://mitpress.mit.edu/sicp/full-text/book/book-Z-H-24.html#%_sec_Temp_476"&gt;generating pairs&lt;/a&gt;:
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;Call the general stream of pairs (pairs S T), and consider it to be composed of three parts: the pair (S&lt;sub&gt;0&lt;/sub&gt;,T&lt;sub&gt;0&lt;/sub&gt;), the rest of the pairs in the first row, and the remaining pairs:&lt;br/&gt;&lt;br/&gt;
+   &lt;img src="http://mitpress.mit.edu/sicp/full-text/book/ch3-Z-G-47.gif" alt="Stream of pairs structure"/&gt;
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;Based on this insight, we can generate our stream of pairs:
+&lt;/p&gt;
+&lt;ol&gt;
+ &lt;li&gt;
+     yielding the pair, (S&lt;sub&gt;0&lt;/sub&gt;,T&lt;sub&gt;0&lt;/sub&gt;)
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     yield pairs from the first row combined with the stream of remaining pairs
+ &lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Note the recursion: the definition of the pairs stream refers to itself. That&amp;#8217;s not a problem so long as we&amp;#8217;re lazy about evaluating the tail of the stream. Since we always know how to pull the first pair from the stream, we can both bootstrap the process and keep going forever.
+&lt;/p&gt;
+&lt;p&gt;All we now need is a suitable method of combining two the first row and the remaining pairs.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/animated-pair-streams.html#toc4" name="tocinterleaving" id="tocinterleaving"&gt;Interleaving&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;The simplest way to combine the two streams is just to interleave them, pulling elements from each in turn. A simple (too simple!) implementation of &lt;code&gt;interleave()&lt;/code&gt; reads:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;Simple interleave&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;def interleave(s, t):
+    while True:
+        yield s.next()
+        yield t.next()
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;(The problem here is that &lt;code&gt;interleave()&lt;/code&gt; stops as soon as either of the the input streams is exhausted, which isn&amp;#8217;t an issue for infinite streams, but isn&amp;#8217;t ideal in the case when either of the inputs are bounded. You get the idea. I&amp;#8217;ll provide better implementation &lt;a href="http://wordaligned.org/articles/animated-pair-streams.html#tying-up"&gt;later&lt;/a&gt;.)
+&lt;/p&gt;
+&lt;p&gt;We can now code our pairs generator:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;Pairs generator&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;import itertools
+
+def pairs(s, t):
+    """ Generate a stream of pairs taken from s, t.
+    
+    Yields a stream of pairs (si, tj) where i &amp;lt;= j.
+    The input streams may be finite or bounded, but must be iterable.
+    """
+    first = s.next(), t.next()
+    yield first
+    t, t_top = itertools.tee(t)
+    s0 = first[0]
+    top_row = ((s0, tt) for tt in t_top)
+    for st in interleave(top_row, pairs(s, t)):
+        yield st
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Here&amp;#8217;s a slideshow of this algorithm in action.
+&lt;/p&gt;
+&lt;img src="http://wordaligned.org/files/animated-pair-stream.gif" alt="Pair stream slideshow"/&gt;
+
+&lt;p&gt;Even though Python (CPython, to be specific) and recursion don&amp;#8217;t generally get along well (unlike in a proper functional programming language), this implementation doesn&amp;#8217;t &lt;em&gt;appear&lt;/em&gt; to fall foul of CPython&amp;#8217;s maximum recursion limits &lt;strong&gt;even though pairs() repeatedly calls itself&lt;/strong&gt;.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;No maximum recursion depth exceeded error here!&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; integers = itertools.count
+&amp;gt;&amp;gt;&amp;gt; for ij in pairs(integers, integers):
+... 	print ij
+... 
+(0, 0)
+(0, 1)
+(1, 1)
+(0, 2)
+(1, 2)
+(0, 3)
+(2, 2)
+....
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;When I dug a little deeper, I started to understand why: the function can&amp;#8217;t run indefinitely since it eats up memory. It continually tees up iterators over &lt;code&gt;t&lt;/code&gt; and creates new generator expressions.
+&lt;/p&gt;
+&lt;p&gt;That said, I was surprised just how quickly it consumes memory. After all, generator expressions and iterators shouldn&amp;#8217;t take up much space. For the purposes of comparison, I compared how it fared against a Scheme program designed to do the same thing. Both had consumed a gigabyte of memory after running just a few minutes (and, for what it&amp;#8217;s worth, the Python program had generated an order of magnitude more pairs by this point).
+&lt;/p&gt;
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;Scheme pair generator&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;(require (lib "40.ss" "srfi")) ;; Scheme stream support
+
+(define (interleave s1 s2)
+  (if (stream-null? s1)
+      s2
+      (stream-cons (stream-car s1)
+                   (interleave s2 (stream-cdr s1)))))
+
+(define (pairs s t)
+  (stream-cons
+   (list (stream-car s) (stream-car t))
+   (interleave
+    (stream-map (lambda (x) (list (stream-car s) x))
+                (stream-cdr t))
+    (pairs (stream-cdr s) (stream-cdr t)))))
+
+(define ones (stream-cons 1 ones))
+
+(define (stream-add s t) (stream-map + s t))
+
+(define integers
+  (stream-cons 0 (stream-add ones integers)))
+
+(stream-for-each
+  (lambda (x) (newline) (display x))
+  (pairs integers integers))
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/animated-pair-streams.html#toc5" name="tocdouble-trouble" id="tocdouble-trouble"&gt;Double Trouble&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Let&amp;#8217;s look a little further into the stream. Here&amp;#8217;s the genesis of the first 120 pairs.
+&lt;/p&gt;
+&lt;img src="http://wordaligned.org/files/animated-pair-stream-120.gif" alt="Pair stream slideshow"/&gt;
+
+&lt;p&gt;Now the pattern becomes clear. Evidently the interleave strategy gives a heavy bias towards advancing rightwards; downwards motion is relatively slow.
+&lt;/p&gt;
+&lt;p&gt;Let&amp;#8217;s filter out the &lt;code&gt;i == j&lt;/code&gt; diagonal to try and quantify this.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; ints = itertools.count
+&amp;gt;&amp;gt;&amp;gt; izip = itertools.izip
+&amp;gt;&amp;gt;&amp;gt; pp = pairs(ints(), ints())
+&amp;gt;&amp;gt;&amp;gt; diagonal = ((ix, (i, j))
+...             for ix, (i, j) in izip(ints(1), pp) if i == j))
+&amp;gt;&amp;gt;&amp;gt; for d in itertools.islice(diagonal, 10):
+...     print d
+...
+(1, (0, 0))
+(3, (1, 1))
+(7, (2, 2))
+(15, (3, 3))
+(31, (4, 4))
+(63, (5, 5))
+(127, (6, 6))
+(255, (7, 7))
+(511, (8, 8))
+(1023, (9, 9))
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;The output shows that pair (0, 0) is the 1&lt;sup&gt;st&lt;/sup&gt; element of the stream, (1, 1) the 3&lt;sup&gt;rd&lt;/sup&gt;, (2, 2) the 7&lt;sup&gt;th&lt;/sup&gt;, and so on.
+&lt;/p&gt;
+&lt;p&gt;Any computer scientist ought to quickly spot the pattern, and any mathematician ought to be able to prove why diagonal advances are exponentially infrequent.
+&lt;/p&gt;
+&lt;p&gt;Loosely speaking, if D&lt;sub&gt;i&lt;/sub&gt; is the stream of positions in the pairs stream of elements which lie on the diagonal (i.e. the stream 1, 3, 7, 15, &amp;#8230; shown in the interpreted Python session), then the elements of D must satisfy the recurrence relation:
+&lt;/p&gt;
+&lt;pre&gt;
+D&lt;sub&gt;i+1&lt;/sub&gt; = 1 + 2&amp;times;D&lt;sub&gt;i&lt;/sub&gt;
+&lt;/pre&gt;
+
+&lt;p&gt;This relation derives directly from the recursive definition of &lt;code&gt;pairs()&lt;/code&gt;: yield a single element, then alternate the rest of yourself with the generated top row.
+&lt;/p&gt;
+&lt;p&gt;Here are some slides showing the points at which the first 5 diagonal elements appear. Watch the recursive pattern emerge.
+&lt;/p&gt;
+&lt;p&gt;&lt;img src="http://wordaligned.org/files/pairs-1.png" alt="diagonal pairs image"/&gt;
+   &lt;img src="http://wordaligned.org/files/pairs-3.png" alt="diagonal pairs image"/&gt;
+   &lt;img src="http://wordaligned.org/files/pairs-7.png" alt="diagonal pairs image"/&gt;
+   &lt;img src="http://wordaligned.org/files/pairs-15.png" alt="diagonal pairs image"/&gt;
+   &lt;img src="http://wordaligned.org/files/pairs-31.png" alt="diagonal pairs image"/&gt;
+&lt;/p&gt;
+&lt;p&gt;The solution to the recurrence relation is &lt;code&gt;D&lt;sub&gt;i&lt;/sub&gt; = 2&lt;sup&gt;i&lt;/sup&gt; &amp;minus; 1&lt;/code&gt;. These diagonal advances correspond to recursive calls to &lt;code&gt;pairs()&lt;/code&gt;. So if our Python session has a recursion limit set to 1000 (try &lt;code&gt;sys.getrecursionlimit()&lt;/code&gt;), and our pairs generator were to yield a result every nanosecond, and we had a machine with infinite memory, it would take quite a few millenia before we run into this limit.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;How many millenia until we hit the recursion limit?&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; (2 ** 1000 - 1)/(1.e9 * 60 * 60 * 24 * 365 * 1000) 
+3.3977315042689856e+281
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/animated-pair-streams.html#toc6" name="tocmemory-use" id="tocmemory-use"&gt;Memory Use&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;It should also now be clear why this particular algorithm burns memory. Teeing an iterator doesn&amp;#8217;t magically mean we don&amp;#8217;t have to store any elements we&amp;#8217;ve iterated past. The greater the distance between the teed iterators, the more that need storing.
+&lt;/p&gt;
+&lt;p&gt;If that&amp;#8217;s not clear, run the following Python session and keep an eye on memory consumption (and be ready to interrupt the infinite loop!). You&amp;#8217;ll see memory use rapidly increase as &lt;code&gt;i&lt;/code&gt; and &lt;code&gt;j&lt;/code&gt; diverge, since &lt;code&gt;j&lt;/code&gt; needs to remember everything &lt;code&gt;i&lt;/code&gt; produces.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; from itertools import *
+&amp;gt;&amp;gt;&amp;gt; i, j = tee(repeat(0))
+&amp;gt;&amp;gt;&amp;gt; for x in i: pass
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;By contrast, if we zip through &lt;code&gt;i&lt;/code&gt; and &lt;code&gt;j&lt;/code&gt; in parallel, memory use is stable.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; i, j = tee(repeat(0))
+&amp;gt;&amp;gt;&amp;gt; for ij in izip(i, j): pass
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Our pair generator has to remember more and more elements from the &lt;code&gt;T&lt;/code&gt; stream (and also, to a lesser extent, from the &lt;code&gt;S&lt;/code&gt; stream). That&amp;#8217;s why it&amp;#8217;s so hungry. Any general purpose infinite pair generator function must suffer this problem, I think, since we &lt;strong&gt;have&lt;/strong&gt; to accumulate increasing portions of the streams into memory, but if it&amp;#8217;s just integer pairs we want we can work around the issue:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;def integer_pairs(i=0):
+    "Generate a stream of integer pairs (i, j) with i &amp;lt;= j"
+    yield i, i
+    top_row = ((i, j) for j in itertools.count(i + 1))
+    for ij in interleave(top_row, integer_pairs(i + 1)):
+        yield ij
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Here, rather than &lt;code&gt;tee()&lt;/code&gt; streams of integers, we use &lt;code&gt;itertools.count()&lt;/code&gt; to create new ones as required. This pair generator will run happily for extended periods. It will very gradually ask for more memory, as numbers get bigger and the number of rows increases. As before, it won&amp;#8217;t hit any embarrassing recursion limits in the lifetime of this galaxy.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/animated-pair-streams.html#toc7" name="tocproblem-solved" id="tocproblem-solved"&gt;Problem Solved?&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;So, does &lt;code&gt;integer_pairs()&lt;/code&gt; solve the problem of generating an infinite stream of pairs for the special case when both input streams are integers? 
+&lt;/p&gt;
+&lt;p&gt;Not really, no!
+&lt;/p&gt;
+&lt;p&gt;The interleave strategy for combining the top row with the remaining pairs has the great merit of simplicity, but is otherwise far from ideal. I don&amp;#8217;t think a one-size-fits-all strategy for streaming pairs exists, so we should allow clients to supply one. And that will have to be the subject of another article.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/animated-pair-streams.html#toc8" name="toctying-up" id="toctying-up"&gt;Tying up&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;It&amp;#8217;s not hard to fix the problem we noticed with &lt;code&gt;interleave()&lt;/code&gt;.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;def interleave(s, t):
+    """Generate an interleaved stream of elements from s and t.
+    
+    If one of the streams finishes, elements continue to be generated
+    from the other until it too is finished. 
+    """
+    for ss, tt in itertools.izip(s, t):
+        yield ss
+        yield tt
+    for s_or_t in itertools.chain(s, t):
+        yield s_or_t
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Here&amp;#8217;s the script I used to generate the animated GIFs. Although it&amp;#8217;s very much geared to doing the single job which it was designed to do, it&amp;#8217;s short enough to be used as a basis for similar tasks. I hope this article helps demonstrate the merits of visualising an algorithm in action.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;pairs-animation.py&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;#! /usr/bin/env python
+"""Script which accepts a list of (i, j) pairs, creating slides and
+   an animated GIF showing the positions of these pairs.
+
+Example use:
+$ echo '((0, 0) (0, 1) (1, 1) (0, 2) (1, 2) (0, 3) (2, 2)' | pairs-animation.py
+
+Dependencies:
+- Python Imaging Library (PIL), http://effbot.org/imagingbook/
+- aggdraw, anti-aliased graphics drawing package,
+  http://effbot.org/zone/pythondoc-aggdraw.htm
+- ImageMagick, http://www.imagemagick.org
+"""
+import Image
+import aggdraw
+import itertools
+
+# Script wide drawing configuration
+block_w = 16
+block_pad = 2
+
+def fading_brushes():
+    "Generate a sequence of fading grey brushes."
+    darkgrey = itertools.repeat(16)
+    greyscale = itertools.chain(range(255, 0, -16), darkgrey)
+    def brush(g):
+        "Return a grey brush."
+        return aggdraw.Brush('rgb(%d,%d,%d)' % (g, g, g))
+    return itertools.imap(brush, greyscale)
+
+def block_start(i):
+    "Return the coordinate (X or Y) at which the ith block starts."
+    return (block_w + block_pad) * i + block_pad
+
+def read_ij(data):
+    """Return pairs of integers found in the input string.
+    
+    Note: this function is extremely unfussy about the string format!
+    &amp;gt;&amp;gt;&amp;gt; read_ij('1 2 3 4')
+    [(1, 2), (3, 4)]
+    &amp;gt;&amp;gt;&amp;gt; read_ij('(1, 2), (3, 4)')
+    [(1, 2), (3, 4)]
+    """
+    import re
+    ij = itertools.imap(int, re.compile(r'-?\d+').findall(data))
+    return zip(ij, ij)
+
+def dimensions(ij):
+    "Return dimensions of an image big enough to contain blocks at ij positions."
+    import operator
+    max_i = max(map(operator.itemgetter(0), ij))
+    max_j = max(map(operator.itemgetter(1), ij))
+    return block_start(max_j + 1), block_start(max_i + 1)
+
+def block_xy(ij):
+    "Return the left, top, right, bottom coords of a block at ij."
+    ylo, xlo = map(block_start, ij)
+    return xlo, ylo, xlo + block_w, ylo + block_w
+
+def draw_blocks(image, blocks):
+    "Draws the supplied blocks onto the input image."
+    draw = aggdraw.Draw(image)
+    brushes = fading_brushes()
+    # Reverse the blocks so the newest are brightest
+    for block, brush in itertools.izip(reversed(blocks), brushes):
+        # The 'ellipse' will be circular since the block is square
+        draw.ellipse(block_xy(block), brush)
+    draw.flush()
+
+def main(ij_data):
+    "Creates slides and an animation from the ij block positions."
+    import os
+    ij = read_ij(ij_data)
+    dims = dimensions(ij)
+    # Create the slides
+    slides = ['pairs-%d.gif' % n for n in range(len(ij) + 1)]
+    for n, slide in enumerate(slides):
+        image = Image.new('L', dims)
+        draw_blocks(image, ij[:n])
+        image.save(slide)
+    # Use ImageMagick to create an animation
+    # -loop 0 =&amp;gt; loop forever, -delay units are .01 seconds
+    os.system('convert -delay 100 -loop 0 %s animation.gif'
+              % ' '.join(slides))
+
+if __name__ == '__main__':
+    import sys
+    main(sys.stdin.read())
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/animated-pair-streams.html#toc9" name="toccredits" id="toccredits"&gt;Credits&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;The inspiration for this article comes directly from &lt;a href="http://mitpress.mit.edu/sicp/full-text/book/book-Z-H-24.html#%_sec_Temp_476"&gt;&amp;#8220;Structure and Interpretation of Computer Programs&amp;#8221;&lt;/a&gt;, which presents some great examples of how to develop and use these pair streams.
+&lt;/p&gt;</description>
+<dc:date>2008-01-13</dc:date>
+<guid>http://wordaligned.org/articles/animated-pair-streams.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/animated-pair-streams.html</link>
+<category>Streams</category>
+</item>
+
+<item>
+<title>The Maximum Sum contiguous subsequence problem</title>
+<description>&lt;div class="toc"&gt;
+&lt;h2&gt;Contents&lt;/h2&gt;
+&lt;ul&gt;
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/the-maximum-subsequence-problem.html#tocwelcome-to-the-pearly-gates" name="toc0" id="toc0"&gt;Welcome to the Pearly Gates&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/the-maximum-subsequence-problem.html#tocprogramming-pearl" name="toc1" id="toc1"&gt;Programming Pearl&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/the-maximum-subsequence-problem.html#toclinear-solution" name="toc2" id="toc2"&gt;Linear Solution&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/the-maximum-subsequence-problem.html#tocstreaming-solution" name="toc3" id="toc3"&gt;Streaming Solution&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/the-maximum-subsequence-problem.html#tocstream-accumulate" name="toc4" id="toc4"&gt;Stream Accumulate&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/the-maximum-subsequence-problem.html#tocstream-floor" name="toc5" id="toc5"&gt;Stream Floor&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/the-maximum-subsequence-problem.html#tocstream-diff" name="toc6" id="toc6"&gt;Stream Diff&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/the-maximum-subsequence-problem.html#tocstreams-and-collections" name="toc7" id="toc7"&gt;Streams and Collections&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/the-maximum-subsequence-problem.html#tocstream-on" name="toc8" id="toc8"&gt;Stream on&amp;#8230;&lt;/a&gt;
+ &lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/the-maximum-subsequence-problem.html#toc0" name="tocwelcome-to-the-pearly-gates" id="tocwelcome-to-the-pearly-gates"&gt;Welcome to the Pearly Gates&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;The Pearly Gates club never closes. Its public entrance, a revolving door, just keeps on spinning. With each rotation some punters enter and others leave. The club&amp;#8217;s owners would like to track this traffic. Specifically, they&amp;#8217;d like to know the maximum increase in people entering the club over a given period.
+&lt;/p&gt;
+&lt;p&gt;The starting point is to track the people who enter/leave with each spin of the door. Here&amp;#8217;s a 5 minute sample of that information. Negative numbers mean more people left than entered during a particular cycle.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;Entries Log&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;0 1 2 -3 3 -1 0 -4 0 -1 -4 2 4 1 1 3 1 0 -2 -3 -3 -2 3 1 1 4 5 -3 -2 -1 ...
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Here&amp;#8217;s the same information plotted on a graph.
+&lt;/p&gt;
+&lt;img alt="Graph of entries to Pearly Gates club" src="http://chart.apis.google.com/chart?
+cht=lc
+&amp;amp;chtt=Entries+to+the+Pearly+Gates+club
+&amp;amp;chs=500x200
+&amp;amp;chxt=x,y
+&amp;amp;chxl=0:|0min|1min|2min|3min|4min|5min
+&amp;amp;chxr=1,-5.0,6.0
+&amp;amp;chd=t:45.5,45.5|45.5,54.5,63.6,18.2,72.7,36.4,45.5,9.1,45.5,36.4,9.1,63.6,81.8,54.5,54.5,72.7,54.5,45.5,27.3,18.2,18.2,27.3,72.7,54.5,54.5,81.8,90.9,18.2,27.3,36.4
+&amp;amp;chco=BBBBBB,0000CC
+&amp;amp;chls=1,1,0|4,1,0
+" /&gt;
+
+&lt;p&gt;The archetypal problem we&amp;#8217;d like to solve can be stated:
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;&lt;strong&gt;Given a sequence of numbers, find the maximum sum of a contiguous subsequence of those numbers.&lt;/strong&gt; 
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;As an example, the maximum sum contiguous subsequence of 0, -1, &lt;strong&gt;2, -1, 3&lt;/strong&gt;, -1, 0 would be 4 (= 2 + -1 + 3).
+&lt;/p&gt;
+&lt;p&gt;This problem is generally known as &lt;strong&gt;the maximum sum contiguous subsequence problem&lt;/strong&gt; and if you haven&amp;#8217;t encountered it before, I&amp;#8217;d recommend trying to solve it before reading on. Even if you have encountered it before, I&amp;#8217;ll invite you to read on anyway &amp;#8212; it&amp;#8217;s well worth another look.
+&lt;/p&gt;
+&lt;span id="continue-reading"/&gt;
+
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/the-maximum-subsequence-problem.html#toc1" name="tocprogramming-pearl" id="tocprogramming-pearl"&gt;Programming Pearl&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;The maximum sum contiguous subsequence problem appears in Jon Bentley&amp;#8217;s &lt;a href="http://www.cs.bell-labs.com/cm/cs/pearls/"&gt;&amp;#8220;Programming Pearls&amp;#8221;&lt;/a&gt;. He first presents a brute force solution which examines all possible contiguous subsequences of the initial sequence and returns the maximum sum of these subsequences.
+&lt;/p&gt;
+&lt;p&gt;A Python implementation might read:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;def generate_pairs(n):
+    "Generate all pairs (i, j) such that 0 &amp;lt;= i &amp;lt;= j &amp;lt; n"
+    for i in range(n):
+        for j in range(i, n):
+            yield i, j
+
+def max_sum_subsequence(seq):
+    "Return the max-sum contiguous subsequence of the input sequence."
+    return max(sum(seq[i:j])
+               for i, j in generate_pairs(len(seq) + 1))
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;It&amp;#8217;s a straightforward piece of code, though note the &lt;code&gt;+ 1&lt;/code&gt; which ensures that we slice to the end of &lt;code&gt;seq&lt;/code&gt;, and also that we include empty slices, which sum to &lt;code&gt;0&lt;/code&gt;, handling the case when every item in the sequence is negative. The trouble is, the algorithm is of cubic complexity: to process just 6 hours of logged activity takes over 2 minutes on a 2GHz Intel Core Duo MacBook, and the cubic nature of the algorithm means we&amp;#8217;d quickly fail to process more substantial log files in real time.
+&lt;/p&gt;
+&lt;img alt="Graph plotting accumulated entries to the Pearly Gates club" src="http://chart.apis.google.com/chart?
+cht=lc
+&amp;amp;chtt=Accumulated+entries+to+the+Pearly+Gates+club
+&amp;amp;chs=500x250
+&amp;amp;chxt=x,y
+&amp;amp;chxl=0:|0min|1min|2min|3min|4min|5min
+&amp;amp;chxr=1,-8.0,10.0
+&amp;amp;chd=t:44.4,50.0,55.6,27.8,61.1,38.9,44.4,22.2,44.4,38.9,22.2,55.6,66.7,50.0,50.0,61.1,50.0,44.4,33.3,27.8,27.8,33.3,61.1,50.0,50.0,66.7,72.2,27.8,33.3,38.9|44.4,50.0,61.1,44.4,61.1,55.6,55.6,33.3,33.3,27.8,5.6,16.7,38.9,44.4,50.0,66.7,72.2,72.2,61.1,44.4,27.8,16.7,33.3,38.9,44.4,66.7,94.4,77.8,66.7,61.1
+&amp;amp;chco=CCCCCC,CC0000
+&amp;amp;chls=3,1,0|3,1,0
+&amp;amp;chdl=Entries|Accum.+Entries
+" /&gt;
+
+&lt;p&gt;A simple optimisation eliminates the repeated calls to &lt;code&gt;sum&lt;/code&gt; by accumulating the input sequence &amp;#8212; the red line in the graph above. Subtracting element &lt;code&gt;i-1&lt;/code&gt; from element &lt;code&gt;j&lt;/code&gt; of this cumulative sequence gives us the sum of elements in the range i, j of the original sequence. We won&amp;#8217;t study the code for this quadratic solution &amp;#8212; it doesn&amp;#8217;t add much to our analysis. Again, some care is needed to avoid &lt;a href="http://wordaligned.org/articles/joined-output-and-the-fencepost-problem.html"&gt;fencepost problems&lt;/a&gt;.
+&lt;/p&gt;
+&lt;p&gt;We won&amp;#8217;t look at the divide-and-conquer NlogN solution either. It&amp;#8217;s hard to understand, and we can do far better.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/the-maximum-subsequence-problem.html#toc2" name="toclinear-solution" id="toclinear-solution"&gt;Linear Solution&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;There is a linear solution. The idea is to scan the sequence from start to finish keeping track of &lt;code&gt;maxsofar&lt;/code&gt;, the maximum sum of a contiguous subsequence seen so far, and &lt;code&gt;maxendinghere&lt;/code&gt;, the maximum sum of a contiguous subsequence which ends at the current position. Bentley&amp;#8217;s pseudo-code reads:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;maxsofar = 0
+maxendinghere = 0
+for i = [0, n)
+    /* invariant: maxendinghere and maxsofar are accurate
+       are accurate for x[0..i-1] */
+    maxendinghere = max(maxendinghere + x[i], 0)
+    maxsofar = max(maxsofar, maxendinghere)
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;This translates directly into Python.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;def max_sum_subsequence(seq):
+    maxsofar = 0
+    maxendinghere = 0
+    for s in seq:
+        # invariant: maxendinghere and maxsofar are accurate
+        # are accurate up to s
+        maxendinghere = max(maxendinghere + s, 0)
+        maxsofar = max(maxsofar, maxendinghere)
+    return maxsofar
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Now, this is a fabulous solution. Bentley describes it as subtle. Such a succinct code snippet hardly &lt;strong&gt;looks&lt;/strong&gt; subtle, but I agree, the loop body &lt;strong&gt;does&lt;/strong&gt; take a bit of understanding:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;maxendinghere = max(maxendinghere + s, 0)
+maxsofar = max(maxsofar, maxendinghere)
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;&lt;strong&gt;Why does this work?&lt;/strong&gt; 
+&lt;/p&gt;
+&lt;p&gt;Well, essentially maxendinghere is what&amp;#8217;s accumulating the subsequences &amp;#8212; it keeps rolling the next element into itself. Should this accumulated sum ever become negative we know that the subsequence-which-ends-here we&amp;#8217;re currently tracking is worse than the empty subsequence-which-restarts-here; so we can reset our subsequence accumulator, and the first clause of the loop invariant still holds. Combine this with the observation that maxsofar tracks peaks in maxendinghere and we&amp;#8217;re done.
+&lt;/p&gt;
+&lt;p&gt;The loop-invariant comment provides a good example of how comments can help us understand an algorithm, even though the code is minimal and the variable names are well-chosen.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/the-maximum-subsequence-problem.html#toc3" name="tocstreaming-solution" id="tocstreaming-solution"&gt;Streaming Solution&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;I prefer to think of this problem in terms of streams &amp;#8212; lazily evaluated sequences. Think of our log file as generating a stream of numbers:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;... 0 1 2 -3 3 -1 0 -4 0 -1 -4 2 4 1 1 3 1 0 -2 -3 -3 -2 3 1 1 4 5 -3 -2 -1 ...
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;The first thing we do is transform this stream to generate another stream, the cumulative sum of numbers seen so far. It&amp;#8217;s an integration of sorts. You&amp;#8217;ll remember we already used this stream, or an in-memory version of it, in our quadratic solution to the problem: the difference between points on it yields subsequence-sums.
+&lt;/p&gt;
+
+&lt;h4&gt;&lt;a href="http://wordaligned.org/articles/the-maximum-subsequence-problem.html#toc4" name="tocstream-accumulate" id="tocstream-accumulate"&gt;Stream Accumulate&lt;/a&gt;&lt;/h4&gt;
+&lt;p&gt;We generate the accumulated stream from our original stream like this:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;def stream_accumulate(stream):
+    total = 0
+    for s in stream:
+        total += s
+        yield total
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;The graph below samples the first five minutes of this stream. The red line accumulates values from the pale grey line.
+&lt;/p&gt;
+&lt;img alt="Graph plotting accumulated entries to the Pearly Gates club" src="http://chart.apis.google.com/chart?
+cht=lc
+&amp;amp;chs=500x250
+&amp;amp;chxt=x,y
+&amp;amp;chxl=0:|0min|1min|2min|3min|4min|5min
+&amp;amp;chxr=1,-8.0,10.0
+&amp;amp;chd=t:44.4,50.0,55.6,27.8,61.1,38.9,44.4,22.2,44.4,38.9,22.2,55.6,66.7,50.0,50.0,61.1,50.0,44.4,33.3,27.8,27.8,33.3,61.1,50.0,50.0,66.7,72.2,27.8,33.3,38.9|44.4,50.0,61.1,44.4,61.1,55.6,55.6,33.3,33.3,27.8,5.6,16.7,38.9,44.4,50.0,66.7,72.2,72.2,61.1,44.4,27.8,16.7,33.3,38.9,44.4,66.7,94.4,77.8,66.7,61.1
+&amp;amp;chm=x,FFCC33,1,10.0,20.0|x,FFCC33,1,26.0,20.0
+&amp;amp;chco=CCCCCC,CC0000
+&amp;amp;chls=3,1,0|3,1,0
+&amp;amp;chdl=Entries|Accum.+Entries
+" /&gt;
+
+&lt;p&gt;These accumulated numbers represent the number of members who have entered the club since we started tracking them. On our graph, the maximum sum contiguous subsequence is simply the greatest Y-increase between any two points on this graph. X&amp;#8217;s mark these points on the graph above. (Note: it&amp;#8217;s &lt;strong&gt;not&lt;/strong&gt; the Y-range of the graph we want since our X-values are time-ordered, and we require X1 &amp;lt;= X2). 
+&lt;/p&gt;
+
+&lt;h4&gt;&lt;a href="http://wordaligned.org/articles/the-maximum-subsequence-problem.html#toc5" name="tocstream-floor" id="tocstream-floor"&gt;Stream Floor&lt;/a&gt;&lt;/h4&gt;
+&lt;p&gt;A second transformation yields the floor of the accumulated stream.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;import sys
+
+def stream_floor(stream):
+    m = 0
+    for s in stream:
+        m = min(m, s)
+        yield m
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;(Note that, for our purposes, the floor of the stream isn&amp;#8217;t exactly the stream of minimum values taken by the stream &amp;#8212; we enforce a baseline at zero. It would be better to allow clients of this function to supply an optional baseline value, but I wanted the simplest possible code that shows the idea.)
+&lt;/p&gt;
+&lt;p&gt;Here&amp;#8217;s a graph plotting the accumulated entries alongside the floor of these entries.
+&lt;/p&gt;
+&lt;img alt="Graph plotting accumulated entries and floor of accumulated entries to the Pearly Gates club" src="http://chart.apis.google.com/chart?
+cht=lc
+&amp;amp;chs=500x250
+&amp;amp;chxt=x,y
+&amp;amp;chxl=0:|0min|1min|2min|3min|4min|5min
+&amp;amp;chxr=1,-8.0,10.0
+&amp;amp;chd=t:44.4,50.0,61.1,44.4,61.1,55.6,55.6,33.3,33.3,27.8,5.6,16.7,38.9,44.4,50.0,66.7,72.2,72.2,61.1,44.4,27.8,16.7,33.3,38.9,44.4,66.7,94.4,77.8,66.7,61.1|44.4,44.4,44.4,44.4,44.4,44.4,44.4,33.3,33.3,27.8,5.6,5.6,5.6,5.6,5.6,5.6,5.6,5.6,5.6,5.6,5.6,5.6,5.6,5.6,5.6,5.6,5.6,5.6,5.6,5.6
+&amp;amp;chco=CC0000,333333
+&amp;amp;chls=3,1,0|3,1,0
+&amp;amp;chm=b,CCCCCC,0,1,0
+&amp;amp;chdl=Accum.+Entries|Floor+Accum.+Entries
+" /&gt;
+
+&lt;p&gt;We&amp;#8217;re very close to what we want now. We can track Y-increases on the graph just by generating the difference between the accumulated stream and its floor &amp;#8212; the shading on the graph.
+&lt;/p&gt;
+
+&lt;h4&gt;&lt;a href="http://wordaligned.org/articles/the-maximum-subsequence-problem.html#toc6" name="tocstream-diff" id="tocstream-diff"&gt;Stream Diff&lt;/a&gt;&lt;/h4&gt;
+&lt;p&gt;Here&amp;#8217;s an implementation of &lt;code&gt;stream_diff&lt;/code&gt;. We can&amp;#8217;t just plug a minus sign &amp;#8220;-&amp;#8221; into the mapping function, so we have to use the less wieldy &lt;code&gt;operator.sub&lt;/code&gt;.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;import itertools
+import operator
+
+def stream_diff(s, t):
+    return itertools.imap(operator.sub, s, t)
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Alternatively, we could generate the new stream with an explicit loop:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;import itertools
+
+def stream_diff(s, t):
+    for ss, tt in itertools.izip(s, t):
+        yield ss - tt
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;The final graph shows us the difference between the accumulated entry count and its floor. I&amp;#8217;ve also added the ceiling of this stream as a thick red line (I&amp;#8217;m sure you can figure out how to implement &lt;code&gt;stream_ceiling&lt;/code&gt;), and this ceiling represents the stream of maximum sum contiguous subsequences. 
+&lt;/p&gt;
+&lt;img alt="Graph plotting Max-ends-here and Max-so-far" src="http://chart.apis.google.com/chart?
+cht=lc
+&amp;amp;chtt=Maximum+Subsequences+at+the+Pearly+Gates+club
+&amp;amp;chs=500x250
+&amp;amp;chxt=x,y
+&amp;amp;chxl=0:|0min|1min|2min|3min|4min|5min
+&amp;amp;chxr=1,0.0,17.0
+&amp;amp;chd=t:0.0,5.9,17.6,17.6,17.6,17.6,17.6,17.6,17.6,17.6,17.6,17.6,35.3,41.2,47.1,64.7,70.6,70.6,70.6,70.6,70.6,70.6,70.6,70.6,70.6,70.6,94.1,94.1,94.1,94.1|0.0,5.9,17.6,0.0,17.6,11.8,11.8,0.0,0.0,0.0,0.0,11.8,35.3,41.2,47.1,64.7,70.6,70.6,58.8,41.2,23.5,11.8,29.4,35.3,41.2,64.7,94.1,76.5,64.7,58.8|0.0,0.0
+&amp;amp;chco=aa0000,333333
+&amp;amp;chls=4,1,0|2,1,0
+&amp;amp;chm=b,CCCCCC,1,2,0
+&amp;amp;chdl=Max-so-far|Max-ending-here
+" /&gt;
+
+&lt;p&gt;We&amp;#8217;ve re-labelled the lines &lt;code&gt;Max-so-far&lt;/code&gt; and &lt;code&gt;Max-ending-here&lt;/code&gt; because they&amp;#8217;re the stream of values taken by the variables &lt;code&gt;maxsofar&lt;/code&gt; and &lt;code&gt;maxendinghere&lt;/code&gt; during Bentley&amp;#8217;s clever solution to the maximum sum contiguous subsequence problem. I think we&amp;#8217;re in a better position to understand how this solution works now.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/the-maximum-subsequence-problem.html#toc7" name="tocstreams-and-collections" id="tocstreams-and-collections"&gt;Streams and Collections&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Please don&amp;#8217;t imagine these streams are bloated. &lt;span /&gt;They may be infinite (remember the Pearly Gates club never closes!) but that doesn&amp;#8217;t mean they take up much space. The graphs shown represent snapshots of their activity, and at no point do our presented algorithms actually store a five minute buffer of entries.
+&lt;/p&gt;
+&lt;p&gt;A final solution to the maximum sum contiguous subsequence problem reads like this. We&amp;#8217;ve pushed the general purpose stream transformation functions into a separate module, &lt;code&gt;stream.py&lt;/code&gt;.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;import itertools
+import stream
+
+def max_sum_subsequence_stream(ss):
+    "Return the stream of max sum contiguous subsequences of the input iterable."
+    accu1, accu2 = itertools.tee(stream.accumulate(ss))
+    return stream.ceil(stream.diff(accu1, 
+                       stream.floor(accu2, baseline=0)))
+
+def max_sum_subsequence(ss):
+    "Return the max sum of a contiguous subsequence of the input iterable."
+    return stream.last(max_sum_subsequence_stream(ss))
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;The iterable supplied to &lt;code&gt;max_sum_subsequence&lt;/code&gt; has its last value read, and should therefore be bounded if we want the function to return. We haven&amp;#8217;t supplied arguments to extract a portion of this iterable (to generate maximum subsequences for the club on a particular day, for example) because that&amp;#8217;s what &lt;code&gt;itertools.islice&lt;/code&gt; is for.
+&lt;/p&gt;
+&lt;p&gt;Note that &lt;code&gt;max_sum_subsequence_stream()&lt;/code&gt; may be more useful to clients than &lt;code&gt;max_sum_subsequence()&lt;/code&gt;. Suppose, for example, we&amp;#8217;re only interested when the maximum sum subsequence exceeds 100. We can do this directly by connecting &lt;code&gt;itertools.dropwhile()&lt;/code&gt; to our function.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;def max_subseq_exceeds(seq, limit=100):
+    max_sub_s = max_sum_subsequence_stream(seq)
+    return itertools.dropwhile(lambda s: s &amp;lt;= limit, max_sub_s)
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Perhaps we&amp;#8217;d like to know if the maximum sum subsequence reaches a plateau; that is, it stays on a level for a while.
+&lt;/p&gt;
+&lt;p&gt;Here&amp;#8217;s the stream module.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;stream.py&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;"General purpose stream generation functions."
+import itertools
+
+def floor(stream, baseline=None):
+    """Generate the stream of minimum values from the input stream.
+    
+    The baseline, if supplied, is an upper limit for the floor.
+    &amp;gt;&amp;gt;&amp;gt; ff = floor((1, 2, -2, 3))
+    &amp;gt;&amp;gt;&amp;gt; assert list(ff) == [1, 1, -2, -2]
+    &amp;gt;&amp;gt;&amp;gt; ff = floor((1, 2, -2, 3), 0)
+    &amp;gt;&amp;gt;&amp;gt; assert list(ff) == [0, 0, -2, -2]    
+    """
+    stream = iter(stream)
+    m = baseline
+    if m is None:
+        try:
+            m = stream.next()
+            yield m
+        except StopIteration:
+            pass
+    for s in stream:
+        m = min(m, s)
+        yield m
+
+def ceil(stream):
+    """Generate the stream of maximum values from the input stream.
+    
+    &amp;gt;&amp;gt;&amp;gt; top = ceil([0, -1, 2, -2, 3])
+    &amp;gt;&amp;gt;&amp;gt; assert list(top) == [0, 0, 2, 2, 3]
+    """
+    stream = iter(stream)
+    try:
+        M = stream.next()
+        yield M
+    except StopIteration:
+        pass
+    for s in stream:
+        M = max(M, s)
+        yield M
+
+def accumulate(stream):
+    """Generate partial sums from the stream.
+    
+    &amp;gt;&amp;gt;&amp;gt; accu = accumulate([1, 2, 3, 4])
+    &amp;gt;&amp;gt;&amp;gt; assert list(accu) == [1, 3, 6, 10]
+    """
+    total = 0
+    for s in stream:
+        total += s
+        yield total
+
+def diff(s, t):
+    """Generate the differences between two streams
+    
+    If the streams are of unequal length, the shorter is truncated.
+    &amp;gt;&amp;gt;&amp;gt; dd = diff([2, 4, 6, 8], [1, 2, 3])
+    &amp;gt;&amp;gt;&amp;gt; assert list(dd) == [1, 2, 3]
+    """
+    import operator
+    return itertools.imap(operator.sub, s, t)
+
+def last(stream, default=None):
+    """Return the last item in the stream or the default if the stream is empty.
+    
+    &amp;gt;&amp;gt;&amp;gt; last('abc')
+    'c'
+    &amp;gt;&amp;gt;&amp;gt; last([], default=-1)
+    -1
+    """
+    s = default
+    for s in stream:
+        pass
+    return s
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/the-maximum-subsequence-problem.html#toc8" name="tocstream-on" id="tocstream-on"&gt;Stream on&amp;#8230;&lt;/a&gt;&lt;/h3&gt;
+&lt;ol&gt;
+ &lt;li&gt;&lt;p&gt;The maximum sum contiguous subsequence problem is described in &lt;a href="http://www.cs.bell-labs.com/cm/cs/pearls/"&gt;&amp;#8220;Programming Pearls&amp;#8221;&lt;/a&gt; by Jon Bentley. 
+&lt;/p&gt;
+
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;p&gt;My favourite introduction to computer programming, &amp;#8220;Structure and Interpretation of Computer Programs&amp;#8221;, has &lt;a href="http://mitpress.mit.edu/sicp/full-text/book/book-Z-H-24.html#%_sec_3.5"&gt;lots to say about streams&lt;/a&gt;, and suggests they have a role in concurrent programming and modelling time. 
+&lt;/p&gt;
+
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;p&gt;Streams are a natural fit with functional programming, and well supported by languages like &lt;a href="http://www.schemers.org"&gt;Scheme&lt;/a&gt; and &lt;a href="http://haskell.org"&gt;Haskell&lt;/a&gt;. Python also handles them nicely: look into &lt;a href="http://www.python.org/dev/peps/pep-0255/"&gt;generators&lt;/a&gt;, &lt;a href="http://www.python.org/dev/peps/pep-0289/"&gt;generator expressions&lt;/a&gt;, the &lt;a href="http://docs.python.org/lib/module-itertools.html"&gt;itertools module&lt;/a&gt;, and study &lt;code&gt;test_generators.py&lt;/code&gt; carefully.
+&lt;/p&gt;
+
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;p&gt;If you liked this article, try more Word Aligned articles &lt;a href="http://wordaligned.org/tag/streams/"&gt;tagged &amp;#8220;streams&amp;#8221;&lt;/a&gt;. And if you like puzzles, there are more articles &lt;a href="http://wordaligned.org/tag/puzzles/"&gt;tagged &amp;#8220;puzzles&amp;#8221;&lt;/a&gt; too.
+&lt;/p&gt;
+
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;p&gt;The graphs in this article are generated using the &lt;a href="http://code.google.com/apis/chart/"&gt;Google chart API&lt;/a&gt;, which is both useful and &lt;span /&gt;a fine example of how to design and document a programming interface.
+&lt;/p&gt;
+
+ &lt;/li&gt;
+&lt;/ol&gt;</description>
+<dc:date>2007-12-17</dc:date>
+<guid>http://wordaligned.org/articles/the-maximum-subsequence-problem.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/the-maximum-subsequence-problem.html</link>
+<category>Streams</category>
+</item>
+
+<item>
+<title>Zippy triples served with Python</title>
+<description>&lt;h3&gt;The Problem&lt;/h3&gt;
+&lt;p&gt;Here&amp;#8217;s a problem I encountered when writing the HTML generator for this site. Logically, Word Aligned is a time-ordered collection of articles. I wanted each article to link to its predecessor and successor. So the general problem is: 
+   &lt;strong&gt;How do you iterate through a collection yielding (previous, this, next) triples?&lt;/strong&gt;
+&lt;/p&gt;
+&lt;span id="continue-reading"/&gt;
+
+
+&lt;h3&gt;Specification&lt;/h3&gt;
+&lt;p&gt;Some test cases make things clearer. Let&amp;#8217;s name the function we&amp;#8217;re developing &lt;code&gt;prev_this_next()&lt;/code&gt;.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; long_weekend = 'Fri', 'Sat', 'Sun', 'Mon',
+&amp;gt;&amp;gt;&amp;gt; yesterday_today_tomorrow = prev_this_next(long_weekend)
+&amp;gt;&amp;gt;&amp;gt; yesterday_today_tomorrow.next()
+(None, 'Fri', 'Sat')
+&amp;gt;&amp;gt;&amp;gt; yesterday_today_tomorrow.next()
+('Fri', 'Sat', 'Sun')
+&amp;gt;&amp;gt;&amp;gt; yesterday_today_tomorrow.next()
+('Sat', 'Sun', 'Mon')
+&amp;gt;&amp;gt;&amp;gt; yesterday_today_tomorrow.next()
+('Sun', 'Mon', None)
+&amp;gt;&amp;gt;&amp;gt; yesterday_today_tomorrow.next()
+Traceback (most recent call last):
+    ...
+StopIteration
+&amp;gt;&amp;gt;&amp;gt; for ptn in prev_this_next(range(5)):
+...     print ptn
+... 
+(None, 0, 1)
+(0, 1, 2)
+(1, 2, 3)
+(2, 3, 4)
+(3, 4, None)
+&amp;gt;&amp;gt;&amp;gt; print "\n".join(map(repr, prev_this_next("XYZ")))
+(None, 'X', 'Y')
+('X', 'Y', 'Z')
+('Y', 'Z', None)
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;You&amp;#8217;ll notice we&amp;#8217;ve specified behaviour at the boundaries: the first item in the collection has no predecessor, thus the first triple returned has its first item set to &lt;code&gt;None&lt;/code&gt;; and similarly the final triple has its third item set to &lt;code&gt;None&lt;/code&gt;. We might equally well have chosen to return a user supplied default, or to wrap the collection at its ends. For now, let&amp;#8217;s go with the simple behaviour shown.
+&lt;/p&gt;
+&lt;p&gt;You&amp;#8217;ll also have noticed I&amp;#8217;m writing Python &amp;#8212; fair enough, since this web site is generated off-line using Python. The &lt;code&gt;long_weekend&lt;/code&gt; example drives the Python iterator protocol by hand, calling &lt;code&gt;yesterday_today_tomorrow.next()&lt;/code&gt; until a &lt;code&gt;StopIteration&lt;/code&gt; exception terminates the iteration. It&amp;#8217;s quite rare to use iterators in this way: more commonly, you just loop through them using &lt;code&gt;for&lt;/code&gt;, or plug them into container operations. The second and third test cases show more typical usage.
+&lt;/p&gt;
+
+&lt;h3&gt;First Implementation&lt;/h3&gt;
+&lt;p&gt;If this were C++, we&amp;#8217;d prefer our collection to support bi-directional iteration: think of a doubly-linked &lt;code&gt;std::list&lt;/code&gt;, or a plain old random access &lt;code&gt;std::vector&lt;/code&gt;. Then we could just decrement/increment each iterator from the collection to find its neighbours. 
+&lt;/p&gt;
+&lt;p&gt;In Python, we might decide to assume a random access container and write something like this:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;def get_default(items):
+    "Return an item getter function."
+    n_items = len(items)
+    def inner(index):
+        "Return items[index] or None if index is out of range."
+        if index &amp;lt; 0 or index &amp;gt;= n_items:
+            return None
+        else:
+            return items[index]
+    return inner
+
+def prev_this_next(items):
+    get = get_default(items)
+    for ix, item in enumerate(items):
+        yield get(ix - 1), item, get(ix + 1)
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;This code isn&amp;#8217;t elegant but it does pass our tests. Incidentally, an attempt to implement &lt;code&gt;get_default&lt;/code&gt; using &lt;a href="http://wordaligned.org/articles/permission-and-forgiveness.html"&gt;EAFP&lt;/a&gt;, as shown below, would fail. Can you see why?
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;def inner(index):
+    try:
+        return items[index]
+    except IndexError:
+        return None
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;This fails because accessing &lt;code&gt;items[-1]&lt;/code&gt; doesn&amp;#8217;t raise an &lt;code&gt;IndexError&lt;/code&gt; (unless &lt;code&gt;items&lt;/code&gt; is empty); it&amp;#8217;s a convenient way to access the final element of &lt;code&gt;items&lt;/code&gt;.
+&lt;/p&gt;
+&lt;p&gt;Even with the correct version of &lt;code&gt;get_default&lt;/code&gt;, if our collection of items is a stream &amp;#8212; by which I mean a lazily-evaluated iterable &amp;#8212; this code raises an exception. We don&amp;#8217;t know how long the stream will be (indeed, it could be infinite) and we can&amp;#8217;t just access elements from it at random. For C++ programmers, think of sequentially reading a file using an input iterator.
+&lt;/p&gt;
+
+&lt;h3&gt;Stream Test Case&lt;/h3&gt;
+&lt;p&gt;Let&amp;#8217;s adapt one of our test cases to expose this flaw.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; long_weekend = iter(('Fri', 'Sat', 'Sun', 'Mon'))
+&amp;gt;&amp;gt;&amp;gt; yesterday_today_tomorrow = prev_this_next(long_weekend)
+...
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Running this code raises an exception:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;Traceback (most recent call last):
+    ...
+TypeError: object of type 'tupleiterator' has no len()
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+
+&lt;h3&gt;Stream Solution&lt;/h3&gt;
+&lt;p&gt;Thinking of this problem in terms of streams gives us a solution which is both more general and more simple. All we have to do is tee up three independent iterators into the stream, stagger them, then zip them back together. &lt;span /&gt;The itertools module supplies the components. We connect.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;import itertools
+
+def prev_this_next(items):
+    extend = itertools.chain([None], items, [None])
+    prev, this, next = itertools.tee(extend, 3)
+    try:
+        this.next()
+        next.next()
+        next.next()
+    except StopIteration:
+        pass
+    return itertools.izip(prev, this, next)
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;This code works on any iterable, infinite, finite or empty, lazy or eager. Some more testcases:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; [ptn for ptn in prev_this_next(list())]
+[]
+&amp;gt;&amp;gt;&amp;gt; [ptn for ptn in prev_this_next(set([1]))]
+[(None, 1, None)]
+&amp;gt;&amp;gt;&amp;gt; ptn = prev_this_next(itertools.count())
+&amp;gt;&amp;gt;&amp;gt; itertools.islice(ptn, 100, 101).next()
+(99, 100, 101)
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+
+&lt;h3&gt;Triples Times Two&lt;/h3&gt;
+&lt;p&gt;Now suppose you want to peel items from an iterable, three at a time. Let&amp;#8217;s call this function &lt;code&gt;three_at_a_time()&lt;/code&gt; and let&amp;#8217;s specify its behaviour with some simple tests:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; t = three_at_a_time((1, 2, 3, 4, 5, 6))
+&amp;gt;&amp;gt;&amp;gt; t.next()
+(1, 2, 3)
+&amp;gt;&amp;gt;&amp;gt; t.next()
+(4, 5, 6)
+&amp;gt;&amp;gt;&amp;gt; t.next()
+Traceback (most recent call last):
+    ...
+StopIteration
+&amp;gt;&amp;gt;&amp;gt; ttt = three_at_a_time((1, 2, 3, 4))
+&amp;gt;&amp;gt;&amp;gt; [t for t in ttt]
+[(1, 2, 3)]
+&amp;gt;&amp;gt;&amp;gt; ttt = three_at_a_time(itertools.count())
+&amp;gt;&amp;gt;&amp;gt; ttt = itertools.islice(ttt, 0, 9, 3)
+&amp;gt;&amp;gt;&amp;gt; [t for t in ttt]
+[(0, 1, 2), (9, 10, 11), (18, 19, 20)]
+&amp;gt;&amp;gt;&amp;gt; "".join(chain(*three_at_a_time("Word Aligned")))
+'Word Aligned'
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Note that any trailing single element or pair at the end of the collection is discarded. We might equally have decided to pad the collection with a user-supplied default or throw an exception.
+&lt;/p&gt;
+&lt;p&gt;Here&amp;#8217;s one implementation.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;def three_at_a_time(items):
+    it = iter(items)
+    return itertools.izip(it, it, it)
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Here&amp;#8217;s another.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;def n_at_a_time(items, n):
+    it = iter(items)
+    return itertools.izip(* [it] * n)
+
+three_at_a_time = lambda items: n_at_a_time(items, 3)
+
+&lt;/pre&gt;
+
+&lt;/div&gt;</description>
+<dc:date>2007-11-20</dc:date>
+<guid>http://wordaligned.org/articles/zippy-triples-served-with-python.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/zippy-triples-served-with-python.html</link>
+<category>Streams</category>
+</item>
+
+<item>
+<title>He Sells Shell Scripts to Intersect Sets</title>
+<description>&lt;div class="toc"&gt;
+&lt;h2&gt;Contents&lt;/h2&gt;
+&lt;ul&gt;
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/shell-script-sets.html#tocintroduction" name="toc0" id="toc0"&gt;Introduction&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/shell-script-sets.html#tocan-example-apache-server-logs" name="toc1" id="toc1"&gt;An Example: Apache Server Logs&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/shell-script-sets.html#tocset-creation" name="toc2" id="toc2"&gt;Set Creation&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/shell-script-sets.html#tocmultiset-creation" name="toc3" id="toc3"&gt;Multiset Creation&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/shell-script-sets.html#tocset-union" name="toc4" id="toc4"&gt;Set Union&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/shell-script-sets.html#tocset-intersection" name="toc5" id="toc5"&gt;Set Intersection&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/shell-script-sets.html#tocset-symmetric-difference" name="toc6" id="toc6"&gt;Set Symmetric Difference&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/shell-script-sets.html#tocset-subtraction" name="toc7" id="toc7"&gt;Set Subtraction&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/shell-script-sets.html#tocsets-of-sets" name="toc8" id="toc8"&gt;Sets of Sets&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/shell-script-sets.html#tocmore-set-operations" name="toc9" id="toc9"&gt;More Set Operations&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/shell-script-sets.html#tocextending-the-toolset" name="toc10" id="toc10"&gt;Extending the Toolset&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/shell-script-sets.html#toca-scripts-got-to-know-its-limitations" name="toc11" id="toc11"&gt;A Script&amp;#8217;s Got to Know its Limitations&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/shell-script-sets.html#tocconclusion" name="toc12" id="toc12"&gt;Conclusion&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/shell-script-sets.html#toccredits" name="toc13" id="toc13"&gt;Credits&lt;/a&gt;
+ &lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;&lt;p&gt;A short article of mine promoting shell scripting has appeared in the excellent &lt;a href="http://accu.org"&gt;ACCU&lt;/a&gt; publication, &lt;a href="http://accu.org/index.php/overloadonline"&gt;Overload&lt;/a&gt;. Since Overload is available online, you can read the original version &lt;a href="http://accu.org/index.php/journals/1410"&gt;there&lt;/a&gt;. Alternatively, I&amp;#8217;ve republished it here, and added a couple of important revisions based on reader comments, so just keep reading &amp;#8230;
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/shell-script-sets.html#toc0" name="tocintroduction" id="tocintroduction"&gt;Introduction&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;&lt;span /&gt;The Unix command shell contains a lot of what I like in a programming environment: it&amp;#8217;s dynamic, high-level, interpreted, flexible, succinct. It&amp;#8217;s even reasonably portable now that bash seems to have become the shell of choice. Although there&amp;#8217;s much about shell scripting I don&amp;#8217;t like, on many occasions it turns out to be the best tool for the job.
+&lt;/p&gt;
+&lt;p&gt;In this article we shall demonstrate how simple shell scripts can be used to implement sets, providing one line recipes for set creation, set union, set intersection and more. Having explored the power of the Unix shell we&amp;#8217;ll consider its limitations, before finally  discussing the more general lessons we can learn from the Unix tools.
+&lt;/p&gt;
+&lt;span id="continue-reading"/&gt;
+
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/shell-script-sets.html#toc1" name="tocan-example-apache-server-logs" id="tocan-example-apache-server-logs"&gt;An Example: Apache Server Logs&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;As an example, let&amp;#8217;s suppose we want to analyse sets of IP addresses contained in a couple of Apache HTTP Server &lt;a href="http://httpd.apache.org/docs/2.0/logs.html#accesslog"&gt;access logs&lt;/a&gt;, &lt;code&gt;access_log1&lt;/code&gt; and &lt;code&gt;access_log2&lt;/code&gt;. Each log file contains many thousands of lines which look something like this:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;65.214.44.29 - - [25/Jun/2007:00:03:21 +0000] ...
+74.6.87.40 - - [25/Jun/2007:00:03:24 +0000] ...
+65.214.44.29 - - [25/Jun/2007:00:03:24 +0000] ...
+74.6.86.212 - - [25/Jun/2007:00:03:36 +0000] ...
+...
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;We can &lt;code&gt;cut&lt;/code&gt; this file down to leave just the IP address at the start of each line. &lt;code&gt;Cut&lt;/code&gt; is a simple tool which we&amp;#8217;ll be using again later, and here we pass it options &lt;code&gt;-f1&lt;/code&gt; to select the first field from each line and &lt;code&gt;-d" "&lt;/code&gt; to use the space character as a field separator.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;$ cut -f1 -d" " access_log1
+65.214.44.29
+74.6.87.40
+65.214.44.29
+74.6.86.212
+...
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/shell-script-sets.html#toc2" name="tocset-creation" id="tocset-creation"&gt;Set Creation&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;The output from this command is likely to be full of duplicates. Regular site visitors typically hit the web server a few times; web spiders and robots are much more hungry. To obtain the &lt;strong&gt;sets&lt;/strong&gt; of unique IP addresses contained in each log file, we could do this:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;$ cut -f1 -d" " access_log1 | sort | uniq &amp;gt; IP1
+$ cut -f1 -d" " access_log2 | sort | uniq &amp;gt; IP2
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Here &lt;code&gt;cut&lt;/code&gt; picks out the IP addresses, &lt;code&gt;sort&lt;/code&gt; orders the results, &lt;code&gt;uniq&lt;/code&gt; eliminates duplicates, and we&amp;#8217;ve redirected the output into files IP1 and IP2. By the way, we could have eliminated a link from the pipeline using the &lt;code&gt;-u&lt;/code&gt; option to sort. The Unix shell tools aren&amp;#8217;t entirely orthogonal!
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;$ cut -f1 -d" " access_log1 | sort -u &amp;gt; IP1
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;The resulting sets are ordered &amp;#8212; a set implementation which should be familiar to C++ programmers. The IP addresses will be lexicographically rather than numerically ordered, since we went with the &lt;code&gt;sort&lt;/code&gt; defaults. This means that, for example, &lt;code&gt;122.152.128.10&lt;/code&gt; appears before &lt;code&gt;58.167.213.128&lt;/code&gt; because &lt;code&gt;1&lt;/code&gt; alphabetically precedes &lt;code&gt;5&lt;/code&gt;. With a little more effort, we could probably persuade &lt;code&gt;sort&lt;/code&gt; to yield a numeric ordering (no, &lt;code&gt;sort -n&lt;/code&gt; isn&amp;#8217;t good enough).
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/shell-script-sets.html#toc3" name="tocmultiset-creation" id="tocmultiset-creation"&gt;Multiset Creation&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;If instead we wanted a &lt;strong&gt;multiset&lt;/strong&gt; &amp;#8212; that is, a set in which elements may appear more than once, we could count the number of times items are repeated in the sorted output using the &lt;code&gt;-c&lt;/code&gt; option to &lt;code&gt;uniq&lt;/code&gt;.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;$ cut -f1 -d" " access_log1 | sort | uniq -c
+   8 12.153.20.132
+   2 12.217.178.11
+  14 12.30.66.226
+   1 122.152.128.49
+  ...
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Here, each IP address is prefixed by the number of times it occurred in the log file, so our multiset contains &lt;code&gt;12.153.20.132&lt;/code&gt; 8 times, etc. This will be useful later when we come to intersection operations.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/shell-script-sets.html#toc4" name="tocset-union" id="tocset-union"&gt;Set Union&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Let&amp;#8217;s assume we&amp;#8217;ve followed the steps above and IP1 and IP1 contain the set of IP addresses in the two access logs.  Forming the &lt;strong&gt;union&lt;/strong&gt; of these sets is simple.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;$ sort -m IP1 IP2 | uniq &amp;gt; IP1_union_IP2
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;The &lt;code&gt;-m&lt;/code&gt; &lt;em&gt;merge&lt;/em&gt; option to &lt;code&gt;sort&lt;/code&gt; is purely for efficiency and the result would be equally correct without it. Since the inputs are already sorted, we can just merge them together, line by line. For C++ users, it&amp;#8217;s the difference between the &lt;code&gt;std::sort&lt;/code&gt; and &lt;code&gt;std::merge&lt;/code&gt; algorithms.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/shell-script-sets.html#toc5" name="tocset-intersection" id="tocset-intersection"&gt;Set Intersection&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Finding the &lt;strong&gt;intersection&lt;/strong&gt; of IP1 and IP2 can be done in a similar fashion. We merge them together then use the &lt;code&gt;-d&lt;/code&gt; option to &lt;code&gt;uniq&lt;/code&gt; to pick out duplicates. Since the original sets contained no duplicates, the elements output by this command are those common to both inputs; the set intersection, that is.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;$ sort -m IP1 IP2 | uniq -d &amp;gt; IP1_intersection_IP2
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Brief though this command is, we needn&amp;#8217;t type it all in. Exploiting its similarity to the previous command and using the magic of shell history, we just hit the up arrow key &amp;uarr; and edit the previous line.
+&lt;/p&gt;
+&lt;p&gt;A more succinct alternative would be to use &lt;code&gt;comm&lt;/code&gt;, a specialised tool for selecting or rejecting lines common to two files.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;$ comm -12 IP1 IP2 &amp;gt; IP1_intersection_IP2
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;&lt;code&gt;Comm&lt;/code&gt; requires the input text files to be lexically sorted, and by default outputs three columns: lines only in the first file; lines only in the second file; and lines common to both files. By supplying the &lt;code&gt;-12&lt;/code&gt; option we choose to select just the third column, again generating the desired intersection.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/shell-script-sets.html#toc6" name="tocset-symmetric-difference" id="tocset-symmetric-difference"&gt;Set Symmetric Difference&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;We can tweak the first intersection recipe to find the &lt;strong&gt;set symmetric difference&lt;/strong&gt; between IP1 and IP2 (the IP addresses in just one of IP1 and IP2 that is). Again, the up arrow key &amp;uarr; recalls the command, and this time we use &lt;code&gt;uniq&lt;/code&gt;&amp;#8217;s &lt;code&gt;-u&lt;/code&gt; option to suppress repeated elements.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;$ sort -m IP1 IP2 | uniq -u &amp;gt; IP1_symmetric_diff_IP2
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;We could also have used &lt;code&gt;comm -3 | tr -d "\t"&lt;/code&gt; (note the use of &lt;code&gt;tr&lt;/code&gt; to delete unwanted tab characters from &lt;code&gt;comm&lt;/code&gt;&amp;#8217;s output).
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/shell-script-sets.html#toc7" name="tocset-subtraction" id="tocset-subtraction"&gt;Set Subtraction&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;What about the elements in IP1 but not IP2? Again, &lt;code&gt;comm&lt;/code&gt; does the job. This time, we suppress columns 2 and 3.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;$ comm -23 IP1 IP2 &amp;gt; IP1_subtract_IP2
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/shell-script-sets.html#toc8" name="tocsets-of-sets" id="tocsets-of-sets"&gt;Sets of Sets&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Uniting a set of sets is easy. &lt;code&gt;Sort&lt;/code&gt; handles as many files as you pass it.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;$ sort -mu IP1 IP2 IP3 .... IPN &amp;gt; IP_unite_all
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;To intersect N sets we could iterate through them, maintaining their cumulative intersection so far by using pair-wise intersection at each step. An alternative approach does away with the explicit iteration by forming their multiset union, then extracting elements which appear N times. Here&amp;#8217;s an example when N is 3.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;$ sort -m IP1 IP2 IP3 | uniq -c | grep "^ *3" \
+    | tr -s " " | cut -f3 -d" "
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Let&amp;#8217;s unpick this pipeline. First, &lt;code&gt;sort -m IP1 IP2 IP3 | uniq -c&lt;/code&gt; generates the multiset of IP addresses in IP1, IP2 and IP2. Since IP1, IP2 and IP3 are sets and therefore &lt;em&gt;individually&lt;/em&gt; contain no repeats, the resulting multiset looks something like this:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;$ sort -m IP1 IP2 IP3 | uniq -c
+   1 12.30.66.226
+   3 122.152.128.10
+   2 122.152.128.49
+   1 122.152.129.54
+   ...
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Each line in the output starts with a count which &lt;em&gt;must&lt;/em&gt; be either 1, 2 or 3. Lines starting with 3 correspond to IP addresses common to all three files &amp;#8212;  and these are the IP addresses which form the intersection of IP1, IP2 and IP3. Now we can use some standard pattern matching and extraction techniques to pick out the desired fields.
+&lt;/p&gt;
+&lt;p&gt;First &lt;code&gt;grep&lt;/code&gt; picks out lines starting with any number of spaces followed by a &lt;code&gt;3&lt;/code&gt;. Next &lt;code&gt;tr -s " "&lt;/code&gt; squeezes repeated spaces from each line, making the output suitable for use with &lt;code&gt;cut&lt;/code&gt; using the space character as a field delimiter. Finally &lt;code&gt;cut&lt;/code&gt; itself extracts the column we want (the one with the IP address).
+&lt;/p&gt;
+&lt;p&gt;This approach generalises to the following shell script.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;intersect&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;#! /bin/sh
+# Intersect a collection of lexicographically sorted input sets
+sort -m $@ | uniq -c | grep "^ *$# " | tr -s " " | cut -f3 -d" "
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;The rather cryptic looking &lt;code&gt;$@&lt;/code&gt; and &lt;code&gt;$#&lt;/code&gt; which appear in this script are special shell parameters: the first expands to the parameters passed to &lt;code&gt;intersect&lt;/code&gt;, the second to the number of these parameters. This function generates output on &lt;code&gt;stdout&lt;/code&gt;, and is ready for use in yet bigger shell scripts.
+&lt;/p&gt;
+&lt;p&gt;If you call this function with no inputs, it appears to hang &amp;#8212; that&amp;#8217;s because &lt;code&gt;sort&lt;/code&gt;, given no input files, processes &lt;code&gt;stdin&lt;/code&gt;. This breaks &lt;code&gt;intersect&lt;/code&gt;. We can fix the problem in a couple of ways. 
+&lt;/p&gt;
+&lt;p&gt;We could add a conditional check that callers have supplied at least one file, printing usage information and returning an error code if not. 
+&lt;/p&gt;
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;intersect&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;#! /bin/sh
+if [ $# -eq 0 ]
+then
+    echo 1&amp;gt;&amp;amp;2 "Usage: $0 SET1 SET2..."
+    exit 127
+fi
+sort -m $@ | uniq -c | grep "^ *$# " | tr -s " " | cut -f3 -d" "
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Alternatively, we could take the view that intersecting the empty set of sets is fine and should yield the empty set. We can avoid a conditional check by using the shell&amp;#8217;s own version of the &lt;a href="http://www.cs.oberlin.edu/~jwalker/nullObjPattern/"&gt;Null Object pattern&lt;/a&gt;.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;sort -m /dev/null $@ | ....
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/shell-script-sets.html#toc9" name="tocmore-set-operations" id="tocmore-set-operations"&gt;More Set Operations&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;One of the nice things about set operations is there aren&amp;#8217;t many of them. We&amp;#8217;ve already covered the important ones, and these can easily be extended. Try and work out what set operations are going on in the the command history shown below.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;$ comm -13 S1 S2
+$ comm -23 S1 S2
+$ diff S1 S2
+$ head -1 S1
+$ sort -m S1 S2 S3 | uniq -c | grep -c "^ *3"
+$ tail -1 S2
+$ wc -l S1
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;As a hint, the answers in lexicographical order are:
+&lt;/p&gt;
+&lt;ul&gt;
+ &lt;li&gt;
+     are two sets disjoint?
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     are two sets the same?
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     how big is the intersection of three sets?
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     how many elements in a set?
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     is a subset of?
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     largest element of a set
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     smallest element of a set
+ &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/shell-script-sets.html#toc10" name="tocextending-the-toolset" id="tocextending-the-toolset"&gt;Extending the Toolset&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;The command shell is a powerful, dynamic and extensible programming environment. Even these simple one-line scripts can be stored as functions which can be sourced when a new shell is started; you can add command-line help to them, you can find them using tab-completion, you can keep them in your source control system. In this way you can create your own customised shell working environment and port it from platform to platform just by &lt;a href="http://wordaligned.org/articles/personal-version-control.html"&gt;checking it out&lt;/a&gt;.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/shell-script-sets.html#toc11" name="toca-scripts-got-to-know-its-limitations" id="toca-scripts-got-to-know-its-limitations"&gt;A Script&amp;#8217;s Got to Know its Limitations&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Apache server logs are no more and no less than line oriented text. Each record in the log is terminated by a newline character, and each field within each record is delimited in an obvious way: by brackets, spaces, quotation marks, whatever &amp;#8212; who needs XML? This is the kind of format shell scripts handle well. Conversely, anything more complicated, XML for example, or records which span multiple lines, is likely to push the shell tools too far. Maybe &lt;code&gt;awk&lt;/code&gt; could cope, but I don&amp;#8217;t think many people bother learning &lt;code&gt;awk&lt;/code&gt; these days: it&amp;#8217;s better to use one of the popular high-level languages when basic shell commands won&amp;#8217;t do.
+&lt;/p&gt;
+&lt;p&gt;Shell scripts tend not to fail safely. For example, the following command is meant to clear out files in a temporary directory:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;# Don't try this at home!
+$ rm -rf $TEMP_WORK_DIR/*
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;You can imagine what happens if TEMP_WORK_DIR has not been set. In general, the Unix commands build on a couple of dangerous assumptions: that programmers know what they are doing; and that the show must go on &amp;#8212; by which I mean that, given malformed input, a shell script will not throw an exception. The IP filters we discussed in this article work quite happily with any old text file as input &amp;#8212; if it wasn&amp;#8217;t an Apache http server log, the only indication of failure may well be smaller sets than expected.
+&lt;/p&gt;
+&lt;p&gt;I&amp;#8217;ll admit that I personally avoid writing any shell scripts much longer than the ones shown here. As with Makefiles, I admire and respect the technology but I&amp;#8217;d rather have someone else deal with the details. The &lt;code&gt;bash&lt;/code&gt; manual may be brief to a fault, but I&amp;#8217;ve yet to get to grips with its finer details. Sometimes it&amp;#8217;s just too subtle.
+&lt;/p&gt;
+&lt;p&gt;On the subject of details, earlier in this article I said that by default &lt;code&gt;sort&lt;/code&gt; uses lexicographical ordering, which isn&amp;#8217;t perhaps the ordering we&amp;#8217;d prefer for IP addresses; and I also said that a numeric &lt;code&gt;sort -n&lt;/code&gt; wouldn&amp;#8217;t do the job either: IP addresses aren&amp;#8217;t really numbers, they&amp;#8217;re dot separated number quartets. You &lt;em&gt;can&lt;/em&gt; use &lt;code&gt;sort&lt;/code&gt; to place IP addresses in a more natural order, but the command you&amp;#8217;ll need is anything but natural.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;# "Natural" ordering of IP addresses
+$ sort -t. +0n -1n +1n -2n +2n -3n +3n IP
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;If you want to know how this works you&amp;#8217;ll have to read the manual. The code, on its own, is &lt;a href="http://wordaligned.org/articles/readable-code.html"&gt;unreadable&lt;/a&gt;. If you don&amp;#8217;t know where the manual is, just open a shell window and type &lt;code&gt;man&lt;/code&gt;. If the output from this command doesn&amp;#8217;t help, try &lt;code&gt;man man&lt;/code&gt;, and if you don&amp;#8217;t know how to open a shell window, I&amp;#8217;m surprised you&amp;#8217;re even reading this sentence!
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/shell-script-sets.html#toc12" name="tocconclusion" id="tocconclusion"&gt;Conclusion&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Modern graphical development environments tend to hide the shell and the command line, probably with good reason, and I don&amp;#8217;t suppose this article will persuade anyone they&amp;#8217;re worth hunting out. And yet the Unix shell embodies so much which is modern and, I suspect, future, best practice.
+&lt;/p&gt;
+&lt;p&gt;&lt;span /&gt;For me, it&amp;#8217;s not just what the shell tools can do, it&amp;#8217;s the example they set. Look again at some of the recipes presented in this article and you&amp;#8217;ll see container operations without explicit loops. You&amp;#8217;ll see flexible and generic algorithms. You&amp;#8217;ll see functional programming. You&amp;#8217;ll see programs which can parallel-process data without a thread or a mutex in sight; no chance of shared memory corruption or race conditions here. The original design of the shell tools may have become somewhat polluted &amp;#8212; we&amp;#8217;ve already seen that &lt;code&gt;sort&lt;/code&gt; does some of what &lt;code&gt;uniq&lt;/code&gt; can do &amp;#8212; but I think the intent shines through as clearly as ever: &lt;span /&gt;we have a compact suite of tools, each with its own responsibility, which cooperate using simple interfaces. We would do well to emulate this model in our own software designs.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/shell-script-sets.html#toc13" name="toccredits" id="toccredits"&gt;Credits&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;I would like to thank the Overload editorial team for their help with this article. I would also like to thank &lt;a href="http://drj11.wordpress.com/"&gt;David Jones&lt;/a&gt; and Don for their suggestions.
+&lt;/p&gt;</description>
+<dc:date>2007-08-18</dc:date>
+<guid>http://wordaligned.org/articles/shell-script-sets.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/shell-script-sets.html</link>
+<category>Streams</category>
+</item>
+
+</channel>
+</rss>

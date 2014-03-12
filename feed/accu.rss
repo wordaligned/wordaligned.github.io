@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" >
+<channel>
+<title>Word Aligned</title>
+<link>http://wordaligned.org</link>
+<description>tales from the code face</description>
+<dc:creator>tag@wordaligned.org</dc:creator>
+<language>en-gb</language>
+<item>
+<title>More adventures in C++</title>
+<description>&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;bool operator&amp;lt;(version const &amp;amp; v1, version const &amp;amp; v2)
+{
+    if (v1.major != v2.major)
+        return v1.major &amp;lt; v2.major;
+    if (v1.minor != v2.minor)
+        return v1.minor &amp;lt; v2.minor;
+    if (v1.patch != v2.patch)
+        return v1.patch &amp;lt; v2.patch;
+    return v1.build &amp;lt; v2.build;
+}
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;C++ programmers are sticklers for tradition and unlikely to be swayed by &lt;a href="http://www.zemanta.com/blog/i-bet-you-over-engineered-your-startup/#comment-685047168" title="unlike web developers"&gt;what&amp;#8217;s in fashion&lt;/a&gt;. C++ suits those who want to control the machine, and who respect the rigour and discipline this imposes. C++ programmers are generally a conservative bunch.
+&lt;/p&gt;
+&lt;p&gt;Some history: C++ was standardized in 1998. The next major revision of the language was developed under the working title of C++0x, where the &amp;#8220;0x&amp;#8221; stood for the year the job would be finished. The X gave the standardizers some slack, but not enough. C++0x became C++11 which is now, thankfully, simply C++.
+&lt;/p&gt;
+&lt;p&gt;Although the language&amp;#8217;s development has been painstakingly slow the developments themselves have been extensive and radical. What&amp;#8217;s more, users are rushing to use the new features &amp;#8212; even before they have access to compilers which support them! I&amp;#8217;ve seen answers to C++ topics on Q&amp;amp;A sites which use aspects of the language the contributors cheerfully admit they have no access to. I&amp;#8217;ve worked on a project which used elaborate shims to hide the fact that GCC 4.6 couldn&amp;#8217;t compile C++ as well as GCC 4.7 does, and this despite the fact that &lt;a href="http://gcc.gnu.org/projects/cxx0x.html" title="Important: GCC's support for C++11 is still experimental"&gt;GCC&amp;#8217;s C++11 support remains, officially, &amp;#8220;experimental&amp;#8221;&lt;/a&gt;.
+&lt;/p&gt;
+&lt;span id="continue-reading"/&gt;
+
+&lt;p&gt;At home, I&amp;#8217;m downloading compiler and library updates I&amp;#8217;m in no position to use at work; and at work, I&amp;#8217;ve already been sent on a C++11 training course.  I&amp;#8217;ve streamed high quality &lt;a href="http://channel9.msdn.com/Events/GoingNative/GoingNative-2012" title="Going Native 2012 - good stuff here!"&gt;videos&lt;/a&gt; starring C++&amp;#8217;s big hitters which promote the new C++, explaining its principles, its foundations, and even where it&amp;#8217;s going next.
+&lt;/p&gt;
+&lt;p&gt;What exactly is it about C++11 that&amp;#8217;s roused such a normally phlegmatic audience?
+&lt;/p&gt;
+&lt;p&gt;Before I try and answer that, I&amp;#8217;ll venture to suggest new C++ isn&amp;#8217;t going to win many new recruits. I don&amp;#8217;t even think it will persuade those who have abandoned the language to return. C++11 contains all of C++98, a notoriously complex and subtle language, then adds &lt;a href="http://www.stroustrup.com/C++11FAQ.html#learn" title="Is C++11 hard to learn? Stroustrup C++11 FAQ"&gt;a whole lot more&lt;/a&gt;. Yes, it &lt;strong&gt;is&lt;/strong&gt; possible to write new C++ which is more compact and efficient than traditional C++, but you&amp;#8217;ll also need to maintain old C++ code and build new expertise. And the language update fails to address some of C++&amp;#8217;s worst characteristics: slow compile times and impenetrable compiler diagnostics.
+&lt;/p&gt;
+&lt;p&gt;No, C++11 is primarily a win for existing C++ programmers; those of us who already have a fair understanding of the language and its trade-offs, and who can appreciate the rationale behind the changes. For traditionalists and pragmatists, the transition isn&amp;#8217;t hard &amp;#8212; at least, no harder than any port between compiler revisions. For progressives, there are several immediate wins: the &lt;code&gt;auto&lt;/code&gt; keyword has been repurposed, reducing repetition and making code more flexible; lambdas enable functions to be plugged directly into algorithms; smart pointers are standard, allowing accurate memory management; and on the subject of memory, rvalues and move semantics mean you&amp;#8217;ll waste less of it on temporaries.
+&lt;/p&gt;
+&lt;p&gt;I could go on.
+&lt;/p&gt;
+&lt;p&gt;Rather than risk more generalisations, here&amp;#8217;s a specific example of C++11 in action. Consider an object with multiple fields, a four part version number, say.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;struct version
+{
+    unsigned major, minor, patch, build;
+};
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;To compare version numbers, or sort them, or put them in a &lt;code&gt;std::set&lt;/code&gt;, we&amp;#8217;ll need &lt;code&gt;operator&amp;lt;()&lt;/code&gt;. This operator must model a &lt;a href="http://www.sgi.com/tech/stl/StrictWeakOrdering.html"&gt;strict weak ordering&lt;/a&gt;. The canonical form looks something like.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;bool operator&amp;lt;(version const &amp;amp; v1, version const &amp;amp; v2)
+{
+    if (v1.major != v2.major)
+        return v1.major &amp;lt; v2.major;
+    if (v1.minor != v2.minor)
+        return v1.minor &amp;lt; v2.minor;
+    if (v1.patch != v2.patch)
+        return v1.patch &amp;lt; v2.patch;
+    return v1.build &amp;lt; v2.build;
+}
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;It&amp;#8217;s not so hard to write this code for the &lt;code&gt;version&lt;/code&gt; struct, where we have a clear idea of what it means for one version number to be less than another. It would be rather more tricky if we were dealing with points, for example, &lt;code&gt;struct point { int x, y; };&lt;/code&gt;. Ordering points makes little sense but we might well want them as keys in an associative container, and we&amp;#8217;d better have a suitable &lt;code&gt;operator&amp;lt;()&lt;/code&gt;.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;No, no, no!&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;bool operator&amp;lt;(point const &amp;amp; p1, point const &amp;amp; p2)
+{
+    return p1.x &amp;lt; p2.x &amp;amp;&amp;amp; p1.y &amp;lt; p2.y;
+}
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;With C++11 &amp;#8212; &lt;strong&gt;with the current version of C++&lt;/strong&gt; &amp;#8212; we can use &lt;code&gt;std::tie()&lt;/code&gt; to create a tuple of references, recasting &lt;code&gt;operator&amp;lt;()&lt;/code&gt; into a form that&amp;#8217;s easy to read and hard to get wrong.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;Yes, yes, yes!&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;bool operator&amp;lt;(version const &amp;amp; v1, version const &amp;amp; v2)
+{
+    return std::tie(v1.major, v1.minor, v1.patch, v1.build)
+         &amp;lt; std::tie(v2.major, v2.minor, v2.patch, v2.build);
+}
+
+bool operator&amp;lt;(point const &amp;amp; p1, point const &amp;amp; p2)
+{
+    return std::tie(p1.x, p1.y) &amp;lt; std::tie(p2.x, p2.y);
+}
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p style="text-align:center"&gt;&amp;sect;&lt;/p&gt;
+
+&lt;p&gt;My thanks to Jonathan Wakely for sharing the &lt;code&gt;std::tie()&lt;/code&gt; recipe on the &lt;a href="http://accu.org/index.php/mailinglists"&gt;accu-general mailing list&lt;/a&gt; and for letting me use it here.
+&lt;/p&gt;</description>
+<dc:date>2013-02-21</dc:date>
+<guid>http://wordaligned.org/articles/more-adventures-in-c++.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/more-adventures-in-c++.html</link>
+<category>Accu</category>
+</item>
+
+</channel>
+</rss>

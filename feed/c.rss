@@ -1,0 +1,2476 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" >
+<channel>
+<title>Word Aligned</title>
+<link>http://wordaligned.org</link>
+<description>tales from the code face</description>
+<dc:creator>tag@wordaligned.org</dc:creator>
+<language>en-gb</language>
+<item>
+<title>Singly Linked Lists in C++</title>
+<description>&lt;p&gt;In a &lt;a href="http://wordaligned.org/articles/two-star-programming.html"&gt;recent post&lt;/a&gt; I wrote about removing items from a singly linked list. I presented a couple of alternative implementations, and in the comments section readers suggested yet more versions.
+&lt;/p&gt;
+&lt;p&gt;My implementations were written in C: the post was inspired by something &lt;a href="http://meta.slashdot.org/story/12/10/11/0030249/linus-torvalds-answers-your-questions"&gt;Linus Torvalds had said&lt;/a&gt; about low-level programming skills, and I&amp;#8217;m guessing he meant C programming skills. The fact is, C programmers are condemned to reimplement these basic functions on this basic structure because the C standard library has nothing to say about singly linked lists. Until recently the C++ standard library was similarly silent on the subject, only offering a doubly linked list.
+&lt;/p&gt;
+
+&lt;h3&gt;C++ introduces &amp;#8230; the linked list!&lt;/h3&gt;
+&lt;p&gt;That&amp;#8217;s all changed now with the introduction of &lt;code&gt;std::forward_list&lt;/code&gt;. The &lt;a href="http://en.cppreference.com/w/cpp/container/forward_list"&gt;class interface&lt;/a&gt; doesn&amp;#8217;t mention links or pointers but a quick glance through its contents makes it clear that if you imagine the container to be a templated version of a classic singly-linked list, you won&amp;#8217;t go far wrong.
+&lt;/p&gt;
+&lt;p&gt;This gives &lt;code&gt;forward_list&lt;/code&gt; some members you won&amp;#8217;t find elsewhere in the &lt;code&gt;std::&lt;/code&gt; namespace. For example, &lt;code&gt;std::forward_list::before_begin()&lt;/code&gt;, which returns an iterator just before the beginning of the list &amp;#8212; much as the more familiar &lt;code&gt;end()&lt;/code&gt; is just past the end.
+&lt;/p&gt;
+&lt;p&gt;Why is &lt;code&gt;before_begin()&lt;/code&gt; necessary? You can&amp;#8217;t dereference it and you can&amp;#8217;t reverse through a forward list till you get to it. Well, since forward list iterators can only go forwards, instead of the familiar sequence &lt;code&gt;insert()&lt;/code&gt;, &lt;code&gt;erase()&lt;/code&gt; and &lt;code&gt;emplace()&lt;/code&gt; methods we have &lt;code&gt;insert_after()&lt;/code&gt;, &lt;code&gt;erase_after()&lt;/code&gt; and &lt;code&gt;emplace_after()&lt;/code&gt;, not to mention &lt;code&gt;splice_after()&lt;/code&gt;. The before-the-beginning iterator allows you to use these operations to modify the node at the head of the list.
+&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Quick question&lt;/strong&gt;: what&amp;#8217;s the complexity of &lt;code&gt;std::list::size()&lt;/code&gt;?
+&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Trick question&lt;/strong&gt;: and how about &lt;code&gt;std::forward_list::size()&lt;/code&gt;?
+&lt;/p&gt;
+&lt;span id="continue-reading"/&gt;
+
+
+&lt;h3&gt;Remove_if for forward lists&lt;/h3&gt;
+&lt;p&gt;Using pointers-to-pointers to modify linked lists gives this elegant and compact C implementation of &lt;code&gt;remove_if()&lt;/code&gt;, which de-lists all nodes which match a supplied predicate.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;void remove_if(node ** head, remove_fn rm)
+{
+    for (node** curr = head; *curr; )
+    {
+        node * entry = *curr;
+        if (rm(entry))
+        {
+            *curr = entry-&amp;gt;next;
+            free(entry);
+        }
+        else
+            curr = &amp;amp;entry-&amp;gt;next;
+    }
+}
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;How does the C++ standard library support this algorithm?
+&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://en.cppreference.com/w/cpp/algorithm/remove"&gt;&lt;code&gt;Std::remove_if()&lt;/code&gt;&lt;/a&gt; operates on an iterator range, &lt;code&gt;remove_if(first, last, pred)&lt;/code&gt;. All it requires is that the iterators are forward iterators so it should just work on a &lt;code&gt;forward_list&lt;/code&gt;.
+&lt;/p&gt;
+&lt;p&gt;Hang on though: what if &lt;code&gt;pred(*first)&lt;/code&gt; is true? How can a node be removed from a linked list without reference to its predecessor? Actually, the node isn&amp;#8217;t removed &amp;#8212; the value it contains gets overwritten by the value in the first node (if any!) for which the predicate returns false. In fact, &lt;code&gt;remove_if&lt;/code&gt; &lt;strong&gt;doesn&amp;#8217;t remove anything&lt;/strong&gt; from the container! What it does is return an iterator, call it &lt;code&gt;new_last&lt;/code&gt;, such that the range &lt;code&gt;(first, new_last)&lt;/code&gt; holds the elements which have been kept, and &lt;code&gt;(new_last, last)&lt;/code&gt; holds those which have been &amp;#8220;removed&amp;#8221;, which is to say they can still be dereferenced but their value is implementation dependent.
+&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;Remove_if&lt;/code&gt; usually pairs up with erase:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;container.erase(remove_if(first, last, pred), last);
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;There is no &lt;code&gt;std::forward_list::erase(iterator)&lt;/code&gt; &amp;#8212; remember, we can only erase &lt;strong&gt;after&lt;/strong&gt; &amp;#8212; so the usual remove_if algorithm is of little use for forward lists.
+&lt;/p&gt;
+
+&lt;h3&gt;Forward_list::remove_if()&lt;/h3&gt;
+&lt;p&gt;As usual, we should &lt;a href="http://www.informit.com/articles/article.aspx?p=21851" title="Scott Meyers, Effective STL"&gt;prefer member functions to algorithms with the same names&lt;/a&gt;. C++&amp;#8217;s &lt;code&gt;forward_list&lt;/code&gt; has its very own &lt;code&gt;remove_if&lt;/code&gt; which manipulates pointers rather than moves values, and which really does remove and destroy items.
+&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://en.cppreference.com/w/cpp/container/forward_list/remove"&gt;&lt;code&gt;Forward_list::remove_if()&lt;/code&gt;&lt;/a&gt; operates on the list as a whole, not an iterator range &amp;#8212; as we&amp;#8217;ve seen, an iterator cannot remove itself. I took a look at a couple of implementations of this function to see how it&amp;#8217;s done.
+&lt;/p&gt;
+&lt;p&gt;Here&amp;#8217;s LLVM&amp;#8217;s libc++ &lt;a href="http://llvm.org/svn/llvm-project/libcxx/trunk/include/forward_list"&gt;implementation&lt;/a&gt;:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;template &amp;lt;class _Tp, class _Alloc&amp;gt;
+template &amp;lt;class _Predicate&amp;gt;
+void
+forward_list&amp;lt;_Tp, _Alloc&amp;gt;::remove_if(_Predicate __pred)
+{
+    iterator __e = end();
+    for (iterator __i = before_begin(); __i.__ptr_-&amp;gt;__next_ != nullptr;)
+    {
+        if (__pred(__i.__ptr_-&amp;gt;__next_-&amp;gt;__value_))
+        {
+            iterator __j = _VSTD::next(__i, 2);
+            for (; __j != __e &amp;amp;&amp;amp; __pred(*__j); ++__j)
+                ;
+            erase_after(__i, __j);
+            if (__j == __e)
+                break;
+            __i = __j;
+        }
+        else
+            ++__i;
+    }
+}
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;There&amp;#8217;s no need for any special treatment of the first list node here, since we have its predecessor, the &lt;code&gt;before_begin()&lt;/code&gt; node. The function does double back though, figuring out the next range to erase before going back to erase it &amp;#8212; and the erase function isn&amp;#8217;t pretty.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;template &amp;lt;class _Tp, class _Alloc&amp;gt;
+typename forward_list&amp;lt;_Tp, _Alloc&amp;gt;::iterator
+forward_list&amp;lt;_Tp, _Alloc&amp;gt;::erase_after(const_iterator __f, const_iterator __l)
+{
+    __node_pointer __e = const_cast&amp;lt;__node_pointer&amp;gt;(__l.__ptr_);
+    if (__f != __l)
+    {
+        __node_pointer __p = const_cast&amp;lt;__node_pointer&amp;gt;(__f.__ptr_);
+        __node_pointer __n = __p-&amp;gt;__next_;
+        if (__n != __e)
+        {
+            __p-&amp;gt;__next_ = __e;
+            __node_allocator&amp;amp; __a = base::__alloc();
+            do
+            {
+                __p = __n-&amp;gt;__next_;
+                __node_traits::destroy(__a, _VSTD::addressof(__n-&amp;gt;__value_));
+                __node_traits::deallocate(__a, __n, 1);
+                __n = __p;
+            } while (__n != __e);
+        }
+    }
+    return iterator(__e);
+}
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;For comparison, here&amp;#8217;s how GCC&amp;#8217;s &lt;a href="http://gcc.gnu.org/viewcvs/trunk/libstdc%2B%2B-v3/include/bits/forward_list.tcc?view=markup"&gt;libstdc++ does the same thing&lt;/a&gt;.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;template&amp;lt;typename _Tp, typename _Alloc&amp;gt;
+    template&amp;lt;typename _Pred&amp;gt;
+      void
+      forward_list&amp;lt;_Tp, _Alloc&amp;gt;::
+      remove_if(_Pred __pred)
+      {
+	_Node* __curr = static_cast&amp;lt;_Node*&amp;gt;(&amp;amp;this-&amp;gt;_M_impl._M_head);
+        while (_Node* __tmp = static_cast&amp;lt;_Node*&amp;gt;(__curr-&amp;gt;_M_next))
+          {
+            if (__pred(*__tmp-&amp;gt;_M_valptr()))
+              this-&amp;gt;_M_erase_after(__curr);
+            else
+              __curr = static_cast&amp;lt;_Node*&amp;gt;(__curr-&amp;gt;_M_next);
+          }
+      }
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Here, erasing (after a) node reads:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;template&amp;lt;typename _Tp, typename _Alloc&amp;gt;
+    _Fwd_list_node_base*
+    _Fwd_list_base&amp;lt;_Tp, _Alloc&amp;gt;::
+    _M_erase_after(_Fwd_list_node_base* __pos)
+    {
+      _Node* __curr = static_cast&amp;lt;_Node*&amp;gt;(__pos-&amp;gt;_M_next);
+      __pos-&amp;gt;_M_next = __curr-&amp;gt;_M_next;
+      _Tp_alloc_type __a(_M_get_Node_allocator());
+      allocator_traits&amp;lt;_Tp_alloc_type&amp;gt;::destroy(__a, __curr-&amp;gt;_M_valptr());
+      __curr-&amp;gt;~_Node();
+      _M_put_node(__curr);
+      return __pos-&amp;gt;_M_next;
+    }
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;This version walks through the list removing nodes which match the predicate as it finds them. Don&amp;#8217;t be confused by &lt;code&gt;&amp;amp;this-&amp;gt;_M_impl._M_head&lt;/code&gt;: it&amp;#8217;s not the node at the head of the list, it&amp;#8217;s the one before.
+&lt;/p&gt;
+
+&lt;h3&gt;Lessons from C++&lt;/h3&gt;
+&lt;p&gt;Maybe this code wouldn&amp;#8217;t persaude Linus Torvalds to rethink &lt;a href="http://harmful.cat-v.org/software/c++/linus" title="C++ is a horrible language"&gt;his opinion of C++&lt;/a&gt;, but if you can see past the angle brackets, underscores and allocators, it&amp;#8217;s simple enough.
+&lt;/p&gt;
+&lt;p&gt;It&amp;#8217;s also:
+&lt;/p&gt;
+&lt;ul&gt;
+ &lt;li&gt;
+     subtle, so I&amp;#8217;m glad someone else has written and checked it
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     generic, so I can put what I want in a list without casting or indirection
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     standard, so I know what to expect
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     supported
+ &lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;The before-begin node idea serves &lt;a href="http://wordaligned.org/articles/two-star-programming.html#comment-760751047"&gt;equally well in C&lt;/a&gt;, enabling list modifiers which have no need of double indirection or special case code for the list head.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;void remove_after(node * prev, remove_fn rm)
+{
+    while (prev-&amp;gt;next != NULL)
+    {
+        node * curr = prev-&amp;gt;next;
+        if (rm(curr))
+        {
+            prev-&amp;gt;next = curr-&amp;gt;next;
+            free(curr);
+        }
+        else
+            prev = curr;
+    }
+}
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Pass this function the before-begin node to remove all items from the list which match the predicate. 
+&lt;/p&gt;</description>
+<dc:date>2013-02-07</dc:date>
+<guid>http://wordaligned.org/articles/singly-linked-lists-in-c++.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/singly-linked-lists-in-c++.html</link>
+<category>C</category>
+</item>
+
+<item>
+<title>Two star programming</title>
+<description>&lt;p&gt;A few weeks ago &lt;a href="http://meta.slashdot.org/story/12/10/11/0030249/linus-torvalds-answers-your-questions"&gt;Linus Torvalds answered some questions&lt;/a&gt; on slashdot. All his responses make good reading but one in particular caught my eye. Asked to describe his favourite kernel hack, Torvalds grumbles he rarely looks at code these days &amp;#8212; unless it&amp;#8217;s to sort out someone else&amp;#8217;s mess. He then pauses to admit he&amp;#8217;s proud of the kernel&amp;#8217;s fiendishly cunning filename lookup cache before continuing to moan about incompetence.
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;At the opposite end of the spectrum, I actually wish more people understood the really core low-level kind of coding. Not big, complex stuff like the lockless name lookup, but simply good use of pointers-to-pointers etc. For example, I&amp;#8217;ve seen too many people who delete a singly-linked list entry by keeping track of the &lt;code&gt;prev&lt;/code&gt; entry, and then to delete the entry, doing something like
+&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;if (prev)
+    prev-&amp;gt;next = entry-&amp;gt;next;
+else
+    list_head = entry-&amp;gt;next;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;and whenever I see code like that, I just go &amp;#8220;This person doesn&amp;#8217;t understand pointers&amp;#8221;. And it&amp;#8217;s sadly quite common.
+&lt;/p&gt;
+&lt;p&gt;People who understand pointers just use a &amp;#8220;pointer to the entry pointer&amp;#8221;, and initialize that with the address of the list_head. And then as they traverse the list, they can remove the entry without using any conditionals, by just doing a &lt;code&gt;*pp = entry-&amp;gt;next&lt;/code&gt;.
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;Well I &lt;em&gt;thought&lt;/em&gt; I understood pointers but, sad to say, if asked to implement a list removal function I too would have kept track of the previous list node. Here&amp;#8217;s a sketch of the code:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;This person doesn&amp;#8217;t understand pointers&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;typedef struct node
+{
+    struct node * next;
+    ....
+} node;
+
+typedef bool (* remove_fn)(node const * v);
+
+// Remove all nodes from the supplied list for which the 
+// supplied remove function returns true.
+// Returns the new head of the list.
+node * remove_if(node * head, remove_fn rm)
+{
+    for (node * prev = NULL, * curr = head; curr != NULL; )
+    {
+        node * const next = curr-&amp;gt;next;
+        if (rm(curr))
+        {
+            if (prev)
+                prev-&amp;gt;next = next;
+            else
+                head = next;
+            free(curr);
+        }
+        else
+            prev = curr;
+        curr = next;
+    }
+    return head;
+}
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;The linked list is a simple but perfectly-formed structure built from nothing more than a pointer-per-node and a sentinel value, but the code to modify such lists can be subtle. No wonder linked lists feature in so many &lt;a href="https://www.google.com/search?q=linked+list+interview+questions" title="Search for linked list interview questions"&gt;interview questions&lt;/a&gt;!
+&lt;/p&gt;
+&lt;p&gt;The subtlety in the implementation shown above is the conditional required to handle any nodes removed from the head of the list.
+&lt;/p&gt;
+&lt;p&gt;Now let&amp;#8217;s look at the implementation Linus Torvalds had in mind. In this case we pass in a pointer to the list head, and the list traversal and modification is done using a pointer to the next pointers.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;Two star programming&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;void remove_if(node ** head, remove_fn rm)
+{
+    for (node** curr = head; *curr; )
+    {
+        node * entry = *curr;
+        if (rm(entry))
+        {
+            *curr = entry-&amp;gt;next;
+            free(entry);
+        }
+        else
+            curr = &amp;amp;entry-&amp;gt;next;
+    }
+}
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Much better! The key insight is that the links in a linked list are pointers and so &lt;strong&gt;pointers to pointers&lt;/strong&gt; are the prime candidates for modifying such a list.
+&lt;/p&gt;
+&lt;p style="text-align:center"&gt;&amp;sect;&lt;/p&gt;
+
+&lt;p&gt;The improved version of &lt;code&gt;remove_if()&lt;/code&gt; is an example of two star programming: the doubled-up asterisks indicate two levels of indirection. A &lt;a href="http://c2.com/cgi/wiki?ThreeStarProgrammer"&gt;third star&lt;/a&gt; would be one too many.
+&lt;/p&gt;</description>
+<dc:date>2013-01-08</dc:date>
+<guid>http://wordaligned.org/articles/two-star-programming.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/two-star-programming.html</link>
+<category>C</category>
+</item>
+
+<item>
+<title>Binary search returns &#8230; ?</title>
+<description>&lt;div class="toc"&gt;
+&lt;h2&gt;Contents&lt;/h2&gt;
+&lt;ul&gt;
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/binary-search.html#tocbsearch-in-c" name="toc0" id="toc0"&gt;Bsearch in C&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/binary-search.html#tocbinary-search-in-c" name="toc1" id="toc1"&gt;Binary search in C++&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/binary-search.html#tocstdbinarysearch-requirements" name="toc2" id="toc2"&gt;Std::binary_search() requirements&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/binary-search.html#tocstdbinarysearch-limitations" name="toc3" id="toc3"&gt;Std::binary_search() limitations&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/binary-search.html#toclocating-missing-elements" name="toc4" id="toc4"&gt;Locating missing elements&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/binary-search.html#toclowerbound" name="toc5" id="toc5"&gt;Lower_bound&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/binary-search.html#tocbinary-search-variants" name="toc6" id="toc6"&gt;Binary search variants&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/binary-search.html#tociterating-over-numbers-in-a-file" name="toc7" id="toc7"&gt;Iterating over numbers in a file&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/binary-search.html#toctriple-fail" name="toc8" id="toc8"&gt;Triple fail&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/binary-search.html#tocthanks" name="toc9" id="toc9"&gt;Thanks&lt;/a&gt;
+ &lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;&lt;p&gt;In an article inspired by Jon Bentley&amp;#8217;s classic book, &lt;a href="http://www.cs.bell-labs.com/cm/cs/pearls/"&gt;Programming Pearls&lt;/a&gt;, Mike Taylor &lt;a href="http://reprog.wordpress.com/2010/04/19/are-you-one-of-the-10-percent/" title="Are you one of the 10% of programmers who can write a binary search?"&gt;invites his readers&lt;/a&gt; to implement the binary search algorithm. To spice things up, he requests we work:
+&lt;/p&gt;
+&lt;ol&gt;
+ &lt;li&gt;
+     without reference to any existing implementation
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     without calling any library routine, such as &lt;code&gt;bsearch&lt;/code&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     without writing tests.
+ &lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Mike Taylor doesn&amp;#8217;t formally specify the problem. He&amp;#8217;s confident his readers will know what a binary search is, and if not, the description he quotes from Programming Pearls should suffice:
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;Binary search solves the problem [of searching within a pre-sorted array] by keeping track of a range within the array in which T [i.e. the sought value] must be if it is anywhere in the array.  Initially, the range is the entire array.  The range is shrunk by comparing its middle element to T and discarding half the range.  The process continues until T is discovered in the array, or until the range in which it must lie is known to be empty.
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;So could our binary search implementation simply return a binary result, &lt;code&gt;true&lt;/code&gt; if &lt;code&gt;T&lt;/code&gt; is in the array, &lt;code&gt;false&lt;/code&gt; otherwise? Well, Yes. And No. A binary search can provide more information, as Mike Taylor hints when he mentions &lt;code&gt;bsearch&lt;/code&gt;. 
+&lt;/p&gt;
+&lt;p&gt;Jon Bentley and Mike Taylor are primarily interested in how often programmers  make a mess of what appears to be a simple assignment and in how to avoid this mess. In this article, I&amp;#8217;d like to point out that the problem specification needs attention too.
+&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://www.flickr.com/photos/pinprick/2547648374"&gt;&lt;img src="http://farm4.static.flickr.com/3066/2547648374_587dbe8f4b_m.jpg" alt="unwrapped morbier"/&gt;&lt;/a&gt;
+   &lt;a href="http://www.flickr.com/photos/pinprick/2546825997"&gt;&lt;img src="http://farm4.static.flickr.com/3083/2546825997_c28af1da65_m.jpg" alt="cut morbier"/&gt;&lt;/a&gt;
+&lt;/p&gt;
+&lt;span id="continue-reading"/&gt;
+
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/binary-search.html#toc0" name="tocbsearch-in-c" id="tocbsearch-in-c"&gt;Bsearch in C&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;The C library&amp;#8217;s &lt;code&gt;bsearch&lt;/code&gt; function returns the location of &lt;code&gt;T&lt;/code&gt;, if found, or a sentinel value otherwise. We might use the array index of &lt;code&gt;T&lt;/code&gt; or &lt;code&gt;-1&lt;/code&gt; as location and sentinel. Standard C uses pointers:
+&lt;/p&gt;
+&lt;pre&gt;
+&lt;b&gt;NAME&lt;/b&gt;
+    &lt;b&gt;bsearch&lt;/b&gt; -- binary search of a sorted table
+    
+&lt;b&gt;SYNOPSIS&lt;/b&gt;
+    #include &amp;lt;stdlib.h&amp;gt;
+    
+    void *
+    &lt;b&gt;bsearch&lt;/b&gt;(const void *key, const void *base, size_t nel, 
+        size_t width,
+        int (*compar) (const void *, const void *));
+    
+&lt;b&gt;DESCRIPTION&lt;/b&gt; 
+    The &lt;b&gt;bsearch()&lt;/b&gt; function searches an array of `nel` objects, 
+    the initial member of which is pointed to by `base`, for a member
+    that matches the  object pointed to by `key`.  The size (in bytes)
+    of each member of the array is specified by `width`.
+    
+    The contents of the array should be in ascending sorted order 
+    according to the comparison function referenced by `compar`.  The 
+    `compar` routine is expected to have two arguments which point to
+    the `key` object and to an array member, in that order.  It should 
+    return an integer which is less than, equal to, or greater than
+    zero if the `key` object is found, respectively, to be less than,
+    to match, or be greater than the array member.
+
+&lt;b&gt;RETURN VALUES&lt;/b&gt;
+    The &lt;b&gt;bsearch()&lt;/b&gt; function returns a pointer to a matching member
+    of the array, or a null pointer if no match is found.  If two members
+    compare as equal, which member is matched is unspecified.
+&lt;/pre&gt;
+
+&lt;p&gt;Void pointers, function pointers, raw memory &amp;#8212; generic functions in C aren&amp;#8217;t pretty. How would this function look in a language with better support for generic programming?
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/binary-search.html#toc1" name="tocbinary-search-in-c" id="tocbinary-search-in-c"&gt;Binary search in C++&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;C++ programmers can of course use &lt;code&gt;bsearch&lt;/code&gt; directly since C++ includes the standard C library. The C++ counterpart would seem to be &lt;a href="http://www.sgi.com/tech/stl/binary_search.html"&gt;&lt;code&gt;std::binary_search&lt;/code&gt;&lt;/a&gt;.
+&lt;/p&gt;
+&lt;p&gt;At first glance &lt;code&gt;std::binary_search&lt;/code&gt; appears to be a weakened version of &lt;code&gt;bsearch&lt;/code&gt;. Like &lt;code&gt;bsearch&lt;/code&gt;, it searches for a value. Unlike &lt;code&gt;bsearch&lt;/code&gt;, it simply returns a boolean result: &lt;code&gt;true&lt;/code&gt; if the value is found, &lt;code&gt;false&lt;/code&gt; otherwise. Nonetheless, it can tell us more than &lt;code&gt;bsearch&lt;/code&gt; in some circumstances.
+&lt;/p&gt;
+&lt;p&gt;Let&amp;#8217;s return to Mike Taylor&amp;#8217;s second constraint, the one about implementing functions which already exist in standard libraries. In a &lt;a href="http://reprog.wordpress.com/2010/04/21/binary-search-redux-part-1/" title="Mike Taylor discusses his binary search challenge"&gt;follow up article&lt;/a&gt; he explains:
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;&amp;#8230; sometimes you do need to write a binary search, and the library routines won&amp;#8217;t get the job done.  Or if they will, they&amp;#8217;re grotesquely inefficient.  For example, suppose you have a 64-bit integer, and you need to find out whether it&amp;#8217;s among the nine billion 64-bit integers that are stored in ascending order in a 72 Gb file.  The naive solution is to read the file into memory, making an array (or, heaven help us, an Array) of nine billion elements, then invoke the library search function.  And of course that just plain won&amp;#8217;t work &amp;#8212; the array won&amp;#8217;t fit in memory.
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;Agreed! We should know how our wheels work and be ready to reinvent them when necessary: but C++&amp;#8217;s &lt;code&gt;std::binary_search&lt;/code&gt; &lt;strong&gt;will&lt;/strong&gt; solve this problem efficiently. All we need is a suitable iterator over the file, in this case one which:
+&lt;/p&gt;
+&lt;ul&gt;
+ &lt;li&gt;
+     increments in 8 byte steps
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     uses file seeks for larger steps
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     is dereferenced by reading 8 byte values from the file
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     stores file position, for use in ordering and distance operations
+ &lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;I include an &lt;a href="http://wordaligned.org/articles/binary-search.html#tociterating-over-numbers-in-a-file"&gt;implementation&lt;/a&gt; of just such an iterator towards the end of this article. My aging laptop didn&amp;#8217;t have enough disk space for a 72GB data file but I found room for a 5GB one. &lt;code&gt;Std::binary_search()&lt;/code&gt; took milliseconds to test the presence of values in this file, and the times improved dramatically on repeat runs; using a linear search, the time extended to minutes, and repeat runs showed no such improvements.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/binary-search.html#toc2" name="tocstdbinarysearch-requirements" id="tocstdbinarysearch-requirements"&gt;Std::binary_search() requirements&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;It&amp;#8217;s fair to suggest that creating a custom iterator just so we could use &lt;code&gt;std::binary_search&lt;/code&gt; merely moves the problem. The iterator&amp;#8217;s implementation is longer and arguably more fiddly than any custom binary search function would be. Why couldn&amp;#8217;t we use a standard &lt;a href="http://www.sgi.com/tech/stl/istream_iterator.html"&gt;input stream iterator&lt;/a&gt; with the standard binary search algorithm?
+&lt;/p&gt;
+&lt;p&gt;The reason is that &lt;code&gt;std::istream_iterator&lt;/code&gt;s are &lt;a href="http://www.sgi.com/tech/stl/InputIterator.html" title="SGI STL input iterator documentation"&gt;input iterators&lt;/a&gt;, suitable only for single pass algorithms. Binary search doesn&amp;#8217;t need to take any backwards steps but it does need to be able copy its iterators and advance them repeatedly. As a minimum, then, it requires &lt;a href="http://www.sgi.com/tech/stl/ForwardIterator.html" title="SGI STL forwards iterator documentation"&gt;forwards iterators&lt;/a&gt;.
+&lt;/p&gt;
+&lt;p&gt;Note the algorithm&amp;#8217;s &lt;a href="http://www.sgi.com/tech/stl/binary_search.html"&gt;complexity&lt;/a&gt;!
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;The number of comparisons is logarithmic: at most &lt;code&gt;log(last - first) + 2&lt;/code&gt;. If ForwardIterator is a Random Access Iterator then the number of steps through the range is also logarithmic; otherwise, the number of steps is proportional to &lt;code&gt;last - first&lt;/code&gt;.
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;In the case of our large file of numbers, comparisons are cheap; there&amp;#8217;s little point minimising them if we&amp;#8217;re going to take billions of short steps through the file. This is why we created a random access file iterator&lt;a id="fn1link" href="http://wordaligned.org/articles/binary-search.html#fn1"&gt;&lt;sup&gt;[1]&lt;/sup&gt;&lt;/a&gt;.
+&lt;/p&gt;
+&lt;p&gt;A more subtle point is that binary search deals with equivalence rather than equality: it only requires a less-than operator (or a comparison function), and returns true if it can find an element &lt;code&gt;x&lt;/code&gt; which satisfies &lt;code&gt;!(x &amp;lt; t) &amp;amp;&amp;amp; !(t &amp;lt; x)&lt;/code&gt;.
+&lt;/p&gt;
+&lt;p&gt;The point I&amp;#8217;m making is that C++ does a nice job of separating algorithms and containers, which is why the same algorithm can be used on vectors, files, arrays etc. It also carefully defines minimum requirements on the types used by algorithms&lt;a id="fn2link" href="http://wordaligned.org/articles/binary-search.html#fn2"&gt;&lt;sup&gt;[2]&lt;/sup&gt;&lt;/a&gt;.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/binary-search.html#toc3" name="tocstdbinarysearch-limitations" id="tocstdbinarysearch-limitations"&gt;Std::binary_search() limitations&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;We noted earlier that &lt;code&gt;std::binary_search&lt;/code&gt; delivers nothing more than a binary result. Is the element there or not? From the SGI STL &lt;a href="http://www.sgi.com/tech/stl/binary_search.html"&gt;documentation&lt;/a&gt;:
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;Note that this is not necessarily the information you are interested in!
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;Even &lt;code&gt;bsearch&lt;/code&gt; tells us where it found the match; or rather, where it found &lt;b&gt;a&lt;/b&gt; match, since there could be several. This imprecision is one of &lt;code&gt;bsearch&lt;/code&gt;&amp;#8217;s failings &amp;#8212; but it really lets us down when it can&amp;#8217;t find the element: in this case, it subdivides the range until it finds where the element would be if it were there, realises there is no match, then throws all positional information away and returns a null pointer.
+&lt;/p&gt;
+&lt;p&gt;Suppose our large file represents a set of numbers and we want to know where our test number should go in this file, if it isn&amp;#8217;t already present? A C++ binary search algorithm can do this, but it isn&amp;#8217;t &lt;code&gt;std::binary_search&lt;/code&gt;.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/binary-search.html#toc4" name="toclocating-missing-elements" id="toclocating-missing-elements"&gt;Locating missing elements&lt;/a&gt;&lt;/h3&gt;
+&lt;img src="http://wordaligned.org/images/london-marathon-2008.jpg" alt="London Marathon, runners crossing Tower Bridge"/&gt;
+
+&lt;p&gt;Here&amp;#8217;s another problem binary search can solve. Suppose we want to know how many runners finished the 2010 London marathon in a time between 3 and 4 hours. Let&amp;#8217;s suppose we&amp;#8217;ve already loaded the ordered finishing times into an array.
+&lt;/p&gt;
+&lt;p&gt;We might try using &lt;code&gt;bsearch&lt;/code&gt; to find the position of the runners who finished with a time of exactly 3 hours and with a time of exactly 4 hours. Then the answer would be the difference between these two positions.
+&lt;/p&gt;
+&lt;p&gt;There are two problems with this approach:
+&lt;/p&gt;
+&lt;ol&gt;
+ &lt;li&gt;
+     what if no one finished with a time of &lt;strong&gt;exactly&lt;/strong&gt; 3 or 4 hours? 
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     what if more than one runner finished with a time of exactly 3 or 4 hours?
+ &lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;In the first case &lt;code&gt;bsearch&lt;/code&gt; returns a null pointer and we can&amp;#8217;t complete our calculation. In the second case, &lt;code&gt;bsearch&lt;/code&gt; makes no guarantees about which of the equally-placed runners it will find, and even if we can make our calculation, we cannot be sure it is correct.
+&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;Bsearch&lt;/code&gt; is not much use, then, but a binary search can give us our answer. 
+&lt;/p&gt;
+&lt;p&gt;Imagine we had a late result for the race, a runner who recorded a time of exactly 3 hours. What&amp;#8217;s the first position in the array at which we could place this runner, whilst maintaining the array ordering? Similarly, where&amp;#8217;s the first position at which we could insert a runner with a time of 4 hours, maintaining the array ordering. Both these positions are well defined and precise &amp;#8212; even if everyone finished the race in less than 3 hours, or even if no one ran the race &amp;#8212; and the correct answer is their difference.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/binary-search.html#toc5" name="toclowerbound" id="toclowerbound"&gt;Lower_bound&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;C++ supplies just such an algorithm. It goes by the name of &lt;a href="http://www.sgi.com/tech/stl/lower_bound.html"&gt;&lt;code&gt;std::lower_bound&lt;/code&gt;&lt;/a&gt;, but really it&amp;#8217;s good old binary search. We want to find the first place our target element could go, whilst maintaining the ordering, which we do by repeatedly splitting the range.
+&lt;/p&gt;
+&lt;ul&gt;
+ &lt;li&gt;
+     while the range is non-empty
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     look at the element in the middle of the range
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     is its value less than the target value?
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     if so, continue looking in the top half of the range
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     if not, continue looking in the bottom half of the range
+ &lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;The while loop exits when the range has been reduced to a single point and this point is what we return. On my platform, the code itself reads a bit like:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;template&amp;lt;typename fwd_it, typename t&amp;gt;
+fwd_it
+lower_bound(fwd_it first, fwd_it last, const t &amp;amp; val)
+{
+    typedef typename iterator_traits&amp;lt;fwd_it&amp;gt;::difference_type distance;
+    
+    distance len = std::distance(first, last);
+    distance half;
+    fwd_it middle;
+    
+    while (len &amp;gt; 0)
+    {
+        half = len &amp;gt;&amp;gt; 1;
+        middle = first;
+        std::advance(middle, half);
+        if (*middle &amp;lt; val)
+        {
+            first = middle;
+            ++first;
+            len = len - half - 1;
+        }
+        else
+            len = half;
+    }
+    return first;
+}
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;I think this version of binary search is &lt;a href="http://wordaligned.org/articles/next-permutation.html" title="Next_permutation: when C++ gets it right"&gt;yet another gem from the C++ standard library&lt;/a&gt;. As Jon Bentley and Mike Taylor eloquently point out, the implementation is subtle &amp;#8212; in particular, if &lt;code&gt;(*middle &amp;lt; val)&lt;/code&gt; we must eliminate &lt;code&gt;middle&lt;/code&gt; or risk an infinite loop &amp;#8212; but by tightening the problem specification and paring back the requirements we&amp;#8217;ve created a function which is far more useful than &lt;code&gt;bsearch&lt;/code&gt; and arguably simpler to code.
+&lt;/p&gt;
+&lt;p&gt;For comparison, here&amp;#8217;s the &lt;code&gt;bsearch&lt;/code&gt; implemented by glibc, version 2.11.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;/* Perform a binary search for KEY in BASE which has NMEMB elements
+   of SIZE bytes each.  The comparisons are done by (*COMPAR)().  */
+void *
+bsearch (const void *key, const void *base, size_t nmemb, size_t size,
+         int (*compar) (const void *, const void *))
+{
+  size_t l, u, idx;
+  const void *p;
+  int comparison;
+  
+  l = 0;
+  u = nmemb;
+  while (l &amp;lt; u)
+    {
+      idx = (l + u) / 2;
+      p = (void *) (((const char *) base) + (idx * size));
+      comparison = (*compar) (key, p);
+      if (comparison &amp;lt; 0)
+        u = idx;
+      else if (comparison &amp;gt; 0)
+        l = idx + 1;
+      else
+        return (void *) p;
+    }
+
+return NULL;
+}
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/binary-search.html#toc6" name="tocbinary-search-variants" id="tocbinary-search-variants"&gt;Binary search variants&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;On my platform, &lt;code&gt;std::binary_search&lt;/code&gt; is built directly on &lt;code&gt;std::lower_bound&lt;/code&gt;. Here&amp;#8217;s the code.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;template&amp;lt;typename fwd_it, typename t&amp;gt;
+fwd_it
+lower_bound(fwd_it first, fwd_it last, const t &amp;amp; val)
+{
+    fwd_it i = std::lower_bound(first, last, val);
+    return i != last &amp;amp;&amp;amp; !(val &amp;lt; *i);
+}
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;&lt;code&gt;Std::upper_bound&lt;/code&gt; searches a sorted range to find the last position an item could be inserted without changing the ordering.
+&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;Std::equal_range&lt;/code&gt; returns a pair of iterators, logically equal to &lt;code&gt;make_pair(lower_bound(...), upper_bound(...))&lt;/code&gt;.
+&lt;/p&gt;
+&lt;hr /&gt;
+
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/binary-search.html#toc7" name="tociterating-over-numbers-in-a-file" id="tociterating-over-numbers-in-a-file"&gt;Iterating over numbers in a file&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;The iterator class I created to use &lt;code&gt;std::binary_search&lt;/code&gt; on an file containing fixed width binary formatted numbers appears below. To determine whether the file &lt;code&gt;numbers.bin&lt;/code&gt; contains the target value &lt;code&gt;288230376151711744&lt;/code&gt;, we would write something like:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;#include &amp;lt;algorithm&amp;gt;
+
+....
+    
+    typedef binary_file_number_iter&amp;lt;long long, 8&amp;gt; iter;
+    long long target = 288230376151711744LL;
+    
+    bool found = std::binary_search(iter("numbers.bin", iter::begin),
+                                    iter("numbers.bin", iter::end),
+                                    target);
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;To test the performance of these iterators I created a 5GB binary file packed with 8 byte numbers. These numbers were multiples of 3:
+&lt;/p&gt;
+&lt;pre title="File contents"&gt;
+0, 3, 6, 9, ..., 2015231997
+&lt;/pre&gt;
+
+&lt;p&gt;I then timed how long it took to search this file for 10 interesting numbers (and to confirm the returned results were as expected).
+&lt;/p&gt;
+&lt;pre title="Seach targets"&gt;
+-1, 0, 1, 2, 1007616000, 1007616001, 1007616002, 1007616003, 2015231997, 2015232000
+&lt;/pre&gt;
+
+&lt;p&gt;&lt;code&gt;Binary_search()&lt;/code&gt; recorded a time of 0.308 seconds on a rather old MacBook&lt;a id="fn3link" href="http://wordaligned.org/articles/binary-search.html#fn3"&gt;&lt;sup&gt;[3]&lt;/sup&gt;&lt;/a&gt;. Using a hand-coded linear search the run time was just over 38 minutes. That is, the binary search ran 7000 times faster on this sample.
+&lt;/p&gt;
+&lt;p&gt;Interestingly, repeated runs of the binary search test using the same input file and the same targets ran in an average time of just 0.030 seconds, a 10-fold times speed up over the first run. Similarly repeating the linear search showed no such improvement. I&amp;#8217;m attributing this to operating system file caching, but I don&amp;#8217;t pretend to know exactly what&amp;#8217;s going on here. (My thanks to Michal Mocny for his explanation in the &lt;a href="http://wordaligned.org/articles/binary-search.html#comment-49972118"&gt;comments&lt;/a&gt; below).
+&lt;/p&gt;
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;Binary file number iterator&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;#ifndef BINARY_FILE_NUMBER_ITERATOR_HPP_INCLUDED
+#define BINARY_FILE_NUMBER_ITERATOR_HPP_INCLUDED
+
+#include &amp;lt;fstream&amp;gt;
+#include &amp;lt;ios&amp;gt;
+#include &amp;lt;iostream&amp;gt;
+#include &amp;lt;iterator&amp;gt;
+#include &amp;lt;stdexcept&amp;gt;
+
+// File read error, thrown when low level file access fails.
+class file_read_error : public std::runtime_error
+{
+public:
+    file_read_error(std::string const &amp;amp; what)
+        : std::runtime_error(what)
+    {
+    }
+};
+
+// This iterator class is used for numbers packed into a file
+// using a fixed width binary format. Numbers must be packed
+// most significant byte first.
+//
+// The file is not read into memory. Iterators are moved by
+// file seeking and dereferenced by reading from the file.
+//
+// These iterators declare themselves to be random access
+// iterators but a file is not usually a random access device.
+// For example, advancing an iterator a large distance may well
+// take longer than advancing a small distance.
+template &amp;lt;typename number, int number_size&amp;gt;
+class binary_file_number_iter
+{
+    typedef binary_file_number_iter&amp;lt;number, number_size&amp;gt; iter;
+    
+private: // Sanity
+    // Check things are OK, closing the stream and throwing an error on failure.
+    void check(bool ok, std::string const &amp;amp; what)
+    {
+        if (!ok)
+        {
+            close();
+            throw file_read_error(what);          
+        }
+    }
+    
+public: // Traits typedefs, which make this class usable with
+        // algorithms which need a random access iterator.
+    typedef std::random_access_iterator_tag iterator_category;
+    typedef number value_type;
+    typedef std::streamoff difference_type;
+    typedef number * pointer;
+    typedef number &amp;amp; reference;
+    
+public:
+    static int const number_width = number_size;
+    
+public: // Enum used to construct begin, end iterators
+    enum start_pos { begin, end };
+    
+public: // Lifecycle
+    binary_file_number_iter(std::string const &amp;amp; filename,
+                            start_pos where = begin)
+        : filename(filename)
+        , pos(-1)
+    {
+        open();
+        if (where == end)
+        {
+            seek_end();
+        }
+    }
+    
+    binary_file_number_iter()
+        : pos(-1)
+    {
+    }
+    
+    binary_file_number_iter(iter const &amp;amp; other)
+        : filename(other.filename)
+    {
+        open();
+        setpos(other.pos);
+    }
+    
+    ~binary_file_number_iter()
+    {
+        close();
+    }
+    
+    iter &amp;amp; operator=(iter const &amp;amp; other)
+    {
+        close();
+        filename = other.filename;
+        open();
+        setpos(other.pos);
+        return *this;
+    } 
+    
+public: // Comparison
+        // Note: it is an error to compare iterators into different files.
+    bool operator&amp;lt;(iter const &amp;amp; other) const
+    {
+        return pos &amp;lt; other.pos;
+    }
+    
+    bool operator&amp;gt;(iter const &amp;amp; other) const
+    {
+        return pos &amp;gt; other.pos;
+    }
+    
+    bool operator==(iter const &amp;amp; other) const
+    {
+        return pos == other.pos;
+    }
+    
+    bool operator!=(iter const &amp;amp; other) const
+    {
+        return pos != other.pos;
+    }
+    
+public: // Iteration
+    iter &amp;amp; operator++()
+    {
+        return *this += 1;
+    }
+    
+    iter &amp;amp; operator--()
+    {
+        return *this -= 1;
+    }
+    
+    iter operator++(int)
+    {
+        iter tmp(*this);
+        ++(*this);
+        return tmp;
+    }
+    
+    iter operator--(int)
+    {
+        iter tmp(*this);
+        --(*this);
+        return tmp;
+    }
+    
+public: // Step
+    iter &amp;amp; operator+=(difference_type n)
+    {
+        advance(n);
+        return *this;
+    }
+    
+    iter &amp;amp; operator-=(difference_type n)
+    {
+        advance(-n);
+        return *this;
+    }
+    
+    iter operator+(difference_type n)
+    {
+        iter result(*this);
+        return result += n;
+    }
+    
+    iter operator-(difference_type n)
+    {
+        iter result(*this);
+        return result -= n;
+    }
+    
+public: // Distance
+    difference_type operator-(iter &amp;amp; other)
+    {
+        return (pos - other.pos) / number_size;
+    }
+    
+public: // Access
+    value_type operator*()
+    {
+        return (*this)[0];
+    }
+    
+    value_type operator[](difference_type n)
+    {
+        std::streampos restore = getpos();
+        advance(n);
+        value_type const result = read();
+        setpos(restore);
+        return result;
+    }
+    
+    // Allow access to the underlying stream position
+    std::streampos getpos()
+    {
+        std::streampos s = in.tellg();
+        check(in, "getpos failed");
+        return s;
+    }
+private: // Implementation details
+    void open()
+    {
+        in.open(filename.c_str(), std::ios::binary);
+        check(in, "open failed");
+        pos = getpos();
+    }
+    
+    void close()
+    {
+        if (in.is_open())
+        {
+            in.close();
+        }
+    }
+    
+    void advance(difference_type n)
+    {
+        check(in.seekg(n * number_size, std::ios_base::cur), "advance failed");
+        pos = getpos();
+    }
+    
+    void seek_end()
+    {
+        check(in.seekg(0, std::ios_base::end), "seek_end failed");
+        pos = getpos();
+    }
+    
+    void setpos(std::streampos newpos)
+    {
+        check(in.seekg(newpos), "setpos failed");
+        pos = newpos;
+    }
+    
+    value_type read()
+    {
+        number n = 0;
+        unsigned char buf[number_size];
+        check(in.read((char *)buf, number_size), "read failed");
+        
+        for (int i = 0; i != number_size; ++i)
+        {
+            n &amp;lt;&amp;lt;= 8;
+            n |= buf[i];
+        }
+        return n;
+    }
+    
+private: // State
+    std::string filename;
+    std::ifstream in;
+    std::streampos pos;
+};
+
+#endif // BINARY_FILE_NUMBER_ITERATOR_HPP_INCLUDED
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Here are some basic tests for the binary file number iterator.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;Test binary file number iterator&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;#include &amp;lt;assert.h&amp;gt;
+#include &amp;lt;fstream&amp;gt;
+#include &amp;lt;algorithm&amp;gt;
+#include &amp;lt;ext/algorithm&amp;gt; // For Gnu's non-standard is_sorted
+#include &amp;lt;iostream&amp;gt;
+
+#include "binary_file_number_iterator.hpp"
+
+typedef binary_file_number_iter&amp;lt;long long, 8&amp;gt; iter8;
+typedef binary_file_number_iter&amp;lt;int, 4&amp;gt; iter4;
+typedef binary_file_number_iter&amp;lt;short, 2&amp;gt; iter2;
+typedef binary_file_number_iter&amp;lt;char, 1&amp;gt; iter1;
+
+template &amp;lt;typename fwd_it&amp;gt;
+bool is_sorted(fwd_it beg, fwd_it end)
+{
+    return __gnu_cxx::is_sorted(beg, end);
+}
+
+char const * empty_test_file(char const * name)
+{
+    std::ofstream ofile;
+    ofile.open(name);
+    ofile.close();
+    return name;
+}
+
+/*
+  Create a small test file containing numbers, in ascending order,
+  for number sizes 1, 2, 4 and 8 bytes.
+  
+  A hex view of the file looks like:
+  
+  0000 0000 0000 0000 0303 0303 0303 0303
+  0606 0606 0606 0606 0909 0909 0909 0909
+  0c0c 0c0c 0c0c 0c0c 0f0f 0f0f 0f0f 0f0f
+*/
+char const * basic_test_file(char const * name)
+{
+    std::ofstream ofile;
+    ofile.open(name);
+    for (unsigned char i = 0; i != 18; i += 3)
+        for (unsigned j = 0; j != 8; ++j)
+            ofile &amp;lt;&amp;lt; i;            
+    ofile.close();
+    return name;
+}
+
+void empty_file_tests()
+{
+    char const * empty_file = empty_test_file("empty_test_file");
+    iter1 beg(empty_file, iter1::begin);
+    iter1 end(empty_file, iter1::end);
+    assert(beg == end);
+    assert(std::lower_bound(beg, end, -1) == end);
+    assert(std::upper_bound(beg, end, -1) == end);
+    assert(!std::binary_search(beg, end, 0));
+    assert(std::equal_range(beg, end, -1) == std::make_pair(beg, beg));
+}
+
+template &amp;lt;typename value_type&amp;gt;
+value_type repeat(int v, int w)
+{
+    value_type result = 0;
+    while (w-- != 0)
+    {
+        result &amp;lt;&amp;lt;= 8;
+        result |= v;
+    }
+    return result;
+}
+
+template &amp;lt;typename iter&amp;gt;
+void basic_file_tests()
+{
+    char const * basic_file = basic_test_file("basic_test_file");
+    
+    typedef typename iter::value_type value_t;
+    typedef typename std::pair&amp;lt;iter, iter&amp;gt; range;
+    int const w = iter::number_width;
+    
+    iter beg(basic_file, iter::begin);
+    iter end(basic_file, iter::end);
+    assert(beg &amp;lt; end);
+    assert(!(beg &amp;gt; end));
+    assert(!(beg == end));
+    assert(beg != end);
+    assert(end - beg == 48 / w);
+    
+    iter mid = beg;
+    assert(mid[0] == 0);
+    assert(mid[8/w] == repeat&amp;lt;value_t&amp;gt;(3, w));
+    assert(*mid == 0);
+    assert(*mid++ == 0);
+    assert(*--mid == 0);
+    assert(*(mid += 16/w) == repeat&amp;lt;value_t&amp;gt;(6, w));
+    assert(mid &amp;lt; end);
+    assert(mid &amp;gt; beg);
+    
+    assert(is_sorted(beg, end));
+    assert(std::lower_bound(beg, mid, -1) == beg);
+    assert(std::lower_bound(beg, mid, 0) == beg);
+    assert(std::upper_bound(beg, mid, 0) == beg + 8/w);
+    assert(std::upper_bound(beg, mid, 1) == beg + 8/w);
+    assert(std::binary_search(beg, end, 0));
+    assert(std::binary_search(beg, end, repeat&amp;lt;value_t&amp;gt;(0xf, w)));
+    
+    mid = beg + 8/w;
+    assert(std::equal_range(beg, end, 0) == std::make_pair(beg, mid));
+    assert(std::equal_range(beg, end, 1) == std::make_pair(mid, mid));
+}
+
+int main()
+{
+    empty_file_tests();
+    basic_file_tests&amp;lt;iter1&amp;gt;();
+    basic_file_tests&amp;lt;iter2&amp;gt;();
+    basic_file_tests&amp;lt;iter4&amp;gt;();
+    basic_file_tests&amp;lt;iter8&amp;gt;();
+    return 0;
+}
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/binary-search.html#toc8" name="toctriple-fail" id="toctriple-fail"&gt;Triple fail&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;In this article we&amp;#8217;ve discussed binary search:
+&lt;/p&gt;
+&lt;ol&gt;
+ &lt;li&gt;
+     referring to existing implementations
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     calling library routines, such as &lt;code&gt;std::binary_search&lt;/code&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     and written some tests.
+ &lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Despite this indiscipline, we never even bothered to roll our own binary search: we&amp;#8217;ve tackled the exact opposite of the problem which Mike Taylor set. Programming tasks rarely start with a clear specification, and even if they do, the specification needs questioning.
+&lt;/p&gt;
+&lt;hr /&gt;
+
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/binary-search.html#toc9" name="tocthanks" id="tocthanks"&gt;Thanks&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;My thanks to &lt;a href="http://www.flickr.com/photos/pinprick/"&gt;pinprick&lt;/a&gt; for the &lt;a href="http://www.flickr.com/photos/pinprick/2547648374"&gt;cheese&lt;/a&gt; &lt;a href="http://www.flickr.com/photos/pinprick/2546825997"&gt;photos&lt;/a&gt;, and for this delicious description.
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;morbier is a soft-ripened, washed rind cheese. the tradition of bathing the rinds in salty water (or strong ale) goes back to trappist monks, who perfected the art. washing the rind makes it tougher, protecting the cheese and making it last longer. washing the rind also makes it a place where a certain bacteria, b. linens, love to hang out. while they work their magic, making the cheese inside smooth and creamy and silky, they also make the outside stinky. there isn&amp;#8217;t any good way to put it. however, most stinky cheese taste amazing, and once you realize that, you find that you love the smell of stinky cheese. stink on the outside means gold on the inside! 
+   &amp;#8212; &lt;a href="http://www.flickr.com/photos/pinprick/2547648374"&gt;pinprick&lt;/a&gt;
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;How long before flickr implements scratch and sniff?
+&lt;/p&gt;
+&lt;hr /&gt;
+
+&lt;p&gt;&lt;a id="fn1" href="http://wordaligned.org/articles/binary-search.html#fn1link"&gt;[1]&lt;/a&gt;: Well, something which masquerades as a random access iterator. Files are not usually random access devices, and the time taken by a seek operation may well vary with the seek offset. By supplying random access scaffolding, we at least ensure that a single, efficient, seek operation is used each time we advance the file position. 
+&lt;/p&gt;
+&lt;p&gt;&lt;a id="fn2" href="http://wordaligned.org/articles/binary-search.html#fn2link"&gt;[2]&lt;/a&gt;: The C++ standard describes the requirements on types in some detail. Unfortunately C++ implementations provide little support for enforcing these requirements. Violations are likely to be punished by &lt;a href="http://wordaligned.org/articles/koenigs-first-rule-of-debugging.html#a-problem-on-line-106"&gt;grotesque compiler warnings&lt;/a&gt;.
+&lt;/p&gt;
+&lt;p&gt;&lt;a id="fn3" href="http://wordaligned.org/articles/binary-search.html#fn3link"&gt;[3]&lt;/a&gt;: The laptop specification:
+&lt;/p&gt;
+&lt;pre&gt;
+Hardware Overview:
+  Model Name:	            MacBook
+  Model Identifier:	    MacBook1,1
+  Processor Name:	    Intel Core Duo
+  Processor Speed:	    2 GHz
+  Number Of Processors:	    1
+  Total Number Of Cores:    2
+  L2 Cache (per processor): 2 MB
+  Memory:                   2 GB
+  Bus Speed:                667 MHz
+&lt;/pre&gt;</description>
+<dc:date>2010-05-12</dc:date>
+<guid>http://wordaligned.org/articles/binary-search.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/binary-search.html</link>
+<category>C</category>
+</item>
+
+<item>
+<title>A useful octal escape sequence</title>
+<description>&lt;p&gt;&lt;a href="http://wordaligned.org/articles/integer-literal-values.html"&gt;Previously&lt;/a&gt; I grumbled about &lt;a href="http://wordaligned.org/articles/octal-literals.html"&gt;octal integer literals&lt;/a&gt;, suggesting:
+&lt;/p&gt;
+&lt;ol&gt;
+ &lt;li&gt;
+     they aren&amp;#8217;t much use, not when you&amp;#8217;ve got hexademical and binary literals.
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     they&amp;#8217;re risky. As Doug Napoleone noted in a &lt;a href="http://wordaligned.org/articles/integer-literal-values.html#comment-14394465"&gt;comment&lt;/a&gt;, &lt;code&gt;011&lt;/code&gt; is all too easily read as eleven rather than nine.
+ &lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Python 3 attempts to patch the readability issue: octal nine must be written as &lt;code&gt;0o11&lt;/code&gt; or &lt;code&gt;0O11&lt;/code&gt;. Choose your fonts with care, &lt;code&gt;O&lt;/code&gt; and &lt;code&gt;0&lt;/code&gt; look similar!
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; 0o11, 0O11
+(9, 9)
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Octal numbers can also appear in escape sequences embedded in &lt;a href="http://docs.python.org/py3k/reference/lexical_analysis.html#string-and-bytes-literals"&gt;string and bytes literals&lt;/a&gt;. The syntax hasn&amp;#8217;t changed for Python 3 and the rules are as in C: the escape sequence &lt;code&gt;\OOO&lt;/code&gt; embeds a character/byte with octal value &lt;code&gt;OOO&lt;/code&gt;. Up to three octal digits are allowed in an octal escape sequence.
+&lt;/p&gt;
+&lt;p&gt;&lt;img src="http://wordaligned.org/images/buttons/octopus-small.jpg" alt="Smart mollusc"/&gt;
+   &lt;img src="http://wordaligned.org/images/buttons/octopus-small.jpg" alt="Smart mollusc"/&gt;
+   &lt;img src="http://wordaligned.org/images/buttons/octopus-small.jpg" alt="Smart mollusc"/&gt;
+&lt;/p&gt;
+&lt;p&gt;Like  octal integers, these octal escape sequences may appear to be of limited use &amp;#8212; a syntactic oddity rarely seen in the wild &amp;#8212; but in fact there&amp;#8217;s one particular use case which is so common we don&amp;#8217;t even notice it.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;char const terminator = '\0';
+
+&lt;/pre&gt;
+
+&lt;/div&gt;</description>
+<dc:date>2009-08-09</dc:date>
+<guid>http://wordaligned.org/articles/a-useful-octal-escape-sequence.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/a-useful-octal-escape-sequence.html</link>
+<category>C</category>
+</item>
+
+<item>
+<title>comp.lang.name?</title>
+<description>&lt;h3&gt;How the Python became&lt;/h3&gt;
+&lt;p&gt;Guido van Rossum had a problem: &lt;a href="http://python-history.blogspot.com/2009/01/personal-history-part-1-cwi.html"&gt;what to call his new language&lt;/a&gt;? Computer language names often tip a hat to their predecessors, as &lt;strong&gt;Ruby&lt;/strong&gt; does to &lt;strong&gt;Perl&lt;/strong&gt;, for example. In this case the immediate predecessor, &lt;strong&gt;ABC&lt;/strong&gt;, had itself changed from &lt;i&gt;&lt;b&gt;B&lt;/b&gt;&lt;/i&gt; because it got mistaken for &lt;strong&gt;B&lt;/strong&gt;, and the suggestion ABC &amp;#8220;made programming easy as ABC&amp;#8221; failed to convince Guido. So he dropped the alphabetic sequencing. Rather than tip a hat he picked a name from one.
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;I picked the first thing that came to mind, which happened to be &lt;a href="http://en.wikipedia.org/wiki/Monty_Python%27s_Flying_Circus"&gt;Monty Python&amp;#8217;s Flying Circus&lt;/a&gt;, one of my favorite comedy troupes. The reference felt suitably irreverent for what was essentially a &lt;a href="http://en.wikipedia.org/wiki/Skunkworks_project"&gt;&amp;#8220;skunkworks project&amp;#8221;&lt;/a&gt;. The word &amp;#8220;Python&amp;#8221; was also catchy, a bit edgy, and at the same time, it fit in the tradition of naming languages after famous people, like Pascal, Ada, and Eiffel.
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;span id="continue-reading"/&gt;
+
+
+&lt;h3&gt;Animals&lt;/h3&gt;
+&lt;p&gt;&lt;a href="http://www.flickr.com/photos/thomasguest/3215793436/" title="ya(k|cc) came?l a[uw]k "&gt;&lt;img style="float:right" src="http://farm4.static.flickr.com/3431/3215793436_6840bb27b3_m.jpg" width="174" height="240" alt="yacc caml awk" /&gt;&lt;/a&gt;
+&lt;/p&gt;
+&lt;p&gt;Although Guido van Rossum held out for some time against Python being associated with snakes, he eventually &lt;a href="http://personal.ee.surrey.ac.uk/Personal/L.Wood/softwear/" title="At last GvR embraces the snake"&gt;capitulated&lt;/a&gt;. Blame the animal cover lovers at O&amp;#8217;Reilly! As it happens, I rate the reptile as highly as the comedians. I also like languages with animal names. Perhaps &lt;strong&gt;Yacc&lt;/strong&gt;, &lt;strong&gt;Awk&lt;/strong&gt; and &lt;strong&gt;Caml&lt;/strong&gt; also started life as skunkworks?
+&lt;/p&gt;
+
+&lt;h3&gt;Naming words&lt;/h3&gt;
+&lt;p&gt;&lt;a href="http://en.wikipedia.org/wiki/Python_(mythology)"&gt;&lt;img src="http://upload.wikimedia.org/wikipedia/commons/thumb/2/20/Virgil_Solis_-_Apollo_Python.jpg/350px-Virgil_Solis_-_Apollo_Python.jpg" alt="Apollo slaying Python"/&gt;&lt;/a&gt;
+&lt;/p&gt;
+&lt;p&gt;Python is a noun &amp;#8212; what we called a &amp;#8220;naming word&amp;#8221; at junior school. Python is also a proper noun: in &lt;a href="http://en.wikipedia.org/wiki/Python_(mythology)" title="Python (mythology)"&gt;Greek Mythology&lt;/a&gt;, &lt;strong&gt;she&lt;/strong&gt; was the earth-dragon of Delphi. It&amp;#8217;s hardly surprising when language creators opt for nouns, often proper, frequently female: &lt;strong&gt;Ada&lt;/strong&gt;, &lt;strong&gt;Miranda&lt;/strong&gt;, &lt;strong&gt;Ruby&lt;/strong&gt;, for example. Also, &lt;strong&gt;Java&lt;/strong&gt;, &lt;strong&gt;Pascal&lt;/strong&gt;, &lt;strong&gt;Haskell&lt;/strong&gt; &amp;#8212; oh, yes, and &lt;strong&gt;Delphi&lt;/strong&gt;.
+&lt;/p&gt;
+
+&lt;h3&gt;Single characters&lt;/h3&gt;
+&lt;p&gt;We&amp;#8217;ve already mentioned &lt;strong&gt;B&lt;/strong&gt;, which I guess is a (homophone of a) girl&amp;#8217;s name. It&amp;#8217;s also a well rounded character found near the front of the alphabet. Alphabetically, B comes before C, and the language B features amongst &lt;strong&gt;C&lt;/strong&gt;&amp;#8217;s predecessors. When Bjarne Stroustrup built object-oriented features on top of C, his new language became known as &amp;#8220;new C&amp;#8221; and &amp;#8220;C with classes&amp;#8221;. The former was disrespectful to C, which risked becoming &amp;#8220;old C&amp;#8221;, and the latter failed to excite. The final name, &lt;strong&gt;C++&lt;/strong&gt;, was an inspired choice, even if some have pointed out &lt;strong&gt;++C&lt;/strong&gt; would be more correct.
+&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;C#&lt;/strong&gt; squeezes more juice from the pun. Pronounced &amp;#8220;See Sharp!&amp;#8221;, the name has a commanding ring to it, and if you look within the hash symbol, #, you can make out redoubled ++ signs. Shouldn&amp;#8217;t it &lt;a href="http://en.wikipedia.org/wiki/C_Sharp_(programming_language)#Language_name"&gt;be written C&amp;#x266f;&lt;/a&gt; though, or should we really pronounce it &amp;#8220;See Hash&amp;#8221;? 
+&lt;/p&gt;
+&lt;p&gt;Both the + and the # characters have special semantics within URLs. How many C++ and C# blog posts end up being tagged &amp;#8220;C&amp;#8221;, I wonder? For similar reasons I guess it&amp;#8217;s still impractical to name a language &lt;b&gt;&amp;lambda;&lt;/b&gt; or &lt;b&gt;&amp;mu;&lt;/b&gt;, unless you&amp;#8217;re prepared to accept that name being spelled &lt;strong&gt;lambda&lt;/strong&gt; or &lt;strong&gt;mu&lt;/strong&gt;, that is.
+&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;D&lt;/strong&gt; really does look like a great language in the C and C++ tradition, but its name lacks imagination. Enough alphabet already!
+&lt;/p&gt;
+
+&lt;h3&gt;Doing words&lt;/h3&gt;
+&lt;p&gt;&lt;strong&gt;B&lt;/strong&gt; and &lt;strong&gt;C&lt;/strong&gt; are both strong, active verbs. Nothing beats being and seeing. Writers like verbs. Verbs make things happen, just like programming languages. Maybe &lt;strong&gt;Lisp&lt;/strong&gt; and &lt;strong&gt;Scheme&lt;/strong&gt; sound a bit geeky, sleazy even, but I like them. They&amp;#8217;re great names. Ever wonder how &lt;strong&gt;Bash&lt;/strong&gt; bludgeoned its way to shell domination? &lt;strong&gt;Squeak&lt;/strong&gt; is a great play on &lt;strong&gt;Smalltalk&lt;/strong&gt;. Knitters &lt;a href="http://dictionary.reference.com/browse/purl"&gt;&lt;strong&gt;perl&lt;/strong&gt;&lt;/a&gt;.
+&lt;/p&gt;
+
+&lt;h3&gt;Etc&lt;/h3&gt;
+&lt;p&gt;&lt;a href="http://www.lancearmstrong.com/"&gt;&lt;img style="float:right;" src="http://wordaligned.org/images/lance-armstrong.jpg" alt="Lance Armstrong, champion cyclist"/&gt;&lt;/a&gt;
+&lt;/p&gt;
+&lt;p&gt;Adjectives and adverbs are poorly represented. &lt;strong&gt;Groovy&lt;/strong&gt; comes to mind, but not a lot else. Plenty of language names are (or once were) acronyms and abbreviations: as names, I prefer the ones you can read over the mouthfuls of consonants. On this basis, &lt;strong&gt;Fortran&lt;/strong&gt; pips &lt;strong&gt;PL/I&lt;/strong&gt;, and &lt;strong&gt;Sequel&lt;/strong&gt; beats &lt;strong&gt;Ess Queue El&lt;/strong&gt;.
+&lt;/p&gt;
+&lt;p&gt;We&amp;#8217;ve listed some great computer languages with great names. Can a good name shape a language&amp;#8217;s success? Well, certainly it can&amp;#8217;t hurt. Names matter. Lance Armstrong is surely the name of a champion, the kind of guy who can beat testicular cancer and win the world&amp;#8217;s toughest endurance event 7 times in a row. Check out his &lt;a href="http://www.lancearmstrong.com/"&gt;flash heavy website&lt;/a&gt;. Whereas the more gently named Tim Henman never quite fulfilled his tennis potential, and I can&amp;#8217;t even connect to &lt;a href="http://www.timhenman.org"&gt;www.timhenman.org&lt;/a&gt;.
+&lt;/p&gt;
+&lt;p&gt;Conversely, can a poor name stand in the way of success? &lt;strong&gt;ABC&lt;/strong&gt; has become (part of Python&amp;#8217;s) history. I think it&amp;#8217;s fair to say that, at this point, the weakly-named &lt;strong&gt;D&lt;/strong&gt; has gained respect rather than presence. On the other hand, &lt;strong&gt;JavaScript&lt;/strong&gt; is a poor name too, and &lt;strong&gt;ECMAScript&lt;/strong&gt; is worse, but it&amp;#8217;s a fine language which can claim to be more widely deployed than any other.
+&lt;/p&gt;
+&lt;h5&gt;&lt;a name="feedback"&gt;Feedback&lt;/a&gt;&lt;/h5&gt;&lt;div id="feedback_div"&gt;&lt;ol id="feedback" class="feedback"&gt;&lt;li class="feedbackitem"&gt;&lt;div class="author"&gt;&lt;cite&gt;Jez&lt;/cite&gt; 2009-01-23&lt;/div&gt;&lt;div class="content"&gt;&lt;p&gt;Names are important.  Choosing a good name for something is very difficult, and I know from past experience that you don&amp;#8217;t usually get a second go.  The humorous code name you chose almost certainly won&amp;#8217;t get changed later, and you&amp;#8217;ll be talking about &amp;#8220;using the Linguini server to add the zubins&amp;#8221; for ever.  Yes, that&amp;#8217;s a real example.&lt;/p&gt;&lt;p&gt;One of my favourite cartoons, The Secret Show, is a comedy spy thriller.  The agency head takes security &lt;i&gt;very&lt;/i&gt; seriously, and so his name is changed daily.  He&amp;#8217;s constantly undermined by being assigned ridiculous names - Mimzy Woowoo, Pimlico Buttonfluff, Princess Fairycakes, and so on.  In one episode his new name is Rock Justice, and his chest swells with pride.  Sadly though, it was just a dream.&lt;/p&gt;&lt;/div&gt;&lt;/li&gt;&lt;li class="feedbackitem" id="feedback-1000"&gt;&lt;div class="author"&gt;&lt;cite&gt;matt burns&lt;/cite&gt; 2009-01-28&lt;/div&gt;&lt;div class="content"&gt;&lt;p&gt;I&amp;#8217;m sure I&amp;#8217;m not alone in pronouncing things incorrectly due to many of the things I learn being done so by reading.&lt;/p&gt;&lt;p&gt;C# was one example because for quite a while I pronounced it &amp;#8220;see hash&amp;#8221; in my head until I descovered it should be &amp;#8220;see sharp&amp;#8221;. I still occasionally slip out with kay-sh instead of cah-sh for cache.&lt;/p&gt;&lt;p&gt;I didn&amp;#8217;t know that # and &amp;#x266f; were different symbols but now I do I feel less stupid.&lt;/p&gt;&lt;p&gt;(Wikipedia does mention that the language is actually C&amp;#x266f; but the # character is merely used to represent the &amp;#x266f; for simplicity.)&lt;/p&gt;&lt;/div&gt;&lt;/li&gt;&lt;li class="feedbackitem"&gt; 
+&lt;div class="author"&gt;&lt;cite&gt;Thomas Guest&lt;/cite&gt; 2009-02-02&lt;/div&gt;&lt;div class="content"&gt;&lt;p&gt;You&amp;#8217;re definitely not alone, Matt. One thing which bugs me is when a name is spelled in a way which makes guessing its pronunciation hard.&lt;/p&gt;&lt;p&gt;The Cuil search engine, for example, which we&amp;#8217;re meant to pronounce &amp;#8220;cool&amp;#8221;.&lt;/p&gt;&lt;p&gt;Much as I like lighttpd, how are you supposed to say it? Lighty, apparently.&lt;/p&gt;&lt;p&gt;And it&amp;#8217;s &amp;#8220;Val-grinned&amp;#8221;, not &amp;#8220;Val-grind&amp;#8221;. Don&amp;#8217;t feed bad, &lt;a href="http://valgrind.org/docs/manual/faq.html#faq.pronounce"&gt;everyone gets it wrong at first&lt;/a&gt;.&lt;/p&gt;&lt;/div&gt;&lt;/li&gt;&lt;/ol&gt;&lt;/div&gt;</description>
+<dc:date>2009-01-21</dc:date>
+<guid>http://wordaligned.org/articles/complangname.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/complangname.html</link>
+<category>C</category>
+</item>
+
+<item>
+<title>Looping forever and ever</title>
+<description>&lt;p&gt;&lt;a href="http://www.flickr.com/photos/thomasguest/2807550621/" title="A Curious Beast by Alex Guest"&gt;&lt;img style="float:right;" src="http://farm4.static.flickr.com/3282/2807550621_db7c0d4481.jpg" width="224" height="354" alt="alex-bug"/&gt;&lt;/a&gt;
+&lt;/p&gt;
+&lt;p&gt;On the subject of &lt;a href="http://wordaligned.org/articles/syntactic-sugar.html"&gt;syntactic sugar&lt;/a&gt;, C&amp;#8217;s &lt;code&gt;for&lt;/code&gt; loop is a curious beast. Many years ago, on encountering code like:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;for (i = 0; i &amp;lt; 10; i++)
+{
+    ....
+}
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;I would have to pause and mentally expand it:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;i = 0;
+while (i &amp;lt; 10)
+{
+    ....
+    i++;
+}
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Now, after repeated use, these loops seem familiar and expressive. While the standard C++ algorithms offer a higher level abstraction with their iterator range operations, plain old loops often turn out to be &lt;a href="http://www.theregister.co.uk/2006/08/08/cplusplus_loops/"&gt;easier to work with&lt;/a&gt;.
+&lt;/p&gt;
+&lt;p&gt;You can plug general expressions into the loop control construct.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;for (&amp;lt;setup&amp;gt;; &amp;lt;proceed?&amp;gt;; &amp;lt;advance&amp;gt;)
+{
+    ....
+}
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Any or all of the control expressions can be omitted: drop the &lt;code&gt;&amp;lt;setup&amp;gt;&lt;/code&gt; if nothing needs setting up; leave out the &lt;code&gt;&amp;lt;advance&amp;gt;&lt;/code&gt; if nothing needs advancing; and kill the &lt;code&gt;&amp;lt;proceed?&amp;gt;&lt;/code&gt; to keep the loop going. Thus one standard form of never-ending loop is:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;for (;;)
+{
+    ....
+}
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Equivalents would be &lt;code&gt;while (1)&lt;/code&gt; or &lt;code&gt;while (true)&lt;/code&gt;, but who wants to see a bald literal in a source file? Besides, &lt;code&gt;for (;;)&lt;/code&gt; is shorter than &lt;code&gt;while (1)&lt;/code&gt;, and an empty &lt;code&gt;while ()&lt;/code&gt; is of course a syntax error. Even better: use a suitable font, squint, and the parenthesised semicolons resemble a mite of some sort.
+&lt;/p&gt;
+&lt;p&gt;&lt;img style="vertical-align:top;" src="http://wordaligned.org/images/scary-mite.gif" alt="Scary mite"/&gt;
+   &lt;a href="http://www.allergy-details.com/82-how-control-dust-mites"&gt;
+   &lt;img style="vertical-align:top;" src="http://wordaligned.org/images/mite.jpg" alt="dust mite"/&gt;&lt;/a&gt;
+&lt;/p&gt;</description>
+<dc:date>2008-09-08</dc:date>
+<guid>http://wordaligned.org/articles/looping-forever-and-ever.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/looping-forever-and-ever.html</link>
+<category>C</category>
+</item>
+
+<item>
+<title>Macros with halos</title>
+<description>&lt;p&gt;&lt;a href="http://www.flickr.com/photos/thomasguest/2814425692/" title="A slippery beast"&gt;&lt;img src="http://farm4.static.flickr.com/3200/2814425692_79d1d1bba3_m.jpg" width="240" height="180" alt="Slippery beast" /&gt;&lt;/a&gt;
+&lt;/p&gt;
+&lt;p&gt;The C preprocessor is a notoriously primitive and slippery creature. Included and occasionally &lt;a href="http://svn.boost.org/trac/boost/browser/trunk/boost/preprocessor/selection/min.hpp"&gt;embraced&lt;/a&gt; by C++, it may eventually prove to be the downfall of the newer language. How much trouble has been caused by seemingly innocuous definitions?
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;#define min(a, b) (((a) &amp;lt; (b)) ? (a) : (b))
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;This macro &lt;a href="http://www.gotw.ca/gotw/077.htm"&gt;hobbles any attempt&lt;/a&gt; to use the standard C++ algorithm, &lt;code&gt;std::min()&lt;/code&gt;, and since it&amp;#8217;s a preprocessor thing the compiler warnings may not alert you immediately to what&amp;#8217;s going on. You don&amp;#8217;t have to include &lt;code&gt;&amp;lt;algorithm&amp;gt;&lt;/code&gt; directly to trigger the problem.
+&lt;/p&gt;
+&lt;p&gt;Try compiling this stripped down source file using GCC 3.4.6:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;macro.cpp&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;#include &amp;lt;string&amp;gt;
+#define min(a, b)  (((a) &amp;lt; (b)) ? (a) : (b)) 
+#include &amp;lt;sstream&amp;gt;
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;and you&amp;#8217;ll see something like:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;In file included from /usr/lib/gcc/i386-redhat-linux/3.4.6/../../../../include/c++/3.4.6/streambuf:781,
+                 from /usr/lib/gcc/i386-redhat-linux/3.4.6/../../../../include/c++/3.4.6/ios:50,
+                 from /usr/lib/gcc/i386-redhat-linux/3.4.6/../../../../include/c++/3.4.6/istream:45,
+                 from /usr/lib/gcc/i386-redhat-linux/3.4.6/../../../../include/c++/3.4.6/sstream:45,
+                 from macros.cpp:3:
+/usr/lib/gcc/i386-redhat-linux/3.4.6/../../../../include/c++/3.4.6/bits/streambuf.tcc: In member function `virtual std::streamsize std::basic_streambuf&amp;lt;_CharT, _Traits&amp;gt;::xsgetn(_CharT*, std::streamsize)':
+/usr/lib/gcc/i386-redhat-linux/3.4.6/../../../../include/c++/3.4.6/bits/streambuf.tcc:54: error: expected unqualified-id before '(' token
+/usr/lib/gcc/i386-redhat-linux/3.4.6/../../../../include/c++/3.4.6/bits/streambuf.tcc: In member function `virtual std::streamsize std::basic_streambuf&amp;lt;_CharT, _Traits&amp;gt;::xsputn(const _CharT*, std::streamsize)':
+/usr/lib/gcc/i386-redhat-linux/3.4.6/../../../../include/c++/3.4.6/bits/streambuf.tcc:88: error: expected unqualified-id before '(' token
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;I spent a while tracking down a similar problem today (needless to say, the offending macro was hiding several #includes away from the file which triggered the error&lt;a id="fn1link" href="http://wordaligned.org/articles/macros-with-halos.html#fn1"&gt;&lt;sup&gt;[1]&lt;/sup&gt;&lt;/a&gt;). Once I&amp;#8217;d exposed the source, I naturally wanted to grumble to someone, so I pasted the code into an instant message to a colleague. Look, my &lt;a href="http://www.adiumx.com"&gt;messaging client&lt;/a&gt; sanctified the macro by adding halos to the &lt;code&gt;a&lt;/code&gt;&amp;#8217;s!
+&lt;/p&gt;
+&lt;img src="http://wordaligned.org/images/saint-a.png" alt="Macros with Halos"/&gt;
+
+&lt;p&gt;&lt;hr /&gt;
+   &lt;a id="fn1" href="http://wordaligned.org/articles/macros-with-halos.html#fn1link"&gt;[1]&lt;/a&gt; One tip for tracking down such problems is to run the preprocessing phase of compilation on its own: with GCC, for example, supply the &lt;code&gt;-E&lt;/code&gt; flag.
+&lt;/p&gt;</description>
+<dc:date>2008-09-02</dc:date>
+<guid>http://wordaligned.org/articles/macros-with-halos.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/macros-with-halos.html</link>
+<category>C</category>
+</item>
+
+<item>
+<title>Fixing header file dependencies</title>
+<description>&lt;h3&gt;DEPENDS&lt;/h3&gt;
+&lt;img src="http://wordaligned.org/images/dependencies.png" alt="Dependencies"/&gt;
+
+&lt;p&gt;Without care C++ header files can &lt;a href="http://yosefk.com/c++fqa/defective.html#defect-3" title="Have you read the C++ FQA yet?"&gt;deteriorate&lt;/a&gt;, so I was interested to find some sensible advice in the &lt;a href="http://google-styleguide.googlecode.com/svn/trunk/cppguide.xml#names_and_Order_of_Includes" title="Google style guide advice on dependencies"&gt;Google C++ Style Guide&lt;/a&gt;.
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;h4&gt;Names and Orders of Includes&lt;/h4&gt;&lt;p&gt;Use standard order for readability and to avoid hidden dependencies: C library, C++ library, other libraries&amp;#8217; &lt;code&gt;.h&lt;/code&gt;, your project&amp;#8217;s &lt;code&gt;.h&lt;/code&gt;.&lt;/p&gt;&lt;p&gt;&amp;#8230;&lt;/p&gt;&lt;p&gt;The preferred ordering reduces hidden dependencies. We want every header file to be compilable on its own. The easiest way to achieve this is to make sure that every one of them is the first &lt;code&gt;.h&lt;/code&gt; file #included in some &lt;code&gt;.cc&lt;/code&gt;.&lt;/p&gt;&lt;/blockquote&gt;
+
+&lt;p&gt;I agree, hidden dependencies are bad, and I&amp;#8217;m not about to quibble with the &amp;#8220;standard order&amp;#8221; defined by the &lt;a href="http://google-styleguide.googlecode.com/svn/trunk/cppguide.xml"&gt;guide&lt;/a&gt;, even if I&amp;#8217;m used to a slightly different ordering. Certainly headers should be compilable on their own; but I suggest the easiest way to achieve this is, well, &lt;strong&gt;to compile them on their own&lt;/strong&gt;. 
+&lt;/p&gt;
+&lt;span id="continue-reading"/&gt;
+
+
+&lt;h3&gt;README&lt;/h3&gt;
+&lt;p&gt;You don&amp;#8217;t need a project file or even a makefile if you want to compile something. It&amp;#8217;s easy to create a script which confirms a header has no hidden dependencies by including and compiling it&lt;a id="fn1link" href="http://wordaligned.org/articles/fixing-header-file-dependencies.html#fn1"&gt;&lt;sup&gt;[1]&lt;/sup&gt;&lt;/a&gt;. Create a file called &lt;code&gt;check-header&lt;/code&gt; and paste in the following:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;check-header&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;#!/bin/bash
+cat &amp;lt;&amp;lt;EOF &amp;gt;tmp.cc &amp;amp;&amp;amp; g++ $CPPFLAGS tmp.cc
+#include "$1"
+int main() { return 0; }
+EOF
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Make sure &lt;code&gt;check-header&lt;/code&gt; is executable. Put it somewhere on your &lt;code&gt;PATH&lt;/code&gt;. Export suitable &lt;code&gt;CPPFLAGS&lt;/code&gt; for your codebase (here, I&amp;#8217;m choosing to treat warnings as errors).
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;$ chmod a+x check-header
+$ mv check-header ~/bin
+$ export CPPFLAGS="-Wall -Werror"
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Given a header file, &lt;code&gt;check-header&lt;/code&gt; redirects a &lt;a href="http://www.gnu.org/software/bash/manual/bashref.html#Redirections"&gt;here document&lt;/a&gt; into a temporary source file. The source file contains a minimal C++ program which does nothing more than include the header. &lt;code&gt;Check-header&lt;/code&gt; compiles that program. Compilation diagnostics, if any, appear on standard error. The exit status will be 0 if the header compiles cleanly, non-zero otherwise.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;$ check-header standalone.h
+$ echo $?
+0
+$ cat &amp;gt; depends_on_x.h
+void f(X x);
+$ check-header depends_on_x.h
+depends_on_x.h:1: error: variable or field 'f' declared void
+depends_on_x.h:1: error: 'X' was not declared in this scope
+$ echo $?
+1
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+
+&lt;h3&gt;INSTALL&lt;/h3&gt;
+&lt;p&gt;It gets tiresome to run this command on one header at a time. Happily we can use it in a compound command to check all the headers in the current directory&lt;a id="fn2link" href="http://wordaligned.org/articles/fixing-header-file-dependencies.html#fn2"&gt;&lt;sup&gt;[2]&lt;/sup&gt;&lt;/a&gt;:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;$ for header in *.h; do check-header $header; done
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Or on all headers beneath the current directory: 
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;$ find . -name "*.h" | xargs -L 1 check-header
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;(The &lt;code&gt;-L 1&lt;/code&gt; is required because &lt;code&gt;check-header&lt;/code&gt; can only handle one file at a time.)
+&lt;/p&gt;
+&lt;p&gt;Make this part of your overnight build, and you&amp;#8217;ve got an easy way to monitor dependencies in header files.
+&lt;/p&gt;
+
+&lt;h3&gt;BUGS&lt;/h3&gt;
+&lt;p&gt;The script shown here is about the simplest thing which could possibly work. Just a single compiler is used, the temporary file name is hard-wired, no clean-up is done, there&amp;#8217;s a dependency on the shell environment, diagnostics are limited, there isn&amp;#8217;t even any command-line help. A grubby header can sneak past this script by using preprocessor defines for conditional compilation, and different (versions of) compilers will disagree on what&amp;#8217;s clean. 
+&lt;/p&gt;
+&lt;p&gt;The truth is that I usually recreate this script and variants of it as and when required. My real intention is to demonstrate the rather obvious idea that we should &lt;span /&gt;use the compiler to detect compilation problems.
+&lt;/p&gt;
+
+&lt;h3&gt;TODO&lt;/h3&gt;
+&lt;p&gt;Once your headers include all they depend on, maybe you&amp;#8217;d like to tackle the flip side of the problem, of determining which includes they don&amp;#8217;t or shouldn&amp;#8217;t depend on. 
+&lt;/p&gt;
+&lt;p&gt;Can another &lt;a href="http://google-styleguide.googlecode.com/svn/trunk/cppguide.xml#Header_File_Dependencies" title="Google Style Guide rule on dependency reduction"&gt;tip&lt;/a&gt; from the Google Style Guide be automated?
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;Use forward declarations to minimize use of &lt;code&gt;#include&lt;/code&gt; in &lt;code&gt;.h&lt;/code&gt; files.
+&lt;/p&gt;
+&lt;p&gt;&amp;#8230;
+&lt;/p&gt;
+&lt;p&gt; You can significantly minimize the number of header files you need to include in your own header files by using forward declarations. For example, if your header file uses the &lt;code&gt;File&lt;/code&gt; class in ways that do not require access to the declaration of the &lt;code&gt;File&lt;/code&gt; class, your header file can just forward declare &lt;code&gt;class File;&lt;/code&gt; instead of having to &lt;code&gt;#include "file/base/file.h"&lt;/code&gt;.
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;div class="amazon"&gt;&lt;a href="http://www.amazon.com/gp/product/0321113586?ie=UTF8&amp;amp;tag=wordalig-20"&gt;&lt;img  src="http://wordaligned.org/images/books/cpp-coding-standards.jpg" alt="Book cover"/&gt;&lt;/a&gt;&lt;/div&gt;
+
+&lt;p&gt;I don&amp;#8217;t think many of us would dispute this advice, though &lt;a href="http://wordaligned.org/articles/retro-fitting-coding-standards.html#tocask-the-experts"&gt;I&amp;#8217;m not sure it belongs in a style guide&lt;/a&gt; &amp;#8212; it&amp;#8217;s just good C++ practice, the stuff you should be getting &lt;a href="http://www.amazon.com/gp/product/0321113586?ie=UTF8&amp;amp;tag=wordalig-20" title="Amazon affiliates link to C++ Coding Standards by Sutter and Alexandrescu"&gt;from a book&lt;/a&gt;. What I&amp;#8217;d like is a refactoring tool which does it for me, something like Eclipse&amp;#8217;s &lt;a href="http://help.eclipse.org/ganymede/index.jsp?topic=/org.eclipse.jdt.doc.user/gettingStarted/qs-OrganizeImports.htm"&gt;&amp;#8220;organize imports&amp;#8221;&lt;/a&gt;. A script might be able to do some of this, but it will have to be considerably more complex than &lt;code&gt;check-header&lt;/code&gt;, and without access to the compiler internals it will be limited in power.
+&lt;/p&gt;
+&lt;hr /&gt;
+
+&lt;p&gt;&lt;a id="fn1" href="http://wordaligned.org/articles/fixing-header-file-dependencies.html#fn1link"&gt;[1]&lt;/a&gt; While writing this article I discovered &lt;a href="http://gcc.gnu.org/"&gt;GCC&lt;/a&gt; allows you to precompile header files, reducing the need to create even a minimal script like &lt;code&gt;check-header&lt;/code&gt;. Running &lt;code&gt;gcc $CPPFLAGS header.h&lt;/code&gt; generates &lt;code&gt;header.gch&lt;/code&gt; for a valid and self-contained header file, and compiler diagnostics otherwise. As the &lt;a href="http://gcc.gnu.org/onlinedocs/gcc/Precompiled-Headers.html"&gt;documentation&lt;/a&gt; says:
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;There are many other possibilities, limited only by your imagination, good sense, and the constraints of your build system.
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;&lt;a id="fn2" href="http://wordaligned.org/articles/fixing-header-file-dependencies.html#fn2link"&gt;[2]&lt;/a&gt; It would be better to tweak &lt;code&gt;check-header&lt;/code&gt; to work on a list of input files.
+&lt;/p&gt;</description>
+<dc:date>2008-07-02</dc:date>
+<guid>http://wordaligned.org/articles/fixing-header-file-dependencies.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/fixing-header-file-dependencies.html</link>
+<category>C</category>
+</item>
+
+<item>
+<title>Fixing Compiler Warnings the Hard Way</title>
+<description>&lt;h3&gt;GCC makes a suggestion&lt;/h3&gt;
+&lt;p&gt;The build server &lt;a href="http://wordaligned.org/articles/antisocial-build-orders.html"&gt;CC&amp;#8217;d me on an ASBO email&lt;/a&gt;. Good old GCC, grumbling about operator precedence again. But Hey! &amp;#8212; at least it had a positive suggestion to make.
+&lt;/p&gt;
+&lt;pre style="border: 2px solid red; background: white; font-size: 150%;"&gt;
+&lt;b&gt;From:&lt;/b&gt; buildmaster@example.com
+&lt;b&gt;To:&lt;/b&gt; lem.e.tweakit@example.com
+&lt;b&gt;Cc:&lt;/b&gt; developers@example.com
+&lt;b&gt;Subject:&lt;/b&gt; Broken build
+------------------------------------
+&lt;span style="font-weight: 900; font-variant: small-caps; font-size: 36px;"&gt;Anti Social Build Order&lt;/span&gt;
+&lt;b&gt;Version:&lt;/b&gt; svn://svnserver/trunk@999
+&lt;b&gt;Platform:&lt;/b&gt; Linux, GCC 4.0.1
+&lt;b&gt;Build Log:&lt;/b&gt; 
+....
+Warning: suggest parentheses around arithmetic
+in operand of ^
+&lt;/pre&gt;
+
+&lt;p&gt;I looked at the code. Here&amp;#8217;s a much simplified version which generates the same warning.
+&lt;/p&gt;
+&lt;span id="continue-reading"/&gt;
+
+&lt;pre&gt;
+void
+unpack(unsigned char const * bits, int n_bits,
+       unsigned char * buf)
+{
+    unsigned char bit, byte, pos;
+    int b;
+    
+    for (b = 0; b != n_bits; ++b)
+    {
+        byte = bits[b / 8];
+        pos = 7 - (b % 8);
+        &lt;strong&gt;bit = byte &amp;amp; 2^pos;&lt;/strong&gt;
+        buf[b] = bit == 0 ? 0 : 255;
+    }
+}
+&lt;/pre&gt;
+
+&lt;p&gt;When compiling this function GCC warns about the line in bold type:
+&lt;/p&gt;
+&lt;pre&gt;
+$ gcc -Wall -c unpack_bits.c 
+unpack_bits.c: In function `unpack':
+unpack_bits.c:12: warning: suggest parentheses around 
+             arithmetic in operand of ^
+&lt;/pre&gt;
+
+
+&lt;h3&gt;Setting a precedent&lt;/h3&gt;
+&lt;p&gt;Needless to say, the actual offending code was buried in a longer function, indented more deeply, and with a few more &lt;a href="http://c2.com/cgi/wiki?ThreeStarProgrammer"&gt;indirections&lt;/a&gt; &amp;#8212; so it was indeed tempting to take GCC&amp;#8217;s advice and whack in a couple of brackets. Clearly the author &lt;strong&gt;meant&lt;/strong&gt; to write:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;bit = byte &amp;amp; (2^pos);
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Why else omit spaces around the &lt;code&gt;^&lt;/code&gt;?
+&lt;/p&gt;
+&lt;p&gt;Fortunately I live by my own rule, to &lt;a href="http://wordaligned.org/articles/brackets-off.html"&gt;avoid unnecessary parentheses&lt;/a&gt;, so I wasn&amp;#8217;t about to add any here without asking why. Worse than my stubborn principles, &lt;code&gt;^&lt;/code&gt;, the exclusive or operator, has &lt;strong&gt;lower&lt;/strong&gt; precedence than bitwise and, &lt;code&gt;&amp;amp;&lt;/code&gt;, so to keep GCC happy and retain the original behaviour we&amp;#8217;d have to write:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;bit = (byte &amp;amp; 2) ^ pos;
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;This last expression looks very bizarre. Had it ever been exercised?
+&lt;/p&gt;
+&lt;p&gt;GCC was right, the code was wrong, but its diagnostic showed the wrong way to right things. On this occasion GCC should have been proscriptive, not prescriptive, and left the fix in the hands of the programmer&lt;a id="fn1link" href="http://wordaligned.org/articles/fixing-compiler-warnings-the-hard-way.html#footnote1"&gt;&lt;sup&gt;[1]&lt;/sup&gt;&lt;/a&gt;.
+&lt;/p&gt;
+
+&lt;h3&gt;Don&amp;#8217;t mix bits and arithmetic&lt;/h3&gt;
+&lt;pre style="color:#00cc00;background:#000;float:right;margin-left:4px;"&gt;0000 0000 5589 e58b 5508 89d0 d1e8 2555
+5555 5529 c289 d0c1 e802 2533 3333 3381
+e233 3333 3301 d089 c2c1 ea04 01d0 250f
+0f0f 0f89 c2c1 ea08 01d0 25ff 00ff 0089
+c2c1 ea10 01d0 25ff ff00 005d c300 0000
+5555 5555 3333 3333 0f0f 0f0f ff00 ff00&lt;/pre&gt;
+
+&lt;p&gt;My personal rule of thumb is to avoid mixing bitwise and arithmetic operations. Although integral types support both kinds of operation, it generally feels like a type-mismatch to combine them in a single expression. An array of bits isn&amp;#8217;t the same as a number, and vice-versa.
+&lt;/p&gt;
+&lt;p&gt;Of course there are some treasured &lt;a href="http://graphics.stanford.edu/~seander/bithacks.html"&gt;bit-twiddling tricks&lt;/a&gt; which exploit the mapping between binary arithmetic and machine level register operations. So we can, for example, calculate &lt;code&gt;2&lt;/code&gt; raised to the power of &lt;code&gt;19&lt;/code&gt; with a simple left-shift, &lt;code&gt;1 &amp;lt;&amp;lt; 19&lt;/code&gt;, or test if &lt;code&gt;v&lt;/code&gt; is a power of &lt;code&gt;2&lt;/code&gt; with &lt;code&gt;!(v &amp;amp; (v - 1)) &amp;amp;&amp;amp; v&lt;/code&gt;. I&amp;#8217;m not suggesting we blacklist these ingenious hacks &amp;#8212; in fact, anyone off to an interview for a programming job with an embedded systems company might do well to study them &amp;#8212; but I would say their use requires thorough documentation.
+&lt;/p&gt;
+&lt;p&gt;On occasion, then, bitwise operations may legitimately be used for fast arithmetic; but using arithmetic to pack bits is rarely necessary. This line of code is probably wrong&lt;a id="fn2link" href="http://wordaligned.org/articles/fixing-compiler-warnings-the-hard-way.html#footnote2"&gt;&lt;sup&gt;[2]&lt;/sup&gt;&lt;/a&gt;:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;r = h &amp;lt;&amp;lt; 4 + 1;
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;The programmer probably intended the (bitwise) shift to happen before the (arithmetic) addition, like this.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;r = (h &amp;lt;&amp;lt; 4) + 1;
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;If we stick to bitwise operations, things become clear. I&amp;#8217;ve written the 1 in hexadecimal as a hint it&amp;#8217;s being used as a bit pattern &amp;#8212; sadly there&amp;#8217;s no way of writing a binary literal directly in C.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;r = h &amp;lt;&amp;lt; 4 | 0x1;
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Anyway, the problem line in &lt;code&gt;unpack()&lt;/code&gt; adheres to my rule of thumb: &lt;code&gt;&amp;amp;&lt;/code&gt; and &lt;code&gt;^&lt;/code&gt; are indeed both bitwise operations. But after some puzzling I realised the author of the code intended &lt;code&gt;2^pos&lt;/code&gt; to mean &lt;code&gt;2&lt;/code&gt; to the power of &lt;code&gt;pos&lt;/code&gt;, &lt;strong&gt;not for its arithmetic value, but for its bit pattern&lt;/strong&gt; &amp;#8212; which, as every programmer knows, is a &lt;code&gt;1&lt;/code&gt; followed by pos &lt;code&gt;0&lt;/code&gt;s. That is, a &lt;code&gt;1&lt;/code&gt; left shifted &lt;code&gt;pos&lt;/code&gt; times.
+&lt;/p&gt;
+&lt;p&gt;Here&amp;#8217;s what I thought the fix should be. Note, incidentally, that I&amp;#8217;ve used &lt;code&gt;~0&lt;/code&gt; rather than &lt;code&gt;255&lt;/code&gt;, because it clearly says &amp;#8220;set every bit&amp;#8221;. I&amp;#8217;m also using unsigned integers throughout &amp;#8212; always a good idea when working with bits. Some programmers might prefer to parenthesise the expression &lt;code&gt;byte &amp;amp; 1 &amp;lt;&amp;lt; pos&lt;/code&gt;, &lt;a href="http://wordaligned.org/articles/brackets-off.html"&gt;but I prefer the form shown&lt;/a&gt;: it&amp;#8217;s easy enough to remember that &lt;code&gt;&amp;amp;&lt;/code&gt; groups with the logical operators and &lt;code&gt;&amp;lt;&amp;lt;&lt;/code&gt; with the (higher precedence) arithmetic ones.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;void
+unpack(unsigned char const * bits, unsigned n_bits,
+       unsigned char * buf)
+{
+    unsigned char bit, byte;
+    unsigned b, pos;
+    
+    for (b = 0; b != n_bits; ++b)
+    {
+        byte = bits[b / 8];
+        pos = 7 - b % 8;
+        bit = byte &amp;amp; 1 &amp;lt;&amp;lt; pos;
+        buf[b] = bit == 0 ? 0 : ~0;
+    }
+}
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Despite the absence of documentation, this is now at least a coherent function. It&amp;#8217;s a &amp;#8220;biterator&amp;#8221; which steps through a collection of bits (packed into bytes, the smallest memory units C offers). Each time it encounters a set/clear bit, it sets/clears all the bits in the next byte in the output buffer. That is, it expands each bit value to fill a whole byte.
+&lt;/p&gt;
+&lt;p&gt;This is exactly the kind of function which is surprisingly fiddly to write but simple to unit test. As already mentioned, though, the function didn&amp;#8217;t actually exist in the form shown, and the tests were all at the module level. The responsible way for me to proceed was to create a module test which exposed the defect, then make my candidate fix, confirm it did indeed fix the defect, then check the change in.
+&lt;/p&gt;
+
+&lt;h3&gt;Unit Test&lt;/h3&gt;
+&lt;p&gt;Here&amp;#8217;s how simple a unit test for &lt;code&gt;unpack()&lt;/code&gt; could be. It may be longer than the function it&amp;#8217;s testing, but it&amp;#8217;s less complex. And with just a couple of test cases, it manages to cover several interesting corners of the functionality. Better still, it passes&lt;a id="fn3link" href="http://wordaligned.org/articles/fixing-compiler-warnings-the-hard-way.html#footnote3"&gt;&lt;sup&gt;[3]&lt;/sup&gt;&lt;/a&gt;!
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;void
+test_unpack()
+{
+    // Start with a varied bit-pattern.
+    // Ensure each byte differs from its reversed self.
+    unsigned char const bits[2] = 
+    {
+        1 &amp;lt;&amp;lt; 7 | 1 &amp;lt;&amp;lt; 5 | 1 &amp;lt;&amp;lt; 4 | 1 &amp;lt;&amp;lt; 0, // 10110001 binary
+        1 &amp;lt;&amp;lt; 6 | 1 &amp;lt;&amp;lt; 5 | 1 &amp;lt;&amp;lt; 3 | 1 &amp;lt;&amp;lt; 0, // 01101001 binary
+    };
+    // The expected output expands bits to bytes (0 =&amp;gt; 0, 1 =&amp;gt; ~0)
+    unsigned char expected[2 * 8] = 
+    {
+        ~0, 0, ~0, ~0, 0, 0, 0, ~0,
+        0, ~0, ~0, 0, ~0, 0, 0, ~0
+    };
+    unsigned char buf[3 * 8] = { 0 };
+    unsigned char buf_copy[3 * 8] = { 0 };
+    
+    size_t const buf_size = sizeof(buf);
+    
+    // Fill the buffer with a pattern of 1s and 0s.
+    // Unpack nothing and check nothing changes.
+    memset(buf, 0xa5, buf_size);
+    memcpy(buf_copy, buf, buf_size);
+    unpack(bits, 0, buf);
+    assert(memcmp(buf, buf_copy, buf_size) == 0);
+    
+    // Unpack some of the bits and check the results.
+    // Also check the remainder of the buffer is undamaged.
+    unpack(bits, 13, buf);
+    assert(memcmp(buf, expected, 13) == 0);
+    assert(memcmp(buf + 13, buf_copy + 13, buf_size - 13) == 0);
+}
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;This is white-box testing: the test knows enough about the implementation of &lt;code&gt;unpack()&lt;/code&gt; to expose potential problems. In this case, there&amp;#8217;s something unusual about the way the &lt;code&gt;pos&lt;/code&gt; counter goes down as the bit counter &lt;code&gt;b&lt;/code&gt; goes up, so we make sure that the bits we&amp;#8217;re unpacking form asymmetric patterns.
+&lt;/p&gt;
+
+&lt;h3&gt;Refactoring&lt;/h3&gt;
+&lt;p&gt;Should we extract this tested &lt;code&gt;unpack()&lt;/code&gt; function from its surrounding, larger, more complex function? Is it safe to do so? Have we time to spend making changes with no externally visible results? Should we tweak &lt;code&gt;unpack()&lt;/code&gt; for efficiency (after all, it doesn&amp;#8217;t need to use the division and modulus operators each time round the loop)?
+&lt;/p&gt;
+&lt;div class="amazon"&gt;&lt;a href="http://www.amazon.com/gp/product/0131177052?ie=UTF8&amp;amp;tag=wordalig-20&amp;amp;linkCode=as2&amp;amp;camp=1789&amp;amp;creative=9325&amp;amp;creativeASIN=0131177052"&gt;&lt;img src="http://wordaligned.org/images/working-effectively-with-legacy-code.jpg" alt="Working Effectively with Legacy Code cover"/&gt;&lt;/a&gt;&lt;/div&gt;
+
+&lt;p&gt;These are important questions. eXtreme Programmers &lt;a href="http://www.extremeprogramming.org/rules/refactor.html"&gt;refactor mercilessly&lt;/a&gt;, confident their extensive test frameworks will provide a safety net. Java programmers select the code block in their IDE then click the &amp;#8220;extract method&amp;#8221; button. C and C++ programmers have less advanced tools, but Michael Feathers&amp;#8217; &lt;a href="http://www.amazon.com/gp/product/0131177052?ie=UTF8&amp;amp;amp;tag=wordalig-20&amp;amp;amp;linkCode=as2&amp;amp;amp;camp=1789&amp;amp;amp;creative=9325&amp;amp;amp;creativeASIN=0131177052"&gt;&amp;#8220;Working Effectively with Legacy Code&amp;#8221;&lt;/a&gt; offers practical advice on how to transform code safely &amp;#8212; that is, how to put it under test.
+&lt;/p&gt;
+&lt;p&gt;In the real world, we judge each case on merit. A &lt;a href="http://wordaligned.org/articles/antisocial-build-orders.html"&gt;nag email&lt;/a&gt; from the build server shouldn&amp;#8217;t trigger mass refactoring, even if the test infrastructure is in place. I think Feathers is right though, that poorly tested code is on its way to becoming legacy code: hard to adapt, unpleasant to work with, and a drag on continuing development.
+&lt;/p&gt;
+
+&lt;h3&gt;Lessons&lt;/h3&gt;
+&lt;p&gt;This new story repeats the same old lessons, and I think they bear repeating:
+&lt;/p&gt;
+&lt;ul&gt;
+ &lt;li&gt;
+     Set up a build server. Listen to it.
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     Compile on multiple platforms.
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     Think! Compilers are concerned with syntax, not semantics. A C compiler reads your code in order to rewrite it for the machine&amp;#8217;s benefit; understanding the code is your job.
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     Write small functions. Unit test them. 
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     Integers and bit arrays are different.
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     Take care when using bitwise operations as arithmetic shortcuts.
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     Avoid using arithmetic for bit packing.
+ &lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Oh, and in C, don&amp;#8217;t mistake &lt;code&gt;^&lt;/code&gt; for exponentiation!
+&lt;/p&gt;
+&lt;hr /&gt;
+
+&lt;p&gt;&lt;a href="http://accu.org" title="ACCU: professionalism in programming"&gt;&lt;img src="http://accu.org/content/images/buttonl_88x31.gif" style="float:right" width="88" height="31" alt="ACCU: professionalism in programming"/&gt;&lt;/a&gt;
+&lt;/p&gt;
+&lt;p&gt;This article was originally published in &lt;a href="http://accu.org/index.php/aboutus/aboutjournals"&gt;CVu&lt;/a&gt;, a print journal for ACCU members, and I would like to thank all at CVu for their help with it.
+&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://wordaligned.org/articles/fixing-compiler-warnings-the-hard-way.html#fn1link" id="footnote1"&gt;[1]&lt;/a&gt; I&amp;#8217;m not complaining about GCC which did an outstanding job of flagging a genuine problem in perfectly well-defined and valid code. The other compiler frequently used on this project, MSVC V8.0, compiles this cleanly, at the same time warning standard C string functions are unsafe and &lt;strong&gt;deprecated&lt;/strong&gt;!
+&lt;/p&gt;
+&lt;div class="amazon"&gt;&lt;a href="http://www.amazon.com/gp/product/0201179288?ie=UTF8&amp;amp;tag=wordalig-20&amp;amp;linkCode=as2&amp;amp;camp=1789&amp;amp;creative=9325&amp;amp;creativeASIN=0201179288"&gt;&lt;img  src="http://wordaligned.org/images/books/c-traps-and-pitfalls.jpg" alt="Book cover"/&gt;&lt;/a&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;a href="http://wordaligned.org/articles/fixing-compiler-warnings-the-hard-way.html#fn2link" id="footnote2"&gt;[2]&lt;/a&gt; I&amp;#8217;ve taken this example directly from Andrew Koenig&amp;#8217;s &lt;a href="http://www.amazon.com/gp/product/0201179288?ie=UTF8&amp;amp;amp;tag=wordalig-20&amp;amp;amp;linkCode=as2&amp;amp;amp;camp=1789&amp;amp;amp;creative=9325&amp;amp;amp;creativeASIN=0201179288"&gt;&amp;#8220;C Traps and Pitfalls&amp;#8221;&lt;/a&gt;. This is a nice little book which expands on the ideas presented in a &lt;a href="http://www.literateprogramming.com/ctraps.pdf"&gt;paper of the same name [PDF]&lt;/a&gt;.
+&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://wordaligned.org/articles/fixing-compiler-warnings-the-hard-way.html#fn3link" id="footnote3"&gt;[3]&lt;/a&gt; One thing I recommend, though, is to temporarily reverse the logic in the assertions and check they then fail. Unit test frameworks often provide hooks to do this reversed-result test, which confirms the test cases are actually being run.
+&lt;/p&gt;</description>
+<dc:date>2008-05-20</dc:date>
+<guid>http://wordaligned.org/articles/fixing-compiler-warnings-the-hard-way.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/fixing-compiler-warnings-the-hard-way.html</link>
+<category>C</category>
+</item>
+
+<item>
+<title>Stop the clock, squash the bug</title>
+<description>&lt;div class="toc"&gt;
+&lt;h2&gt;Contents&lt;/h2&gt;
+&lt;ul&gt;
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/stop-the-clock-squash-the-bug.html#tocsoftware-bugs" name="toc0" id="toc0"&gt;Software Bugs&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/stop-the-clock-squash-the-bug.html#tocleaks-and-races" name="toc1" id="toc1"&gt;Leaks and Races&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/stop-the-clock-squash-the-bug.html#toc75-correct-vs-50-correct" name="toc2" id="toc2"&gt;75% correct vs 50% correct&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/stop-the-clock-squash-the-bug.html#tocprobabilistic-algorithms" name="toc3" id="toc3"&gt;Probabilistic algorithms&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/stop-the-clock-squash-the-bug.html#tocfixing-isfprime" name="toc4" id="toc4"&gt;Fixing is_fprime&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/stop-the-clock-squash-the-bug.html#tocdefensive-programming" name="toc5" id="toc5"&gt;Defensive programming&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/stop-the-clock-squash-the-bug.html#tocdefect-halflife" name="toc6" id="toc6"&gt;Defect halflife&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/stop-the-clock-squash-the-bug.html#tochow-did-that-code-ever-work" name="toc7" id="toc7"&gt;How did that code ever work?&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/stop-the-clock-squash-the-bug.html#tocconclusions" name="toc8" id="toc8"&gt;Conclusions&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/stop-the-clock-squash-the-bug.html#tocsource-code" name="toc9" id="toc9"&gt;Source code&lt;/a&gt;
+ &lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;&lt;p&gt;Which clock is the best?
+&lt;/p&gt;
+&lt;p&gt;&lt;img src="http://wordaligned.org/images/stopped-clock.gif" alt="Stopped clock"/&gt;
+   &lt;img src="http://wordaligned.org/images/slow-clock.gif" alt="Slow clock"/&gt;
+   &lt;img src="http://wordaligned.org/images/fast-clock.gif" alt="Fast clock"/&gt;
+&lt;/p&gt;
+&lt;p&gt;We can easily rule the one which has stopped &amp;#8230; 
+&lt;/p&gt;
+&lt;p&gt;Or can we? In &amp;#8220;The Rectory Umbrella&amp;#8221; Lewis Carroll &lt;a href="http://www.gavagai.de/themen/HHPT02.htm"&gt;argues otherwise&lt;/a&gt;.
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;Which is better, a clock that is right only once a year, or a clock that is right twice every day?
+&lt;/p&gt;
+&lt;p&gt;&amp;#8220;The latter,&amp;#8221; you reply, &amp;#8220;unquestionably.&amp;#8221;
+&lt;/p&gt;
+&lt;p&gt;Very good, now attend.
+   I have two clocks: one doesn&amp;#8217;t go at all, and the other loses a minute a day: which would you prefer? &amp;#8220;The losing one,&amp;#8221; you answer, &amp;#8220;without a doubt.&amp;#8221; Now observe: the one which loses a minute a day has to lose twelve hours, or seven hundred and twenty minutes before it is right again, consequently it is only right once in two years, whereas the other is evidently right as often as the time it points to comes round, which happens twice a day. 
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;span id="continue-reading"/&gt;
+
+&lt;p&gt;It&amp;#8217;s an amusing diversion, but not really that puzzling: &lt;em&gt;of course&lt;/em&gt; the clock which loses time is of more practical use, even if, somewhat paradoxically, the less time it loses the less often it tells the right time. A clock which loses just a second a day only tells the right time every 118 years or so.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/stop-the-clock-squash-the-bug.html#toc0" name="tocsoftware-bugs" id="tocsoftware-bugs"&gt;Software Bugs&lt;/a&gt;&lt;/h3&gt;
+&lt;img style="float:right;" src="http://wordaligned.org/images/buttons/spider.jpg" alt="Bug"/&gt;
+
+&lt;p&gt;I mention these defective clocks because I&amp;#8217;m thinking about bugs in software and how we go about finding and fixing them. 
+&lt;/p&gt;
+&lt;p&gt;Code which is obviously wrong is easier to spot than code which is almost right, and spotting bugs is the precursor to fixing them. This implies &amp;#8212; building on Carroll&amp;#8217;s terminology &amp;#8212; that we&amp;#8217;re unlikely to ship many stopped clocks but if we&amp;#8217;re not careful we may end up delivering a few which lose time. And, in general, code which is obviously wrong is easier to fix than code which is almost right. A badly-broken function clearly needs a rethink; whereas one which &lt;em&gt;almost&lt;/em&gt; works may simply get tweaked until it &lt;em&gt;appears&lt;/em&gt; to work, often resulting in a more subtle bug.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/stop-the-clock-squash-the-bug.html#toc1" name="tocleaks-and-races" id="tocleaks-and-races"&gt;Leaks and Races&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;C and C++ provide a good example of what I&amp;#8217;m talking about. Consider a program which misuses memory. An attempt to allocate workspace of 4294967295 bytes fails instantly&lt;a id="fn1link" href="http://wordaligned.org/articles/stop-the-clock-squash-the-bug.html#fn1"&gt;&lt;sup&gt;[1]&lt;/sup&gt;&lt;/a&gt;; a slow memory leak, like a slow running clock, may cause no perceptible damage for an extended period.
+&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://valgrind.org"&gt;Decent tools&lt;/a&gt; detect memory leaks. Race conditions in multi-threaded code are harder to track and may prove elusive during system testing. More than once I&amp;#8217;ve left a program running under a debugger, being fed random inputs, in the hope some rare and apparently random condition will trigger a break in execution. Give me truly broken code any day!
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/stop-the-clock-squash-the-bug.html#toc2" name="toc75-correct-vs-50-correct" id="toc75-correct-vs-50-correct"&gt;75% correct vs 50% correct&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Here are two implementations of a C function to find an integer midway between a pair of ordered, positive integer values, truncating downwards. Before reading on, ask yourself which is better.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;int midpoint1(int low, int high)
+{
+    return low/2 + high/2;
+}
+
+int midpoint2(int low, int high)
+{
+    return (low + high)/2;
+}
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;&lt;code&gt;Midpoint1&lt;/code&gt; is a &amp;#8220;stopped clock&amp;#8221;, returning 3 instead of 4 as the mid-point of 3 and 5, for example. It gets the wrong answer 25% of the time &amp;#8212; fatally wrong were it to be used at the heart of, say, a binary search. I think we&amp;#8217;d quickly detect the problem.
+&lt;/p&gt;
+&lt;p&gt;An obvious fix would be the one shown in &lt;code&gt;midpoint2&lt;/code&gt; which does indeed return 4 as the mid-point of 3 and 5. 
+&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;Midpoint2&lt;/code&gt; turns out to be a losing clock, though. If the sum &lt;code&gt;low + high&lt;/code&gt; overflows then the result is undefined. On my implementation I get a negative value &amp;#8212; a dangerous thing to use as an array index. This is a notorious and very real defect, nicely documented in a &lt;a href="http://googleresearch.blogspot.com/2006/06/extra-extra-read-all-about-it-nearly.html"&gt;note by Joshua Bloch&lt;/a&gt; subtitled &amp;#8220;Nearly all Binary Searches and Mergesorts are broken&amp;#8221;. 
+&lt;/p&gt;
+&lt;p&gt;Bloch offers more than one fix so I&amp;#8217;ll just note here that:
+&lt;/p&gt;
+&lt;ul&gt;
+ &lt;li&gt;
+     this defect simply doesn&amp;#8217;t exist in a high-level language like Python or Haskell, where integers are bounded only by machine resources
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     I think Bloch is unfair to suggest Jon Bentley&amp;#8217;s analysis in chapter 4 of Programming Pearls is wrong. The pseudo-code in this chapter is written in a C-like language somewhere between C and Python, and in fact one of Bentley&amp;#8217;s exercises is to examine what effect word size has on this analysis.
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     in a sense, &lt;code&gt;midpoint2&lt;/code&gt; is more broken than &lt;code&gt;midpoint1&lt;/code&gt;: over the range of possible low and high inputs, the sum overflows and triggers the defect 50% of the time.
+ &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/stop-the-clock-squash-the-bug.html#toc3" name="tocprobabilistic-algorithms" id="tocprobabilistic-algorithms"&gt;Probabilistic algorithms&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Computers are supposed to be predictable and we typically aim for correct programs. There&amp;#8217;s no reason why we shouldn&amp;#8217;t consider aiming for programs which are good enough, though, and indeed many programs which are good enough to be useful are also flawed. Google adverts, for example, analyse the contents of web pages and serve up related links. The algorithm used is secret, clever and quick, but often results in &lt;a href="http://wordaligned.org/articles/mistargeted-ads.html"&gt;semantic blunders&lt;/a&gt; and, on occasion, &lt;a href="http://www.bofh.org.uk/articles/2008/04/15/ads-are-gone"&gt;offensive mistakes&lt;/a&gt;. Few could deny how useful to Google this program has been, though.
+&lt;/p&gt;
+&lt;p&gt;Here&amp;#8217;s a more interesting example of an algorithm which, like a losing clock, is nearly right.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;def is_fprime(n):
+    """Use Fermat's little theorem to guess if n is prime.
+    """
+    from random import randrange
+    tries = 3
+    xs = (randrange(1, n) for _ in range(tries))
+    return all((x ** n) % n == x for x in xs)
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;We won&amp;#8217;t go into the &lt;a href="http://mathworld.wolfram.com/FermatsLittleTheorem.html"&gt;mathematics&lt;/a&gt; here. A quick play with this function looks promising.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; all(is_fprime(n) for n in [2, 3, 5, 7, 11, 13, 17, 19])
+True
+&amp;gt;&amp;gt;&amp;gt; any(is_fprime(n) for n in [4, 6, 8, 9, 10, 12, 14, 15])
+False
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;In fact, if we give it a real work-out on some large numbers, it does well. I used it to guess which of the numbers between 100000 and 102000 were prime, comparing the answer with the correct result (the code is at the end of this article). It had a better than 99% success rate (in clock terms, it lost around 8 minutes a day) and increasing &lt;code&gt;tries&lt;/code&gt; will boost its performance.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/stop-the-clock-squash-the-bug.html#toc4" name="tocfixing-isfprime" id="tocfixing-isfprime"&gt;Fixing is_fprime&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;The better &lt;code&gt;is_fprime&lt;/code&gt; performs, the less likely we are to spot that it&amp;#8217;s wrong. What&amp;#8217;s worse, though, is that &lt;em&gt;it cannot be fixed&lt;/em&gt; by simple tweaking. However high we set &lt;code&gt;tries&lt;/code&gt; we won&amp;#8217;t have a correct function. We could even take the random probing out of the function and shove every single value of &lt;code&gt;x&lt;/code&gt; in the range 1 to n into the predicate:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;def exhaustive_is_fprime(n):
+    return all((x ** n) % n == x for x in range(1, n))
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;&lt;code&gt;Exhaustive_is_fprime&lt;/code&gt; is expensive to run and will (very) occasionally return &lt;code&gt;True&lt;/code&gt; for a composite number&lt;a id="fn2link" href="http://wordaligned.org/articles/stop-the-clock-squash-the-bug.html#fn2"&gt;&lt;sup&gt;[2]&lt;/sup&gt;&lt;/a&gt;. If you want to know more, &lt;a href="http://www.google.com/search?q=carmichael+numbers"&gt;search for Carmichael numbers&lt;/a&gt;. 
+&lt;/p&gt;
+&lt;p&gt;The point I&amp;#8217;m making is that code which is almost right can be dangerous. We are tempted to fix it by adjusting the existing implementation, even if, as in this case, a complete overhaul is required. By contrast, we all know what needs doing with code which is plainly wrong.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/stop-the-clock-squash-the-bug.html#toc5" name="tocdefensive-programming" id="tocdefensive-programming"&gt;Defensive programming&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;We&amp;#8217;ve all seen nervous functions which go beyond their stated interface in an attempt to protect themselves from careless users.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;/**
+ * Return the maximum value found in the input array.
+ * Pre-condition: the input array must not be empty.
+ */
+int nervy_maximum_value(int const * items, size_t count)
+{
+    int M = -INT_MAX;
+    
+    if (items == NULL || count == 0)
+    {
+        return M;
+    }
+    for ( ; count-- != 0; ++items)
+    {
+        if (*items &amp;gt; M)
+        {
+            M = *items;
+        }
+    }
+    return M;
+}
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;What&amp;#8217;s really wanted is both simpler and easier for clients to code against.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;int maximum_value(int const * items, size_t count)
+{
+    int const * const end = items + count;
+    int M = *items++;
+    
+    for ( ; items != end; ++items)
+    {
+        if (*items &amp;gt; M)
+        {
+            M = *items;
+        }
+    }
+    return M;
+}
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Did you spot the subtle bug in &lt;code&gt;nervy_maximum_value&lt;/code&gt;? It uses &lt;code&gt;-INT_MAX&lt;/code&gt; instead of &lt;code&gt;INT_MIN&lt;/code&gt; which will cause trouble if clients code against this undocumented behaviour; if &lt;code&gt;nervy_maximum_value&lt;/code&gt; is subsequently fixed, this client code back-fires.
+&lt;/p&gt;
+&lt;p&gt;Note that I&amp;#8217;m not against the use of assertions to check pre-conditions, and a simple &lt;code&gt;assert(items != NULL &amp;amp;&amp;amp; count != 0)&lt;/code&gt; works well in &lt;code&gt;maximum_value&lt;/code&gt;; it&amp;#8217;s writing code which swallows these failed pre-conditions I consider wrong.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/stop-the-clock-squash-the-bug.html#toc6" name="tocdefect-halflife" id="tocdefect-halflife"&gt;Defect halflife&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;The occurrence of defects in complex software systems can be modelled in the same way as radioactive decay. I haven&amp;#8217;t studied this theory and my physics is rusty&lt;a id="fn3link" href="http://wordaligned.org/articles/stop-the-clock-squash-the-bug.html#fn3"&gt;&lt;sup&gt;[3]&lt;/sup&gt;&lt;/a&gt;, but the basic idea is that the population of bugs in some software is rather like a population of radioactive particles. Any given bug fires (any given particle decays) at random, so we can&amp;#8217;t predict when this event will happen, but it is equally likely to fire at any particular time. This gives each defect an average lifetime: a small lifetime for howling defects, such as dereferencing NULL pointers, and a longer one for more subtle problems, such as accumulated rounding errors. Assuming we fix a bug once it occurs, the population of defects decays exponentially, and we get the classic tailing-off curve.
+&lt;/p&gt;
+&lt;img src="http://chart.apis.google.com/chart?
+cht=lc
+&amp;amp;chtt=Exponential+Defect+Decay
+&amp;amp;chs=500x200
+&amp;amp;chxt=x,y
+&amp;amp;chxl=0:||Time|1:||Bugs
+&amp;amp;chd=t:95.0,70.3,52.1,38.6,28.6,21.1,15.7,11.6,8.61,6.38
+&amp;amp;chco=ff0000
+&amp;amp;chm=B,dddddd,0,0,0
+&amp;amp;chls=3,1,0" alt="Classic exponential decay curve"/&gt;
+
+&lt;p&gt;&lt;span /&gt;Anyone who has ever tried to release a software product knows how it feels to slide down the slope of this curve. We system test, find bugs, fix them, repeat. At the start it can be exhilarating as bugs with short half-lives fall out and get squashed, but the end game is demoralising as defects get reported which then cannot be reproduced, and we find ourselves clawing out progress. When we eventually draw the line and ship the product we do so suspecting the worst problems are yet to be found. To put it more succinctly&lt;a id="fn4link" href="http://wordaligned.org/articles/stop-the-clock-squash-the-bug.html#fn4"&gt;&lt;sup&gt;[4]&lt;/sup&gt;&lt;/a&gt;.
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;Ship happens!
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;A combination of techniques can help us escape this depressing picture. The most obvious one would be to avoid it: rather than aim for &amp;#8220;big-bang&amp;#8221; releases every few years, we can move towards continual and incremental delivery. A modular, decoupled architecture helps. So does insistence on unit testing. Rather than shake the system and sweep up the bugs which fall off we should develop a suite of automated tests which actively seek the various paths through the code, and exercise edge cases. Within the code-base, as already mentioned, &lt;span /&gt;defensive programming can cause defects to become entrenched. Instead, we should adopt a more confident style, where code fails hard and fast.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/stop-the-clock-squash-the-bug.html#toc7" name="tochow-did-that-code-ever-work" id="tochow-did-that-code-ever-work"&gt;How did that code ever work?&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Have you ever fixed a defect and wondered how the code ever even appeared to work before your fix? It&amp;#8217;s an important question and one which requires investigation. Perhaps the bug you&amp;#8217;ve fixed is compensated for by defensive programming elsewhere. Or perhaps there are vast routes through the code which have yet to be exercised.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/stop-the-clock-squash-the-bug.html#toc8" name="tocconclusions" id="tocconclusions"&gt;Conclusions&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;&lt;img src="http://wordaligned.org/images/stopped-clock.gif" alt="Stopped clock"/&gt;
+   &lt;img src="http://wordaligned.org/images/slow-clock.gif" alt="Slow clock"/&gt;
+   &lt;img src="http://wordaligned.org/images/fast-clock.gif" alt="Fast clock"/&gt;
+&lt;/p&gt;
+&lt;p&gt;None of these clocks is much good. The first has stopped, the second loses a second every minute, the third gains a second every minute. At least it&amp;#8217;s easy to see the problem with the first: we won&amp;#8217;t be tempted to patch it.
+&lt;/p&gt;
+&lt;p&gt;We should never expect our code to work first time and we should be suspicious if it appears to do so. Defensive programming seems to mean different things to different people. If I&amp;#8217;ve misused the term here, I&amp;#8217;m sorry. Our best defence is to assume code is broken until we&amp;#8217;ve tested it, to assume it will break in future if our tests are not automated, and to fail hard and fast when we detect errors.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/stop-the-clock-squash-the-bug.html#toc9" name="tocsource-code" id="tocsource-code"&gt;Source code&lt;/a&gt;&lt;/h3&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;import math
+from itertools import islice, count
+from random import randrange
+
+def primes(lo, hi):
+    '''Return the list of primes in the range [lo, hi).
+    
+    &amp;gt;&amp;gt;&amp;gt; primes(0, 19)
+    [2, 3, 5, 7, 11, 13, 17]
+    &amp;gt;&amp;gt;&amp;gt; primes(5, 10)
+    [5, 7]
+    '''
+    sqrt_hi = int(math.sqrt(hi))
+    sieve = range(hi)
+    zeros = [0] * hi
+    sieve[1] = 0
+    for i in islice(count(2), sqrt_hi):
+        if sieve[i] != 0:
+            remove = slice(i * i, hi, i)
+            sieve[remove] = zeros[remove]
+    return [p for p in sieve[lo:] if p != 0]
+
+def is_fprime(n, tries=3):
+    '''Use Fermat little theorem to guess if n is prime.
+    '''
+    xs = (randrange(1, n) for _ in range(tries))
+    return all((x ** n) % n == x for x in xs)
+
+def fprimes(lo, hi, tries=10):
+    '''Alternative implementation of primes.
+    '''
+    return filter(is_fprime, range(lo, hi))
+
+if __name__ == '__main__':
+    import doctest
+    doctest.testmod()
+    lo, hi = 100000, 102000
+    primes_set = set(primes(lo, hi))
+    fprimes_set = set(fprimes(lo, hi))
+    print "Range [%r, %r)" % (lo, hi)
+    print "Actual number of primes", len(primes_set)
+    print "Number of fprimes", len(fprimes_set)
+    print "Primes missed", primes_set - fprimes_set
+    print "False fprimes", fprimes_set - primes_set
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Running this program produced output:
+&lt;/p&gt;
+&lt;pre&gt;
+Range [100000, 102000)
+Actual number of primes 174
+Number of fprimes 175
+Primes missed set([])
+False fprimes set([101101])
+&lt;/pre&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;&lt;a id="fn1" href="http://wordaligned.org/articles/stop-the-clock-squash-the-bug.html#fn1link"&gt;[1]&lt;/a&gt; In the first version of this article I wrote that an attempt to allocate 4294967295 bytes would cause the program to crash, which isn&amp;#8217;t quite right. &lt;code&gt;Malloc&lt;/code&gt; returns NULL in the event of failure; standard C++ operator new behaviour is to throw a &lt;code&gt;bad_alloc&lt;/code&gt; exception. My thanks to R Samuel Klatchko for the &lt;a href="http://www.haloscan.com/comments/wordaligned/stop_the_clock_squash_the_bug/#16928"&gt;correction&lt;/a&gt;.
+&lt;/p&gt;
+&lt;p&gt;&lt;a id="fn2" href="http://wordaligned.org/articles/stop-the-clock-squash-the-bug.html#fn2link"&gt;[2]&lt;/a&gt;
+   &lt;a href="http://mitpress.mit.edu/sicp"&gt;&amp;#8220;Structure and Interpretation of Computer Programs&amp;#8221;&lt;/a&gt; discusses Carmichael numbers in a &lt;a href="http://mitpress.mit.edu/sicp/full-text/book/book-Z-H-11.html#call_footnote_Temp_80"&gt;footnote&lt;/a&gt;
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;Numbers that fool the Fermat test are called &lt;em&gt;Carmichael numbers&lt;/em&gt;, and little is known about them other than that they are extremely rare. There are 255 Carmichael numbers below 100,000,000. The smallest few are 561, 1105, 1729, 2465, 2821, and 6601. In testing primality of very large numbers chosen at random, the chance of stumbling upon a value that fools the Fermat test is less than the chance that cosmic radiation will cause the computer to make an error in carrying out a &amp;#8220;correct&amp;#8221; algorithm. Considering an algorithm to be inadequate for the first reason but not for the second illustrates the difference between mathematics and engineering.
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;&lt;a id="fn3" href="http://wordaligned.org/articles/stop-the-clock-squash-the-bug.html#fn3link"&gt;[3]&lt;/a&gt;
+   Being lazy and online I thought I&amp;#8217;d search for a nice radioactive decay graphic rather than draw my own. I found a real gem on the &lt;a href="http://www.colorado.edu/physics/2000/isotopes/radioactive_decay3.html"&gt;University of Colarado site&lt;/a&gt;, where Kyla and Bob discuss radioactive decay.
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;&lt;img src="http://www.colorado.edu/physics/2000/images/kyla-set/kyla3.jpg" alt="Kyla" style="float:left;"/&gt;&lt;/p&gt;&lt;p&gt;Hmmm&amp;#8230;so a lot of decays happen really fast when there are lots of atoms, and then things slow down when there aren&amp;#8217;t so many. The halflife is always the same, but the &lt;i&gt;half&lt;/i&gt; gets smaller and smaller.&lt;/p&gt;
+&lt;p&gt;&lt;img src="http://www.colorado.edu/physics/2000/images/bob-set/bob2.jpg" alt="Bob" style="float:left;"/&gt;&lt;/p&gt;&lt;p&gt;That&amp;#8217;s exactly right.  Here&amp;#8217;s another applet that illustrates radioactive decay in action.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;&lt;a href="http://www.colorado.edu/physics/2000/isotopes/radioactive_decay3.html"&gt;Visit the site&lt;/a&gt; to play with the applet Bob mentions. You&amp;#8217;ll find more Kyla and Bob pictures there too.
+&lt;/p&gt;
+&lt;p&gt;&lt;a id="fn4" href="http://wordaligned.org/articles/stop-the-clock-squash-the-bug.html#fn4link"&gt;[4]&lt;/a&gt;
+   I&amp;#8217;m unable to provide a definitive attribution for the &amp;#8220;Ship happens!&amp;#8221; quotation. I first heard it from &lt;a href="http://erdani.org"&gt;Andrei Alexandrescu&lt;/a&gt; at an &lt;a href="http://accu.org/index.php/conferences"&gt;ACCU conference&lt;/a&gt;, who in turn thinks he got it from Erich Gamma. I haven&amp;#8217;t managed to contact Erich Gamma. Matthew B. Doar &lt;a href="http://www.haloscan.com/comments/wordaligned/stop_the_clock_squash_the_bug/#17002"&gt;reports&lt;/a&gt; using the term back in 2002, and it appears as a &lt;a href="http://www.oreilly.com/catalog/practicalde/toc.html"&gt;section heading&lt;/a&gt; in his book &lt;a href="http://www.oreilly.com/catalog/practicalde"&gt;&amp;#8220;Practical Development Environments&amp;#8221;&lt;/a&gt;.
+&lt;/p&gt;</description>
+<dc:date>2008-04-16</dc:date>
+<guid>http://wordaligned.org/articles/stop-the-clock-squash-the-bug.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/stop-the-clock-squash-the-bug.html</link>
+<category>C</category>
+</item>
+
+<item>
+<title>Hunting down globals with nm</title>
+<description>&lt;p&gt;It was an old library, in need of attention &amp;#8212; we all knew that &amp;#8212; but it worked well, and we saw no reason to change it. Until, that is, we wanted more than one of it. The problem being, it was riddled with globals. A typical file looked something like this:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;Too many globals&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;#include &amp;lt;string.h&amp;gt;
+#define MSG_BUF_SIZE 256
+
+char const * g_libname = "TOO.MANY.GLOBALS";
+
+void initialise()
+{
+    static int s_initialised = 0;    
+    if (s_initialised == 0)
+    {
+        s_initialised = 1;
+        ....
+    }
+}
+
+char g_msg_buf[MSG_BUF_SIZE];
+
+static void clear_message()
+{
+    memset(g_msg_buf, 0, sizeof(g_msg_buf));
+}
+
+....
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;In the snippet above, the &lt;code&gt;g_msg_buf&lt;/code&gt; has external linkage. Other files in the library accessed it freely. The local static int, &lt;code&gt;s_initialised&lt;/code&gt;, is better contained, but still stood in our way. How could we initialise two library instances?
+&lt;/p&gt;
+&lt;p&gt;Don&amp;#8217;t worry, we&amp;#8217;re not about to discuss the evils of globals and singletons. We all know what needs doing here: initialising the library should return clients a handle, and each client would use its returned handle for subsequent access to the library. Internally, the handle would be a pointer to a struct, the details of which would be private to the library, packaging its internal state.
+&lt;/p&gt;
+&lt;span id="continue-reading"/&gt;
+
+&lt;p&gt;Sadly no refactoring IDE could cope with this job. Our immediate problem was simply sizing up the task. So we had to count up the &lt;code&gt;s_initialised&lt;/code&gt;&amp;#8217;s and &lt;code&gt;g_msg_buf&lt;/code&gt;&amp;#8217;s and so on. One obvious way of getting a number would be to browse the code and build a list of these globals. Indeed, this approach has some merit: we&amp;#8217;re building familiarity with the code, code we&amp;#8217;ll ultimately have to change. An exact answer isn&amp;#8217;t really needed at this stage.
+&lt;/p&gt;
+&lt;p&gt;Shell hackers might attempt an instant estimate by combining &lt;code&gt;grep&lt;/code&gt;, &lt;code&gt;sort&lt;/code&gt; and &lt;code&gt;uniq&lt;/code&gt; &amp;#8212; if we&amp;#8217;re confident that the &lt;code&gt;s_&lt;/code&gt; and &lt;code&gt;g_&lt;/code&gt; prefixes are consistently used in the library.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;$ grep -Eioh "\b[sg]_[[:alnum:]_]*\b" nm.c | sort | uniq
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Such text based approaches are better than nothing. We can review the result for  false hits, inspect the code to see if we&amp;#8217;ve missed anything obvious, adapt the pattern if required, and pipe the result to &lt;code&gt;wc -l&lt;/code&gt; for a final count.
+&lt;/p&gt;
+&lt;p&gt;&lt;span /&gt;But the best route to an accurate answer is easier and quicker. The compiler &lt;em&gt;has to know&lt;/em&gt; exactly what&amp;#8217;s global, what&amp;#8217;s local, what&amp;#8217;s data and what&amp;#8217;s missing, and that information gets put in the object code it generates. Since reading object code is tough, we&amp;#8217;ll ask &lt;code&gt;nm&lt;/code&gt; to do it for us. Here&amp;#8217;s what I get if I compile the snippet above and inspect the output object file with &lt;code&gt;nm&lt;/code&gt;. (What you get should be similar, but the details will depend on your platform.)
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;$ gcc -c too_many_globals.c &amp;amp;&amp;amp; nm too_many_globals.o
+00000018 t clear_message
+00000000 D g_libname
+00000100 C g_msg_buf
+00000000 T initialise
+         U memset
+00000000 b s_initialised.0
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;The &lt;code&gt;nm&lt;/code&gt; manual tells us how to interpret the output:
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;Nm displays the name list (symbol table) of each object file in the argument list &amp;#8230; Each symbol name is preceded  by  its  value (blanks if undefined) &amp;#8230; this value is followed by one of the following  characters,  representing  the symbol type: U (undefined), A (absolute), T (text section symbol), D (data section  symbol), B (bss section  symbol), C (common  symbol) &amp;#8230;. If the symbol is local (non-external), the symbol&amp;#8217;s type is instead represented  by  the  corresponding lowercase letter.
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;&lt;code&gt;Nm&lt;/code&gt; works on object files, libraries (static and dynamic) and executables. You don&amp;#8217;t have to be an expert on object code to correlate the &lt;code&gt;nm&lt;/code&gt; output shown above with the source code. It&amp;#8217;s telling us:
+&lt;/p&gt;
+&lt;ul&gt;
+ &lt;li&gt;
+     &lt;code&gt;clear_message&lt;/code&gt; is a local function
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     &lt;code&gt;g_libname&lt;/code&gt; is constant global data 
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     &lt;code&gt;initialise&lt;/code&gt; is an external function
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     &lt;code&gt;memset&lt;/code&gt; is undefined (it&amp;#8217;s part of the standard C library)
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     &lt;code&gt;g_msg_buf&lt;/code&gt; and &lt;code&gt;s_initialised&lt;/code&gt; are the bad boys we&amp;#8217;re hunting down
+ &lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Once we&amp;#8217;ve discovered &lt;code&gt;nm&lt;/code&gt; we can pick out the globals accurately and swiftly.  Running &lt;code&gt;nm libtoo_many_globals.a&lt;/code&gt; outputs text which we can pipe through standard Unix tools as before to get &lt;em&gt;exact&lt;/em&gt; metrics.
+&lt;/p&gt;
+&lt;p&gt;The &lt;a href="http://www.gnu.org/software/binutils/manual/html_chapter/binutils_2.html"&gt;GNU version of nm&lt;/a&gt; has some bells and whistles &amp;#8212; it can demangle C++ symbols, for example. Object code is platform dependent and the details of &lt;code&gt;nm&lt;/code&gt;&amp;#8217;s output will similarly vary across platforms, so I suggest you look at the manual, but most of the time &lt;code&gt;nm OBJECTFILE&lt;/code&gt; is all you&amp;#8217;ll need.
+&lt;/p&gt;
+
+&lt;h3&gt;Global constants&lt;/h3&gt;
+&lt;p&gt;Note that &lt;code&gt;nm&lt;/code&gt; has nothing to say about the preprocessor definition, MSG_BUF_SIZE, which vanishes well before the object file gets written. Since MSG_BUF_SIZE can&amp;#8217;t be changed at run time or even after compilation, it won&amp;#8217;t stop us from safely using more than one library instance. &lt;code&gt;Nm&lt;/code&gt; does tell us about &lt;code&gt;g_libname&lt;/code&gt;, a string constant has been placed in the data section of the object file. Like MSG_BUF_SIZE, multiple library instances can safely share this read-only data.
+&lt;/p&gt;
+&lt;p&gt;Just because something can be done doesn&amp;#8217;t make it &lt;a href="http://accu.org/index.php/journals/1411"&gt;good practice&lt;/a&gt;. I don&amp;#8217;t think there&amp;#8217;s enough information here to definitively rule against these two &amp;#8220;safe&amp;#8221; globals, but they certainly look suspect. At the very least, the scope of the library name string should be reduced. It would be better to review use of constant data throughout the library; by passing this data in, perhaps as an initialisation parameter, the library may become more flexible and easier to test.
+&lt;/p&gt;</description>
+<dc:date>2008-04-08</dc:date>
+<guid>http://wordaligned.org/articles/hunting-down-globals-with-nm.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/hunting-down-globals-with-nm.html</link>
+<category>C</category>
+</item>
+
+<item>
+<title>Metaprogramming is Your Friend</title>
+<description>&lt;p&gt;An &lt;a href="http://wordaligned.org/docs/metaprogramming/index.html"&gt;investigation&lt;/a&gt; into metaprogramming techniques used by lazy C, C++, Lisp and Python programmers. This &lt;a href="http://wordaligned.org/docs/metaprogramming/index.html"&gt;article&lt;/a&gt; first appeared in &lt;a href="http://accu.org/index.php/journals/c146/"&gt;Overload 66&lt;/a&gt;.
+&lt;/p&gt;
+&lt;div class="extended"&gt;&lt;p&gt;&lt;a href="http://wordaligned.org/docs/metaprogramming/index.html"&gt;Continue reading&amp;#8230;&lt;/a&gt;&lt;/p&gt;&lt;/div&gt;</description>
+<dc:date>2005-04-01</dc:date>
+<guid>http://wordaligned.org/articles/metaprogramming.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/metaprogramming.html</link>
+<category>C</category>
+</item>
+
+<item>
+<title>Brackets Off!</title>
+<description>&lt;p&gt;The mathematical formula:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;v = u + at
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;calculates the speed, &lt;code&gt;v&lt;/code&gt;, of an object, with initial speed &lt;code&gt;u&lt;/code&gt; and constant acceleration &lt;code&gt;a&lt;/code&gt;, after time &lt;code&gt;t&lt;/code&gt;. Placing the &lt;code&gt;a&lt;/code&gt; next to the &lt;code&gt;t&lt;/code&gt; is a convenient shorthand for &amp;#8220;multiply &lt;code&gt;a&lt;/code&gt; by &lt;code&gt;t&lt;/code&gt;&amp;#8221;, which also makes it apparent that the multiplication must be done before the addition.
+&lt;/p&gt;
+&lt;p&gt;When the same formula is written in C, the multiplication operator needs
+   explicit representation:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;v = u + a * t;
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;The layout of this expression no longer makes it clear that the multiplication should be done before the addition, so a programmer might choose to parenthesise:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;v = u + (a * t)
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Are these parentheses required to guarantee correct evaluation of &lt;code&gt;v&lt;/code&gt;? If not, should they be included anyway, to help convey the meaning of the expression? How can coding standards help with such choices?
+&lt;/p&gt;
+&lt;p&gt;This article aims to answer these questions. It first presents some examples of the operator precedence and associativity rules in action, then offers some guidelines on when to parenthesise expressions, and finally argues that these guidelines should be replaced by a single rule.
+&lt;/p&gt;
+
+&lt;h3&gt;Examples&lt;/h3&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;v = u + a * t,
+x = 8 - 4 - 2,
+r = h &amp;lt;&amp;lt; 4 + 1,
+str += ((errors == 0) ? "succeeded" : "failed"),
+*utf++ = 0x80 | ucs &amp;gt;&amp;gt; 6 &amp;amp; 0x6f;
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Our first example, &lt;code&gt;v = u + a * t&lt;/code&gt; contains three operators: assignment, addition and multiplication. These operators &amp;#8212; indeed all operators &amp;#8212; follow a strict precedence which defines the order of evaluation. Since multiplication has higher precedence than addition, which in turn has higher precedence than assigment, the expression is equivalent to:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;v = (u + (a * t))
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;This means the compiler can be trusted with the expression as first presented.
+   No parentheses are required. Good, the language does what we expect.
+&lt;/p&gt;
+&lt;p&gt;In the second example, subtraction binds more tightly (i.e. has higher precedence than) assignment, so the subtractions are performed first. Since all the arithmetic operators associate left to right the expression is equivalent to:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;x = ((8 - 4) - 2)
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;In &lt;code&gt;r = h &amp;lt;&amp;lt; 4 + 1&lt;/code&gt; the arithmetic addition operator binds more tightly than the shift operator, so the expression is equivalent to:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;r = (h &amp;lt;&amp;lt; (4 + 1))
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Why did the programmer not write &lt;code&gt;r = h &amp;lt;&amp;lt; 5&lt;/code&gt;? Probably because the intention was:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;r = (h &amp;lt;&amp;lt; 4) + 1
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;but bit shifting (like, say, finding the address of something, or subscripting
+   an array) somehow seems closer to the machine and feels as if it ought to be
+   of higher precedence than addition, so the crucial parentheses were missed &lt;a id="fn1link" href="http://wordaligned.org/articles/brackets-off.html#footnote1"&gt;[1]&lt;/a&gt;.
+&lt;/p&gt;
+&lt;p&gt;The parentheses are unneccessary in our fourth example. We could rewrite:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;str += ((errors == 0) ? "succeeded" : "failed")
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;as:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;str += errors == 0 ? "succeeded" : "failed"
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;since the comparison operators bind more tightly than the conditional operator, which in turn binds more tightly than the assignment operators. Do the parentheses help you understand the meaning of this expression? Would you have left them out &amp;#8212; and if so, would one of your team-mates have complained?
+&lt;/p&gt;
+&lt;p&gt;How should the fifth example be parenthesised, to make its meaning clear? It is equivalent to:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;(*(utf++)) = (0x80 | ((ucs &amp;gt;&amp;gt; 6) &amp;amp; 0x6f))
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;which shows how complicated an expression looks when parentheses are added indiscriminately.
+&lt;/p&gt;
+
+&lt;h3&gt;Coding Standards&lt;/h3&gt;
+&lt;p&gt;In general &amp;#8212; at least, in my experience &amp;#8212; &lt;a href="http://wordaligned.org/articles/retro-fitting-coding-standards.html"&gt;coding standards&lt;/a&gt; do not provide rules on how to parenthesise expressions. I suspect this is for two reasons.
+&lt;/p&gt;
+&lt;p&gt;Firstly, because although all programmers use parentheses to clarify the meaning of expressions, they may well disagree on what makes an expression clear. Clarity seems a matter of taste. While programmers in a team may agree (to differ) on whether tabs or spaces are to be used for indentation, their coding standard leaves them free to rewrite Example 4 as:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;str += errors == 0 ? "succeeded" : "failed"
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;And secondly, if a coding standard were to rule on how to parenthesise, it would be difficult to find a middle ground. This leaves as candidate rules the two extremes:
+&lt;/p&gt;
+&lt;ol&gt;
+ &lt;li&gt;
+     parenthesise everything
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     never parenthesise
+ &lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;The first quickly leads to unreadable code. The second seems overly proscriptive.
+&lt;/p&gt;
+&lt;p&gt;In the absence of a hard rule, here are some guidelines which I hope are
+   non-contentious and which may help us reach a conclusion:
+&lt;/p&gt;
+&lt;ul&gt;
+ &lt;li&gt;
+     have the operator precedence tables to hand and understand how to interpret expressions using them   &lt;br /&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     understand the logic behind the operator precedence tables, but be aware of the traps and pitfalls
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     remember, parentheses are not the only way to make order of evaluation clear. For example, our fourth example could be rewritten:
+ &lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;*utf++ = 0x80 | 
+              ucs &amp;gt;&amp;gt; 6 &amp;amp; 
+              0x6f
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;ul&gt;
+ &lt;li&gt;
+     or even:
+ &lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;*utf = ucs &amp;gt;&amp;gt; 6; 
+*utf &amp;amp;= 0x6f; 
+*utf |= 0x80; 
+++utf;
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;ul&gt;
+ &lt;li&gt;
+     if an expression is hard to understand, break it down into simpler steps, or extract it out as a function with a meaningful name
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     trust the compiler: it might not implement partial template specialisation correctly, but it will get operator precedence right every time
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     never use parentheses simply because you aren&amp;#8217;t sure of how an expression will be evaluated without them: treat doubt as an opportunity to learn
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     all macro arguments must be parenthesised.
+ &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3&gt;Concluding Thoughts&lt;/h3&gt;
+&lt;p&gt;Any effort put into becoming familiar with precedence tables is likely to pay off across a range of languages. For example, although C++ introduces several new operators over C, there are no surprises. The precedence rules remain in force even if the operators have been overloaded (but that&amp;#8217;s the subject of another article). Java operator precedence is almost a subset of C&amp;#8217;s. Similarly, scripting languages are generally compatible with C, even where C&amp;#8217;s precedence rules are slightly &lt;a id="fn2link" href="http://wordaligned.org/articles/brackets-off.html#footnote2"&gt;[2]&lt;/a&gt;. So, while Perl introduces lower precedence versions of the logical operators &lt;code&gt;not&lt;/code&gt;, &lt;code&gt;and&lt;/code&gt;, and &lt;code&gt;or&lt;/code&gt;, it ensures that &lt;code&gt;not&lt;/code&gt; binds more tightly than &lt;code&gt;and&lt;/code&gt; which in turn binds more tightly than &lt;code&gt;or&lt;/code&gt;. Interestingly, in &lt;a href="http://python.org"&gt;Python&lt;/a&gt;, where whitespace is syntactically significant, parentheses can be used not just to indicate order of evaluation, but also to wrap lengthy expressions over several lines.
+&lt;/p&gt;
+&lt;p&gt;The more experienced I become as programmer, the fewer parentheses I use. Coming from a mathematical background, it was several months into my first job before I dared use the conditional operator &amp;#8212; and when I finally did start using it, I parenthesised all the sub-expressions for safety. Later on in my career, when I first found myself working with the bitwise operators, again, I enclosed sub-expressions with brackets. As my confidence has increased, the brackets have peeled away.
+&lt;/p&gt;
+&lt;p&gt;This, though, is simply evolution. Familiarity with the languages you use makes it easier to read expressions without the unnecessary noise of parentheses. Evolving in this way, however, leaves a programmer vulnerable when working on code written by a more experienced team-mate, unless the experienced programmer writes to a lowest common denominator.
+&lt;/p&gt;
+&lt;p&gt;Surely it would be better for everyone to raise their game. The operator precedence tables are a fundamental part of the language. The rules for using them are simple. Although there are many precedence levels, the operators do group logically. Update your coding standards. Prohibit unnecessary parentheses. Brackets off!
+&lt;/p&gt;
+&lt;hr /&gt;
+
+
+&lt;h3&gt;Notes&lt;/h3&gt;
+&lt;div class="amazon"&gt;&lt;a href="http://www.amazon.com/gp/product/0201179288?ie=UTF8&amp;amp;tag=wordalig-20&amp;amp;linkCode=as2&amp;amp;camp=1789&amp;amp;creative=9325&amp;amp;creativeASIN=0201179288"&gt;&lt;img  src="http://wordaligned.org/images/books/c-traps-and-pitfalls.jpg" alt="Book cover"/&gt;&lt;/a&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;a href="http://wordaligned.org/articles/brackets-off.html#fn1link" id="footnote1"&gt;[1]&lt;/a&gt; I&amp;#8217;ve taken this example directly from Andrew Koenig&amp;#8217;s &lt;a href="http://www.amazon.com/gp/product/0201179288?ie=UTF8&amp;amp;amp;tag=wordalig-20&amp;amp;amp;linkCode=as2&amp;amp;amp;camp=1789&amp;amp;amp;creative=9325&amp;amp;amp;creativeASIN=0201179288"&gt;&amp;#8220;C Traps and Pitfalls&amp;#8221;&lt;/a&gt;. This is a nice little book which expands on the ideas presented in a &lt;a href="http://www.literateprogramming.com/ctraps.pdf"&gt;paper of the same name [PDF]&lt;/a&gt;.
+&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://wordaligned.org/articles/brackets-off.html#fn2link" id="footnote2"&gt;[2]&lt;/a&gt; According to Koenig, some of C&amp;#8217;s
+   peculiarities can be blamed on its heritage:
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;The precedence of the C logical operators comes about for historical reasons. B, the predecessor of C, had logical operators that corresponded roughly to C&amp;#8217;s &lt;code&gt;&amp;amp;&lt;/code&gt; and &lt;code&gt;|&lt;/code&gt; operators. Although they were defined to act on bits, the compiler would treat them as &lt;code&gt;&amp;amp;&amp;amp;&lt;/code&gt; and &lt;code&gt;||&lt;/code&gt; if they were in a conditional context. When the two usages were split apart in C, it was deemed too dangerous to change the precedence much.
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;This article first appeared appeared in &lt;a href="http://accu.org/index.php/aboutus/aboutjournals"&gt;C Vu&lt;/a&gt; 15.6, and I am grateful to all at C Vu for their help.
+&lt;/p&gt;</description>
+<dc:date>2004-05-06</dc:date>
+<guid>http://wordaligned.org/articles/brackets-off.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/brackets-off.html</link>
+<category>C</category>
+</item>
+
+</channel>
+</rss>

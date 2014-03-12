@@ -1,0 +1,171 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<link rel="icon" href="/images/favicon.png" type="image/png"/>
+<link href="/styles/application.css" media="all" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="/scripts/prettify.js"></script>
+<script type="text/javascript" src="/scripts/lang-lisp.js"></script>
+<title>Undogfooding</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="author" content="Thomas Guest" />
+<meta name="description" content="A Word Aligned article posted 2009-07-08, tagged Python, Europython, Knuth, Drawing." />
+<meta name="keywords" content="Python, Europython, Knuth, Drawing" />
+<link rel="alternate" type="application/rss+xml" title="Feed" href="http://feeds.wordaligned.org/wordaligned" />
+</head>
+
+<body onload="prettyPrint()">
+<div id="container">
+  <div id="header">
+<h1><span><a accesskey="h" href="/">Word Aligned</a></span></h1>
+<h2>space sensitive programming</h2>
+<a class="button" href="http://feeds.wordaligned.org/wordaligned" title="Subscribe to Word Aligned"><img style="float: right;" src="/images/feed.png" alt="Feed Logo" height="28" width="28"/></a>
+</div>
+
+  <div id="page">
+    <div id="content">
+      <div class="atomentry" id="undogfooding.html">
+<h2 class="title"><a href="/articles/undogfooding.html">Undogfooding</a></h2>
+<p class="meta"><abbr class="published" title="2009-07-08">2009-07-08</abbr> &bull; <a href="/tag/python" rel="tag">Python</a>, <a href="/tag/europython" rel="tag">Europython</a>, <a href="/tag/knuth" rel="tag">Knuth</a>, <a href="/tag/drawing" rel="tag">Drawing</a> &bull; <a href="/articles/undogfooding.html#disqus_thread">Comments</a></p>
+<p>David Jones perfectly <a href="http://drj11.wordpress.com/2009/07/04/tony-hoare-man-of-science/">captures the look and feel</a> of Sir Tony Hoare&#8217;s presentation at <a href="http://www.europython.eu">Europython 2009</a>
+</p>
+<blockquote><p>Tony Hoare is clearly old skool. His slides had the calm and aged patina of the <a href="http://en.wikipedia.org/wiki/Overhead_projector">OHP</a> era, and I thought they were all the better for that. If you have a message, then that message can be conveyed without all the flash and shine that PowerPoint tempts you with (although, being a Microsoft man, of course his slides <em>were</em> in PowerPoint). 
+</p>
+</blockquote><p><a href="http://docs.python.org/library/turtle.html#module-turtle"><img src="/images/my-1st-turtle.png" alt="My first turtle sketch"/></a>
+</p>
+<p>Note the parenthetical comment: Tony Hoare works for Microsoft and he uses Microsoft software, an activity developers refer to as <a href="http://catb.org/jargon/html/D/dogfood.html">&#8220;eating your own dogfood&#8221;</a>. Also eating dogfood at Europython, <a href="http://www.europython.eu/talks/speakers/index.html#lingl_gregor">Gregor Lingl</a> employed his very own <a href="http://docs.python.org/library/turtle.html#module-turtle">turtle</a> to guide the audience through a nifty presentation belying the reptile&#8217;s slow-and-steady reputation. I&#8217;ve always enjoyed sketching code using the Python interpreter, and sketching pictures with a turtle feels very pythonic.
+</p>
+<div class="typocode"><div class="codetitle">My first turtle sketch</div>
+
+<pre class="prettyprint">Python 3.1
+&gt;&gt;&gt; from turtle import *
+&gt;&gt;&gt; shape('turtle')
+&gt;&gt;&gt; circle(100)
+&gt;&gt;&gt; fillcolour('red')
+Traceback (most recent call last):
+  File "&lt;stdin&gt;", line 1, in &lt;module&gt;
+NameError: name 'fillcolour' is not defined
+&gt;&gt;&gt; fillcolor('red')
+&gt;&gt;&gt; begin_fill(); circle(100); end_fill()
+&gt;&gt;&gt; def grey(pc): c = pc/100; fillcolor(c, c, c)
+... 
+&gt;&gt;&gt; clear()
+&gt;&gt;&gt; def doit(r): begin_fill(); grey(r); circle(r); end_fill()
+... 
+&gt;&gt;&gt; for r in range(100): doit(r)
+... 
+^C^C
+Traceback (most recent call last):
+...
+&gt;&gt;&gt; clear()
+&gt;&gt;&gt; for r in range(100, 0, -5): doit(r)
+...
+&gt;&gt;&gt; fillcolor('white')
+&gt;&gt;&gt; forward(150)
+
+</pre>
+
+</div>
+
+<p>Gregor Lingl&#8217;s session at Europython wasn&#8217;t the only one delivered using software developed by the presenter. What would be the opposite of eating your own dogfood, I wondered? Abusing someone else&#8217;s software, perhaps.
+</p>
+<span id="continue-reading"/>
+
+<blockquote><p>After one too many bad presentations at a meeting in January 2000, I decided to see if I could do something about it. &#8212; <a href="http://norvig.com/Gettysburg/making.html" title="The Making of the Gettysburg PowerPoint Presentation">Peter Norvig</a>
+</p>
+</blockquote><p>I&#8217;m fairly sure Peter Norvig had no part in PowerPoint&#8217;s development. In a <a href="http://norvig.com/Gettysburg">hilarious satire</a> he skewers the popular presentation tool with its own Autocontent Wizard.
+</p>
+<p><a href="http://norvig.com/Gettysburg/index.htm"><img src="http://norvig.com/Gettysburg/img001.gif" width="500px" height="375px" alt="Gettysburg PPT, slide 1"/></a>
+</p>
+<p>Back on the subject of overhead projectors, I saw one put to good use by another eminent old-skooler, Donald Knuth, at the recent <a href="http://www.dcs.warwick.ac.uk/bshm/meetings/Fiction.html">Mathematics and Fiction</a> workshop in Oxford. Asked by passport control at London Heathrow if he&#8217;d be visiting Oxford on a business trip or a pleasure trip, Knuth had answered: no, he&#8217;d come on a ego trip.
+</p>
+<p>Knuth was in Oxford to talk to his fans about about <a href="http://www-cs-faculty.stanford.edu/~knuth/sn.html">Surreal Numbers</a>, a       book he wrote in just a couple of weeks in 1973 while taking a break from working on <a href="http://en.wikipedia.org/wiki/The_Art_of_Computer_Programming">The Art of Computer Programming</a> in a hotel in Oslo, and which may well be the only example of a mathematical <a href="http://en.wikipedia.org/wiki/Surreal_numbers">theory</a> first published in fictional form.
+</p>
+<p><a href="http://www-cs-faculty.stanford.edu/~knuth/sn.html"><img src="/images/books/surreal-numbers.jpg" width="240px" height="240px" alt="Surreal Numbers book cover" style="float:right;"/></a>
+</p>
+<p>For the workshop Knuth had gone back to his files and found his working notes, the original hotel brochure, photos, hand-written reviews by P&oacute;lya and others, though he couldn&#8217;t locate the paper napkin on which <a href="http://en.wikipedia.org/wiki/John_Horton_Conway">John Horton Conway</a> had sketched the axioms underpinning the number system a few months before<a id="fn1link" href="#fn1"><sup>[1]</sup></a> &#8212; Knuth had copied this source material onto acetates which he then sorted and shuffled on the OHP according to the direction his reminiscences and questions from the audience took him.
+</p>
+<p>Unlike Tony Hoare, Donald Knuth wasn&#8217;t making a formal presentation, but I was struck by some advantages offered by the OHP. For one, the process of getting slides displayed seemed foolproof &#8212; at Europython we had the usual catalogue of computer/screen interface glitches (unwanted dialog boxes popping up, batteries dying, screensavers kicking in, missing Mac display dongles, delays while rebooting Ubuntu, alignment issues). The OHP also facilitated a dynamic presentation style: Knuth accessed his slides at random, composing screens from more than one slide on the fly, and pointing to areas of interest directly using a finger. He didn&#8217;t modify his slides during the session by writing on them, but that would also have been possible.
+</p>
+<p>In a supreme example of dogfood consumption, a couple of years after publishing Surreal Numbers Knuth took a rather longer break from TAOCP to work on <a href="http://en.wikipedia.org/wiki/TeX">TeX</a>, a typesetting system whose results match the beauty of his writing.
+</p>
+<p style="text-align:center">&sect;</p>
+
+<blockquote><p>&#8230; You get surreal numbers by playing games. I used to feel guilty in Cambridge that I spent all day playing games, while I was supposed to be doing mathematics. Then, when I discovered surreal numbers, I realized that playing games IS mathematics. &#8212; <a href="http://www.gap-system.org/~history/Quotations/Conway.html">John Horton Conway</a>
+</p>
+</blockquote><hr />
+
+<p><a id="fn1" href="#fn1link">[1]</a> In fact, he&#8217;d lost the napkin before his stay in the hotel in Oslo, which explains the difference between the axioms used in Surreal Numbers and the ones originally suggested by John Horton Conway.
+</p>
+</div>
+
+<div class="comments"><hr/><div id="disqus_thread"></div><script type="text/javascript" src="http://disqus.com/forums/wordaligned/embed.js"></script></div>
+      
+<div id="comments"><script type="text/javascript">
+//<![CDATA[
+(function() {
+    var links = document.getElementsByTagName('a');
+    var query = '?';
+    for(var i = 0; i < links.length; i++) {
+        if(links[i].href.indexOf('#disqus_thread') >= 0) {
+            query += 'url' + i + '=' + encodeURIComponent(links[i].href) + '&amp;';
+        }
+    }
+    document.write('<script type="text/javascript" src="http://disqus.com/forums/wordaligned/get_num_replies.js' + query + '"></' + 'script>');
+})();
+//]]>
+</script></div>
+
+    </div>
+    <div id="sidebar">
+      
+<div class="sidebar-node">
+<h3>Tagged</h3>
+<ul id="categories"><li><a href="/tag/python" rel="tag">Python</a></li>
+<li><a href="/tag/europython" rel="tag">Europython</a></li>
+<li><a href="/tag/knuth" rel="tag">Knuth</a></li>
+<li><a href="/tag/drawing" rel="tag">Drawing</a></li></ul>
+
+</div>
+
+<div class="sidebar-node">
+<h3>Chain</h3>
+<ul>
+<li><a accesskey="n" href="/articles/calligraphylion.html" title="Next article">&laquo; Could OCR conquer the calligraphylion?</a></li>
+<li><a accesskey="p" href="/articles/europython-2009.html" title="Previous article">&raquo; Tony Hoare&#8217;s vision, car crashes, and Alan Turing</a></li>
+</ul>
+
+
+</div>
+
+<div class="sidebar-node">
+<h3>Feeds</h3>
+
+<ul>
+<li><a href="http://feeds.wordaligned.org/wordaligned"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Articles</a></li>
+<li><a href="http://feeds.wordaligned.org/wordaligned/comments"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Comments</a></li>
+</ul>
+
+
+</div>
+
+    </div>
+  </div>
+  <div id="footer">
+<hr />
+<p><a href="http://tag.wordaligned.org">Thomas Guest</a></p>
+</div>
+
+</div>
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-3373724-1']);
+  _gaq.push(['_trackPageview']);
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ga);
+  })();
+</script>
+</body>
+
+</html>

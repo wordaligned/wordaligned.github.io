@@ -1,0 +1,199 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<link rel="icon" href="/images/favicon.png" type="image/png"/>
+<link href="/styles/application.css" media="all" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="/scripts/prettify.js"></script>
+<script type="text/javascript" src="/scripts/lang-lisp.js"></script>
+<script type="text/javascript" src="http://www.haloscan.com/load/wordaligned"></script>
+
+<title>Code completion for dynamic languages</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="author" content="Thomas Guest" />
+<meta name="description" content="A Word Aligned article posted 2007-02-02, tagged Python, Ruby, Emacs, Dynamic Languages." />
+<meta name="keywords" content="Python, Ruby, Emacs, Dynamic Languages" />
+<link rel="alternate" type="application/rss+xml" title="Feed" href="http://feeds.wordaligned.org/wordaligned" />
+</head>
+
+<body onload="prettyPrint()">
+<div id="container">
+  <div id="header">
+<h1><span><a accesskey="h" href="/">Word Aligned</a></span></h1>
+<h2>space sensitive programming</h2>
+<a class="button" href="http://feeds.wordaligned.org/wordaligned" title="Subscribe to Word Aligned"><img style="float: right;" src="/images/feed.png" alt="Feed Logo" height="28" width="28"/></a>
+</div>
+
+  <div id="page">
+    <div id="content">
+      <div class="atomentry" id="code-completion-for-dynamic-languages.html">
+<h2 class="title"><a href="/articles/code-completion-for-dynamic-languages.html">Code completion for dynamic languages</a></h2>
+<p class="meta"><abbr class="published" title="2007-02-02">2007-02-02</abbr> &bull; <a href="/tag/python" rel="tag">Python</a>, <a href="/tag/ruby" rel="tag">Ruby</a>, <a href="/tag/emacs" rel="tag">Emacs</a>, <a href="/tag/dynamic-languages" rel="tag">Dynamic Languages</a> &bull; <a href="/articles/code-completion-for-dynamic-languages.html#disqus_thread">Comments</a></p>
+<p>Here&#8217;s an interesting <a href="http://www.regdeveloper.co.uk/2007/02/01/making_sense_ruby/">article</a> in which Huw Collingbourne describes
+   his frustration with trying to program a smart code completion system
+   for Visual Studio. The problem being, the code in question is
+   <a href="http://www.ruby-lang.org" title="Ruby Website">Ruby</a>. One particularly juicy quotation reads:
+</p>
+<blockquote><p><span id="excerpt0"/>Ruby is a so-called &#8220;dynamic&#8221; language, which is a polite way of saying that it&#8217;s hugely unpredictable.
+</p>
+</blockquote><span id="continue-reading"/>
+
+<p>He goes on to explain:
+</p>
+<blockquote><p>A <a href="http://www.ruby-lang.org" title="Ruby Website">Ruby</a> program is so dynamic that you can never be sure what it is
+   up to from one moment to the next. To take a simple example, when
+   you write some stand-alone functions into the editor, those
+   functions get bound into the base class of the entire Ruby class
+   hierarchy. That means that every single Ruby class automatically
+   &#8220;inherits&#8221; them - and the IntelliSense system is expected to know
+   about it!
+</p>
+</blockquote><p>Despite overtly grumbling about dynamic languages, the author does a
+   good job of promoting them. <span id="excerpt1"/>Software is supposed to be soft and
+   dynamic languages help keep it that way. Everything is
+   open. Everything can be queried. Everything can be adapted.
+</p>
+
+<h4>Emacs Python mode</h4>
+<p>My preferred IDE is <a href="http://www.gnu.org/software/emacs">emacs</a> &#8212; whatever language I&#8217;m using. It has a
+   particularly nice <a href="http://sourceforge.net/projects/python-mode">Python integration</a>.
+   Here&#8217;s how it works:
+</p>
+<ul>
+ <li>
+     Pull up a full-screen window
+ </li>
+
+ <li>
+     Split the window vertically
+ </li>
+
+ <li>
+     Use one side for the code you&#8217;re working on
+ </li>
+
+ <li>
+     Use the other side to run an interpreted <a href="http://python.org">Python</a> session
+ </li>
+
+ <li>
+     Switch sides as desired
+ </li>
+</ul>
+<p>I continually select regions of code to execute. I continually step
+   into the interpreter and use the <a href="http://python.org">Python</a> <code>help</code> command to get help on
+   modules and functions &#8212; including the ones I&#8217;m creating right now.
+   I rework a function in one window then exercise it in the other. I
+   sketch experimental code, run it, rub it out.
+</p>
+<p>Collingbourne says:
+</p>
+<blockquote><p>Creating real
+   <a href="http://www.sapphiresteel.com/IntelliSense">IntelliSense</a> is much
+   harder. The only way to do it properly is to analyse the code much
+   as the Ruby interpreter itself does. The big difference is that the
+   interpreter only goes into operation when a program is complete &#8230;
+</p>
+</blockquote><p>He spots the answer in one sentence &#8212; <em>to do it properly, you do have
+   to hook into the interpreter and its powers of reflection</em> &#8212; then misses
+   the point in the next. You just have to run the interpreter alongside the code
+   you&#8217;re developing, like emacs Python mode does.
+</p>
+
+<h4>A cheat&#8217;s guide to code-completion</h4>
+<p>Collingbourne also exposes some code-completion systems as &#8220;cheats&#8221;.
+</p>
+<blockquote><p>Some code-completion systems solve this problem in a cunning way -
+   they cheat. Instead of working out what type of object x is at any
+   given moment, taking into account all the difficult stuff such as
+   its scope, inheritance and context, they work alphabetically. If
+   someone enters a dot followed by the letters &#8220;my&#8221;, they drop down a
+   list of names such as &#8220;my_method&#8221;, &#8220;my_othermethod&#8221; and
+   &#8220;my_random_guess&#8221; whether or not those methods have anything to do
+   with the object in question.
+</p>
+</blockquote><p>Well, I&#8217;m happy to cheat using <a href="http://www.gnu.org/software/emacs">emacs</a> in this way. The <em></em><code>ALT-/</code><em></em>
+   combination uses alphabetic completion and I use it more
+   than any other key sequence, whatever document I&#8217;m working on. More
+   often than not, it does the right thing. As usual, simple solutions
+   are better.
+</p>
+</div>
+
+<div class="comments"><hr/><div id="disqus_thread"></div><script type="text/javascript" src="http://disqus.com/forums/wordaligned/embed.js"></script></div>
+      
+<div id="comments"><script type="text/javascript">
+//<![CDATA[
+(function() {
+    var links = document.getElementsByTagName('a');
+    var query = '?';
+    for(var i = 0; i < links.length; i++) {
+        if(links[i].href.indexOf('#disqus_thread') >= 0) {
+            query += 'url' + i + '=' + encodeURIComponent(links[i].href) + '&amp;';
+        }
+    }
+    document.write('<script type="text/javascript" src="http://disqus.com/forums/wordaligned/get_num_replies.js' + query + '"></' + 'script>');
+})();
+//]]>
+</script></div>
+
+    </div>
+    <div id="sidebar">
+      <div class="sidebar-node">
+<h3>Excerpts</h3>
+<p><a href="#excerpt0">Ruby is a so-called "dynamic" language, which is a polite way of saying that it's hugely unpredictable.</a></p>
+<p><a href="#excerpt1">Software is supposed to be soft and
+dynamic languages help keep it that way.</a></p>
+
+</div>
+
+<div class="sidebar-node">
+<h3>Tagged</h3>
+<ul id="categories"><li><a href="/tag/python" rel="tag">Python</a></li>
+<li><a href="/tag/ruby" rel="tag">Ruby</a></li>
+<li><a href="/tag/emacs" rel="tag">Emacs</a></li>
+<li><a href="/tag/dynamic-languages" rel="tag">Dynamic Languages</a></li></ul>
+
+</div>
+
+<div class="sidebar-node">
+<h3>Chain</h3>
+<ul>
+<li><a accesskey="n" href="/articles/bin2hex-py.html" title="Next article">&laquo; bin2hex.py</a></li>
+<li><a accesskey="p" href="/articles/casualties-in-the-great-computer-shootout.html" title="Previous article">&raquo; Casualties in the great computer shootout</a></li>
+</ul>
+
+
+</div>
+
+<div class="sidebar-node">
+<h3>Feeds</h3>
+
+<ul>
+<li><a href="http://feeds.wordaligned.org/wordaligned"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Articles</a></li>
+<li><a href="http://feeds.wordaligned.org/wordaligned/comments"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Comments</a></li>
+</ul>
+
+
+</div>
+
+    </div>
+  </div>
+  <div id="footer">
+<hr />
+<p><a href="http://tag.wordaligned.org">Thomas Guest</a></p>
+</div>
+
+</div>
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-3373724-1']);
+  _gaq.push(['_trackPageview']);
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ga);
+  })();
+</script>
+</body>
+
+</html>

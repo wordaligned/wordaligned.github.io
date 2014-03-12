@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" >
+<channel>
+<title>Word Aligned</title>
+<link>http://wordaligned.org</link>
+<description>tales from the code face</description>
+<dc:creator>tag@wordaligned.org</dc:creator>
+<language>en-gb</language>
+<item>
+<title>Angle brackets hurt my eyes</title>
+<description>&lt;blockquote&gt;&lt;p&gt;&amp;#8220;All these angle brackets, they&amp;#8217;re hurting my eyes.&amp;#8221;
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;I&amp;#8217;m quoting a colleague who sits next to me and I sympathise. Perhaps a section from a build file was causing him pain?
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;lt;target name="all" description="Build product."&amp;gt;
+  &amp;lt;mkdir dir="build" if="${not directory::exists('build')}" /&amp;gt;
+   ....
+&amp;lt;/target&amp;gt;
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Or maybe it was some XSL to generate XML by applying XML to XML?
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;lt;xsl:if test="$index-make or @index!='false'"&amp;gt;
+  &amp;lt;xsl:if test="//index"&amp;gt;
+    &amp;lt;fo:block text-align-last="justify" space-before="5pt"&amp;gt;
+      &amp;lt;fo:basic-link internal-destination="index-page"&amp;gt;
+        &amp;lt;xsl:choose&amp;gt;
+          &amp;lt;xsl:when test="(/doc/@lang = 'ja') or (/doc/@lang = '')&amp;lt;/xsl:when&amp;gt;
+          &amp;lt;xsl:otherwise&amp;gt;INDEX&amp;lt;/xsl:otherwise&amp;gt;
+        &amp;lt;/xsl:choose&amp;gt;
+      &amp;lt;/fo:basic-link&amp;gt;
+      &amp;lt;fo:page-number-citation ref-id="index-page"/&amp;gt;
+    &amp;lt;/fo:block&amp;gt;
+  &amp;lt;/xsl:if&amp;gt;
+&amp;lt;/xsl:if&amp;gt;
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Or perhaps he was wrestling with a C++ compile error.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;print.cpp: In function 'void print(const
+std::map&amp;lt;std::basic_string&amp;lt;char, std::char_traits&amp;lt;char&amp;gt;,
+std::allocator&amp;lt;char&amp;gt; &amp;gt;, int, std::less&amp;lt;std::basic_string&amp;lt;char,
+std::char_traits&amp;lt;char&amp;gt;, std::allocator&amp;lt;char&amp;gt; &amp;gt; &amp;gt;,
+std::allocator&amp;lt;std::pair&amp;lt;const std::basic_string&amp;lt;char,
+std::char_traits&amp;lt;char&amp;gt;, std::allocator&amp;lt;char&amp;gt; &amp;gt;, int&amp;gt; &amp;gt; &amp;gt;&amp;amp;)':
+print.cpp:7: error: no match for 'operator&amp;lt;&amp;lt;' in 'std::cout &amp;lt;&amp;lt;
+details' /usr/include/c++/4.2.1/ostream:112: note: candidates are:
+std::basic_ostream&amp;lt;_CharT, _Traits&amp;gt;&amp;amp; std::basic_ostream&amp;lt;_CharT,
+_Traits&amp;gt;::operator&amp;lt;&amp;lt;(std::basic_ostream&amp;lt;_CharT, _Traits&amp;gt;&amp;amp;
+(*)(std::basic_ostream&amp;lt;_CharT, _Traits&amp;gt;&amp;amp;)) [with _CharT = char,
+_Traits = std::char_traits&amp;lt;char&amp;gt;]
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;What makes angle brackets so vexatious. Could it be their sharp corners?
+&lt;/p&gt;
+&lt;p&gt;Lisp is as elegant as XML is prickly, yet it too is famous for brackets, &lt;a href="http://en.wikipedia.org/wiki/S-expression"&gt;albeit round ones&lt;/a&gt; &amp;#8212; and lots of them.
+&lt;/p&gt;
+&lt;blockquote class="twitter-tweet"&gt;&lt;p&gt;It&amp;#8217;s not that Clojure/Lisp has a lot of parentheses. Its just that we removed everything else.&lt;/p&gt;&amp;mdash; Alex Miller (@puredanger) &lt;a href="https://twitter.com/puredanger/status/313507982623268865"&gt;March 18, 2013&lt;/a&gt;&lt;/blockquote&gt;
+&lt;script async src="http://wordaligned.org//platform.twitter.com/widgets.js" charset="utf-8"&gt;&lt;/script&gt;
+
+Imagine a parallel universe with angle-bracket Lisp. I wonder if the language would have proved so enduring?
+
+
+
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;Not so pretty now?&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;lt;define &amp;lt;euler-transform s&amp;gt;
+  &amp;lt;let &amp;lt;&amp;lt;s0 &amp;lt;stream-ref s 0&amp;gt;&amp;gt;
+        &amp;lt;s1 &amp;lt;stream-ref s 1&amp;gt;&amp;gt;    
+        &amp;lt;s2 &amp;lt;stream-ref s 2&amp;gt;&amp;gt;&amp;gt;
+    &amp;lt;cons-stream &amp;lt;- s2 &amp;lt;/ &amp;lt;square &amp;lt;- s2 s1&amp;gt;&amp;gt;
+                          &amp;lt;+ s0 &amp;lt;* -2 s1&amp;gt; s2&amp;gt;&amp;gt;&amp;gt;
+                 &amp;lt;euler-transform &amp;lt;stream-cdr s&amp;gt;&amp;gt;&amp;gt;&amp;gt;&amp;gt;
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+
+
+Looking more closely at the first code snippet, the section from a build file, we can see the problem isn&amp;#8217;t so much the angle brackets as all the others.
+
+
+
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;lt;mkdir dir="build" if="${not directory::exists('build')}" /&amp;gt;
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+
+
+The braces and parentheses may be embedded in a double quoted string but that only makes things worse. The nested levels hurt my eyes and, if you can bear to look at the code long enough, you&amp;#8217;ll realise there&amp;#8217;s a simpler message trying to get out: &lt;tt&gt;mkdir -p build&lt;/tt&gt;.</description>
+<dc:date>2013-05-01</dc:date>
+<guid>http://wordaligned.org/articles/angle-brackets-hurt-my-eyes.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/angle-brackets-hurt-my-eyes.html</link>
+<category>Syntax</category>
+</item>
+
+<item>
+<title>Folded files and rainbow code</title>
+<description>&lt;p&gt;In one of my first programming jobs I worked at a software house which grew its own tools. We had a home made version control system, build system, test harness and programming language. We even had our own editor!
+&lt;/p&gt;
+&lt;p&gt;The language was C, lightly extended to support the primitive types of our particular problem domain. The editor was more esoteric. You drove it using the numeric keypad and it modeled source code as nested blocks:
+&lt;/p&gt;
+&lt;ul&gt;&lt;li&gt;files contained blocks of:&lt;/li&gt;
+&lt;ul&gt;&lt;li&gt;includes&lt;/li&gt;
+&lt;li&gt;documentation&lt;/li&gt;
+&lt;li&gt;data&lt;/li&gt;
+&lt;li&gt;functions&lt;/li&gt;&lt;/ul&gt;
+&lt;li&gt;functions contained groups of:&lt;/li&gt;
+&lt;ul&gt;&lt;li&gt;parameters:&lt;/li&gt;
+&lt;ul&gt;&lt;li&gt;in parameters&lt;/li&gt;
+&lt;li&gt;out parameters&lt;/li&gt;&lt;/ul&gt;
+&lt;li&gt;initialisation blocks&lt;/li&gt;
+&lt;li&gt;assertions&lt;/li&gt;
+&lt;li&gt;code blocks&lt;/li&gt;
+&lt;li&gt;loops&lt;/li&gt;
+&lt;li&gt;machine dependent sections&lt;/li&gt;
+&lt;li&gt;returns&lt;/li&gt;&lt;/ul&gt;&lt;/ul&gt;
+
+&lt;p&gt;The editor facilitated navigation of this nested structure, with keypresses to &lt;a href="http://en.wikipedia.org/wiki/Code_folding"&gt;fold and unfold&lt;/a&gt;.
+&lt;/p&gt;
+&lt;p&gt;You don&amp;#8217;t need to write your own editor to get the benefits of code folding: most editors support it to some degree. With this particular editor, however, folding reached its apotheosis. You could crimp and tuck and pleat, nesting layer upon layer within a single source file.
+&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://www.flickr.com/photos/cobbphoto/4534419314/" title="Origami Dragon by g cobb, on Flickr"&gt;&lt;img src="http://farm5.staticflickr.com/4001/4534419314_705521d064.jpg" width="500" height="334" alt="Origami Dragon"&gt;&lt;/a&gt;
+&lt;/p&gt;
+&lt;span id="continue-reading"/&gt;
+
+&lt;p&gt;The house editor wasn&amp;#8217;t mandated but the fold tokens it automatically placed in special comments made it challenging to work with anything else &lt;a id="fn1link" href="http://wordaligned.org/articles/folded-files-and-rainbow-code.html#fn1"&gt;&lt;sup&gt;[1]&lt;/sup&gt;&lt;/a&gt;. 
+&lt;/p&gt;
+&lt;p&gt;Folding made it easy to work with large files and long, complex functions. Looking back, I&amp;#8217;d say it made it &lt;strong&gt;too&lt;/strong&gt; easy &amp;#8212; I&amp;#8217;ve come to prefer other ways of organising code &amp;#8212; but at the time I saw things differently. We all did. What interests me now is the effect an editor has on the shape of your code.
+&lt;/p&gt;
+&lt;p&gt;A wide editing pane renders long lines comfortably. Code completion makes forgettable names workable. Smart indentation keeps your code legal even as you type. Cut and paste allows you to replicate an existing function and tweak it for a new use case. Undo, redo and autosave are like version control made simple.
+&lt;/p&gt;
+&lt;p&gt;The folding editor failed to seduce everyone. One colleague grumbled it lacked syntax highlighting. Well, it probably came from an age before coloured pixels, and, similarly dated, at the time, I couldn&amp;#8217;t see the need.
+&lt;/p&gt;
+&lt;p&gt;These days I find it hard to operate without syntax highlighting: code doesn&amp;#8217;t even look like code if imports, literals, comments etc. aren&amp;#8217;t visually distinct. Yet there are &lt;a href="http://en.wikipedia.org/wiki/Rob_Pike"&gt;elite programmers&lt;/a&gt; who write their own programming languages using their &lt;a href="http://acme.cat-v.org/faq"&gt;own editors&lt;/a&gt; who find syntax highlighting a distraction.
+&lt;/p&gt;
+&lt;iframe width="500" height="281" src="http://www.youtube.com/embed/dP1xVpMPn8M?rel=0" frameborder="0" allowfullscreen&gt;&lt;/iframe&gt;
+
+&lt;p&gt;Walking round the office where I work I see a diversity of editors. There are split screens and floating windows, stacked up toolbars, icons piled high. Helicopter views expose the jagged outlines of source code seen from a distance. Lenses zoom in on regions of interest. Tokens glow like plankton in deep sea colour schemes.
+&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://www.flickr.com/photos/76798465@N00/4169369269/" title="More phytoplankton zooplankton by willapalens, on Flickr"&gt;&lt;img src="http://farm3.staticflickr.com/2663/4169369269_ac9a8bf641.jpg" width="500" height="375" alt="More phytoplankton zooplankton"&gt;&lt;/a&gt;
+&lt;/p&gt;
+&lt;p&gt;It&amp;#8217;s good practice to develop code on multiple platforms even if your product targets just one. Different compilers and hardware exercise your software in different ways, making it resilient and portable. I wonder too if multiple editors scrutinize your software from different perspectives, keeping it flexible and clean.
+&lt;/p&gt;
+&lt;p style="text-align:center"&gt;&amp;sect;&lt;/p&gt;
+
+&lt;p&gt;My thanks to &lt;a href="http://www.flickr.com/photos/cobbphoto"&gt;Gary Cobb&lt;/a&gt; for permission to use his origami dragon snap, and to &lt;a href="http://www.flickr.com/photos/76798465@N00"&gt;willapalens&lt;/a&gt; for the plankton. The video clip is by &lt;a href="http://swtch.com/~rsc"&gt;Russ Cox&lt;/a&gt;, acme fanatic and &lt;a href="http://golang.org"&gt;go developer&lt;/a&gt;.
+&lt;/p&gt;
+&lt;p&gt;&lt;hr /&gt;
+   &lt;a id="fn1" href="http://wordaligned.org/articles/folded-files-and-rainbow-code.html#fn1link"&gt;[1]&lt;/a&gt;: Programmers relish challenges and one seasoned emacs user had put together an emacs mode to cope with the folds.
+&lt;/p&gt;</description>
+<dc:date>2013-01-23</dc:date>
+<guid>http://wordaligned.org/articles/folded-files-and-rainbow-code.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/folded-files-and-rainbow-code.html</link>
+<category>Syntax</category>
+</item>
+
+<item>
+<title>Syntactic Sugar</title>
+<description>&lt;p&gt;&lt;a href="http://www.sgi.com/tech/stl/"&gt;&lt;img style="float:right;" src="http://www.sgi.com/images/common/sgilogo.gif" alt="SGI logo"/&gt;&lt;/a&gt;
+&lt;/p&gt;
+&lt;p&gt;The SGI STL documentation &lt;a href="http://www.sgi.com/tech/stl/Map.html#3"&gt;notes that&lt;/a&gt; &lt;code&gt;std::map::operator[]&lt;/code&gt; is redundant:
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;Strictly speaking, this member function is unnecessary: it exists only for convenience.
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;This sentence pretty much nails what&amp;#8217;s meant by &amp;#8220;syntactic sugar&amp;#8221;, &lt;a href="http://en.wikipedia.org/wiki/Syntactic_sugar"&gt;defined more formally in Wikipedia&lt;/a&gt; as:
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;&amp;#8230; a term coined by Peter J. Landin for additions to the syntax of a computer language that do not affect its functionality but make it &amp;#8220;sweeter&amp;#8221; for humans to use.
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;&lt;a href="http://uncyclopedia.org/wiki/Semicolon_Cancer"&gt;&lt;img style="float:right;" src="http://images.wikia.com/uncyclopedia/images/4/4a/Semicolon.png" alt="Cancer of the semicolon"/&gt;&lt;/a&gt;
+&lt;/p&gt;
+&lt;p&gt;For example, Python&amp;#8217;s &lt;a href="http://wordaligned.org/articles/echo.html"&gt;@decorator&lt;/a&gt; syntax sweetens the practice of wrapping functions. In C++, operator overloading adds nothing which couldn&amp;#8217;t be achieved using standard function call syntax, but it opens the door to some &lt;a href="http://www.boost.org/doc/libs/1_36_0/libs/spirit/classic/doc/introduction.html" title="Spirit imitates EBNF in C++ using operator overloading"&gt;inventive and expressive techniques&lt;/a&gt;. Haskell has a &lt;a href="http://www.haskell.org/haskellwiki/Syntactic_sugar"&gt;nice syntax&lt;/a&gt; for custom infix operators, and so on. 
+&lt;/p&gt;
+&lt;p&gt;Lisp values its &lt;a href="http://paulgraham.com/hundred.html" title="As few axioms as possible, says Paul Graham"&gt;spare syntax&lt;/a&gt; and certainly won&amp;#8217;t allow infix operators, but even a &lt;a href="http://schemers.org"&gt;minimalist dialect like Scheme&lt;/a&gt; allows lists to be &lt;a href="http://www.r6rs.org/final/html/r6rs/r6rs-Z-H-7.html#node_sec_4.3.2"&gt;represented&lt;/a&gt; like this &lt;code&gt;(a b c d e)&lt;/code&gt; rather than &lt;code&gt;(a . (b . (c . (d . (e . ())))))&lt;/code&gt;.
+&lt;/p&gt;
+&lt;p&gt;Perl comes laced and frosted with syntactic sugar. &lt;a href="http://www.wall.org/~larry/"&gt;Larry Wall&lt;/a&gt; explains why he doesn&amp;#8217;t heed Alan Perlis&amp;#8217;s famous warning about &lt;a href="http://www.cs.yale.edu/quotes.html" title="Syntactic sugar causes cancer of the semicolon, says Alan J. Perlis"&gt;cancer of the semicolon&lt;/a&gt;.
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;To me, one of the most agonizing aspects of language design is coming up with a useful system of operators. To other language designers, this may seem like a silly thing to agonize over. After all, you can view all operators as mere syntactic sugar &amp;#8212; operators are just funny looking function calls. Some languages make a feature of leveling all function calls into one syntax. As a result, the so-called functional languages tend to wear out your parenthesis keys, while OO languages tend to wear out your dot key. &amp;#8212; &lt;a href="http://dev.perl.org/perl6/doc/design/apo/A03.html"&gt;Larry Wall, Apocalypse 3, Operators&lt;/a&gt;
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;(Perl, of course, tends to wear out your shift key &amp;#8230;)
+&lt;/p&gt;
+&lt;span id="continue-reading"/&gt;
+
+&lt;p&gt;There&amp;#8217;s not much in C++ you couldn&amp;#8217;t manage using C, given enough effort. I &lt;a href="http://www.research.att.com/~bs/blast.html" title="Be tolerant, refrain from hyperbole, says Bjarne Stroustrup"&gt;both use and bitch about C++&lt;/a&gt; and sometimes it&amp;#8217;s good to get back to the plain and wholesome taste of C. Not for long though: I start to miss the standard containers and algorithms, operator overloading, exceptions etc.
+&lt;/p&gt;
+&lt;p&gt;I mention this because I&amp;#8217;ve been thinking about what &lt;a href="http://wordaligned.org/articles/entertaining-documentation.html"&gt;makes good software documentation&lt;/a&gt;. If I&amp;#8217;m working with the C standard library, I tend to refer to the &lt;code&gt;man&lt;/code&gt; pages for help, and very fine they are too. Apparently &lt;code&gt;man&lt;/code&gt; pages for the C++ standard library exist but they don&amp;#8217;t come as standard on my platform and I haven&amp;#8217;t installed them &amp;#8212; instead I refer to the &lt;a href="http://www.sgi.com/tech/stl/"&gt;SGI STL Programmer&amp;#8217;s Guide&lt;/a&gt;, which I&amp;#8217;ve downloaded locally for instant and offline access. Now, it&amp;#8217;s clear this guide hasn&amp;#8217;t been actively maintained (the &lt;a href="http://www.sgi.com/tech/stl/whats_new.html"&gt;&amp;#8220;What&amp;#8217;s New&amp;#8221;&lt;/a&gt; page lists nothing more recent than June 2000): it includes non-standard extensions and in some places I&amp;#8217;ve found it&amp;#8217;s no longer correct&lt;a id="fn1link" href="http://wordaligned.org/articles/syntactic-sugar.html#fn1"&gt;&lt;sup&gt;[1]&lt;/sup&gt;&lt;/a&gt;. Nonetheless, its clear exposition and clean layout make it my first point of reference.
+&lt;/p&gt;
+&lt;p&gt;C++&amp;#8217;s standard &lt;code&gt;map&lt;/code&gt; container bears a superficial resemblance to Python&amp;#8217;s &lt;code&gt;dict&lt;/code&gt;, associating keys with values (under the surface, a &lt;code&gt;map&lt;/code&gt; is a balanced tree and a &lt;code&gt;dict&lt;/code&gt; is a hash table&lt;a id="fn2link" href="http://wordaligned.org/articles/syntactic-sugar.html#fn2"&gt;&lt;sup&gt;[2]&lt;/sup&gt;&lt;/a&gt;). Like Python, the &lt;code&gt;[]&lt;/code&gt; operator syntax can be used for container access. Unlike Python, accessing the value associated with a key not present in the map succeeds &amp;#8212; the key gets added and the value is default constructed&lt;a id="fn3link" href="http://wordaligned.org/articles/syntactic-sugar.html#fn3"&gt;&lt;sup&gt;[3]&lt;/sup&gt;&lt;/a&gt;. &lt;a href="http://www.sgi.com/tech/stl/Map.html#3"&gt;Here&amp;#8217;s how the SGI guide documents&lt;/a&gt; this overloading of &lt;code&gt;operator[]&lt;/code&gt; (emphasis mine).
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;Since &lt;code&gt;operator[]&lt;/code&gt; might insert a new element into the &lt;code&gt;map&lt;/code&gt;, it can&amp;#8217;t possibly be a &lt;code&gt;const&lt;/code&gt; member function. Note that the definition of &lt;code&gt;operator[]&lt;/code&gt; is &lt;strong&gt;extremely simple&lt;/strong&gt;: &lt;code&gt;m[k]&lt;/code&gt; is equivalent to &lt;code&gt;(*((m.insert(value_type(k, data_type()))).first)).second&lt;/code&gt;. Strictly speaking, this member function is unnecessary: it exists only for convenience.
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;&lt;a href="http://wordaligned.org/articles/entertaining-documentation.html"&gt;Should reference documentation entertain?&lt;/a&gt; This paragraph may not have had me rolling on the floor with laughter, but I did snort in my coffee.
+&lt;/p&gt;
+&lt;p&gt;Here&amp;#8217;s some compact C++ code designed to showcase the convenience of the operator overload, in this case calculating word frequencies in an istream:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;typedef std::string Word;
+typedef std::map&amp;lt;Word, int&amp;gt; WordCounts;
+
+void count_words(std::istream &amp;amp; text, WordCounts &amp;amp; word_counts)
+{
+    Word word;
+    while (text &amp;gt;&amp;gt; word)
+    {
+        ++word_counts[word];
+    }
+}
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Using the supplied definition of &lt;code&gt;operator[]&lt;/code&gt;, the loop reads:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;    while (text &amp;gt;&amp;gt; word)
+    {
+        ++(*((word_counts.insert
+              (WordCounts::value_type(word, WordCounts::mapped_type()))
+              .first))).second;
+    }
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Now, I realise you have to be clever to use C++, and I&amp;#8217;m sure there&amp;#8217;s a better way of laying out this expression, but can really anyone find it &lt;strong&gt;extremely simple&lt;/strong&gt;?
+&lt;/p&gt;
+&lt;p&gt;Syntactic sugar. Pour it on!
+&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://www.flickr.com/photos/thomasguest/2828100509/" title="sugar by Thomas Guest, on Flickr"&gt;&lt;img src="http://farm4.static.flickr.com/3240/2828100509_2e0c61bfdd_m.jpg" width="180" height="240" alt="sugar" /&gt;&lt;/a&gt;
+&lt;/p&gt;
+&lt;hr /&gt;
+
+&lt;p&gt;&lt;a id="fn1" href="http://wordaligned.org/articles/syntactic-sugar.html#fn1link"&gt;[1]&lt;/a&gt; For example, in the quoted documentation for &lt;code&gt;operator[]&lt;/code&gt;, &lt;code&gt;data_type()&lt;/code&gt; should now read &lt;code&gt;mapped_type()&lt;/code&gt;.
+&lt;/p&gt;
+&lt;p&gt;&lt;a id="fn2" href="http://wordaligned.org/articles/syntactic-sugar.html#fn2link"&gt;[2]&lt;/a&gt; TR1 at last brings a standard hash table to C++, which goes under the unlikely name of &lt;code&gt;std::tr1::unordered_map&lt;/code&gt;.
+&lt;/p&gt;
+&lt;p&gt;&lt;a id="fn3" href="http://wordaligned.org/articles/syntactic-sugar.html#fn3link"&gt;[3]&lt;/a&gt; Python provides &lt;a href="http://docs.python.org/lib/defaultdict-objects.html"&gt;collections.defaultdict&lt;/a&gt; if you want this behaviour.
+&lt;/p&gt;</description>
+<dc:date>2008-09-04</dc:date>
+<guid>http://wordaligned.org/articles/syntactic-sugar.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/syntactic-sugar.html</link>
+<category>Syntax</category>
+</item>
+
+</channel>
+</rss>

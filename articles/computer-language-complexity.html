@@ -1,0 +1,200 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<link rel="icon" href="/images/favicon.png" type="image/png"/>
+<link href="/styles/application.css" media="all" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="/scripts/prettify.js"></script>
+<script type="text/javascript" src="/scripts/lang-lisp.js"></script>
+<script type="text/javascript" src="http://www.haloscan.com/load/wordaligned"></script>
+
+<title>Computer Language Complexity</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="author" content="Thomas Guest" />
+<meta name="description" content="A Word Aligned article posted 2006-10-26, tagged C++, Python, Boost, Scheme." />
+<meta name="keywords" content="C++, Python, Boost, Scheme" />
+<link rel="alternate" type="application/rss+xml" title="Feed" href="http://feeds.wordaligned.org/wordaligned" />
+</head>
+
+<body onload="prettyPrint()">
+<div id="container">
+  <div id="header">
+<h1><span><a accesskey="h" href="/">Word Aligned</a></span></h1>
+<h2>sweating the small stuff</h2>
+<a class="button" href="http://feeds.wordaligned.org/wordaligned" title="Subscribe to Word Aligned"><img style="float: right;" src="/images/feed.png" alt="Feed Logo" height="28" width="28"/></a>
+</div>
+
+  <div id="page">
+    <div id="content">
+      <div class="atomentry" id="computer-language-complexity.html">
+<h2 class="title"><a href="/articles/computer-language-complexity.html">Computer Language Complexity</a></h2>
+<p class="meta"><abbr class="published" title="2006-10-26">2006-10-26</abbr> &bull; <a href="/tag/c++" rel="tag">C++</a>, <a href="/tag/python" rel="tag">Python</a>, <a href="/tag/boost" rel="tag">Boost</a>, <a href="/tag/scheme" rel="tag">Scheme</a> &bull; <a href="/articles/computer-language-complexity.html#disqus_thread">Comments</a></p>
+<p>A debate has been raging on the <a href="http://accu.org/index.php/mailinglists">ACCU general</a> email reflector. It
+   started with some ugly <a href="http://www.boost.org/boost/mpl/vector.hpp">C++
+code</a> and ended up
+   attempting to answer some more general questions about computer
+   languages:
+</p>
+<ol>
+ <li>
+     Can a language be both small and powerful?
+ </li>
+
+ <li>
+     What makes a language powerful anyway?
+ </li>
+
+ <li>
+     Is it better for (any necessary) complexity to be in the language or in its associated libraries?
+ </li>
+
+ <li>
+     Shouldn&#8217;t we just admit that programming is hard?
+ </li>
+</ol>
+<p>C++ came in for criticism from some, though, as its <a href="http://www.research.att.com/~bs/">designer and
+original implementer</a> has been compelled to
+   <a href="http://www.research.att.com/~bs/blast.html">remind</a> us:
+</p>
+<blockquote><p>The major cause of complaints is C++&#8217;s undoubted success. As someone
+   remarked: There are only two kinds of programming languages: those
+   people always bitch about and those nobody uses.
+</p>
+</blockquote><p>Who is that someone? I&#8217;d like to disagree with him &#8212; or her. For now, though,
+   I want to record some of the answers to these questions
+   which I <em>did</em> agree with.
+</p>
+<span id="continue-reading"/>
+
+
+<h4>Can a language be both small and powerful?</h4>
+<p>Yes. <a href="http://www.russel.org.uk">Russel</a> explains:
+</p>
+<blockquote><p>&#8230; If the language comprises a small, orthogonal set of
+   higher order functions and primitive operations, all other things
+   can be built from them.  <span id="excerpt0"/>Small, powerful language, large, structured library of usable software.
+</p>
+</blockquote><p>Clearly, though, there&#8217;s some tension between &#8220;small&#8221; and
+   &#8220;powerful&#8221;. For example, when
+   <a href="http://www.python.org/dev/peps/pep-0255/">generators</a> were added to
+   <a href="http://python.org">Python</a>, the language gained in power at the expense
+   of size: in this case, though, the gains more than
+   outweighed the costs.
+</p>
+<p>It&#8217;s also noteworthy that the next major revision of Python actually
+   aims to make the core language <em>smaller</em>. Yes, Python isn&#8217;t as
+   widely-used as C++ (yet), but it is a major language and it does take
+   backwards compatibility very seriously.  I guess it&#8217;s the kind of
+   progression which can only happen when you have a <a href="http://www.python.org/~guido/">benevolent dictator
+for life</a> rather than a standards
+   committee. Of course, it remains to be seen how well the transition to
+   Python 3.0 actually goes.
+</p>
+
+<h4>What makes a language powerful anyway?</h4>
+<p><a href="http://www.spongelava.com">Paul</a> came up with a practical and
+   appealing definition.
+</p>
+<blockquote><p>The language facilitates more with less required of the programmer.
+</p>
+</blockquote><p>On examination, though, this doesn&#8217;t distinguish between the power of
+   the language itself and the power attained through associated libraries.
+   It&#8217;s possible for the language itself to be simple
+   and powerful, but for the range of available libraries to be poor,
+   meaning that the programmer has to (for example) write their own
+   database access code.  It looks as though <a href="http://schemers.org">Scheme</a>
+   <em>currently</em> falls into this category. And it&#8217;s possible
+   for a language to be less powerful but the range of libraries to be
+   excellent, meaning that the programmer (for example) can&#8217;t overload
+   operators, but can (for example) access a database. I&#8217;d say
+   <a href="http://java.sun.com">Java</a> falls into this category.
+</p>
+
+<h4>Should complexity be in the language or its libraries?</h4>
+<p>It&#8217;s better to keep the core of the language as small and powerful as
+   possible. It&#8217;s far easier to extend what you can do with a language by
+   adding libraries (and it&#8217;s easier to deprecate libraries than
+   deprecate language features).
+</p>
+
+<h3>Shouldn&#8217;t we just admit that programming is hard?</h3>
+<p>We should. It is. But we should still strive for
+   <a href="http://wiki.hsr.ch/SimpleCode/wiki.cgi">simplicity</a>.
+</p>
+</div>
+
+<div class="comments"><hr/><div id="disqus_thread"></div><script type="text/javascript" src="http://disqus.com/forums/wordaligned/embed.js"></script></div>
+      
+<div id="comments"><script type="text/javascript">
+//<![CDATA[
+(function() {
+    var links = document.getElementsByTagName('a');
+    var query = '?';
+    for(var i = 0; i < links.length; i++) {
+        if(links[i].href.indexOf('#disqus_thread') >= 0) {
+            query += 'url' + i + '=' + encodeURIComponent(links[i].href) + '&amp;';
+        }
+    }
+    document.write('<script type="text/javascript" src="http://disqus.com/forums/wordaligned/get_num_replies.js' + query + '"></' + 'script>');
+})();
+//]]>
+</script></div>
+
+    </div>
+    <div id="sidebar">
+      <div class="sidebar-node">
+<h3>Excerpt</h3>
+<p><a href="#excerpt0">Small, powerful language, large, structured library of usable software.</a></p>
+
+</div>
+
+<div class="sidebar-node">
+<h3>Tagged</h3>
+<ul id="categories"><li><a href="/tag/c++" rel="tag">C++</a></li>
+<li><a href="/tag/python" rel="tag">Python</a></li>
+<li><a href="/tag/boost" rel="tag">Boost</a></li>
+<li><a href="/tag/scheme" rel="tag">Scheme</a></li></ul>
+
+</div>
+
+<div class="sidebar-node">
+<h3>Chain</h3>
+<ul>
+<li><a accesskey="n" href="/articles/the-day-when-computer-applications-reside-on-the-web.html" title="Next article">&laquo; When computer applications reside on the web</a></li>
+<li><a accesskey="p" href="/articles/complacency-in-the-computer-industry.html" title="Previous article">&raquo; Complacency in the computer industry</a></li>
+</ul>
+
+
+</div>
+
+<div class="sidebar-node">
+<h3>Feeds</h3>
+
+<ul>
+<li><a href="http://feeds.wordaligned.org/wordaligned"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Articles</a></li>
+<li><a href="http://feeds.wordaligned.org/wordaligned/comments"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Comments</a></li>
+</ul>
+
+
+</div>
+
+    </div>
+  </div>
+  <div id="footer">
+<hr />
+<p><a href="http://tag.wordaligned.org">Thomas Guest</a></p>
+</div>
+
+</div>
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-3373724-1']);
+  _gaq.push(['_trackPageview']);
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ga);
+  })();
+</script>
+</body>
+
+</html>

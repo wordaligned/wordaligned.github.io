@@ -1,0 +1,351 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<link rel="icon" href="/images/favicon.png" type="image/png"/>
+<link href="/styles/application.css" media="all" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="/scripts/prettify.js"></script>
+<script type="text/javascript" src="/scripts/lang-lisp.js"></script>
+<title>Blackmail made easy using Python counters</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="author" content="Thomas Guest" />
+<meta name="description" content="A programming puzzle and a discussion of Python's evolution. A Word Aligned article posted 2009-07-27, tagged Python, Puzzles, Characters." />
+<meta name="keywords" content="Python, Puzzles, Characters" />
+<link rel="alternate" type="application/rss+xml" title="Feed" href="http://feeds.wordaligned.org/wordaligned" />
+</head>
+
+<body onload="prettyPrint()">
+<div id="container">
+  <div id="header">
+<h1><span><a accesskey="h" href="/">Word Aligned</a></span></h1>
+<h2>space sensitive programming</h2>
+<a class="button" href="http://feeds.wordaligned.org/wordaligned" title="Subscribe to Word Aligned"><img style="float: right;" src="/images/feed.png" alt="Feed Logo" height="28" width="28"/></a>
+</div>
+
+  <div id="page">
+    <div id="content">
+      <div class="atomentry" id="python-counters">
+<h2 class="title"><a href="/articles/python-counters">Blackmail made easy using Python counters</a></h2>
+<p class="meta"><abbr class="published" title="2009-07-27">2009-07-27</abbr> &bull; <a href="/tag/python" rel="tag">Python</a>, <a href="/tag/puzzles" rel="tag">Puzzles</a>, <a href="/tag/characters" rel="tag">Characters</a> &bull; <a href="/articles/python-counters#disqus_thread">Comments</a></p>
+<div class="toc">
+<h2>Contents</h2>
+<ul>
+ <li><a href="#tocthe-obsessive-blackmailer" name="toc0" id="toc0">The Obsessive Blackmailer</a>
+ </li>
+
+ <li><a href="#tocmodeling-the-problem" name="toc1" id="toc1">Modeling the Problem</a>
+ </li>
+
+ <li><a href="#tocthe-evolution-of-multisets-in-python" name="toc2" id="toc2">The evolution of multisets in Python</a>
+ </li>
+
+ <li><a href="#tocwait-theres-more" name="toc3" id="toc3">Wait, there&#8217;s more!</a>
+ </li>
+
+ <li><a href="#tocback-to-blackmail" name="toc4" id="toc4">Back to Blackmail</a>
+ </li>
+
+ <li><a href="#tocgeneric-code" name="toc5" id="toc5">Generic Code</a>
+ </li>
+
+ <li><a href="#tocend-of-message" name="toc6" id="toc6">End of Message</a>
+ </li>
+</ul>
+</div>
+<h3><a href="#toc0" name="tocthe-obsessive-blackmailer" id="tocthe-obsessive-blackmailer">The Obsessive Blackmailer</a></h3>
+<p>An obsessive blackmailer writes anonymous messages by by cut-and-pasting letters from newspapers. Being obsessive, the blackmailer only writes messages which can be composed entirely from a single newspaper.
+</p>
+<p><a href="http://www.flickr.com/photos/thomasguest/3754867981/" title="word aligned by Thomas Guest, on Flickr"><img src="http://farm3.static.flickr.com/2567/3754867981_a752d15f74_o.png" width="480" height="309" alt="word aligned" /></a>
+</p>
+<p>Devise an algorithm which determines whether a given message can be written using a given newspaper.
+</p>
+
+<h3><a href="#toc1" name="tocmodeling-the-problem" id="tocmodeling-the-problem">Modeling the Problem</a></h3>
+<p>This is a nice little problem but I&#8217;m about to spoil it since I&#8217;m using it here as a study in Python&#8217;s evolution. So if you&#8217;d like to try it yourself, look away now.
+</p>
+<span id="continue-reading"/>
+
+<p>We can represent both inputs to the algorithm as sequences of characters: a message string, length M, and a newspaper string, length N. We <em>could</em> process the message string one character at a time, at each step scanning through the newspaper and noting the first occurrence of that character we haven&#8217;t used before; but this is inefficient since we potentially read the whole paper M times.
+</p>
+<p>It&#8217;s better to think of this problem in terms of multisets, sometimes known as bags. A multiset is a set which can have repeated elements. Our blackmailer can proceed if the multiset of letters used in the message is contained entirely within the multiset of letters used in the newspaper.
+</p>
+
+<h3><a href="#toc2" name="tocthe-evolution-of-multisets-in-python" id="tocthe-evolution-of-multisets-in-python">The evolution of multisets in Python</a></h3>
+<p>A dictionary provides a compact and efficient way to represent a multiset in Python: each dictionary key represents an item in the multiset, and the value associated with that key is the number of times the key appears in the multiset. Python dictionaries are implemented as hashed arrays, meaning that member insertion and access take constant time, on average.
+</p>
+<p>It&#8217;s not hard to create such a multiset from a sequence but it&#8217;s interesting to see how advances in the Python language have simplified the code. 
+</p>
+<p><a href="http://python.org/doc/1.4/lib/node13.html#SECTION00316000000000000000"><img src="http://python.org/doc/1.4/lib/img7.gif" height="181px" width="469px"/></a>
+</p>
+<p>The complete documentation for <a href="http://python.org/doc/1.4/">Python 1.4</a>, released in 1996, is still available on the Python website. In version 1.4 you could write:
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">def multiset_14(xs):
+    multiset = {}
+    for x in xs:
+        if multiset.has_key(x):
+            multiset[x] = multiset[x] + 1
+        else:
+            multiset[x] = 1
+    return multiset
+
+</pre>
+
+</div>
+
+<p>This code works unchanged in the current Python release, 2.6 (though note <code>dict.has_key()</code> doesn&#8217;t exist in Python 3.*). Alternatively, you might catch the <code>KeyError</code> raised when trying to access the dict with an invalid key:
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">def multiset_14(xs):
+    multiset = {}        
+    for x in xs:
+        try:
+            multiset[x] = multiset[x] + 1
+        except KeyError:
+            multiset[x] = 1
+    return multiset
+
+</pre>
+
+</div>
+
+<p>Python 1.5 introduces an exception-free dictionary access method, <code>dict.get()</code>, which returns a user supplied default (defaulting to <code>None</code>) for missing keys.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">def multiset_15(xs):
+    multiset = {}        
+    for x in xs:
+        multiset[x] = multiset.get(x, 0) + 1
+    return multiset
+
+</pre>
+
+</div>
+
+<p>It&#8217;s certainly shorter, a little cleaner maybe, but perhaps it takes more effort for readers to see what exactly is going on.
+</p>
+<p>At Python 2.2, <code>x in multiset</code> improves on the equivalent <code>multiset.has_key(x)</code> and we can use augmented arithmetic operators (<code>+=, -=, *=, /=, %=, **=, &lt;&lt;=, &gt;&gt;=, &amp;=, =, |=</code>), allowing:
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">def multiset_22(xs):
+    multiset = {}
+    for x in xs:
+        if x in multiset:
+            multiset[x] += 1
+        else:
+            multiset[x] = 1
+    return multiset
+
+</pre>
+
+</div>
+
+<p>I think I prefer the <code>dict.get()</code> version, though.
+</p>
+<p>The <code>collections</code> module makes its first appearance in Python 2.4 offering a <code>deque</code> and a promise of more high performance container types to come. Python 2.5 makes good on this promise, adding <code>defaultdict</code> to the module. A <code>defaultdict</code> is a specialised dictionary which calls a client supplied factory function for missing keys. Setting this factory function to <code>int</code> turns the <code>defaultdict</code> into a multiset. No need for <code>dict.get()</code> any more.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">from collections import defaultdict
+
+def multiset_25(xs):
+    multiset = defaultdict(int)
+    for x in xs:
+        multiset[x] += 1
+    return multiset
+
+</pre>
+
+</div>
+
+
+<h3><a href="#toc3" name="tocwait-theres-more" id="tocwait-theres-more">Wait, there&#8217;s more!</a></h3>
+<p>The final improvement is available in Python 3.1 right now (or in Python 2.7, coming soon), courtesy once again of the collections module. <a href="http://docs.python.org/dev/library/collections.html#collections.Counter">Collections.Counter</a> is exactly what we&#8217;ve been waiting for.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">from collections import Counter
+
+def multiset_31(xs):
+    return Counter(xs)
+
+</pre>
+
+</div>
+
+
+<h3><a href="#toc4" name="tocback-to-blackmail" id="tocback-to-blackmail">Back to Blackmail</a></h3>
+<p>So our blackmailer should first generate a multiset representation of the letters in the message. Then it&#8217;s a matter of iterating through the newspaper and reducing the multiset each time a letter matches up. We keep a tally of the number of letters we still need to match, and stop when this tally is zero or when we get to the end of the newspaper. Here&#8217;s a sketch of an implementation.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">def blackmailable(message, newspaper):
+    """Return True if newspaper can be used to write the blackmail 
+    message, False otherwise.
+    """
+    m = len(message)
+    if m == 0:
+        return True
+    counts = multiset(message)
+    for ch in newspaper:
+        if counts[ch] &gt; 0:
+            counts[ch] -= 1
+            m -= 1
+            if m == 0:
+                return True
+    return False
+
+</pre>
+
+</div>
+
+<p>This code assumes the multiset is represented as a <code>Counter</code> or a <code>defaultdict</code>, since it depends on <code>counts[ch]</code> returning 0 for any character not in the message. If we&#8217;d used a plain dict, we&#8217;d need to employ <code>dict.get(ch, 0)</code>.
+</p>
+<p>I&#8217;m not entirely happy with the code shown. It&#8217;s what I first came up with. Here&#8217;s an alternative, which I also find a bit clunky. I&#8217;d welcome any improvements. It&#8217;s also worth noting that the algorithm locates the matching characters in the newspaper, so we might want to cache some indices for later use.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">def blackmailable(message, newspaper):
+    """Return True if newspaper can be used to write the blackmail 
+    message, False otherwise.
+    """
+    counts = multiset(message)
+    m = len(message)
+    n = len(newspaper)
+    i = 0
+    while m != 0 and i != n:
+        ch = newspaper[i]
+        if counts[ch] &gt; 0:
+            counts[ch] -= 1
+            m -= 1
+        i += 1
+    return m == 0
+
+</pre>
+
+</div>
+
+<p>We can avoid the ugly code by persuading the obssessive blackmailer to generate and maintain multiset representations of the entire newspaper library. Then <code>blackmailable()</code> can be implemented as multiset containment, something which the <code>Counter</code> class handles nicely using the subtraction operator. Note here that multiset subtraction never results in any negative counts, even though a <code>Counter</code> instance could itself have negative counts.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">&gt;&gt;&gt; from collections import Counter
+&gt;&gt;&gt; missing_letters = Counter(message) - Counter(newspaper)
+&gt;&gt;&gt; blackmailable = len(missing_letters) == 0
+
+</pre>
+
+</div>
+
+<p>Alternatively:
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">&gt;&gt;&gt; blackmailable = not missing_letters
+
+</pre>
+
+</div>
+
+
+<h3><a href="#toc5" name="tocgeneric-code" id="tocgeneric-code">Generic Code</a></h3>
+<p>Suppose the blackmailer prefers to compose a message from words, rather than letters? (For an example, see the threat to stay away from Grimpen Moor delivered to Sir Henry Baskerville discussed later in this article.) The code works as is &#8212; just pass in message and newspaper as word sequences, rather than character sequences. Anything we can hash can be counted.
+</p>
+
+<h3><a href="#toc6" name="tocend-of-message" id="tocend-of-message">End of Message</a></h3>
+<p>In the age of the interweb anonymous cowardice is far easier and blackmailers don&#8217;t need to resort to manual cut and paste techniques unless they&#8217;re after a retro threatening effect.
+</p>
+<p><a href="http://en.wikipedia.org/wiki/Never_Mind_the_Bollocks,_Here's_the_Sex_Pistols"><img src="/images/never-mind-the-bollocks.jpg" alt="Never Mind the Bollocks"/></a>
+</p>
+<img style="float:right" alt="Sherlock Holmes" src="/images/sherlock-holmes.png"/>
+
+<p>What&#8217;s more, a detective can figure out plenty from these messages: so when Sir Henry Baskerville receives a threatening letter during his stay at the Northumberland Hotel, he shows it promptly to Sherlock Holmes:
+</p>
+<blockquote><p>Across the middle of it a single sentence had been formed by the expedient of pasting printed words upon it. It ran: &#8220;As you value your life or your reason keep away from the moor.&#8221; The word &#8220;moor&#8221; only was printed in ink.
+</p>
+</blockquote><p>In a virtuso display of deductive reasoning, Holmes shows the author of the message was in a hurry, afraid of being interrupted, and working in a hotel room using nail-scissors. (He also deduces something else, which he does not reveal at the time.) Identifying the source of the words to be yesterday&#8217;s Times leader is elementary.
+</p>
+<blockquote><p>The detection of types is one of the most elementary branches of knowledge to the special expert in crime, though I confess that once when I was very young I confused the Leeds Mercury with the Western Morning News. But a Times leader is entirely distinctive, and these words could have been taken from nothing else.
+</p>
+<p>&#8212; Sherlock Holmes, <a href="http://www.gutenberg.org/dirs/etext02/bskrv11a.txt">The Hound of the Baskervilles</a>
+</p>
+</blockquote><p>Can anyone identify the newspaper I used to create the image at the start of this article?
+</p>
+<p><hr />
+   My thanks to jay for a <a href="#comment-13418772">correction</a> to the original version of this article.
+</p>
+</div>
+
+<div class="comments"><hr/><div id="disqus_thread"></div><script type="text/javascript" src="http://disqus.com/forums/wordaligned/embed.js"></script></div>
+      
+<div id="comments"><script type="text/javascript">
+//<![CDATA[
+(function() {
+    var links = document.getElementsByTagName('a');
+    var query = '?';
+    for(var i = 0; i < links.length; i++) {
+        if(links[i].href.indexOf('#disqus_thread') >= 0) {
+            query += 'url' + i + '=' + encodeURIComponent(links[i].href) + '&amp;';
+        }
+    }
+    document.write('<script type="text/javascript" src="http://disqus.com/forums/wordaligned/get_num_replies.js' + query + '"></' + 'script>');
+})();
+//]]>
+</script></div>
+
+    </div>
+    <div id="sidebar">
+      
+<div class="sidebar-node">
+<h3>Tagged</h3>
+<ul id="categories"><li><a href="/tag/python" rel="tag">Python</a></li>
+<li><a href="/tag/puzzles" rel="tag">Puzzles</a></li>
+<li><a href="/tag/characters" rel="tag">Characters</a></li></ul>
+
+</div>
+
+<div class="sidebar-node">
+<h3>Chain</h3>
+<ul>
+<li><a accesskey="n" href="/articles/inner-outer-shake-it-all-abouter.html" title="Next article">&laquo; Inner, Outer, Shake it all abouter</a></li>
+<li><a accesskey="p" href="/articles/calligraphylion" title="Previous article">&raquo; Could OCR conquer the calligraphylion?</a></li>
+</ul>
+
+
+</div>
+
+<div class="sidebar-node">
+<h3>Feeds</h3>
+
+<ul>
+<li><a href="http://feeds.wordaligned.org/wordaligned"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Articles</a></li>
+<li><a href="http://feeds.wordaligned.org/wordaligned/comments"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Comments</a></li>
+</ul>
+
+
+</div>
+
+    </div>
+  </div>
+  <div id="footer">
+<hr />
+<p><a href="http://tag.wordaligned.org">Thomas Guest</a></p>
+</div>
+
+</div>
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-3373724-1']);
+  _gaq.push(['_trackPageview']);
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ga);
+  })();
+</script>
+</body>
+
+</html>

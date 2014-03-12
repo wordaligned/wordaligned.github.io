@@ -1,0 +1,189 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<link rel="icon" href="/images/favicon.png" type="image/png"/>
+<link href="/styles/application.css" media="all" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="/scripts/prettify.js"></script>
+<script type="text/javascript" src="/scripts/lang-lisp.js"></script>
+<script type="text/javascript" src="http://www.haloscan.com/load/wordaligned"></script>
+
+<title>Mixing Python and C++</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="author" content="Thomas Guest" />
+<meta name="description" content="A Word Aligned article posted 2007-02-28, tagged C++, Python." />
+<meta name="keywords" content="C++, Python" />
+<link rel="alternate" type="application/rss+xml" title="Feed" href="http://feeds.wordaligned.org/wordaligned" />
+</head>
+
+<body onload="prettyPrint()">
+<div id="container">
+  <div id="header">
+<h1><span><a accesskey="h" href="/">Word Aligned</a></span></h1>
+<h2>sweating the small stuff</h2>
+<a class="button" href="http://feeds.wordaligned.org/wordaligned" title="Subscribe to Word Aligned"><img style="float: right;" src="/images/feed.png" alt="Feed Logo" height="28" width="28"/></a>
+</div>
+
+  <div id="page">
+    <div id="content">
+      <div class="atomentry" id="mixing-python-and-cpp">
+<h2 class="title"><a href="/articles/mixing-python-and-cpp">Mixing Python and C++</a></h2>
+<p class="meta"><abbr class="published" title="2007-02-28">2007-02-28</abbr> &bull; <a href="/tag/c++" rel="tag">C++</a>, <a href="/tag/python" rel="tag">Python</a> &bull; <a href="/articles/mixing-python-and-cpp#disqus_thread">Comments</a></p>
+<p>A while ago, I expressed a desire to work on a <a href="http://wordaligned.org/tag/index.html">mixed language
+system</a>.
+</p>
+<blockquote><p>I can&#8217;t get over how neat Python is. Sometime soon I&#8217;d like to work
+   on a mixed language system: Python for the tricky bits, C++ for the
+   speedy bits.
+</p>
+</blockquote><p>I haven&#8217;t changed my mind. As usual, it&#8217;s been an evolution rather
+   than a revolution &#8212; step by step, I&#8217;ve got closer to realising this
+   ambition, and finally, now, I think I can say I&#8217;ve achieved it.
+</p>
+<span id="continue-reading"/>
+
+
+<h2>Why Python and C++?</h2>
+<p>No particular reason. C++ is the systems programming language I know
+   best. When you need to get close to the silicon, it does the job very
+   well. And Python is the high level language I know best. When you want to
+   write concise, flexible software, it does the job very well.
+   Really, though, I&#8217;d be just as happy to write the tricky code in any
+   decent high-level language, switching in low-level languages as
+   dictated by performance and platform requirements.
+</p>
+
+<h2>Mixed language development</h2>
+<p>Perhaps the most obvious way to mix languages is in a single program:
+   you start off by writing the program in Python. If it doesn&#8217;t go
+   quickly enough, you profile it and write a C++ library to look after
+   the slow bits. There are disadvantages to this, though:
+</p>
+<ul>
+ <li>
+     you have to figure out how to interface between the two languages
+ </li>
+
+ <li>
+     the library and the program can become interdependent and harder to test in isolation
+ </li>
+
+ <li>
+     your IDE and build system may not like it
+ </li>
+</ul>
+<p>As a consequence, this turns out to be a technique I&#8217;ve used relatively
+   little. Here are some other techniques I&#8217;ve used more frequently.
+</p>
+<ul>
+ <li><p><strong>Code Generation</strong>. Python is a great language for generating code
+     &#8212; either in Python or C++, or indeed in any other language.
+</p>
+
+ </li>
+
+ <li><p><strong>Multiple Processes</strong>. Rather than sharing a single process, the
+     C++ and the Python programs can run as separate executables. <span id="excerpt0"/>C++ does the
+     heavy lifting; Python manages the complex application logic. A nice
+     side-effect of this approach is that the operating system can use separate processors
+     for the separate processes without all the problems associated with
+     multi-threaded code.
+</p>
+
+ </li>
+
+ <li><p><strong>Prototyping</strong>. Sometimes a compiled C++ program is required. I&#8217;ve
+     found that sketching out a prototype in Python then simply rewriting
+     it in C++ can work well. The prototype can be used as both a
+     reference implementation and a source of test data. 
+</p>
+
+ </li>
+
+ <li><p><strong>Testing</strong>. Python is a great tool for creating test data and for running tests.
+</p>
+
+ </li>
+
+ <li><p><strong>Refactoring</strong>. C++ lacks the refactoring tool support available
+     for (e.g.) Java, but simple Python scripts can do some refactoring  jobs well enough.
+</p>
+
+ </li>
+</ul>
+</div>
+
+<div class="comments"><hr/><div id="disqus_thread"></div><script type="text/javascript" src="http://disqus.com/forums/wordaligned/embed.js"></script></div>
+      
+<div id="comments"><script type="text/javascript">
+//<![CDATA[
+(function() {
+    var links = document.getElementsByTagName('a');
+    var query = '?';
+    for(var i = 0; i < links.length; i++) {
+        if(links[i].href.indexOf('#disqus_thread') >= 0) {
+            query += 'url' + i + '=' + encodeURIComponent(links[i].href) + '&amp;';
+        }
+    }
+    document.write('<script type="text/javascript" src="http://disqus.com/forums/wordaligned/get_num_replies.js' + query + '"></' + 'script>');
+})();
+//]]>
+</script></div>
+
+    </div>
+    <div id="sidebar">
+      <div class="sidebar-node">
+<h3>Excerpt</h3>
+<p><a href="#excerpt0">C++ does the
+  heavy lifting; Python manages the complex application logic.</a></p>
+
+</div>
+
+<div class="sidebar-node">
+<h3>Tagged</h3>
+<ul id="categories"><li><a href="/tag/c++" rel="tag">C++</a></li>
+<li><a href="/tag/python" rel="tag">Python</a></li></ul>
+
+</div>
+
+<div class="sidebar-node">
+<h3>Chain</h3>
+<ul>
+<li><a accesskey="n" href="/articles/test-driven-development-in-python" title="Next article">&laquo; Test driven development in Python</a></li>
+<li><a accesskey="p" href="/articles/release-then-test" title="Previous article">&raquo; Release then Test</a></li>
+</ul>
+
+
+</div>
+
+<div class="sidebar-node">
+<h3>Feeds</h3>
+
+<ul>
+<li><a href="http://feeds.wordaligned.org/wordaligned"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Articles</a></li>
+<li><a href="http://feeds.wordaligned.org/wordaligned/comments"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Comments</a></li>
+</ul>
+
+
+</div>
+
+    </div>
+  </div>
+  <div id="footer">
+<hr />
+<p><a href="http://tag.wordaligned.org">Thomas Guest</a></p>
+</div>
+
+</div>
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-3373724-1']);
+  _gaq.push(['_trackPageview']);
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ga);
+  })();
+</script>
+</body>
+
+</html>

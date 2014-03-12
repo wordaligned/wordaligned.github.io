@@ -1,0 +1,173 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<link rel="icon" href="/images/favicon.png" type="image/png"/>
+<link href="/styles/application.css" media="all" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="/scripts/prettify.js"></script>
+<script type="text/javascript" src="/scripts/lang-lisp.js"></script>
+<script type="text/javascript" src="http://www.haloscan.com/load/wordaligned"></script>
+
+<title>Launching missiles and other unhappy accidents</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="author" content="Thomas Guest" />
+<meta name="description" content="Launching a missile is an example of a dangerous programming side-effect.  Bus accidents are used to motivate team-work. A Word Aligned article posted 2008-09-28, tagged Missiles, Haskell, Accidents, Teamwork." />
+<meta name="keywords" content="Missiles, Haskell, Accidents, Teamwork" />
+<link rel="alternate" type="application/rss+xml" title="Feed" href="http://feeds.wordaligned.org/wordaligned" />
+</head>
+
+<body onload="prettyPrint()">
+<div id="container">
+  <div id="header">
+<h1><span><a accesskey="h" href="/">Word Aligned</a></span></h1>
+<h2>tales from the code face</h2>
+<a class="button" href="http://feeds.wordaligned.org/wordaligned" title="Subscribe to Word Aligned"><img style="float: right;" src="/images/feed.png" alt="Feed Logo" height="28" width="28"/></a>
+</div>
+
+  <div id="page">
+    <div id="content">
+      <div class="atomentry" id="launching-missiles-and-other-unhappy-accidents.html">
+<h2 class="title"><a href="/articles/launching-missiles-and-other-unhappy-accidents.html">Launching missiles and other unhappy accidents</a></h2>
+<p class="meta"><abbr class="published" title="2008-09-28">2008-09-28</abbr> &bull; <a href="/tag/missiles" rel="tag">Missiles</a>, <a href="/tag/haskell" rel="tag">Haskell</a>, <a href="/tag/accidents" rel="tag">Accidents</a>, <a href="/tag/teamwork" rel="tag">Teamwork</a> &bull; <a href="/articles/launching-missiles-and-other-unhappy-accidents.html#disqus_thread">Comments</a></p>
+<h3>Team work</h3>
+<p><a href="http://en.wikipedia.org/wiki/Buses_in_London"><img style="float:right;" src="http://upload.wikimedia.org/wikipedia/commons/thumb/d/d0/Routemaster.JPG/180px-Routemaster.JPG" alt="Routemaster bus"/></a>
+</p>
+<p>Only Iain really understood the application engine, a particularly subtle and complex part of our system. We depended on him alone for any modifications in this area. To reduce the risk, the project manager paired me with Iain to work on a new feature for the engine. After all,
+</p>
+<blockquote><p>&#8220;What would happen if Iain fell under a bus?&#8221;
+</p>
+</blockquote><p>Well, if something that terrible happened, I don&#8217;t suppose I&#8217;d have cared much about the app engine. As it turned out we never got started on that feature. A customer reported a critical bug in the graphics library &#8212; a more straightforward part of the system, but one which only <strong>I</strong> knew about &#8212; and by the time I&#8217;d turned in a fix Iain was heading off for the weekend. Celtic were at home to Rangers. He had a plane to catch.
+</p>
+<p><a href="http://www.celticfc.net"><img  src="http://www.celticfc.net/images/doc/celticcrest.png" alt="Celtic FC Logo"/></a>
+</p>
+
+<h3>Haskell makes the A-Z</h3>
+<p><a href="http://haskell.org"><img src="http://haskell.org/wikistatic/haskellwiki_logo.png" alt="Haskell wiki logo" style="float:right;"/></a>
+</p>
+<p>Switching from buses and planes to Haskell, <a href="http://www.computerworld.com.au/index.php/id;1974033854">Computerworld&#8217;s great A-Z of Programming Languages series</a> recently featured <a href="http://research.microsoft.com/~simonpj/">Simon Peyton Jones</a> talking with characteristic exuberance about the language.
+</p>
+<p>Haskell&#8217;s roots are in academia. Unlike, say, C++ or Erlang, it wasn&#8217;t created with a particular real world application in mind. Rather, the language aimed at rigorously investigating an approach to programming, that approach being strongly-typed lazily-evaluated functional programming. Pure functional programming, if you like. As the language continues to evolve its purity has not been watered down &#8212; what&#8217;s more, as computer architectures develop, the real world seems to be turning towards Haskell.
+</p>
+<p>So much for the summary. It&#8217;s the terrible side effects I&#8217;d like to pick up on.
+</p>
+<span id="continue-reading"/>
+
+
+<h3>Launching Missiles</h3>
+<p>In the interview Simon Peyton Jones talks about pure functions and side effects, a subject <a href="/articles/programming-nirvana-plan-b.html">I was lucky enough to hear him present</a> on at this year&#8217;s ACCU conference.
+</p>
+<p>Advantage number 1. Pure functions can execute in parallel.
+</p>
+<blockquote><p>If the functions that you call do not have any side effect effects behind the scenes, if all they do is compute a value from the input values that you give them, then if you have two such things, you can clearly do them both at the same time. And that&#8217;s purely functional programming. Mainstream languages are, by default, dangerous for parallel evaluation. And purely functional languages are by default fine at parallel evaluation.
+</p>
+</blockquote><p>Advantage number 2. Pure functions are safer.
+</p>
+<blockquote><p>Functional, whether lazy or non-lazy, means no side effect. It doesn&#8217;t mess about behind the scenes &#8212; it doesn&#8217;t launch the missiles, it doesn&#8217;t write to the disk.
+</p>
+</blockquote><p><a href="http://en.wikipedia.org/wiki/Ballistic_missile"><img src="http://upload.wikimedia.org/wikipedia/commons/thumb/6/60/Minuteman3launch.jpg/300px-Minuteman3launch.jpg" alt="Missile launch"/></a>
+</p>
+<p><strong>Launching missiles?</strong> As a side effect, it&#8217;s certainly more dangerous than printing &#8220;Hello, World&#8221; to a terminal. Simon Peyton Jones again, in this case discussing what&#8217;s meant by evaluation order, and why strictness matters.
+</p>
+<blockquote><p>In theory, lazy evaluation means that you can&#8217;t take the ML or Scheme route of just saying &#8216;oh well, we&#8217;ll just allow you to do input/output side effects&#8217;, as you don&#8217;t know what order they&#8217;ll happen in. You wouldn&#8217;t know if you armed the missiles before launching them, or launched them before arming them.
+</p>
+</blockquote>
+<h3>Safety Critical</h3>
+<p>Haskell&#8217;s roots, as already mentioned, are in academia, but funnily enough Simon Peyton Jones has more teaching experience with a language more traditionally associated with missiles and the military.
+</p>
+<blockquote><p>While I was at Glasgow I was exclusively engaged in first year teaching of Ada &#8230;
+</p>
+</blockquote><p>Let&#8217;s suppose Haskell were used to control a hypothetical missile launcher. It&#8217;s true that the <strong>language</strong> allows programmers to formally partition the system between the safe, pure functions, and those which risk changing the world by probing the launch device; but to be truly confident, we must also test the <strong>platform</strong>, by which I mean the compiler, the machine code it generates, and indeed the underlying machine which that code executes on.
+</p>
+<p>Haskell compiler writers have a big responsibility!
+</p>
+<p>Here&#8217;s an even bigger irony: C, a language as side-effectful as they come, is often used to program military devices for the reason that C, as a platform, is easier to ratify. You compile sample programs, you cross-check the generated assembler.
+</p>
+<p>OK, I know, I&#8217;m reading far too much into the &#8220;launch the missiles&#8221; example, but I&#8217;ll admit the phrase makes me shiver, much like the hacker term <a href="http://www.catb.org/jargon/html/I/ICBM-address.html">&#8220;ICBM address&#8221;</a> for geo-tagging does &#8212; and indeed the suggestion that bus accidents should motivate team work.
+</p>
+<p>Somewhere out there, computer programs really do have the power to launch missiles. I couldn&#8217;t find any report of disaster caused by such a program but I did find <a href="http://www.wired.com/science/discoveries/news/2007/09/dayintech_0926">this story</a> about a satellite early warning system reporting <strong>in error</strong> that five ballistic missiles had been launched at Russia. 
+   Fortunately duty officer Lt. Col. Stanislav Petrov smelled a rat.
+</p>
+<blockquote><p>&#8220;I had a funny feeling in my gut&#8221; that this was a false alarm. For one thing, the report indicated that only five missiles had been fired. Had the United States been launching an actual nuclear attack, he reasoned, ICBMs would be raining down on them.
+</p>
+</blockquote>
+<h3>Falling under a bus</h3>
+<p>There was no sign of Iain at work on the Monday morning, and he&#8217;d normally be one of the first in. I had a funny feeling in my gut when the project manager summarily told us to stop what we were doing and gather for an all-hands meeting. Something serious had happened. Maybe we&#8217;d been taken over or someone had been sacked. Actually, it was worse than that.
+</p>
+<p>We all stood in the centre of the open-plan office, shuffling, shutting phones down, waiting. The project manager broke the news. This morning he&#8217;d had a call. On Saturday, Iain had been at the match with some friends. Afterwards, heading away from the ground, no doubt jostled by the crowd, he&#8217;d fallen into the road. He&#8217;d been hit by a bus. Emergency brain surgery &#8230; a helicopter flight &#8230; more surgery to follow &#8230; the situation looked bad &#8230; would keep us all informed.
+</p>
+
+<h3>Outcome</h3>
+<p>After a long period of convalescence Iain returned to work. He has some chilling scars and trouble with tinnitus. Otherwise, he was lucky. Now, when we shuffle work around so as not to depend on one person, we don&#8217;t talk about falling under buses.
+</p>
+</div>
+
+<div class="comments"><hr/><div id="disqus_thread"></div><script type="text/javascript" src="http://disqus.com/forums/wordaligned/embed.js"></script></div>
+      
+<div id="comments"><script type="text/javascript">
+//<![CDATA[
+(function() {
+    var links = document.getElementsByTagName('a');
+    var query = '?';
+    for(var i = 0; i < links.length; i++) {
+        if(links[i].href.indexOf('#disqus_thread') >= 0) {
+            query += 'url' + i + '=' + encodeURIComponent(links[i].href) + '&amp;';
+        }
+    }
+    document.write('<script type="text/javascript" src="http://disqus.com/forums/wordaligned/get_num_replies.js' + query + '"></' + 'script>');
+})();
+//]]>
+</script></div>
+
+    </div>
+    <div id="sidebar">
+      
+<div class="sidebar-node">
+<h3>Tagged</h3>
+<ul id="categories"><li><a href="/tag/missiles" rel="tag">Missiles</a></li>
+<li><a href="/tag/haskell" rel="tag">Haskell</a></li>
+<li><a href="/tag/accidents" rel="tag">Accidents</a></li>
+<li><a href="/tag/teamwork" rel="tag">Teamwork</a></li></ul>
+
+</div>
+
+<div class="sidebar-node">
+<h3>Chain</h3>
+<ul>
+<li><a accesskey="n" href="/articles/merging-sorted-streams-in-python.html" title="Next article">&laquo; Merging sorted streams in Python</a></li>
+<li><a accesskey="p" href="/articles/recursive-pictures.html" title="Previous article">&raquo; Life, user manuals, recursive pictures</a></li>
+</ul>
+
+
+</div>
+
+<div class="sidebar-node">
+<h3>Feeds</h3>
+
+<ul>
+<li><a href="http://feeds.wordaligned.org/wordaligned"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Articles</a></li>
+<li><a href="http://feeds.wordaligned.org/wordaligned/comments"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Comments</a></li>
+</ul>
+
+
+</div>
+
+    </div>
+  </div>
+  <div id="footer">
+<hr />
+<p><a href="http://tag.wordaligned.org">Thomas Guest</a></p>
+</div>
+
+</div>
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-3373724-1']);
+  _gaq.push(['_trackPageview']);
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ga);
+  })();
+</script>
+</body>
+
+</html>

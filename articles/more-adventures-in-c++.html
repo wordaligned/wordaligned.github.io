@@ -1,0 +1,202 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<link rel="icon" href="/images/favicon.png" type="image/png"/>
+<link href="/styles/application.css" media="all" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="/scripts/prettify.js"></script>
+<script type="text/javascript" src="/scripts/lang-lisp.js"></script>
+<title>More adventures in C++</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="author" content="Thomas Guest" />
+<meta name="description" content="A Word Aligned article posted 2013-02-21, tagged C++, Accu." />
+<meta name="keywords" content="C++, Accu" />
+<link rel="alternate" type="application/rss+xml" title="Feed" href="http://feeds.wordaligned.org/wordaligned" />
+</head>
+
+<body onload="prettyPrint()">
+<div id="container">
+  <div id="header">
+<h1><span><a accesskey="h" href="/">Word Aligned</a></span></h1>
+<h2>sweating the small stuff</h2>
+<a class="button" href="http://feeds.wordaligned.org/wordaligned" title="Subscribe to Word Aligned"><img style="float: right;" src="/images/feed.png" alt="Feed Logo" height="28" width="28"/></a>
+</div>
+
+  <div id="page">
+    <div id="content">
+      <div class="atomentry" id="more-adventures-in-c++.html">
+<h2 class="title"><a href="/articles/more-adventures-in-c++.html">More adventures in C++</a></h2>
+<p class="meta"><abbr class="published" title="2013-02-21">2013-02-21</abbr> &bull; <a href="/tag/c++" rel="tag">C++</a>, <a href="/tag/accu" rel="tag">Accu</a> &bull; <a href="/articles/more-adventures-in-c++.html#disqus_thread">Comments</a></p>
+<div class="typocode">
+
+<pre class="prettyprint">bool operator&lt;(version const &amp; v1, version const &amp; v2)
+{
+    if (v1.major != v2.major)
+        return v1.major &lt; v2.major;
+    if (v1.minor != v2.minor)
+        return v1.minor &lt; v2.minor;
+    if (v1.patch != v2.patch)
+        return v1.patch &lt; v2.patch;
+    return v1.build &lt; v2.build;
+}
+
+</pre>
+
+</div>
+
+<p>C++ programmers are sticklers for tradition and unlikely to be swayed by <a href="http://www.zemanta.com/blog/i-bet-you-over-engineered-your-startup/#comment-685047168" title="unlike web developers">what&#8217;s in fashion</a>. C++ suits those who want to control the machine, and who respect the rigour and discipline this imposes. C++ programmers are generally a conservative bunch.
+</p>
+<p>Some history: C++ was standardized in 1998. The next major revision of the language was developed under the working title of C++0x, where the &#8220;0x&#8221; stood for the year the job would be finished. The X gave the standardizers some slack, but not enough. C++0x became C++11 which is now, thankfully, simply C++.
+</p>
+<p>Although the language&#8217;s development has been painstakingly slow the developments themselves have been extensive and radical. What&#8217;s more, users are rushing to use the new features &#8212; even before they have access to compilers which support them! I&#8217;ve seen answers to C++ topics on Q&amp;A sites which use aspects of the language the contributors cheerfully admit they have no access to. I&#8217;ve worked on a project which used elaborate shims to hide the fact that GCC 4.6 couldn&#8217;t compile C++ as well as GCC 4.7 does, and this despite the fact that <a href="http://gcc.gnu.org/projects/cxx0x.html" title="Important: GCC's support for C++11 is still experimental">GCC&#8217;s C++11 support remains, officially, &#8220;experimental&#8221;</a>.
+</p>
+<span id="continue-reading"/>
+
+<p>At home, I&#8217;m downloading compiler and library updates I&#8217;m in no position to use at work; and at work, I&#8217;ve already been sent on a C++11 training course.  I&#8217;ve streamed high quality <a href="http://channel9.msdn.com/Events/GoingNative/GoingNative-2012" title="Going Native 2012 - good stuff here!">videos</a> starring C++&#8217;s big hitters which promote the new C++, explaining its principles, its foundations, and even where it&#8217;s going next.
+</p>
+<p>What exactly is it about C++11 that&#8217;s roused such a normally phlegmatic audience?
+</p>
+<p>Before I try and answer that, I&#8217;ll venture to suggest new C++ isn&#8217;t going to win many new recruits. I don&#8217;t even think it will persuade those who have abandoned the language to return. C++11 contains all of C++98, a notoriously complex and subtle language, then adds <a href="http://www.stroustrup.com/C++11FAQ.html#learn" title="Is C++11 hard to learn? Stroustrup C++11 FAQ">a whole lot more</a>. Yes, it <strong>is</strong> possible to write new C++ which is more compact and efficient than traditional C++, but you&#8217;ll also need to maintain old C++ code and build new expertise. And the language update fails to address some of C++&#8217;s worst characteristics: slow compile times and impenetrable compiler diagnostics.
+</p>
+<p>No, C++11 is primarily a win for existing C++ programmers; those of us who already have a fair understanding of the language and its trade-offs, and who can appreciate the rationale behind the changes. For traditionalists and pragmatists, the transition isn&#8217;t hard &#8212; at least, no harder than any port between compiler revisions. For progressives, there are several immediate wins: the <code>auto</code> keyword has been repurposed, reducing repetition and making code more flexible; lambdas enable functions to be plugged directly into algorithms; smart pointers are standard, allowing accurate memory management; and on the subject of memory, rvalues and move semantics mean you&#8217;ll waste less of it on temporaries.
+</p>
+<p>I could go on.
+</p>
+<p>Rather than risk more generalisations, here&#8217;s a specific example of C++11 in action. Consider an object with multiple fields, a four part version number, say.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">struct version
+{
+    unsigned major, minor, patch, build;
+};
+
+</pre>
+
+</div>
+
+<p>To compare version numbers, or sort them, or put them in a <code>std::set</code>, we&#8217;ll need <code>operator&lt;()</code>. This operator must model a <a href="http://www.sgi.com/tech/stl/StrictWeakOrdering.html">strict weak ordering</a>. The canonical form looks something like.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">bool operator&lt;(version const &amp; v1, version const &amp; v2)
+{
+    if (v1.major != v2.major)
+        return v1.major &lt; v2.major;
+    if (v1.minor != v2.minor)
+        return v1.minor &lt; v2.minor;
+    if (v1.patch != v2.patch)
+        return v1.patch &lt; v2.patch;
+    return v1.build &lt; v2.build;
+}
+
+</pre>
+
+</div>
+
+<p>It&#8217;s not so hard to write this code for the <code>version</code> struct, where we have a clear idea of what it means for one version number to be less than another. It would be rather more tricky if we were dealing with points, for example, <code>struct point { int x, y; };</code>. Ordering points makes little sense but we might well want them as keys in an associative container, and we&#8217;d better have a suitable <code>operator&lt;()</code>.
+</p>
+<div class="typocode"><div class="codetitle">No, no, no!</div>
+
+<pre class="prettyprint">bool operator&lt;(point const &amp; p1, point const &amp; p2)
+{
+    return p1.x &lt; p2.x &amp;&amp; p1.y &lt; p2.y;
+}
+
+</pre>
+
+</div>
+
+<p>With C++11 &#8212; <strong>with the current version of C++</strong> &#8212; we can use <code>std::tie()</code> to create a tuple of references, recasting <code>operator&lt;()</code> into a form that&#8217;s easy to read and hard to get wrong.
+</p>
+<div class="typocode"><div class="codetitle">Yes, yes, yes!</div>
+
+<pre class="prettyprint">bool operator&lt;(version const &amp; v1, version const &amp; v2)
+{
+    return std::tie(v1.major, v1.minor, v1.patch, v1.build)
+         &lt; std::tie(v2.major, v2.minor, v2.patch, v2.build);
+}
+
+bool operator&lt;(point const &amp; p1, point const &amp; p2)
+{
+    return std::tie(p1.x, p1.y) &lt; std::tie(p2.x, p2.y);
+}
+
+</pre>
+
+</div>
+
+<p style="text-align:center">&sect;</p>
+
+<p>My thanks to Jonathan Wakely for sharing the <code>std::tie()</code> recipe on the <a href="http://accu.org/index.php/mailinglists">accu-general mailing list</a> and for letting me use it here.
+</p>
+</div>
+
+<div class="comments"><hr/><div id="disqus_thread"></div><script type="text/javascript" src="http://disqus.com/forums/wordaligned/embed.js"></script></div>
+      
+<div id="comments"><script type="text/javascript">
+//<![CDATA[
+(function() {
+    var links = document.getElementsByTagName('a');
+    var query = '?';
+    for(var i = 0; i < links.length; i++) {
+        if(links[i].href.indexOf('#disqus_thread') >= 0) {
+            query += 'url' + i + '=' + encodeURIComponent(links[i].href) + '&amp;';
+        }
+    }
+    document.write('<script type="text/javascript" src="http://disqus.com/forums/wordaligned/get_num_replies.js' + query + '"></' + 'script>');
+})();
+//]]>
+</script></div>
+
+    </div>
+    <div id="sidebar">
+      
+<div class="sidebar-node">
+<h3>Tagged</h3>
+<ul id="categories"><li><a href="/tag/c++" rel="tag">C++</a></li>
+<li><a href="/tag/accu" rel="tag">Accu</a></li></ul>
+
+</div>
+
+<div class="sidebar-node">
+<h3>Chain</h3>
+<ul>
+<li><a accesskey="n" href="/articles/hosting-for-life-textdrive-revived.html" title="Next article">&laquo; Hosting for Life? TextDrive revived!</a></li>
+<li><a accesskey="p" href="/articles/singly-linked-lists-in-c++.html" title="Previous article">&raquo; Singly Linked Lists in C++</a></li>
+</ul>
+
+
+</div>
+
+<div class="sidebar-node">
+<h3>Feeds</h3>
+
+<ul>
+<li><a href="http://feeds.wordaligned.org/wordaligned"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Articles</a></li>
+<li><a href="http://feeds.wordaligned.org/wordaligned/comments"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Comments</a></li>
+</ul>
+
+
+</div>
+
+    </div>
+  </div>
+  <div id="footer">
+<hr />
+<p><a href="http://tag.wordaligned.org">Thomas Guest</a></p>
+</div>
+
+</div>
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-3373724-1']);
+  _gaq.push(['_trackPageview']);
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ga);
+  })();
+</script>
+</body>
+
+</html>

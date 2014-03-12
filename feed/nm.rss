@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" >
+<channel>
+<title>Word Aligned</title>
+<link>http://wordaligned.org</link>
+<description>tales from the code face</description>
+<dc:creator>tag@wordaligned.org</dc:creator>
+<language>en-gb</language>
+<item>
+<title>Hunting down globals with nm</title>
+<description>&lt;p&gt;It was an old library, in need of attention &amp;#8212; we all knew that &amp;#8212; but it worked well, and we saw no reason to change it. Until, that is, we wanted more than one of it. The problem being, it was riddled with globals. A typical file looked something like this:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;Too many globals&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;#include &amp;lt;string.h&amp;gt;
+#define MSG_BUF_SIZE 256
+
+char const * g_libname = "TOO.MANY.GLOBALS";
+
+void initialise()
+{
+    static int s_initialised = 0;    
+    if (s_initialised == 0)
+    {
+        s_initialised = 1;
+        ....
+    }
+}
+
+char g_msg_buf[MSG_BUF_SIZE];
+
+static void clear_message()
+{
+    memset(g_msg_buf, 0, sizeof(g_msg_buf));
+}
+
+....
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;In the snippet above, the &lt;code&gt;g_msg_buf&lt;/code&gt; has external linkage. Other files in the library accessed it freely. The local static int, &lt;code&gt;s_initialised&lt;/code&gt;, is better contained, but still stood in our way. How could we initialise two library instances?
+&lt;/p&gt;
+&lt;p&gt;Don&amp;#8217;t worry, we&amp;#8217;re not about to discuss the evils of globals and singletons. We all know what needs doing here: initialising the library should return clients a handle, and each client would use its returned handle for subsequent access to the library. Internally, the handle would be a pointer to a struct, the details of which would be private to the library, packaging its internal state.
+&lt;/p&gt;
+&lt;span id="continue-reading"/&gt;
+
+&lt;p&gt;Sadly no refactoring IDE could cope with this job. Our immediate problem was simply sizing up the task. So we had to count up the &lt;code&gt;s_initialised&lt;/code&gt;&amp;#8217;s and &lt;code&gt;g_msg_buf&lt;/code&gt;&amp;#8217;s and so on. One obvious way of getting a number would be to browse the code and build a list of these globals. Indeed, this approach has some merit: we&amp;#8217;re building familiarity with the code, code we&amp;#8217;ll ultimately have to change. An exact answer isn&amp;#8217;t really needed at this stage.
+&lt;/p&gt;
+&lt;p&gt;Shell hackers might attempt an instant estimate by combining &lt;code&gt;grep&lt;/code&gt;, &lt;code&gt;sort&lt;/code&gt; and &lt;code&gt;uniq&lt;/code&gt; &amp;#8212; if we&amp;#8217;re confident that the &lt;code&gt;s_&lt;/code&gt; and &lt;code&gt;g_&lt;/code&gt; prefixes are consistently used in the library.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;$ grep -Eioh "\b[sg]_[[:alnum:]_]*\b" nm.c | sort | uniq
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Such text based approaches are better than nothing. We can review the result for  false hits, inspect the code to see if we&amp;#8217;ve missed anything obvious, adapt the pattern if required, and pipe the result to &lt;code&gt;wc -l&lt;/code&gt; for a final count.
+&lt;/p&gt;
+&lt;p&gt;&lt;span /&gt;But the best route to an accurate answer is easier and quicker. The compiler &lt;em&gt;has to know&lt;/em&gt; exactly what&amp;#8217;s global, what&amp;#8217;s local, what&amp;#8217;s data and what&amp;#8217;s missing, and that information gets put in the object code it generates. Since reading object code is tough, we&amp;#8217;ll ask &lt;code&gt;nm&lt;/code&gt; to do it for us. Here&amp;#8217;s what I get if I compile the snippet above and inspect the output object file with &lt;code&gt;nm&lt;/code&gt;. (What you get should be similar, but the details will depend on your platform.)
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;$ gcc -c too_many_globals.c &amp;amp;&amp;amp; nm too_many_globals.o
+00000018 t clear_message
+00000000 D g_libname
+00000100 C g_msg_buf
+00000000 T initialise
+         U memset
+00000000 b s_initialised.0
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;The &lt;code&gt;nm&lt;/code&gt; manual tells us how to interpret the output:
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;Nm displays the name list (symbol table) of each object file in the argument list &amp;#8230; Each symbol name is preceded  by  its  value (blanks if undefined) &amp;#8230; this value is followed by one of the following  characters,  representing  the symbol type: U (undefined), A (absolute), T (text section symbol), D (data section  symbol), B (bss section  symbol), C (common  symbol) &amp;#8230;. If the symbol is local (non-external), the symbol&amp;#8217;s type is instead represented  by  the  corresponding lowercase letter.
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;&lt;code&gt;Nm&lt;/code&gt; works on object files, libraries (static and dynamic) and executables. You don&amp;#8217;t have to be an expert on object code to correlate the &lt;code&gt;nm&lt;/code&gt; output shown above with the source code. It&amp;#8217;s telling us:
+&lt;/p&gt;
+&lt;ul&gt;
+ &lt;li&gt;
+     &lt;code&gt;clear_message&lt;/code&gt; is a local function
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     &lt;code&gt;g_libname&lt;/code&gt; is constant global data 
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     &lt;code&gt;initialise&lt;/code&gt; is an external function
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     &lt;code&gt;memset&lt;/code&gt; is undefined (it&amp;#8217;s part of the standard C library)
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     &lt;code&gt;g_msg_buf&lt;/code&gt; and &lt;code&gt;s_initialised&lt;/code&gt; are the bad boys we&amp;#8217;re hunting down
+ &lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Once we&amp;#8217;ve discovered &lt;code&gt;nm&lt;/code&gt; we can pick out the globals accurately and swiftly.  Running &lt;code&gt;nm libtoo_many_globals.a&lt;/code&gt; outputs text which we can pipe through standard Unix tools as before to get &lt;em&gt;exact&lt;/em&gt; metrics.
+&lt;/p&gt;
+&lt;p&gt;The &lt;a href="http://www.gnu.org/software/binutils/manual/html_chapter/binutils_2.html"&gt;GNU version of nm&lt;/a&gt; has some bells and whistles &amp;#8212; it can demangle C++ symbols, for example. Object code is platform dependent and the details of &lt;code&gt;nm&lt;/code&gt;&amp;#8217;s output will similarly vary across platforms, so I suggest you look at the manual, but most of the time &lt;code&gt;nm OBJECTFILE&lt;/code&gt; is all you&amp;#8217;ll need.
+&lt;/p&gt;
+
+&lt;h3&gt;Global constants&lt;/h3&gt;
+&lt;p&gt;Note that &lt;code&gt;nm&lt;/code&gt; has nothing to say about the preprocessor definition, MSG_BUF_SIZE, which vanishes well before the object file gets written. Since MSG_BUF_SIZE can&amp;#8217;t be changed at run time or even after compilation, it won&amp;#8217;t stop us from safely using more than one library instance. &lt;code&gt;Nm&lt;/code&gt; does tell us about &lt;code&gt;g_libname&lt;/code&gt;, a string constant has been placed in the data section of the object file. Like MSG_BUF_SIZE, multiple library instances can safely share this read-only data.
+&lt;/p&gt;
+&lt;p&gt;Just because something can be done doesn&amp;#8217;t make it &lt;a href="http://accu.org/index.php/journals/1411"&gt;good practice&lt;/a&gt;. I don&amp;#8217;t think there&amp;#8217;s enough information here to definitively rule against these two &amp;#8220;safe&amp;#8221; globals, but they certainly look suspect. At the very least, the scope of the library name string should be reduced. It would be better to review use of constant data throughout the library; by passing this data in, perhaps as an initialisation parameter, the library may become more flexible and easier to test.
+&lt;/p&gt;</description>
+<dc:date>2008-04-08</dc:date>
+<guid>http://wordaligned.org/articles/hunting-down-globals-with-nm.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/hunting-down-globals-with-nm.html</link>
+<category>nm</category>
+</item>
+
+</channel>
+</rss>

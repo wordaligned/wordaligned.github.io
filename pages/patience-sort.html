@@ -1,0 +1,156 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<link rel="icon" href="/images/favicon.png" type="image/png"/>
+<title>Patience Sort Animation</title> 
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.1/jquery.min.js"></script>
+<script type="text/javascript" src="/scripts/shuffle.js"></script>
+</head>
+<body onload="shuffle()">
+<script type="text/javascript">
+ncards = 52;
+
+margin = 11;
+vbot = 131;
+htabtop = 17;
+htabbot = 97;
+vtab = 20;
+
+z = 0;
+
+deck = new Array(ncards);
+
+for (var i = 0; i != ncards; ++i) {
+    deck[i] = i;
+}
+
+function px(n) {
+    return n + randrange(-2, 3) + "px";
+}
+
+function deal(deck) {
+    for (var i = 0; i != deck.length; ++i) {
+        var j = deck.length - i - 1;
+        jQuery("#card" + deck[j]).css
+            ({zIndex : ++z, marginLeft : px(i * htabtop + margin), marginTop : px(margin)});
+    }
+}
+
+function win(moves) {
+    for (var i = 0; i != moves.length; ++i) {
+        if (moves[i].pile == 9) {
+            return false;
+        }
+    }
+    return true;
+}
+
+function animate(moves, i) {
+    if (i != ncards) {
+         var move = moves[i];
+         jQuery("#card" + move.card)
+             .animate({ marginLeft : px(move.pile * htabbot + margin),
+                        marginTop : px(vbot + move.depth * vtab)},
+                 "slow", 0,
+                 function(){ animate(moves, ++i); })
+             .css({ zIndex : ++z });
+    } else if (win(moves)) {
+        alert("Congratulations, you win!");
+    }
+}
+
+function reset() {
+    jQuery("img").stop();
+    z = 0;
+}
+
+function shuffle() {
+    reset();
+    randomshuffle(deck);
+    deal(deck);
+}
+
+function psort() {
+    reset();
+    deal(deck);
+    moves = patience_sort(deck);
+    animate(moves, 0);
+}
+</script>
+<div class="cardtable" style="background-color: #093; width:2048px; height:480px;">
+<img id="card0" style="position: absolute; margin-left: 15px; margin-top: 19px;" src="/images/cards/1c.png" alt="card"/>
+<img id="card1" style="position: absolute; margin-left: 33px; margin-top: 22px;" src="/images/cards/2c.png" alt="card"/>
+<img id="card2" style="position: absolute; margin-left: 50px; margin-top: 20px;" src="/images/cards/3c.png" alt="card"/>
+<img id="card3" style="position: absolute; margin-left: 68px; margin-top: 20px;" src="/images/cards/4c.png" alt="card"/>
+<img id="card4" style="position: absolute; margin-left: 85px; margin-top: 21px;" src="/images/cards/5c.png" alt="card"/>
+<img id="card5" style="position: absolute; margin-left: 101px; margin-top: 22px;" src="/images/cards/6c.png" alt="card"/>
+<img id="card6" style="position: absolute; margin-left: 121px; margin-top: 18px;" src="/images/cards/7c.png" alt="card"/>
+<img id="card7" style="position: absolute; margin-left: 135px; margin-top: 21px;" src="/images/cards/8c.png" alt="card"/>
+<img id="card8" style="position: absolute; margin-left: 155px; margin-top: 22px;" src="/images/cards/9c.png" alt="card"/>
+<img id="card9" style="position: absolute; margin-left: 172px; margin-top: 20px;" src="/images/cards/10c.png" alt="card"/>
+<img id="card10" style="position: absolute; margin-left: 189px; margin-top: 20px;" src="/images/cards/11c.png" alt="card"/>
+<img id="card11" style="position: absolute; margin-left: 205px; margin-top: 18px;" src="/images/cards/12c.png" alt="card"/>
+<img id="card12" style="position: absolute; margin-left: 221px; margin-top: 19px;" src="/images/cards/13c.png" alt="card"/>
+<img id="card13" style="position: absolute; margin-left: 239px; margin-top: 22px;" src="/images/cards/1d.png" alt="card"/>
+<img id="card14" style="position: absolute; margin-left: 255px; margin-top: 21px;" src="/images/cards/2d.png" alt="card"/>
+<img id="card15" style="position: absolute; margin-left: 272px; margin-top: 22px;" src="/images/cards/3d.png" alt="card"/>
+<img id="card16" style="position: absolute; margin-left: 289px; margin-top: 21px;" src="/images/cards/4d.png" alt="card"/>
+<img id="card17" style="position: absolute; margin-left: 305px; margin-top: 22px;" src="/images/cards/5d.png" alt="card"/>
+<img id="card18" style="position: absolute; margin-left: 322px; margin-top: 20px;" src="/images/cards/6d.png" alt="card"/>
+<img id="card19" style="position: absolute; margin-left: 339px; margin-top: 18px;" src="/images/cards/7d.png" alt="card"/>
+<img id="card20" style="position: absolute; margin-left: 358px; margin-top: 22px;" src="/images/cards/8d.png" alt="card"/>
+<img id="card21" style="position: absolute; margin-left: 373px; margin-top: 22px;" src="/images/cards/9d.png" alt="card"/>
+<img id="card22" style="position: absolute; margin-left: 393px; margin-top: 22px;" src="/images/cards/10d.png" alt="card"/>
+<img id="card23" style="position: absolute; margin-left: 406px; margin-top: 18px;" src="/images/cards/11d.png" alt="card"/>
+<img id="card24" style="position: absolute; margin-left: 423px; margin-top: 20px;" src="/images/cards/12d.png" alt="card"/>
+<img id="card25" style="position: absolute; margin-left: 443px; margin-top: 18px;" src="/images/cards/13d.png" alt="card"/>
+<img id="card26" style="position: absolute; margin-left: 460px; margin-top: 22px;" src="/images/cards/1h.png" alt="card"/>
+<img id="card27" style="position: absolute; margin-left: 476px; margin-top: 19px;" src="/images/cards/2h.png" alt="card"/>
+<img id="card28" style="position: absolute; margin-left: 495px; margin-top: 19px;" src="/images/cards/3h.png" alt="card"/>
+<img id="card29" style="position: absolute; margin-left: 509px; margin-top: 18px;" src="/images/cards/4h.png" alt="card"/>
+<img id="card30" style="position: absolute; margin-left: 525px; margin-top: 19px;" src="/images/cards/5h.png" alt="card"/>
+<img id="card31" style="position: absolute; margin-left: 544px; margin-top: 21px;" src="/images/cards/6h.png" alt="card"/>
+<img id="card32" style="position: absolute; margin-left: 562px; margin-top: 19px;" src="/images/cards/7h.png" alt="card"/>
+<img id="card33" style="position: absolute; margin-left: 579px; margin-top: 20px;" src="/images/cards/8h.png" alt="card"/>
+<img id="card34" style="position: absolute; margin-left: 596px; margin-top: 18px;" src="/images/cards/9h.png" alt="card"/>
+<img id="card35" style="position: absolute; margin-left: 613px; margin-top: 19px;" src="/images/cards/10h.png" alt="card"/>
+<img id="card36" style="position: absolute; margin-left: 630px; margin-top: 18px;" src="/images/cards/11h.png" alt="card"/>
+<img id="card37" style="position: absolute; margin-left: 644px; margin-top: 22px;" src="/images/cards/12h.png" alt="card"/>
+<img id="card38" style="position: absolute; margin-left: 665px; margin-top: 21px;" src="/images/cards/13h.png" alt="card"/>
+<img id="card39" style="position: absolute; margin-left: 679px; margin-top: 22px;" src="/images/cards/1s.png" alt="card"/>
+<img id="card40" style="position: absolute; margin-left: 697px; margin-top: 20px;" src="/images/cards/2s.png" alt="card"/>
+<img id="card41" style="position: absolute; margin-left: 714px; margin-top: 18px;" src="/images/cards/3s.png" alt="card"/>
+<img id="card42" style="position: absolute; margin-left: 731px; margin-top: 22px;" src="/images/cards/4s.png" alt="card"/>
+<img id="card43" style="position: absolute; margin-left: 747px; margin-top: 20px;" src="/images/cards/5s.png" alt="card"/>
+<img id="card44" style="position: absolute; margin-left: 765px; margin-top: 21px;" src="/images/cards/6s.png" alt="card"/>
+<img id="card45" style="position: absolute; margin-left: 781px; margin-top: 18px;" src="/images/cards/7s.png" alt="card"/>
+<img id="card46" style="position: absolute; margin-left: 799px; margin-top: 21px;" src="/images/cards/8s.png" alt="card"/>
+<img id="card47" style="position: absolute; margin-left: 816px; margin-top: 20px;" src="/images/cards/9s.png" alt="card"/>
+<img id="card48" style="position: absolute; margin-left: 834px; margin-top: 19px;" src="/images/cards/10s.png" alt="card"/>
+<img id="card49" style="position: absolute; margin-left: 848px; margin-top: 22px;" src="/images/cards/11s.png" alt="card"/>
+<img id="card50" style="position: absolute; margin-left: 869px; margin-top: 20px;" src="/images/cards/12s.png" alt="card"/>
+<img id="card51" style="position: absolute; margin-left: 883px; margin-top: 21px;" src="/images/cards/13s.png" alt="card"/>
+</div>
+<div>
+<p><button onclick="shuffle();">Shuffle and Deal</button><button onclick="psort();">Patience Sort</button></p>
+</div>
+
+<blockquote><p>Take a deck of cards labeled 1, 2, 3, &#8230; , <strong>n</strong>. The deck is shuffled, cards are turned up one at a time and dealt into piles on the table, according to the rule 
+</p>
+<ul>
+ <li>
+     A low card may be placed on a higher card (e.g. 2 may be placed on 7), or may be put into a new pile to the right of the existing piles. 
+ </li>
+</ul>
+<p>At each stage we see the top card on each pile. If the turned up card is higher than the cards showing, then it <strong>must</strong> be put into a new pile to the right of the others. <strong>The object of the game is to finish with as few piles as possible</strong>.
+</p>
+&mdash; <a href="http://www.ams.org/bull/1999-36-04/S0273-0979-99-00796-X/home.html">&#8220;Longest Increasing Subsequences: From Patience Sorting to the Baik-Deift-Johansson Theorem&#8221;</a>, David Aldous and Persi Diaconis
+<p>
+</blockquote>
+
+<p>As a target Aldous and Diaconis recommend aiming for 9 piles, which, combined with an optimal strategy, gives you roughly a 1 in 20 chance of winning.
+</p>
+</p>
+</body>
+</html>
+

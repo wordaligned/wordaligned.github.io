@@ -1,0 +1,142 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<link rel="icon" href="/images/favicon.png" type="image/png"/>
+<link href="/styles/application.css" media="all" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="/scripts/prettify.js"></script>
+<script type="text/javascript" src="/scripts/lang-lisp.js"></script>
+<script type="text/javascript" src="http://www.haloscan.com/load/wordaligned"></script>
+
+<title>So many feeds, so little news</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="author" content="Thomas Guest" />
+<meta name="description" content="So many feeds, so little news. A reflection on internet consumption. A Word Aligned article posted 2007-12-11, tagged Self, Web Applications, Charts." />
+<meta name="keywords" content="Self, Web Applications, Charts" />
+<link rel="alternate" type="application/rss+xml" title="Feed" href="http://feeds.wordaligned.org/wordaligned" />
+</head>
+
+<body onload="prettyPrint()">
+<div id="container">
+  <div id="header">
+<h1><span><a accesskey="h" href="/">Word Aligned</a></span></h1>
+<h2>whatsoever I do, it&#8217;s got to be funky</h2>
+<a class="button" href="http://feeds.wordaligned.org/wordaligned" title="Subscribe to Word Aligned"><img style="float: right;" src="/images/feed.png" alt="Feed Logo" height="28" width="28"/></a>
+</div>
+
+  <div id="page">
+    <div id="content">
+      <div class="atomentry" id="so-many-feeds-so-little-news.html">
+<h2 class="title"><a href="/articles/so-many-feeds-so-little-news.html">So many feeds, so little news</a></h2>
+<p class="meta"><abbr class="published" title="2007-12-11">2007-12-11</abbr> &bull; <a href="/tag/self" rel="tag">Self</a>, <a href="/tag/web-applications" rel="tag">Web Applications</a>, <a href="/tag/charts" rel="tag">Charts</a> &bull; <a href="/articles/so-many-feeds-so-little-news.html#disqus_thread">Comments</a></p>
+<p>I consume the internet using <a href="http://www.mozilla.com/firefox/">a web browser</a> and <a href="http://reader.google.com">a feed reader</a>. Here&#8217;s the pseudo-code:
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">find www -follow -type feed -print | sort
+
+</pre>
+
+</div>
+
+
+<h4>Find</h4>
+<p>The <code>find</code> process seeds itself. When I read something I like I follow promising links; and if I <em>do</em> like what I then find, I click the feed icon in the browser address bar, and my preferences arrange for the feed to be filed by my news reader.
+</p>
+<img style="float:right;padding:10px;" width="50%" src="http://www.cricketschirping.com/processing/GraphLayout/GraphLayout.png" alt="Part of a graph" />
+
+<p>So I&#8217;m recursively walking a massive directed graph. The further I explore, the more there is to be explored. I haven&#8217;t yet added the same node twice (I do at least remember where I&#8217;ve been and what I&#8217;ve already added) but it&#8217;s only a matter of time (and now I think about it, I <em>have</em> added planets which syndicate feeds I&#8217;ve already subscribed to).
+</p>
+<p>Should I tire of this auto-discovery, my feed reader will happily, and with unnerving accuracy, offer its own recommendations.
+</p>
+
+<h4>Sort</h4>
+<p>The subsequent <code>sort</code> isn&#8217;t too bad. My reader supports various filing and filtering and viewing operations.
+</p>
+
+<h4>Uniq</h4>
+<p>What I&#8217;m starting to want, though, is <code>uniq</code>.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">find www -type feed -follow -print | sort | uniq
+
+</pre>
+
+</div>
+
+<p>Last week half a dozen feeds I subscribe to reported that <a href="http://www.python.org/news/index.html#Fri07Dec20071020-0800">Python3.0a2 had been released</a>; none added much news to that headline. Similarly lots of people told me about the <a href="http://code.google.com/apis/chart/">google chart API launch</a> &#8212; though in in this case, some had something <a href="http://www.dougma.com/archives/56">original</a> to report. It&#8217;s fuzzy <code>uniq</code> I need, a filter which kills hollow echoes and keeps thoughtful commentary.
+</p>
+<p>My feed reader shows me what&#8217;s been updated. It can&#8217;t show me what&#8217;s new.
+</p>
+</div>
+
+<div class="comments"><hr/><div id="disqus_thread"></div><script type="text/javascript" src="http://disqus.com/forums/wordaligned/embed.js"></script></div>
+      
+<div id="comments"><script type="text/javascript">
+//<![CDATA[
+(function() {
+    var links = document.getElementsByTagName('a');
+    var query = '?';
+    for(var i = 0; i < links.length; i++) {
+        if(links[i].href.indexOf('#disqus_thread') >= 0) {
+            query += 'url' + i + '=' + encodeURIComponent(links[i].href) + '&amp;';
+        }
+    }
+    document.write('<script type="text/javascript" src="http://disqus.com/forums/wordaligned/get_num_replies.js' + query + '"></' + 'script>');
+})();
+//]]>
+</script></div>
+
+    </div>
+    <div id="sidebar">
+      
+<div class="sidebar-node">
+<h3>Tagged</h3>
+<ul id="categories"><li><a href="/tag/self" rel="tag">Self</a></li>
+<li><a href="/tag/web-applications" rel="tag">Web Applications</a></li>
+<li><a href="/tag/charts" rel="tag">Charts</a></li></ul>
+
+</div>
+
+<div class="sidebar-node">
+<h3>Chain</h3>
+<ul>
+<li><a accesskey="n" href="/articles/the-maximum-subsequence-problem.html" title="Next article">&laquo; The Maximum Sum contiguous subsequence problem</a></li>
+<li><a accesskey="p" href="/articles/elegance-and-efficiency.html" title="Previous article">&raquo; Elegance and Efficiency</a></li>
+</ul>
+
+
+</div>
+
+<div class="sidebar-node">
+<h3>Feeds</h3>
+
+<ul>
+<li><a href="http://feeds.wordaligned.org/wordaligned"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Articles</a></li>
+<li><a href="http://feeds.wordaligned.org/wordaligned/comments"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Comments</a></li>
+</ul>
+
+
+</div>
+
+    </div>
+  </div>
+  <div id="footer">
+<hr />
+<p><a href="http://tag.wordaligned.org">Thomas Guest</a></p>
+</div>
+
+</div>
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-3373724-1']);
+  _gaq.push(['_trackPageview']);
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ga);
+  })();
+</script>
+</body>
+
+</html>

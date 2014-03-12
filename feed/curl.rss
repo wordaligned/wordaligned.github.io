@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" >
+<channel>
+<title>Word Aligned</title>
+<link>http://wordaligned.org</link>
+<description>tales from the code face</description>
+<dc:creator>tag@wordaligned.org</dc:creator>
+<language>en-gb</language>
+<item>
+<title>Curling for web sites</title>
+<description>&lt;p&gt;I wanted information about ISO 3166-1 alpha-2 country codes. Google found me the definitive link (&lt;a href="http://www.iso.org/iso/country_codes/iso_3166_code_lists.htm" title="ISO 3166 country code lists"&gt;http://www.iso.org/iso/country_codes/iso_3166_code_lists.htm&lt;/a&gt;) but clicking on it showed the ISO website to be temporarily down for maintenance.
+&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://www.iso.org/error/sitedown.html" title="ISO site down page"&gt;&lt;img style="border: 2px solid orange;" src="http://wordaligned.org/images/iso-down.png" alt="ISO website out of action" /&gt;&lt;/a&gt;
+&lt;/p&gt;
+&lt;p&gt;Rather than check back again every few minutes or hunt for stale information in the google cache, I got &lt;code&gt;curl&lt;/code&gt; and &lt;code&gt;bash&lt;/code&gt; to notify me when the site went live.
+&lt;/p&gt;
+&lt;pre&gt;
+$ url=http://www.iso.org/iso/country_codes/iso_3166_code_lists.htm
+$ curl -I $url
+HTTP/1.1 302 Found
+Date: Tue, 27 May 2008 08:00:44 GMT
+Server: BIG-IP
+Location: http://www.iso.org/error/sitedown.html
+Via: 1.1 www.iso.org
+Connection: close
+Content-Type: text/html
+&lt;/pre&gt;
+
+&lt;p&gt;&lt;code&gt;Curl -I&lt;/code&gt; fetches the page header only, which in this case uses a &lt;a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html"&gt;302 status code&lt;/a&gt; to temporarily redirect clients to the &lt;code&gt;sitedown.html&lt;/code&gt; page. Using this information I wrote a simple while loop to ping the site every minute and determine when this status changed.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;$ http_status() { curl -I -s $1 | head -1 | cut -d " " -f 2; }
+$ while [ $(http_status $url) == 302 ]; do sleep 60; done; open $url
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;&lt;code&gt;Open&lt;/code&gt; is an OS X thing: when the loop completes &lt;code&gt;open&lt;/code&gt; just opens the web page in a browser tab.
+&lt;/p&gt;
+&lt;p&gt;To run this command in the background, &lt;code&gt;&amp;amp;&lt;/code&gt; it.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;$ (while [ $(http_status $url) == 302 ]; do sleep 60; done; open $url)&amp;amp;
+[1] 808
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Here, the job has a handle of &lt;code&gt;1&lt;/code&gt; and a process id of &lt;code&gt;808&lt;/code&gt;. You can recover this information using &lt;code&gt;jobs&lt;/code&gt;.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;$ jobs
+[1]+  Running                 ( while [ $(http_status $url) == 302 ]; do
+    sleep 300;
+done; open $url ) &amp;amp;
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;If you need to kill the job, &lt;code&gt;kill %1&lt;/code&gt; does the trick.
+&lt;/p&gt;</description>
+<dc:date>2008-05-27</dc:date>
+<guid>http://wordaligned.org/articles/curling-for-web-sites.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/curling-for-web-sites.html</link>
+<category>Curl</category>
+</item>
+
+</channel>
+</rss>

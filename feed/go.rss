@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" >
+<channel>
+<title>Word Aligned</title>
+<link>http://wordaligned.org</link>
+<description>tales from the code face</description>
+<dc:creator>tag@wordaligned.org</dc:creator>
+<language>en-gb</language>
+<item>
+<title>Go for short variable names</title>
+<description>&lt;p&gt;Recently Brad Fitzpatrick promoted the &lt;a href="http://golang.org/s/style" title="Go style guide"&gt;Go style guide&lt;/a&gt; on twitter, which prompted Tim Penhey to take issue with its advice on variable naming.
+&lt;/p&gt;
+&lt;div&gt;&lt;blockquote class="twitter-tweet" lang="en"&gt;&lt;p&gt;&lt;a href="https://twitter.com/bradfitz"&gt;@bradfitz&lt;/a&gt; sorry, but can&amp;#39;t agree with &amp;#8220;use short variable names over descriptive ones&amp;#8221; &lt;a href="https://twitter.com/search?q=%23golang&amp;amp;src=hash"&gt;#golang&lt;/a&gt; &lt;a href="https://twitter.com/search?q=%23styleguide&amp;amp;src=hash"&gt;#styleguide&lt;/a&gt; /cc &lt;a href="https://twitter.com/sidneidasilva"&gt;@sidneidasilva&lt;/a&gt;&lt;/p&gt;&amp;mdash; Tim Penhey (@howbazaar) &lt;a href="https://twitter.com/howbazaar/statuses/437893595857571840"&gt;February 24, 2014&lt;/a&gt;&lt;/blockquote&gt;&lt;script async src="http://wordaligned.org//platform.twitter.com/widgets.js" charset="utf-8"&gt;&lt;/script&gt;&lt;/div&gt;
+
+&lt;p&gt;A brief and inconclusive exchange followed. Twitter&amp;#8217;s fine for opinions and one-liners but flawed for discussions &amp;#8212; even when the subject happens to be brevity.
+&lt;/p&gt;
+&lt;p&gt;I&amp;#8217;m not going to tweet about it, but I like Go and I like its style. I&amp;#8217;d rather read code which uses short variable names. Long descriptive names, which may appear to provide more information, often obscure the structure and flow of the code. The narrower the scope, the shorter names can be; so the style guide implicitly sanctions short functions and shuns globals. All good.
+&lt;/p&gt;
+&lt;p&gt;How short is short?
+&lt;/p&gt;
+&lt;div&gt;&lt;blockquote class="twitter-tweet" data-conversation="none" lang="en"&gt;&lt;p&gt;&lt;a href="https://twitter.com/golang"&gt;@golang&lt;/a&gt; where does it stop? In our project we have &amp;#8220;c, ch, d, m, s, st&amp;#8221; and they point and say &amp;#8220;style guide says it is fine&amp;#8221;.&lt;/p&gt;&amp;mdash; Tim Penhey (@howbazaar) &lt;a href="https://twitter.com/howbazaar/statuses/438084788038037505"&gt;February 24, 2014&lt;/a&gt;&lt;/blockquote&gt;&lt;/div&gt;
+
+&lt;p&gt;Those variables are certainly short rather than descriptive but they aren&amp;#8217;t scary: &lt;code&gt;c&lt;/code&gt; could be a character; &lt;code&gt;ch&lt;/code&gt; for channel, maybe, or another character; &lt;code&gt;d&lt;/code&gt; for data, difference or distance; &lt;code&gt;m&lt;/code&gt;, midpoint; &lt;code&gt;s&lt;/code&gt; string; &lt;code&gt;st&lt;/code&gt; state. All guesses, of course, but in context I&amp;#8217;d expect to see &amp;#8212; in the space of just a few lines of code &amp;#8212; where each variable lives and how it&amp;#8217;s used, a more clear and correct indication of what it means than a lengthy name could ever be.
+&lt;/p&gt;
+&lt;p&gt;Single character variables are just fine, says the &lt;a href="http://golang.org/s/style" title="Go style guide"&gt;style guide&lt;/a&gt;:
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;Prefer c to lineCount. Prefer i to sliceIndex.
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;Some languages allow you to go further. Omit a variable in Perl and it defaults to being what you&amp;#8217;d like it to be. Usually.
+&lt;/p&gt;
+&lt;p&gt;A single character variable name is an extreme form of abbreviation. It works nicely for small things, like pixels and characters.
+&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;Pixel pixel, pel, px, &lt;b&gt;p&lt;/b&gt;;
+Character character, char, ch, &lt;b&gt;c&lt;/b&gt;;&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Some less terse abbreviations hurt my ear: &lt;code&gt;mngr&lt;/code&gt;, &lt;code&gt;svr&lt;/code&gt;, &lt;code&gt;cnt&lt;/code&gt;.
+&lt;/p&gt;
+&lt;p&gt;The style guide is, after all, a guide, and common sense applies.
+   Some abbreviations are ugly and others save so little space they aren&amp;#8217;t worth it.
+&lt;/p&gt;
+&lt;p&gt;Go&amp;#8217;s advice on naming tips a hat to the language&amp;#8217;s C heritage and to C&amp;#8217;s great application, UNIX, which is unsurprising when you realise one of Go&amp;#8217;s prominent contributors, Ken Thompson, had a hand in both. When Thompson was asked what he would do differently if he were redesigning UNIX &lt;a href="http://en.wikiquote.org/wiki/Kenneth_Thompson#Attributed" title="Ken Thompson, quoted in The UNIX Programming Environment (Kernighan, Pike)"&gt;he replied&lt;/a&gt;: 
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;I&amp;#8217;d spell &lt;a href="http://unixhelp.ed.ac.uk/CGI/man-cgi?creat" title="man 2 creat"&gt;creat&lt;/a&gt; with an &amp;#8220;e&amp;#8221;.
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;So, working on Go, &lt;a href="https://code.google.com/p/go/source/detail?r=4a3f6bbb5f0c6021279ccb3c23558b3c480d995f" title="Spell it with an e"&gt;he did&lt;/a&gt;.
+&lt;/p&gt;</description>
+<dc:date>2014-03-06</dc:date>
+<guid>http://wordaligned.org/articles/go-for-short-variable-names.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/go-for-short-variable-names.html</link>
+<category>Go</category>
+</item>
+
+</channel>
+</rss>

@@ -1,0 +1,130 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<link rel="icon" href="/images/favicon.png" type="image/png"/>
+<link href="/styles/application.css" media="all" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="/scripts/prettify.js"></script>
+<script type="text/javascript" src="/scripts/lang-lisp.js"></script>
+<script type="text/javascript" src="http://www.haloscan.com/load/wordaligned"></script>
+
+<title>Sugar Pie</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="author" content="Thomas Guest" />
+<meta name="description" content="Approximating pi by scattering sugar. A Word Aligned article posted 2008-03-06, tagged Python, Streams, Algorithms, Puzzles." />
+<meta name="keywords" content="Python, Streams, Algorithms, Puzzles" />
+<link rel="alternate" type="application/rss+xml" title="Feed" href="http://feeds.wordaligned.org/wordaligned" />
+</head>
+
+<body onload="prettyPrint()">
+<div id="container">
+  <div id="header">
+<h1><span><a accesskey="h" href="/">Word Aligned</a></span></h1>
+<h2>space sensitive programming</h2>
+<a class="button" href="http://feeds.wordaligned.org/wordaligned" title="Subscribe to Word Aligned"><img style="float: right;" src="/images/feed.png" alt="Feed Logo" height="28" width="28"/></a>
+</div>
+
+  <div id="page">
+    <div id="content">
+      <div class="atomentry" id="sugar-pie.html">
+<h2 class="title"><a href="/articles/sugar-pie.html">Sugar Pie</a></h2>
+<p class="meta"><abbr class="published" title="2008-03-06">2008-03-06</abbr> &bull; <a href="/tag/python" rel="tag">Python</a>, <a href="/tag/streams" rel="tag">Streams</a>, <a href="/tag/algorithms" rel="tag">Algorithms</a>, <a href="/tag/puzzles" rel="tag">Puzzles</a> &bull; <a href="/articles/sugar-pie.html#disqus_thread">Comments</a></p>
+<p><strong>Question:</strong> in the code snippet bleow, what does the result stream, <code>rs</code>, approximate?
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">from itertools import count, ifilter, izip
+from random import random as xy
+from math import hypot
+    
+pt = lambda: (xy(), xy())
+on = ifilter(lambda n: hypot(*pt()) &lt; 1., count(1))
+rs = (4. * j / i for i, j in izip(on, count(1)))
+
+</pre>
+
+</div>
+
+<p>The code isn&#8217;t wilfully obscure but I&#8217;ll admit it&#8217;s unusual. Although written in a functional style, the source of the stream, <code>pt</code>, is utterly impure, generating a sequence of random results: it sprinkles points in a unit square. Despite this random input the results stream always tends to the same value. Well, in theory it should!
+</p>
+<p>Here&#8217;s a picture of a round pie on a square baking tray being dusted with sugar.    <br />
+</p>
+<img alt="Dusting a pie" src="/images/sugar-pie.gif"/>
+
+<p>Thanks again to <a href="http://gedmin.as">Marius Gedminas</a> for pointing me at
+   <code>math.hypot</code>, the best way to find the length of a 2D vector. (The
+   previous version of this note used <code>abs(complex(*pt())</code>, which it
+   claimed to be better than <code>math.sqrt(x * x + y * y)</code>).
+</p>
+</div>
+
+<div class="comments"><hr/><div id="disqus_thread"></div><script type="text/javascript" src="http://disqus.com/forums/wordaligned/embed.js"></script></div>
+      
+<div id="comments"><script type="text/javascript">
+//<![CDATA[
+(function() {
+    var links = document.getElementsByTagName('a');
+    var query = '?';
+    for(var i = 0; i < links.length; i++) {
+        if(links[i].href.indexOf('#disqus_thread') >= 0) {
+            query += 'url' + i + '=' + encodeURIComponent(links[i].href) + '&amp;';
+        }
+    }
+    document.write('<script type="text/javascript" src="http://disqus.com/forums/wordaligned/get_num_replies.js' + query + '"></' + 'script>');
+})();
+//]]>
+</script></div>
+
+    </div>
+    <div id="sidebar">
+      
+<div class="sidebar-node">
+<h3>Tagged</h3>
+<ul id="categories"><li><a href="/tag/python" rel="tag">Python</a></li>
+<li><a href="/tag/streams" rel="tag">Streams</a></li>
+<li><a href="/tag/algorithms" rel="tag">Algorithms</a></li>
+<li><a href="/tag/puzzles" rel="tag">Puzzles</a></li></ul>
+
+</div>
+
+<div class="sidebar-node">
+<h3>Chain</h3>
+<ul>
+<li><a accesskey="n" href="/articles/echo.html" title="Next article">&laquo; Tracing function calls using Python decorators</a></li>
+<li><a accesskey="p" href="/articles/the-price-of-coffee.html" title="Previous article">&raquo; The Price of Coffee</a></li>
+</ul>
+
+
+</div>
+
+<div class="sidebar-node">
+<h3>Feeds</h3>
+
+<ul>
+<li><a href="http://feeds.wordaligned.org/wordaligned"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Articles</a></li>
+<li><a href="http://feeds.wordaligned.org/wordaligned/comments"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Comments</a></li>
+</ul>
+
+
+</div>
+
+    </div>
+  </div>
+  <div id="footer">
+<hr />
+<p><a href="http://tag.wordaligned.org">Thomas Guest</a></p>
+</div>
+
+</div>
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-3373724-1']);
+  _gaq.push(['_trackPageview']);
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ga);
+  })();
+</script>
+</body>
+
+</html>

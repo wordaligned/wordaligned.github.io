@@ -1,0 +1,1970 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" >
+<channel>
+<title>Word Aligned</title>
+<link>http://wordaligned.org</link>
+<description>tales from the code face</description>
+<dc:creator>tag@wordaligned.org</dc:creator>
+<language>en-gb</language>
+<item>
+<title>Rewriting String.Left()</title>
+<description>&lt;p&gt;Over at &lt;a href="http://www.codinghorror.com/blog/archives/001151.html"&gt;Coding Horror, Jeff Atwood&lt;/a&gt; codes up &lt;code&gt;String.Left()&lt;/code&gt; in C#.
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;For example, in C#, there is no String.Left() function. Fair enough; we can roll up our sleeves and write our own function lickety-split:&lt;/p&gt;
+&lt;pre&gt;
+public static string Left(string s, int len)
+{
+    if (len == 0 || s.Length == 0)
+        return "";
+    else if (s.Length &amp;lt;= len)
+        return s;
+    else
+        return s.Substring(0, len);
+}
+&lt;/pre&gt;&lt;/blockquote&gt;
+
+&lt;p&gt;He&amp;#8217;s using this function to introduce &lt;a href="http://msdn.microsoft.com/en-us/library/bb383977.aspx"&gt;C# extension-methods&lt;/a&gt;, but I&amp;#8217;m more interested in making some sweeping generalisations about Java code.
+&lt;/p&gt;
+&lt;p&gt;In the article&amp;#8217;s comments section PRMan points out this function &amp;#8220;blows up&amp;#8221; if the input string is null, and offers a simple fix:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;public static string Left(string s, int len)
+{
+    if (s == null)
+        return s;
+    else if (len == 0 || s.Length == 0)
+        return "";
+    else if (s.Length &amp;lt;= len)
+        return s;
+    else
+        return s.Substring(0, len);
+}
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Now, I&amp;#8217;ve never written any C#. In fact I don&amp;#8217;t even have a C# compiler to hand. But this code looks like everything which ever bugged me about Java. What&amp;#8217;s the point of writing a string function which accepts a null input? All we&amp;#8217;ve done is force clients of &lt;code&gt;String.Left()&lt;/code&gt; to handle null inputs too. Just (implicitly) raise a null pointer exception (which is &lt;strong&gt;not&lt;/strong&gt; the same as blowing up) and be done with it.
+&lt;/p&gt;
+&lt;p&gt;It&amp;#8217;s unfair to suggest this &lt;a href="http://wordaligned.org/articles/stop-the-clock-squash-the-bug.html#tocdefensive-programming"&gt;bogus defensive coding&lt;/a&gt; has anything to do with Java &amp;#8212; you can do the same thing in any language &amp;#8212; but in my personal experience lots of Java code gets written this way, to the extent that I used to regard these nervy null checks as being idiomatic. So I was relieved when a Michael Feathers &lt;a href="http://www.artima.com/weblogs/viewpost.jsp?thread=168511"&gt;article&lt;/a&gt; put me straight:
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;Spurious null checks are a symptom of bad code.
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;Feathers&amp;#8217; examples are coded in Java, so maybe I wasn&amp;#8217;t being unfair after all. If you&amp;#8217;re really concerned about &lt;code&gt;String.Left()&lt;/code&gt; handling whatever clients might throw at it, then it&amp;#8217;s more important to deal with negative values of &lt;code&gt;len&lt;/code&gt;.
+&lt;/p&gt;
+&lt;p&gt;So we&amp;#8217;re back to Atwood&amp;#8217;s original version which reads the way a programmer might think about this problem:
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;The leftmost &lt;code&gt;n&lt;/code&gt; characters is just &lt;code&gt;s.Substring(0, len)&lt;/code&gt;, but, &lt;em&gt;careful!&lt;/em&gt;, what if &lt;code&gt;len&lt;/code&gt; is too big, and what about if &lt;code&gt;s&lt;/code&gt; is empty, or if &lt;code&gt;len&lt;/code&gt; is zero?
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;Hence we end up with a three way conditional with three separate and rather different looking return values, in which the most interesting case appears last. I think this code could be more readable. First (unless I&amp;#8217;m missing something about C#) we can get rid of the special case of &lt;code&gt;(len == 0 || s.Length == 0)&lt;/code&gt; since the subsequent clauses do the right thing. (By the way, I&amp;#8217;m switching to Java now since I have no C# compiler to hand.)
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;    public static String left(String s, int len)
+    {
+        if (s.length() &amp;lt;= len) {
+            return s;
+        } else {
+            return s.substring(0, len);
+        }
+    }
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;I personally would transform this to:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;    public static String left(String s, int len){
+        return s.substring(0, Math.min(len, s.length()));
+    }
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;It&amp;#8217;s not that I&amp;#8217;m particularly against multiple returns, and I don&amp;#8217;t claim this tweak is a big improvement: I just prefer a more declarative style, which clearly says we&amp;#8217;re returning a substring of &lt;code&gt;s&lt;/code&gt;, starting at index 0, of length &lt;code&gt;len&lt;/code&gt; or &lt;code&gt;s.length()&lt;/code&gt; if smaller.
+&lt;/p&gt;
+&lt;p&gt;In fact, I don&amp;#8217;t think many Java programmers would agree I&amp;#8217;ve improved things. Java seems to favour explicit control flow over even this trivial functional composition. Which is why I don&amp;#8217;t miss &lt;a href="http://wordaligned.org/articles/introducing-java.html#toclanguage-wars"&gt;programming in Java&lt;/a&gt;, and why I&amp;#8217;m in no hurry to try C#.
+&lt;/p&gt;
+&lt;p&gt;I also wonder if Jeff Atwood&amp;#8217;s original version of &lt;code&gt;String.Left()&lt;/code&gt; is, in theory, more efficient. Will a return value of &lt;code&gt;""&lt;/code&gt; be pooled? Does it make sense to return the original string whenever possible, to avoid creating unnecessary objects? I don&amp;#8217;t know enough about C# or Java say if there&amp;#8217;s any truth in these suggestions. I do know that such savings are extremely unlikely to make any real difference for real strings in real programs, and that sacrificing readability for theoretical efficiency is a &lt;a href="http://en.wikipedia.org/wiki/Optimization_(computer_science)#Quotes"&gt;mistake&lt;/a&gt;.
+&lt;/p&gt;
+&lt;p&gt;On the subject of readability, &lt;code&gt;String.Left()&lt;/code&gt; is really just a special case of &lt;a href="http://docs.python.org/lib/typesseq.html"&gt;sequence slicing&lt;/a&gt; &amp;#8212; a Python feature which I&amp;#8217;d like to monkey-patch into other languages.
+&lt;/p&gt;</description>
+<dc:date>2008-07-13</dc:date>
+<guid>http://wordaligned.org/articles/rewriting-stringleft.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/rewriting-stringleft.html</link>
+<category>Java</category>
+</item>
+
+<item>
+<title>Elegance and Efficiency</title>
+<description>&lt;div class="toc"&gt;
+&lt;h2&gt;Contents&lt;/h2&gt;
+&lt;ul&gt;
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/elegance-and-efficiency.html#tocwhat-is-elegant-code" name="toc0" id="toc0"&gt;What is Elegant Code?&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/elegance-and-efficiency.html#tocappearance" name="toc1" id="toc1"&gt;Appearance&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/elegance-and-efficiency.html#tocuse-of-standard-libraries" name="toc2" id="toc2"&gt;Use of standard libraries&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/elegance-and-efficiency.html#tocplanar-vectors-in-scheme" name="toc3" id="toc3"&gt;Planar vectors in Scheme&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/elegance-and-efficiency.html#tocminimalism-and-simplicity" name="toc4" id="toc4"&gt;Minimalism and Simplicity&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/elegance-and-efficiency.html#tocefficiency-and-elegance" name="toc5" id="toc5"&gt;Efficiency and Elegance?&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/elegance-and-efficiency.html#tocelegance-and-inefficiency" name="toc6" id="toc6"&gt;Elegance and Inefficiency?&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/elegance-and-efficiency.html#tocislipogram1" name="toc7" id="toc7"&gt;is_lipogram1&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/elegance-and-efficiency.html#tocislipogram2--3" name="toc8" id="toc8"&gt;is_lipogram2 &amp;amp; 3&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/elegance-and-efficiency.html#tocislipogram4" name="toc9" id="toc9"&gt;is_lipogram4&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/elegance-and-efficiency.html#tocislipogram5" name="toc10" id="toc10"&gt;is_lipogram5&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/elegance-and-efficiency.html#tocislipogram6" name="toc11" id="toc11"&gt;is_lipogram6&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/elegance-and-efficiency.html#tocwinding-up" name="toc12" id="toc12"&gt;Winding Up&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/elegance-and-efficiency.html#tocc-source-code" name="toc13" id="toc13"&gt;C++ Source Code&lt;/a&gt;
+ &lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;&lt;p&gt;Elegant code is often efficient. Think of the heap data structure, for example, which always remains exactly as sorted as it needs to be, making it perfect for modelling priority queues. It&amp;#8217;s both elegant and efficient &amp;mdash; and dazzlingly so.
+&lt;/p&gt;
+&lt;img src="http://upload.wikimedia.org/wikipedia/commons/b/bf/Max-heap.png" width="50%" alt="Heap graphic"/&gt;
+
+&lt;p&gt;This article discusses the relationship between elegance and efficiency in more depth, and asks the question: &lt;strong&gt;Can inefficient code ever be elegant?&lt;/strong&gt;
+&lt;/p&gt;
+&lt;span id="continue-reading"/&gt;
+
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/elegance-and-efficiency.html#toc0" name="tocwhat-is-elegant-code" id="tocwhat-is-elegant-code"&gt;What is Elegant Code?&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;First, we should consider what&amp;#8217;s meant by &amp;#8220;elegant code&amp;#8221;.
+&lt;/p&gt;
+&lt;p&gt;Anthony Williams discusses this very subject in a recent blog &lt;a href="http://www.justsoftwaresolutions.co.uk/design/elegance-in-software.html"&gt;post&lt;/a&gt; (which is what got me thinking about it in the first place). Up front he admits the search for elegance is subjective and that the factors he lists are all &lt;em&gt;&amp;#8220;my opinion&amp;#8221;&lt;/em&gt;. He also points out his list is not exhaustive. Nonetheless, it&amp;#8217;s a good starting point, and I&amp;#8217;d like to build on it. Let&amp;#8217;s start by summarising his list here.
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;Factors affecting the elegance of software
+&lt;/p&gt;
+&lt;ul&gt;
+ &lt;li&gt;
+     Does it work?
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     Is it easy to understand?
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     Is it efficient?
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     Short functions
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     Good naming
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     Clear division of responsibility
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     High cohesion
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     Low coupling
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     Appropriate use of OO and other techniques
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     Minimal code
+ &lt;/li&gt;
+&lt;/ul&gt;
+&lt;/blockquote&gt;
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/elegance-and-efficiency.html#toc1" name="tocappearance" id="tocappearance"&gt;Appearance&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;I&amp;#8217;m not sure this list completely nails elegance. For a start, there&amp;#8217;s no mention of appearance &amp;mdash; the way the code actually looks, on screen, or in print &amp;#8212; which in my opinion is fundamental. Elegant code looks clean, balanced, self-consistent.
+&lt;/p&gt;
+&lt;p&gt;&lt;span /&gt;That&amp;#8217;s one of the reasons I like Python: it&amp;#8217;s hard to get away with poorly laid out code. Scheme, with its minimal syntax, also wins here. Java stands a good chance of doing well on this front too, thanks to a clearly stated set of coding conventions and excellent IDE support for applying these conventions.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/elegance-and-efficiency.html#toc2" name="tocuse-of-standard-libraries" id="tocuse-of-standard-libraries"&gt;Use of standard libraries&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;I&amp;#8217;d also say that appropriate and even cunning use of the language&amp;#8217;s standard libraries can add to code&amp;#8217;s elegance. Williams hints at this with his mention of &lt;em&gt;Minimal Code&lt;/em&gt;, though minimalism covers many other things.
+&lt;/p&gt;
+&lt;p&gt;As an example, if you&amp;#8217;re using C++, you should take the time to become familiar with the standard library, and use it whenever possible. &lt;a href="http://www.artima.com/cppsource/lazy_builder.html"&gt;It works. It&amp;#8217;s efficient&lt;/a&gt;. In fact it embodies pretty much everything Williams lists, with a few notable exceptions (no one could describe &lt;code&gt;std::string&lt;/code&gt; as minimal, and &lt;code&gt;std::auto_ptr&lt;/code&gt; is notoriously slippery). Use the standard library and you&amp;#8217;ll save yourself code and time, and your own code will be the more elegant for it.
+&lt;/p&gt;
+
+&lt;h4&gt;&lt;a href="http://wordaligned.org/articles/elegance-and-efficiency.html#toc3" name="tocplanar-vectors-in-scheme" id="tocplanar-vectors-in-scheme"&gt;Planar vectors in Scheme&lt;/a&gt;&lt;/h4&gt;
+&lt;p&gt;Let&amp;#8217;s return to Scheme to illustrate my point about cunning use of standard libraries and consider &lt;a href="http://mitpress.mit.edu/sicp/full-text/book/book-Z-H-15.html#%_thm_2.46"&gt;exercise 2.46&lt;/a&gt; from the &lt;a href="http://mitpress.mit.edu/sicp/full-text/book/book.html"&gt;Wizard Book&lt;/a&gt;.
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;&lt;strong&gt;Exercise 2.46.&lt;/strong&gt;  A two-dimensional vector v running from the origin to a point can be represented as a pair consisting of an x-coordinate and a y-coordinate. Implement a data abstraction for vectors by giving a constructor make-vect and corresponding selectors xcor-vect and ycor-vect. In terms of your selectors and constructor, implement procedures add-vect, sub-vect, and scale-vect that perform the operations vector addition, vector subtraction, and multiplying a vector by a scalar.
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;An obvious solution would be to model the 2-D vector as a pair.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;(define make-vect cons)
+(define xcor-vect car)
+(define ycor-vect cdr)
+
+(define (add-vect v w)
+  (make-vect (+ (xcor-vect v) (xcor-vect w))
+             (+ (ycor-vect v) (ycor-vect w))))
+
+(define (sub-vect v w)
+  (make-vect (- (xcor-vect v) (xcor-vect w))
+             (- (ycor-vect v) (ycor-vect w))))
+
+(define (scale-vect s v)
+  (make-vect (* s (xcor-vect v))
+             (* s (ycor-vect v))))
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;An elegant alternative builds on Scheme&amp;#8217;s support for complex numbers.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;;; represent 2-D vect using a complex number
+(define make-vect make-rectangular)
+(define xcor-vect real-part)
+(define ycor-vect imag-part)
+
+(define add-vect +)
+(define sub-vect -)
+(define scale-vect *)
+
+;; some other vector operations come for free
+(define magnitude-vect magnitude)
+(define make-vect-from-polar-coords make-polar)
+(define angle-vect angle)
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/elegance-and-efficiency.html#toc4" name="tocminimalism-and-simplicity" id="tocminimalism-and-simplicity"&gt;Minimalism and Simplicity&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Elegance and beauty are not the same, though perhaps elegant forms a subset of beautiful. Elegance carries the additional connotation of simplicity, which itself correlates with minimalism. If I were forced to select the single item from Williams&amp;#8217; list most closely aligned to elegance, I&amp;#8217;d go for minimalism: allowed my own choice, it would be simplicity.
+&lt;/p&gt;
+&lt;p&gt;Williams notes a couple of ways you can remove to improve:
+&lt;/p&gt;
+&lt;ul&gt;
+ &lt;li&gt;
+     avoid unnecessary layering 
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     eliminate duplication
+ &lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;We&amp;#8217;ve already added:
+&lt;/p&gt;
+&lt;ul&gt;
+ &lt;li&gt;
+     use standard libraries
+ &lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Kevlin Henney gives minimalism more careful attention in a series of &lt;a href="http://www.two-sdg.demon.co.uk/curbralan/papers.html"&gt;articles&lt;/a&gt;. &lt;a href="http://www.two-sdg.demon.co.uk/curbralan/papers/minimalism/OmitNeedlessCode.html"&gt;Omit Needless Code&lt;/a&gt; promotes:
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;Code that is simple and clear, brief and direct.
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;Henney illustrates his points with some elegant examples which reinforce my own claims about the C++ standard library
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;As an example, the common task of counting words in a text file or stream can be reduced to a single statement of executable C++ code &lt;a href="http://www.two-sdg.demon.co.uk/curbralan/papers/IfIHadAHammer.pdf"&gt;[Henney2001c]&lt;/a&gt; when built on the appropriate abstractions:&lt;/p&gt;
+&lt;pre&gt;
+typedef std::istream_iterator&amp;lt;std::string&amp;gt; in;
+std::cout &amp;lt;&amp;lt; std::distance(in(std::cin), in());
+&lt;/pre&gt;
+&lt;p&gt;Want to count characters instead?&lt;/p&gt;
+&lt;pre&gt;
+typedef std::istreambuf_iterator&amp;lt;char&amp;gt; in;
+std::cout &amp;lt;&amp;lt; std::distance(in(std::cin), in());
+&lt;/pre&gt;
+&lt;p&gt;Or lines?&lt;/p&gt;
+&lt;pre&gt;
+typedef std::istreambuf_iterator&amp;lt;char&amp;gt; in;
+std::cout &amp;lt;&amp;lt; std::count(in(std::cin), in(), '\n');
+&lt;/pre&gt;
+&lt;p&gt;These fragments are all compact and fluffless, crisp and essential.&lt;/p&gt;&lt;/blockquote&gt;
+
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/elegance-and-efficiency.html#toc5" name="tocefficiency-and-elegance" id="tocefficiency-and-elegance"&gt;Efficiency and Elegance?&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Efficiency comes high on Williams&amp;#8217; list, right after correctness, which shouldn&amp;#8217;t be a surprise to anyone who writes code for a living. Surely code which doesn&amp;#8217;t run fast enough is about as useful as code which doesn&amp;#8217;t work? You could even note that efficiency is yet another aspect of minimalism: in this case, it&amp;#8217;s the machine&amp;#8217;s resource consumption you&amp;#8217;d like to reduce.
+&lt;/p&gt;
+&lt;img src="http://upload.wikimedia.org/wikipedia/commons/6/6a/Sorting_quicksort_anim.gif" alt="Quicksort animation"/&gt;
+
+&lt;p&gt;I&amp;#8217;m not convinced, though. It&amp;#8217;s true, many of the most elegant algorithms happen to be efficient too &amp;mdash; and may even have arisen from the quest for efficiency. Thus the standard quicksort algorithm has virtually no space overhead, and as a general purpose sorting algorithm, really can&amp;#8217;t be beaten. Similarly the &lt;a href="http://en.wikipedia.org/wiki/Heap_(data_structure)"&gt;heap&lt;/a&gt;, as already mentioned, is a lean clean implementation of a priority queue. But &lt;em&gt;&lt;/em&gt;I don&amp;#8217;t think elegance implies efficiency&lt;em&gt;&lt;/em&gt;. I&amp;#8217;d even suggest that something could be elegant but of no practical use, at least not on today&amp;#8217;s hardware.
+&lt;/p&gt;
+&lt;p&gt;The downside of efficiency is that it can be at odds with simplicity and minimalism. Consider the sad fate of &lt;code&gt;boost::lexical_cast&lt;/code&gt;, a general purpose conversion function. If I go back to early &lt;a href="http://www.boost.org"&gt;Boost&lt;/a&gt; releases I find code which reads like this.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;Excerpt from lexical_cast.hpp, Boost 1.22&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;template&amp;lt;typename Target, typename Source&amp;gt;
+Target lexical_cast(Source arg)
+{
+# ifndef BOOST_NO_STRINGSTREAM
+    std::stringstream interpreter;
+# else
+    std::strstream interpreter; // for out-of-the-box g++ 2.95.2
+# endif
+    Target result;
+    
+    if(!(interpreter &amp;lt;&amp;lt; arg) || !(interpreter &amp;gt;&amp;gt; result) ||
+       !(interpreter &amp;gt;&amp;gt; std::ws).eof())
+        throw bad_lexical_cast();
+     return result;
+}
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;For brevity I&amp;#8217;ve omitted file headers, include guards and the unexceptional definition of &lt;code&gt;boost::bad_lexical_cast&lt;/code&gt;. Even with these present, the file runs to just 68 lines long, and provides an elegant example of what generic C++ code can do. The body of &lt;code&gt;lexical_cast&lt;/code&gt; itself is a readable one-liner, tainted only by a preprocessor workaround for non-compliant compilers. 
+&lt;/p&gt;
+&lt;p&gt;Wind forwards to 2007, and this small stain has spread across the entire &lt;a href="http://boost.cvs.sourceforge.net/boost/boost/boost/lexical_cast.hpp?revision=1.36&amp;amp;view=markup"&gt;library&lt;/a&gt;, which, after tuning for correctness, portability and &lt;strong&gt;efficiency&lt;/strong&gt; now weighs in at well over 1K lines of code. Here&amp;#8217;s a flavour of the latest greatest &lt;code&gt;lexical_cast&lt;/code&gt;, which is far too long to include in its entirety.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;Excerpt from lexical_cast.hpp@1.36&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;namespace detail // lcast_put_unsigned
+{
+    // I'd personally put lcast_put_unsigned in .cpp file if not
+    // boost practice for header-only libraries (Alexander Nasonov).
+    template&amp;lt;typename T, typename CharT&amp;gt;
+    CharT* lcast_put_unsigned(T n, CharT* finish)
+    {
+        CharT thousands_sep = 0;
+#ifdef BOOST_LEXICAL_CAST_ASSUME_C_LOCALE
+        char const* grouping = "";
+        std::size_t const grouping_size = 0;
+#else
+        std::locale loc;
+        typedef std::numpunct&amp;lt;CharT&amp;gt; numpunct;
+        numpunct const&amp;amp; np = BOOST_USE_FACET(numpunct, loc);
+        std::string const&amp;amp; grouping = np.grouping();
+        std::string::size_type const grouping_size = grouping.size();    
+        if(grouping_size)
+            thousands_sep = np.thousands_sep();
+#endif
+        std::string::size_type group = 0; // current group number
+        char last_grp_size = grouping[0] &amp;lt;= 0 ? CHAR_MAX : grouping[0];
+        // a) Since grouping is const, grouping[grouping.size()] returns 0.
+        // b) It's safe to assume here and below that CHAR_MAX
+        //    is equivalent to unlimited grouping:
+#ifndef BOOST_NO_LIMITS_COMPILE_TIME_CONSTANTS
+        BOOST_STATIC_ASSERT(std::numeric_limits&amp;lt;T&amp;gt;::digits10 &amp;lt; CHAR_MAX);
+#endif
+        char left = last_grp_size;
+        do
+        {
+            if(left == 0)
+            {
+                ++group;
+                if(group &amp;lt; grouping_size)
+                {
+                    char const grp_size = grouping[group];
+                    last_grp_size = grp_size &amp;lt;= 0 ? CHAR_MAX : grp_size;
+                }
+                left = last_grp_size;
+                --finish;
+                *finish = thousands_sep;
+            }
+            --left;
+            --finish;
+            int const digit = static_cast&amp;lt;int&amp;gt;(n % 10);
+            int const cdigit = digit + lcast_char_constants&amp;lt;CharT&amp;gt;::zero;
+            *finish = static_cast&amp;lt;char&amp;gt;(cdigit);
+            n /= 10;
+        } while(n);
+    
+        return finish;
+    }
+}
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;I&amp;#8217;m not saying that the changes to &lt;code&gt;boost::lexical_cast&lt;/code&gt; are &lt;em&gt;bad&lt;/em&gt;: after all, users of the library get software which does the right thing more often and more quickly &amp;mdash; all without any client-side changes. That&amp;#8217;s one of the benefits of using a layered software stack. Rather, I present this as an example of the tension between efficiency and elegance. Somewhere along the line, an elegant piece of code got buried.
+&lt;/p&gt;
+&lt;p&gt;It&amp;#8217;s also interesting that, in this case, even &amp;#8220;does-it-work&amp;#8221; counteracts elegance. We noted that &lt;code&gt;boost::lexical_cast@v1.22&lt;/code&gt; became tainted in its eagerness to work with legacy compilers. The current version makes far greater concessions. It&amp;#8217;s a reminder &amp;mdash; as if any were needed &amp;mdash; that we programmers have to keep our feet on the ground and aim for pragmatic solutions. Perfection is rarely possible, elegance occasional.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/elegance-and-efficiency.html#toc6" name="tocelegance-and-inefficiency" id="tocelegance-and-inefficiency"&gt;Elegance and Inefficiency?&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;We&amp;#8217;ve demonstrated the tension between elegance and efficiency, but could blatantly inefficient code ever claim to be elegant? The original elegant implementation of &lt;code&gt;lexical_cast&lt;/code&gt; may not have been optimally tuned for all possible inputs (it&amp;#8217;s meant to be generic code, after all), but it could hardly be described as inefficient.
+&lt;/p&gt;
+&lt;p&gt;We&amp;#8217;re going to develop some code which I&amp;#8217;ll claim is elegant despite being inefficient. To get us started, let&amp;#8217;s consider another problem we can skin in more than one way: &lt;strong&gt;how do we determine if a book forms a lipogram?&lt;/strong&gt; (A &lt;a href="http://phrontistery.info/lipogram.html"&gt;lipogram&lt;/a&gt; is a piece of text written avoiding the use of a particular character, the letter E for example, and &lt;a href="http://en.wikipedia.org/wiki/A_Void"&gt;full length books&lt;/a&gt; really have been written &amp;mdash; and even translated &amp;mdash; which adhere to this constraint.)
+&lt;/p&gt;
+&lt;p&gt;We&amp;#8217;ll pose the problem in C++. Here&amp;#8217;s the function prototype.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;#include &amp;lt;string&amp;gt;
+#include &amp;lt;vector&amp;gt;
+    
+typedef std::string word;
+typedef std::vector&amp;lt;word&amp;gt; book;
+    
+// Return true if the input text avoids using any characters
+// in 'avoid', false otherwise.
+// Example call:
+// bool const lipo = is_lipogram(text, "Ee");
+bool is_lipogram(book const &amp;amp; text, word const &amp;amp; avoid);
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;What we have here might be seen as a loop within a loop within a loop: for each word in the book, for each character in that word, check against each character in the string of characters to be avoided. A match against an avoided character means we know our book isn&amp;#8217;t a lipogram, and we can return false; but if we reach the end of our book without such a match, we can return true.
+&lt;/p&gt;
+
+&lt;h4&gt;&lt;a href="http://wordaligned.org/articles/elegance-and-efficiency.html#toc7" name="tocislipogram1" id="tocislipogram1"&gt;is_lipogram1&lt;/a&gt;&lt;/h4&gt;
+&lt;p&gt;We can code this up:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;typedef word::const_iterator word_iter;
+typedef book::const_iterator book_iter;
+    
+bool is_lipogram(book const &amp;amp; text, word const &amp;amp; avoid)
+{
+    // Handle edge case -- empty book
+    if (text.empty())
+    {
+        return true;
+    }
+    // Handle edge case -- nothing to avoid
+    if (avoid.empty())
+    {
+        return true;
+    }
+    for (book_iter w = text.begin(); w != text.end(); ++w)
+    {
+        for (word_iter c = w-&amp;gt;begin(); c != w-&amp;gt;end(); ++c)
+        {
+            for (word_iter a = avoid.begin(); a != avoid.end(); ++a)
+            {
+                if (*c == *a)
+                {
+                    return false;
+                }
+            }
+        }
+    }
+    return true;
+}
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;This painstaking chunk of code reads like a direct transcription of the way an unfortunate human proof-reader might approach the task, one finger tracking through the text, word by word, character by character, another finger repeatedly working through the characters to be avoided. It fails the elegance test on a number of counts:
+&lt;/p&gt;
+&lt;ul&gt;
+ &lt;li&gt;
+     &lt;strong&gt;Not minimal&lt;/strong&gt;. The edge cases do not merit special treatment. Normal processing of the (nested) main loop handles empty inputs just fine.
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     &lt;strong&gt;Failure to use the standard library.&lt;/strong&gt; The &lt;code&gt;std::string&lt;/code&gt; class is big enough to support searches for characters in a string directly, allowing us to remove a couple of layers of nesting.
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     &lt;strong&gt;Clumsy&lt;/strong&gt;. The function has &lt;em&gt;four&lt;/em&gt; separate exit points.
+ &lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Perhaps none of these charges seem too bad in such a small function, but small functions have a tendency to grow into larger ones, and &lt;span /&gt;flaws, in particular, scale rapidly.
+&lt;/p&gt;
+
+&lt;h4&gt;&lt;a href="http://wordaligned.org/articles/elegance-and-efficiency.html#toc8" name="tocislipogram2--3" id="tocislipogram2--3"&gt;is_lipogram2 &amp;amp; 3&lt;/a&gt;&lt;/h4&gt;
+&lt;p&gt;Here&amp;#8217;s a standard-library-aware improvement.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;bool is_lipogram(book const &amp;amp; text, word const &amp;amp; avoid)
+{
+    for (book_iter w = text.begin(); w != text.end(); ++w)
+    {
+        if (w-&amp;gt;find_first_of(avoid) != std::string::npos)
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Many programmers would leave it at that, but I still prefer to re-cast this particular variant as follows:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;bool is_lipogram(book const &amp;amp; text, word const &amp;amp; avoid)
+{
+    book_iter w = text.begin();
+    while (w != text.end() &amp;amp;&amp;amp;
+           w-&amp;gt;find_first_of(avoid) == std::string::npos)
+    {
+        ++w;
+    }
+    return w == text.end();
+}
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Rather than exit as soon as we detect a character in the &lt;code&gt;avoid&lt;/code&gt; string, we keep reading as long as there&amp;#8217;s text to read and we&amp;#8217;ve avoided such characters. There&amp;#8217;s not much in it, especially in such a small function, but my preference is to simplify the control flow.
+&lt;/p&gt;
+
+&lt;h4&gt;&lt;a href="http://wordaligned.org/articles/elegance-and-efficiency.html#toc9" name="tocislipogram4" id="tocislipogram4"&gt;is_lipogram4&lt;/a&gt;&lt;/h4&gt;
+&lt;p&gt;We can remove the explicit iteration from our code by using the &lt;code&gt;std::find_if&lt;/code&gt; algorithm, which accepts a predicate. In this case we want to find the first word which isn&amp;#8217;t itself a lipogram. Combining the &lt;code&gt;std::not1&lt;/code&gt; function adaptor with a hand-written class deriving from &lt;code&gt;std::unary_function&amp;lt;std::string const, bool&amp;gt;&lt;/code&gt; does the job.
+&lt;/p&gt;
+&lt;p&gt;This code demonstrates proper use of the STL predicates and adaptors, but it also reaches the limits of my personal comfort zone for using C++ in a functional programming style. The price paid for avoiding explicit iteration is just too high; clever though this code may be, I don&amp;#8217;t find it elegant. 
+&lt;/p&gt;
+&lt;p&gt;When I first coded up &lt;code&gt;lipogram_word_tester&lt;/code&gt;, it derived from &lt;code&gt;std::unary_function&amp;lt;word const &amp;amp;, bool&amp;gt;&lt;/code&gt;. This turns out to be wrong, or at least, it failed to compile with a typically cryptic diagnostic, and I&amp;#8217;m still not sure why!
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;// Simple functor for use in lipogram algorithms
+class lipogram_word_tester:
+    public std::unary_function&amp;lt;word const, bool&amp;gt;
+{
+public:
+    // Constructor. Caches a copy of the 'avoid' parameter.
+    lipogram_word_tester(word const &amp;amp; avoid)
+        : avoid(avoid)
+    {
+    }
+    // Function operator returns true if the word being tested
+    // omits characters from the 'avoid' string, false otherwise.
+    bool operator()(word const &amp;amp; to_test) const
+    {
+        return to_test.find_first_of(avoid)
+            == std::string::npos;
+    }
+private:
+    // Private cache of characters to avoid.
+    word const avoid;
+};
+    
+bool is_lipogram(book const &amp;amp; text, word const &amp;amp; avoid)
+{
+    lipogram_word_tester const word_test(avoid);
+    return find_if(text.begin(), text.end(),
+                   not1(word_test)) == text.end();
+}
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+
+&lt;h4&gt;&lt;a href="http://wordaligned.org/articles/elegance-and-efficiency.html#toc10" name="tocislipogram5" id="tocislipogram5"&gt;is_lipogram5&lt;/a&gt;&lt;/h4&gt;
+&lt;p&gt;I would expect all four functions presented so far to be similarly efficient in terms of memory, stack, CPU cycles. 
+&lt;/p&gt;
+&lt;p&gt;A recursive solution may require more stack: it depends on the compiler. We&amp;#8217;ve now got two functions, and although each comprises just a single expression, the expression forming the body of the recursive helper function, &lt;code&gt;is_lipo()&lt;/code&gt;, is tricky. I wouldn&amp;#8217;t recommend this implementation.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;bool is_lipo(book_iter wb, book_iter we, word const &amp;amp; avoid)
+{
+    return wb == we ||
+        wb-&amp;gt;find_first_of(avoid) == std::string::npos &amp;amp;&amp;amp;
+        is_lipo(++wb, we, avoid);
+}
+    
+bool is_lipogram(book const &amp;amp; text, word const &amp;amp; avoid)
+{
+    return is_lipo(text.begin(), text.end(), avoid);
+}
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+
+&lt;h4&gt;&lt;a href="http://wordaligned.org/articles/elegance-and-efficiency.html#toc11" name="tocislipogram6" id="tocislipogram6"&gt;is_lipogram6&lt;/a&gt;&lt;/h4&gt;
+&lt;p&gt;Our final alternative is a clear winner on the three fronts which led us to reject our original implementation: it&amp;#8217;s brief, it leans heavily on the standard library, it has just a single exit point &amp;mdash; in fact, is just a single expression.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;bool is_lipogram(book const &amp;amp; text, word const &amp;amp; avoid)
+{
+    return accumulate(text.begin(), text.end(), std::string()
+                     ).find_first_of(avoid) == std::string::npos;
+}
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Does it qualify as elegant? I&amp;#8217;d say so, yes. Sadly, though, its inefficiency rules it out as a heavy-duty lipogram checker. The &lt;code&gt;std::string&lt;/code&gt; class is not designed for repeated addition &amp;mdash; which is what &lt;code&gt;std::accumulate&lt;/code&gt; does.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/elegance-and-efficiency.html#toc12" name="tocwinding-up" id="tocwinding-up"&gt;Winding Up&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Actually none of the C++ lipogram checkers are much use, except in the case when we&amp;#8217;re certain our book is written in 7-bit ASCII. A lipogram which avoids the letter E should also avoid its various accented forms: &amp;eacute;, &amp;egrave;, &amp;ecirc;, &amp;euml;, &amp;Eacute;, &amp;Egrave;, &amp;Ecirc;, &amp;Euml;, &amp;#8230;
+&lt;/p&gt;
+&lt;p&gt;A heavy-duty lipogram checker needs to work in Unicode and, for C++ at least, will have to establish some ground rules for input encoding schemes. The current C++ standard (C++98) has little to say about Unicode. We&amp;#8217;d be better off using a more Unicode aware language, such as Java.
+&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://python.org"&gt;Python&lt;/a&gt; allows us to create a character stream which accumulates all the characters in all the words, but yields them lazily. The function below uses &lt;code&gt;itertools.chain&lt;/code&gt; to flatten the input words (which themselves may be a stream or an in-memory collection) into a character stream. The built-in &lt;code&gt;all&lt;/code&gt; function reads exactly as far into this stream as it needs to. In other words, we&amp;#8217;ve got a Python counterpart to our final C++ algorithm which is both efficient (efficient for Python that is!) and equally happy with Unicode and ASCII.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;import iterools
+    
+def is_lipogram(words, avoid):
+    return all(ch not in avoid
+               for ch in itertools.chain(*words))
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/elegance-and-efficiency.html#toc13" name="tocc-source-code" id="tocc-source-code"&gt;C++ Source Code&lt;/a&gt;&lt;/h3&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;#include &amp;lt;cassert&amp;gt;
+#include &amp;lt;functional&amp;gt;
+#include &amp;lt;iostream&amp;gt;
+#include &amp;lt;numeric&amp;gt;
+#include &amp;lt;set&amp;gt;
+#include &amp;lt;string&amp;gt;
+#include &amp;lt;vector&amp;gt;
+    
+namespace
+{
+typedef std::string word;
+typedef word::const_iterator word_iter;
+typedef std::vector&amp;lt;word&amp;gt; book;
+typedef book::const_iterator book_iter;
+typedef bool (* lipo_fn)(book const &amp;amp;, word const &amp;amp;);
+    
+// Return true if the input text avoids using any characters
+// in 'avoid', false otherwise.
+bool is_lipogram1(book const &amp;amp; text, word const &amp;amp; avoid)
+{
+    // Handle edge case -- empty book
+    if (text.empty())
+    {
+        return true;
+    }
+    // Handle edge case -- nothing to avoid
+    if (avoid.empty())
+    {
+        return true;
+    }
+    for (book_iter w = text.begin(); w != text.end(); ++w)
+    {
+        for (word_iter c = w-&amp;gt;begin(); c != w-&amp;gt;end(); ++c)
+        {
+            for (word_iter a = avoid.begin(); a != avoid.end(); ++a)
+            {
+                if (*c == *a)
+                {
+                    return false;
+                }
+            }
+        }
+    }
+    return true;
+}       
+    
+bool is_lipogram2(book const &amp;amp; text, word const &amp;amp; avoid)
+{
+    for (book_iter w = text.begin(); w != text.end(); ++w)
+    {
+        if (w-&amp;gt;find_first_of(avoid) != std::string::npos)
+        {
+            return false;
+        }
+    }
+    return true;
+}
+    
+bool is_lipogram3(book const &amp;amp; text, word const &amp;amp; avoid)
+{
+    book_iter w = text.begin();
+    while (w != text.end() &amp;amp;&amp;amp;
+           w-&amp;gt;find_first_of(avoid) == std::string::npos)
+    {
+        ++w;
+    }
+    return w == text.end();
+}
+    
+// Simple functor for use in lipogram algorithms
+class lipogram_word_tester:
+    public std::unary_function&amp;lt;std::string const, bool&amp;gt;
+{
+public:
+    // Constructor. Caches a copy of the avoid parameter.
+    lipogram_word_tester(word const &amp;amp; avoid)
+        : avoid(avoid)
+    {
+    }
+    // Function operator returns true if the word being tested
+    // omits characters from the 'avoid' string, false otherwise.
+    bool operator()(word const &amp;amp; to_test) const
+    {
+        return to_test.find_first_of(avoid)
+            == std::string::npos;
+    }
+private:
+    // Private cache of characters to avoid.
+    word const avoid;
+};
+    
+bool is_lipogram4(book const &amp;amp; text, word const &amp;amp; avoid)
+{
+    lipogram_word_tester const word_test(avoid);
+    return find_if(text.begin(), text.end(),
+                   not1(word_test)) == text.end();
+}
+    
+bool is_lipo5(book_iter wb, book_iter we, word const &amp;amp; avoid)
+{
+    return wb == we ||
+        wb-&amp;gt;find_first_of(avoid) == std::string::npos &amp;amp;&amp;amp;
+        is_lipo5(++wb, we, avoid);
+}
+    
+bool is_lipogram5(book const &amp;amp; text, word const &amp;amp; avoid)
+{
+    return is_lipo5(text.begin(), text.end(), avoid);
+}
+    
+bool is_lipogram6(book const &amp;amp; text, word const &amp;amp; avoid)
+{
+    return accumulate(text.begin(), text.end(), std::string()
+                      ).find_first_of(avoid) == std::string::npos;
+}
+    
+void read_book(book &amp;amp; text, std::istream &amp;amp; input) 
+{
+    typedef std::istream_iterator&amp;lt;word&amp;gt; in;
+    std::copy(in(input), in(), back_inserter(text));
+}
+    
+// Function-like class used for lipo_fn evaluation.
+class lipo_functor
+{
+public:
+    // Construct an instance of this class, caching lipo_fn parameters.
+    lipo_functor(book const &amp;amp; text, word const &amp;amp; avoid)
+        : text(text)
+        , avoid(avoid)
+    {
+    }
+    // Return the result of applying is_lipo to the cached parameters.
+    bool operator()(lipo_fn is_lipo)
+    {
+        return is_lipo(text, avoid);
+    }
+private:
+    book const &amp;amp; text;
+    word const &amp;amp; avoid;
+};
+    
+void check_if_lipogram(std::ostream &amp;amp; report,
+                       book const &amp;amp; text, word const &amp;amp; avoid)
+{
+    typedef std::set&amp;lt;bool&amp;gt; answers;
+    lipo_fn const lipo_fns[] =
+        {
+            is_lipogram1,
+            is_lipogram2,
+            is_lipogram3,
+            is_lipogram4,
+            is_lipogram5,
+            is_lipogram6,
+        };
+    
+    lipo_functor lipo_func(text, avoid);
+    answers results;
+    lipo_fn const * const end = lipo_fns + sizeof lipo_fns / sizeof *lipo_fns;
+    transform(lipo_fns, end, inserter(results, results.end()), lipo_func);
+    assert(results.size() == 1);
+    report &amp;lt;&amp;lt; "Is " &amp;lt;&amp;lt; (*results.begin() ? "" : "not ")
+           &amp;lt;&amp;lt; "a lipogram" &amp;lt;&amp;lt; '\n';
+}
+} // end anonymous namespace
+    
+int main()
+{
+    book text;
+    word const avoid = "Ee";
+    read_book(text, std::cin);
+    check_if_lipogram(std::cout, text, avoid);
+    return 0;
+}
+
+&lt;/pre&gt;
+
+&lt;/div&gt;</description>
+<dc:date>2007-12-03</dc:date>
+<guid>http://wordaligned.org/articles/elegance-and-efficiency.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/elegance-and-efficiency.html</link>
+<category>Java</category>
+</item>
+
+<item>
+<title>Pitching Python in three syllables</title>
+<description>&lt;p&gt;Someone recently posted a question on the &lt;a href="http://accu.org/index.php/mailinglists"&gt;accu-general mailing list&lt;/a&gt;. It went something like this:
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;&amp;#8220;A new project is starting at work using C++, and I was suggesting use the &lt;a href="http://boost.org"&gt;Boost&lt;/a&gt; C++ libraries, only a colleague said there were problems with Boost 64 bit build on some platforms, and wanted to know what people here thought about Boost?&amp;#8221;
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;My reply unanswered the question:
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;&amp;#8220;Why choose C++ for a new project?&amp;#8221;
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;When pressed further, I wrote:
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;&amp;#8220;Use Python!&amp;#8221;
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;Thinking things over, I realised this wasn&amp;#8217;t a particularly helpful suggestion. Maybe the company in question had a team of experienced C++ programmers; maybe they&amp;#8217;d delivered previous projects using C++; maybe the development manager had been promoted following the successful completion of one of these projects.
+&lt;/p&gt;
+&lt;p&gt;So I asked myself a question: If I were a junior developer at this company, how could I convince management that Python was a better language for a greenfield project than C++. Management time being at a premium and attention-spans being short, I made the question more specific: &lt;strong&gt;how could I best describe Python in a single sentence&lt;/strong&gt;?
+&lt;/p&gt;
+&lt;span id="continue-reading"/&gt;
+
+
+&lt;h4&gt;No prize for originality&lt;/h4&gt;
+&lt;p&gt;There&amp;#8217;s no need for an original answer. Python has an official &lt;a href="http://python.org"&gt;home page&lt;/a&gt; and the very first sentence on this page supplies Python&amp;#8217;s own answer. Also, although I&amp;#8217;ve used Python as a specific C++ alternative, I might equally well have favoured other languages in a similar niche: &lt;a href="http://ruby-lang.org"&gt;Ruby&lt;/a&gt;, &lt;a href="http://groovy.codehaus.org/"&gt;Groovy&lt;/a&gt;, &lt;a href="http://perl.org"&gt;Perl&lt;/a&gt;, for example. It depends which you&amp;#8217;re happiest to promote. 
+&lt;/p&gt;
+&lt;p&gt;All these languages offer one sentence introductions on their homepages. Thus, in no particular order (can you guess which is which?), Python/Ruby/Groovy/Perl is:
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;ol&gt;
+ &lt;li&gt;
+     A stable, cross platform programming language.
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     A dynamic object-oriented programming language that can be used for many kinds of software development.
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     A dynamic, open source programming language with a focus on simplicity and productivity.
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     An agile dynamic language for the Java Virtual Machine.
+ &lt;/li&gt;
+&lt;/ol&gt;
+&lt;/blockquote&gt;&lt;p&gt;Plenty of other languages occupy a similar domain. All describe themselves using similar words. I wasn&amp;#8217;t entirely happy though, since none of these sentences do a great job of pitching Python etc.
+&lt;/p&gt;
+&lt;p&gt;So I applied a common programming tactic. I reduced the scope of the problem: &lt;span /&gt;how could I pitch Python in just 3 syllables?
+&lt;/p&gt;
+
+&lt;h4&gt;Dynamic?&lt;/h4&gt;
+&lt;p&gt;Three of the four sentences above use the term &lt;strong&gt;dynamic&lt;/strong&gt; and there&amp;#8217;s little doubt that Perl (which, with an uncharacteristically serious face on, describes itself as &lt;strong&gt;stable&lt;/strong&gt;) is every bit as dynamic as its peers.
+&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;Dynamic&lt;/em&gt; appeals, especially to a programmer (as do adjectives like &lt;em&gt;Agile&lt;/em&gt; and  &lt;em&gt;eXtreme&lt;/em&gt;). The word implies change, energy, force. My dictionary has nothing to say about its specific connotations when applied to a computer language, so I &lt;a href="http://www.google.co.uk/search?q=dynamic+programing+language"&gt;googled&lt;/a&gt; and found myself at &lt;a href="http://en.wikipedia.org/wiki/Dynamic_language"&gt;Wikipedia&lt;/a&gt;.
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;&lt;a href="http://en.wikipedia.org/wiki/Dynamic_language"&gt;Dynamic programming language&lt;/a&gt; is a term used broadly in computer science to describe a class of high level programming languages that execute at runtime many common behaviors that other languages might perform during compilation, if at all. These behaviors could include extension of the program, by adding new code, by extending objects and definitions, or by modifying the type system, all during program execution.
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;I&amp;#8217;m not sure that&amp;#8217;s especially helpful as a sales pitch, and certainly it&amp;#8217;s not a commonly understood definition. If I wanted to promote (for example) Python as a suitable language for a project, I wouldn&amp;#8217;t emphasise these features. And there&amp;#8217;s also the problem of overloaded meaning, as Wikipedia goes on to point out.
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;Dynamic languages and dynamic typing are not identical concepts, and a dynamic language need not be dynamically typed, though many dynamic languages are dynamically typed.
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;So, if we describe a language as &lt;em&gt;dynamic&lt;/em&gt;, there&amp;#8217;s a risk our C++-biased manager assumes &lt;em&gt;dynamically typed&lt;/em&gt;; and there&amp;#8217;s a common misconception that dynamic typing equals weak typing. There&amp;#8217;s also a danger our audience fears the volatility associated with dynamism (how can a &lt;em&gt;dynamic&lt;/em&gt; language be used to build a &lt;em&gt;solid&lt;/em&gt; application?)
+&lt;/p&gt;
+
+&lt;h4&gt;Scripting?&lt;/h4&gt;
+&lt;p&gt;None of the languages mentioned describes itself as a scripting language. Nonetheless, the term is commonly used, especially for Perl. Perhaps many of us first pick up these languages when we have a scripting task to do: copy a bunch of files around, change their contents in some way, pull a page from a web server and parse it, convert a spreadsheet into HTML and post it on the intranet &amp;#8212; the kind of quotidian task which is tiresome to implement in a low-level language.
+&lt;/p&gt;
+&lt;p&gt;By scripting we tend to mean one-shot tasks such as these, where perhaps we can squander a few CPU cycles or expend more memory than strictly necessary. The focus is on getting the job done. Scripts are just little programs.
+&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Little&lt;/strong&gt; is &lt;strong&gt;good&lt;/strong&gt; in this context. &lt;span /&gt;When we say we want readable code, we don&amp;#8217;t mean we want to sit in a comfortable chair and page through a Java-saga. We prefer something succinct: something easy to understand, something which fits in our heads. I can imagine the term &lt;em&gt;scripting&lt;/em&gt; being reclaimed as a badge of pride rather like &lt;em&gt;hacker&lt;/em&gt; has been &amp;#8212; but for now scripting means writing little programs, and belittles the language used.
+&lt;/p&gt;
+
+&lt;h4&gt;Well what then?&lt;/h4&gt;
+&lt;p&gt;Having snubbed the popular terms, scripting and dynamic, what shall we use in their place? Reviewing the original four one-sentence descriptions we find open source, simple, cross platform, agile, object-oriented, productive, used in many kinds of software development &amp;#8212; all of which are fine attributes and true enough, but none of which, on its own, goes far enough.
+&lt;/p&gt;
+
+&lt;h4&gt;High Level!&lt;/h4&gt;
+&lt;p&gt;Python is a &lt;strong&gt;high-level&lt;/strong&gt; language. Ruby, Groovy and Perl are high-level languages. High-level has become my preferred term.
+&lt;/p&gt;
+&lt;p&gt;High-level doesn&amp;#8217;t tell the whole story, of course &amp;#8212; nor can any one word. It&amp;#8217;s also relative: C is high-level compared to assembler which itself is high-level compared to machine code &amp;#8212; but these days C is a low-level language and &lt;a href="http://www.networkrail.co.uk/aspx/779.aspx"&gt;Birmingham New Street&lt;/a&gt; is old.
+&lt;/p&gt;
+&lt;p&gt;Management may think of C++ as high-level. It isn&amp;#8217;t. You must manage memory by hand, understand pointers, budget for each of the bits in each of the various integral types on each of your platforms. Java is better, but not much.
+&lt;/p&gt;
+&lt;p&gt;High-level no longer applies to C++ etc. and that&amp;#8217;s one reason why I want to appropriate it for today&amp;#8217;s real high-level languages. The benefits of using high-level languages are understood: the language does more for you.
+&lt;/p&gt;
+&lt;p&gt;One day, Python may not be high-level. Today, it is.
+&lt;/p&gt;
+&lt;hr /&gt;
+
+
+&lt;h4&gt;Footnotes&lt;/h4&gt;
+&lt;ol&gt;
+ &lt;li&gt;
+     I delivered this as a lightning speech at &lt;a href="http://www.pyconuk.org/"&gt;PyCon UK&lt;/a&gt; yesterday. Lightning speeches are limited to 5 minutes, and I had to skip some bits and race through others. This is what I meant to say!
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     I don&amp;#8217;t mean to criticise &lt;a href="http://boost.org"&gt;Boost&lt;/a&gt;, which sets standards very high indeed. If you&amp;#8217;re going to use C++, Boost is the next best thing to the C++ standard library. I would treat any hearsay about Boost not working on particular platforms with skepticism: you don&amp;#8217;t have to look hard to find Boost library test reports for common platforms.
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     Birmingham New Street opened in 1854.
+ &lt;/li&gt;
+&lt;/ol&gt;</description>
+<dc:date>2007-09-09</dc:date>
+<guid>http://wordaligned.org/articles/pitching-python-in-three-syllables.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/pitching-python-in-three-syllables.html</link>
+<category>Java</category>
+</item>
+
+<item>
+<title>Shameful Names</title>
+<description>&lt;p&gt;There&amp;#8217;s a lots of good positive &lt;a href="http://www.objectmentor.com/resources/articles/naming.htm"&gt;advice&lt;/a&gt; out there on how programmers should name classes, functions, variables and so on. To help balance things out are three half-baked tips on how &lt;em&gt;not&lt;/em&gt; to name things.
+&lt;/p&gt;
+&lt;ul&gt;
+ &lt;li&gt;
+     Don&amp;#8217;t use &lt;code&gt;m_something&lt;/code&gt; for member variables. Prefer &lt;code&gt;something&lt;/code&gt;. If there&amp;#8217;s any doubt about a variable&amp;#8217;s scope your code blocks are too long. Besides, you can always qualify a member variable&amp;#8217;s scope like &lt;code&gt;this-&amp;gt;something&lt;/code&gt;&lt;sup&gt;&lt;a href="http://wordaligned.org/articles/shameful-names.html#footnote1"&gt;[1]&lt;/a&gt;&lt;/sup&gt;.
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     &lt;code&gt;Utility&lt;/code&gt; is a poor name for a module. And yes, the same goes for &lt;code&gt;utilities&lt;/code&gt; and &lt;code&gt;util&lt;/code&gt;.
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     Don&amp;#8217;t create a class called &lt;code&gt;SomethingManager&lt;/code&gt; when plain old &lt;code&gt;Something&lt;/code&gt; would do. Why? Because &amp;#8220;manager&amp;#8221; is a long word and I&amp;#8217;ll bet class instance names get abbreviated to &lt;code&gt;something_mgr&lt;/code&gt;. Because you&amp;#8217;ll end up with source code with too many managers and not enough workers &lt;sup&gt;&lt;a href="http://wordaligned.org/articles/shameful-names.html#footnote2"&gt;[2]&lt;/a&gt;&lt;/sup&gt;. And because eventually you&amp;#8217;ll find yourself needing a &lt;code&gt;SomethingManagerManager&lt;/code&gt;.
+ &lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;One thing I like about &lt;a href="http://schemers.org"&gt;Scheme&lt;/a&gt; is that you can use punctuation characters in identifiers. Question marks work well in predicates (rather than &lt;code&gt;is_empty&lt;/code&gt;, write &lt;code&gt;empty?&lt;/code&gt;), and an exclamation mark alerts readers to functions with side-effects (&lt;code&gt;set!&lt;/code&gt;, for example).
+&lt;/p&gt;
+&lt;p&gt;&lt;a id="footnote1"&gt;[1]&lt;/a&gt; &lt;span /&gt;I can understand C++ programmers objecting to the explicit &lt;code&gt;self&lt;/code&gt; Python requires for member access. The objection becomes less easy to understand if they adopt the &lt;code&gt;m_something&lt;/code&gt; naming convention.
+&lt;/p&gt;
+&lt;p&gt;&lt;a id="footnote2"&gt;[2]&lt;/a&gt; Now that I think about it, my real objection is to object oriented code-bloat. Too many managers = too deep a heirarchy = not enough action. Think of JBoss and shudder.
+&lt;/p&gt;</description>
+<dc:date>2007-08-20</dc:date>
+<guid>http://wordaligned.org/articles/shameful-names.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/shameful-names.html</link>
+<category>Java</category>
+</item>
+
+<item>
+<title>Why Python programmers should learn Python</title>
+<description>&lt;p&gt;I recently clicked upon Keith Braithwaite and Ivan Moore&amp;#8217;s presentation, &lt;a href="http://www.keithbraithwaite.demon.co.uk/professional/presentations/#python"&gt;&amp;#8220;Why Java Programmers Should Learn Python&amp;#8221;&lt;/a&gt;. It starts off well with an expert discussion of three different axes of type systems, placing various programming languages in the resulting 3-space. It then poses a programming problem, the kind of problem which Python excels at:
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;Given the supplied library classes write some code in &amp;#8220;quickSilver&amp;#8221; to convert between word and decimal digits representations of positive integers less than 1001.
+&lt;/p&gt;
+&lt;p&gt;e.g. &amp;#8220;five seven three&amp;#8221; &amp;rarr; 573
+&lt;/p&gt;
+&lt;p&gt;e.g. 672 &amp;rarr; &amp;#8220;six seven two&amp;#8221;
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;The Java programmers attending the presentation don&amp;#8217;t know it yet, but &amp;#8220;quickSilver&amp;#8221; turns out to be Python, or at least a subset of it sufficient to solve the problem, and the final slides of the presentation contain a model  solution to this problem.
+&lt;/p&gt;
+&lt;span id="continue-reading"/&gt;
+
+
+&lt;h3&gt;A &amp;#8220;model&amp;#8221; solution?&lt;/h3&gt;
+&lt;p&gt;Here is that solution.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;class WordsFromNumber:
+    def __init__(self,number):
+        self.representationOf = number
+    def wordsOf(self):
+        lsd = self.representationOf % 10
+        msds = self.representationOf / 10
+        if msds == 0:
+            return self.wordFor(self.representationOf)
+        else:
+            return WordsFromNumber(msds).wordsOf() + " " + \
+                   self.wordFor(lsd)
+
+def wordFor(self,numeral):
+        return ["zero", "one", "two", "three", "four",
+                "five", "six", "seven", "eight", "nine"][numeral]
+
+class NumberFromWords:
+    def __init__(self,words):
+        self.representation = words
+    def number(self):
+        words =  split("\\s",self.representation) 
+        return self.unpack(words)
+    def unpack(self,words):
+        if len(words) == 1:
+            return self.numberFor(words[0])
+        else:
+            lswi = len(words) - 1
+            lswi = words[lswi]
+            msws = words[0:lswi]
+            return self.numberFor(lsw) + 10 * self.unpack(msw)
+    def numberFor(self,word):
+        return {"zero" : 0, "one" : 1, "two" : 2, "three" : 3,
+                "four" : 4, "five" : 5, "six" : 6, "seven" : 7,
+                "eight" : 8, "nine" : 9}[word]
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;I don&amp;#8217;t know what point the presenters were trying to make. I wasn&amp;#8217;t in their audience but if I were, &lt;span /&gt;this code wouldn&amp;#8217;t go any way towards persuading me I should bother with Python. It&amp;#8217;s got two classes where none is needed, it uses recursion when container operations would do, it&amp;#8217;s longer than it needs to be, and (putting myself in a Java programmer&amp;#8217;s shoes) are all those &lt;code&gt;self&lt;/code&gt;s really needed?
+&lt;/p&gt;
+&lt;p&gt;In other words this, to me, looks like Java written in Python. I&amp;#8217;ll assume this is the point the presenters are trying to make, but if they revise the presentation, I&amp;#8217;d like to suggest extending it to add an alternative ending, which I think shows off Python&amp;#8217;s advantages.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;An alternative ending&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;number_to_word = {
+    '0' : 'zero', '1' : 'one', '2' : 'two', '3' : 'three', '4' : 'four',
+    '5' : 'five', '6' : 'six', '7' : 'seven', '8': 'eight', '9' : 'nine'
+    }
+word_to_number = {
+    'zero' : 0, 'one' : 1, 'two' : 2, 'three' : 3, 'four' : 4,
+    'five' : 5, 'six' : 6, 'seven' : 7, 'eight' : 8, 'nine' : 9
+}
+
+def number_to_words(number):
+    return ' '.join(number_to_word[c] for c in str(number))
+
+def words_to_number(words):
+    def dec_shift_add(x, y):
+        return x * 10 + y
+    return reduce(dec_shift_add,
+        (word_to_number[w] for w in words.split()))
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;I&amp;#8217;ve omitted documentation in order to squeeze the encode-decode functions on to a single slide. If I had time and space, though, I&amp;#8217;d show how to document and test this function in one go using &lt;code&gt;doctest&lt;/code&gt;, taking care to cover what happens with invalid inputs.
+&lt;/p&gt;
+&lt;p&gt;By the way, you&amp;#8217;ll see I&amp;#8217;m using &lt;code&gt;reduce&lt;/code&gt; &lt;a href="http://www.artima.com/weblogs/viewpost.jsp?thread=98196"&gt;while I can&lt;/a&gt;! I think this example is one of those rare cases where it works well.
+&lt;/p&gt;
+
+&lt;h3&gt;Dictionary initialisation&lt;/h3&gt;
+&lt;p&gt;The explicit dictionaries are fine and good and almost certainly what should be presented to an audience of Python virgins, but in my own code I&amp;#8217;d be tempted to remove a little replication. (My thanks to Ashwin for tactfully pointing out a howling bug in the code originally posted here).
+&lt;/p&gt;
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;Zippy dicts&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;import string
+words = "zero one two three four five six seven eight nine".split()
+number_to_word = dict(zip(string.digits, words))
+word_to_number = dict(zip(words, range(10)))
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+
+&lt;h3&gt;Living by the Sword&lt;/h3&gt;
+&lt;p&gt;A recent (2008-03-07) wave of hits from &lt;a href="http://reddit.com/r/programming/info/6b511/comments/"&gt;Reddit&lt;/a&gt; has prompted me to revisit this note and, cough, refactor my code. There&amp;#8217;s no need for any mathematics, nested functions or &lt;code&gt;reduce&lt;/code&gt;: this problem is better handled by string conversions. And the goal of squeezing functions on a single slide is misguided. This code &lt;strong&gt;needs&lt;/strong&gt; doctesting. Java programmers are used to good test frameworks with great tool support, but Python excels at this too.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;from string import digits
+
+words = 'zero one two three four five six seven eight nine'.split()
+number_to_word = dict(zip(digits, words))
+word_to_number = dict(zip(words, digits))
+
+def number_to_words(number):
+    '''Converts a positive integer into a string of digit names.
+    
+    Examples:
+    &amp;gt;&amp;gt;&amp;gt; number_to_words(123)
+    'one two three'
+    &amp;gt;&amp;gt;&amp;gt; number_to_words(-1)
+    Traceback (most recent call last):
+    ...
+    KeyError: '-'
+    '''
+    return ' '.join(number_to_word[c] for c in str(number))
+    
+def words_to_number(words):
+    '''Converts a string of digit names into an integer.
+    
+    Examples:
+    &amp;gt;&amp;gt;&amp;gt; words_to_number('one two three')
+    123
+    &amp;gt;&amp;gt;&amp;gt; words_to_number('One tWo thrEE')
+    123
+    &amp;gt;&amp;gt;&amp;gt; words_to_number('zero one two')
+    12
+    &amp;gt;&amp;gt;&amp;gt; words_to_number('minus one')
+    Traceback (most recent call last):
+    ...
+    KeyError: 'minus'
+    &amp;gt;&amp;gt;&amp;gt; all(words_to_number(number_to_words(x)) == x for x in range(100))
+    True
+    '''
+    return int(''.join(word_to_number[w]
+                       for w in words.lower().split()))
+    
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
+
+&lt;/pre&gt;
+
+&lt;/div&gt;</description>
+<dc:date>2007-07-01</dc:date>
+<guid>http://wordaligned.org/articles/why-python-programmers-should-learn-python.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/why-python-programmers-should-learn-python.html</link>
+<category>Java</category>
+</item>
+
+<item>
+<title>Introducing Java</title>
+<description>&lt;div class="toc"&gt;
+&lt;h2&gt;Contents&lt;/h2&gt;
+&lt;ul&gt;
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/introducing-java.html#tocgarbage-collection" name="toc0" id="toc0"&gt;Garbage collection&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/introducing-java.html#tocruntime-errors" name="toc1" id="toc1"&gt;Runtime Errors&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/introducing-java.html#tocverbosity" name="toc2" id="toc2"&gt;Verbosity&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/introducing-java.html#tocthe-march-of-ides" name="toc3" id="toc3"&gt;The March of IDEs&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/introducing-java.html#tocin-java-everything-is-an-object" name="toc4" id="toc4"&gt;In Java, everything is an Object&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/introducing-java.html#toccompilation" name="toc5" id="toc5"&gt;Compilation&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/introducing-java.html#toclibraries" name="toc6" id="toc6"&gt;Libraries&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/introducing-java.html#tocjavadoc" name="toc7" id="toc7"&gt;Javadoc&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/introducing-java.html#tocjunit" name="toc8" id="toc8"&gt;JUnit&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/introducing-java.html#tocjava-versus-c" name="toc9" id="toc9"&gt;Java versus C++?&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/introducing-java.html#tocthe-jvm-platform" name="toc10" id="toc10"&gt;The JVM Platform&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/introducing-java.html#toclanguage-wars" name="toc11" id="toc11"&gt;Language Wars&lt;/a&gt;
+ &lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;&lt;p&gt;I didn&amp;#8217;t get to use Java until relatively recently in my programming
+   career. &lt;span /&gt;As a C++ programmer brought up on C, I suppose I suffered the
+   usual prejudice: that Java would be a feeble language designed to stop
+   feeble programmers from getting hurt too badly. The truth turned out
+   to be rather different.
+&lt;/p&gt;
+&lt;span id="continue-reading"/&gt;
+
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/introducing-java.html#toc0" name="tocgarbage-collection" id="tocgarbage-collection"&gt;Garbage collection&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;One headline difference between Java and C++ is of course garbage
+   collection. On the face of it, C++ provides the best of all worlds:
+   there are &lt;a href="http://boost.org/libs/smart_ptr/index.html"&gt;techniques&lt;/a&gt; to precisely encapsulate resource lifecycle;
+   there are &lt;a href="http://www.hpl.hp.com/personal/Hans_Boehm/gc/"&gt;libraries&lt;/a&gt; you can get hold of to collect garbage for you; and, finally, it looks like &lt;a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2006/n2129.pdf"&gt;C++09 will include garbage collection&lt;/a&gt;.
+&lt;/p&gt;
+&lt;p&gt;The sad truth is that the techniques I mention aren&amp;#8217;t as widely used
+   as they should be. It&amp;#8217;s hard to blame C++ programmers because the
+   various smart pointer classes haven&amp;#8217;t yet been formally standardised
+   and most C++ books fail to mention them (and the one smart pointer
+   which did make it into the standard library is notoriously
+   slippery). So we&amp;#8217;ll have to wait for C++09, roll our own, or get hold of a TR1 implementation &amp;#8212; and without considerable discipline there&amp;#8217;s
+   nothing to stop rogue programmers on the team using &lt;code&gt;new&lt;/code&gt; and &lt;code&gt;delete&lt;/code&gt;
+   as a high-level interface to heap management.
+&lt;/p&gt;
+&lt;p&gt;Garbage collection &lt;a href="http://www.octopull.demon.co.uk/java/ImmortalityAtaPrice.html"&gt;doesn&amp;#8217;t release programmers from thinking about
+the way a program uses resources&lt;/a&gt;, but it sure does release us
+   from some tiresome defects. Running a program though
+   &lt;a href="http://valgrind.org"&gt;valgrind&lt;/a&gt; (or similar) doesn&amp;#8217;t prove it&amp;#8217;s clean.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/introducing-java.html#toc1" name="tocruntime-errors" id="tocruntime-errors"&gt;Runtime Errors&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Similarly, Java throws runtime errors as soon as it detects problems C++ may not even notice. If you try and read past the end of an array or access a non-existent object, the runtime signals the error soon as it happens. No need for forensic investigation to figure out what trashed the stack.
+&lt;/p&gt;
+&lt;p&gt;The C++ counter-argument is that this kind of checking &lt;em&gt;costs&lt;/em&gt;. You have to be pretty dumb to try and read past the end of an array, so why ever pay for a safety check on every array access?  It only took a couple of &lt;code&gt;ArrayIndexOutOfBoundsException&lt;/code&gt;s to disabuse me of this notion. Dumb checks save time, especially the ones the programmer doesn&amp;#8217;t have to write; excluding them on the grounds of perceived cost counts as premature optimisation.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/introducing-java.html#toc2" name="tocverbosity" id="tocverbosity"&gt;Verbosity&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Unfortunately, though, if you write Java, you usually have to write a lot of it. I&amp;#8217;ll repeat &lt;a href="http://www.paulgraham.com"&gt;Paul Graham&lt;/a&gt;&amp;#8217;s joke about the Java implementation of &amp;#8220;Hello, World!&amp;#8221;.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;Hello, World!&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;public class Hello {
+    public static void main(String[] args) {
+        System.out.println("Hello, world!");
+    }
+}
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;blockquote&gt;&lt;p&gt;Someone who has never written a program probably looks at this and
+   wonders, why do you need to say so much to get the the computer to
+   print a message? Curiously, the reaction of experienced programmers
+   is identical.
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;An IDE will write a lot of this for you (and Java is rightly famous for its associated IDEs) but you&amp;#8217;ll still have to read it every time you visit the file. Programs are read more often than they&amp;#8217;re written.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/introducing-java.html#toc3" name="tocthe-march-of-ides" id="tocthe-march-of-ides"&gt;The March of IDEs&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;I&amp;#8217;ll admit that refactoring IDEs can be useful. If you have to use Java, use a refactoring IDE to keep your code in shape. The relative simplicity of the Java syntax and compilation model means that a Java IDE is always going to be one step ahead of a C++ one for this kind of thing.
+&lt;/p&gt;
+&lt;p&gt;While we&amp;#8217;re on the subject of IDEs, I&amp;#8217;ve also noticed some &lt;a href="http://www.regdeveloper.co.uk/2007/02/01/making_sense_ruby/"&gt;grumbling&lt;/a&gt; about the lack of such IDEs for high-level dynamic languages such as Ruby and Python.  If a variable&amp;#8217;s type isn&amp;#8217;t declared when a program is being written, how&amp;#8217;s an IDE going to auto-complete the methods supported by that variable? I&amp;#8217;m not an IDE designer, but the solution to this would seem to me to be to merge the interpreter and the editor: that is, run and write the program at the same time. If I&amp;#8217;m in the Python interpreter, I can just use &lt;code&gt;dir&lt;/code&gt; to tell me what&amp;#8217;s available.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/introducing-java.html#toc4" name="tocin-java-everything-is-an-object" id="tocin-java-everything-is-an-object"&gt;In Java, everything is an Object&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Everything except the built in types, that is. Java couldn&amp;#8217;t quite go the whole way: if it&amp;#8217;s going to compete with C and C++, it&amp;#8217;ll have to measure up on performance, and that seems to mean fixed-width built in types. At least Java &lt;em&gt;does&lt;/em&gt; have and always has had an official eight byte long integer, meaning that, for example, millisecond clock values won&amp;#8217;t wrap in the lifetime of this planet.
+&lt;/p&gt;
+&lt;p&gt;The downside of making everything an object is that few application domains can be modelled in this way. Sure, a windows-based user interface maps nicely to an object hierarchy, but when you get into the core application engine, you&amp;#8217;re likely to find yourself mapping, filtering and reducing collections &amp;#8212; a more functional style programming. C++ provides far more power here: I&amp;#8217;m reluctant to say it does better, because any heavy use of the STL and templated code requires lengthy build times and a willingness to unpick hideous compilation errors.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/introducing-java.html#toc5" name="toccompilation" id="toccompilation"&gt;Compilation&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Java is much much quicker to compile than C++. You don&amp;#8217;t have to
+   worry about dependencies the way you do in C++. A modern Java IDE
+   compiles as you type and can even run unit tests on the fly (though I
+   never quite got into this myself). Even better, once you&amp;#8217;ve compiled
+   the code, it should run wherever you&amp;#8217;ve got a suitable JVM. Java
+   abstracts the platform nicely enough.
+&lt;/p&gt;
+&lt;p&gt;The flip-side of this is that, if you need to dig beneath the JVM and poke at the system level, you&amp;#8217;ll have to work harder. The JNI is fiddly to use and not documented to Java&amp;#8217;s usual high standards. Of the low-level languages, C and C++ have the edge here; and high-level languages built on the C hardware abstraction layer such as Python and Perl fare better.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/introducing-java.html#toc6" name="toclibraries" id="toclibraries"&gt;Libraries&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;With Java, if you&amp;#8217;re doing something someone&amp;#8217;s probably done
+   before, they probably have done it before and made a suitably licensed
+   library available. I was very impressed with the range and quality of
+   Java libraries. The fact that Java has a standard and widely followed
+   set of coding conventions makes it easy to work with these libraries, 
+   as does the Javadoc documentation system and the JUnit test framework.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/introducing-java.html#toc7" name="tocjavadoc" id="tocjavadoc"&gt;Javadoc&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;&lt;a href="http://java.sun.com/j2se/javadoc/"&gt;Javadoc&lt;/a&gt; may seem like an incidental detail. It&amp;#8217;s not part of the core language and you don&amp;#8217;t need to use it when writing Java. The truth is that Javadoc is a defacto standard &amp;#8212; so much so that it&amp;#8217;s cloned itself into &lt;a href="http://www.doxygen.org"&gt;Doxygen&lt;/a&gt;, which does a similar job for C++. Not everyone likes the documentation template which Javadoc imposes but few would complain at the end result: a coherent, consistent, hyper-linked documentation suite, and simple tools which allow you to generate your own documentation in the same format.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/introducing-java.html#toc8" name="tocjunit" id="tocjunit"&gt;JUnit&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;&lt;a href="http://www.junit.org"&gt;JUnit&lt;/a&gt;, like Javadoc, is a defacto standard &amp;#8212; a simple and well-documented test framework with great tool support built around it. Again, it&amp;#8217;s been cloned into other languages even when they don&amp;#8217;t naturally support such a framework.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/introducing-java.html#toc9" name="tocjava-versus-c" id="tocjava-versus-c"&gt;Java versus C++?&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Java versus C++ for &lt;em&gt;what&lt;/em&gt; exactly? As a general purpose programming language for doing XML-y database-y user-interface-y internet-y things, Java has the edge. Then again, C# probably has the edge over Java in this same domain &amp;#8212; it certainly should do since it&amp;#8217;s had the opportunity to learn from Java&amp;#8217;s mistakes, and it surely has enough brains and backing behind it. I don&amp;#8217;t speak from experience: I&amp;#8217;ve never used C# and I don&amp;#8217;t see any pressing need to use it. In fact, I don&amp;#8217;t see the need to use Java. I&amp;#8217;m convinced that high-level languages such as Python knock the spots off Java and any Java clone in the application development domain.
+&lt;/p&gt;
+&lt;p&gt;As a general purpose programming language which needs to mix low-level platform access and high-performance algorithms, C++ is probably still where it&amp;#8217;s at. If you&amp;#8217;re prepared to invest the effort to learn it (which I wouldn&amp;#8217;t recommend!) then I&amp;#8217;d say C++ is a more expressive language than Java. I&amp;#8217;d rather be able to overload operators than have to put all my functions in classes. Structs beat beans.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/introducing-java.html#toc10" name="tocthe-jvm-platform" id="tocthe-jvm-platform"&gt;The JVM Platform&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Java welcomes high-level languages. Just put the Java &amp;#8220;J&amp;#8221; in front of Python, Ruby, &amp;#8230; and you&amp;#8217;ll find an implementation of your favourite language running on the JVM. Then there are the JVM natives such as Groovy and Scala and no doubt many others. Russel Winder &lt;a href="http://www.accu.org/index.php/conferences/accu_conference_2007/accu2007_sessions#C++%20has%20no%20useful%20purpose"&gt;comments&lt;/a&gt;:
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;What about Java? It survives as the assembly language for Groovy programming.
+&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/introducing-java.html#toc11" name="toclanguage-wars" id="toclanguage-wars"&gt;Language Wars&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Reading through all this, I realise I&amp;#8217;ve not said anything radical or original. At the outset I declared myself &amp;#8220;a C++ programmer brought up on C&amp;#8221; &amp;#8212; which is pretty much what I was doing when I first encountered Java (though my not-so-secret mission was to write code using high-level languages). The truth now is that I&amp;#8217;m actually a Python programmer brought up on C/C++, and as such, anything which might have seemed radical or original about Java seems, well &amp;#8230; ordinary and bland.
+&lt;/p&gt;
+&lt;p&gt;Certainly I&amp;#8217;ve been cured of any prejudice about Java being a feeble language designed to stop feeble programmers from getting hurt. It&amp;#8217;s the other way round; Java is a powerful language and it&amp;#8217;s the C++ programmers who revel in &lt;a href="http://www.artima.com/weblogs/viewpost.jsp?thread=104707"&gt;pain&lt;/a&gt;.
+&lt;/p&gt;
+&lt;p&gt;It took me about a year to get round to writing this note, a year in which I&amp;#8217;ve barely touched Java. I haven&amp;#8217;t missed it.
+&lt;/p&gt;</description>
+<dc:date>2007-05-17</dc:date>
+<guid>http://wordaligned.org/articles/introducing-java.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/introducing-java.html</link>
+<category>Java</category>
+</item>
+
+<item>
+<title>Retro-fitting coding standards</title>
+<description>&lt;div class="toc"&gt;
+&lt;h2&gt;Contents&lt;/h2&gt;
+&lt;ul&gt;
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/retro-fitting-coding-standards.html#tocwhat-no-coding-standards" name="toc0" id="toc0"&gt;What, No Coding Standards!?&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/retro-fitting-coding-standards.html#tocloss-of-freedom" name="toc1" id="toc1"&gt;Loss of Freedom&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/retro-fitting-coding-standards.html#tocask-the-experts" name="toc2" id="toc2"&gt;Ask the Experts&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/retro-fitting-coding-standards.html#tocsmall-stuff" name="toc3" id="toc3"&gt;Small Stuff&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/retro-fitting-coding-standards.html#tocreuse" name="toc4" id="toc4"&gt;Re-Use&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/retro-fitting-coding-standards.html#toclanguage-conventions" name="toc5" id="toc5"&gt;Language Conventions&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/retro-fitting-coding-standards.html#tocthe-legacy-issue" name="toc6" id="toc6"&gt;The Legacy Issue&lt;/a&gt;
+ &lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;&lt;p&gt;I&amp;#8217;ve worked at more than one organisation where a retrospective
+   attempt has been made to set up a coding standard. This article
+   discusses why these attempts were made and how they went.
+&lt;/p&gt;
+&lt;span id="continue-reading"/&gt;
+
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/retro-fitting-coding-standards.html#toc0" name="tocwhat-no-coding-standards" id="tocwhat-no-coding-standards"&gt;What, No Coding Standards!?&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;When I say &amp;#8220;a retrospective attempt&amp;#8221;, I mean that plenty of code had
+   already been written &amp;#8212; over a number of years, in fact &amp;#8212; with no
+   existing coding standard in place. Is this a bad thing? Not
+   necessarily. Joel Spolsky&amp;#8217;s 12 point &lt;a href="http://www.joelonsoftware.com/articles/fog0000000043.html"&gt;checklist&lt;/a&gt; on how to
+   write better code is generally sound, and in particular I think he
+   does well to &lt;strong&gt;not&lt;/strong&gt; say:
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;&amp;#8220;Do you have a Coding Standard, and does everyone follow it?&amp;#8221;
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;In the cases I&amp;#8217;m describing the code was in no way sub-standard. It
+   worked well. Its success had caused the team to grow, with all the
+   consequent problems, and in fact it wasn&amp;#8217;t management who imposed
+   a coding standard, but the developers themselves who decided they 
+   wanted one.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/retro-fitting-coding-standards.html#toc1" name="tocloss-of-freedom" id="tocloss-of-freedom"&gt;Loss of Freedom&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;&lt;span /&gt;A good coding standard shouldn&amp;#8217;t be there to constrain developers or force
+   them to comply to a particular coding style. In fact, most seasoned
+   programmers are careful not to waste energy arguing about coding
+   styles (which isn&amp;#8217;t to say we don&amp;#8217;t care, or don&amp;#8217;t have opinions
+   on such matters &amp;#8212; it&amp;#8217;s just that we prefer not to waste energy).
+&lt;/p&gt;
+&lt;p&gt;For this very reason, a coding standard can help. By drawing a line
+   under arguments about where to place braces, how far to indent, what
+   to call things, and then moving on, we allow ourselves to concentrate
+   on solving more interesting problems. Even better, if everyone adopts
+   a consistent style, it becomes easier to work with code written
+   by colleagues.
+&lt;/p&gt;
+&lt;p&gt;The term &amp;#8220;Coding Standards&amp;#8221; suggests rules and red tape. It&amp;#8217;s perhaps
+   the most common term, which is why I&amp;#8217;ve been using it, but I think
+   guidelines are what are really required. In fact, as I&amp;#8217;ll explain, we
+   don&amp;#8217;t really need guidelines since the experts have already written
+   them for us. A &amp;#8220;Style Guide&amp;#8221; describing local conventions should be
+   quite enough.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/retro-fitting-coding-standards.html#toc2" name="tocask-the-experts" id="tocask-the-experts"&gt;Ask the Experts&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;All too often a corporate coding standard reads as an attempt by a
+   local expert to lay down rules on how to write good code: when to use
+   exceptions, why to pass arguments by constant reference, when to use
+   protected data members, etc.  At best, this is a waste of effort, and,
+   more likely (unless &lt;a href="http://www.gotw.ca/"&gt;Herb Sutter&lt;/a&gt; or &lt;a href="http://www.aristeia.com/"&gt;Scott Meyers&lt;/a&gt;
+   happens to be your local expert), there&amp;#8217;s a high probability these
+   home-brewed rules will be wrong.
+&lt;/p&gt;
+&lt;p&gt;&lt;span /&gt;It&amp;#8217;s far better to provide a well-stocked library than to attempt
+   to write your own diluted imitations of Sutter and Meyers.
+&lt;/p&gt;
+&lt;p&gt;What &lt;a href="http://www.gotw.ca/"&gt;Sutter&lt;/a&gt; and &lt;a href="http://www.aristeia.com/"&gt;Meyers&lt;/a&gt; can&amp;#8217;t do, though, is document your
+   local coding style &amp;#8212; by which I mean those finickity things such as
+   what &amp;copy; copyright notice goes in a header file, where braces get
+   placed, how far to indent, how to name things. That&amp;#8217;s what goes in
+   your Style Guide.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/retro-fitting-coding-standards.html#toc3" name="tocsmall-stuff" id="tocsmall-stuff"&gt;Small Stuff&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;The Style Guide, then, will comprise entirely of what 
+   &lt;a href="http://www.gotw.ca/publications/c++cs.htm"&gt;Sutter and Alexandrescu&lt;/a&gt;
+   refer to as &amp;#8220;small stuff&amp;#8221;, about which their specific advice is:
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;Item 0. Don&amp;#8217;t sweat the small stuff.
+&lt;/p&gt;
+&lt;p&gt;&amp;#8212; &lt;a href="http://www.gotw.ca/publications/c++cs.htm"&gt;C++ Coding Standards&lt;/a&gt;, Herb Sutter and Andrei Alexandrescu
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;By this they mean:
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;Issues that are really just personal taste and don&amp;#8217;t affect correctness
+   don&amp;#8217;t belong in a coding standard. Any professional programmer can easily
+   read and write code that is formatted a little differently than they&amp;#8217;re
+   used to.
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;Does this imply that even a Style Guide isn&amp;#8217;t worth writing? And if so,
+   why ever did the team I was working on want one?
+&lt;/p&gt;
+&lt;p&gt;I agree with Sutter and Alexandrescu&amp;#8217;s headline advice, but my take on
+   it is slightly different: yes, small stuff isn&amp;#8217;t worth fussing over;
+   and yes, I&amp;#8217;m capable of resetting my tabwidth to edit a file, and even
+   of adopting the brace placement rules and naming conventions in force
+   in that file &amp;#8212; but it requires concentration and becomes
+   tiresome. What if there are several conflicting styles in a single
+   file? I prefer to work on a consistent code base, and so do most
+   programmers I&amp;#8217;ve worked with. So some sweating turns out to be
+   necessary!
+&lt;/p&gt;
+&lt;p&gt;In this same section, 
+   &lt;a href="http://www.gotw.ca/publications/c++cs.htm"&gt;Sutter and Alexandrescu&lt;/a&gt; manage to
+   define a sensible naming convention in a single paragraph: this
+   demonstrates the level of detail we&amp;#8217;re looking for. An entire Style
+   Guide should fit comfortably on a single page, otherwise 
+   it&amp;#8217;s too fussy and won&amp;#8217;t be adopted.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/retro-fitting-coding-standards.html#toc4" name="tocreuse" id="tocreuse"&gt;Re-Use&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;I hope we&amp;#8217;ve agreed to resist the temptation to write our own feeble
+   imitations of 
+   &lt;a href="http://www.gotw.ca/publications/c++cs.htm"&gt;&amp;#8220;C++ Coding Standards&amp;#8221;&lt;/a&gt;, 
+   &lt;a href="http://www.aristeia.com/books_frames.html"&gt;&amp;#8220;Effective C++&amp;#8221;&lt;/a&gt;, 
+   and similar. Out-sourcing this kind of thing is appealing. Surely we 
+   could also reuse a coding style we&amp;#8217;ve seen elsewhere?
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/retro-fitting-coding-standards.html#toc5" name="toclanguage-conventions" id="toclanguage-conventions"&gt;Language Conventions&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Up to now I&amp;#8217;ve avoided explicitly mentioned what programming language
+   I&amp;#8217;m talking about. If the language were &lt;a href="http://www.java.com/"&gt;Java&lt;/a&gt;,
+   then defining our Style Guide really shouldn&amp;#8217;t be an issue: we&amp;#8217;d just
+   cross-reference the 
+   &lt;a href="http://java.sun.com/docs/codeconv/"&gt;Sun Java Programming Conventions&lt;/a&gt;, 
+   configure an &lt;a href="http://eclipse-cs.sourceforge.net/"&gt;Eclipse plugin&lt;/a&gt; 
+   to enforce these conventions, share the configuration
+   and be done with it.
+&lt;/p&gt;
+&lt;p&gt;Similarly, &lt;a href="http://python.org"&gt;Python&lt;/a&gt; has a reasonably well-defined
+   preferred style &amp;#8212; and its famous space-sensitivity unasks most
+   questions about code layout.
+&lt;/p&gt;
+&lt;p&gt;If it&amp;#8217;s C++ we&amp;#8217;re talking about, the ground rules are less clear, and
+   there&amp;#8217;s a whole lot more syntax to fret about. Nonetheless, we could
+   draw inspiration from the C++ Standard Library, which follows a
+   consistent &amp;#8212; if not formally documented &amp;#8212; naming style. This is exactly
+   what &lt;a href="http//boost.org"&gt;Boost&lt;/a&gt; has chosen to do, and indeed parts of &lt;a href="http//boost.org"&gt;Boost&lt;/a&gt; are already
+   making their way into the C++ Library. Many of the Boost
+   &lt;a href="http://boost.org/more/lib_guide.htm#Guidelines"&gt;guidelines&lt;/a&gt; are specific to the Boost project, but we could
+   sensibly extract the short sections on naming and layout to form the
+   basis of our own Style Guide.
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;Use the naming conventions of the C++ Standard Library (See Naming
+   conventions rationale): 
+&lt;/p&gt;
+&lt;ul&gt;
+ &lt;li&gt;
+     Names (except as noted below) should be all lowercase, with words separated by underscores.  &lt;br /&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     Acronyms should be treated as ordinary names (e.g. xml_parser instead of XML_parser).  &lt;br /&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     Template parameter names begin with an uppercase letter.  &lt;br /&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     Macro (gasp!) names all uppercase and begin with BOOST_.
+ &lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Choose meaningful names &amp;#8212; explicit is better than implicit, and
+   readability counts. There is a strong preference for clear and
+   descriptive names, even if lengthy.  &lt;br /&gt;
+&lt;/p&gt;
+&lt;p&gt;&amp;#8230;  &lt;br /&gt;
+&lt;/p&gt;
+&lt;ul&gt;
+ &lt;li&gt;
+     Use fixed-width fonts.
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     Use spaces rather than tabs.
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     Limit line lengths to 80 characters.
+ &lt;/li&gt;
+&lt;/ul&gt;
+&lt;/blockquote&gt;&lt;p&gt;Of course, if we&amp;#8217;re retro-fitting a style guide, it&amp;#8217;s unlikely that we
+   can just cut and paste the relevant sections of the Boost one. Another
+   great site is Sven Rosvall&amp;#8217;s 
+   &lt;a href="http://www.rosvall.ie/CSG/"&gt;Coding Standard Generator&lt;/a&gt;, 
+   which allows you to generate your own coding standard by filling out a few forms.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/retro-fitting-coding-standards.html#toc6" name="tocthe-legacy-issue" id="tocthe-legacy-issue"&gt;The Legacy Issue&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;What if, having got together our one page Style Guide, we find that,
+   say, only 50% the codebase fits that style? This is a serious concern,
+   and one which threatens the usefulness of the whole exercise.
+&lt;/p&gt;
+&lt;p&gt;A Style Guide is supposed to make things easier for new team members
+   to pick things up &amp;#8212; but if they discover little of the codebase
+   follows the guide, then they&amp;#8217;ll ignore it like everyone else seems
+   to. Similarly, experienced team members will resent effort spent on
+   writing a guide which only looks good on paper, and will ignore
+   it too.
+&lt;/p&gt;
+&lt;p&gt;There&amp;#8217;s no easy way to tackle this issue, but there are a few viable
+   approaches:
+&lt;/p&gt;
+&lt;ol&gt;
+ &lt;li&gt;
+     Relax the style guide. By loosening it to accomodate everything,
+        everything conforms.
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     Refactor the entire codebase to meet the accepted style.
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     When working on a file, first refactor it to meet the accepted style.
+ &lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;General C++ refactorings &amp;#8212; to change the name of a class, for example
+   &amp;#8212; can be surprisingly difficult to automate and guarantee. The
+   complexity of the language and its compilation model makes sure of
+   that. Nonetheless, it can be done if the benefits are judged
+   worthwhile. If you&amp;#8217;re worried that changing code will break it, then
+   you probably don&amp;#8217;t have a good suite of regression tests: setting up
+   and automating such a suite is &lt;em&gt;far&lt;/em&gt; more important than code style
+   issues.
+&lt;/p&gt;
+&lt;p&gt;Simple refactorings &amp;#8212; to expand tabs to spaces, or to eliminate
+   unwanted 
+   &lt;a href="http://wordaligned.org/articles/keyword-substitution-just-say-no.html"&gt;Subversion keywords&lt;/a&gt;
+    &amp;#8212; are easier to apply. Once done,
+   they can be enforced using 
+   &lt;a href="http://wordaligned.org/articles/a-subversion-pre-commit-hook.html"&gt;hook scripts&lt;/a&gt;.
+&lt;/p&gt;
+&lt;p&gt;In practice, a balance between the listed approaches combined with a
+   good dose of common sense provides our only way forward. The Style
+   Guide should be a living document which always reflects the current
+   code base. As is so often the case, we can iterate to get where we want,
+   starting from: step zero, no style guide, anything goes.
+&lt;/p&gt;</description>
+<dc:date>2007-01-11</dc:date>
+<guid>http://wordaligned.org/articles/retro-fitting-coding-standards.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/retro-fitting-coding-standards.html</link>
+<category>Java</category>
+</item>
+
+<item>
+<title>Readable Code</title>
+<description>&lt;p&gt;In an &lt;a href="http://wordaligned.org/articles/my-test-first-ruby-program.html"&gt;earlier post&lt;/a&gt; I described how I got started with &lt;a href="http://www.ruby-lang.org" title="Ruby home"&gt;Ruby&lt;/a&gt;
+   not by studying the language, but by reading then adapting some
+   existing code. Of course I was lucky in that the code I started from
+   was good. (At least I&amp;#8217;m pretty sure it was: it came from a trusted
+   source, it had unit tests, looked clean &amp;#8212; I think I can recognise
+   good code even without knowing the language it&amp;#8217;s been written in.)
+   &lt;span /&gt;This approach of learning how to program by reading code is far from
+   radical but is perhaps better suited to some languages than others.
+&lt;/p&gt;
+&lt;span id="continue-reading"/&gt;
+
+
+&lt;h4&gt;Learning to Program by Reading&lt;/h4&gt;
+&lt;p&gt;The suggestion that we can learn how to program by reading code is far
+   from original. In his essay &lt;a href="http://catb.org/~esr/faqs/hacker-howto.html"&gt;How to Become a
+Hacker&lt;/a&gt; &lt;a href="http://catb.org/~esr/" title="Eric Raymond"&gt;Eric
+Raymond&lt;/a&gt; says:
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;Learning to program is like learning to write good natural
+   language. &lt;em&gt;The best way to do it is to read some stuff written by masters of the form&lt;/em&gt;,
+   write some things yourself, read a lot more,
+   write a little more, read a lot more, write some more &amp;#8230; and repeat
+   until your writing begins to develop the kind of strength and
+   economy you see in your models.
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;In &lt;a href="http://www.norvig.com/21-days.html"&gt;Teach Yourself Programming in Ten Years&lt;/a&gt;
+   &lt;a href="http://www.norvig.com"&gt;Peter Norvig&lt;/a&gt; recommends:
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;Talk to other programmers; &lt;em&gt;read other programs&lt;/em&gt;. This is more
+   important than any book or training course.
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;We must also remember &lt;a href="http://allankelly.net" title="No single link here, but Allan has lots to say about learning"&gt;learning&lt;/a&gt; never stops
+   &amp;#8212; meaning that we should always be reading good code.
+&lt;/p&gt;
+
+&lt;h4&gt;Finding Good Code&lt;/h4&gt;
+&lt;p&gt;Where, then, do we find good code to read? Maybe you&amp;#8217;re lucky enough
+   to work with some excellent programmers &amp;#8212; I guess many of us put in
+   more time reading code written by colleagues than by anyone else, since
+   that&amp;#8217;s what we&amp;#8217;re paid to do. Aside from that, you&amp;#8217;re probably looking at
+   code you found somewhere on the internet.
+&lt;/p&gt;
+&lt;p&gt;Of course, the code will have to be open source (meaning, in this
+   case, that you have access to source code, not compiled binaries) and,
+   if you wish to adapt it, suitably licensed.
+&lt;/p&gt;
+
+&lt;h4&gt;Dynamic Languages&lt;/h4&gt;
+&lt;p&gt;One thing I like about the dynamic languages (&lt;a href="http://python.org" title="Python home"&gt;Python&lt;/a&gt;, &lt;a href="http://www.ruby-lang.org" title="Ruby home"&gt;Ruby&lt;/a&gt;,
+   &lt;a href="http://www.perl.org" title="The Perl directory"&gt;Perl&lt;/a&gt;, etc.) is their open nature. It may be possible to scramble a
+   &lt;a href="http://python.org" title="Python home"&gt;Python&lt;/a&gt; program so it can&amp;#8217;t be read but I don&amp;#8217;t know how to
+   do it &amp;#8212; and it&amp;#8217;s certainly not part of the language tradition.
+&lt;/p&gt;
+&lt;p&gt;Another thing I like is the tradition of, and indeed support for, unit
+   testing in these languages. Some form of reflection makes unit testing
+   much easier. As does the ability to &lt;a href="http://docs.python.org/lib/module-doctest.html" title="doctest"&gt;dynamically execute
+code&lt;/a&gt;.
+   Unit tests actually make code easy to read: if you want to know how to
+   use a library, look at its unit tests. &lt;a href="http://docs.python.org/lib/module-doctest.html" title="doctest"&gt;Python&amp;#8217;s doctest&lt;/a&gt; presses this
+   point home by blurring the boundaries between code, tests and documentation.
+&lt;/p&gt;
+&lt;p&gt;So, if, for example, you want to learn how to program using &lt;a href="http://python.org" title="Python home"&gt;Python&lt;/a&gt;,
+   the Python standard library is a great starting point. You&amp;#8217;ll find it in your
+   Python installation. It&amp;#8217;s the code you actually run when you use
+   Python, it&amp;#8217;s of excellent quality, and of course there are
+   comprehensive unit tests.
+&lt;/p&gt;
+&lt;p&gt;Finally, dynamic languages are terse, so there&amp;#8217;s less code to read.
+   Have a look, for example, at Peter Norvig&amp;#8217;s &lt;a href="http://norvig.com/sudoku.html"&gt;Sudoku
+solver&lt;/a&gt; &amp;#8212; or even &lt;a href="http://wordaligned.org/sudoku.cgi"&gt;my
+own&lt;/a&gt;!
+&lt;/p&gt;
+
+&lt;h4&gt;Not So Dynamic Languages&lt;/h4&gt;
+&lt;p&gt;To be fair, &lt;a href="http://java.sun.com"&gt;Java&lt;/a&gt; also has a fine tradition of
+   openness.  It&amp;#8217;s far from my favourite language but you don&amp;#8217;t have to
+   look to hard to find superb Java source code published by the likes of
+   &lt;a href="http://www.sun.com"&gt;Sun&lt;/a&gt; and &lt;a href="http://www.apache.org"&gt;Apache&lt;/a&gt;.
+&lt;/p&gt;
+&lt;p&gt;You can also find good C code without trouble. C has been around long
+   enough that:
+&lt;/p&gt;
+&lt;ol&gt;
+ &lt;li&gt;
+     the language is stable, and
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     we know how to use it
+ &lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;C is often used as a portability layer for open source projects. Good
+   starting points to find good, readable C code would be
+   &lt;a href="http://www.gnu.org/"&gt;GNU&lt;/a&gt;, the Linux kernel, the C-Python
+   implementation.
+&lt;/p&gt;
+
+&lt;h4&gt;Readable C++&lt;/h4&gt;
+&lt;p&gt;Good C++ is rather harder to find &amp;#8212; or at least C++ which is both
+   good and readable. Part of the reason for this is that there&amp;#8217;s no
+   single way to write good C++. A C++ program which looked OK ten years
+   ago probably looks dated now (_&amp;#8221;That&amp;#8217;s not exception safe!&amp;#8221;_,
+   &lt;em&gt;&amp;#8220;Why ever didn&amp;#8217;t they use the STL?&amp;#8221;&lt;/em&gt;,
+   &lt;em&gt;&amp;#8220;Surely we need a bit of template metaprograming here?&amp;#8221;&lt;/em&gt;).
+   If the code hasn&amp;#8217;t been actively maintained,
+   it probably doesn&amp;#8217;t even compile: even though the standard is mature,
+   different implementations interpret it in different ways &amp;#8212; and their
+   interpretations are subject to change.
+&lt;/p&gt;
+&lt;p&gt;You can probably examine much of your standard library implementation
+   &amp;#8212; much of it is templated code delivered in header files &amp;#8212; but some
+   of the platform specific ifs and buts may make it hard to read. This
+   stuff is heavily optimised, and, when optimisation and readability are
+   in opposition, as they often are, your standard library implementation
+   is likely to prefer the former.
+&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://boost.org"&gt;Boost&lt;/a&gt; is packed
+   with superb, peer-reviewed, tested, open-source C++ code; but I
+   wouldn&amp;#8217;t describe it as an easy read: certainly, it&amp;#8217;s not for
+   beginners.
+&lt;/p&gt;
+
+&lt;h4&gt;And Finally&lt;/h4&gt;
+&lt;p&gt;I&amp;#8217;m going to return to this subject. For now, I&amp;#8217;ll close with a
+   favourite quotation, taken from the preface to &lt;a href="http://mitpress.mit.edu/sicp/full-text/book/book.html"&gt;the Wizard
+Book&lt;/a&gt;.
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;Programs should be written for people to read, and only incidentally
+   for machines to execute.
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;Happy reading!
+&lt;/p&gt;</description>
+<dc:date>2006-08-06</dc:date>
+<guid>http://wordaligned.org/articles/readable-code.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/readable-code.html</link>
+<category>Java</category>
+</item>
+
+<item>
+<title>Brackets Off!</title>
+<description>&lt;p&gt;The mathematical formula:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;v = u + at
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;calculates the speed, &lt;code&gt;v&lt;/code&gt;, of an object, with initial speed &lt;code&gt;u&lt;/code&gt; and constant acceleration &lt;code&gt;a&lt;/code&gt;, after time &lt;code&gt;t&lt;/code&gt;. Placing the &lt;code&gt;a&lt;/code&gt; next to the &lt;code&gt;t&lt;/code&gt; is a convenient shorthand for &amp;#8220;multiply &lt;code&gt;a&lt;/code&gt; by &lt;code&gt;t&lt;/code&gt;&amp;#8221;, which also makes it apparent that the multiplication must be done before the addition.
+&lt;/p&gt;
+&lt;p&gt;When the same formula is written in C, the multiplication operator needs
+   explicit representation:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;v = u + a * t;
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;The layout of this expression no longer makes it clear that the multiplication should be done before the addition, so a programmer might choose to parenthesise:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;v = u + (a * t)
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Are these parentheses required to guarantee correct evaluation of &lt;code&gt;v&lt;/code&gt;? If not, should they be included anyway, to help convey the meaning of the expression? How can coding standards help with such choices?
+&lt;/p&gt;
+&lt;p&gt;This article aims to answer these questions. It first presents some examples of the operator precedence and associativity rules in action, then offers some guidelines on when to parenthesise expressions, and finally argues that these guidelines should be replaced by a single rule.
+&lt;/p&gt;
+
+&lt;h3&gt;Examples&lt;/h3&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;v = u + a * t,
+x = 8 - 4 - 2,
+r = h &amp;lt;&amp;lt; 4 + 1,
+str += ((errors == 0) ? "succeeded" : "failed"),
+*utf++ = 0x80 | ucs &amp;gt;&amp;gt; 6 &amp;amp; 0x6f;
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Our first example, &lt;code&gt;v = u + a * t&lt;/code&gt; contains three operators: assignment, addition and multiplication. These operators &amp;#8212; indeed all operators &amp;#8212; follow a strict precedence which defines the order of evaluation. Since multiplication has higher precedence than addition, which in turn has higher precedence than assigment, the expression is equivalent to:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;v = (u + (a * t))
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;This means the compiler can be trusted with the expression as first presented.
+   No parentheses are required. Good, the language does what we expect.
+&lt;/p&gt;
+&lt;p&gt;In the second example, subtraction binds more tightly (i.e. has higher precedence than) assignment, so the subtractions are performed first. Since all the arithmetic operators associate left to right the expression is equivalent to:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;x = ((8 - 4) - 2)
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;In &lt;code&gt;r = h &amp;lt;&amp;lt; 4 + 1&lt;/code&gt; the arithmetic addition operator binds more tightly than the shift operator, so the expression is equivalent to:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;r = (h &amp;lt;&amp;lt; (4 + 1))
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Why did the programmer not write &lt;code&gt;r = h &amp;lt;&amp;lt; 5&lt;/code&gt;? Probably because the intention was:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;r = (h &amp;lt;&amp;lt; 4) + 1
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;but bit shifting (like, say, finding the address of something, or subscripting
+   an array) somehow seems closer to the machine and feels as if it ought to be
+   of higher precedence than addition, so the crucial parentheses were missed &lt;a id="fn1link" href="http://wordaligned.org/articles/brackets-off.html#footnote1"&gt;[1]&lt;/a&gt;.
+&lt;/p&gt;
+&lt;p&gt;The parentheses are unneccessary in our fourth example. We could rewrite:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;str += ((errors == 0) ? "succeeded" : "failed")
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;as:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;str += errors == 0 ? "succeeded" : "failed"
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;since the comparison operators bind more tightly than the conditional operator, which in turn binds more tightly than the assignment operators. Do the parentheses help you understand the meaning of this expression? Would you have left them out &amp;#8212; and if so, would one of your team-mates have complained?
+&lt;/p&gt;
+&lt;p&gt;How should the fifth example be parenthesised, to make its meaning clear? It is equivalent to:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;(*(utf++)) = (0x80 | ((ucs &amp;gt;&amp;gt; 6) &amp;amp; 0x6f))
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;which shows how complicated an expression looks when parentheses are added indiscriminately.
+&lt;/p&gt;
+
+&lt;h3&gt;Coding Standards&lt;/h3&gt;
+&lt;p&gt;In general &amp;#8212; at least, in my experience &amp;#8212; &lt;a href="http://wordaligned.org/articles/retro-fitting-coding-standards.html"&gt;coding standards&lt;/a&gt; do not provide rules on how to parenthesise expressions. I suspect this is for two reasons.
+&lt;/p&gt;
+&lt;p&gt;Firstly, because although all programmers use parentheses to clarify the meaning of expressions, they may well disagree on what makes an expression clear. Clarity seems a matter of taste. While programmers in a team may agree (to differ) on whether tabs or spaces are to be used for indentation, their coding standard leaves them free to rewrite Example 4 as:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;str += errors == 0 ? "succeeded" : "failed"
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;And secondly, if a coding standard were to rule on how to parenthesise, it would be difficult to find a middle ground. This leaves as candidate rules the two extremes:
+&lt;/p&gt;
+&lt;ol&gt;
+ &lt;li&gt;
+     parenthesise everything
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     never parenthesise
+ &lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;The first quickly leads to unreadable code. The second seems overly proscriptive.
+&lt;/p&gt;
+&lt;p&gt;In the absence of a hard rule, here are some guidelines which I hope are
+   non-contentious and which may help us reach a conclusion:
+&lt;/p&gt;
+&lt;ul&gt;
+ &lt;li&gt;
+     have the operator precedence tables to hand and understand how to interpret expressions using them   &lt;br /&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     understand the logic behind the operator precedence tables, but be aware of the traps and pitfalls
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     remember, parentheses are not the only way to make order of evaluation clear. For example, our fourth example could be rewritten:
+ &lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;*utf++ = 0x80 | 
+              ucs &amp;gt;&amp;gt; 6 &amp;amp; 
+              0x6f
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;ul&gt;
+ &lt;li&gt;
+     or even:
+ &lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;*utf = ucs &amp;gt;&amp;gt; 6; 
+*utf &amp;amp;= 0x6f; 
+*utf |= 0x80; 
+++utf;
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;ul&gt;
+ &lt;li&gt;
+     if an expression is hard to understand, break it down into simpler steps, or extract it out as a function with a meaningful name
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     trust the compiler: it might not implement partial template specialisation correctly, but it will get operator precedence right every time
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     never use parentheses simply because you aren&amp;#8217;t sure of how an expression will be evaluated without them: treat doubt as an opportunity to learn
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     all macro arguments must be parenthesised.
+ &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3&gt;Concluding Thoughts&lt;/h3&gt;
+&lt;p&gt;Any effort put into becoming familiar with precedence tables is likely to pay off across a range of languages. For example, although C++ introduces several new operators over C, there are no surprises. The precedence rules remain in force even if the operators have been overloaded (but that&amp;#8217;s the subject of another article). Java operator precedence is almost a subset of C&amp;#8217;s. Similarly, scripting languages are generally compatible with C, even where C&amp;#8217;s precedence rules are slightly &lt;a id="fn2link" href="http://wordaligned.org/articles/brackets-off.html#footnote2"&gt;[2]&lt;/a&gt;. So, while Perl introduces lower precedence versions of the logical operators &lt;code&gt;not&lt;/code&gt;, &lt;code&gt;and&lt;/code&gt;, and &lt;code&gt;or&lt;/code&gt;, it ensures that &lt;code&gt;not&lt;/code&gt; binds more tightly than &lt;code&gt;and&lt;/code&gt; which in turn binds more tightly than &lt;code&gt;or&lt;/code&gt;. Interestingly, in &lt;a href="http://python.org"&gt;Python&lt;/a&gt;, where whitespace is syntactically significant, parentheses can be used not just to indicate order of evaluation, but also to wrap lengthy expressions over several lines.
+&lt;/p&gt;
+&lt;p&gt;The more experienced I become as programmer, the fewer parentheses I use. Coming from a mathematical background, it was several months into my first job before I dared use the conditional operator &amp;#8212; and when I finally did start using it, I parenthesised all the sub-expressions for safety. Later on in my career, when I first found myself working with the bitwise operators, again, I enclosed sub-expressions with brackets. As my confidence has increased, the brackets have peeled away.
+&lt;/p&gt;
+&lt;p&gt;This, though, is simply evolution. Familiarity with the languages you use makes it easier to read expressions without the unnecessary noise of parentheses. Evolving in this way, however, leaves a programmer vulnerable when working on code written by a more experienced team-mate, unless the experienced programmer writes to a lowest common denominator.
+&lt;/p&gt;
+&lt;p&gt;Surely it would be better for everyone to raise their game. The operator precedence tables are a fundamental part of the language. The rules for using them are simple. Although there are many precedence levels, the operators do group logically. Update your coding standards. Prohibit unnecessary parentheses. Brackets off!
+&lt;/p&gt;
+&lt;hr /&gt;
+
+
+&lt;h3&gt;Notes&lt;/h3&gt;
+&lt;div class="amazon"&gt;&lt;a href="http://www.amazon.com/gp/product/0201179288?ie=UTF8&amp;amp;tag=wordalig-20&amp;amp;linkCode=as2&amp;amp;camp=1789&amp;amp;creative=9325&amp;amp;creativeASIN=0201179288"&gt;&lt;img  src="http://wordaligned.org/images/books/c-traps-and-pitfalls.jpg" alt="Book cover"/&gt;&lt;/a&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;a href="http://wordaligned.org/articles/brackets-off.html#fn1link" id="footnote1"&gt;[1]&lt;/a&gt; I&amp;#8217;ve taken this example directly from Andrew Koenig&amp;#8217;s &lt;a href="http://www.amazon.com/gp/product/0201179288?ie=UTF8&amp;amp;amp;tag=wordalig-20&amp;amp;amp;linkCode=as2&amp;amp;amp;camp=1789&amp;amp;amp;creative=9325&amp;amp;amp;creativeASIN=0201179288"&gt;&amp;#8220;C Traps and Pitfalls&amp;#8221;&lt;/a&gt;. This is a nice little book which expands on the ideas presented in a &lt;a href="http://www.literateprogramming.com/ctraps.pdf"&gt;paper of the same name [PDF]&lt;/a&gt;.
+&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://wordaligned.org/articles/brackets-off.html#fn2link" id="footnote2"&gt;[2]&lt;/a&gt; According to Koenig, some of C&amp;#8217;s
+   peculiarities can be blamed on its heritage:
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;The precedence of the C logical operators comes about for historical reasons. B, the predecessor of C, had logical operators that corresponded roughly to C&amp;#8217;s &lt;code&gt;&amp;amp;&lt;/code&gt; and &lt;code&gt;|&lt;/code&gt; operators. Although they were defined to act on bits, the compiler would treat them as &lt;code&gt;&amp;amp;&amp;amp;&lt;/code&gt; and &lt;code&gt;||&lt;/code&gt; if they were in a conditional context. When the two usages were split apart in C, it was deemed too dangerous to change the precedence much.
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;This article first appeared appeared in &lt;a href="http://accu.org/index.php/aboutus/aboutjournals"&gt;C Vu&lt;/a&gt; 15.6, and I am grateful to all at C Vu for their help.
+&lt;/p&gt;</description>
+<dc:date>2004-05-06</dc:date>
+<guid>http://wordaligned.org/articles/brackets-off.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/brackets-off.html</link>
+<category>Java</category>
+</item>
+
+</channel>
+</rss>

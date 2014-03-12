@@ -1,0 +1,198 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<link rel="icon" href="/images/favicon.png" type="image/png"/>
+<link href="/styles/application.css" media="all" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="/scripts/prettify.js"></script>
+<script type="text/javascript" src="/scripts/lang-lisp.js"></script>
+<script type="text/javascript" src="http://www.haloscan.com/load/wordaligned"></script>
+
+<title>Seamless sequence output in Python 3.0</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="author" content="Thomas Guest" />
+<meta name="description" content="A Word Aligned article posted 2009-01-09, tagged Python." />
+<meta name="keywords" content="Python" />
+<link rel="alternate" type="application/rss+xml" title="Feed" href="http://feeds.wordaligned.org/wordaligned" />
+</head>
+
+<body onload="prettyPrint()">
+<div id="container">
+  <div id="header">
+<h1><span><a accesskey="h" href="/">Word Aligned</a></span></h1>
+<h2>space sensitive programming</h2>
+<a class="button" href="http://feeds.wordaligned.org/wordaligned" title="Subscribe to Word Aligned"><img style="float: right;" src="/images/feed.png" alt="Feed Logo" height="28" width="28"/></a>
+</div>
+
+  <div id="page">
+    <div id="content">
+      <div class="atomentry" id="seamless-sequence-output-in-python-30.html">
+<h2 class="title"><a href="/articles/seamless-sequence-output-in-python-30.html">Seamless sequence output in Python 3.0</a></h2>
+<p class="meta"><abbr class="published" title="2009-01-09">2009-01-09</abbr> &bull; <a href="/tag/python" rel="tag">Python</a> &bull; <a href="/articles/seamless-sequence-output-in-python-30.html#disqus_thread">Comments</a></p>
+<p>We all know how to join things up for output in Python 2.6.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">&gt;&gt;&gt; words = ['a', 'list', 'of', 'words']
+&gt;&gt;&gt; numbers = 1, 2, 3, 4, 5
+&gt;&gt;&gt; print ' '.join(words)
+a list of words
+&gt;&gt;&gt; print ' + '.join(str(n) for n in numbers)
+1 + 2 + 3 + 4 + 5
+
+</pre>
+
+</div>
+
+<p><a href="http://docs.python.org/library/stdtypes.html#str.join">String.join</a> does the joining (without any <a href="/articles/joined-output-and-the-fencepost-problem.html" title="Joined output and the fencepost problem">unwanted extra spaces</a>). I often create a bound method, which I think looks a little better:
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">&gt;&gt;&gt; spaced = ' '.join
+&gt;&gt;&gt; concat = ''.join
+&gt;&gt;&gt; spaced(words)
+'a list of words'
+&gt;&gt;&gt; concat(words)
+'alistofwords'
+
+</pre>
+
+</div>
+
+<p><code>String.join()</code> hasn&#8217;t changed in Python 3.0, but <a href="http://docs.python.org/3.0/library/functions.html#print">print</a> has.
+</p>
+<div class="typocode"><div class="codetitle">print statement, 2.6</div>
+
+<pre class="prettyprint">print ' '.join(words)
+print ' + '.join(str(n) for n in numbers)
+
+</pre>
+
+</div>
+
+<p>Applying the <a href="http://docs.python.org/library/2to3.html">2to3</a> converter to the snippet above gives
+</p>
+<div class="typocode"><div class="codetitle">print function, 3.0</div>
+
+<pre class="prettyprint">print(' '.join(words))
+print(' + '.join(str(n) for n in numbers))
+
+</pre>
+
+</div>
+
+<p>Alternatively, we can dispense with the explicit <code>string.join</code>. With some argument unpacking, Python 3.0&#8217;s new print function can do it all for us. It also stringifies the printed arguments, so we don&#8217;t need the <code>str(n)</code>&#8217;s either.
+</p>
+<div class="typocode"><div class="codetitle">look no joins</div>
+
+<pre class="prettyprint">print(*words)
+print(*numbers, sep=' + ')
+
+</pre>
+
+</div>
+
+<p><code>Sys.stdout</code> is the defaulted destination for the print calls above. Supply a file (or anything with a <code>write(string)</code> method) to <a href="http://docs.python.org/3.0/library/functions.html#print">print</a> elsewhere.
+   If you&#8217;re using Python 2.6 but would like to use Python 3.0 style printing, use a future statement.
+</p>
+<div class="typocode"><div class="codetitle">no joins in 2.6 either</div>
+
+<pre class="prettyprint">&gt;&gt;&gt; from __future__ import print_function
+&gt;&gt;&gt; print(*[1, 2, 3, 4, 5], sep=' + ')
+1 + 2 + 3 + 4 + 5
+&gt;&gt;&gt; print(1, 2, 3, 4, 5, sep=' + ')
+1 + 2 + 3 + 4 + 5
+
+</pre>
+
+</div>
+
+<hr />
+
+<p>&#x2621; In a <a href="#feedbackitem-1">comment</a> <a href="http://online.effbot.org/">Fredrik Lundh</a> points out that <code>print</code> isn&#8217;t exactly optimized for handling large numbers of arguments, so the sequence unpacking technique is likely to be slower than using <code>string.join()</code>. Running a simple timing test confirmed this: 
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">$ python -m timeit -s 'n = list(range(1000))' 'print(*n)'
+....
+10 loops, best of 3: 27.9 msec per loop
+$ python -m timeit -s 'n = list(range(1000))' 'print(" ".join(str(i) for i in n))'
+....
+1000 loops, best of 3: 1.22 msec per loop
+
+</pre>
+
+</div>
+
+<p>That is, the  <code>string.join</code> technique runs about 20 times more quickly when space printing the number range 0 to 999.
+</p>
+<h5><a name="feedback">Feedback</a></h5><div id="feedback_div"><ol id="feedback" class="feedback"><li class="feedbackitem" id="feedbackitem-1"><div class="author"><cite>Fredrik</cite> 2009-01-10</div><div class="content"><p>Did you try benchmarking this?  &#8220;print&#8221; isn&#8217;t exactly optimized for handling a large number of arguments.  &#8220;join&#8221; is heavily optimized, though&#8230;</p><p>(I see about a 15x slowdown in a simple test I made.  YMMV.)</p></div></li><li class="feedbackitem" id="feedbackitem-2"><div class="author"><cite>Thomas Guest</cite> 2009-01-10</div><div class="content"><p>Fredrik, good point! No I didn&#8217;t try benchmarking, and after posting this entry it did occur to me that print(*things) would probably be slower than print(&#8217; &#8216;.join(str(thing) for thing in things)).</p><p>In my defence: print is something I lean on most heavily during interpreted sessions, when speed isn&#8217;t as much of a concern as the keystroke saving, and typically I&#8217;m not printing very long sequences anyway.</p><p>I&#8217;ll run some benchmarks later and put a cautionary note in the article.</p></div></li></ol></div>
+</div>
+
+<div class="comments"><hr/><div id="disqus_thread"></div><script type="text/javascript" src="http://disqus.com/forums/wordaligned/embed.js"></script></div>
+      
+<div id="comments"><script type="text/javascript">
+//<![CDATA[
+(function() {
+    var links = document.getElementsByTagName('a');
+    var query = '?';
+    for(var i = 0; i < links.length; i++) {
+        if(links[i].href.indexOf('#disqus_thread') >= 0) {
+            query += 'url' + i + '=' + encodeURIComponent(links[i].href) + '&amp;';
+        }
+    }
+    document.write('<script type="text/javascript" src="http://disqus.com/forums/wordaligned/get_num_replies.js' + query + '"></' + 'script>');
+})();
+//]]>
+</script></div>
+
+    </div>
+    <div id="sidebar">
+      
+<div class="sidebar-node">
+<h3>Tagged</h3>
+<ul id="categories"><li><a href="/tag/python" rel="tag">Python</a></li></ul>
+
+</div>
+
+<div class="sidebar-node">
+<h3>Chain</h3>
+<ul>
+<li><a accesskey="n" href="/articles/could-a-python-eat-an-elephant.html" title="Next article">&laquo; Could a Python eat an elephant?</a></li>
+<li><a accesskey="p" href="/articles/virtualization.html" title="Previous article">&raquo; Tell me about &#8230; Virtualization</a></li>
+</ul>
+
+
+</div>
+
+<div class="sidebar-node">
+<h3>Feeds</h3>
+
+<ul>
+<li><a href="http://feeds.wordaligned.org/wordaligned"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Articles</a></li>
+<li><a href="http://feeds.wordaligned.org/wordaligned/comments"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Comments</a></li>
+</ul>
+
+
+</div>
+
+    </div>
+  </div>
+  <div id="footer">
+<hr />
+<p><a href="http://tag.wordaligned.org">Thomas Guest</a></p>
+</div>
+
+</div>
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-3373724-1']);
+  _gaq.push(['_trackPageview']);
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ga);
+  })();
+</script>
+</body>
+
+</html>

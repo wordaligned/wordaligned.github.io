@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" >
+<channel>
+<title>Word Aligned</title>
+<link>http://wordaligned.org</link>
+<description>tales from the code face</description>
+<dc:creator>tag@wordaligned.org</dc:creator>
+<language>en-gb</language>
+<item>
+<title>Drawing Software Designs</title>
+<description>&lt;p&gt;Here&amp;#8217;s &lt;a href="http://mitpress.mit.edu/sicp/full-text/book/book-Z-H-28.html#%_thm_4.45"&gt;Exercise 4.45&lt;/a&gt; from the &lt;a href="http://mitpress.mit.edu/sicp/"&gt;Wizard Book&lt;/a&gt;.
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;The following sentence can be parsed in five different ways: &amp;#8220;The
+   professor lectures to the student in the class with the cat.&amp;#8221;
+   Give the five parses and explain the differences in shades of
+   meaning among them.
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;You can find a formal representation of the five parses at the end of
+   this post. I found it easiest to describe the different shades of
+   meaning with a diagram.
+&lt;/p&gt;
+&lt;span id="continue-reading"/&gt;
+
+
+&lt;h2&gt;The Different Shades of Meaning&lt;/h2&gt;
+&lt;img src="http://wordaligned.org/images/ex4.45.jpg" width="100%" alt="The cat, the class, the student, the professor"/&gt;
+
+
+&lt;h2&gt;Drawing as a Design Tool&lt;/h2&gt;
+&lt;p&gt;I use drawings all the time when I&amp;#8217;m writing software. Pencil and
+   paper are good enough for many jobs; whiteboard and pen are perfect
+   for others. I enjoy using these tools and they allow me to communicate
+   ideas very efficiently &amp;#8212; when you work in this way, you soon build a
+   &lt;a href="http://www.hasbro.com/default.cfm?page=browse&amp;amp;product_id=9475"&gt;Pictionary&lt;/a&gt;-style rapport with colleagues, and a simple rectangle becomes a
+   class, or a server, or an item on a queue, or anything else you want it to be.
+&lt;/p&gt;
+&lt;p&gt;Often, the drawings themselves are ephemeral. It&amp;#8217;s the act of
+   producing the picture which shapes the design. There&amp;#8217;s never been any
+   question of feeding the drawing into the computer and having it
+   generate code. (Though the reverse trip sometimes works: given source
+   code, a computer can sketch a hyper-linked class heirarchy, for
+   example). Similarly, I&amp;#8217;ve never seen real benefits from the various 
+   corners of the UML syntax. Please, keep it simple.
+&lt;/p&gt;
+&lt;p&gt;If you hit on a drawing you do want to save, there&amp;#8217;s no need to transpose
+   it into a computer drawing package; that&amp;#8217;s sure to take time and risks
+   stifling the picture. Instead, just scan in or photograph the original
+   and put it on the wiki.
+&lt;/p&gt;
+
+&lt;h2&gt;Computer Drawing Packages&lt;/h2&gt;
+&lt;p&gt;Computer drawing packages generally leave me cold. They really don&amp;#8217;t
+   seem to have moved on since the version of Mac Draw I encountered over
+   twenty years ago, back when a mouse was a novel input device. It took
+   me about 10 minutes to draw the picture above by hand, of which most
+   of the time was spent thinking. Using a computer, I should think it
+   would have taken well over an hour, of which most of my time would
+   have been spent cursing.
+&lt;/p&gt;
+&lt;p&gt;The one thing I &lt;em&gt;do&lt;/em&gt; like about computer drawing packages is that they
+   allow you to animate a drawing &amp;#8212; for example to replay it, starting from 
+   a blank page, adding features in turn. I&amp;#8217;ve seen this technique used very effectively
+   in presentations. Building these pictures is, however, a painful process.
+&lt;/p&gt;
+
+&lt;h2&gt;The Five Parses&lt;/h2&gt;
+&lt;p&gt;For the record, the five different parses are:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;;; 1st parse
+(sentence
+  (simple-noun-phrase
+    (article the) (noun professor))
+  (verb-phrase
+    (verb-phrase
+      (verb-phrase
+        (verb lectures)
+        (prep-phrase
+          (prep to)
+          (simple-noun-phrase (article the) (noun student))))
+      (prep-phrase
+        (prep in)
+        (simple-noun-phrase (article the) (noun class))))
+    (prep-phrase
+      (prep with)
+      (simple-noun-phrase (article the) (noun cat)))))
+
+;; 2nd parse
+(sentence
+  (simple-noun-phrase (article the) (noun professor))
+  (verb-phrase
+    (verb-phrase
+      (verb lectures)
+      (prep-phrase
+        (prep to)
+        (simple-noun-phrase (article the) (noun student))))
+    (prep-phrase
+      (prep in)
+      (noun-phrase
+        (simple-noun-phrase (article the) (noun class))
+        (prep-phrase 
+           (prep with) 
+           (simple-noun-phrase (article the) (noun cat)))))))
+
+;; 3rd parse
+(sentence
+  (simple-noun-phrase (article the) (noun professor))
+  (verb-phrase
+    (verb-phrase
+      (verb lectures)
+      (prep-phrase
+        (prep to)
+        (noun-phrase
+          (simple-noun-phrase (article the) (noun student))
+          (prep-phrase
+            (prep in)
+            (simple-noun-phrase (article the) (noun class))))))
+    (prep-phrase
+      (prep with)
+      (simple-noun-phrase (article the) (noun cat)))))
+
+;; 4th parse
+(sentence
+  (simple-noun-phrase (article the) (noun professor))
+  (verb-phrase
+    (verb lectures)
+    (prep-phrase
+      (prep to)
+      (noun-phrase
+        (noun-phrase
+          (simple-noun-phrase (article the) (noun student))
+          (prep-phrase 
+            (prep in)
+            (simple-noun-phrase (article the) (noun class))))
+        (prep-phrase 
+          (prep with) 
+          (simple-noun-phrase (article the) (noun cat)))))))
+
+;; 5th parse
+(sentence
+  (simple-noun-phrase (article the) (noun professor))
+  (verb-phrase
+    (verb lectures)
+    (prep-phrase
+      (prep to)
+      (noun-phrase
+        (simple-noun-phrase (article the) (noun student))
+        (prep-phrase
+          (prep in)
+          (noun-phrase
+            (simple-noun-phrase (article the) (noun class))
+            (prep-phrase
+              (prep with)
+              (simple-noun-phrase (article the) (noun cat)))))))))
+
+&lt;/pre&gt;
+
+&lt;/div&gt;</description>
+<dc:date>2007-03-04</dc:date>
+<guid>http://wordaligned.org/articles/drawing-software-designs.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/drawing-software-designs.html</link>
+<category>Design</category>
+</item>
+
+</channel>
+</rss>

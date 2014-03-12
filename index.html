@@ -1,0 +1,736 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<link rel="icon" href="/images/favicon.png" type="image/png"/>
+<link href="/styles/application.css" media="all" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="/scripts/prettify.js"></script>
+<script type="text/javascript" src="/scripts/lang-lisp.js"></script>
+<script type="text/javascript" src="http://www.haloscan.com/load/wordaligned"></script>
+
+<title>Word Aligned</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="author" content="Thomas Guest" />
+<meta name="description" content="A collection of articles on software development written by Thomas Guest." />
+<meta name="keywords" content="CLRS, Regex, Missiles, Cycling, apple, Pictures, Self, Editors, Emacs, Torvalds, ImageMagick, IDE, Decorators, Shell, PIL, Lcs, Turing, Ruby on Rails, Puzzles, Europython, iphone, Characters, Fractals, Crabs, DocBook, Dynamic Languages, lighttpd, Bugs, CVS, Reviews, Steganography, Algorithms, Perec, Content, Markdown, Two Wheels, Conferences, Syntax, Unix, Arc, Go, Web-applications, Chess, Web Applications, Java, Esr, Recursion, Charts, Perl, Subversion, Recommended, Teamwork, Build, ACCU, Knuth, Android, OCR, Boost, php, Erlang, nm, Python, cvs2svn, SICP, Lisp, Books, Graphics, Disqus, Ruby, openid, C, Zlib, Trac, Windows, Documentation, C++, Accu, Streams, Bristol, Tesseract, Drawing, Accidents, Google, Apple, Etc, Functional Programming, Pi, Haskell, Design, Virtualization, Spolsky, Curl, Scheme" />
+<link rel="alternate" type="application/rss+xml" title="Feed" href="http://feeds.wordaligned.org/wordaligned" />
+</head>
+
+<body onload="prettyPrint()">
+<div id="container">
+  <div id="header">
+<h1><span><a accesskey="h" href="/">Word Aligned</a></span></h1>
+<h2>tales from the code face</h2>
+<a class="button" href="http://feeds.wordaligned.org/wordaligned" title="Subscribe to Word Aligned"><img style="float: right;" src="/images/feed.png" alt="Feed Logo" height="28" width="28"/></a>
+</div>
+
+  <div id="page">
+    <div id="content">
+      <div class="atomentry" id="go-for-short-variable-names.html">
+<h2 class="title"><a href="/articles/go-for-short-variable-names.html">Go for short variable names</a></h2>
+<p class="meta"><abbr class="published" title="2014-03-06">2014-03-06</abbr> &bull; <a href="/tag/go" rel="tag">Go</a> &bull; <a href="/articles/go-for-short-variable-names.html#disqus_thread">Comments</a></p>
+<p>Recently Brad Fitzpatrick promoted the <a href="http://golang.org/s/style" title="Go style guide">Go style guide</a> on twitter, which prompted Tim Penhey to take issue with its advice on variable naming.
+</p>
+<div><blockquote class="twitter-tweet" lang="en"><p><a href="https://twitter.com/bradfitz">@bradfitz</a> sorry, but can&#39;t agree with &#8220;use short variable names over descriptive ones&#8221; <a href="https://twitter.com/search?q=%23golang&amp;src=hash">#golang</a> <a href="https://twitter.com/search?q=%23styleguide&amp;src=hash">#styleguide</a> /cc <a href="https://twitter.com/sidneidasilva">@sidneidasilva</a></p>&mdash; Tim Penhey (@howbazaar) <a href="https://twitter.com/howbazaar/statuses/437893595857571840">February 24, 2014</a></blockquote><script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script></div>
+
+<p>A brief and inconclusive exchange followed. Twitter&#8217;s fine for opinions and one-liners but flawed for discussions &#8212; even when the subject happens to be brevity.
+</p>
+<p>I&#8217;m not going to tweet about it, but I like Go and I like its style. I&#8217;d rather read code which uses short variable names. Long descriptive names, which may appear to provide more information, often obscure the structure and flow of the code. The narrower the scope, the shorter names can be; so the style guide implicitly sanctions short functions and shuns globals. All good.
+</p>
+<p>How short is short?
+</p>
+<div><blockquote class="twitter-tweet" data-conversation="none" lang="en"><p><a href="https://twitter.com/golang">@golang</a> where does it stop? In our project we have &#8220;c, ch, d, m, s, st&#8221; and they point and say &#8220;style guide says it is fine&#8221;.</p>&mdash; Tim Penhey (@howbazaar) <a href="https://twitter.com/howbazaar/statuses/438084788038037505">February 24, 2014</a></blockquote></div>
+
+<p>Those variables are certainly short rather than descriptive but they aren&#8217;t scary: <code>c</code> could be a character; <code>ch</code> for channel, maybe, or another character; <code>d</code> for data, difference or distance; <code>m</code>, midpoint; <code>s</code> string; <code>st</code> state. All guesses, of course, but in context I&#8217;d expect to see &#8212; in the space of just a few lines of code &#8212; where each variable lives and how it&#8217;s used, a more clear and correct indication of what it means than a lengthy name could ever be.
+</p>
+<p>Single character variables are just fine, says the <a href="http://golang.org/s/style" title="Go style guide">style guide</a>:
+</p>
+<blockquote><p>Prefer c to lineCount. Prefer i to sliceIndex.
+</p>
+</blockquote><p>Some languages allow you to go further. Omit a variable in Perl and it defaults to being what you&#8217;d like it to be. Usually.
+</p>
+<p>A single character variable name is an extreme form of abbreviation. It works nicely for small things, like pixels and characters.
+</p>
+<pre><code>Pixel pixel, pel, px, <b>p</b>;
+Character character, char, ch, <b>c</b>;</code></pre>
+
+<p>Some less terse abbreviations hurt my ear: <code>mngr</code>, <code>svr</code>, <code>cnt</code>.
+</p>
+<p>The style guide is, after all, a guide, and common sense applies.
+   Some abbreviations are ugly and others save so little space they aren&#8217;t worth it.
+</p>
+<p>Go&#8217;s advice on naming tips a hat to the language&#8217;s C heritage and to C&#8217;s great application, UNIX, which is unsurprising when you realise one of Go&#8217;s prominent contributors, Ken Thompson, had a hand in both. When Thompson was asked what he would do differently if he were redesigning UNIX <a href="http://en.wikiquote.org/wiki/Kenneth_Thompson#Attributed" title="Ken Thompson, quoted in The UNIX Programming Environment (Kernighan, Pike)">he replied</a>: 
+</p>
+<blockquote><p>I&#8217;d spell <a href="http://unixhelp.ed.ac.uk/CGI/man-cgi?creat" title="man 2 creat">creat</a> with an &#8220;e&#8221;.
+</p>
+</blockquote><p>So, working on Go, <a href="https://code.google.com/p/go/source/detail?r=4a3f6bbb5f0c6021279ccb3c23558b3c480d995f" title="Spell it with an e">he did</a>.
+</p>
+
+</div>
+
+
+<div class="atomentry" id="all-any-none.html">
+<h2 class="title"><a href="/articles/all-any-none.html">You wait all day for a bus&#8230;</a></h2>
+<p class="meta"><abbr class="published" title="2013-10-02">2013-10-02</abbr> &bull; <a href="/tag/c++" rel="tag">C++</a>, <a href="/tag/python" rel="tag">Python</a> &bull; <a href="/articles/all-any-none.html#disqus_thread">Comments</a></p>
+<p><a href="http://docs.python.org/3/library/functions.html#any"><code>Any</code></a> and <a href="http://docs.python.org/3/library/functions.html#all"><code>all</code></a>  didn&#8217;t appear in Python until version 2.5, released in 2006, when the language was already well into its teens.
+</p>
+<p>Why the delay in offering such fundamental functions? An oversight? Or simply that they&#8217;re so easy to implement they weren&#8217;t thought necessary. Either way, they&#8217;re here now.
+</p>
+<p>The functions are closely related and complementary. We can define <code>any</code> in terms of <code>all</code> and vice-versa.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">def any_(xs):
+    return not all(map(operator.not_, xs))
+
+def all_(xs):
+    return not any(map(operator.not_, xs))
+
+</pre>
+
+</div>
+
+<p>C++ reached its 30s before introducing <a href="http://en.cppreference.com/w/cpp/algorithm/all_any_none_of">its own versions</a> of these logical algorithms, <code>any_of</code> and <code>all_of</code>, but made up for lost time by finding room for a third, <code>none_of</code>, which is not <code>any_of</code>.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">template &lt;class Iter, class Pred&gt;
+bool none_of_(Iter b, Iter e, Pred p)
+{
+    return std::find_if(b, e, p) == e;
+}
+
+template &lt;class Iter, class Pred&gt;
+bool any_of_(Iter b, Iter e, Pred p)
+{
+    return !none_of_(b, e, p);
+}
+
+template &lt;class Iter, class Pred&gt;
+bool all_of_(Iter b, Iter e, Pred p)
+{
+    return !any_of_(b, e, std::not1(p));
+}
+
+</pre>
+
+</div>
+
+</div>
+
+
+<div class="atomentry" id="reverse-esrever.html">
+<h2 class="title"><a href="/articles/reverse-esrever.html">Reverse, Esrever</a></h2>
+<p class="meta"><abbr class="published" title="2013-09-27">2013-09-27</abbr> &bull; <a href="/tag/c++" rel="tag">C++</a>, <a href="/tag/puzzles" rel="tag">Puzzles</a> &bull; <a href="/articles/reverse-esrever.html#disqus_thread">Comments</a></p>
+<p><code><a href="http://en.cppreference.com/w/cpp/algorithm/reverse">Reverse</a></code> is a member of the C++ standard library, but its reverse, <code>esrever</code>, isn&#8217;t. Similarly <code>keep</code> isn&#8217;t but <code><a href="http://en.cppreference.com/w/cpp/io/basic_istream/peek">peek</a></code> is.
+</p>
+<p>Can anyone think of a C++ standard library member whose reverse <strong>is also a member</strong>?
+</p>
+<p>Answers in the comments below.
+</p>
+<p>Go!
+</p>
+
+</div>
+
+
+<div class="atomentry" id="clown-flee-jump.html">
+<h2 class="title"><a href="/articles/clown-flee-jump.html">Clown, Flee, Jump</a></h2>
+<p class="meta"><abbr class="published" title="2013-09-11">2013-09-11</abbr> &bull; <a href="/tag/puzzles" rel="tag">Puzzles</a> &bull; <a href="/articles/clown-flee-jump.html#disqus_thread">Comments</a></p>
+<p>The clown is running away from the circus. The contortionist wants nothing more to do with him. She&#8217;s confessed everything to her husband, the strongman, who&#8217;s after the clown&#8217;s blood. The clown has no time to pack. Hurrying from the big top he snatches up his most treasured possessions and some refreshments:
+</p>
+<ul>
+ <li>
+     a makeup case
+ </li>
+
+ <li>
+     a box camera, with tripod attached
+ </li>
+
+ <li>
+     a cactus
+ </li>
+
+ <li>
+     a roasted goose
+ </li>
+
+ <li>
+     a magnum of champagne
+ </li>
+</ul>
+<p>Each item weighs exactly 3kg.
+</p>
+<p>Soon he reaches the edge of a ravine. A rope bridge connected to the other side has a sign in front of it.
+</p>
+<pre style="align:center;width:400px;border: 2px solid red; background: white;font-size:200%;">WARNING
+UNSTABLE STRUCTURE
+SAFE TO A MAXIMUM OF 75KG</pre>
+
+<p>The bridge is 100m long. The clown weighs 70kg. The strongman, who&#8217;s closing in, weighs considerably more. The clown must cross the bridge at once to effect his escape. <strong>How can he do so without abandoning any of his baggage</strong>?
+</p>
+<p style="text-align:center;font-size:200%">?</p>
+
+<p>Elsewhere, it&#8217;s school sports day. Conditions are perfect for the high jump &#8212; warm, sunny, still &#8212; and a talented young athlete has raised the bar to 1.85m, which happens to be his own height. On the first two attempts he fails. On the third attempt he succeeds.
+</p>
+<img alt="High Jump" src="/images/high-jump.jpg"/>
+
+<p>&#8220;Chapeau!&#8221; says the French teacher.
+</p>
+<p>&#8220;Awesome!&#8221; says the Chaplain.
+</p>
+<p>&#8220;Unbelievable!&#8221; says the head of Mathematics.
+</p>
+<p>&#8220;Actually,&#8221; the sports coach says, &#8220;it&#8217;s quite simple: a combination of talent, training, and technique. He cleared his own height <strong>but his centre of gravity didn&#8217;t</strong>.&#8221;
+</p>
+<p>&#8220;What nonsense!&#8221; says the mathematician.
+</p>
+<p style="text-align:center;font-size:300%">??</p>
+
+<img alt="Grimaldi" src="/images/grimaldi.jpg"/>
+
+<p>The clown barely breaks stride. Juggling with mismatched objects is part of his act and quick as a flash case, camera, cactus, fowl and fizz are in the air. At no point does he have more than one object in either hand so his weight never exceeds 73kg. The bridge holds. The clown gets away.
+</p>
+<p>&#8220;Grrrr!&#8221; says the strongman, shaking his fists.
+</p>
+<p style="text-align:center;font-size:400%">???</p>
+
+</div>
+
+
+<div class="atomentry" id="angle-brackets-hurt-my-eyes.html">
+<h2 class="title"><a href="/articles/angle-brackets-hurt-my-eyes.html">Angle brackets hurt my eyes</a></h2>
+<p class="meta"><abbr class="published" title="2013-05-01">2013-05-01</abbr> &bull; <a href="/tag/lisp" rel="tag">Lisp</a>, <a href="/tag/syntax" rel="tag">Syntax</a> &bull; <a href="/articles/angle-brackets-hurt-my-eyes.html#disqus_thread">Comments</a></p>
+<blockquote><p>&#8220;All these angle brackets, they&#8217;re hurting my eyes.&#8221;
+</p>
+</blockquote><p>I&#8217;m quoting a colleague who sits next to me and I sympathise. Perhaps a section from a build file was causing him pain?
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">&lt;target name="all" description="Build product."&gt;
+  &lt;mkdir dir="build" if="${not directory::exists('build')}" /&gt;
+   ....
+&lt;/target&gt;
+
+</pre>
+
+</div>
+
+<p>Or maybe it was some XSL to generate XML by applying XML to XML?
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">&lt;xsl:if test="$index-make or @index!='false'"&gt;
+  &lt;xsl:if test="//index"&gt;
+    &lt;fo:block text-align-last="justify" space-before="5pt"&gt;
+      &lt;fo:basic-link internal-destination="index-page"&gt;
+        &lt;xsl:choose&gt;
+          &lt;xsl:when test="(/doc/@lang = 'ja') or (/doc/@lang = '')&lt;/xsl:when&gt;
+          &lt;xsl:otherwise&gt;INDEX&lt;/xsl:otherwise&gt;
+        &lt;/xsl:choose&gt;
+      &lt;/fo:basic-link&gt;
+      &lt;fo:page-number-citation ref-id="index-page"/&gt;
+    &lt;/fo:block&gt;
+  &lt;/xsl:if&gt;
+&lt;/xsl:if&gt;
+
+</pre>
+
+</div>
+
+<p>Or perhaps he was wrestling with a C++ compile error.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">print.cpp: In function 'void print(const
+std::map&lt;std::basic_string&lt;char, std::char_traits&lt;char&gt;,
+std::allocator&lt;char&gt; &gt;, int, std::less&lt;std::basic_string&lt;char,
+std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt; &gt;,
+std::allocator&lt;std::pair&lt;const std::basic_string&lt;char,
+std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt;, int&gt; &gt; &gt;&amp;)':
+print.cpp:7: error: no match for 'operator&lt;&lt;' in 'std::cout &lt;&lt;
+details' /usr/include/c++/4.2.1/ostream:112: note: candidates are:
+std::basic_ostream&lt;_CharT, _Traits&gt;&amp; std::basic_ostream&lt;_CharT,
+_Traits&gt;::operator&lt;&lt;(std::basic_ostream&lt;_CharT, _Traits&gt;&amp;
+(*)(std::basic_ostream&lt;_CharT, _Traits&gt;&amp;)) [with _CharT = char,
+_Traits = std::char_traits&lt;char&gt;]
+
+</pre>
+
+</div>
+
+<p>What makes angle brackets so vexatious. Could it be their sharp corners?
+</p>
+<p>Lisp is as elegant as XML is prickly, yet it too is famous for brackets, <a href="http://en.wikipedia.org/wiki/S-expression">albeit round ones</a> &#8212; and lots of them.
+</p>
+<blockquote class="twitter-tweet"><p>It&#8217;s not that Clojure/Lisp has a lot of parentheses. Its just that we removed everything else.</p>&mdash; Alex Miller (@puredanger) <a href="https://twitter.com/puredanger/status/313507982623268865">March 18, 2013</a></blockquote>
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+Imagine a parallel universe with angle-bracket Lisp. I wonder if the language would have proved so enduring?
+
+
+
+<div class="typocode"><div class="codetitle">Not so pretty now?</div>
+
+<pre class="prettyprint">&lt;define &lt;euler-transform s&gt;
+  &lt;let &lt;&lt;s0 &lt;stream-ref s 0&gt;&gt;
+        &lt;s1 &lt;stream-ref s 1&gt;&gt;    
+        &lt;s2 &lt;stream-ref s 2&gt;&gt;&gt;
+    &lt;cons-stream &lt;- s2 &lt;/ &lt;square &lt;- s2 s1&gt;&gt;
+                          &lt;+ s0 &lt;* -2 s1&gt; s2&gt;&gt;&gt;
+                 &lt;euler-transform &lt;stream-cdr s&gt;&gt;&gt;&gt;&gt;
+
+</pre>
+
+</div>
+
+
+
+Looking more closely at the first code snippet, the section from a build file, we can see the problem isn&#8217;t so much the angle brackets as all the others.
+
+
+
+<div class="typocode">
+
+<pre class="prettyprint">&lt;mkdir dir="build" if="${not directory::exists('build')}" /&gt;
+
+</pre>
+
+</div>
+
+
+
+The braces and parentheses may be embedded in a double quoted string but that only makes things worse. The nested levels hurt my eyes and, if you can bear to look at the code long enough, you&#8217;ll realise there&#8217;s a simpler message trying to get out: <tt>mkdir -p build</tt>.
+
+</div>
+
+
+<div class="atomentry" id="solutions.html">
+<h2 class="title"><a href="/articles/solutions.html">&#8220;Solutions&#8221;</a></h2>
+<p class="meta"><abbr class="published" title="2013-04-17">2013-04-17</abbr> &bull; <a href="/tag/windows" rel="tag">Windows</a>, <a href="/tag/c++" rel="tag">C++</a>, <a href="/tag/emacs" rel="tag">Emacs</a> &bull; <a href="/articles/solutions.html#disqus_thread">Comments</a></p>
+<p>I like working around enthusiasts and optimists but that doesn&#8217;t mean I want to use chirpy or bombastic software.
+</p>
+<p>These days I build programs using visual studio. Sure, it&#8217;s a decent tool but part of me cringes every time I&#8217;m asked to open a <strong>&#8220;Solution&#8221;</strong> especially when what I get seems more like a <strong>&#8220;Muddle&#8221;</strong>. A progress bar slides into action after my program links: <strong>&#8220;Updating Intellisense &#8230;&#8221;</strong>
+</p>
+<p>Who coined that galumphing portmanteau? It means auto-completion and I don&#8217;t want to know it&#8217;s going on &#8212; especially since I edit code using <a href="/articles/accidental-emacs.html">Emacs</a>.
+</p>
+<p>Perforce is new to me and I lean on a <a href="http://www.perforce.com/product/components/perforce-visual-client" title="P4V">graphical client</a> so heavily I sometimes trip over it. So when I&#8217;m trying to dance round client workspaces and their half-baked integration with microsoft <del>muddles</del> solutions, the last thing I want is to be asked to <strong>&#8220;Choose a Favorite Connection&#8221;</strong>. When it comes to Perforce Servers I don&#8217;t have favourites let alone favorites. Sorry.
+</p>
+
+</div>
+
+
+<div class="atomentry" id="accu-2013.html">
+<h2 class="title"><a href="/articles/accu-2013.html">ACCU 2013</a></h2>
+<p class="meta"><abbr class="published" title="2013-04-11">2013-04-11</abbr> &bull; <a href="/tag/accu" rel="tag">ACCU</a>, <a href="/tag/c++" rel="tag">C++</a>, <a href="/tag/bristol" rel="tag">Bristol</a> &bull; <a href="/articles/accu-2013.html#disqus_thread">Comments</a></p>
+<img src="http://accu.org/content/images/conferences/2013/accu2013web.png" alt="ACCU 2013" />
+
+<p>Brian Marick opened the second day of ACCU 2013 with a keynote presentation entitled: <a href="http://accu.org/index.php/conferences/accu_conference_2013/accu2013_sessions#cheating_decline:acting_now_to_let_you_program_well_for_a_really_long_time">&#8220;Cheating Decline: Acting now to let you program well for a really long time&#8221;</a>. He drew a distinction between effortful and automatic thinking. For example, we can drive a car along a clear road automatically but it requires considerable concentration to parallel park that same car. By tuning out unwanted signals crickets can locate their mates using minimal brainpower, and cricket players have no need of Newtonian dynamics to track the trajectory of a ball &#8212; they apply a simple visual self-calibrating algorithm to catch out batsmen. Tango dancers disturb and re-establish invariants. A robot can walk for hours without thinking about what it&#8217;s doing. Actually, if it&#8217;s your job to park cars, you can probably do <strong>that</strong> without thinking; and this was Brian Marick&#8217;s main cheat &#8212; find the work practices which allow you to lean on your perceptions and so avoid effortful thinking.
+</p>
+<iframe width="560" height="315" src="http://www.youtube.com/embed/rhu2xNIpgDE?rel=0" frameborder="0" allowfullscreen></iframe>
+
+<p>Anthony Williams&#8217; talk on <a href="http://accu.org/index.php/conferences/accu_conference_2013/accu2013_sessions#c_11_features_and_real-world_code">C++11 Features and Real World code</a> did require effortful thinking but that was what I&#8217;d hoped for. He provided a concise and expert summary of the new language features in action, focusing on the biggest early winners. Leading with <code>auto</code>, <code>lambda</code>, <code>range-for</code>, he went on to talk about concurrency and move semantics. I learned that <code>lambda</code> functions can have a mutable qualifier. Ha!
+</p>
+<p>I couldn&#8217;t resist <a href="http://www.pvv.org/~oma/">Olve Maudal&#8217;s</a> C++11 pub quiz, appropriately held in the Marriot Hotel bar, for which we formed teams and mentally compiled and executed dodgy code, capturing standard output on an answer sheet. Some of the answers may well have have been implementation dependent but Olve specified an implementation: our answers should match <strong>this</strong> laptop running <strong>this</strong> software. I was simultaneously appalled by the limits of my knowledge on fundamental subjects such as integral promotion and initialisation order, and surprised by my ability to correctly predict the behaviour of some esoteric and perverse code. I&#8217;m chastened and will be studying the answers in the cold light of day. Brian Marick may have advocated programming after a beer or two in his morning session, but the afternoon pub quiz proved that coffee works better for me!
+</p>
+<p>A programmer&#8217;s dozen (13, which is 12 counting from zero!) lightning talks kept the day crackling with energy. Ewan Milne chaired the session expertly, adeptly dispatching a birthday cake as proceedings commenced. I wish I could describe all the talks but you really had to be there. Phil Nash&#8217;s use of the little known <a href="http://ideone.com/jWHxu2">left arrow operator</a> &larr; got a well deserved response from the audience. Sander Hoogendoorn stuck the boot into <a href="http://sanderhoogendoorn.com/blog/?p=1059">&#8220;Agile Fluffiness&#8221;</a>. <a href="http://www.renaissancesoftware.net/blog/">James Grenning&#8217;s</a> talk on embedded development was a lightning keynote: hilarious, moving and, ultimately, tragic.
+</p>
+
+</div>
+
+
+<div class="atomentry" id="an-exploration-of-the-phenomenology-of-software-development.html">
+<h2 class="title"><a href="/articles/an-exploration-of-the-phenomenology-of-software-development.html">An Exploration of the Phenomenology of Software Development</a></h2>
+<p class="meta"><abbr class="published" title="2013-04-02">2013-04-02</abbr> &bull; <a href="/tag/accu" rel="tag">ACCU</a> &bull; <a href="/articles/an-exploration-of-the-phenomenology-of-software-development.html#disqus_thread">Comments</a></p>
+<p>I was lucky to be in the audience last week, when <a href="http://charlestolman.com/">Charles Tolman</a> visited Accu Bristol to preview his Accu 2013 conference talk: <a href="http://www.meetup.com/ACCU-Bristol-Bath/events/105025942" title="An Exploration of the Phenomenology of Software Development">&#8220;An Exploration of the Phenomenology of Software Development&#8221;</a>.
+</p>
+<p>The talk precis is entirely accurate &#8212; but maybe not so helpful. What this talk actually delivers is a highly original and thoughtful examination of what the software development revolution is and how we can make sense of it.
+</p>
+<p>Charles Tolman&#8217;s central insight is that we have crossed a boundary. New tools and technologies have extended our powers. Just as  machinery developed in the industrial revolution extended our physical abilities, so software developed in the information technology revolution extends our capacity for thought.
+</p>
+<p>Essentially, software development <strong>is</strong> thinking, so to analyse it we need to think about thought. With this realisation we can view our industry as a continuation of the efforts of earlier thought workers &#8212; philosophers such as Descartes and Goethe.
+</p>
+<p>If this all sounds a bit heavy, Charles made space for anecdotes, humourous insights and pictures of gliders. I look forward to future episodes.
+</p>
+
+</div>
+
+
+<div class="atomentry" id="patience-sorted.html">
+<h2 class="title"><a href="/articles/patience-sorted.html">Patience Sorted</a></h2>
+<p class="meta"><abbr class="published" title="2013-03-14">2013-03-14</abbr> &bull; <a href="/tag/algorithms" rel="tag">Algorithms</a>, <a href="/tag/puzzles" rel="tag">Puzzles</a>, <a href="/tag/self" rel="tag">Self</a> &bull; <a href="/articles/patience-sorted.html#disqus_thread">Comments</a></p>
+<p>I gave a lightning talk today about patience sorting and its application to the longest increasing subsequence problem. It&#8217;s a subject I&#8217;ve <a href="/articles/patience-sort.html" title="Patience sort and the longest increasing subsequence">written about</a> before. My computer has been put through several million simulations. I&#8217;ve even coded up a <a href="/pages/psort">javascript demo</a> which deals out virtual playing cards and sorts them at the click of a button.
+</p>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.1/jquery.min.js"></script>
+<script type="text/javascript">
+var zz = 0;
+
+var xtop  = ["330px", "302px", "275px", "255px", "234px", "209px", "187px", "158px", "128px", "99px", "70px", "43px", "15px"];
+var ytop  = ["26px", "30px", "28px", "29px", "31px", "28px", "27px", "28px", "28px", "30px", "26px", "30px", "29px"];
+var xpile = ["10px", "13px", "12px", "115px", "14px", "220px", "220px", "319px", "15px", "216px", "118px", "118px", "321px"];
+var ypile = ["205px", "233px", "266px", "206px", "295px", "206px", "236px", "209px", "325px", "267px", "235px", "263px", "234px"];
+var result = ["#card7", "#card6", "#card3", "#card2"];
+
+function reset_cards() {
+    jQuery("img").stop();
+    zz += 13;
+    for (var j = 0; j != 13; ++j, --zz) {
+        jQuery("#card" + j)
+        .css({"z-index":zz, "margin-left":xtop[j], "margin-top":ytop[j], "border-width":0});
+    }
+    zz += 13;
+}
+
+function lis(j) {
+    var it = jQuery(result[j]);
+    if (it.length > 0) {
+        it.animate({borderWidth : "5px"}, "slow", 0, function(){lis(++j);});
+    }
+}
+
+function psort(j) {
+    var it = jQuery("#card"+j);
+    if (it.length != 0) {
+        it
+        .animate({marginLeft : xpile[j], marginTop: ypile[j]}, "slow", 0, function(){psort(++j);})
+        .css({"z-index" : ++zz});
+    } else {
+        lis(0);
+    }
+}
+
+function animate() {
+    reset_cards();
+    psort(0);
+}
+</script>
+
+<div class="cardtable" style="background-color: #093; width:440px; height:480px;">
+<img id="card0" style="border: 0 orange solid; position: absolute; margin-left: 330px; margin-top: 27px; z-index: 13;" src="/images/cards/1s.png" alt="Ace of Spades"/>
+<img id="card1" style="border: 0 orange solid; position: absolute; margin-left: 302px; margin-top: 27px; z-index: 12;" src="/images/cards/10s.png" alt="10 of Spades"/>
+<img id="card2" style="border: 0 orange solid; position: absolute; margin-left: 275px; margin-top: 27px; z-index: 11;" src="/images/cards/6s.png" alt="6 of Spades"/>
+<img id="card3" style="border: 0 orange solid; position: absolute; margin-left: 255px; margin-top: 26px; z-index: 10;" src="/images/cards/7s.png" alt="7 of Spades"/>
+<img id="card4" style="border: 0 orange solid; position: absolute; margin-left: 234px; margin-top: 28px; z-index: 9;" src="/images/cards/5s.png" alt="5 of Spades"/>
+<img id="card5" style="border: 0 orange solid; position: absolute; margin-left: 209px; margin-top: 26px; z-index: 8;" src="/images/cards/13s.png" alt="King of Spades"/>
+<img id="card6" style="border: 0 orange solid; position: absolute; margin-left: 187px; margin-top: 31px; z-index: 7;" src="/images/cards/9s.png" alt="9 of Spades"/>
+<img id="card7" style="border: 0 orange solid; position: absolute; margin-left: 158px; margin-top: 27px; z-index: 6;" src="/images/cards/12s.png" alt="Queen of Spades"/>
+<img id="card8" style="border: 0 orange solid; position: absolute; margin-left: 128px; margin-top: 29px; z-index: 5;" src="/images/cards/2s.png" alt="2 of Spades"/>
+<img id="card9" style="border: 0 orange solid; position: absolute; margin-left: 99px; margin-top: 29px; z-index: 4;" src="/images/cards/8s.png" alt="8 of Spades"/>
+<img id="card10" style="border: 0 orange solid; position: absolute; margin-left: 70px; margin-top: 26px; z-index: 3;" src="/images/cards/4s.png" alt="4 of Spades"/>
+<img id="card11" style="border: 0 orange solid; position: absolute; margin-left: 43px; margin-top: 27px; z-index: 2;" src="/images/cards/3s.png" alt="3 of Spades"/>
+<img id="card12" style="border: 0 orange solid; position: absolute; margin-left: 15px; margin-top: 28px; z-index: 1;" src="/images/cards/11s.png" alt="Knave of Spades"/>
+</div><div><p><button onclick="reset_cards();">Reset</button><button onclick="animate();">Play</button></p></div>
+
+<p>Today I used real playing cards; a linen-finished standard deck. For any talk it&#8217;s nice to have a prop.
+</p>
+<p><a href="http://www.flickr.com/photos/thomasguest/8558343442/" title="Rock &amp; Pop Legends by Thomas Guest, on Flickr"><img src="http://farm9.staticflickr.com/8100/8558343442_0402f04e83.jpg" width="500" height="361" alt="Rock &amp; Pop Legends"></a>
+</p>
+<p>Now, I <strong>thought</strong> I understood the patience sort algorithm but until yesterday I&#8217;d never actually played it with real cards. I&#8217;ve been surprised by how much this physical dimension has developed my understanding.
+</p>
+<p>I&#8217;ll be testing my new cards on some other sorting algorithms; I have high hopes. It would be good to find a similarly simple prop for linked data structures so I can balance trees, flip lists and walk graphs.
+</p>
+
+</div>
+
+
+<div class="atomentry" id="hosting-for-life-textdrive-revived.html">
+<h2 class="title"><a href="/articles/hosting-for-life-textdrive-revived.html">Hosting for Life? TextDrive revived!</a></h2>
+<p class="meta"><abbr class="published" title="2013-03-06">2013-03-06</abbr> &bull; <a href="/tag/self" rel="tag">Self</a>, <a href="/tag/webapplications" rel="tag">Web-applications</a> &bull; <a href="/articles/hosting-for-life-textdrive-revived.html#disqus_thread">Comments</a></p>
+<p>Towards the end of last year I was emailed by Jason Hoffman from Joyent. <a href="http://en.wikipedia.org/wiki/Joyent" title="Wikipedia on Joyent and TextDrive">Joyent owned TextDrive</a>, the company which, 6 years ago, offered web hosting <strong>for life</strong> in return for a single up-front payment. Jason&#8217;s email said this lifetime hosting &#8212; legacy service, he called it &#8212; was nearing <strong>End of Life</strong> (!) and would be sunsetted (!!) at the end of October 2012.
+</p>
+<p><a href="http://textdrive.com"><img src="/images/txd-banner.png" alt="TextDrive banner"/></a> 
+</p>
+<p>As a TextDrive customer I reckon I&#8217;d had good value from the original deal, but while six years may seem like forever on the internet it&#8217;s surely not a lifetime. Happily TextDrive&#8217;s original founder, Dean Allen, <a href="http://techcrunch.com/2012/08/30/happy-ending-to-the-joyent-lifetime-subscription-story/" title="TechCrunch reports on Joyent/TextDrive">felt the same way</a>: <strong>he</strong> emailed me to say he&#8217;d be relaunching <a href="http://textdrive.com/">TextDrive</a> on a new, modern, infrastructure.
+</p>
+<p>Quite how this pans out remains to be seen but I&#8217;m sticking it out. If you&#8217;re reading this page, great: it&#8217;s been served up by the new, modern infrastructure which Dean mentioned. Whilst migrating <a href="/">wordaligned.org</a> I&#8217;ve had to fiddle with rewrite rules and tinker with DNS records and file permissions. Any glitches or oddities, please <a href="mailto:tag@wordaligned.org?subject=Wordaligned.org%20glitches">let me know</a>.
+</p>
+
+</div>
+
+
+<div class="atomentry" id="more-adventures-in-c++.html">
+<h2 class="title"><a href="/articles/more-adventures-in-c++.html">More adventures in C++</a></h2>
+<p class="meta"><abbr class="published" title="2013-02-21">2013-02-21</abbr> &bull; <a href="/tag/c++" rel="tag">C++</a>, <a href="/tag/accu" rel="tag">Accu</a> &bull; <a href="/articles/more-adventures-in-c++.html#disqus_thread">Comments</a></p>
+<div class="typocode">
+
+<pre class="prettyprint">bool operator&lt;(version const &amp; v1, version const &amp; v2)
+{
+    if (v1.major != v2.major)
+        return v1.major &lt; v2.major;
+    if (v1.minor != v2.minor)
+        return v1.minor &lt; v2.minor;
+    if (v1.patch != v2.patch)
+        return v1.patch &lt; v2.patch;
+    return v1.build &lt; v2.build;
+}
+
+</pre>
+
+</div>
+
+<p>C++ programmers are sticklers for tradition and unlikely to be swayed by <a href="http://www.zemanta.com/blog/i-bet-you-over-engineered-your-startup/#comment-685047168" title="unlike web developers">what&#8217;s in fashion</a>. C++ suits those who want to control the machine, and who respect the rigour and discipline this imposes. C++ programmers are generally a conservative bunch.
+</p>
+<p>Some history: C++ was standardized in 1998. The next major revision of the language was developed under the working title of C++0x, where the &#8220;0x&#8221; stood for the year the job would be finished. The X gave the standardizers some slack, but not enough. C++0x became C++11 which is now, thankfully, simply C++.
+</p>
+<p>Although the language&#8217;s development has been painstakingly slow the developments themselves have been extensive and radical. What&#8217;s more, users are rushing to use the new features &#8212; even before they have access to compilers which support them! I&#8217;ve seen answers to C++ topics on Q&amp;A sites which use aspects of the language the contributors cheerfully admit they have no access to. I&#8217;ve worked on a project which used elaborate shims to hide the fact that GCC 4.6 couldn&#8217;t compile C++ as well as GCC 4.7 does, and this despite the fact that <a href="http://gcc.gnu.org/projects/cxx0x.html" title="Important: GCC's support for C++11 is still experimental">GCC&#8217;s C++11 support remains, officially, &#8220;experimental&#8221;</a>.
+</p>
+<div class="extended">
+<p><a href="/articles/more-adventures-in-c++.html#continue-reading">Continue reading...</a></p>
+</div>
+
+</div>
+
+
+<div class="atomentry" id="singly-linked-lists-in-c++.html">
+<h2 class="title"><a href="/articles/singly-linked-lists-in-c++.html">Singly Linked Lists in C++</a></h2>
+<p class="meta"><abbr class="published" title="2013-02-07">2013-02-07</abbr> &bull; <a href="/tag/c" rel="tag">C</a>, <a href="/tag/c++" rel="tag">C++</a>, <a href="/tag/algorithms" rel="tag">Algorithms</a> &bull; <a href="/articles/singly-linked-lists-in-c++.html#disqus_thread">Comments</a></p>
+<p>In a <a href="/articles/two-star-programming.html">recent post</a> I wrote about removing items from a singly linked list. I presented a couple of alternative implementations, and in the comments section readers suggested yet more versions.
+</p>
+<p>My implementations were written in C: the post was inspired by something <a href="http://meta.slashdot.org/story/12/10/11/0030249/linus-torvalds-answers-your-questions">Linus Torvalds had said</a> about low-level programming skills, and I&#8217;m guessing he meant C programming skills. The fact is, C programmers are condemned to reimplement these basic functions on this basic structure because the C standard library has nothing to say about singly linked lists. Until recently the C++ standard library was similarly silent on the subject, only offering a doubly linked list.
+</p>
+
+<h3>C++ introduces &#8230; the linked list!</h3>
+<p>That&#8217;s all changed now with the introduction of <code>std::forward_list</code>. The <a href="http://en.cppreference.com/w/cpp/container/forward_list">class interface</a> doesn&#8217;t mention links or pointers but a quick glance through its contents makes it clear that if you imagine the container to be a templated version of a classic singly-linked list, you won&#8217;t go far wrong.
+</p>
+<p>This gives <code>forward_list</code> some members you won&#8217;t find elsewhere in the <code>std::</code> namespace. For example, <code>std::forward_list::before_begin()</code>, which returns an iterator just before the beginning of the list &#8212; much as the more familiar <code>end()</code> is just past the end.
+</p>
+<p>Why is <code>before_begin()</code> necessary? You can&#8217;t dereference it and you can&#8217;t reverse through a forward list till you get to it. Well, since forward list iterators can only go forwards, instead of the familiar sequence <code>insert()</code>, <code>erase()</code> and <code>emplace()</code> methods we have <code>insert_after()</code>, <code>erase_after()</code> and <code>emplace_after()</code>, not to mention <code>splice_after()</code>. The before-the-beginning iterator allows you to use these operations to modify the node at the head of the list.
+</p>
+<p><strong>Quick question</strong>: what&#8217;s the complexity of <code>std::list::size()</code>?
+</p>
+<p><strong>Trick question</strong>: and how about <code>std::forward_list::size()</code>?
+</p>
+<div class="extended">
+<p><a href="/articles/singly-linked-lists-in-c++.html#continue-reading">Continue reading...</a></p>
+</div>
+
+</div>
+
+
+<div class="atomentry" id="folded-files-and-rainbow-code.html">
+<h2 class="title"><a href="/articles/folded-files-and-rainbow-code.html">Folded files and rainbow code</a></h2>
+<p class="meta"><abbr class="published" title="2013-01-23">2013-01-23</abbr> &bull; <a href="/tag/editors" rel="tag">Editors</a>, <a href="/tag/syntax" rel="tag">Syntax</a> &bull; <a href="/articles/folded-files-and-rainbow-code.html#disqus_thread">Comments</a></p>
+<p>In one of my first programming jobs I worked at a software house which grew its own tools. We had a home made version control system, build system, test harness and programming language. We even had our own editor!
+</p>
+<p>The language was C, lightly extended to support the primitive types of our particular problem domain. The editor was more esoteric. You drove it using the numeric keypad and it modeled source code as nested blocks:
+</p>
+<ul><li>files contained blocks of:</li>
+<ul><li>includes</li>
+<li>documentation</li>
+<li>data</li>
+<li>functions</li></ul>
+<li>functions contained groups of:</li>
+<ul><li>parameters:</li>
+<ul><li>in parameters</li>
+<li>out parameters</li></ul>
+<li>initialisation blocks</li>
+<li>assertions</li>
+<li>code blocks</li>
+<li>loops</li>
+<li>machine dependent sections</li>
+<li>returns</li></ul></ul>
+
+<p>The editor facilitated navigation of this nested structure, with keypresses to <a href="http://en.wikipedia.org/wiki/Code_folding">fold and unfold</a>.
+</p>
+<p>You don&#8217;t need to write your own editor to get the benefits of code folding: most editors support it to some degree. With this particular editor, however, folding reached its apotheosis. You could crimp and tuck and pleat, nesting layer upon layer within a single source file.
+</p>
+<p><a href="http://www.flickr.com/photos/cobbphoto/4534419314/" title="Origami Dragon by g cobb, on Flickr"><img src="http://farm5.staticflickr.com/4001/4534419314_705521d064.jpg" width="500" height="334" alt="Origami Dragon"></a>
+</p>
+<div class="extended">
+<p><a href="/articles/folded-files-and-rainbow-code.html#continue-reading">Continue reading...</a></p>
+</div>
+
+</div>
+
+
+<div class="atomentry" id="c++-concurrency-in-action.html">
+<h2 class="title"><a href="/articles/c++-concurrency-in-action.html">C++ Concurrency in Action</a></h2>
+<p class="meta"><abbr class="published" title="2013-01-21">2013-01-21</abbr> &bull; <a href="/tag/c++" rel="tag">C++</a>, <a href="/tag/reviews" rel="tag">Reviews</a> &bull; <a href="/articles/c++-concurrency-in-action.html#disqus_thread">Comments</a></p>
+<p><span style="text-align:center;font-size:72px;color:gold;">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+</p>
+<p><a href="http://www.amazon.co.uk/C-Concurrency-Action-Practical-Multithreading/dp/1933988770" title="C++ Concurrency in Action, on Amazon">C++ Concurrency in Action</a> is an excellent book. You should buy it if you want to use the support for concurrency added by the new C++ standard, C++11; and if you&#8217;re using C++11 you&#8217;ll deepen your understanding of the various language enhancements and how they work together.
+</p>
+<div class="amazon"><a href="http://www.amazon.co.uk/C-Concurrency-Action-Practical-Multithreading/dp/1933988770"><img src="http://www.justsoftwaresolutions.co.uk/images/ccia.jpg" alt="C++ Concurrency in Action cover"></a></div>
+
+<p>Who&#8217;s the author? What makes him qualified to write this book?
+</p>
+<blockquote><p><a href="http://www.justsoftwaresolutions.co.uk/" title="Anthony Willams' website">Anthony Williams</a> is a UK-based developer and consultant with many years experience in C++. He has been an active member of the BSI C++ Standards Panel since 2001, and is author or coauthor of many of the C++ Standards Committee papers that led up to the inclusion of the thread library in the new C++ Standard, known as C++11 or C++0x. He has been the maintainer of the Boost Thread library since 2006, and is the developer of the <a href="http://www.stdthread.co.uk/" title="just::thread, a C++ Standard Thread Library implementation">just::thread</a> implementation of the C++11 thread library from Just Software Solutions Ltd. Anthony lives in the far west of Cornwall, England. &#8212; <a href="http://www.manning.com/williams/" title="Williams' author page on Manning website">About the Author, Manning website</a>
+</p>
+</blockquote><p>It&#8217;s clear the experience of writing papers for the standards committee has paid off. The book is well organised and clearly written. Accurate and thorough, it&#8217;s also a pleasure to read. The examples are practical, and range from launching threads through to lock-free message queues. The largest case study &#8212; a message passing framework and an ATM application built on this framework &#8212; shows the expert use of modern C++ to write elegant and compact code.
+</p>
+<p>The clarity of the text is matched by the book&#8217;s clean and functional design. It looks good. I bought the dead-tree version which gave me free access to the ebook and I&#8217;ve made use of both formats.
+</p>
+<p>I&#8217;m new to C++11 and compilers are still catching up with the standard. This book is steeped in C++11. Reading through it, I came to realise that a close look at the standard thread library helps explain the evolution of the language as a whole: so <strong>that&#8217;s</strong> why variadic templates are needed, and move semantics work <strong>there</strong>, and &#8212; <strong>I get it!</strong> &#8212; lambda functions fit nicely with condition variables.
+</p>
+<p>Recommended++
+</p>
+
+</div>
+
+
+<div class="atomentry" id="pythons-lesser-known-loop-control.html">
+<h2 class="title"><a href="/articles/pythons-lesser-known-loop-control.html">Python&#8217;s lesser known loop control</a></h2>
+<p class="meta"><abbr class="published" title="2013-01-14">2013-01-14</abbr> &bull; <a href="/tag/python" rel="tag">Python</a> &bull; <a href="/articles/pythons-lesser-known-loop-control.html#disqus_thread">Comments</a></p>
+<p>I&#8217;ll break out of a loop if I have to but generally prefer to recast code so no <code>break</code> is needed. It&#8217;s not about avoiding the keyword; but rather that the loop control expression should tell readers when and why the loop exits.
+</p>
+<p>In C and C++ such recasting is rarely a problem. Python separates statements and expressions which makes things more difficult. You can&#8217;t assign to a variable in a loop control expression, for example. Consider a function which processes a file one chunk at a time, until the file is exhausted.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">while True:
+    data = fp.read(4096)
+    if not data:
+        break
+    ...
+
+</pre>
+
+</div>
+
+<p>The control expression, <code>while True</code>, suggests an infinite loop, which isn&#8217;t what actually happens, but readers must poke around in the loop body to find the actual termination condition.
+</p>
+<p>As already mentioned, an assignment statement isn&#8217;t an expression, so we can&#8217;t write this:
+</p>
+<div class="typocode"><div class="codetitle">Syntax error!</div>
+
+<pre class="prettyprint">while data = fp.read(4096):
+    ...
+
+</pre>
+
+</div>
+
+<p>You could implement a file reader <a href="http://docs.python.org/3/howto/functional.html#generators">generator function</a> which yields chunks of data, allowing clients to write:
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">for data in chunked_file_reader(fp):
+    ...
+
+</pre>
+
+</div>
+
+<p>This at least localises the problem to <code>chunked_file_reader()</code>.
+</p>
+<p>Another solution is to use the two argument flavour of <a href="http://docs.python.org/3.3/library/functions.html#iter">iter</a>, <code>iter(object, sentinel)</code>. Here, <code>object</code> is a callable and <code>sentinel</code> is a terminal value. <code>Object</code> is called with no arguments: use <code><a href="http://docs.python.org/3/library/functools.html#functools.partial">functools.partial</a></code> to set the chunk size passed to <code>file.read</code>; and stop when this function returns the empty string.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">import functools
+
+chunked_file_reader = functools.partial(fp.read, 4096)
+
+for data in iter(chunked_file_reader, ''):
+    ...
+
+</pre>
+
+</div>
+
+</div>
+
+
+<div class="extended">
+<p><a href="/articles/">Visit the Word Aligned archives...</a></p>
+</div>
+
+      
+<div id="comments"><script type="text/javascript">
+//<![CDATA[
+(function() {
+    var links = document.getElementsByTagName('a');
+    var query = '?';
+    for(var i = 0; i < links.length; i++) {
+        if(links[i].href.indexOf('#disqus_thread') >= 0) {
+            query += 'url' + i + '=' + encodeURIComponent(links[i].href) + '&amp;';
+        }
+    }
+    document.write('<script type="text/javascript" src="http://disqus.com/forums/wordaligned/get_num_replies.js' + query + '"></' + 'script>');
+})();
+//]]>
+</script></div>
+
+    </div>
+    <div id="sidebar">
+      <div class="sidebar-node">
+<h3>Hello, World!</h3>
+<p>Welcome to <a href="/">Word Aligned</a>, a collection of articles on software development and computer programming.</p>
+<p>I&#8217;m <a href="http://tag.wordaligned.org">Thomas Guest</a>, an experienced and enthusiastic computer programmer who prefers <a href="/articles/pitching-python-in-three-syllables.html">high-level languages</a> and <a href="/articles/fixed-wheels-and-simple-designs.html">simple solutions</a>. My writing has been published in a number of online and print magazines as well as here at <a href="/">wordaligned.org</a>.</p>
+
+
+</div>
+
+<div class="sidebar-node">
+<h3>Feeds</h3>
+
+<ul>
+<li><a href="http://feeds.wordaligned.org/wordaligned"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Articles</a></li>
+<li><a href="http://feeds.wordaligned.org/wordaligned/comments"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Comments</a></li>
+</ul>
+
+
+</div>
+
+<div class="sidebar-node">
+<h3>Top Tags</h3>
+<ul id="categories"><li><a href="/tag/python" rel="tag">Python</a> <em>(107)</em></li>
+<li><a href="/tag/c++" rel="tag">C++</a> <em>(66)</em></li>
+<li><a href="/tag/self" rel="tag">Self</a> <em>(53)</em></li>
+<li><a href="/tag/puzzles" rel="tag">Puzzles</a> <em>(30)</em></li>
+<li><a href="/tag/web-applications" rel="tag">Web Applications</a> <em>(27)</em></li>
+<li><a href="/tag/subversion" rel="tag">Subversion</a> <em>(27)</em></li>
+<li><a href="/tag/accu" rel="tag">ACCU</a> <em>(27)</em></li>
+<li><a href="/tag/algorithms" rel="tag">Algorithms</a> <em>(24)</em></li>
+<li><a href="/tag/google" rel="tag">Google</a> <em>(19)</em></li>
+<li><a href="/tag/characters" rel="tag">Characters</a> <em>(17)</em></li></ul>
+
+</div>
+
+<div class="sidebar-node">
+<h3>All Tags</h3>
+<p><a href="/tag/accidents" rel="tag">accidents</a>, <a href="/tag/accu" rel="tag">accu</a>, <a href="/tag/accu" rel="tag">accu</a>, <a href="/tag/algorithms" rel="tag">algorithms</a>, <a href="/tag/android" rel="tag">android</a>, <a href="/tag/apple" rel="tag">apple</a>, <a href="/tag/apple" rel="tag">apple</a>, <a href="/tag/arc" rel="tag">arc</a>, <a href="/tag/books" rel="tag">books</a>, <a href="/tag/boost" rel="tag">boost</a>, <a href="/tag/bristol" rel="tag">bristol</a>, <a href="/tag/bugs" rel="tag">bugs</a>, <a href="/tag/build" rel="tag">build</a>, <a href="/tag/c" rel="tag">c</a>, <a href="/tag/c++" rel="tag">c++</a>, <a href="/tag/characters" rel="tag">characters</a>, <a href="/tag/charts" rel="tag">charts</a>, <a href="/tag/chess" rel="tag">chess</a>, <a href="/tag/clrs" rel="tag">clrs</a>, <a href="/tag/conferences" rel="tag">conferences</a>, <a href="/tag/content" rel="tag">content</a>, <a href="/tag/crabs" rel="tag">crabs</a>, <a href="/tag/curl" rel="tag">curl</a>, <a href="/tag/cvs" rel="tag">cvs</a>, <a href="/tag/cvs2svn" rel="tag">cvs2svn</a>, <a href="/tag/cycling" rel="tag">cycling</a>, <a href="/tag/decorators" rel="tag">decorators</a>, <a href="/tag/design" rel="tag">design</a>, <a href="/tag/disqus" rel="tag">disqus</a>, <a href="/tag/docbook" rel="tag">docbook</a>, <a href="/tag/documentation" rel="tag">documentation</a>, <a href="/tag/drawing" rel="tag">drawing</a>, <a href="/tag/dynamic-languages" rel="tag">dynamic-languages</a>, <a href="/tag/editors" rel="tag">editors</a>, <a href="/tag/emacs" rel="tag">emacs</a>, <a href="/tag/erlang" rel="tag">erlang</a>, <a href="/tag/esr" rel="tag">esr</a>, <a href="/tag/etc" rel="tag">etc</a>, <a href="/tag/europython" rel="tag">europython</a>, <a href="/tag/fractals" rel="tag">fractals</a>, <a href="/tag/functional-programming" rel="tag">functional-programming</a>, <a href="/tag/go" rel="tag">go</a>, <a href="/tag/google" rel="tag">google</a>, <a href="/tag/graphics" rel="tag">graphics</a>, <a href="/tag/haskell" rel="tag">haskell</a>, <a href="/tag/ide" rel="tag">ide</a>, <a href="/tag/imagemagick" rel="tag">imagemagick</a>, <a href="/tag/iphone" rel="tag">iphone</a>, <a href="/tag/java" rel="tag">java</a>, <a href="/tag/knuth" rel="tag">knuth</a>, <a href="/tag/lcs" rel="tag">lcs</a>, <a href="/tag/lighttpd" rel="tag">lighttpd</a>, <a href="/tag/lisp" rel="tag">lisp</a>, <a href="/tag/markdown" rel="tag">markdown</a>, <a href="/tag/missiles" rel="tag">missiles</a>, <a href="/tag/nm" rel="tag">nm</a>, <a href="/tag/ocr" rel="tag">ocr</a>, <a href="/tag/openid" rel="tag">openid</a>, <a href="/tag/perec" rel="tag">perec</a>, <a href="/tag/perl" rel="tag">perl</a>, <a href="/tag/php" rel="tag">php</a>, <a href="/tag/pi" rel="tag">pi</a>, <a href="/tag/pictures" rel="tag">pictures</a>, <a href="/tag/pil" rel="tag">pil</a>, <a href="/tag/puzzles" rel="tag">puzzles</a>, <a href="/tag/python" rel="tag">python</a>, <a href="/tag/recommended" rel="tag">recommended</a>, <a href="/tag/recursion" rel="tag">recursion</a>, <a href="/tag/regex" rel="tag">regex</a>, <a href="/tag/reviews" rel="tag">reviews</a>, <a href="/tag/ruby" rel="tag">ruby</a>, <a href="/tag/ruby-on-rails" rel="tag">ruby-on-rails</a>, <a href="/tag/scheme" rel="tag">scheme</a>, <a href="/tag/self" rel="tag">self</a>, <a href="/tag/shell" rel="tag">shell</a>, <a href="/tag/sicp" rel="tag">sicp</a>, <a href="/tag/spolsky" rel="tag">spolsky</a>, <a href="/tag/steganography" rel="tag">steganography</a>, <a href="/tag/streams" rel="tag">streams</a>, <a href="/tag/subversion" rel="tag">subversion</a>, <a href="/tag/syntax" rel="tag">syntax</a>, <a href="/tag/teamwork" rel="tag">teamwork</a>, <a href="/tag/tesseract" rel="tag">tesseract</a>, <a href="/tag/torvalds" rel="tag">torvalds</a>, <a href="/tag/trac" rel="tag">trac</a>, <a href="/tag/turing" rel="tag">turing</a>, <a href="/tag/two-wheels" rel="tag">two-wheels</a>, <a href="/tag/unix" rel="tag">unix</a>, <a href="/tag/virtualization" rel="tag">virtualization</a>, <a href="/tag/web-applications" rel="tag">web-applications</a>, <a href="/tag/webapplications" rel="tag">webapplications</a>, <a href="/tag/windows" rel="tag">windows</a>, <a href="/tag/zlib" rel="tag">zlib</a></p>
+
+</div>
+
+<div class="sidebar-node">
+<h3>Articles</h3>
+<ul>
+<li><a href="/articles/">Ordered by date</a></li>
+<li><a href="/articles/alphabetical-order/">Alphabetical order</a></li>
+</ul>
+
+
+</div>
+
+<div class="sidebar-node">
+<h3>Chain</h3>
+<ul>
+<li><a accesskey="p" href="/articles/go-for-short-variable-names.html" title="First article">&raquo; Go for short variable names</a></li>
+
+</ul>
+
+
+</div>
+
+    </div>
+  </div>
+  <div id="footer">
+<hr />
+<p><a href="http://tag.wordaligned.org">Thomas Guest</a></p>
+</div>
+
+</div>
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-3373724-1']);
+  _gaq.push(['_trackPageview']);
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ga);
+  })();
+</script>
+</body>
+
+</html>

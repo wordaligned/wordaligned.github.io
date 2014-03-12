@@ -1,0 +1,310 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<link rel="icon" href="/images/favicon.png" type="image/png"/>
+<link href="/styles/application.css" media="all" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="/scripts/prettify.js"></script>
+<script type="text/javascript" src="/scripts/lang-lisp.js"></script>
+<script type="text/javascript" src="http://www.haloscan.com/load/wordaligned"></script>
+
+<title>Running Sums in Python</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="author" content="Thomas Guest" />
+<meta name="description" content="A Python program to generate the running sum of a series. A Word Aligned article posted 2008-06-24, tagged Python, Streams, Algorithms." />
+<meta name="keywords" content="Python, Streams, Algorithms" />
+<link rel="alternate" type="application/rss+xml" title="Feed" href="http://feeds.wordaligned.org/wordaligned" />
+</head>
+
+<body onload="prettyPrint()">
+<div id="container">
+  <div id="header">
+<h1><span><a accesskey="h" href="/">Word Aligned</a></span></h1>
+<h2>space sensitive programming</h2>
+<a class="button" href="http://feeds.wordaligned.org/wordaligned" title="Subscribe to Word Aligned"><img style="float: right;" src="/images/feed.png" alt="Feed Logo" height="28" width="28"/></a>
+</div>
+
+  <div id="page">
+    <div id="content">
+      <div class="atomentry" id="running-sums-in-python.html">
+<h2 class="title"><a href="/articles/running-sums-in-python.html">Running Sums in Python</a></h2>
+<p class="meta"><abbr class="published" title="2008-06-24">2008-06-24</abbr> &bull; <a href="/tag/python" rel="tag">Python</a>, <a href="/tag/streams" rel="tag">Streams</a>, <a href="/tag/algorithms" rel="tag">Algorithms</a> &bull; <a href="/articles/running-sums-in-python.html#disqus_thread">Comments</a></p>
+<p>Suppose we want to generate the running sum series <code>r</code> formed by sums of <code>n</code> consecutive elements taken from a series <code>s</code>. For example, to sum consecutive pairs taken from the first 6 integers:
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">&gt;&gt;&gt; n = 2
+&gt;&gt;&gt; s = 0, 1, 2, 3, 4, 5
+&gt;&gt;&gt; running_sum(s, 2)
+[1, 3, 5, 7, 9]
+
+</pre>
+
+</div>
+
+<p>One approach would be to combine the <code>sum</code> built-in function with list slices and comprehensions.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">&gt;&gt;&gt; def running_sum(s, n):
+... 	return [sum(s[lo:lo + n]) for lo in range(len(s) - n + 1)]
+... 
+&gt;&gt;&gt; running_sum([0, 1, 2, 3, 4, 5], 2)
+[1, 3, 5, 7, 9]
+
+</pre>
+
+</div>
+
+<p>This is fine if:
+</p>
+<ol>
+ <li>
+     <code>s</code> is finite
+ </li>
+
+ <li>
+     <code>s</code> supports slice access (i.e. <code>s[lo:hi]</code> doesn&#8217;t raise a <code>TypeError</code>)
+ </li>
+
+ <li>
+     <code>n</code> isn&#8217;t too big
+ </li>
+</ol>
+<p>With just a little extra thought we can address all these issues.
+</p>
+<span id="continue-reading"/>
+
+<p>To deal with the first two points we return to the specification. What exactly do we require of <code>s</code> in order to generate <code>r</code>? Well, all that&#8217;s really needed is for <code>s</code> to be iterable &#8212; which is to say we can advance along it &#8212; then our running sum function can arrange to buffer <code>n</code> items from <code>s</code> and yield their sums. For maximum flexibility the result series <code>r</code> should also be iterable, allowing clients to choose how to consume it<a id="fn1link" href="#fn1"><sup>[1]</sup></a>.
+</p>
+<p>In Python an object, <code>o</code>, becomes iterable by implementing the <a href="http://docs.python.org/lib/typeiter.html">iterator protocol</a>: <code>o.__iter__()</code> should return an iterator, <code>i</code>, over the container, which <code>i.next()</code> advances, raising a <code>StopIteration</code> exception when done.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">&gt;&gt;&gt; r = [1, 2, 3]
+&gt;&gt;&gt; i = r.__iter__()
+&gt;&gt;&gt; i.next()
+1
+&gt;&gt;&gt; i.next()
+2
+&gt;&gt;&gt; i.next()
+3
+&gt;&gt;&gt; i.next()
+Traceback (most recent call last):
+  File "&lt;stdin&gt;", line 1, in &lt;module&gt;
+StopIteration
+
+</pre>
+
+</div>
+
+<p>Python programs typically don&#8217;t expose this protocol directly since we can build more convenient looping constructs on top of it. By using the <a href="http://docs.python.org/ref/yield.html">yield statement</a> our running sum filter needn&#8217;t implement the iterator protocol directly either. Here&#8217;s a generator function which uses <code>itertools.islice</code> in place of the original list slices.
+</p>
+<div class="typocode"><div class="codetitle">Running sum for infinite series</div>
+
+<pre class="prettyprint">import itertools
+
+def running_sum(s, n):
+    while True:
+        r, s = itertools.tee(s)
+        yield sum(itertools.islice(r, n))
+        s.next()
+
+</pre>
+
+</div>
+
+<p>As you can see, objects returned by this function implement the iterator protocol.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint"># Running sum of pairs from 0, 1, 2, 3, ...
+&gt;&gt;&gt; rs = running_sum(itertools.count(), 2)
+&gt;&gt;&gt; i = rs.__iter__()
+&gt;&gt;&gt; i.next()
+1
+&gt;&gt;&gt; i.next()
+3
+&gt;&gt;&gt; for s in rs: print s
+... 
+5
+7
+9
+11
+13
+....
+Traceback (most recent call last):
+  File "&lt;stdin&gt;", line 1, in &lt;module&gt;
+KeyboardInterrupt
+
+</pre>
+
+</div>
+
+<p>We have to kill the for loop by interrupting it since <code>rs</code>, being infinite (in this particular case), never raises a <code>StopIteration</code>. In fact, this particular version of <code>running_sum()</code> fails badly on finite inputs for reasons we&#8217;ll touch on later.
+</p>
+<p>I won&#8217;t dwell on this flawed variant of <code>running_sum()</code>, except to note in passing that the built-in sum function doesn&#8217;t buffer <code>n</code> items from its input stream &#8212; it&#8217;s a lazy function which accumulates these items one at a time. There&#8217;s no magic here, though: behind the scenes, as the teed iterators <code>r</code> and <code>s</code> diverge, the in-between values must be stored somewhere!
+</p>
+<p>Each slice of items from <code>s</code> overlaps the one before: if we visualise the sliced range sliding along the series, at each stage an element gets pushed in at the top and an element gets popped out from the bottom. Rather than repeatedly summing all the elements of these slices, we can calculate a single sum at the start of the series then adjust it as we progress<a id="fn2link" href="#fn2"><sup>[2]</sup></a>.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">def running_sum(s, n):
+    lo, hi = itertools.tee(s)
+    rs = sum(itertools.islice(hi, n))
+    while True:
+        yield rs
+        rs += hi.next() - lo.next()
+
+</pre>
+
+</div>
+
+<p>Before we sign this function off, there&#8217;s a bug to fix. What if <code>n</code> is larger than the length of the input series? We&#8217;d expect the output series to be empty, but:
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">&gt;&gt;&gt; list(running_sum([1, 2, 3], 4))
+[6]
+
+</pre>
+
+</div>
+
+<p>Oops! The problem here is in passing an <code>itertools.islice</code> series to <code>sum()</code>, which happily swallows the <code>StopIteration</code> exception without knowing if the sliced stream reached its end or if we reached the end of the slice, or indeed both.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">&gt;&gt;&gt; i = itertools.islice([1, 2, 3], 4)
+&gt;&gt;&gt; i.next(), i.next(), i.next()
+(1, 2, 3)
+&gt;&gt;&gt; i.next()
+Traceback (most recent call last):
+  File "&lt;stdin&gt;", line 1, in &lt;module&gt;
+StopIteration
+
+</pre>
+
+</div>
+
+<p>A fix is to pass <code>sum</code> a list comprehension. If <code>n</code> is too big a <code>StopIteration</code> exception gets raised before <code>sum</code> ever sees this list.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">def running_sum(s, n):
+    lo, hi = itertools.tee(s)
+    rs = sum([hi.next() for _ in range(n)])
+    while True:
+        yield rs
+        rs += hi.next() - lo.next()
+
+</pre>
+
+</div>
+
+<p>As a final tweak, we can make <code>lo</code> and <code>hi</code> iterator.next functions rather than iterators, which saves a few attribute access calls.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">def running_sum(s, n):
+    '''Generate the series of running sums of n elements of s.
+    
+    &gt;&gt;&gt; list(running_sum([1, 2, 3, 4], 2))
+    [3, 5, 7]
+    &gt;&gt;&gt; rs = running_sum(itertools.count(), 3)
+    &gt;&gt;&gt; rs.next(), rs.next(), rs.next()
+    (3, 6, 9)
+    &gt;&gt;&gt; list(running_sum([1, 2], 3))
+    []
+    '''
+    lo, hi = [i.next for i in itertools.tee(s)]
+    rs = sum([hi() for _ in range(n)])
+    while True:
+        yield rs
+        rs += hi() - lo()
+
+</pre>
+
+</div>
+
+<hr />
+
+<p>Thanks to <a href="http://www.reddit.com/r/programming/info/6otfp/comments/">doubtingthomas</a> for pointing out an off-by-one error in the original version of this article.
+</p>
+<p><a id="fn1" href="#fn1link">[1]</a> In a recent <a href="http://geekrant.wordpress.com/2008/06/23/misconceptions/">post on his blog</a>, Jake clears up some misconceptions about <a href="http://haskell.org">Haskell</a>. In doing so he analyses the difference between lazy and strict types with clarity and insight. Recommended reading!
+</p>
+<blockquote><p>This parallel indicates pretty clearly that recursively operating on each element of a stream is an infinite loop. <code>Stream</code> is a <em>control structure</em>. It doesn&#8217;t exist to persist data across many parts of a program. It exists to feed data into a function one element at a time. In contrast, a <code>Vector</code> exists to persist an intermediate or final <em>result</em> of some 3-dimensional computation. In short, <code>Stream</code> is for <em>controlling computation</em>, and <code>Vector</code> is for <em>storing data</em>. This generalizes to lazy and strict types, respectively.
+</p>
+</blockquote><p><a id="fn2" href="#fn2link">[2]</a> There may be situations where we really want each running sum to be generated directly from <code>n</code> consecutive elements of the source stream: for example, if we are dealing with a series of floating point numbers, then addition is not exact and we must take care to avoid accumulated errors.
+</p>
+</div>
+
+<div class="comments"><hr/><div id="disqus_thread"></div><script type="text/javascript" src="http://disqus.com/forums/wordaligned/embed.js"></script></div>
+      
+<div id="comments"><script type="text/javascript">
+//<![CDATA[
+(function() {
+    var links = document.getElementsByTagName('a');
+    var query = '?';
+    for(var i = 0; i < links.length; i++) {
+        if(links[i].href.indexOf('#disqus_thread') >= 0) {
+            query += 'url' + i + '=' + encodeURIComponent(links[i].href) + '&amp;';
+        }
+    }
+    document.write('<script type="text/javascript" src="http://disqus.com/forums/wordaligned/get_num_replies.js' + query + '"></' + 'script>');
+})();
+//]]>
+</script></div>
+
+    </div>
+    <div id="sidebar">
+      
+<div class="sidebar-node">
+<h3>Tagged</h3>
+<ul id="categories"><li><a href="/tag/python" rel="tag">Python</a></li>
+<li><a href="/tag/streams" rel="tag">Streams</a></li>
+<li><a href="/tag/algorithms" rel="tag">Algorithms</a></li></ul>
+
+</div>
+
+<div class="sidebar-node">
+<h3>Chain</h3>
+<ul>
+<li><a accesskey="n" href="/articles/fixing-header-file-dependencies.html" title="Next article">&laquo; Fixing header file dependencies</a></li>
+<li><a accesskey="p" href="/articles/eurovision-2008-charts.html" title="Previous article">&raquo; Eurovision 2008 charts</a></li>
+</ul>
+
+
+</div>
+
+<div class="sidebar-node">
+<h3>Feeds</h3>
+
+<ul>
+<li><a href="http://feeds.wordaligned.org/wordaligned"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Articles</a></li>
+<li><a href="http://feeds.wordaligned.org/wordaligned/comments"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Comments</a></li>
+</ul>
+
+
+</div>
+
+    </div>
+  </div>
+  <div id="footer">
+<hr />
+<p><a href="http://tag.wordaligned.org">Thomas Guest</a></p>
+</div>
+
+</div>
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-3373724-1']);
+  _gaq.push(['_trackPageview']);
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ga);
+  })();
+</script>
+</body>
+
+</html>

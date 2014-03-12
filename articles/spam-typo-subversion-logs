@@ -1,0 +1,256 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<link rel="icon" href="/images/favicon.png" type="image/png"/>
+<link href="/styles/application.css" media="all" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="/scripts/prettify.js"></script>
+<script type="text/javascript" src="/scripts/lang-lisp.js"></script>
+<script type="text/javascript" src="http://www.haloscan.com/load/wordaligned"></script>
+
+<title>Spam, Typo, Subversion Logs</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="author" content="Thomas Guest" />
+<meta name="description" content="A Word Aligned article posted 2006-11-27, tagged Python, Web Applications, Subversion, Self, Trac." />
+<meta name="keywords" content="Python, Web Applications, Subversion, Self, Trac" />
+<link rel="alternate" type="application/rss+xml" title="Feed" href="http://feeds.wordaligned.org/wordaligned" />
+</head>
+
+<body onload="prettyPrint()">
+<div id="container">
+  <div id="header">
+<h1><span><a accesskey="h" href="/">Word Aligned</a></span></h1>
+<h2>space sensitive programming</h2>
+<a class="button" href="http://feeds.wordaligned.org/wordaligned" title="Subscribe to Word Aligned"><img style="float: right;" src="/images/feed.png" alt="Feed Logo" height="28" width="28"/></a>
+</div>
+
+  <div id="page">
+    <div id="content">
+      <div class="atomentry" id="spam-typo-subversion-logs">
+<h2 class="title"><a href="/articles/spam-typo-subversion-logs">Spam, Typo, Subversion Logs</a></h2>
+<p class="meta"><abbr class="published" title="2006-11-27">2006-11-27</abbr> &bull; <a href="/tag/python" rel="tag">Python</a>, <a href="/tag/web-applications" rel="tag">Web Applications</a>, <a href="/tag/subversion" rel="tag">Subversion</a>, <a href="/tag/self" rel="tag">Self</a>, <a href="/tag/trac" rel="tag">Trac</a> &bull; <a href="/articles/spam-typo-subversion-logs#disqus_thread">Comments</a></p>
+<p>This <a href="http://blog.wordaligned.org">blog</a> got hit by some spam promoting online gambling sites,
+   even though I&#8217;d cranked up most of the built in anti-spam settings. I
+   went across to the <a href="http://www.typosphere.org">Typo</a> website looking for advice and discovered:
+</p>
+<blockquote><p>The Typo Trac is currently offline because of a high level of
+   spam. It shall return as soon as we&#8217;ve got some more protection
+   added to it.
+</p>
+</blockquote><p>Unfunnily enough, I experimented with an open <a href="http://trac.edgewall.org/">Trac</a> project a while
+   back and it too received spam contributions cunningly hidden
+   where a regular reader wouldn&#8217;t notice.
+</p>
+<span id="continue-reading"/>
+
+
+<h4>Examining the Typo Subversion Logs</h4>
+<p>Fortunately the <a href="http://www.typosphere.org">Typo</a> Subversion server remains up and running. I
+   took a look at the log files to see if there were any spam-related
+   improvements since I&#8217;d originally installed Typo and the latest release
+   (4.0.3 at the time of writing). There were a few hits.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">$ svn log -r1133:1231 svn://typosphere.org/typo | grep spam
+Add spam setting for Akismet key.  I still need to write the Akismet glue code, but it won't work without a key.
+Big spam filtering upgrade.
+Comments (and trackbacks) that fail the spam check are marked as unpublished
+registering of spam/ham classification with akismet). JustPresumedHam
+of articles whose classification you have confirmed as well as a simple spam/ham
+Use published_at for comment spam checks.  Closes #1089
+
+</pre>
+
+</div>
+
+
+<h4>A Closer Examination</h4>
+<p>This superficial inspection suggests that, out of 99 changes, 4 relate
+   to spam &#8212; suggesting that the <a href="http://www.typosphere.org">Typo</a> developers spent less than 5%
+   of their effort making anti-spam changes in the period concerned.
+</p>
+<p>A more useful statistic would be the number of files which were
+   modified for anti-spam purposes. It&#8217;s rather harder to extract this
+   number using simple shell programs such as <code>grep</code> so I wrote a
+   <a href="http://python.org">Python</a> program to analyse the the <a href="http://svnbook.red-bean.com/en/1.2/svn.ref.svn.c.log.html">svn log</a> output. I used the
+   <code>--xml</code> option to the <a href="http://svnbook.red-bean.com/en/1.2/svn.ref.svn.c.log.html">svn log</a> command to provide me with more
+   structured output, and the Python <a href="http://www.python.org/doc/current/lib/module-xml.dom.minidom.html">minidom</a> XML module proved more than
+   up to the task of parsing this output.
+</p>
+<p>Here&#8217;s what this program told me.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">$ svn log -r1133:1231 svn://typosphere.org/typo --xml --verbose | \
+  process_svn_log.py spam akismet
+Found /spam|akismet/i in 9/99 changes affecting 72/270 files.
+
+</pre>
+
+</div>
+
+<p>Note that I included <a href="http://akismet.com/">Akismet</a> in my pattern match. As I understand
+   it, <a href="http://akismet.com/">Akismet</a> is a service specifically designed to protect blogs
+   against spam.
+</p>
+<p>I could dig even deeper and find out how many lines of code were
+   changed, but I don&#8217;t think it&#8217;s worth it. This is a pretty blunt tool,
+   but it does tell us that some smart programmers are having to spend
+   almost as much time fighting dumb spammers as they are writing more
+   useful code.
+</p>
+
+<h4>The svn log processor</h4>
+<p>For the record, here&#8217;s my program. It&#8217;s best suited to the job it
+   actually did but it&#8217;s simple enough that I&#8217;ll be able to adapt it for
+   use elsewhere.
+</p>
+<div class="typocode"><div class="codetitle">process_svn_log.py</div>
+
+<pre class="prettyprint">""" This program filters 'svn log --xml --verbose' output
+    for log entries which match patterns.
+
+This output has the form:
+&lt;?xml version="1.0"?&gt;
+&lt;log&gt;
+&lt;logentry
+   revision="1133"&gt;
+&lt;author&gt;scott&lt;/author&gt;
+&lt;date&gt;2006-07-13T17:26:26.186291Z&lt;/date&gt;
+&lt;paths&gt;
+&lt;path
+   action="M"&gt;/trunk/app/views/admin/feedback/list.rhtml&lt;/path&gt;
+&lt;/paths&gt;
+&lt;msg&gt;Make search+pagination work right&lt;/msg&gt;
+&lt;/logentry&gt;
+&lt;/log&gt;
+"""
+
+def usage(program):
+    print """\
+Usage: %s PATTERN ...
+Searches the output from 'svn log --xml --verbose' for log entries whose
+message matches the supplied PATTERN(s) and yields summary statistics.
+Example:
+svn log -r1133:1231 svn://typosphere.org/typo --xml --verbose | %s spam""" % (
+    program, program)
+
+def elements(node, tagname):
+    " Return named child elements of a DOM node. "
+    return node.getElementsByTagName(tagname)
+
+def count_paths(logentries):
+    " Count repository path changes logged. "
+    return sum(1
+               for logentry in logentries
+               for paths in elements(logentry, "paths")
+               for path in elements(paths, "path"))
+
+def log_msg_matches(logentry, matcher):
+    " Return true if the logentry message matches, false otherwise. "
+    msgs = elements(logentry, "msg")
+    assert len(msgs) == 1, "Require a single log message per log entry."
+    return matcher(msgs[0].childNodes[0].data) is not None
+
+def process(log, patterns):
+    " Process the input svn log, looking for messages matching the input patterns. "
+    import re
+    pattern = "|".join(patterns)
+    matcher = re.compile(pattern, re.IGNORECASE).search
+    entries = elements(log, "logentry")
+    matches = [entry for entry in entries
+               if log_msg_matches(entry, matcher)]
+    paths = count_paths(entries)
+    matching_paths = count_paths(matches)
+
+print "Found /%s/i in %d/%d changes affecting %d/%d files." % (
+        pattern, len(matches), len(entries), matching_paths, paths)
+
+def main(argv):
+    if len(argv) == 1:
+        usage(argv[0])
+    else:
+        from xml.dom.minidom import parse
+        process(parse(sys.stdin), argv[1:])
+
+if __name__ == "__main__":
+    import sys
+    main(sys.argv)
+
+</pre>
+
+</div>
+</div>
+
+<div class="comments"><hr/><div id="disqus_thread"></div><script type="text/javascript" src="http://disqus.com/forums/wordaligned/embed.js"></script></div>
+      
+<div id="comments"><script type="text/javascript">
+//<![CDATA[
+(function() {
+    var links = document.getElementsByTagName('a');
+    var query = '?';
+    for(var i = 0; i < links.length; i++) {
+        if(links[i].href.indexOf('#disqus_thread') >= 0) {
+            query += 'url' + i + '=' + encodeURIComponent(links[i].href) + '&amp;';
+        }
+    }
+    document.write('<script type="text/javascript" src="http://disqus.com/forums/wordaligned/get_num_replies.js' + query + '"></' + 'script>');
+})();
+//]]>
+</script></div>
+
+    </div>
+    <div id="sidebar">
+      
+<div class="sidebar-node">
+<h3>Tagged</h3>
+<ul id="categories"><li><a href="/tag/python" rel="tag">Python</a></li>
+<li><a href="/tag/web-applications" rel="tag">Web Applications</a></li>
+<li><a href="/tag/subversion" rel="tag">Subversion</a></li>
+<li><a href="/tag/self" rel="tag">Self</a></li>
+<li><a href="/tag/trac" rel="tag">Trac</a></li></ul>
+
+</div>
+
+<div class="sidebar-node">
+<h3>Chain</h3>
+<ul>
+<li><a accesskey="n" href="/articles/functional-programming-aha-moments" title="Next article">&laquo; Functional Programming &#8220;Aha!&#8221; Moments</a></li>
+<li><a accesskey="p" href="/articles/internal-subversion-externals" title="Previous article">&raquo; Internal Subversion Externals</a></li>
+</ul>
+
+
+</div>
+
+<div class="sidebar-node">
+<h3>Feeds</h3>
+
+<ul>
+<li><a href="http://feeds.wordaligned.org/wordaligned"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Articles</a></li>
+<li><a href="http://feeds.wordaligned.org/wordaligned/comments"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Comments</a></li>
+</ul>
+
+
+</div>
+
+    </div>
+  </div>
+  <div id="footer">
+<hr />
+<p><a href="http://tag.wordaligned.org">Thomas Guest</a></p>
+</div>
+
+</div>
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-3373724-1']);
+  _gaq.push(['_trackPageview']);
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ga);
+  })();
+</script>
+</body>
+
+</html>

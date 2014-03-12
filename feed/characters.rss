@@ -1,0 +1,2307 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" >
+<channel>
+<title>Word Aligned</title>
+<link>http://wordaligned.org</link>
+<description>tales from the code face</description>
+<dc:creator>tag@wordaligned.org</dc:creator>
+<language>en-gb</language>
+<item>
+<title>Equality and Equivalence</title>
+<description>&lt;p&gt;&lt;a href="http://oracleofbacon.org"&gt;&lt;img style="float:right;" src="http://wordaligned.org/images/kevin-bacon.jpg" alt="Kevin Bacon mugshot"/&gt;&lt;/a&gt;
+&lt;/p&gt;
+&lt;p&gt;If A &amp;lt;= B and B &amp;lt;= A then A and B must be equal, right?
+&lt;/p&gt;
+&lt;p&gt;Wrong, actually.
+&lt;/p&gt;
+&lt;p&gt;We could rank actors according to their Bacon number, for example. Hugh Grant and Daniel Day-Lewis both have a &lt;a href="http://oracleofbacon.org" title="so says the Oracle of Bacon"&gt;Bacon number of 2&lt;/a&gt;, but that doesn&amp;#8217;t make them equal!
+&lt;/p&gt;
+&lt;p&gt;I think most programmers get the distinction between ordering and equality, but it&amp;#8217;s easy to forget.
+&lt;/p&gt;
+&lt;p&gt;Part of the problem is the less-than-or-&lt;strong&gt;equal&lt;/strong&gt;-to and greater-than-or-&lt;strong&gt;equal&lt;/strong&gt;-to operators both mention &lt;strong&gt;equal&lt;/strong&gt;. The standard programming representation of these operators includes a single equals symbol, whil the representation of equality has two equals symbols. Symbolically we might assume:
+&lt;/p&gt;
+&lt;pre style="font-size:400%"&gt;&amp;lt;= &lt;span style="color:#930;"&gt;&amp;and;&lt;/span&gt; &amp;gt;= &lt;span style="color:#930;"&gt;&amp;rArr;&lt;/span&gt; == &lt;/pre&gt;
+
+&lt;p&gt;Wrong!
+&lt;/p&gt;
+&lt;div style="font-size:800%"&gt;&amp;#x2620;&lt;/div&gt;
+
+&lt;p&gt;Another part of the problem is that we tend to think of numbers as archetypal objects: &lt;a href="http://www.google.com/search?q=%22when+in+doubt+do+as+the+ints+do%22" title="Scott Meyers advice"&gt;when in doubt, do as the ints do&lt;/a&gt;. For integers, it&amp;#8217;s true, equality and equivalence are the same. The same is true of real numbers, but what about their &lt;a href="http://docs.sun.com/source/806-3568/ncg_goldberg.html" title="What Every Computer Scientist Should Know About Floating-Point Arithmetic"&gt;floating point representations&lt;/a&gt;? A &lt;code&gt;NaN&lt;/code&gt; doesn&amp;#8217;t even equal itself. Complex numbers have no standard comparison operators.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; 3+4j == 4j+3
+True
+&amp;gt;&amp;gt;&amp;gt; 3+4j &amp;lt;= 4j+3
+Traceback (most recent call last):
+  File "&amp;lt;stdin&amp;gt;", line 1, in &amp;lt;module&amp;gt;
+TypeError: no ordering relation is defined for complex numbers
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;To avoid trouble, remember that the &lt;strong&gt;equal&lt;/strong&gt; in less-than-or-&lt;strong&gt;equal&lt;/strong&gt;-to should really be &lt;strong&gt;equivalent&lt;/strong&gt;. 
+&lt;/p&gt;
+&lt;p&gt;Oh, and please don&amp;#8217;t confuse equality with assignment.
+&lt;/p&gt;</description>
+<dc:date>2010-06-09</dc:date>
+<guid>http://wordaligned.org/articles/equals-equals.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/equals-equals.html</link>
+<category>Characters</category>
+</item>
+
+<item>
+<title>Blackmail made easy using Python counters</title>
+<description>&lt;div class="toc"&gt;
+&lt;h2&gt;Contents&lt;/h2&gt;
+&lt;ul&gt;
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/python-counters.html#tocthe-obsessive-blackmailer" name="toc0" id="toc0"&gt;The Obsessive Blackmailer&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/python-counters.html#tocmodeling-the-problem" name="toc1" id="toc1"&gt;Modeling the Problem&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/python-counters.html#tocthe-evolution-of-multisets-in-python" name="toc2" id="toc2"&gt;The evolution of multisets in Python&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/python-counters.html#tocwait-theres-more" name="toc3" id="toc3"&gt;Wait, there&amp;#8217;s more!&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/python-counters.html#tocback-to-blackmail" name="toc4" id="toc4"&gt;Back to Blackmail&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/python-counters.html#tocgeneric-code" name="toc5" id="toc5"&gt;Generic Code&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/python-counters.html#tocend-of-message" name="toc6" id="toc6"&gt;End of Message&lt;/a&gt;
+ &lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/python-counters.html#toc0" name="tocthe-obsessive-blackmailer" id="tocthe-obsessive-blackmailer"&gt;The Obsessive Blackmailer&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;An obsessive blackmailer writes anonymous messages by by cut-and-pasting letters from newspapers. Being obsessive, the blackmailer only writes messages which can be composed entirely from a single newspaper.
+&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://www.flickr.com/photos/thomasguest/3754867981/" title="word aligned by Thomas Guest, on Flickr"&gt;&lt;img src="http://farm3.static.flickr.com/2567/3754867981_a752d15f74_o.png" width="480" height="309" alt="word aligned" /&gt;&lt;/a&gt;
+&lt;/p&gt;
+&lt;p&gt;Devise an algorithm which determines whether a given message can be written using a given newspaper.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/python-counters.html#toc1" name="tocmodeling-the-problem" id="tocmodeling-the-problem"&gt;Modeling the Problem&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;This is a nice little problem but I&amp;#8217;m about to spoil it since I&amp;#8217;m using it here as a study in Python&amp;#8217;s evolution. So if you&amp;#8217;d like to try it yourself, look away now.
+&lt;/p&gt;
+&lt;span id="continue-reading"/&gt;
+
+&lt;p&gt;We can represent both inputs to the algorithm as sequences of characters: a message string, length M, and a newspaper string, length N. We &lt;em&gt;could&lt;/em&gt; process the message string one character at a time, at each step scanning through the newspaper and noting the first occurrence of that character we haven&amp;#8217;t used before; but this is inefficient since we potentially read the whole paper M times.
+&lt;/p&gt;
+&lt;p&gt;It&amp;#8217;s better to think of this problem in terms of multisets, sometimes known as bags. A multiset is a set which can have repeated elements. Our blackmailer can proceed if the multiset of letters used in the message is contained entirely within the multiset of letters used in the newspaper.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/python-counters.html#toc2" name="tocthe-evolution-of-multisets-in-python" id="tocthe-evolution-of-multisets-in-python"&gt;The evolution of multisets in Python&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;A dictionary provides a compact and efficient way to represent a multiset in Python: each dictionary key represents an item in the multiset, and the value associated with that key is the number of times the key appears in the multiset. Python dictionaries are implemented as hashed arrays, meaning that member insertion and access take constant time, on average.
+&lt;/p&gt;
+&lt;p&gt;It&amp;#8217;s not hard to create such a multiset from a sequence but it&amp;#8217;s interesting to see how advances in the Python language have simplified the code. 
+&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://python.org/doc/1.4/lib/node13.html#SECTION00316000000000000000"&gt;&lt;img src="http://python.org/doc/1.4/lib/img7.gif" height="181px" width="469px"/&gt;&lt;/a&gt;
+&lt;/p&gt;
+&lt;p&gt;The complete documentation for &lt;a href="http://python.org/doc/1.4/"&gt;Python 1.4&lt;/a&gt;, released in 1996, is still available on the Python website. In version 1.4 you could write:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;def multiset_14(xs):
+    multiset = {}
+    for x in xs:
+        if multiset.has_key(x):
+            multiset[x] = multiset[x] + 1
+        else:
+            multiset[x] = 1
+    return multiset
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;This code works unchanged in the current Python release, 2.6 (though note &lt;code&gt;dict.has_key()&lt;/code&gt; doesn&amp;#8217;t exist in Python 3.*). Alternatively, you might catch the &lt;code&gt;KeyError&lt;/code&gt; raised when trying to access the dict with an invalid key:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;def multiset_14(xs):
+    multiset = {}        
+    for x in xs:
+        try:
+            multiset[x] = multiset[x] + 1
+        except KeyError:
+            multiset[x] = 1
+    return multiset
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Python 1.5 introduces an exception-free dictionary access method, &lt;code&gt;dict.get()&lt;/code&gt;, which returns a user supplied default (defaulting to &lt;code&gt;None&lt;/code&gt;) for missing keys.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;def multiset_15(xs):
+    multiset = {}        
+    for x in xs:
+        multiset[x] = multiset.get(x, 0) + 1
+    return multiset
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;It&amp;#8217;s certainly shorter, a little cleaner maybe, but perhaps it takes more effort for readers to see what exactly is going on.
+&lt;/p&gt;
+&lt;p&gt;At Python 2.2, &lt;code&gt;x in multiset&lt;/code&gt; improves on the equivalent &lt;code&gt;multiset.has_key(x)&lt;/code&gt; and we can use augmented arithmetic operators (&lt;code&gt;+=, -=, *=, /=, %=, **=, &amp;lt;&amp;lt;=, &amp;gt;&amp;gt;=, &amp;amp;=, =, |=&lt;/code&gt;), allowing:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;def multiset_22(xs):
+    multiset = {}
+    for x in xs:
+        if x in multiset:
+            multiset[x] += 1
+        else:
+            multiset[x] = 1
+    return multiset
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;I think I prefer the &lt;code&gt;dict.get()&lt;/code&gt; version, though.
+&lt;/p&gt;
+&lt;p&gt;The &lt;code&gt;collections&lt;/code&gt; module makes its first appearance in Python 2.4 offering a &lt;code&gt;deque&lt;/code&gt; and a promise of more high performance container types to come. Python 2.5 makes good on this promise, adding &lt;code&gt;defaultdict&lt;/code&gt; to the module. A &lt;code&gt;defaultdict&lt;/code&gt; is a specialised dictionary which calls a client supplied factory function for missing keys. Setting this factory function to &lt;code&gt;int&lt;/code&gt; turns the &lt;code&gt;defaultdict&lt;/code&gt; into a multiset. No need for &lt;code&gt;dict.get()&lt;/code&gt; any more.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;from collections import defaultdict
+
+def multiset_25(xs):
+    multiset = defaultdict(int)
+    for x in xs:
+        multiset[x] += 1
+    return multiset
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/python-counters.html#toc3" name="tocwait-theres-more" id="tocwait-theres-more"&gt;Wait, there&amp;#8217;s more!&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;The final improvement is available in Python 3.1 right now (or in Python 2.7, coming soon), courtesy once again of the collections module. &lt;a href="http://docs.python.org/dev/library/collections.html#collections.Counter"&gt;Collections.Counter&lt;/a&gt; is exactly what we&amp;#8217;ve been waiting for.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;from collections import Counter
+
+def multiset_31(xs):
+    return Counter(xs)
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/python-counters.html#toc4" name="tocback-to-blackmail" id="tocback-to-blackmail"&gt;Back to Blackmail&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;So our blackmailer should first generate a multiset representation of the letters in the message. Then it&amp;#8217;s a matter of iterating through the newspaper and reducing the multiset each time a letter matches up. We keep a tally of the number of letters we still need to match, and stop when this tally is zero or when we get to the end of the newspaper. Here&amp;#8217;s a sketch of an implementation.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;def blackmailable(message, newspaper):
+    """Return True if newspaper can be used to write the blackmail 
+    message, False otherwise.
+    """
+    m = len(message)
+    if m == 0:
+        return True
+    counts = multiset(message)
+    for ch in newspaper:
+        if counts[ch] &amp;gt; 0:
+            counts[ch] -= 1
+            m -= 1
+            if m == 0:
+                return True
+    return False
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;This code assumes the multiset is represented as a &lt;code&gt;Counter&lt;/code&gt; or a &lt;code&gt;defaultdict&lt;/code&gt;, since it depends on &lt;code&gt;counts[ch]&lt;/code&gt; returning 0 for any character not in the message. If we&amp;#8217;d used a plain dict, we&amp;#8217;d need to employ &lt;code&gt;dict.get(ch, 0)&lt;/code&gt;.
+&lt;/p&gt;
+&lt;p&gt;I&amp;#8217;m not entirely happy with the code shown. It&amp;#8217;s what I first came up with. Here&amp;#8217;s an alternative, which I also find a bit clunky. I&amp;#8217;d welcome any improvements. It&amp;#8217;s also worth noting that the algorithm locates the matching characters in the newspaper, so we might want to cache some indices for later use.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;def blackmailable(message, newspaper):
+    """Return True if newspaper can be used to write the blackmail 
+    message, False otherwise.
+    """
+    counts = multiset(message)
+    m = len(message)
+    n = len(newspaper)
+    i = 0
+    while m != 0 and i != n:
+        ch = newspaper[i]
+        if counts[ch] &amp;gt; 0:
+            counts[ch] -= 1
+            m -= 1
+        i += 1
+    return m == 0
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;We can avoid the ugly code by persuading the obssessive blackmailer to generate and maintain multiset representations of the entire newspaper library. Then &lt;code&gt;blackmailable()&lt;/code&gt; can be implemented as multiset containment, something which the &lt;code&gt;Counter&lt;/code&gt; class handles nicely using the subtraction operator. Note here that multiset subtraction never results in any negative counts, even though a &lt;code&gt;Counter&lt;/code&gt; instance could itself have negative counts.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; from collections import Counter
+&amp;gt;&amp;gt;&amp;gt; missing_letters = Counter(message) - Counter(newspaper)
+&amp;gt;&amp;gt;&amp;gt; blackmailable = len(missing_letters) == 0
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Alternatively:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; blackmailable = not missing_letters
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/python-counters.html#toc5" name="tocgeneric-code" id="tocgeneric-code"&gt;Generic Code&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Suppose the blackmailer prefers to compose a message from words, rather than letters? (For an example, see the threat to stay away from Grimpen Moor delivered to Sir Henry Baskerville discussed later in this article.) The code works as is &amp;#8212; just pass in message and newspaper as word sequences, rather than character sequences. Anything we can hash can be counted.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/python-counters.html#toc6" name="tocend-of-message" id="tocend-of-message"&gt;End of Message&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;In the age of the interweb anonymous cowardice is far easier and blackmailers don&amp;#8217;t need to resort to manual cut and paste techniques unless they&amp;#8217;re after a retro threatening effect.
+&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://en.wikipedia.org/wiki/Never_Mind_the_Bollocks,_Here's_the_Sex_Pistols"&gt;&lt;img src="http://wordaligned.org/images/never-mind-the-bollocks.jpg" alt="Never Mind the Bollocks"/&gt;&lt;/a&gt;
+&lt;/p&gt;
+&lt;img style="float:right" alt="Sherlock Holmes" src="http://wordaligned.org/images/sherlock-holmes.png"/&gt;
+
+&lt;p&gt;What&amp;#8217;s more, a detective can figure out plenty from these messages: so when Sir Henry Baskerville receives a threatening letter during his stay at the Northumberland Hotel, he shows it promptly to Sherlock Holmes:
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;Across the middle of it a single sentence had been formed by the expedient of pasting printed words upon it. It ran: &amp;#8220;As you value your life or your reason keep away from the moor.&amp;#8221; The word &amp;#8220;moor&amp;#8221; only was printed in ink.
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;In a virtuso display of deductive reasoning, Holmes shows the author of the message was in a hurry, afraid of being interrupted, and working in a hotel room using nail-scissors. (He also deduces something else, which he does not reveal at the time.) Identifying the source of the words to be yesterday&amp;#8217;s Times leader is elementary.
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;The detection of types is one of the most elementary branches of knowledge to the special expert in crime, though I confess that once when I was very young I confused the Leeds Mercury with the Western Morning News. But a Times leader is entirely distinctive, and these words could have been taken from nothing else.
+&lt;/p&gt;
+&lt;p&gt;&amp;#8212; Sherlock Holmes, &lt;a href="http://www.gutenberg.org/dirs/etext02/bskrv11a.txt"&gt;The Hound of the Baskervilles&lt;/a&gt;
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;Can anyone identify the newspaper I used to create the image at the start of this article?
+&lt;/p&gt;
+&lt;p&gt;&lt;hr /&gt;
+   My thanks to jay for a &lt;a href="http://wordaligned.org/articles/python-counters.html#comment-13418772"&gt;correction&lt;/a&gt; to the original version of this article.
+&lt;/p&gt;</description>
+<dc:date>2009-07-27</dc:date>
+<guid>http://wordaligned.org/articles/python-counters.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/python-counters.html</link>
+<category>Characters</category>
+</item>
+
+<item>
+<title>Could OCR conquer the calligraphylion?</title>
+<description>&lt;p&gt;&lt;a href="http://tesseract-ocr.googlecode.com/files/TesseractOSCON.pdf" title="Tesseract presentation (PDF)"&gt;&lt;img src="http://wordaligned.org/images/ocr-outline.png" width="425px" height="135px" alt="OCR outline"/&gt;&lt;/a&gt;
+&lt;/p&gt;
+&lt;p&gt;Optical character recognition (&lt;a href="http://en.wikipedia.org/wiki/Optical_character_recognition" title="Wikipedia on OCR"&gt;OCR&lt;/a&gt;) algorithms typically process an image in stages:
+&lt;/p&gt;
+&lt;ul&gt;
+ &lt;li&gt;
+     convert the image to monochrome
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     identify blocks of text
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     find lines of text within those blocks
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     separate out words, then characters
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     extract character outlines
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     match outlines to archetypes
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     match candidate words to dictionary
+ &lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;a href="http://tesseract-ocr.googlecode.com/files/TesseractOSCON.pdf" title="Tesseract presentation (PDF)"&gt;&lt;img src="http://wordaligned.org/images/ocr-matching.png" width="425px" height="135px" alt="OCR matching"/&gt;&lt;/a&gt;
+&lt;/p&gt;
+&lt;span id="continue-reading"/&gt;
+
+&lt;p&gt;These algorithms can be tuned and trained, to particular fonts and dictionaries for example, and the later stages can feedback into earlier ones; but the strategy basically tackles the picture character by character. This form of OCR is a mature and successful technology. It works very effectively with, for example, a page from a Western newspaper; but as with all things language-related, varying cultural conventions can lead to complications. The fundamental assumption that the atoms of a text image are characters may no longer be true. &lt;a href="http://code.google.com/p/tesseract-ocr"&gt;Tesseract&lt;/a&gt;, the leading open source OCR engine, &lt;a href="http://code.google.com/p/tesseract-ocr/wiki/TrainingTesseract"&gt;comes clean&lt;/a&gt;
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;Tesseract is unlikely to be able to handle connected scripts like Arabic. It will take some specialized algorithms to handle this case, and right now it doesn&amp;#8217;t have them.
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;Mohammad S. M. Khorsheed&amp;#8217;s &lt;a href="http://www.cl.cam.ac.uk/techreports/UCAM-CL-TR-495.html"&gt;Phd dissertation&lt;/a&gt; describes such algorithms, explaining the dimensions of the challenge in more detail:
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;Arabic scripts are inherently cursive: writing isolated characters in &amp;#8216;block letters&amp;#8217; is an unacceptable and unused writing style. The letters are context sensitive. Certain character combinations form new ligature shapes which are often font dependent. Some ligatures involve vertical stacking of characters. Since not all characters connect, word boundary location becomes an interesting problem, as spacing may not only separate words but also certain characters within a word.
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;Here&amp;#8217;s an illustration of Arabic characters taking on different forms, depending on position.
+&lt;/p&gt;
+&lt;img src="http://wordaligned.org/images/arabic-context-sensitive-characters.png" alt="Context sensitive Arabic characters"/&gt;
+
+&lt;p&gt;There are some commercially available specialised Arabic OCR packages but I haven&amp;#8217;t been able to try them out. They don&amp;#8217;t provide information about the algorithms they use. 
+&lt;/p&gt;
+&lt;p&gt;Could OCR software ever conquer the calligraphylion?
+&lt;/p&gt;
+&lt;img width="512px" height="408px" src="http://wordaligned.org/images/calligraphylion.jpg" alt="Calligraphylion"/&gt;
+
+&lt;p&gt;This magical beast demonstrates OCR in reverse: an image which has been converted by hand into text.
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;This image of a lion originates from Lahore, Pakistan and is part of a rich tradition of zoomorphic calligraphy. This practice, developed in the sixteenth century, employs the flexibility and beauty of Arabic script to delineate living forms such as tigers, parrots, ostriches and cockerels. This is done without disobeying religious injunctions that prohibit their direct depiction.
+&lt;/p&gt;
+&lt;p&gt;&amp;#8212; Tate Gallery, East West exhibition, 2006-2007
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;(More &lt;a href="http://images.google.com/images?q=zoomorphic+calligraphy"&gt;zoomorphic calligraphy&lt;/a&gt;.)
+&lt;/p&gt;</description>
+<dc:date>2009-07-14</dc:date>
+<guid>http://wordaligned.org/articles/calligraphylion.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/calligraphylion.html</link>
+<category>Characters</category>
+</item>
+
+<item>
+<title>Patience sort and the Longest increasing subsequence</title>
+<description>&lt;a href="http://wordaligned.org/articles/patience-sort.html"&gt;&lt;img src="http://wordaligned.org/images/patience-sort.gif" alt="Patience sort and longest increasing subsequence"/&gt;&lt;/a&gt;&lt;p&gt;This article relies on Javascript and CSS for graphical content and I don&amp;#8217;t trust a feed reader to render it properly, which is why I&amp;#8217;m posting a teaser here rather than the full content. To find out how a simple card game provides an efficient algorithm for finding the longest increasing subsequence of a sequence, please &lt;a href="http://wordaligned.org/articles/patience-sort.html"&gt;visit the original&lt;/a&gt;.&lt;/p&gt;</description>
+<dc:date>2009-03-26</dc:date>
+<guid>http://wordaligned.org/articles/patience-sort.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/patience-sort.html</link>
+<category>Characters</category>
+</item>
+
+<item>
+<title>comp.lang.name?</title>
+<description>&lt;h3&gt;How the Python became&lt;/h3&gt;
+&lt;p&gt;Guido van Rossum had a problem: &lt;a href="http://python-history.blogspot.com/2009/01/personal-history-part-1-cwi.html"&gt;what to call his new language&lt;/a&gt;? Computer language names often tip a hat to their predecessors, as &lt;strong&gt;Ruby&lt;/strong&gt; does to &lt;strong&gt;Perl&lt;/strong&gt;, for example. In this case the immediate predecessor, &lt;strong&gt;ABC&lt;/strong&gt;, had itself changed from &lt;i&gt;&lt;b&gt;B&lt;/b&gt;&lt;/i&gt; because it got mistaken for &lt;strong&gt;B&lt;/strong&gt;, and the suggestion ABC &amp;#8220;made programming easy as ABC&amp;#8221; failed to convince Guido. So he dropped the alphabetic sequencing. Rather than tip a hat he picked a name from one.
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;I picked the first thing that came to mind, which happened to be &lt;a href="http://en.wikipedia.org/wiki/Monty_Python%27s_Flying_Circus"&gt;Monty Python&amp;#8217;s Flying Circus&lt;/a&gt;, one of my favorite comedy troupes. The reference felt suitably irreverent for what was essentially a &lt;a href="http://en.wikipedia.org/wiki/Skunkworks_project"&gt;&amp;#8220;skunkworks project&amp;#8221;&lt;/a&gt;. The word &amp;#8220;Python&amp;#8221; was also catchy, a bit edgy, and at the same time, it fit in the tradition of naming languages after famous people, like Pascal, Ada, and Eiffel.
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;span id="continue-reading"/&gt;
+
+
+&lt;h3&gt;Animals&lt;/h3&gt;
+&lt;p&gt;&lt;a href="http://www.flickr.com/photos/thomasguest/3215793436/" title="ya(k|cc) came?l a[uw]k "&gt;&lt;img style="float:right" src="http://farm4.static.flickr.com/3431/3215793436_6840bb27b3_m.jpg" width="174" height="240" alt="yacc caml awk" /&gt;&lt;/a&gt;
+&lt;/p&gt;
+&lt;p&gt;Although Guido van Rossum held out for some time against Python being associated with snakes, he eventually &lt;a href="http://personal.ee.surrey.ac.uk/Personal/L.Wood/softwear/" title="At last GvR embraces the snake"&gt;capitulated&lt;/a&gt;. Blame the animal cover lovers at O&amp;#8217;Reilly! As it happens, I rate the reptile as highly as the comedians. I also like languages with animal names. Perhaps &lt;strong&gt;Yacc&lt;/strong&gt;, &lt;strong&gt;Awk&lt;/strong&gt; and &lt;strong&gt;Caml&lt;/strong&gt; also started life as skunkworks?
+&lt;/p&gt;
+
+&lt;h3&gt;Naming words&lt;/h3&gt;
+&lt;p&gt;&lt;a href="http://en.wikipedia.org/wiki/Python_(mythology)"&gt;&lt;img src="http://upload.wikimedia.org/wikipedia/commons/thumb/2/20/Virgil_Solis_-_Apollo_Python.jpg/350px-Virgil_Solis_-_Apollo_Python.jpg" alt="Apollo slaying Python"/&gt;&lt;/a&gt;
+&lt;/p&gt;
+&lt;p&gt;Python is a noun &amp;#8212; what we called a &amp;#8220;naming word&amp;#8221; at junior school. Python is also a proper noun: in &lt;a href="http://en.wikipedia.org/wiki/Python_(mythology)" title="Python (mythology)"&gt;Greek Mythology&lt;/a&gt;, &lt;strong&gt;she&lt;/strong&gt; was the earth-dragon of Delphi. It&amp;#8217;s hardly surprising when language creators opt for nouns, often proper, frequently female: &lt;strong&gt;Ada&lt;/strong&gt;, &lt;strong&gt;Miranda&lt;/strong&gt;, &lt;strong&gt;Ruby&lt;/strong&gt;, for example. Also, &lt;strong&gt;Java&lt;/strong&gt;, &lt;strong&gt;Pascal&lt;/strong&gt;, &lt;strong&gt;Haskell&lt;/strong&gt; &amp;#8212; oh, yes, and &lt;strong&gt;Delphi&lt;/strong&gt;.
+&lt;/p&gt;
+
+&lt;h3&gt;Single characters&lt;/h3&gt;
+&lt;p&gt;We&amp;#8217;ve already mentioned &lt;strong&gt;B&lt;/strong&gt;, which I guess is a (homophone of a) girl&amp;#8217;s name. It&amp;#8217;s also a well rounded character found near the front of the alphabet. Alphabetically, B comes before C, and the language B features amongst &lt;strong&gt;C&lt;/strong&gt;&amp;#8217;s predecessors. When Bjarne Stroustrup built object-oriented features on top of C, his new language became known as &amp;#8220;new C&amp;#8221; and &amp;#8220;C with classes&amp;#8221;. The former was disrespectful to C, which risked becoming &amp;#8220;old C&amp;#8221;, and the latter failed to excite. The final name, &lt;strong&gt;C++&lt;/strong&gt;, was an inspired choice, even if some have pointed out &lt;strong&gt;++C&lt;/strong&gt; would be more correct.
+&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;C#&lt;/strong&gt; squeezes more juice from the pun. Pronounced &amp;#8220;See Sharp!&amp;#8221;, the name has a commanding ring to it, and if you look within the hash symbol, #, you can make out redoubled ++ signs. Shouldn&amp;#8217;t it &lt;a href="http://en.wikipedia.org/wiki/C_Sharp_(programming_language)#Language_name"&gt;be written C&amp;#x266f;&lt;/a&gt; though, or should we really pronounce it &amp;#8220;See Hash&amp;#8221;? 
+&lt;/p&gt;
+&lt;p&gt;Both the + and the # characters have special semantics within URLs. How many C++ and C# blog posts end up being tagged &amp;#8220;C&amp;#8221;, I wonder? For similar reasons I guess it&amp;#8217;s still impractical to name a language &lt;b&gt;&amp;lambda;&lt;/b&gt; or &lt;b&gt;&amp;mu;&lt;/b&gt;, unless you&amp;#8217;re prepared to accept that name being spelled &lt;strong&gt;lambda&lt;/strong&gt; or &lt;strong&gt;mu&lt;/strong&gt;, that is.
+&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;D&lt;/strong&gt; really does look like a great language in the C and C++ tradition, but its name lacks imagination. Enough alphabet already!
+&lt;/p&gt;
+
+&lt;h3&gt;Doing words&lt;/h3&gt;
+&lt;p&gt;&lt;strong&gt;B&lt;/strong&gt; and &lt;strong&gt;C&lt;/strong&gt; are both strong, active verbs. Nothing beats being and seeing. Writers like verbs. Verbs make things happen, just like programming languages. Maybe &lt;strong&gt;Lisp&lt;/strong&gt; and &lt;strong&gt;Scheme&lt;/strong&gt; sound a bit geeky, sleazy even, but I like them. They&amp;#8217;re great names. Ever wonder how &lt;strong&gt;Bash&lt;/strong&gt; bludgeoned its way to shell domination? &lt;strong&gt;Squeak&lt;/strong&gt; is a great play on &lt;strong&gt;Smalltalk&lt;/strong&gt;. Knitters &lt;a href="http://dictionary.reference.com/browse/purl"&gt;&lt;strong&gt;perl&lt;/strong&gt;&lt;/a&gt;.
+&lt;/p&gt;
+
+&lt;h3&gt;Etc&lt;/h3&gt;
+&lt;p&gt;&lt;a href="http://www.lancearmstrong.com/"&gt;&lt;img style="float:right;" src="http://wordaligned.org/images/lance-armstrong.jpg" alt="Lance Armstrong, champion cyclist"/&gt;&lt;/a&gt;
+&lt;/p&gt;
+&lt;p&gt;Adjectives and adverbs are poorly represented. &lt;strong&gt;Groovy&lt;/strong&gt; comes to mind, but not a lot else. Plenty of language names are (or once were) acronyms and abbreviations: as names, I prefer the ones you can read over the mouthfuls of consonants. On this basis, &lt;strong&gt;Fortran&lt;/strong&gt; pips &lt;strong&gt;PL/I&lt;/strong&gt;, and &lt;strong&gt;Sequel&lt;/strong&gt; beats &lt;strong&gt;Ess Queue El&lt;/strong&gt;.
+&lt;/p&gt;
+&lt;p&gt;We&amp;#8217;ve listed some great computer languages with great names. Can a good name shape a language&amp;#8217;s success? Well, certainly it can&amp;#8217;t hurt. Names matter. Lance Armstrong is surely the name of a champion, the kind of guy who can beat testicular cancer and win the world&amp;#8217;s toughest endurance event 7 times in a row. Check out his &lt;a href="http://www.lancearmstrong.com/"&gt;flash heavy website&lt;/a&gt;. Whereas the more gently named Tim Henman never quite fulfilled his tennis potential, and I can&amp;#8217;t even connect to &lt;a href="http://www.timhenman.org"&gt;www.timhenman.org&lt;/a&gt;.
+&lt;/p&gt;
+&lt;p&gt;Conversely, can a poor name stand in the way of success? &lt;strong&gt;ABC&lt;/strong&gt; has become (part of Python&amp;#8217;s) history. I think it&amp;#8217;s fair to say that, at this point, the weakly-named &lt;strong&gt;D&lt;/strong&gt; has gained respect rather than presence. On the other hand, &lt;strong&gt;JavaScript&lt;/strong&gt; is a poor name too, and &lt;strong&gt;ECMAScript&lt;/strong&gt; is worse, but it&amp;#8217;s a fine language which can claim to be more widely deployed than any other.
+&lt;/p&gt;
+&lt;h5&gt;&lt;a name="feedback"&gt;Feedback&lt;/a&gt;&lt;/h5&gt;&lt;div id="feedback_div"&gt;&lt;ol id="feedback" class="feedback"&gt;&lt;li class="feedbackitem"&gt;&lt;div class="author"&gt;&lt;cite&gt;Jez&lt;/cite&gt; 2009-01-23&lt;/div&gt;&lt;div class="content"&gt;&lt;p&gt;Names are important.  Choosing a good name for something is very difficult, and I know from past experience that you don&amp;#8217;t usually get a second go.  The humorous code name you chose almost certainly won&amp;#8217;t get changed later, and you&amp;#8217;ll be talking about &amp;#8220;using the Linguini server to add the zubins&amp;#8221; for ever.  Yes, that&amp;#8217;s a real example.&lt;/p&gt;&lt;p&gt;One of my favourite cartoons, The Secret Show, is a comedy spy thriller.  The agency head takes security &lt;i&gt;very&lt;/i&gt; seriously, and so his name is changed daily.  He&amp;#8217;s constantly undermined by being assigned ridiculous names - Mimzy Woowoo, Pimlico Buttonfluff, Princess Fairycakes, and so on.  In one episode his new name is Rock Justice, and his chest swells with pride.  Sadly though, it was just a dream.&lt;/p&gt;&lt;/div&gt;&lt;/li&gt;&lt;li class="feedbackitem" id="feedback-1000"&gt;&lt;div class="author"&gt;&lt;cite&gt;matt burns&lt;/cite&gt; 2009-01-28&lt;/div&gt;&lt;div class="content"&gt;&lt;p&gt;I&amp;#8217;m sure I&amp;#8217;m not alone in pronouncing things incorrectly due to many of the things I learn being done so by reading.&lt;/p&gt;&lt;p&gt;C# was one example because for quite a while I pronounced it &amp;#8220;see hash&amp;#8221; in my head until I descovered it should be &amp;#8220;see sharp&amp;#8221;. I still occasionally slip out with kay-sh instead of cah-sh for cache.&lt;/p&gt;&lt;p&gt;I didn&amp;#8217;t know that # and &amp;#x266f; were different symbols but now I do I feel less stupid.&lt;/p&gt;&lt;p&gt;(Wikipedia does mention that the language is actually C&amp;#x266f; but the # character is merely used to represent the &amp;#x266f; for simplicity.)&lt;/p&gt;&lt;/div&gt;&lt;/li&gt;&lt;li class="feedbackitem"&gt; 
+&lt;div class="author"&gt;&lt;cite&gt;Thomas Guest&lt;/cite&gt; 2009-02-02&lt;/div&gt;&lt;div class="content"&gt;&lt;p&gt;You&amp;#8217;re definitely not alone, Matt. One thing which bugs me is when a name is spelled in a way which makes guessing its pronunciation hard.&lt;/p&gt;&lt;p&gt;The Cuil search engine, for example, which we&amp;#8217;re meant to pronounce &amp;#8220;cool&amp;#8221;.&lt;/p&gt;&lt;p&gt;Much as I like lighttpd, how are you supposed to say it? Lighty, apparently.&lt;/p&gt;&lt;p&gt;And it&amp;#8217;s &amp;#8220;Val-grinned&amp;#8221;, not &amp;#8220;Val-grind&amp;#8221;. Don&amp;#8217;t feed bad, &lt;a href="http://valgrind.org/docs/manual/faq.html#faq.pronounce"&gt;everyone gets it wrong at first&lt;/a&gt;.&lt;/p&gt;&lt;/div&gt;&lt;/li&gt;&lt;/ol&gt;&lt;/div&gt;</description>
+<dc:date>2009-01-21</dc:date>
+<guid>http://wordaligned.org/articles/complangname.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/complangname.html</link>
+<category>Characters</category>
+</item>
+
+<item>
+<title>What&#8217;s in the box?</title>
+<description>&lt;p&gt;Last week I posted &lt;a href="http://wordaligned.org/articles/a-little-teaser.html"&gt;a little teaser&lt;/a&gt; which hid a series of clues in and around the page&amp;#8217;s HTML and the referenced graphic. Thanks to everyone who joined in. Some of you said you learned something in the process, which is good; and &lt;a href="http://netpbm.sourceforge.net/"&gt;I did too&lt;/a&gt;, which is better!
+&lt;/p&gt;
+&lt;p&gt;Filip Salomonsson completed the treasure hunt first. Extra credits go to Robin Stocker for his &lt;a href="http://www.flickr.com/photos/thomasguest/3106269463/"&gt;Swiss version&lt;/a&gt;, &lt;a href="http://chneukirchen.org/"&gt;Christian Neukirchen&lt;/a&gt; for a solution which requires no programming, and to Shiar who spotted the answer at once but nevertheless followed the clues to the end! 
+&lt;/p&gt;
+&lt;p&gt;A full solution appears below, &lt;a href="http://fliptitle.com"&gt;ROT-180&amp;deg;&lt;/a&gt; encoded.
+&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://wordaligned.org/articles/a-little-teaser.html"&gt;&lt;img src="http://wordaligned.org/images/top-row-flipped.png" alt="What's this? Answer below!"/&gt;&lt;/a&gt;
+&lt;/p&gt;
+&lt;div style="text-align:right;"&gt;&lt;p&gt;&amp;#x02D9;&amp;#x01DD;&amp;#x0279;&amp;#x01DD;&amp;#x0265; p&amp;#x01DD;&amp;#x028C;&amp;#x0131;&amp;#x0279;&amp;#x0279;&amp;#x0250; &amp;#x01DD;&amp;#x028C;,no&amp;#x028E; &amp;#x028D;ou&amp;#x029E; &amp;#x01DD;&amp;#x026F; &amp;#x0287;&amp;#x01DD;l o&amp;#x0287; &amp;#x0183;&amp;#x0279;o&amp;#x02D9;p&amp;#x01DD;u&amp;#x0183;&amp;#x0131;l&amp;#x0250;p&amp;#x0279;o&amp;#x028D;@s&amp;#x028E;&amp;#x01DD;&amp;#x029E;&amp;#x0287;l&amp;#x0250;:o&amp;#x0287;l&amp;#x0131;&amp;#x0250;&amp;#x026F; &amp;#x01DD;s&amp;#x0250;&amp;#x01DD;ld &amp;#x02D9;(-&amp;#x061B; p&amp;#x01DD;u&amp;#x0183;&amp;#x0131;l&amp;#x0250; p&amp;#x0279;o&amp;#x028D; o&amp;#x0287; uo&amp;#x0131;&amp;#x0287;d&amp;#x0131;&amp;#x0279;&amp;#x0254;sqns &amp;#x0183;uol&amp;#x01DD;&amp;#x025F;&amp;#x0131;l &amp;#x01DD;&amp;#x01DD;&amp;#x0279;&amp;#x025F; &amp;#x0250; s&amp;#x0131; &amp;#x01DD;z&amp;#x0131;&amp;#x0279;d &amp;#x0279;no&amp;#x028E; &amp;#x00A1;&amp;#x01DD;uop ll&amp;#x01DD;&amp;#x028D; &amp;#x02D9;&lt;a href="http://www.flickr.com/photos/thomasguest/3104398656/"&gt;&amp;#x01DD;&amp;#x0279;&amp;#x01DD;&amp;#x0265;&lt;/a&gt; s&amp;#x0279;&amp;#x01DD;&amp;#x0287;&amp;#x0254;&amp;#x0250;&amp;#x0279;&amp;#x0250;&amp;#x0265;&amp;#x0254; &amp;#x025F;o s&amp;#x028D;o&amp;#x0279; &amp;#x01DD;&amp;#x01DD;&amp;#x0279;&amp;#x0265;&amp;#x0287; ll&amp;#x0250; &amp;#x01DD;&amp;#x01DD;s u&amp;#x0250;&amp;#x0254; no&amp;#x028E; &amp;#x02D9;&amp;#x028E;&amp;#x01DD;&amp;#x029E; &amp;#x0287;l&amp;#x0250; &amp;#x01DD;&amp;#x0265;&amp;#x0287; u&amp;#x028D;op &amp;#x0183;u&amp;#x0131;plo&amp;#x0265; &amp;#x01DD;l&amp;#x0131;&amp;#x0265;&amp;#x028D; p&amp;#x0279;&amp;#x0250;oq&amp;#x028E;&amp;#x01DD;&amp;#x029E; &amp;#x028E;&amp;#x0287;&amp;#x0279;&amp;#x01DD;&amp;#x028D;b &amp;#x0254;&amp;#x0250;&amp;#x026F; &amp;#x01DD;ldd&amp;#x0250; u&amp;#x0250; uo s&amp;#x0279;&amp;#x01DD;&amp;#x0287;&amp;#x0254;&amp;#x0250;&amp;#x0279;&amp;#x0250;&amp;#x0265;&amp;#x0254; &amp;#x025F;o &amp;#x028D;o&amp;#x0279; do&amp;#x0287; &amp;#x01DD;&amp;#x0265;&amp;#x0287; u&amp;#x0131; &amp;#x01DD;d&amp;#x028E;&amp;#x0287; &amp;#8216;&amp;#x01DD;&amp;#x0183;&amp;#x0250;&amp;#x026F;&amp;#x0131; s&amp;#x0131;&amp;#x0265;&amp;#x0287; &amp;#x01DD;&amp;#x0287;&amp;#x0250;&amp;#x0279;&amp;#x01DD;u&amp;#x01DD;&amp;#x0183; o&amp;#x0287; :uo&amp;#x0131;&amp;#x0287;nlos&lt;/p&gt;&lt;p&gt;&amp;#x02D9;004 &amp;#x0254;- p&amp;#x0250;&amp;#x01DD;&amp;#x0265; | &amp;#x0183;ud&amp;#x02D9;&amp;#x028D;o&amp;#x0279;-do&amp;#x0287; &amp;#x0250;&amp;#x0265;dl&amp;#x0250;- &amp;#x026F;udo&amp;#x0287;&amp;#x0183;ud :&amp;#x0183;u&amp;#x0131;&amp;#x026F;&amp;#x026F;&amp;#x0250;&amp;#x0279;&amp;#x0183;o&amp;#x0279;d &amp;#x028E;u&amp;#x0250; &amp;#x0183;u&amp;#x0131;&amp;#x0279;&amp;#x0131;nb&amp;#x01DD;&amp;#x0279; &amp;#x0287;no&amp;#x0265;&amp;#x0287;&amp;#x0131;&amp;#x028D; &amp;#x0279;&amp;#x01DD;&amp;#x028D;su&amp;#x0250; &amp;#x01DD;&amp;#x0265;&amp;#x0287; s&amp;#x0287;&amp;#x01DD;&amp;#x0183; &amp;#x0265;&amp;#x0254;&amp;#x0131;&amp;#x0265;&amp;#x028D; &amp;#x026F;udo&amp;#x0287;&amp;#x0183;ud &amp;#x0287;&amp;#x0250; &amp;#x01DD;&amp;#x026F; p&amp;#x01DD;&amp;#x0287;u&amp;#x0131;od u&amp;#x01DD;&amp;#x0265;&amp;#x0254;&amp;#x0279;&amp;#x0131;&amp;#x029E;n&amp;#x01DD;u u&amp;#x0250;&amp;#x0131;&amp;#x0287;s&amp;#x0131;&amp;#x0279;&amp;#x0265;&amp;#x0254; &amp;#x02D9;s&amp;#x01DD;nl&amp;#x0250;&amp;#x028C; &amp;#x0250;&amp;#x0265;dl&amp;#x0250; &amp;#x01DD;&amp;#x0265;&amp;#x0287; &amp;#x0287;&amp;#x01DD;&amp;#x0183; o&amp;#x0287; &amp;#x0287;d&amp;#x0131;&amp;#x0279;&amp;#x0254;s &amp;#x01DD;ld&amp;#x026F;&amp;#x0131;s &amp;#x0250; &amp;#x01DD;&amp;#x0287;&amp;#x0131;&amp;#x0279;&amp;#x028D; o&amp;#x0287; &amp;#x028E;&amp;#x0279;&amp;#x0250;&amp;#x0279;q&amp;#x0131;l &amp;#x0183;u&amp;#x0131;&amp;#x0183;&amp;#x0250;&amp;#x026F;&amp;#x0131; uo&amp;#x0265;&amp;#x0287;&amp;#x028E;d &amp;#x01DD;&amp;#x0265;&amp;#x0287; p&amp;#x01DD;sn &amp;#x0131;&lt;/p&gt;&lt;p&gt;&amp;#x02D9;&amp;#x01DD;nl&amp;#x0254; &amp;#x0287;x&amp;#x01DD;u &amp;#x01DD;&amp;#x0265;&amp;#x0287; &amp;#x0287;no ll&amp;#x01DD;ds &amp;#x0183;ud s&amp;#x0131;&amp;#x0265;&amp;#x0287; &amp;#x025F;o &amp;#x028D;o&amp;#x0279; do&amp;#x0287; &amp;#x01DD;&amp;#x0265;&amp;#x0287; u&amp;#x0131; s&amp;#x01DD;nl&amp;#x0250;&amp;#x028C; &amp;#x0250;&amp;#x0265;dl&amp;#x0250; &amp;#x01DD;&amp;#x0265;&amp;#x0287; :s&amp;#x028E;&amp;#x0250;s &amp;#x0265;&amp;#x0254;&amp;#x0131;&amp;#x0265;&amp;#x028D; &amp;#8216;&amp;#x0287;u&amp;#x01DD;&amp;#x026F;&amp;#x026F;o&amp;#x0254; &amp;#x01DD;&amp;#x0265;&amp;#x0287; p&amp;#x0250;&amp;#x01DD;&amp;#x0279; o&amp;#x0287; &amp;#x0183;ud&amp;#x02D9;&amp;#x028D;o&amp;#x0279;-do&amp;#x0287; &amp;#x01DD;soq&amp;#x0279;&amp;#x01DD;&amp;#x028C;- &amp;#x028E;&amp;#x025F;&amp;#x0131;&amp;#x0287;u&amp;#x01DD;p&amp;#x0131; &amp;#x029E;&amp;#x0254;&amp;#x0131;&amp;#x0183;&amp;#x0250;&amp;#x026F;&amp;#x01DD;&amp;#x0183;&amp;#x0250;&amp;#x026F;&amp;#x0131; p&amp;#x01DD;sn &amp;#x0131; &amp;#x02D9;&amp;#x028E;ll&amp;#x0250;&amp;#x0254;ol &amp;#x0183;ud &amp;#x01DD;&amp;#x0265;&amp;#x0287; &amp;#x01DD;&amp;#x028C;&amp;#x0250;s&lt;/p&gt;&lt;p&gt;&amp;#x02D9;&amp;#x0183;ud &amp;#x01DD;&amp;#x0265;&amp;#x0287; &amp;#x025F;o &amp;#x029E;un&amp;#x0265;&amp;#x0254; &amp;#x0287;x&amp;#x0287;z &amp;#x01DD;&amp;#x0265;&amp;#x0287; u&amp;#x0131; &amp;#x0287;u&amp;#x01DD;&amp;#x026F;&amp;#x026F;o&amp;#x0254; &amp;#x01DD;&amp;#x0265;&amp;#x0287; p&amp;#x0250;&amp;#x01DD;&amp;#x0279; &amp;#8216;&amp;#x01DD;nl&amp;#x0254; &amp;#x0287;x&amp;#x01DD;u &amp;#x01DD;&amp;#x0265;&amp;#x0287; &amp;#x0279;o&amp;#x025F; :&amp;#x01DD;&amp;#x01DD;s ll,no&amp;#x028E; &amp;#x02D9;&amp;#x01DD;sno&amp;#x026F; &amp;#x0279;no&amp;#x028E; &amp;#x0183;u&amp;#x0131;sn &amp;#x0279;&amp;#x0250;q&amp;#x01DD;p&amp;#x0131;s &amp;#x01DD;&amp;#x0265;&amp;#x0287; &amp;#x0287;&amp;#x0254;&amp;#x01DD;l&amp;#x01DD;s&lt;/p&gt;&lt;p&gt;&amp;#x02D9;&amp;#x0279;&amp;#x0250;q&amp;#x01DD;p&amp;#x0131;s &amp;#x01DD;&amp;#x0265;&amp;#x0287; u&amp;#x0131; &amp;#x0287;x&amp;#x01DD;&amp;#x0287; &amp;#x01DD;&amp;#x0287;&amp;#x0131;&amp;#x0265;&amp;#x028D; uo &amp;#x01DD;&amp;#x0287;&amp;#x0131;&amp;#x0265;&amp;#x028D; &amp;#x01DD;&amp;#x0265;&amp;#x0287; &amp;#x0287;&amp;#x0265;&amp;#x0183;&amp;#x0131;l&amp;#x0265;&amp;#x0183;&amp;#x0131;&amp;#x0265; &amp;#8216;&amp;#x01DD;nl&amp;#x0254; &amp;#x0287;x&amp;#x01DD;u &amp;#x01DD;&amp;#x0265;&amp;#x0287; &amp;#x01DD;&amp;#x01DD;s o&amp;#x0287; :sp&amp;#x0250;&amp;#x01DD;&amp;#x0279; l&amp;#x026F;&amp;#x0287;&amp;#x0265; &amp;#x01DD;&amp;#x0265;&amp;#x0287; u&amp;#x0131; &amp;#x0287;u&amp;#x01DD;&amp;#x026F;&amp;#x026F;o&amp;#x0254; &amp;#x0250; &amp;#x02D9;xo&amp;#x025F;&amp;#x01DD;&amp;#x0279;&amp;#x0131;&amp;#x025F; uo n+l&amp;#x0279;&amp;#x0287;&amp;#x0254; (&amp;#x02D9;&amp;#x0183;&amp;#x02D9;&amp;#x01DD;) &amp;#x0183;u&amp;#x0131;sn l&amp;#x026F;&amp;#x0287;&amp;#x0265; &amp;#x01DD;&amp;#x0265;&amp;#x0287; &amp;#x028D;&amp;#x01DD;&amp;#x0131;&amp;#x028C;&lt;/p&gt;&lt;/div&gt;
+
+&lt;span id="continue-reading"/&gt;
+
+&lt;p&gt;Some found the teaser too easy. Others asked if I&amp;#8217;d be posting a follow up.
+&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://www.flickr.com/photos/thomasguest/3122529935/" title="What's in the box?"&gt;&lt;img src="http://farm4.static.flickr.com/3264/3122529935_dfe6550cf6_o.png" width="294" height="450" alt="What's in the box?" /&gt;&lt;/a&gt;
+&lt;/p&gt;
+&lt;p&gt;Sorry. Maybe.
+&lt;/p&gt;</description>
+<dc:date>2008-12-20</dc:date>
+<guid>http://wordaligned.org/articles/whats-in-the-box.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/whats-in-the-box.html</link>
+<category>Characters</category>
+</item>
+
+<item>
+<title>A Little Teaser. Keen Eyes? You&#8217;ll See!</title>
+<description>&lt;p&gt;This curious document turned up in the lost+found. Can anyone help me &lt;a href="http://www.imagemagick.org/www/identify.html" title="First hint!"&gt;identify&lt;/a&gt; it?
+&lt;/p&gt;
+&lt;img src="http://wordaligned.org/images/top-row.png" alt="What's this?"/&gt;
+
+&lt;p&gt;(View &lt;a href="http://wordaligned.org/articles/a-little-teaser.html"&gt;this page&amp;#8217;s&lt;/a&gt; source for a clue.)
+&lt;/p&gt;
+&lt;!-- To see the next clue, highlight the white on white text in the sidebar --&gt;</description>
+<dc:date>2008-12-12</dc:date>
+<guid>http://wordaligned.org/articles/a-little-teaser.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/a-little-teaser.html</link>
+<category>Characters</category>
+</item>
+
+<item>
+<title>BIG G little g - What begins with G?</title>
+<description>&lt;h3&gt;That was Then&lt;/h3&gt;
+&lt;p&gt;&lt;a href="http://www.google.com"&gt;&lt;img src="http://www.google.com/images/logo.gif" alt="Google logo"/&gt;&lt;/a&gt;
+&lt;/p&gt;
+&lt;p&gt;There are two G&amp;#8217;s in Google, a big &lt;strong&gt;G&lt;/strong&gt; at the start and a little &lt;strong&gt;g&lt;/strong&gt; half way through. Historically, the search giant has been sniffy about people googling, by which I mean verbing the corporate name and neglecting its proper case. Back in 2003 &lt;a href="http://news.bbc.co.uk/1/hi/uk/3006486.stm"&gt;the beeb quotes&lt;/a&gt; singer Robbie Williams as saying (note the little g)
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;&amp;#8220;So hurrah for googling. Science got me laid&amp;#8221;
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;and comments
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;But what&amp;#8217;s good news for Robbie is becoming a headache for folk at Google HQ. The company&amp;#8217;s lawyers are trying to stamp out this sort of language.
+&lt;/p&gt;
+&lt;p&gt;Paul McFedries, who runs the lexicography site &lt;a href="http://www.wordspy.com"&gt;Word Spy&lt;/a&gt;, received a stiffly worded letter from the firm after he added &amp;#8220;google&amp;#8221; to his online lexicon.
+&lt;/p&gt;
+&lt;p&gt;The company asked him to delete the definition or revise it to take account of the &amp;#8220;trade mark status of Google&amp;#8221;. He opted for the latter. 
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;span id="continue-reading"/&gt;
+
+
+&lt;h3&gt;This is Now&lt;/h3&gt;
+&lt;p&gt;2003 marks the midpoint of Google&amp;#8217;s 10 year ascendence. Since then Williams has faded but &lt;a href="http://www.wordspy.com/words/google.asp"&gt;Word Spy still lists google&lt;/a&gt;
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;To search for information on the Web, particularly by using the Google search engine; to search the Web for information related to a new or potential girlfriend or boyfriend.
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;though it cautions
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;Google&amp;trade; is a trademark identifying the search technology and services of Google Technologies Inc.
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;I thought I&amp;#8217;d try a second source &amp;#8212; one which claims to be the definitive record of the English language &amp;#8212; and &lt;a href="http://tag.wordaligned.org/posts/the-oed-online-available-using-your-library-ticket"&gt;oeded&lt;/a&gt; google. I discovered google is a verb, though not with the meaning we&amp;#8217;re searching for.
+&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://www.flickr.com/photos/thomasguest/2941753877/" title="oed google by Thomas Guest, on Flickr"&gt;&lt;img src="http://farm4.static.flickr.com/3155/2941753877_d9c2223fdf.jpg" width="500" height="177" alt="oed google" /&gt;&lt;/a&gt;
+&lt;/p&gt;
+&lt;p&gt;The &lt;a href="http://oed.com"&gt;OED&lt;/a&gt; reckons Googling still merits a capital, even if a citation omits it.
+&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://www.flickr.com/photos/thomasguest/2942611906/" title="OED Google by Thomas Guest, on Flickr"&gt;&lt;img src="http://farm4.static.flickr.com/3053/2942611906_9cf2c987b0.jpg" width="500" height="323" alt="OED Google" /&gt;&lt;/a&gt;
+&lt;/p&gt;
+
+&lt;h3&gt;Google at 10&lt;/h3&gt;
+&lt;p&gt;&lt;a href="http://www.google.com/tenthbirthday"&gt;Google turned 10 this year&lt;/a&gt;. As the &lt;a href="http://news.bbc.co.uk/1/hi/business/7597599.stm"&gt;beeb reports&lt;/a&gt;
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;People don&amp;#8217;t search the internet any more, they google it.
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;&lt;a href="http://www.skrenta.com/2007/01/winnertakeall_google_and_the_t.html"&gt;Rich Skrenta&lt;/a&gt; goes further
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;&lt;strong&gt;Google is the start page for the Internet&lt;/strong&gt;
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;(Surely that should be &lt;strong&gt;i&lt;/strong&gt;nternet?)
+&lt;/p&gt;
+&lt;p&gt;As part of the birthday celebrations, you can &lt;a href="http://googleblog.blogspot.com/2008/09/2001-search-odyssey.html"&gt;Google! just like you did back in 2001&lt;/a&gt;.
+&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://www.google.com/search2001.html"&gt;&lt;img src="http://www.google.com/google.jpg" alt="Google! 2001"/&gt;&lt;/a&gt;
+&lt;/p&gt;
+&lt;p&gt;The search &lt;em&gt;experience&lt;/em&gt; has barely changed &amp;#8212; you get the result you want within milliseconds &amp;#8212; but how &lt;a href="http://www.google.com/search?q=yahoo!"&gt;pass&amp;eacute;e the exclamation mark seems!&lt;/a&gt;
+&lt;/p&gt;
+
+&lt;h3&gt;Small changes&lt;/h3&gt;
+&lt;p&gt;&lt;a href="http://blogoscoped.com/archive/2008-05-30-n48.html"&gt;&lt;img style="float:right;" src="http://blogoscoped.com/files/google-new-favicon.png" alt="Favicons"/&gt;&lt;/a&gt;
+&lt;/p&gt;
+&lt;p&gt;In &lt;a href="http://googleblog.blogspot.com/2008/06/one-fish-two-fish-red-fish-blue-fish.html"&gt;a post&lt;/a&gt; on Google&amp;#8217;s corporate blog Marissa Mayer and Micheal Lopez describe a tiny but significant change: the Google favicon, formerly a BIG Google&amp;trade; G, has become a little google g. In the space of just 256 understated pixels the company asserts its claim to the internet.
+&lt;/p&gt;
+
+&lt;h3&gt;Do no evil&lt;/h3&gt;
+&lt;p&gt;Jeff Atwood &lt;a href="http://www.codinghorror.com/blog/archives/001174.html"&gt;recoils at Google&amp;#8217;s power&lt;/a&gt;:
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;Google&amp;#8217;s current position as &lt;a href="http://www.skrenta.com/2007/01/winnertakeall_google_and_the_t.html"&gt;the start page for the internet&lt;/a&gt; kind of scares the crap out of me, in a way that Microsoft&amp;#8217;s dominance over the desktop PC never did.
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;Should we be scared? Certainly the &lt;a href="http://www.google.com/search?q=do+no+evil"&gt;&amp;#8220;do no evil&amp;#8221;&lt;/a&gt; motto has changed from being precocious to portentous. The company which, in 2004, &lt;a href="http://www.google.com/search?q=horoscopes+financial+advice+chat"&gt;&amp;#8220;does not do horoscopes, financial advice or chat&amp;#8221;&lt;/a&gt; has expanded its portfolio.
+&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://googlesystem.blogspot.com/2006/03/horoscopes-financial-advice-chat.html"&gt;&lt;img src="http://photos1.blogger.com/blogger/7506/607/400/10things.0.jpg" alt="Google does horoscopes financial advice and chat"/&gt;&lt;/a&gt;
+&lt;/p&gt;
+&lt;p&gt;It&amp;#8217;s true. I sign into Google whenever I&amp;#8217;m online. The search engine, I take for granted: I switch browsers more often than search engines, and indeed when Chrome is ported to my platform it may well supplant Firefox as my browser of choice. Gmail, Google reader and Google maps supply me with content. Many of the blogs I read are served by &lt;a href="http://blogger.com"&gt;blogger.com&lt;/a&gt; and most publish feeds via &lt;a href="http://feedburner.com"&gt;Feedburner&lt;/a&gt;: both Google properties. All these services are best in class, or at least contenders; all are paid for by advertising. And if I don&amp;#8217;t like it, the competition is just a click away.
+&lt;/p&gt;
+&lt;p&gt;On the internet there&amp;#8217;s little evidence of menace. The googlebot crawls discreetly from site to site, visible only to webmasters, harvesting pages which are bundled into fresh new search indexes at the googlefarm. On the streets the &lt;a href="http://tag.wordaligned.org/posts/google-street-view-is-watching-you"&gt;google surveillance machines&lt;/a&gt; are more tangible, more threatening. Being offline is no longer an option.
+&lt;/p&gt;
+
+&lt;h3&gt;So what does begin with G?&lt;/h3&gt;
+&lt;div class="amazon"&gt;&lt;a href="http://www.amazon.com/gp/product/0679882812?ie=UTF8&amp;amp;tag=wordalig-20"&gt;&lt;img src="http://wordaligned.org/images/dr-seuss-abc.jpg" alt="Dr Seuss's ABC"/&gt;&lt;/a&gt;&lt;/div&gt;
+
+&lt;p&gt;The &lt;a href="http://oed.com"&gt;OED&lt;/a&gt; may be definitive but when it comes to big and little letters another reference has been more formative. The title of this post draws inspiration from &lt;a href="http://www.amazon.com/gp/product/0679882812?ie=UTF8&amp;amp;tag=wordalig-20"&gt;Dr. Seuss&amp;#8217;s ABC&lt;/a&gt;, a classic children&amp;#8217;s book originally published in 1963, a year when Google&amp;#8217;s founders had yet to be born. The ABC has this to say about BIG G little g
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;A B C D 
+&lt;/p&gt;
+&lt;p&gt;E F G 
+&lt;/p&gt;
+&lt;p&gt;Goat
+&lt;/p&gt;
+&lt;p&gt;girl
+&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;google googles&lt;/strong&gt;
+&lt;/p&gt;
+&lt;p&gt;G&amp;#8230; g&amp;#8230; G
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;&lt;a href="http://www.flickr.com/photos/thomasguest/3504658289/" title="goat girl google googles by Thomas Guest, on Flickr"&gt;&lt;img src="http://farm4.static.flickr.com/3331/3504658289_fd30e3b5a0.jpg" width="500" height="338" alt="goat girl google googles" /&gt;&lt;/a&gt;
+&lt;/p&gt;
+&lt;p&gt;Oops, my mistake, that should have read
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;googoo goggles
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;Hang on though! Rotate the goggles by 90&amp;deg; and they look suspiciously like Google&amp;#8217;s new favicon.
+&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://www.flickr.com/photos/thomasguest/2942568508/" title="googoogoggles by Thomas Guest, on Flickr"&gt;&lt;img src="http://farm4.static.flickr.com/3213/2942568508_d138523625_t.jpg" width="60" height="100" alt="googoogoggles" /&gt;&lt;/a&gt;&lt;img src="http://wordaligned.org/images/google-favicon.png" height="100" alt="Google favicon"/&gt;
+&lt;/p&gt;</description>
+<dc:date>2008-10-15</dc:date>
+<guid>http://wordaligned.org/articles/big-g-little-g.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/big-g-little-g.html</link>
+<category>Characters</category>
+</item>
+
+<item>
+<title>Looping forever and ever</title>
+<description>&lt;p&gt;&lt;a href="http://www.flickr.com/photos/thomasguest/2807550621/" title="A Curious Beast by Alex Guest"&gt;&lt;img style="float:right;" src="http://farm4.static.flickr.com/3282/2807550621_db7c0d4481.jpg" width="224" height="354" alt="alex-bug"/&gt;&lt;/a&gt;
+&lt;/p&gt;
+&lt;p&gt;On the subject of &lt;a href="http://wordaligned.org/articles/syntactic-sugar.html"&gt;syntactic sugar&lt;/a&gt;, C&amp;#8217;s &lt;code&gt;for&lt;/code&gt; loop is a curious beast. Many years ago, on encountering code like:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;for (i = 0; i &amp;lt; 10; i++)
+{
+    ....
+}
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;I would have to pause and mentally expand it:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;i = 0;
+while (i &amp;lt; 10)
+{
+    ....
+    i++;
+}
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Now, after repeated use, these loops seem familiar and expressive. While the standard C++ algorithms offer a higher level abstraction with their iterator range operations, plain old loops often turn out to be &lt;a href="http://www.theregister.co.uk/2006/08/08/cplusplus_loops/"&gt;easier to work with&lt;/a&gt;.
+&lt;/p&gt;
+&lt;p&gt;You can plug general expressions into the loop control construct.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;for (&amp;lt;setup&amp;gt;; &amp;lt;proceed?&amp;gt;; &amp;lt;advance&amp;gt;)
+{
+    ....
+}
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Any or all of the control expressions can be omitted: drop the &lt;code&gt;&amp;lt;setup&amp;gt;&lt;/code&gt; if nothing needs setting up; leave out the &lt;code&gt;&amp;lt;advance&amp;gt;&lt;/code&gt; if nothing needs advancing; and kill the &lt;code&gt;&amp;lt;proceed?&amp;gt;&lt;/code&gt; to keep the loop going. Thus one standard form of never-ending loop is:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;for (;;)
+{
+    ....
+}
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Equivalents would be &lt;code&gt;while (1)&lt;/code&gt; or &lt;code&gt;while (true)&lt;/code&gt;, but who wants to see a bald literal in a source file? Besides, &lt;code&gt;for (;;)&lt;/code&gt; is shorter than &lt;code&gt;while (1)&lt;/code&gt;, and an empty &lt;code&gt;while ()&lt;/code&gt; is of course a syntax error. Even better: use a suitable font, squint, and the parenthesised semicolons resemble a mite of some sort.
+&lt;/p&gt;
+&lt;p&gt;&lt;img style="vertical-align:top;" src="http://wordaligned.org/images/scary-mite.gif" alt="Scary mite"/&gt;
+   &lt;a href="http://www.allergy-details.com/82-how-control-dust-mites"&gt;
+   &lt;img style="vertical-align:top;" src="http://wordaligned.org/images/mite.jpg" alt="dust mite"/&gt;&lt;/a&gt;
+&lt;/p&gt;</description>
+<dc:date>2008-09-08</dc:date>
+<guid>http://wordaligned.org/articles/looping-forever-and-ever.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/looping-forever-and-ever.html</link>
+<category>Characters</category>
+</item>
+
+<item>
+<title>Macros with halos</title>
+<description>&lt;p&gt;&lt;a href="http://www.flickr.com/photos/thomasguest/2814425692/" title="A slippery beast"&gt;&lt;img src="http://farm4.static.flickr.com/3200/2814425692_79d1d1bba3_m.jpg" width="240" height="180" alt="Slippery beast" /&gt;&lt;/a&gt;
+&lt;/p&gt;
+&lt;p&gt;The C preprocessor is a notoriously primitive and slippery creature. Included and occasionally &lt;a href="http://svn.boost.org/trac/boost/browser/trunk/boost/preprocessor/selection/min.hpp"&gt;embraced&lt;/a&gt; by C++, it may eventually prove to be the downfall of the newer language. How much trouble has been caused by seemingly innocuous definitions?
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;#define min(a, b) (((a) &amp;lt; (b)) ? (a) : (b))
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;This macro &lt;a href="http://www.gotw.ca/gotw/077.htm"&gt;hobbles any attempt&lt;/a&gt; to use the standard C++ algorithm, &lt;code&gt;std::min()&lt;/code&gt;, and since it&amp;#8217;s a preprocessor thing the compiler warnings may not alert you immediately to what&amp;#8217;s going on. You don&amp;#8217;t have to include &lt;code&gt;&amp;lt;algorithm&amp;gt;&lt;/code&gt; directly to trigger the problem.
+&lt;/p&gt;
+&lt;p&gt;Try compiling this stripped down source file using GCC 3.4.6:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;macro.cpp&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;#include &amp;lt;string&amp;gt;
+#define min(a, b)  (((a) &amp;lt; (b)) ? (a) : (b)) 
+#include &amp;lt;sstream&amp;gt;
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;and you&amp;#8217;ll see something like:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;In file included from /usr/lib/gcc/i386-redhat-linux/3.4.6/../../../../include/c++/3.4.6/streambuf:781,
+                 from /usr/lib/gcc/i386-redhat-linux/3.4.6/../../../../include/c++/3.4.6/ios:50,
+                 from /usr/lib/gcc/i386-redhat-linux/3.4.6/../../../../include/c++/3.4.6/istream:45,
+                 from /usr/lib/gcc/i386-redhat-linux/3.4.6/../../../../include/c++/3.4.6/sstream:45,
+                 from macros.cpp:3:
+/usr/lib/gcc/i386-redhat-linux/3.4.6/../../../../include/c++/3.4.6/bits/streambuf.tcc: In member function `virtual std::streamsize std::basic_streambuf&amp;lt;_CharT, _Traits&amp;gt;::xsgetn(_CharT*, std::streamsize)':
+/usr/lib/gcc/i386-redhat-linux/3.4.6/../../../../include/c++/3.4.6/bits/streambuf.tcc:54: error: expected unqualified-id before '(' token
+/usr/lib/gcc/i386-redhat-linux/3.4.6/../../../../include/c++/3.4.6/bits/streambuf.tcc: In member function `virtual std::streamsize std::basic_streambuf&amp;lt;_CharT, _Traits&amp;gt;::xsputn(const _CharT*, std::streamsize)':
+/usr/lib/gcc/i386-redhat-linux/3.4.6/../../../../include/c++/3.4.6/bits/streambuf.tcc:88: error: expected unqualified-id before '(' token
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;I spent a while tracking down a similar problem today (needless to say, the offending macro was hiding several #includes away from the file which triggered the error&lt;a id="fn1link" href="http://wordaligned.org/articles/macros-with-halos.html#fn1"&gt;&lt;sup&gt;[1]&lt;/sup&gt;&lt;/a&gt;). Once I&amp;#8217;d exposed the source, I naturally wanted to grumble to someone, so I pasted the code into an instant message to a colleague. Look, my &lt;a href="http://www.adiumx.com"&gt;messaging client&lt;/a&gt; sanctified the macro by adding halos to the &lt;code&gt;a&lt;/code&gt;&amp;#8217;s!
+&lt;/p&gt;
+&lt;img src="http://wordaligned.org/images/saint-a.png" alt="Macros with Halos"/&gt;
+
+&lt;p&gt;&lt;hr /&gt;
+   &lt;a id="fn1" href="http://wordaligned.org/articles/macros-with-halos.html#fn1link"&gt;[1]&lt;/a&gt; One tip for tracking down such problems is to run the preprocessing phase of compilation on its own: with GCC, for example, supply the &lt;code&gt;-E&lt;/code&gt; flag.
+&lt;/p&gt;</description>
+<dc:date>2008-09-02</dc:date>
+<guid>http://wordaligned.org/articles/macros-with-halos.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/macros-with-halos.html</link>
+<category>Characters</category>
+</item>
+
+<item>
+<title>White black knight then black white knight</title>
+<description>&lt;img src="http://wordaligned.org/images/chess-pos-small-font.png" alt="Small chess board" style="float:right;"/&gt;
+
+&lt;p&gt;At the end of &lt;a href="http://wordaligned.org/articles/drawing-chess-positions.html"&gt;yesterday&amp;#8217;s article&lt;/a&gt; I admitted defeat. I&amp;#8217;d developed a script to render chess positions, using a suitable font as a source of scalable bitmasks to represent the pieces. Sadly, you could clearly see the board through the pieces, which meant white pieces on black squares looked wrong. I couldn&amp;#8217;t see an easy fix.
+&lt;/p&gt;
+&lt;p&gt;Happily one of my readers was &lt;a href="http://www.haloscan.com/comments/wordaligned/drawing_chess_positions/#14496"&gt;more resourceful&lt;/a&gt;:
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;You can make white pieces by drawing a &amp;#8220;black&amp;#8221; piece in white, then overlaying that with a &amp;#8220;white&amp;#8221; piece in black.
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;This is a clever trick which I wish I&amp;#8217;d thought of! The redrawn pictures do look better.
+&lt;/p&gt;
+&lt;img src="http://wordaligned.org/images/chess-font-fixed.png" alt="Fixed chess board"/&gt;
+
+&lt;p&gt;We need three more lines of code and comments apiece.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;def chess_position_font(fen, font_file, sq_size):
+    ....
+    for sq, piece in filter(not_blank, zip(sqs, pieces)):
+        if is_white_piece(piece):
+            # Use the equivalent black piece, drawn white,
+            # for the 'body' of the piece, so the background
+            # square doesn't show through.
+            filler = unichr_pieces[piece.lower()]
+            put_piece(sq, filler, fill='white', font=font)
+        put_piece(sq, unichr_pieces[piece], fill='black', font=font)
+    return board
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Note, in passing, that &lt;span /&gt;I &lt;strong&gt;don&amp;#8217;t&lt;/strong&gt; think comments can or should be entirely eliminated from source code &amp;#8212; here&amp;#8217;s a case where they help.
+&lt;/p&gt;
+&lt;p&gt;Even after this hack, the pictures aren&amp;#8217;t pixel perfect. But I do like the grey mane you get when a white knight occupies a dark square.
+&lt;/p&gt;
+&lt;img src="http://wordaligned.org/images/white-knight-on-black-square.png" alt="White knight on a black square"/&gt;</description>
+<dc:date>2008-03-31</dc:date>
+<guid>http://wordaligned.org/articles/white-black-knight.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/white-black-knight.html</link>
+<category>Characters</category>
+</item>
+
+<item>
+<title>Drawing Chess Positions</title>
+<description>&lt;div class="toc"&gt;
+&lt;h2&gt;Contents&lt;/h2&gt;
+&lt;ul&gt;
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/drawing-chess-positions.html#tocdominus-connects" name="toc0" id="toc0"&gt;Dominus Connects&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/drawing-chess-positions.html#tocchessboards-revisited" name="toc1" id="toc1"&gt;Chessboards Revisited&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/drawing-chess-positions.html#tocprogram-input" name="toc2" id="toc2"&gt;Program Input&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/drawing-chess-positions.html#tocascii-chess-positions" name="toc3" id="toc3"&gt;ASCII Chess Positions&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/drawing-chess-positions.html#tocunicode--css" name="toc4" id="toc4"&gt;Unicode + CSS&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/drawing-chess-positions.html#tocwiki-macros" name="toc5" id="toc5"&gt;Wiki Macros&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/drawing-chess-positions.html#tocpython-imaging-library" name="toc6" id="toc6"&gt;Python Imaging Library&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/drawing-chess-positions.html#tocinteracting-with-images" name="toc7" id="toc7"&gt;Interacting with Images&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/drawing-chess-positions.html#tocthe-details" name="toc8" id="toc8"&gt;The details&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/drawing-chess-positions.html#tocusing-a-font-with-pil" name="toc9" id="toc9"&gt;Using a font with PIL&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/drawing-chess-positions.html#toclatex" name="toc10" id="toc10"&gt;LaTeX&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/drawing-chess-positions.html#tocconclusions" name="toc11" id="toc11"&gt;Conclusions&lt;/a&gt;
+ &lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/drawing-chess-positions.html#toc0" name="tocdominus-connects" id="tocdominus-connects"&gt;Dominus Connects&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;In a recent &lt;a href="http://blog.plover.com/prog/perl/lines.html"&gt;article&lt;/a&gt; Mark Dominus describes how he grew frustrated with his graphical editor and wrote a script to draw connectors:
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;Here&amp;#8217;s what I did instead. I wrote a program that would read an input like this:&lt;/p&gt;
+&lt;pre&gt;
+        &amp;gt;-v-&amp;lt;
+        '-+-`
+&lt;/pre&gt;
+&lt;p&gt;and produce a jpeg file that looks like this:
+&lt;img src="http://pic.blog.plover.com/prog/perl/lines/demo1.jpg" alt="Line and box graphic"/&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;I haven&amp;#8217;t tried running the software, which, Dominus admits, isn&amp;#8217;t his most polished. What interests me is: the way he devises a mini-language for describing these connectors, then combines hand-built and standard tools to produce the required result; and how quickly he ditches the &lt;a href="http://www.gimp.org"&gt;Gimp&lt;/a&gt; and settles on this approach. Clearly he&amp;#8217;s done this sort of thing before.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/drawing-chess-positions.html#toc1" name="tocchessboards-revisited" id="tocchessboards-revisited"&gt;Chessboards Revisited&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Recently I wrote about a rather easier graphics problem, of &lt;a href="http://wordaligned.org/articles/drawing-chessboards.html"&gt;drawing chessboards&lt;/a&gt;. My real mission, though, was to promote scripted graphics. A chessboard would make a good starting point, I thought. I planned to go on to describe a more advanced drawing problem, of putting pieces on the board &amp;#8212; a problem requiring more pixel bashing and more thought about inputs.
+&lt;/p&gt;
+&lt;p&gt;This article tackles that follow-on problem. What I didn&amp;#8217;t realise &amp;#8212; but really should have guessed &amp;#8212; is that it&amp;#8217;s a problem which has been solved many times before in many different domains. You can find &lt;a href="http://www.ctan.org/tex-archive/fonts/chess/skak/"&gt;LaTeX packages&lt;/a&gt; and &lt;a href="http://emacs-chess.sourceforge.net/"&gt;emacs modes&lt;/a&gt; for it. There&amp;#8217;s even a &lt;a href="http://en.wikipedia.org/wiki/Template:Chess_diagram"&gt;MediaWiki macro&lt;/a&gt;. So if you need to draw chess positions please investigate what&amp;#8217;s &lt;a href="http://www.enpassant.dk/chess/diaeng.htm"&gt;already out there&lt;/a&gt;.
+&lt;/p&gt;
+&lt;p&gt;That said, the rest of this article follows on from its &lt;a href="http://wordaligned.org/articles/drawing-chessboards.html"&gt;predecessor&lt;/a&gt;. We&amp;#8217;ll settle on a suitable notation for describing chess positions and use this as a basis for creating ASCII, Unicode + CSS, and PNG graphics. We&amp;#8217;ll also discuss the advantages of using an interpreted, dynamic language for image processing.
+&lt;/p&gt;
+&lt;span id="continue-reading"/&gt;
+
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/drawing-chess-positions.html#toc2" name="tocprogram-input" id="tocprogram-input"&gt;Program Input&lt;/a&gt;&lt;/h3&gt;
+&lt;div class="info"&gt;Things I learned while writing this article: Forsyth-Edwards Notation (FEN) is a standard way to record a chess position.&lt;/div&gt;
+
+&lt;p&gt;Mark Dominus invented his own input notation. We needn&amp;#8217;t. The Forsyth-Edwards notation for recording a particular board position is compact, simple and standard.
+&lt;/p&gt;
+&lt;p&gt;From &lt;a href="http://en.wikipedia.org/wiki/Forsyth-Edwards_Notation"&gt;Wikipedia&lt;/a&gt;:
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;A FEN &amp;#8220;record&amp;#8221; defines a particular game position, all in one text line and using only the ASCII character set. A FEN record contains six fields. The separator between fields is a space. The fields are:
+&lt;/p&gt;
+&lt;ol&gt;
+ &lt;li&gt;
+     Piece placement (from white&amp;#8217;s perspective). Each rank is described, starting with rank 8 and ending with rank 1; within each rank, the contents of each square are described from file a through file h. Following the Standard Algebraic Notation (SAN), each piece is identified by a single letter taken from the standard English names (pawn = &amp;#8220;P&amp;#8221;, knight = &amp;#8220;N&amp;#8221;, bishop = &amp;#8220;B&amp;#8221;, rook = &amp;#8220;R&amp;#8221;, queen = &amp;#8220;Q&amp;#8221; and king = &amp;#8220;K&amp;#8221;). White pieces are designated using upper-case letters (&amp;#8220;PNBRQK&amp;#8221;) while Black take lowercase (&amp;#8220;pnbrqk&amp;#8221;). Blank squares are noted using digits 1 through 8 (the number of blank squares), and &amp;#8220;/&amp;#8221; separate ranks.
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     &amp;#8230;
+ &lt;/li&gt;
+&lt;/ol&gt;
+&lt;/blockquote&gt;&lt;p&gt;The remaining five fields store other pieces of state (whose turn it is, who can castle etc.) required for resuming a game. We&amp;#8217;ll omit them from our input.
+&lt;/p&gt;
+&lt;p&gt;So, for example, we record the start position:
+&lt;/p&gt;
+&lt;pre&gt;rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR&lt;/pre&gt;
+
+&lt;p&gt;Some moves later, the game might be at:
+&lt;/p&gt;
+&lt;pre&gt;r2q1rk1/pp2ppbp/1np2np1/2Q3B1/3PP1b1/2N2N2/PP3PPP/3RKB1R&lt;/pre&gt;
+
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/drawing-chess-positions.html#toc3" name="tocascii-chess-positions" id="tocascii-chess-positions"&gt;ASCII Chess Positions&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;The first field of the FEN record is already close to an ASCII representation of a chessboard. If we expand the digits into the spaces they represent and switch the forward slashes for newlines, then printing the resulting string gives an 8x8 text square. (By the way, I&amp;#8217;ve fixed the chessboard size at 8 rather than make it an input parameter since the FEN notation won&amp;#8217;t work for a board size of 10x10 or bigger.) It&amp;#8217;s not hard to add some ASCII dividers to tart up this simple graphic.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;def expand_blanks(fen):
+    '''Expand the digits in an FEN string into spaces
+    
+    &amp;gt;&amp;gt;&amp;gt; expand_blanks("rk4q3")
+    'rk    q   '
+    '''
+    def expand(match):
+        return ' ' * int(match.group(0))
+    return re.compile(r'\d').sub(expand, fen)
+    
+def outer_join(sep, ss):
+    '''Like string.join, but encloses the result with outer separators.
+    
+    Example:
+    &amp;gt;&amp;gt;&amp;gt; outer_join('|', ['1', '2', '3'])
+    '|1|2|3|'
+    '''
+    return '%s%s%s' % (sep, sep.join(ss), sep)
+    
+def ascii_draw_chess_position(fen):
+    '''Returns an ASCII picture of pieces on a chessboard.'''
+    pieces = expand_blanks(fen).replace('/', '')
+    divider = '+-+-+-+-+-+-+-+-+\n'
+    rows = ((outer_join('|', pieces[r: r + 8]) + '\n')
+            for r in range(0, 8 * 8, 8))
+    return outer_join(divider, rows)
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;An example:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; fen = "r2q1rk1/pp2ppbp/1np2np1/2Q3B1/3PP1b1/2N2N2/PP3PPP/3RKB1R"
+&amp;gt;&amp;gt;&amp;gt; print ascii_draw_chess_position(fen)
++-+-+-+-+-+-+-+-+
+|r| | |q| |r|k| |
++-+-+-+-+-+-+-+-+
+|p|p| | |p|p|b|p|
++-+-+-+-+-+-+-+-+
+| |n|p| | |n|p| |
++-+-+-+-+-+-+-+-+
+| | |Q| | | |B| |
++-+-+-+-+-+-+-+-+
+| | | |P|P| |b| |
++-+-+-+-+-+-+-+-+
+| | |N| | |N| | |
++-+-+-+-+-+-+-+-+
+|P|P| | | |P|P|P|
++-+-+-+-+-+-+-+-+
+| | | |R|K|B| |R|
++-+-+-+-+-+-+-+-+
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/drawing-chess-positions.html#toc4" name="tocunicode--css" id="tocunicode--css"&gt;Unicode + CSS&lt;/a&gt;&lt;/h3&gt;
+&lt;div class="info"&gt;Things I learned while writing this article: Unicode has code points for the black and white chess pieces.&lt;/div&gt;
+
+&lt;p&gt;This means we can get a rather better picture of a chess position using nothing more than text. Note that these Unicode characters solve the internationalisation problem without the need for translators. (We will need a suitable font though!)
+&lt;/p&gt;
+&lt;p&gt;Here&amp;#8217;s how we can create a dictionary which maps the FEN piece ASCII names to their HTML entity codes.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;unicode_pieces=dict(
+    zip("KQRBNPkqrbnp",
+        ("&amp;amp;#x%x;" % uc for uc in range(0x2654, 0x2660))))
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;I&amp;#8217;ve used this dictionary to create the block of text shown below. I&amp;#8217;ve tried using CSS to colour and place squares on the board &amp;#8212; sorry if it doesn&amp;#8217;t work in your browser, I&amp;#8217;m no CSS expert!
+&lt;/p&gt;
+&lt;div class="chessboard"&gt;
+&lt;pre&gt;
+&lt;span class="white_sq"&gt;&amp;#x265c;&lt;/span&gt;&lt;span class="black_sq"&gt; &lt;/span&gt;&lt;span class="white_sq"&gt; &lt;/span&gt;&lt;span class="black_sq"&gt;&amp;#x265b;&lt;/span&gt;&lt;span class="white_sq"&gt; &lt;/span&gt;&lt;span class="black_sq"&gt;&amp;#x265c;&lt;/span&gt;&lt;span class="white_sq"&gt;&amp;#x265a;&lt;/span&gt;&lt;span class="black_sq"&gt; &lt;/span&gt;&lt;br/&gt;
+&lt;span class="black_sq"&gt;&amp;#x265f;&lt;/span&gt;&lt;span class="white_sq"&gt;&amp;#x265f;&lt;/span&gt;&lt;span class="black_sq"&gt; &lt;/span&gt;&lt;span class="white_sq"&gt; &lt;/span&gt;&lt;span class="black_sq"&gt;&amp;#x265f;&lt;/span&gt;&lt;span class="white_sq"&gt;&amp;#x265f;&lt;/span&gt;&lt;span class="black_sq"&gt;&amp;#x265d;&lt;/span&gt;&lt;span class="white_sq"&gt;&amp;#x265f;&lt;/span&gt;&lt;br/&gt;
+&lt;span class="white_sq"&gt; &lt;/span&gt;&lt;span class="black_sq"&gt;&amp;#x265e;&lt;/span&gt;&lt;span class="white_sq"&gt;&amp;#x265f;&lt;/span&gt;&lt;span class="black_sq"&gt; &lt;/span&gt;&lt;span class="white_sq"&gt; &lt;/span&gt;&lt;span class="black_sq"&gt;&amp;#x265e;&lt;/span&gt;&lt;span class="white_sq"&gt;&amp;#x265f;&lt;/span&gt;&lt;span class="black_sq"&gt; &lt;/span&gt;&lt;br/&gt;
+&lt;span class="black_sq"&gt; &lt;/span&gt;&lt;span class="white_sq"&gt; &lt;/span&gt;&lt;span class="black_sq"&gt;&amp;#x2655;&lt;/span&gt;&lt;span class="white_sq"&gt; &lt;/span&gt;&lt;span class="black_sq"&gt; &lt;/span&gt;&lt;span class="white_sq"&gt; &lt;/span&gt;&lt;span class="black_sq"&gt;&amp;#x2657;&lt;/span&gt;&lt;span class="white_sq"&gt; &lt;/span&gt;&lt;br/&gt;
+&lt;span class="white_sq"&gt; &lt;/span&gt;&lt;span class="black_sq"&gt; &lt;/span&gt;&lt;span class="white_sq"&gt; &lt;/span&gt;&lt;span class="black_sq"&gt;&amp;#x2659;&lt;/span&gt;&lt;span class="white_sq"&gt;&amp;#x2659;&lt;/span&gt;&lt;span class="black_sq"&gt; &lt;/span&gt;&lt;span class="white_sq"&gt;&amp;#x265d;&lt;/span&gt;&lt;span class="black_sq"&gt; &lt;/span&gt;&lt;br/&gt;
+&lt;span class="black_sq"&gt; &lt;/span&gt;&lt;span class="white_sq"&gt; &lt;/span&gt;&lt;span class="black_sq"&gt;&amp;#x2658;&lt;/span&gt;&lt;span class="white_sq"&gt; &lt;/span&gt;&lt;span class="black_sq"&gt; &lt;/span&gt;&lt;span class="white_sq"&gt;&amp;#x2658;&lt;/span&gt;&lt;span class="black_sq"&gt; &lt;/span&gt;&lt;span class="white_sq"&gt; &lt;/span&gt;&lt;br/&gt;
+&lt;span class="white_sq"&gt;&amp;#x2659;&lt;/span&gt;&lt;span class="black_sq"&gt;&amp;#x2659;&lt;/span&gt;&lt;span class="white_sq"&gt; &lt;/span&gt;&lt;span class="black_sq"&gt; &lt;/span&gt;&lt;span class="white_sq"&gt; &lt;/span&gt;&lt;span class="black_sq"&gt;&amp;#x2659;&lt;/span&gt;&lt;span class="white_sq"&gt;&amp;#x2659;&lt;/span&gt;&lt;span class="black_sq"&gt;&amp;#x2659;&lt;/span&gt;&lt;br/&gt;
+&lt;span class="black_sq"&gt; &lt;/span&gt;&lt;span class="white_sq"&gt; &lt;/span&gt;&lt;span class="black_sq"&gt; &lt;/span&gt;&lt;span class="white_sq"&gt;&amp;#x2656;&lt;/span&gt;&lt;span class="black_sq"&gt;&amp;#x2654;&lt;/span&gt;&lt;span class="white_sq"&gt;&amp;#x2657;&lt;/span&gt;&lt;span class="black_sq"&gt; &lt;/span&gt;&lt;span class="white_sq"&gt;&amp;#x2656;&lt;/span&gt;
+&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;This image isn&amp;#8217;t ideal: the board background is visible through the pieces, which is particularly noticeable for white pieces on dark squares. I haven&amp;#8217;t figured out how to eliminate this flaw!
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/drawing-chess-positions.html#toc5" name="tocwiki-macros" id="tocwiki-macros"&gt;Wiki Macros&lt;/a&gt;&lt;/h3&gt;
+&lt;div class="info"&gt;Things I learned while writing this article: MediaWiki has a fully-featured macro for chess diagrams.&lt;/div&gt;
+
+&lt;p&gt;Here&amp;#8217;s the opening chess position as a MediaWiki macro. If this seems like too much effort to type, David A. Wheeler provides an online &lt;a href="http://www.dwheeler.com/misc/fen2wikipedia.html"&gt;FEN-to-Wikipedia conversion tool&lt;/a&gt;.
+&lt;/p&gt;
+&lt;pre&gt;{{Chess diagram|=
+| tright
+| 
+|=
+ 8 |rd|nd|bd|qd|kd|bd|nd|rd|=
+ 7 |pd|pd|pd|pd|pd|pd|pd|pd|=
+ 6 |  |  |  |  |  |  |  |  |=
+ 5 |  |  |  |  |  |  |  |  |=
+ 4 |  |  |  |  |  |  |  |  |=
+ 3 |  |  |  |  |  |  |  |  |=
+ 2 |pl|pl|pl|pl|pl|pl|pl|pl|=
+ 1 |rl|nl|bl|ql|kl|bl|nl|rl|=
+    a  b  c  d  e  f  g  h
+| 
+}}&lt;/pre&gt;
+
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/drawing-chess-positions.html#toc6" name="tocpython-imaging-library" id="tocpython-imaging-library"&gt;Python Imaging Library&lt;/a&gt;&lt;/h3&gt;
+&lt;div class="info"&gt;Things I learned while writing this article: OS X has problems distinguishing upper- and lower-case filenames.&lt;/div&gt;
+
+&lt;p&gt;The OS X filename limitation came as a nasty surprise. Most of the time I use my Mac like any other Unix box and so I naturally expected that &lt;code&gt;K.png&lt;/code&gt; and &lt;code&gt;k.png&lt;/code&gt; would co-reside happily in the same directory. They can&amp;#8217;t! Apparently it&amp;#8217;s for &lt;a href="http://www.jms1.net/osx-case-sensitive-fs.shtml"&gt;backwards compatibility&lt;/a&gt;, to keep old software alive. Yuck!
+&lt;/p&gt;
+&lt;p&gt;Anyway, to render a chess position using the &lt;a href="http://effbot.org/imagingbook/pil-index.htm"&gt;Python Imaging Library&lt;/a&gt; (PIL), we&amp;#8217;ll need some suitable pictures of the pieces. I downloaded some from Wikipedia (thanks!) It&amp;#8217;s important these images have an alpha channel. (The alpha channel assigns an opacity to each pixel, which will be used when we compose the image with another: when we put the piece on the board, that is. Without an alpha channel, we wouldn&amp;#8217;t see the squares underneath the pieces.)
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/drawing-chess-positions.html#toc7" name="tocinteracting-with-images" id="tocinteracting-with-images"&gt;Interacting with Images&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;An interpreted language comes into its own when working with an image. Here&amp;#8217;s a session in which we open a PNG (the black king) and poke around at it to find:
+&lt;/p&gt;
+&lt;ul&gt;
+ &lt;li&gt;
+     what it looks like
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     its mode and size
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     whether all pixels are grey
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     how many transparent and opaque pixels it has
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     the contents of a few pixels on the left of the image
+ &lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; import Image
+&amp;gt;&amp;gt;&amp;gt; king = Image.open('k.png')
+&amp;gt;&amp;gt;&amp;gt; king.show()
+&amp;gt;&amp;gt;&amp;gt; king.mode
+'RGBA'
+&amp;gt;&amp;gt;&amp;gt; king.size
+(45, 45)
+&amp;gt;&amp;gt;&amp;gt; pixels = king.load()
+&amp;gt;&amp;gt;&amp;gt; def is_grey(rgba):
+... 	r, g, b, a = rgba
+... 	return r == g == b
+... 
+&amp;gt;&amp;gt;&amp;gt; W, H = king.size
+&amp;gt;&amp;gt;&amp;gt; xys = [(x, y) for y in range(H) for x in range(W)]
+&amp;gt;&amp;gt;&amp;gt; all(is_grey(pixels[xy]) for xy in xys) 
+True
+&amp;gt;&amp;gt;&amp;gt; sum(1 for xy in xys if pixels[xy][3] == 0)
+1243
+&amp;gt;&amp;gt;&amp;gt; sum(1 for xy in xys if pixels[xy][3] == 255)
+612
+&amp;gt;&amp;gt;&amp;gt; print "\n".join(map(repr, (pixels[x, 20] for x in range(10))))
+(0, 0, 0, 0)
+(0, 0, 0, 0)
+(0, 0, 0, 0)
+(0, 0, 0, 0)
+(0, 0, 0, 0)
+(15, 15, 15, 170)
+(247, 247, 247, 255)
+(148, 148, 148, 255)
+(0, 0, 0, 255)
+(0, 0, 0, 255)
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;To place this piece on top of a background image we use &lt;a href="http://effbot.org/imagingbook/image.htm#tag-Image.Image.paste"&gt;Image.paste&lt;/a&gt;. Again, we can experiment interactively.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; red_sq = Image.new('RGBA', king.size, 'red')
+&amp;gt;&amp;gt;&amp;gt; help(red_sq.paste)
+Help on method paste in module Image:
+
+paste(self, im, box=None, mask=None) method of Image.Image instance
+    Paste other image into region
+
+&amp;gt;&amp;gt;&amp;gt; mask = king.split()[3]
+&amp;gt;&amp;gt;&amp;gt; red_sq.paste(king, None, mask)
+&amp;gt;&amp;gt;&amp;gt; red_sq.show()
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Note that &lt;a href="http://effbot.org/imagingbook/image.htm#tag-Image.Image.show"&gt;Image.show&lt;/a&gt; allows us to view the image using some platform dependent utility.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/drawing-chess-positions.html#toc8" name="tocthe-details" id="tocthe-details"&gt;The details&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Once we&amp;#8217;ve figured out how to put pieces on the board using &lt;a href="http://effbot.org/imagingbook/image.htm#tag-Image.Image.paste"&gt;Image.paste&lt;/a&gt;, the rest is all details. I&amp;#8217;ve decided to create a class for rendering chess positions. Creating a class instance pre-loads the piece graphics and sketches in the board background; each time we call draw, the background is copied and the pieces are pasted into place. The resulting image is returned directly to the client, who can choose what to do with it.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;#! /usr/bin/env python
+'''Code to draw chess board and pieces.
+
+FEN notation to describe the arrangement of peices on a chess board.
+
+White pieces are coded: K, Q, B, N, R, P, for king, queen, bishop,
+rook knight, pawn. Black pieces use lowercase k, q, b, n, r, p. Blank
+squares are noted with digits, and the "/" separates ranks.
+
+As an example, the game starts at:
+
+rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR
+
+See: http://en.wikipedia.org/wiki/Forsyth-Edwards_Notation
+'''
+import re
+import Image
+import ImageDraw
+
+class BadChessboard(ValueError):
+    pass
+    
+def expand_blanks(fen):
+    '''Expand the digits in an FEN string into spaces
+    
+    &amp;gt;&amp;gt;&amp;gt; expand_blanks("rk4q3")
+    'rk    q   '
+    '''
+    def expand(match):
+        return ' ' * int(match.group(0))
+    return re.compile(r'\d').sub(expand, fen)
+    
+def check_valid(expanded_fen):
+    '''Asserts an expanded FEN string is valid'''
+    match = re.compile(r'([KQBNRPkqbnrp ]{8}/){8}$').match
+    if not match(expanded_fen + '/'):
+        raise BadChessboard()
+    
+def expand_fen(fen):
+    '''Preprocesses a fen string into an internal format.
+    
+    Each square on the chessboard is represented by a single 
+    character in the output string. The rank separator characters
+    are removed. Invalid inputs raise a BadChessboard error.
+    '''
+    expanded = expand_blanks(fen)
+    check_valid(expanded)
+    return expanded.replace('/', '')
+    
+def draw_board(n=8, sq_size=(20, 20)):
+    '''Return an image of a chessboard.
+    
+    The board has n x n squares each of the supplied size.'''
+    from itertools import cycle
+    def square(i, j):
+        return i * sq_size[0], j * sq_size[1]
+    opaque_grey_background = 192, 255
+    board = Image.new('LA', square(n, n), opaque_grey_background) 
+    draw_square = ImageDraw.Draw(board).rectangle
+    whites = ((square(i, j), square(i + 1, j + 1))
+              for i_start, j in zip(cycle((0, 1)), range(n))
+              for i in range(i_start, n, 2))
+    for white_square in whites:
+        draw_square(white_square, fill='white')
+    return board
+    
+class DrawChessPosition(object):
+    '''Chess position renderer.
+    
+    Create an instance of this class, then call 
+    '''
+    def __init__(self):
+        '''Initialise, preloading pieces and creating a blank board.''' 
+        self.n = 8
+        self.create_pieces()
+        self.create_blank_board()
+    
+    def create_pieces(self):
+        '''Load the chess pieces from disk.
+        
+        Also extracts and caches the alpha masks for these pieces. 
+        '''
+        whites = 'KQBNRP'
+        piece_images = dict(
+            zip(whites, (Image.open('pieces/w%s.png' % p) for p in whites)))
+        blacks = 'kqbnrp'
+        piece_images.update(dict(
+            zip(blacks, (Image.open('pieces/%s.png' % p) for p in blacks))))
+        piece_sizes = set(piece.size for piece in piece_images.values())
+        # Sanity check: the pieces should all be the same size
+        assert len(piece_sizes) == 1
+        self.piece_w, self.piece_h = piece_sizes.pop()
+        self.piece_images = piece_images
+        self.piece_masks = dict((pc, img.split()[3]) for pc, img in
+                                 self.piece_images.iteritems())
+    
+    def create_blank_board(self):
+        '''Pre-render a blank board.'''
+        self.board = draw_board(sq_size=(self.piece_w, self.piece_h))
+    
+    def point(self, i, j):
+        '''Return the top left of the square at (i, j).'''
+        w, h = self.piece_w, self.piece_h
+        return i * h, j * w
+    
+    def square(self, i, j):
+        '''Return the square at (i, j).'''
+        t, l = self.point(i, j)
+        b, r = self.point(i + 1, j + 1)
+        return t, l, b, r
+    
+    def draw(self, fen):
+        '''Return an image depicting the input position.
+        
+        fen - the first record of a FEN chess position.
+        Clients are responsible for resizing this image and saving it,
+        if required.
+        '''
+        board = self.board.copy()
+        pieces = expand_fen(fen)
+        images, masks, n = self.piece_images, self.piece_masks, self.n
+        pts = (self.point(i, j) for j in range(n) for i in range(n))
+        def not_blank(pt_pc):
+            return pt_pc[1] != ' '
+        for pt, piece in filter(not_blank, zip(pts, pieces)):
+            board.paste(images[piece], pt, masks[piece])
+        return board
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;This code depends on PNGs for the pieces being available in the current directory, filed under the (case-sensitive!) names: &lt;code&gt;{K,Q,B,N,R,P,k,q,b,n,r,p}.png&lt;/code&gt;. It also requires all these PNGs to have the same dimensions. Here&amp;#8217;s how to use it:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; renderer = DrawChessPosition()
+&amp;gt;&amp;gt;&amp;gt; fen = "r2q1rk1/pp2ppbp/1np2np1/2Q3B1/3PP1b1/2N2N2/PP3PPP/3RKB1R"
+&amp;gt;&amp;gt;&amp;gt; board = renderer.draw(fen)
+&amp;gt;&amp;gt;&amp;gt; board.show()
+&amp;gt;&amp;gt;&amp;gt; board.save("%s.png" % fen.replace('/', '-'))
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;And here&amp;#8217;s the resulting image (with a CSS double border):
+&lt;/p&gt;
+&lt;img style="border-style:double;" src="http://wordaligned.org/images/r2q1rk1-pp2ppbp-1np2np1-2Q3B1-3PP1b1-2N2N2-PP3PPP-3RKB1R.png" alt="Chess position with FEN r2q1rk1/pp2ppbp/1np2np1/2Q3B1/3PP1b1/2N2N2/PP3PPP/3RKB1R"/&gt;
+
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/drawing-chess-positions.html#toc9" name="tocusing-a-font-with-pil" id="tocusing-a-font-with-pil"&gt;Using a font with PIL&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;There is a problem with the approach taken in the previous section. We only get a good graphic if we save the returned image at its native size: scaling it up or down results in a suboptimal picture. That&amp;#8217;s because the scaling doesn&amp;#8217;t have enough information to go on &amp;#8212; it has to work from a pixel raster when it really needs strokes or vector graphics.
+&lt;/p&gt;
+&lt;p&gt;So if we scale the linear dimensions up or down:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; fen = "r2q1rk1/pp2ppbp/1np2np1/2Q3B1/3PP1b1/2N2N2/PP3PPP/3RKB1R"
+&amp;gt;&amp;gt;&amp;gt; renderer = DrawChessPosition()
+&amp;gt;&amp;gt;&amp;gt; board = renderer.draw(fen)
+&amp;gt;&amp;gt;&amp;gt; board.size
+(360, 360)
+&amp;gt;&amp;gt;&amp;gt; small_board = board.resize((160, 160))
+&amp;gt;&amp;gt;&amp;gt; big_board = board.resize((640, 640))
+&amp;gt;&amp;gt;&amp;gt; big_4_squares = big_board.crop([80, 160, 240, 320])
+&amp;gt;&amp;gt;&amp;gt; big_4_squares.show()
+&amp;gt;&amp;gt;&amp;gt; small_board.show()
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;we&amp;#8217;ll get something like this:
+&lt;/p&gt;
+&lt;p&gt;&lt;img src="http://wordaligned.org/images/chess-pos-small.png" alt="Small chess board"/&gt;
+   &lt;img src="http://wordaligned.org/images/chess-pos-big4.png" alt="Section of large chess board"/&gt;
+&lt;/p&gt;
+&lt;p&gt;The way to avoid the aliasing problems is to work directly from a stroke representation of the chess pieces; for example, by using a &lt;a href="http://mip.noekeon.org/HTMLTTChess/install.html"&gt;suitable font&lt;/a&gt;. Once again, PIL can do the job (though you&amp;#8217;ll need to have installed PIL with FreeType support). I found a freely available unicode true type &lt;a href="http://mip.noekeon.org/HTMLTTChess/install.html"&gt;font&lt;/a&gt; and plugged it into the following code:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;unichr_pieces=dict(
+    zip("KQRBNPkqrbnp",
+        (unichr(uc) for uc in range(0x2654, 0x2660))))
+    
+def chess_position_using_font(fen, font_file, sq_size):
+    '''Return a chess position image.
+    
+    font_file - the name of a font file
+    sq_size - the size of each square on the chess board
+    '''
+    font = ImageFont.truetype(font_file, sq_size)
+    pieces = expand_fen(fen)
+    board = draw_board(sq_size=(sq_size, sq_size))
+    put_piece = ImageDraw.Draw(board).text
+    def point(i, j):
+        return i * sq_size, j * sq_size
+    def not_blank(pt_pce):
+        return pt_pce[1] != ' '
+    pts = (point(i, j) for j in range(8) for i in range(8))
+    for pt, piece in filter(not_blank, zip(pts, pieces)):
+        put_piece(pt, unichr_pieces[piece], fill='black', font=font)
+    return board
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;If we use this code to create small and large chess pictures, much as before, we&amp;#8217;ll see something like this:
+&lt;/p&gt;
+&lt;p&gt;&lt;img src="http://wordaligned.org/images/chess-pos-small-font.png" alt="Small chess board"/&gt;
+   &lt;img src="http://wordaligned.org/images/chess-pos-big4-font.png" alt="Section of large chess board"/&gt;
+&lt;/p&gt;
+&lt;p&gt;As with our CSS + Unicode picture, this image isn&amp;#8217;t ideal since the board shows through the interiors of the pieces. And once again, I haven&amp;#8217;t figured out how to work around this problem.
+&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Update, 2008-03-31.&lt;/strong&gt; A reader has worked out a &lt;a href="http://www.haloscan.com/comments/wordaligned/drawing_chess_positions/#14496"&gt;cunning solution&lt;/a&gt;:
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;You can make white pieces by drawing a &amp;#8220;black&amp;#8221; piece in white, then overlaying that with a &amp;#8220;white&amp;#8221; piece in black.
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;I&amp;#8217;ve given this idea a try and &lt;a href="http://wordaligned.org/articles/white-black-knight.html"&gt;written up the results&lt;/a&gt;. Here&amp;#8217;s the knight at square c3 &amp;#8212; a definite  improvement!
+&lt;/p&gt;
+&lt;img src="http://wordaligned.org/images/white-knight-on-black-square.png" alt="White knight on a black square"/&gt;
+
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/drawing-chess-positions.html#toc10" name="toclatex" id="toclatex"&gt;LaTeX&lt;/a&gt;&lt;/h3&gt;
+&lt;div class="info"&gt;Things I learned while writing this article: the &lt;a href="http://www.ctan.org/tex-archive/fonts/chess/skak/"&gt;skak package&lt;/a&gt; does chess with LaTeX.&lt;/div&gt;
+
+&lt;p&gt;My thanks Ivan Uemlianin for pointing out that I&amp;#8217;d neglected to mention LaTeX as a suitable chess position type-setter, as &lt;a href="http://www.llaisdy.com/blog/2008/04/19/drawing-chess-positions/"&gt;shown in his blog&lt;/a&gt;. LaTeX has been high on my list of things I really ought to learn about for well over a decade, and I simply wasn&amp;#8217;t aware it could do this.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/drawing-chess-positions.html#toc11" name="tocconclusions" id="tocconclusions"&gt;Conclusions&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;This article has shown, again, the merits of scripting graphics. We&amp;#8217;ve also seen that &lt;span /&gt;an interpreted language has much to offer in this area, allowing us to query and shape images dynamically, effectively bridging the gap between our program and a GUI driven graphics package.
+&lt;/p&gt;
+&lt;p&gt;The &lt;a href="http://effbot.org/imagingbook/pil-index.htm"&gt;Python Imaging Library&lt;/a&gt; has shown itself capable of working with shapes, colours, text and fonts. It&amp;#8217;s a great tool.
+&lt;/p&gt;
+&lt;p&gt;We&amp;#8217;ve not done so well at our motivating task, of drawing a chess position. As I said at the outset, if that&amp;#8217;s why you&amp;#8217;re here I&amp;#8217;d suggest taking another look at the alternatives.
+&lt;/p&gt;
+&lt;p&gt;The subtext of this article is platform-dependence. I don&amp;#8217;t know if the Unicode + CSS combination works in your browser or feed-reader, or indeed any other user agent; it depends on font contents and CSS rendering. 
+&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://www.libpng.org/pub/png/"&gt;&lt;img style="float:right;" src="http://www.libpng.org/pub/png/img_png/pngnow.png" alt="[PNG now!]"/&gt;&lt;/a&gt;
+&lt;/p&gt;
+&lt;p&gt;The &amp;#8220;P&amp;#8221; in PNG stands for &amp;#8220;Portable&amp;#8221;, and I would hope you can see the IMGs, which all source from PNGs &amp;#8212; all except the off-site JPEG, another well supported format.
+&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://www.freetype.org/index2.html"&gt;&lt;img style="float:right;" src="http://upload.wikimedia.org/wikipedia/en/thumb/3/3a/Freetype.png/160px-Freetype.png" alt="[FreeType now!]"/&gt;&lt;/a&gt;
+&lt;/p&gt;
+&lt;p&gt;&lt;span /&gt;One reason I like Python and writing about Python is its platform independence. Linux, Windows, OS X etc. &amp;mdash; we can all run the same code. For this particular application, that&amp;#8217;s less true. For a start, you&amp;#8217;ll need to install the non-standard &lt;a href="http://effbot.org/imagingbook/pil-index.htm"&gt;PIL&lt;/a&gt; module. Then there&amp;#8217;s the filename case-insensitivity (which is easy to work around, but nonetheless an embarrassment). The capabilities of PIL itself depend on the presence of other thirdparty libraries: to get you going with this article you&amp;#8217;ll need &lt;a href="http://www.libpng.org/pub/png/"&gt;libpng&lt;/a&gt;, which in turn depends on &lt;a href="http://www.zlib.net/"&gt;zlib&lt;/a&gt;, and &lt;a href="http://www.freetype.org/index2.html"&gt;FreeType&lt;/a&gt;, which again depends on zlib. On my Linux machine &lt;a href="http://effbot.org/imagingbook/image.htm#tag-Image.Image.show"&gt;Image.show&lt;/a&gt; didn&amp;#8217;t work until I&amp;#8217;d installed &lt;a href="http://www.trilon.com/xv/"&gt;xv&lt;/a&gt; from source, and that source needed some tweaking before it would build. So the code in this article is only portable once you&amp;#8217;ve suitably prepared your platform &amp;#8212; that is, the code isn&amp;#8217;t really portable!
+&lt;/p&gt;</description>
+<dc:date>2008-03-30</dc:date>
+<guid>http://wordaligned.org/articles/drawing-chess-positions.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/drawing-chess-positions.html</link>
+<category>Characters</category>
+</item>
+
+<item>
+<title>Drawing Chessboards</title>
+<description>&lt;div class="toc"&gt;
+&lt;h2&gt;Contents&lt;/h2&gt;
+&lt;ul&gt;
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/drawing-chessboards.html#tocthe-python-imaging-library" name="toc0" id="toc0"&gt;The Python Imaging Library&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/drawing-chessboards.html#tocimagemagick" name="toc1" id="toc1"&gt;ImageMagick&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/drawing-chessboards.html#tocgoogle-chart-api" name="toc2" id="toc2"&gt;Google Chart API&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/drawing-chessboards.html#tocascii-text" name="toc3" id="toc3"&gt;ASCII Text&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/drawing-chessboards.html#tocunicode-block-elements" name="toc4" id="toc4"&gt;Unicode Block Elements&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/drawing-chessboards.html#tocand-more" name="toc5" id="toc5"&gt;And more&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/drawing-chessboards.html#tocwhy" name="toc6" id="toc6"&gt;Why?&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/drawing-chessboards.html#tocteaser" name="toc7" id="toc7"&gt;Teaser&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/drawing-chessboards.html#tocthanks" name="toc8" id="toc8"&gt;Thanks&lt;/a&gt;
+ &lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;&lt;p&gt;I wanted a picture of a chessboard. Rather than boot up some drawing software and cut and paste black and white squares I decided to write a program to create the picture.
+&lt;/p&gt;
+&lt;p&gt;If you&amp;#8217;d like to know &lt;strong&gt;why&lt;/strong&gt; anyone would ever create work for themselves in this way, skip to the end of this article, where you&amp;#8217;ll find justification and a more challenging &lt;a href="http://wordaligned.org/articles/drawing-chessboards.html#why"&gt;follow-on problem&lt;/a&gt;. Otherwise, please read on from top to bottom in the usual way.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/drawing-chessboards.html#toc0" name="tocthe-python-imaging-library" id="tocthe-python-imaging-library"&gt;The Python Imaging Library&lt;/a&gt;&lt;/h3&gt;
+&lt;img style="border-style:double;" src="http://wordaligned.org/images/chessboard-pil.png" alt="Chessboard created by PIL"/&gt;
+
+&lt;p&gt;Fredrik Lundh&amp;#8217;s &lt;a href="http://effbot.org/imagingbook/pil-index.htm"&gt;Python Imaging Library&lt;/a&gt; (commonly known as &lt;a href="http://effbot.org/imagingbook/pil-index.htm"&gt;PIL&lt;/a&gt;) must surely rank as one of the most popular Python libraries which doesn&amp;#8217;t come as standard&lt;sup&gt;&lt;a id="fn1link" href="http://wordaligned.org/articles/drawing-chessboards.html#fn1"&gt;[1]&lt;/a&gt;&lt;/sup&gt;. It&amp;#8217;s a fabulous tool which I&amp;#8217;ve used to create the graphic above (though note that the double border around this graphic and subsequent ones is applied by a CSS style property). Here&amp;#8217;s how.
+   &lt;span id="continue-reading"/&gt;
+&lt;/p&gt;
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;PIL chessboard&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;def draw_chessboard(n=8, pixel_width=200):
+    "Draw an n x n chessboard using PIL."
+    import Image, ImageDraw
+    from itertools import cycle
+    def sq_start(i):
+        "Return the x/y start coord of the square at column/row i."
+        return i * pixel_width / n
+    
+    def square(i, j):
+        "Return the square corners, suitable for use in PIL drawings" 
+        return map(sq_start, [i, j, i + 1, j + 1])
+    
+    image = Image.new("L", (pixel_width, pixel_width))
+    draw_square = ImageDraw.Draw(image).rectangle
+    squares = (square(i, j)
+               for i_start, j in zip(cycle((0, 1)), range(n))
+               for i in range(i_start, n, 2))
+    for sq in squares:
+        draw_square(sq, fill='white')
+    image.save("chessboard-pil.png")
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Note:
+&lt;/p&gt;
+&lt;ul&gt;
+ &lt;li&gt;
+     We don&amp;#8217;t draw any black squares, instead relying on the default image background being black.
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     The &amp;#8220;L&amp;#8221; image type (Luminance?) specifies a greyscale image.
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     PIL adopts the usual raster graphics convention, of the origin being in the top-left corner.
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     As we progress &lt;strong&gt;down&lt;/strong&gt; the board row by row, the first white square alternates between being the first and second square of each row. &lt;code&gt;Itertools.cycle((0, 1))&lt;/code&gt; achieves this nicely. 
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     A regular 8 x 8 chessboard will, then, have a black square at the bottom left, which is the usual convention. For odd values of n the bottom-left square would be white.
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     There may be rounding problems with this code if the supplied pixel width isn&amp;#8217;t an integral multiple of &lt;code&gt;n&lt;/code&gt;. It&amp;#8217;s probably better to guarantee the image size, rather than round down the board size.
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     It would be better to parametrise the output file name, or even return the created image to clients. For now, we&amp;#8217;ll just save to a fixed-name PNG.
+ &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/drawing-chessboards.html#toc1" name="tocimagemagick" id="tocimagemagick"&gt;ImageMagick&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;PIL is a general purpose image processing library and it takes a little head-scratching and maths before we can even create something as simple as a chessboard. &lt;a href="http://www.imagemagick.org/script/index.php"&gt;ImageMagick&lt;/a&gt; provides tools to perform a similar job from the command-line, making the chessboard a one-liner.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;ImageMagick chessboard&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;$ N=8
+$ PIXEL_WIDTH=200
+$ convert -size $((N*15))x$((N*15)) pattern:checkerboard \
+  -monochrome -resize $PIXEL_WIDTH chessboard-magick.png
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;img style="border-style:double;float:right;margin-left:4px;" src="http://wordaligned.org/images/chessboard-magick.png" alt="Chessboard created by ImageMagick"/&gt;
+
+&lt;p&gt;Here, the checkerboard pattern is an ImageMagick built-in which, inspecting its output, happens to generate 15x15 squares (hence the 15&amp;#8217;s in the script above). The &lt;code&gt;-monochrome&lt;/code&gt; filter renders the pattern in black and white, rather than its native light- on dark-grey. The &lt;code&gt;-size&lt;/code&gt; and &lt;code&gt;-resize&lt;/code&gt; parameters should need no further explanation. The ((double parentheses)) perform Bash shell arithmetic.
+&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://www.imagemagick.org/script/index.php"&gt;ImageMagick&lt;/a&gt; masquerades as a shell tool but really it&amp;#8217;s a powerful and fully featured programmer&amp;#8217;s imaging tool &amp;#8212; a bit like a command-line version of &lt;a href="http://www.gimp.org"&gt;Gimp&lt;/a&gt;&lt;a id="fn2link" href="http://wordaligned.org/articles/drawing-chessboards.html#fn2"&gt;&lt;sup&gt;[2]&lt;/sup&gt;&lt;/a&gt;. Although well documented, my gut reaction is that it pushes the command-line interface too far. For more advanced image mangling, you&amp;#8217;ll probably need a program to generate the one-liner needed to drive &lt;code&gt;convert&lt;/code&gt;. Despite this reservation, it does the simple things simply, and it can do complex things too. Recommended!
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/drawing-chessboards.html#toc2" name="tocgoogle-chart-api" id="tocgoogle-chart-api"&gt;Google Chart API&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;For a bit of fun, we can persuade Google to render the chessboard for us &amp;#8212; in this case as a scatter plot using a square black markers&lt;a id="fn3link" href="http://wordaligned.org/articles/drawing-chessboards.html#fn3"&gt;&lt;sup&gt;[3]&lt;/sup&gt;&lt;/a&gt;. We flip the PIL processing around, drawing black squares on the (default) white background, and using the usual plotting convention which places the origin at the bottom left.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;Google chart chessboard&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;def chessboard_url(n=8, pixel_width=200):
+    "Returns the URL of a chessboard graphic."
+    def sq_midpt(i):
+        "Return the x/y midpt of a square in column/row i."
+        # For text encoding, the graphic's logical width is 100
+        return (0.5 + i) * 100. / n
+    
+    xys = [(sq_midpt(i), sq_midpt(j))
+           for i_start, j in zip(cycle((0, 1)), range(n))
+           for i in range(i_start, n, 2)]
+    fields = dict(width=pixel_width, sqside=pixel_width/n,
+                  xs=",".join("%.02f" % x for x, _ in xys),
+                  ys=",".join("%.02f" % y for _, y in xys))
+    return (
+        "http://chart.apis.google.com/chart?"
+        "cht=s&amp;amp;"                        # Draw a scatter graph
+        "chd=t:%(xs)s|%(ys)s&amp;amp;"          # using text encoding and
+        "chm=s,000000,1,2.0,%(sqside)r&amp;amp;"# square black markers
+        "chs=%(width)rx%(width)r"       # at this size.
+        ) % fields
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Note that we plot our chart on a logical 100 x 100 rectangle, the coordinate space mandated by the encoding we&amp;#8217;ve chosen, then resize it to the physical dimensions supplied by the client.
+&lt;/p&gt;
+&lt;p&gt;This function actually returns the URL of a PNG which the &lt;a href="http://code.google.com/apis/chart/"&gt;Google chart API&lt;/a&gt; serves up. Paste this URL into your browser address bar to see the graphic, or curl it to a local file.
+&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://chart.apis.google.com/chart?cht=s&amp;amp;chd=t:6.25,31.25,56.25,81.25,18.75,43.75,68.75,93.75,6.25,31.25,56.25,81.25,18.75,43.75,68.75,93.75,6.25,31.25,56.25,81.25,18.75,43.75,68.75,93.75,6.25,31.25,56.25,81.25,18.75,43.75,68.75,93.75|6.25,6.25,6.25,6.25,18.75,18.75,18.75,18.75,31.25,31.25,31.25,31.25,43.75,43.75,43.75,43.75,56.25,56.25,56.25,56.25,68.75,68.75,68.75,68.75,81.25,81.25,81.25,81.25,93.75,93.75,93.75,93.75&amp;amp;chm=s,000000,1,2.0,25.0&amp;amp;chs=200x200"&gt;http://chart.apis.google.com/chart?cht=s&amp;amp;chd=t:6.25,31.25&amp;#8230;&amp;amp;chs=200x200&lt;/a&gt;
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;$ url=`python chessboard_url.py`
+$ curl $url &amp;gt; chessboard.png
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;We could embed the image into HTML using the IMG element, which is how I&amp;#8217;ve embedded the image which you should see below.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; from cgi import escape
+&amp;gt;&amp;gt;&amp;gt; img = '&amp;lt;img src="%s" alt="chessboard graphic"/&amp;gt;'
+&amp;gt;&amp;gt;&amp;gt; img % escape(chessboard_url())
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;img src="http://chart.apis.google.com/chart?cht=s&amp;amp;chd=t:6.25,31.25,56.25,81.25,18.75,43.75,68.75,93.75,6.25,31.25,56.25,81.25,18.75,43.75,68.75,93.75,6.25,31.25,56.25,81.25,18.75,43.75,68.75,93.75,6.25,31.25,56.25,81.25,18.75,43.75,68.75,93.75|6.25,6.25,6.25,6.25,18.75,18.75,18.75,18.75,31.25,31.25,31.25,31.25,43.75,43.75,43.75,43.75,56.25,56.25,56.25,56.25,68.75,68.75,68.75,68.75,81.25,81.25,81.25,81.25,93.75,93.75,93.75,93.75&amp;amp;chm=s,000000,1,2.0,25.0&amp;amp;chs=200x200" alt="Chessboard chart" style="float:right;border-style:double;margin-left:4px;"/&gt;
+
+&lt;p&gt;As you can see, we have plenty of options, but unfortunately the image itself isn&amp;#8217;t suitable. You can&amp;#8217;t get rid of the axes &amp;#8212; or at least, I haven&amp;#8217;t found a way to &amp;#8212; and the rendered chart has some padding to the top and the right. And worse, we&amp;#8217;re pretty much at the end of the line for this hack: if we wanted to do something more interesting, such as place pieces on the board, we&amp;#8217;re out of luck. 
+&lt;/p&gt;
+&lt;p&gt;Of course this isn&amp;#8217;t a flaw in the &lt;a href="http://code.google.com/apis/chart/"&gt;Google Chart API&lt;/a&gt;: we&amp;#8217;ve actually asked it to draw a scatter plot of the centres of black squares on a chessboard, using square black markers, a job it&amp;#8217;s done well enough. Some examples showing the proper use of Google charts can be found in an &lt;a href="http://wordaligned.org/articles/the-maximum-subsequence-problem.html"&gt;article I wrote about maximum sum subsequences&lt;/a&gt;.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/drawing-chessboards.html#toc3" name="tocascii-text" id="tocascii-text"&gt;ASCII Text&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;The chart URL might be considered a text encoding of the image; the actual graphic is returned by a server. There are other, more direct, textual representations.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;ASCII art chessboard&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;def outer_join(sep, ss):
+    """Like string.join, but encloses the result with outer separators.
+    
+    Example:
+    &amp;gt;&amp;gt;&amp;gt; outer_join('|', ['1', '2', '3'])
+    '|1|2|3|'
+    """
+    return "%s%s%s" % (sep, sep.join(ss), sep)
+    
+def ascii_chessboard(n=8):
+    """Draws an ASCII art chessboard.
+    
+    Returns a string representation of an n x n board.
+    """
+    from itertools import islice, cycle
+    divider = outer_join("+", "-" * n) + "\n"
+    row0 = outer_join("|", islice(cycle(" B"), n)) + "\n"
+    row1 = outer_join("|", islice(cycle("B "), n)) + "\n"
+    return outer_join(divider, islice(cycle([row0, row1]), n))
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;I suspect this code was easier for me to write than it is for you to read! It treats the chessboard as a sequence of alternating rows of alternating squares, which are then joined together for output.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; print ascii_chessboard(8)
++-+-+-+-+-+-+-+-+
+| |B| |B| |B| |B|
++-+-+-+-+-+-+-+-+
+|B| |B| |B| |B| |
++-+-+-+-+-+-+-+-+
+| |B| |B| |B| |B|
++-+-+-+-+-+-+-+-+
+|B| |B| |B| |B| |
++-+-+-+-+-+-+-+-+
+| |B| |B| |B| |B|
++-+-+-+-+-+-+-+-+
+|B| |B| |B| |B| |
++-+-+-+-+-+-+-+-+
+| |B| |B| |B| |B|
++-+-+-+-+-+-+-+-+
+|B| |B| |B| |B| |
++-+-+-+-+-+-+-+-+
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Not pretty, but such graphics may be useful in source code, which is typically viewed in a plain-text editor, and where ASCII art provides a way of embedding pictures right where they&amp;#8217;re needed. 
+&lt;/p&gt;
+&lt;p&gt;On which point: if you&amp;#8217;re working through &amp;#8220;Structure and Interpretation of Computer Programs&amp;#8221; you may like to know the book is &lt;a href="http://www.neilvandyke.org/sicp-texi/"&gt;available in Texinfo format&lt;/a&gt;, with the pictures all rendered in ASCII art. So you can split your editor window and run the code on one side, while browsing the book on the other. Here&amp;#8217;s one of the figures:
+&lt;/p&gt;
+&lt;pre&gt;
+*Figure 4.6:* The `or' combination of two queries is produced by
+operating on the stream of frames in parallel and merging the
+results.
+    
+            +---------------------------+
+            |          (or A B)         |
+            |    +---+                  |
+ input      | +-&amp;gt;| A |------------+     |  output
+ stream of  | |  +---+            V     |  stream of
+ frames     | |    ^          +-------+ |  frames
+ -------------*    |          | merge +---------------&amp;gt;
+            | |    |          +-------+ |
+            | |    |              ^     |
+            | |    |   +---+      |     |
+            | +-------&amp;gt;| B +------+     |
+            |      |   +---+            |
+            |      |     ^              |
+            |      |     |              |
+            |      +--*--+              |
+            +---------|-----------------+
+                      |
+                  data base
+&lt;/pre&gt;
+
+&lt;p&gt;Even though I own a copy of the book and the &lt;a href="http://mitpress.mit.edu/sicp/full-text/book/book.html"&gt;full text is available on-line&lt;/a&gt;, this primitive info version has become my preferred format when actually running the code examples and exercises.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/drawing-chessboards.html#toc4" name="tocunicode-block-elements" id="tocunicode-block-elements"&gt;Unicode Block Elements&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Most programming languages may be &lt;a href="http://wordaligned.org/articles/a-yen-for-more-symbols.html"&gt;stuck in ASCII&lt;/a&gt;, but we needn&amp;#8217;t restict ourselves in this way. I found some block elements in the &lt;a href="http://www.unicode.org/charts/symbols.html"&gt;Geometrical Symbols&lt;/a&gt; section of the Unicode code charts (&lt;a href="http://www.unicode.org/charts/PDF/U2580.pdf"&gt;Unicode Block Elements (PDF)&lt;/a&gt;). Here&amp;#8217;s a pre-rendered block of text composed of the light and dark shade block characters, U+2591 LIGHT SHADE and U+2593 DARK SHADE.
+&lt;/p&gt;
+&lt;pre&gt;
+&amp;#x2591;&amp;#x2593;&amp;#x2591;&amp;#x2593;&amp;#x2591;&amp;#x2593;&amp;#x2591;&amp;#x2593;
+&amp;#x2593;&amp;#x2591;&amp;#x2593;&amp;#x2591;&amp;#x2593;&amp;#x2591;&amp;#x2593;&amp;#x2591;
+&amp;#x2591;&amp;#x2593;&amp;#x2591;&amp;#x2593;&amp;#x2591;&amp;#x2593;&amp;#x2591;&amp;#x2593;
+&amp;#x2593;&amp;#x2591;&amp;#x2593;&amp;#x2591;&amp;#x2593;&amp;#x2591;&amp;#x2593;&amp;#x2591;
+&amp;#x2591;&amp;#x2593;&amp;#x2591;&amp;#x2593;&amp;#x2591;&amp;#x2593;&amp;#x2591;&amp;#x2593;
+&amp;#x2593;&amp;#x2591;&amp;#x2593;&amp;#x2591;&amp;#x2593;&amp;#x2591;&amp;#x2593;&amp;#x2591;
+&amp;#x2591;&amp;#x2593;&amp;#x2591;&amp;#x2593;&amp;#x2591;&amp;#x2593;&amp;#x2591;&amp;#x2593;
+&amp;#x2593;&amp;#x2591;&amp;#x2593;&amp;#x2591;&amp;#x2593;&amp;#x2591;&amp;#x2593;&amp;#x2591;
+&lt;/pre&gt;
+
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/drawing-chessboards.html#toc5" name="tocand-more" id="tocand-more"&gt;And more&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;I can think of plenty of other ways to draw a chessboard. My favourite &lt;a href="http://wordaligned.org/articles/drawing-software-design.htmls"&gt;drawing&lt;/a&gt; environments are the &lt;a href="http://blogoscoped.com/archive/2008-02-11-n78.html"&gt;pencil and paper&lt;/a&gt;, and the pen and whiteboard; combine the former with a scanner and the latter with a digital camera and you&amp;#8217;ve got an easy route to an electronic version of your design.
+&lt;/p&gt;
+&lt;p&gt;For an HTML document I suspect &lt;a href="http://www.w3.org/Graphics/SVG/"&gt;SVG&lt;/a&gt; would be a good choice, but I don&amp;#8217;t know enough about SVG to state this with confidence. I bet you could go a long way with &lt;a href="http://www.w3.org/Style/CSS/"&gt;CSS&lt;/a&gt; too. &lt;a href="http://en.wikipedia.org/wiki/Chessboard"&gt;Wikipedia&amp;#8217;s chess board&lt;/a&gt; is a table built on top of two small images, a light and a dark square, which I guess saves on bandwidth.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/drawing-chessboards.html#toc6" name="tocwhy" id="tocwhy"&gt;Why?&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Why ever bother programming when all we want is a simple graphic?
+&lt;/p&gt;
+&lt;p&gt;Well, for one thing, there&amp;#8217;s not &lt;strong&gt;that&lt;/strong&gt; much programming. The actual work of pushing pixels around is done by &lt;a href="http://code.google.com/apis/chart/"&gt;Google&lt;/a&gt;, or &lt;a href="http://effbot.org/imagingbook/pil-index.htm"&gt;PIL&lt;/a&gt;, or &lt;a href="http://www.imagemagick.org/script/index.php"&gt;ImageMagick&lt;/a&gt;.
+&lt;/p&gt;
+&lt;p&gt;Once we&amp;#8217;ve got a program written, it should be easy to adapt it. We&amp;#8217;ve already put in hooks to specify the number of squares and the image dimensions. It&amp;#8217;s equally easy to, for example, write out a JPEG rather than a PNG, or use different colours.
+&lt;/p&gt;
+&lt;p&gt;A programmatic solution is dynamic. Google&amp;#8217;s chart API generates pictures on the fly, based on data points, ranges etc. which clients choose as and when. It&amp;#8217;s rather  like lazy-evaluation: pre-rendering all possibilities isn&amp;#8217;t just expensive, it&amp;#8217;s out of the question.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/drawing-chessboards.html#toc7" name="tocteaser" id="tocteaser"&gt;Teaser&lt;/a&gt;&lt;/h3&gt;
+&lt;img src="http://tbn0.google.com/images?q=tbn:AmRSkxMo-1W5iM:http://web.usna.navy.mil/~wdj/images_chess/chess011.gif" alt="Lurid chessboard" style="float:right;margin-left:4px;"/&gt;
+
+&lt;p&gt;That&amp;#8217;s quite enough pixels and characters for now, so this article will have to appear in two parts. If I&amp;#8217;ve still not convinced you of the merits of creating images programmatically, please consider the following puzzle.
+&lt;/p&gt;
+&lt;p&gt;&lt;span /&gt;How would you draw a position reached in a game of chess, showing both the board and the pieces?
+&lt;/p&gt;
+&lt;p&gt;And if I &lt;strong&gt;have&lt;/strong&gt; convinced you, this exercise makes for a good workout.
+&lt;/p&gt;
+&lt;p&gt;Some Q&amp;amp;A&amp;#8217;s.
+&lt;/p&gt;
+&lt;ul&gt;
+ &lt;li&gt;
+     &lt;strong&gt;Q&lt;/strong&gt;: What position, exactly?
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     &lt;strong&gt;A&lt;/strong&gt;: Any!
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     &lt;strong&gt;Q&lt;/strong&gt;: How will the position be described?
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     &lt;strong&gt;A&lt;/strong&gt;: Your choice &amp;#8212; it&amp;#8217;s an interesting part of the puzzle.
+ &lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;A great starting point would be to solve the puzzle using an ASCII art representation.
+&lt;/p&gt;
+&lt;p&gt;You can find my solution in &lt;a href="http://wordaligned.org/articles/drawing-chess-positions.html"&gt;this follow-up article&lt;/a&gt;.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/drawing-chessboards.html#toc8" name="tocthanks" id="tocthanks"&gt;Thanks&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Thanks to &lt;a href="http://gedmin.as"&gt;Marius Gedminas&lt;/a&gt; and Johannes Hoff for their help bug-fixing this article.
+&lt;/p&gt;
+&lt;hr /&gt;
+
+&lt;p&gt;&lt;a id="fn1" href="http://wordaligned.org/articles/drawing-chessboards.html#fn1link"&gt;[1]&lt;/a&gt;
+   I&amp;#8217;m confused about where exactly PIL belongs; the official homepage seems to be on the PythonWare website (&lt;a href="http://www.pythonware.com/library/pil/handbook/"&gt;http://www.pythonware.com/library/pil/handbook/&lt;/a&gt;), but I usually head for the Effbot site, &lt;a href="http://effbot.org/imagingbook/"&gt;http://effbot.org/imagingbook/&lt;/a&gt;. I think the sites mirror the same information, so it boils down to whether you prefer a blue or green theme, and how off-putting you find all the ads-by-google.
+&lt;/p&gt;
+&lt;p&gt;&lt;a id="fn2" href="http://wordaligned.org/articles/drawing-chessboards.html#fn2link"&gt;[2]&lt;/a&gt;
+   Actually, you can use &lt;a href="http://www.gimp.org/tutorials/Basic_Batch/"&gt;Gimp from the command-line&lt;/a&gt;, and it comes with some tools for creating and editing batch files, and indeed for creating a personal suite of image processing scripts. I&amp;#8217;ve never used &lt;a href="http://www.gimp.org"&gt;Gimp&lt;/a&gt; in this way, so I can&amp;#8217;t say much more about this.
+&lt;/p&gt;
+&lt;p&gt;&lt;a id="fn3" href="http://wordaligned.org/articles/drawing-chessboards.html#fn3link"&gt;[3]&lt;/a&gt;
+   In theory you could use the Google Chart API to render any image in a pointillist manner: just plot enough pixels in the right places.
+&lt;/p&gt;</description>
+<dc:date>2008-03-18</dc:date>
+<guid>http://wordaligned.org/articles/drawing-chessboards.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/drawing-chessboards.html</link>
+<category>Characters</category>
+</item>
+
+<item>
+<title>Attack of the Alien Asterisks</title>
+<description>&lt;img src="http://wordaligned.org/files/asterisk-invasion.png" alt="Attack of the alien asterisks picture"/&gt;
+
+&lt;span id="continue-reading"/&gt;
+
+
+&lt;h3&gt;Cross Platform Hassles&lt;/h3&gt;
+&lt;p&gt;I&amp;#8217;ve been spending an increasing amount of time working on Windows recently, using a virtual XP installation running on an Apple iMac. I&amp;#8217;ve had some trouble with &lt;a href="http://wordaligned.org/articles/from-hash-key-to-haskell.html"&gt;key-mappings&lt;/a&gt; but by now my fingers have adjusted: the Apple Key is the Windows key, the ALT key is the META key, the &lt;a href="http://wordaligned.org/articles/from-hash-key-to-haskell.html"&gt;HASH key is AWOL&lt;/a&gt;. It&amp;#8217;s tolerable, especially given my limited enthusiasm for re-configuring.
+&lt;/p&gt;
+&lt;p&gt;Surprisingly, I suffer more with the font rendering discrepancies. Or perhaps it&amp;#8217;s not so surprising: I write software which, at its most basic, involves shuffling characters around using a text editor until they look right.
+&lt;/p&gt;
+&lt;p&gt;I&amp;#8217;m not that fussy. Apple is rightly praised for its fonts and rendering but Windows does fine in this area too. What I dislike is having the two styles side by side.
+&lt;/p&gt;
+
+&lt;h3&gt;Side by Side&lt;/h3&gt;
+&lt;p&gt;Here&amp;#8217;s what I mean. On the Mac, the code snippet looks full-bodied and smooth.
+&lt;/p&gt;
+&lt;img src="http://wordaligned.org/files/ft-snippet-osx.png" alt="Mac code graphic"/&gt;
+
+&lt;p&gt;On Windows XP, the same code looks a bit scratchy.
+&lt;/p&gt;
+&lt;img src="http://wordaligned.org/files/ft-snippet-xp.png" alt="Windows XP code graphic"/&gt;
+
+&lt;p&gt;Maybe &lt;a href="http://www.codinghorror.com/blog/archives/000884.html" title="Jeff Atwood asks What's wrong with Apple's Font Rendering"&gt;you prefer the Windows rendering&lt;/a&gt;; maybe you wouldn&amp;#8217;t just go with the default &lt;a href="http://www.codinghorror.com/blog/archives/000969.html" title="Jeff Atwood revisits programming fonts"&gt;fixed-width font&lt;/a&gt; (Monaco on OS X, Courier New on XP). I suspect it boils down to what you&amp;#8217;re used to, which is really the point I&amp;#8217;m trying to make: the two approaches to font-rendering don&amp;#8217;t coexist comfortably. I wanted them to look more similar.
+&lt;/p&gt;
+
+&lt;h3&gt;Clear Type&lt;/h3&gt;
+&lt;p&gt;Clearly getting the OS X text rendering to look Window-sy was a non-starter. So I poked around in the XP display properties.
+&lt;/p&gt;
+&lt;p&gt;Display Properties &amp;rarr; Appearance &amp;rarr; Effects&amp;#8230; 
+&lt;/p&gt;
+&lt;p&gt;I then checked the &lt;a href="http://en.wikipedia.org/wiki/ClearType"&gt;ClearType&lt;/a&gt; option to &amp;#8220;smooth the edges of screen fonts&amp;#8221;, and this is what I got.
+&lt;/p&gt;
+&lt;img src="http://wordaligned.org/files/ft-snippet-cleartype.png" alt="Windows XP code graphic"/&gt;
+
+&lt;p&gt;An improvement, I think, and certainly closer to the Apple rendering. (Apparently &lt;a href="http://en.wikipedia.org/wiki/ClearType"&gt;ClearType&lt;/a&gt; is on by default for Windows Vista, and I recognise it from recent versions Internet Explorer.)
+&lt;/p&gt;
+&lt;p&gt;The asterisks look a bit odd though. Here&amp;#8217;s a close up of a field/flock/fleet of them.
+&lt;/p&gt;
+&lt;img src="http://wordaligned.org/files/asterisk-invasion.png" alt="Attack of the alien asterisks picture"/&gt;
+
+&lt;p&gt;Scary!
+&lt;/p&gt;</description>
+<dc:date>2008-01-31</dc:date>
+<guid>http://wordaligned.org/articles/attack-of-the-alien-asterisks.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/attack-of-the-alien-asterisks.html</link>
+<category>Characters</category>
+</item>
+
+<item>
+<title>From Hash Key to Haskell</title>
+<description>&lt;h3&gt;Mac Hash&lt;/h3&gt;
+&lt;p&gt;How annoying, there&amp;#8217;s no hash key on the Mac UK keyboard!
+&lt;/p&gt;
+&lt;p&gt;SHIFT+3 gets you the UK pound sign, &amp;pound; (I&amp;#8217;d prefer the Euro, &amp;euro;), and once you&amp;#8217;ve found that you&amp;#8217;re in the right vicinity &amp;#8212; as if by magic, ALT+3 produces the #.
+&lt;/p&gt;
+&lt;p&gt;Unfortunately this same key combination doesn&amp;#8217;t work on the Windows XP virtual machine I run under &lt;a href="http://www.parallels.com/en/products/desktop/"&gt;Parallels&lt;/a&gt;. I&amp;#8217;ve done enough configuring to get the Mac keyboard working tolerably with this virtualised XP, but whenever I need to enter a # I&amp;#8217;m reduced to cutting and pasting.
+&lt;/p&gt;
+
+&lt;h3&gt;Trigraph Confusion&lt;/h3&gt;
+&lt;p&gt;C and C++ programmers could avoid the # by using trigraphs, an obscure language feature which allows you to write &lt;code&gt;??=&lt;/code&gt; instead. Yes, there are other trigraphs. Courtesy of Wikipedia, here&amp;#8217;s an &lt;a href="http://en.wikipedia.org/wiki/C_trigraph#Example"&gt;example program&lt;/a&gt; which uses them all.
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;pre&gt;
+??=include &amp;lt;stdio.h&amp;gt;
+
+int main(void)
+??&amp;lt;
+    char n??(5??);
+    n??(4??) = '0' - (??-0 ??' 1 ??! 2);
+    printf("%c??/n", n??(4??));
+    return 0;
+??&amp;gt;
+&lt;/pre&gt;&lt;/blockquote&gt;
+
+&lt;p&gt;Impressively unreadable!
+&lt;/p&gt;
+
+&lt;h3&gt;What you see is not what you type&lt;/h3&gt;
+&lt;p&gt;An important difference between a typewriter and a text editor is the software between keypress and screen update &amp;#8212; the software I&amp;#8217;ve failed to fully configure on my virtual XP machine. So why not exploit this indirection?
+&lt;/p&gt;
+&lt;p&gt;Developers of mobile phones have grown ingenious at adapting a numeric keypad to generate text almost as ably as a QWERTY one. (Which do serious texters prefer, I wonder, an &lt;a href="http://www.apple.com/iphone/"&gt;iphone&lt;/a&gt; or a numeric keypad?) And my &lt;a href="http://www.adiumx.com/"&gt;instant messenger client&lt;/a&gt; is cute enough to display smiley punctuation sequences as emoticon graphics.
+&lt;/p&gt;
+
+&lt;h3&gt;Python smiley&lt;/h3&gt;
+&lt;p&gt;On which point, &lt;span /&gt;has anyone else noticed the square-jawed smiley you get when you chop the last element from a Python list? This one&amp;#8217;s wearing a cap.
+&lt;/p&gt;
+&lt;pre style="font-size: 150%"&gt;q[:-1]&lt;/pre&gt;
+
+
+&lt;h3&gt;Readable Haskell&lt;/h3&gt;
+&lt;p&gt;&lt;a href="http://www.haskell.org"&gt;Haskell&lt;/a&gt; is one of my &lt;a href="http://www.codinghorror.com/blog/archives/000916.html" title="Jeff Attwood cautions against the magpie mentality."&gt;shiny new things&lt;/a&gt; for 2008. I&amp;#8217;ve scratched at it before and one of the things which put me off is the number of digraphs in the code. They don&amp;#8217;t look right. I&amp;#8217;m talking about the arrows in particular:
+&lt;/p&gt;
+&lt;pre style="font-size: 150%"&gt;-&amp;gt;  &amp;lt;-  =&amp;gt;&lt;/pre&gt;
+
+&lt;p&gt;Of course I&amp;#8217;m used to the logical digraphs &lt;code&gt;&amp;amp;&amp;amp;&lt;/code&gt;, &lt;code&gt;||&lt;/code&gt; and the comparison operators, &lt;code&gt;==&lt;/code&gt;, &lt;code&gt;&amp;lt;=&lt;/code&gt; etc. These don&amp;#8217;t look out of place in the C family of languages, but Haskell&amp;#8217;s roots seem closer to mathematics and logic; it &lt;em&gt;craves&lt;/em&gt; proper mathematical and logical symbols.
+&lt;/p&gt;
+&lt;img style="float:right;" src="http://haskell.org/haskellwiki_logo_small.png" alt="Haskell Logo"/&gt;
+
+&lt;p&gt;The symbol Haskell uses for anonymous functions is a single backslash, &lt;code&gt;\&lt;/code&gt;. This should of course be a lambda, &amp;#x03BB;. It&amp;#8217;s ironic that this character is the star of the &lt;a href="http://www.haskell.org"&gt;Haskell homepage&lt;/a&gt; but can&amp;#8217;t be found in Haskell source code.
+&lt;/p&gt;
+&lt;p&gt;It shouldn&amp;#8217;t be too hard to view and edit Haskell code using more appropriate characters even if you actually input them as usual. Oh look, &lt;a href="http://www.iro.umontreal.ca/~monnier/elisp/#haskell-mode"&gt;Emacs does it already&lt;/a&gt;!
+&lt;/p&gt;
+&lt;p&gt;Set &lt;code&gt;(setq haskell-font-lock-symbols 'unicode)&lt;/code&gt; and your Haskell code will look something like the sample shown in the upper screen below (I&amp;#8217;ve split the editor window and shown a plain-text view of the same content in the lower screen).
+&lt;/p&gt;
+&lt;img src="http://wordaligned.org/files/haskell-emacs-screen.png" alt="Emacs Haskell mode screen grab"/&gt;
+
+&lt;p&gt;Much better!
+&lt;/p&gt;</description>
+<dc:date>2008-01-19</dc:date>
+<guid>http://wordaligned.org/articles/from-hash-key-to-haskell.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/from-hash-key-to-haskell.html</link>
+<category>Characters</category>
+</item>
+
+<item>
+<title>A yen for more symbols</title>
+<description>&lt;p&gt;Apparently &lt;a href="http://tartley.com/?p=197"&gt;true&lt;/a&gt;: at one point &lt;a href="http://dev.perl.org/perl6/"&gt;Perl 6&lt;/a&gt; used &amp;#x00a5; U+00A5 YEN SIGN as a zip operator, for the excellent reason that this particular symbol looks like a zip.
+&lt;/p&gt;
+&lt;pre&gt;
+my @tile_values = &amp;lt; A B C D E F &amp;gt; &amp;#x00a5; (1, 3, 4, 2, 1, 4)
+&lt;/pre&gt;
+
+&lt;p&gt;Sadly this witty visual pun seems to have been deprecated. &lt;span /&gt;All programming languages I know of are firmly stuck in the 7-bit ASCII range, where the only currency character is the good old American $ 0x24 DOLLAR SIGN.
+&lt;/p&gt;
+&lt;p&gt;There are plenty of useful symbols for programmers once you&amp;#8217;re willing to advance into Unicode space:
+&lt;/p&gt;
+&lt;ul&gt;
+ &lt;li&gt;
+     Multiplication &amp;#x00d7; U+00D7 MULTIPLICATION SIGN, obviously
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     &lt;a href="http://haskell.org"&gt;Haskell&lt;/a&gt; would surely prefer a real &amp;#x03BB; U+03BB GREEK SMALL LETTER LAMDA to the backslash currently used for anonymous functions
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     Pointers would be less threatening if we could dereference them with a &amp;rarr; U+2192 RIGHTWARDS ARROW
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     And there are lots of nice symbols we could use for assignment, &amp;#x21a4; U+21A4 LEFTWARDS ARROW FROM BAR for example, and then we could use the EQUALS SIGN for equality and fix several bugs
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     Proper &lt;a href="http://en.wikipedia.org/wiki/Table_of_logic_symbols"&gt;logic symbols&lt;/a&gt; for and, or, not, which wipe the floor with &lt;code&gt;&amp;amp;&amp;amp;&lt;/code&gt;, &lt;code&gt;||&lt;/code&gt;, &lt;code&gt;!&lt;/code&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     I won&amp;#8217;t even try to list the exciting mathematical symbols and the possibilities they open up. Let&amp;#8217;s just say we&amp;#8217;d all use container operations if &amp;#x2200; U+2200 FOR ALL were available
+ &lt;/li&gt;
+&lt;/ul&gt;</description>
+<dc:date>2007-09-13</dc:date>
+<guid>http://wordaligned.org/articles/a-yen-for-more-symbols.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/a-yen-for-more-symbols.html</link>
+<category>Characters</category>
+</item>
+
+<item>
+<title>String literals and regular expressions</title>
+<description>&lt;div class="toc"&gt;
+&lt;h2&gt;Contents&lt;/h2&gt;
+&lt;ul&gt;
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/string-literals-and-regular-expressions.html#tocstring-literals" name="toc0" id="toc0"&gt;String Literals&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/string-literals-and-regular-expressions.html#tocescape-sequences" name="toc1" id="toc1"&gt;Escape Sequences&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/string-literals-and-regular-expressions.html#tocliteral-backslashes" name="toc2" id="toc2"&gt;Literal Backslashes&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/string-literals-and-regular-expressions.html#tocregular-expressions" name="toc3" id="toc3"&gt;Regular Expressions&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/string-literals-and-regular-expressions.html#tocattempting-to-match-a-c-string-literal" name="toc4" id="toc4"&gt;Attempting to Match a C++ String Literal&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/string-literals-and-regular-expressions.html#toccorrectly-matching-a-c-string-literal" name="toc5" id="toc5"&gt;Correctly Matching a C++ String Literal&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/string-literals-and-regular-expressions.html#tocnow-lets-do-it-in-c" name="toc6" id="toc6"&gt;Now let&amp;#8217;s do it in C++&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/string-literals-and-regular-expressions.html#toca-complete-c-string-literal-matcher" name="toc7" id="toc7"&gt;A complete C++ string literal matcher&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/string-literals-and-regular-expressions.html#tocraw-strings-in-python" name="toc8" id="toc8"&gt;Raw Strings in Python&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/string-literals-and-regular-expressions.html#tocraw-strings-in-c" name="toc9" id="toc9"&gt;Raw Strings in C++?&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/string-literals-and-regular-expressions.html#tocverbatim-strings-in-c" name="toc10" id="toc10"&gt;Verbatim Strings in C++?&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/string-literals-and-regular-expressions.html#toctheres-no-escape" name="toc11" id="toc11"&gt;There&amp;#8217;s no escape&lt;/a&gt;
+ &lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;&lt;p&gt;According to the &lt;a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2005/n1836.pdf"&gt;&amp;#8220;Draft Technical Report on C++ Library Extensions&amp;#8221;&lt;/a&gt;
+   (more commonly known as &lt;a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2005/n1836.pdf"&gt;TR1&lt;/a&gt;) regular expressions are making their way
+   into the C++ standard library. Actually, &lt;a href="http://boost.org"&gt;Boost&lt;/a&gt; users have had
+   a &lt;a href="http://www.boost.org/libs/regex/doc/index.html"&gt;regular expression library&lt;/a&gt; for a while now. The library
+   is well designed and easy to use but is let down by the limitations
+   of string literals.
+&lt;/p&gt;
+&lt;span id="continue-reading"/&gt;
+
+
+&lt;h4&gt;&lt;a href="http://wordaligned.org/articles/string-literals-and-regular-expressions.html#toc0" name="tocstring-literals" id="tocstring-literals"&gt;String Literals&lt;/a&gt;&lt;/h4&gt;
+&lt;p&gt;Let&amp;#8217;s go back to basics and examine a C++ string literal:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;char const * s = "string literal";
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Here, the string literal comprises the sequence of characters &lt;code&gt;s&lt;/code&gt;,
+   &lt;code&gt;t&lt;/code&gt;, &amp;#8230; &lt;code&gt;l&lt;/code&gt;. The double-quotes &lt;code&gt;"&lt;/code&gt; serve to delimit the contents of
+   the string.
+&lt;/p&gt;
+&lt;p&gt;All&amp;#8217;s fine until we need a double-quote inside the string:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;Broken string literal&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;char const * s = "The "x" in C++0x will probably be 9";
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;This line of code gives a compilation error:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;error: expected `,' or `;' before "x"
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;since the first internal double-quote closed the string. But how can we
+   include a double-quote without closing the string?
+&lt;/p&gt;
+
+&lt;h4&gt;&lt;a href="http://wordaligned.org/articles/string-literals-and-regular-expressions.html#toc1" name="tocescape-sequences" id="tocescape-sequences"&gt;Escape Sequences&lt;/a&gt;&lt;/h4&gt;
+&lt;p&gt;Here&amp;#8217;s how: the backslash, &lt;code&gt;\&lt;/code&gt;, is treated as an &lt;em&gt;escape&lt;/em&gt;
+   &lt;em&gt;character&lt;/em&gt;. That is to say, normal interpretation of the string is suspended
+   for a while &amp;#8212; in this case for a single character &amp;#8212; allowing us to write:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;Fixed string literal&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;char const * s = "The \"x\" in C++0x will probably be 9";
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Here, the internal double-quotes have been &lt;em&gt;escaped&lt;/em&gt;, so they don&amp;#8217;t close the
+   string literal but are in fact interpreted as double-quote characters
+   within the string itself. Yes, it&amp;#8217;s confusing.
+&lt;/p&gt;
+
+&lt;h4&gt;&lt;a href="http://wordaligned.org/articles/string-literals-and-regular-expressions.html#toc2" name="tocliteral-backslashes" id="tocliteral-backslashes"&gt;Literal Backslashes&lt;/a&gt;&lt;/h4&gt;
+&lt;p&gt;Now, if the backslash takes on a special meaning, how are
+   we to insert a literal backslash into the string? Simple &amp;#8212; we must escape that too:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;String literal containing a single backslash&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;char const * s = "A backslash \\ starts an escape sequence";
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Here, despite first appearances, the string contains just a &lt;em&gt;single&lt;/em&gt;
+   backslash character.  We did say it was confusing! Which leads us on to &amp;#8230;
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/string-literals-and-regular-expressions.html#toc3" name="tocregular-expressions" id="tocregular-expressions"&gt;Regular Expressions&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Put string literals aside for now. We&amp;#8217;re going to talk about regular
+   expressions (let&amp;#8217;s call them regexes from now on).  Regexes are used
+   to find and match patterns in blocks of text.  Like string literals,
+   regexes are composed of sequences of characters, and, also like
+   string literals, we need to escape the usual meaning of characters in regexes.
+&lt;/p&gt;
+&lt;p&gt;Once again, the backslash, &lt;code&gt;\&lt;/code&gt;, is used as the escape sequence prefix.
+&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://www.ruby-lang.org" title="Ruby Website"&gt;Ruby&lt;/a&gt; embeds a powerful regex engine, so let&amp;#8217;s use Ruby for our regex
+   examples:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;Some Ruby regex patterns&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;/w/
+/w+/
+/\w+/
+/"\w*"/
+/\\/
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Notice here that the &lt;em&gt;forward&lt;/em&gt; slash, &lt;code&gt;/&lt;/code&gt;, is used as a delimiter and
+   is not part of the body of the regex pattern &amp;#8212; just like the
+   double-quote, &lt;code&gt;"&lt;/code&gt;, was not part of the body our string literals.
+&lt;/p&gt;
+&lt;p&gt;What do these regex patterns mean?
+&lt;/p&gt;
+&lt;ol&gt;
+ &lt;li&gt;
+     &lt;code&gt;/w/&lt;/code&gt; matches the character &lt;code&gt;w&lt;/code&gt;.
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     &lt;code&gt;/w+/&lt;/code&gt; matches a sequence of one or more adjacent &lt;code&gt;w&lt;/code&gt;&amp;#8217;s.
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     &lt;code&gt;/\w+/&lt;/code&gt; matches one or more adjacent &amp;#8220;word&amp;#8221; characters.
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     &lt;code&gt;/"\w*"/&lt;/code&gt; matches a double-quote delimited sequence of zero or more &amp;#8220;word&amp;#8221; characters.
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     &lt;code&gt;/\\/&lt;/code&gt; matches a &lt;em&gt;single&lt;/em&gt; backslash.
+ &lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Did you notice that the backslash, &lt;code&gt;\&lt;/code&gt;, gives the succeding &lt;code&gt;w&lt;/code&gt; a special
+   meaning? Did you notice that the &lt;code&gt;+&lt;/code&gt; has a special meaning within a regex
+   (it means one or more)?  To match a literal &lt;code&gt;+&lt;/code&gt;, we&amp;#8217;d need to escape
+   it like this: &lt;code&gt;/\+/&lt;/code&gt;. And did you notice that to match a literal backslash
+   we must escape it? Good &amp;#8212; but that was the easy bit!
+&lt;/p&gt;
+
+&lt;h4&gt;&lt;a href="http://wordaligned.org/articles/string-literals-and-regular-expressions.html#toc4" name="tocattempting-to-match-a-c-string-literal" id="tocattempting-to-match-a-c-string-literal"&gt;Attempting to Match a C++ String Literal&lt;/a&gt;&lt;/h4&gt;
+&lt;p&gt;Let&amp;#8217;s suppose we want to use our regex pattern matching on some C++ code.
+   Now, matching a C++ string literal is going to be tricky. A first attempt,
+   &lt;code&gt;/".*"/&lt;/code&gt;, just won&amp;#8217;t do because the &lt;code&gt;.*&lt;/code&gt; is &lt;em&gt;greedy&lt;/em&gt; and will eat up
+   everything until the final &lt;code&gt;"&lt;/code&gt; in the text to be matched. So
+   we might match too much:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;char * s1 = "string", * s2 = "literal";
+            ^---------match----------^
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;A non-greedy second attempt, &lt;code&gt;/".*?"/&lt;/code&gt;, won&amp;#8217;t do either since it gets
+   confused by an escaped double-quote in a string literal. So
+   we might match too little:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;char const * s = "The \"x\" in C++0x will probably be 9";
+                 ^match^
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+
+&lt;h4&gt;&lt;a href="http://wordaligned.org/articles/string-literals-and-regular-expressions.html#toc5" name="toccorrectly-matching-a-c-string-literal" id="toccorrectly-matching-a-c-string-literal"&gt;Correctly Matching a C++ String Literal&lt;/a&gt;&lt;/h4&gt;
+&lt;p&gt;To properly match a C++ string literal we need to apply the following
+   pattern: start with a double-quote; continue with a sequence of
+   &lt;em&gt;either&lt;/em&gt; characters which aren&amp;#8217;t the double-quote or the backslash
+   &lt;em&gt;or&lt;/em&gt; escape sequences; then finish with a double-quote.
+&lt;/p&gt;
+&lt;p&gt;Precisely what makes up a valid escape sequence is a little fiddly;
+   there are octal and hexadecimal escapes, there are various whitespace
+   characters, and there are unicode values. We can however compose a
+   pattern using a suitable short-cut as follows:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;A regex to match a C++ string literal&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;/"([^"\\]|\\.)*"/
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;We can read this as: a string literal starts with a double quote,
+   followed by any number of items which are:
+&lt;/p&gt;
+&lt;ul&gt;
+ &lt;li&gt;
+     &lt;em&gt;either&lt;/em&gt; not a double-quote or a backslash
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     &lt;em&gt;or&lt;/em&gt; are a backslash followed by any single character
+ &lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;and then finishes with a closing double-quote.
+&lt;/p&gt;
+&lt;p&gt;As you&amp;#8217;ve probably spotted, we have to double up the backslashes in
+   the regex pattern because the backslash is used as an escape sequence;
+   i.e. a literal backslash is matched by the pattern &lt;code&gt;\\\\&lt;/code&gt;.
+&lt;/p&gt;
+
+&lt;h4&gt;&lt;a href="http://wordaligned.org/articles/string-literals-and-regular-expressions.html#toc6" name="tocnow-lets-do-it-in-c" id="tocnow-lets-do-it-in-c"&gt;Now let&amp;#8217;s do it in C++&lt;/a&gt;&lt;/h4&gt;
+&lt;p&gt;I&amp;#8217;ll use the &lt;a href="http://www.boost.org/libs/regex/doc/index.html"&gt;Boost&lt;/a&gt; implementation since the compilers I
+   have available don&amp;#8217;t support &lt;a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2005/n1836.pdf"&gt;TR1&lt;/a&gt; yet. We&amp;#8217;re going to need to
+   construct a &lt;code&gt;boost::regex&lt;/code&gt; using a pattern represented by a string
+   literal. Which is where the problems start.  Of course we can&amp;#8217;t write:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;This regex won&amp;#8217;t compile!&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;boost::regex const
+    string_matcher(/"([^"\\]|\\.)*"/);
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;because we haven&amp;#8217;t passed a string literal to the &lt;code&gt;boost::regex&lt;/code&gt;
+   constructor.  In order to pass a string literal we&amp;#8217;ll need to use
+   double-quotes instead of forward-slashes and we&amp;#8217;ll have to escape
+   the internal double-quotes. Let&amp;#8217;s try again:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;This regex throws an exception!&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;boost::regex const
+    string_matcher("\"([^\"\\]|\\.)*\"");
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Oh dear &amp;#8212; the error moves to run-time. We get an exception:
+   &lt;code&gt;Unmatched [ or [^&lt;/code&gt;. This is because the closing square bracket &lt;code&gt;]&lt;/code&gt;
+   has been escaped by the time it gets to the regex engine. Unfortunately
+   the &lt;code&gt;\\&lt;/code&gt;&amp;#8217;s in the string literal contract to just single backslashes. We need
+   to redouble them.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;This regex is just right!&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;boost::regex const
+    string_matcher("\"([^\"\\\\]|\\\\.)*\"");
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Here, each pair of backslashes has contracted to a single backslash by the
+   time the regex engine sees it, which &amp;#8212; believe it or not &amp;#8212; is what&amp;#8217;s
+   required.
+&lt;/p&gt;
+&lt;p&gt;This &lt;code&gt;string_matcher&lt;/code&gt; works, but as code it is rather more cryptic
+   than communicative.
+&lt;/p&gt;
+
+&lt;h4&gt;&lt;a href="http://wordaligned.org/articles/string-literals-and-regular-expressions.html#toc7" name="toca-complete-c-string-literal-matcher" id="toca-complete-c-string-literal-matcher"&gt;A complete C++ string literal matcher&lt;/a&gt;&lt;/h4&gt;
+&lt;p&gt;Here&amp;#8217;s a complete program for you to try.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;A C++ string matcher&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;#include &amp;lt;boost/regex.hpp&amp;gt;
+#include &amp;lt;iostream&amp;gt;
+#include &amp;lt;stdexcept&amp;gt;
+#include &amp;lt;string&amp;gt;
+
+int main(int argc, char * argv[])
+{
+  try
+  {
+    boost::regex const
+      string_matcher("\"([^\"\\\\]|\\\\.)*\"");
+    std::string line;
+    while (std::getline(std::cin, line))
+    {
+      if (boost::regex_match(line, string_matcher))
+      {
+        std::cout &amp;lt;&amp;lt; line &amp;lt;&amp;lt; " is a C++ string literal\n";
+      }
+    }
+  }
+  catch (std::exception &amp;amp; exc)
+  {
+    std::cerr &amp;lt;&amp;lt; "An error occurred: " &amp;lt;&amp;lt; exc.what();
+  }
+  catch (...)
+  {
+    std::cerr &amp;lt;&amp;lt; "An error occurred\n";
+  }
+  return 0;
+}
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+
+&lt;h4&gt;&lt;a href="http://wordaligned.org/articles/string-literals-and-regular-expressions.html#toc8" name="tocraw-strings-in-python" id="tocraw-strings-in-python"&gt;Raw Strings in Python&lt;/a&gt;&lt;/h4&gt;
+&lt;p&gt;Unlike &lt;a href="http://www.ruby-lang.org" title="Ruby Website"&gt;Ruby&lt;/a&gt;, &lt;a href="http://python.org"&gt;Python&lt;/a&gt; doesn&amp;#8217;t include support for regexes in the
+   language itself. Instead, regex support is provided by the standard
+   &lt;a href="http://docs.python.org/lib/module-re.html"&gt;regular expression library&lt;/a&gt;.
+&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://python.org"&gt;Python&lt;/a&gt;&amp;#8217;s flexible string literals allow us to simplify the pattern,
+   though. Here, we use a &lt;a href="http://docs.python.org/ref/strings.html"&gt;raw string&lt;/a&gt;, and we chose to delimit it with
+   single-quotes so we don&amp;#8217;t need to escape the internal double-quotes.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;string_literal_pattern = r'"([^"\\]|\\.)*"'
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;This is nice. Basically, &lt;a href="http://docs.python.org/ref/strings.html"&gt;raw strings&lt;/a&gt; leave the backslashes
+   unprocessed.  &lt;a href="http://docs.python.org/ref/strings.html"&gt;Raw strings&lt;/a&gt; aren&amp;#8217;t just restricted to regex patterns,
+   though perhaps that&amp;#8217;s their most common use.
+&lt;/p&gt;
+
+&lt;h4&gt;&lt;a href="http://wordaligned.org/articles/string-literals-and-regular-expressions.html#toc9" name="tocraw-strings-in-c" id="tocraw-strings-in-c"&gt;Raw Strings in C++?&lt;/a&gt;&lt;/h4&gt;
+&lt;p&gt;C++ doesn&amp;#8217;t support raw strings (at least, it doesn&amp;#8217;t support them
+   yet, and I haven&amp;#8217;t found them mentioned in &lt;a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2005/n1836.pdf"&gt;TR1&lt;/a&gt;) &amp;#8212; but it does
+   support wide-strings, indicated by the &lt;code&gt;L&lt;/code&gt; prefix.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;cpp_wide_string = L"this is a wide string";
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Maybe if we switched the &lt;code&gt;L&lt;/code&gt; for an &lt;code&gt;R&lt;/code&gt; we could allow raw strings into
+   C++? It would make regex patterns far more readable.
+&lt;/p&gt;
+
+&lt;h4&gt;&lt;a href="http://wordaligned.org/articles/string-literals-and-regular-expressions.html#toc10" name="tocverbatim-strings-in-c" id="tocverbatim-strings-in-c"&gt;Verbatim Strings in C++?&lt;/a&gt;&lt;/h4&gt;
+&lt;p&gt;Alternatively &amp;#8230;
+&lt;/p&gt;
+&lt;p&gt;I&amp;#8217;ve never used C# but &lt;a href="http://www.google.co.uk/search?q=c%23%20string%20literals&amp;amp;hl=en&amp;amp;meta="&gt;googling&lt;/a&gt;
+   suggests raw strings are supported and rather nicely named
+   &amp;#8220;verbatim string literals&amp;#8221;. C# uses the &lt;code&gt;@&lt;/code&gt; prefix to indicate that a
+   string literal is a verbatim string. Now, &lt;code&gt;@&lt;/code&gt; isn&amp;#8217;t even part of the C++
+   source character set, so maybe this too would be possible.
+&lt;/p&gt;
+
+&lt;h4&gt;&lt;a href="http://wordaligned.org/articles/string-literals-and-regular-expressions.html#toc11" name="toctheres-no-escape" id="toctheres-no-escape"&gt;There&amp;#8217;s no escape&lt;/a&gt;&lt;/h4&gt;
+&lt;p&gt;The proliferation of backslashes when we combine regexes and string
+   literals is unfortunate. &lt;span /&gt;It could be worse. What if the backslash key
+   had fallen off our keyboard? Remarkably &amp;ndash; and, as far as I know,
+   uniquely &amp;ndash; C++ caters for this situation. A number source characters
+   can be written as &amp;#8220;trigraphs&amp;#8221; &amp;#8212; sequences of three characters
+   starting &lt;code&gt;??&lt;/code&gt;. The backslash is one such character: it can be
+   written as &lt;code&gt;??/&lt;/code&gt;.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;regex using trigraphs&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;boost::regex const
+    string_matcher("??/"([^??/"??/??/??/??/]|??/??/??/??/.)*??/"");
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;For completeness, we could also lose the &lt;code&gt;|&lt;/code&gt;, &lt;code&gt;[&lt;/code&gt; and &lt;code&gt;]&lt;/code&gt; keys.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;regex using even more trigraphs&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;boost::regex const
+    string_matcher("??/"(??(^??/"??/??/??/??/??)??!??/??/??/??/.)*??/"");
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;The string literal used to initialise &lt;code&gt;string_matcher&lt;/code&gt; &lt;em&gt;is&lt;/em&gt; valid, but
+   the regex wouldn&amp;#8217;t match it properly. I&amp;#8217;ll leave the fix as an exercise
+   for the reader.
+&lt;/p&gt;</description>
+<dc:date>2006-09-02</dc:date>
+<guid>http://wordaligned.org/articles/string-literals-and-regular-expressions.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/string-literals-and-regular-expressions.html</link>
+<category>Characters</category>
+</item>
+
+</channel>
+</rss>

@@ -1,0 +1,224 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<link rel="icon" href="/images/favicon.png" type="image/png"/>
+<link href="/styles/application.css" media="all" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="/scripts/prettify.js"></script>
+<script type="text/javascript" src="/scripts/lang-lisp.js"></script>
+<title>Run-length encoding in Python</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="author" content="Thomas Guest" />
+<meta name="description" content="A Word Aligned article posted 2009-06-01, tagged Python, Streams." />
+<meta name="keywords" content="Python, Streams" />
+<link rel="alternate" type="application/rss+xml" title="Feed" href="http://feeds.wordaligned.org/wordaligned" />
+</head>
+
+<body onload="prettyPrint()">
+<div id="container">
+  <div id="header">
+<h1><span><a accesskey="h" href="/">Word Aligned</a></span></h1>
+<h2>space sensitive programming</h2>
+<a class="button" href="http://feeds.wordaligned.org/wordaligned" title="Subscribe to Word Aligned"><img style="float: right;" src="/images/feed.png" alt="Feed Logo" height="28" width="28"/></a>
+</div>
+
+  <div id="page">
+    <div id="content">
+      <div class="atomentry" id="runlength-encoding-in-python.html">
+<h2 class="title"><a href="/articles/runlength-encoding-in-python.html">Run-length encoding in Python</a></h2>
+<p class="meta"><abbr class="published" title="2009-06-01">2009-06-01</abbr> &bull; <a href="/tag/python" rel="tag">Python</a>, <a href="/tag/streams" rel="tag">Streams</a> &bull; <a href="/articles/runlength-encoding-in-python.html#disqus_thread">Comments</a></p>
+<p>Recently I discussed <a href="/articles/deflate-runlength-encoding-but-better.html" title="DEFLATE: run-length encoding, but better">run-length encoding and DEFLATE</a> compression. I never actually showed a Python implementation of a run-length encoder, so here&#8217;s one now.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">import itertools as its
+
+def ilen(it):
+    '''Return the length of an iterable.
+    
+    &gt;&gt;&gt; ilen(range(7))
+    7
+    '''
+    return sum(1 for _ in it)
+
+def runlength_enc(xs):
+    '''Return a run-length encoded version of the stream, xs.
+    
+    The resulting stream consists of (count, x) pairs.
+    
+    &gt;&gt;&gt; ys = runlength_enc('AAABBCCC')
+    &gt;&gt;&gt; next(ys)
+    (3, 'A')
+    &gt;&gt;&gt; list(ys)
+    [(2, 'B'), (3, 'C')]
+    '''
+    return ((ilen(gp), x) for x, gp in its.groupby(xs))
+
+</pre>
+
+</div>
+
+<p>The decoder is equally simple. <code>Itertools.repeat</code> expands a <code>(count, value)</code> pair into an iterable which will generate <code>count</code> elements. <code>Itertools.chain</code> flattens these iterables into a single stream.
+</p>
+<span id="continue-reading"/>
+
+<div class="typocode">
+
+<pre class="prettyprint">def runlength_dec(xs):
+    '''Expand a run-length encoded stream.
+    
+    Each element of xs is a pair, (count, x).
+    
+    &gt;&gt;&gt; ys = runlength_dec(((3, 'A'), (2, 'B')))
+    &gt;&gt;&gt; next(ys)
+    'A'
+    &gt;&gt;&gt; ''.join(ys)
+    'AABB'
+    '''
+    return its.chain.from_iterable(its.repeat(x, n) for n, x in xs)
+
+</pre>
+
+</div>
+
+<p>If you haven&#8217;t seen <code><a href="http://docs.python.org/library/itertools.html#itertools.itertools.chain.from_iterable">itertools.chain.from_iterable()</a></code> yet, it was introduced at Python 3.0/2.6. The important feature here is that it lazily works its way through a single iterable argument. If instead we&#8217;d written:
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">def runlength_dec(xs):
+    ....
+    return its.chain(*(its.repeat(x, n) for n, x in xs))
+
+</pre>
+
+</div>
+
+<p>then our run-length decoder would need to consume all of <code>xs</code> before yielding results (which is why we must interrupt the interpreter&#8217;s execution below).
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">&gt;&gt;&gt; xs = its.cycle((3, 'A'), (2, 'B'))
+&gt;&gt;&gt; runlength_dec(xs)
+  C-c C-cTraceback (most recent call last):
+  File "&lt;stdin&gt;", line 1, in &lt;module&gt;
+  File "&lt;string&gt;", line 25, in runlength_dec
+  File "&lt;string&gt;", line 25, in &lt;genexpr&gt;
+KeyboardInterrupt
+
+</pre>
+
+</div>
+
+
+<h3>Named tuples for clarity</h3>
+<p>Streams of pairs (as shown above) are perfectly Pythonic. If we run-length encode a stream of numbers, clients will just have to read the manual and remember that <code>item[0]</code> is a repeat count and <code>item[1]</code> is a value.
+</p>
+<p>If this seems fragile, a new-ish member of the <a href="http://docs.python.org/dev/library/collections.html">collections module</a> can give the pair more structure.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">&gt;&gt;&gt; from collections import namedtuple
+&gt;&gt;&gt; Run = namedtuple('Run', 'count value') 
+&gt;&gt;&gt; run1 = Run(count=10, value=2)
+&gt;&gt;&gt; run2 = Run(value=2, count=10)
+&gt;&gt;&gt; run1
+Run(count=10, value=2)
+&gt;&gt;&gt; run2
+Run(count=10, value=2)
+&gt;&gt;&gt; run1.count
+10
+&gt;&gt;&gt; run1[0]
+10
+
+</pre>
+
+</div>
+
+<p>Here&#8217;s how we&#8217;d change <code>runlength_enc()</code> to use the new type.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">def runlength_enc(xs):
+    '''Return a run-length encoded version of the stream, xs.
+    
+    &gt;&gt;&gt; ys = runlength_enc('AAABBCCC')
+    &gt;&gt;&gt; next(ys)
+    Run(count=3, value='A')
+    &gt;&gt;&gt; list(ys)
+    [Run(count=2, value='B'), Run(count=3, value='C')]
+    '''
+    return (Run(ilen(gp), x) for x, gp in its.groupby(xs))
+
+</pre>
+
+</div>
+</div>
+
+<div class="comments"><hr/><div id="disqus_thread"></div><script type="text/javascript" src="http://disqus.com/forums/wordaligned/embed.js"></script></div>
+      
+<div id="comments"><script type="text/javascript">
+//<![CDATA[
+(function() {
+    var links = document.getElementsByTagName('a');
+    var query = '?';
+    for(var i = 0; i < links.length; i++) {
+        if(links[i].href.indexOf('#disqus_thread') >= 0) {
+            query += 'url' + i + '=' + encodeURIComponent(links[i].href) + '&amp;';
+        }
+    }
+    document.write('<script type="text/javascript" src="http://disqus.com/forums/wordaligned/get_num_replies.js' + query + '"></' + 'script>');
+})();
+//]]>
+</script></div>
+
+    </div>
+    <div id="sidebar">
+      
+<div class="sidebar-node">
+<h3>Tagged</h3>
+<ul id="categories"><li><a href="/tag/python" rel="tag">Python</a></li>
+<li><a href="/tag/streams" rel="tag">Streams</a></li></ul>
+
+</div>
+
+<div class="sidebar-node">
+<h3>Chain</h3>
+<ul>
+<li><a accesskey="n" href="/articles/oulipo-eodermdrome.html" title="Next article">&laquo; Oulipo and the Eodermdrome challenge</a></li>
+<li><a accesskey="p" href="/articles/deflate-runlength-encoding-but-better.html" title="Previous article">&raquo; DEFLATE: run-length encoding, but better</a></li>
+</ul>
+
+
+</div>
+
+<div class="sidebar-node">
+<h3>Feeds</h3>
+
+<ul>
+<li><a href="http://feeds.wordaligned.org/wordaligned"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Articles</a></li>
+<li><a href="http://feeds.wordaligned.org/wordaligned/comments"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Comments</a></li>
+</ul>
+
+
+</div>
+
+    </div>
+  </div>
+  <div id="footer">
+<hr />
+<p><a href="http://tag.wordaligned.org">Thomas Guest</a></p>
+</div>
+
+</div>
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-3373724-1']);
+  _gaq.push(['_trackPageview']);
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ga);
+  })();
+</script>
+</body>
+
+</html>

@@ -1,0 +1,212 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<link rel="icon" href="/images/favicon.png" type="image/png"/>
+<link href="/styles/application.css" media="all" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="/scripts/prettify.js"></script>
+<script type="text/javascript" src="/scripts/lang-lisp.js"></script>
+<script type="text/javascript" src="http://www.haloscan.com/load/wordaligned"></script>
+
+<title>Hunting down globals with nm</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="author" content="Thomas Guest" />
+<meta name="description" content="A Word Aligned article posted 2008-04-08, tagged C, Shell, nm." />
+<meta name="keywords" content="C, Shell, nm" />
+<link rel="alternate" type="application/rss+xml" title="Feed" href="http://feeds.wordaligned.org/wordaligned" />
+</head>
+
+<body onload="prettyPrint()">
+<div id="container">
+  <div id="header">
+<h1><span><a accesskey="h" href="/">Word Aligned</a></span></h1>
+<h2>tales from the code face</h2>
+<a class="button" href="http://feeds.wordaligned.org/wordaligned" title="Subscribe to Word Aligned"><img style="float: right;" src="/images/feed.png" alt="Feed Logo" height="28" width="28"/></a>
+</div>
+
+  <div id="page">
+    <div id="content">
+      <div class="atomentry" id="hunting-down-globals-with-nm.html">
+<h2 class="title"><a href="/articles/hunting-down-globals-with-nm.html">Hunting down globals with nm</a></h2>
+<p class="meta"><abbr class="published" title="2008-04-08">2008-04-08</abbr> &bull; <a href="/tag/c" rel="tag">C</a>, <a href="/tag/shell" rel="tag">Shell</a>, <a href="/tag/nm" rel="tag">nm</a> &bull; <a href="/articles/hunting-down-globals-with-nm.html#disqus_thread">Comments</a></p>
+<p>It was an old library, in need of attention &#8212; we all knew that &#8212; but it worked well, and we saw no reason to change it. Until, that is, we wanted more than one of it. The problem being, it was riddled with globals. A typical file looked something like this:
+</p>
+<div class="typocode"><div class="codetitle">Too many globals</div>
+
+<pre class="prettyprint">#include &lt;string.h&gt;
+#define MSG_BUF_SIZE 256
+
+char const * g_libname = "TOO.MANY.GLOBALS";
+
+void initialise()
+{
+    static int s_initialised = 0;    
+    if (s_initialised == 0)
+    {
+        s_initialised = 1;
+        ....
+    }
+}
+
+char g_msg_buf[MSG_BUF_SIZE];
+
+static void clear_message()
+{
+    memset(g_msg_buf, 0, sizeof(g_msg_buf));
+}
+
+....
+
+</pre>
+
+</div>
+
+<p>In the snippet above, the <code>g_msg_buf</code> has external linkage. Other files in the library accessed it freely. The local static int, <code>s_initialised</code>, is better contained, but still stood in our way. How could we initialise two library instances?
+</p>
+<p>Don&#8217;t worry, we&#8217;re not about to discuss the evils of globals and singletons. We all know what needs doing here: initialising the library should return clients a handle, and each client would use its returned handle for subsequent access to the library. Internally, the handle would be a pointer to a struct, the details of which would be private to the library, packaging its internal state.
+</p>
+<span id="continue-reading"/>
+
+<p>Sadly no refactoring IDE could cope with this job. Our immediate problem was simply sizing up the task. So we had to count up the <code>s_initialised</code>&#8217;s and <code>g_msg_buf</code>&#8217;s and so on. One obvious way of getting a number would be to browse the code and build a list of these globals. Indeed, this approach has some merit: we&#8217;re building familiarity with the code, code we&#8217;ll ultimately have to change. An exact answer isn&#8217;t really needed at this stage.
+</p>
+<p>Shell hackers might attempt an instant estimate by combining <code>grep</code>, <code>sort</code> and <code>uniq</code> &#8212; if we&#8217;re confident that the <code>s_</code> and <code>g_</code> prefixes are consistently used in the library.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">$ grep -Eioh "\b[sg]_[[:alnum:]_]*\b" nm.c | sort | uniq
+
+</pre>
+
+</div>
+
+<p>Such text based approaches are better than nothing. We can review the result for  false hits, inspect the code to see if we&#8217;ve missed anything obvious, adapt the pattern if required, and pipe the result to <code>wc -l</code> for a final count.
+</p>
+<p><span id="excerpt0"/>But the best route to an accurate answer is easier and quicker. The compiler <em>has to know</em> exactly what&#8217;s global, what&#8217;s local, what&#8217;s data and what&#8217;s missing, and that information gets put in the object code it generates. Since reading object code is tough, we&#8217;ll ask <code>nm</code> to do it for us. Here&#8217;s what I get if I compile the snippet above and inspect the output object file with <code>nm</code>. (What you get should be similar, but the details will depend on your platform.)
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">$ gcc -c too_many_globals.c &amp;&amp; nm too_many_globals.o
+00000018 t clear_message
+00000000 D g_libname
+00000100 C g_msg_buf
+00000000 T initialise
+         U memset
+00000000 b s_initialised.0
+
+</pre>
+
+</div>
+
+<p>The <code>nm</code> manual tells us how to interpret the output:
+</p>
+<blockquote><p>Nm displays the name list (symbol table) of each object file in the argument list &#8230; Each symbol name is preceded  by  its  value (blanks if undefined) &#8230; this value is followed by one of the following  characters,  representing  the symbol type: U (undefined), A (absolute), T (text section symbol), D (data section  symbol), B (bss section  symbol), C (common  symbol) &#8230;. If the symbol is local (non-external), the symbol&#8217;s type is instead represented  by  the  corresponding lowercase letter.
+</p>
+</blockquote><p><code>Nm</code> works on object files, libraries (static and dynamic) and executables. You don&#8217;t have to be an expert on object code to correlate the <code>nm</code> output shown above with the source code. It&#8217;s telling us:
+</p>
+<ul>
+ <li>
+     <code>clear_message</code> is a local function
+ </li>
+
+ <li>
+     <code>g_libname</code> is constant global data 
+ </li>
+
+ <li>
+     <code>initialise</code> is an external function
+ </li>
+
+ <li>
+     <code>memset</code> is undefined (it&#8217;s part of the standard C library)
+ </li>
+
+ <li>
+     <code>g_msg_buf</code> and <code>s_initialised</code> are the bad boys we&#8217;re hunting down
+ </li>
+</ul>
+<p>Once we&#8217;ve discovered <code>nm</code> we can pick out the globals accurately and swiftly.  Running <code>nm libtoo_many_globals.a</code> outputs text which we can pipe through standard Unix tools as before to get <em>exact</em> metrics.
+</p>
+<p>The <a href="http://www.gnu.org/software/binutils/manual/html_chapter/binutils_2.html">GNU version of nm</a> has some bells and whistles &#8212; it can demangle C++ symbols, for example. Object code is platform dependent and the details of <code>nm</code>&#8217;s output will similarly vary across platforms, so I suggest you look at the manual, but most of the time <code>nm OBJECTFILE</code> is all you&#8217;ll need.
+</p>
+
+<h3>Global constants</h3>
+<p>Note that <code>nm</code> has nothing to say about the preprocessor definition, MSG_BUF_SIZE, which vanishes well before the object file gets written. Since MSG_BUF_SIZE can&#8217;t be changed at run time or even after compilation, it won&#8217;t stop us from safely using more than one library instance. <code>Nm</code> does tell us about <code>g_libname</code>, a string constant has been placed in the data section of the object file. Like MSG_BUF_SIZE, multiple library instances can safely share this read-only data.
+</p>
+<p>Just because something can be done doesn&#8217;t make it <a href="http://accu.org/index.php/journals/1411">good practice</a>. I don&#8217;t think there&#8217;s enough information here to definitively rule against these two &#8220;safe&#8221; globals, but they certainly look suspect. At the very least, the scope of the library name string should be reduced. It would be better to review use of constant data throughout the library; by passing this data in, perhaps as an initialisation parameter, the library may become more flexible and easier to test.
+</p>
+</div>
+
+<div class="comments"><hr/><div id="disqus_thread"></div><script type="text/javascript" src="http://disqus.com/forums/wordaligned/embed.js"></script></div>
+      
+<div id="comments"><script type="text/javascript">
+//<![CDATA[
+(function() {
+    var links = document.getElementsByTagName('a');
+    var query = '?';
+    for(var i = 0; i < links.length; i++) {
+        if(links[i].href.indexOf('#disqus_thread') >= 0) {
+            query += 'url' + i + '=' + encodeURIComponent(links[i].href) + '&amp;';
+        }
+    }
+    document.write('<script type="text/javascript" src="http://disqus.com/forums/wordaligned/get_num_replies.js' + query + '"></' + 'script>');
+})();
+//]]>
+</script></div>
+
+    </div>
+    <div id="sidebar">
+      <div class="sidebar-node">
+<h3>Excerpt</h3>
+<p><a href="#excerpt0">But the best route to an accurate answer is easier and quicker.</a></p>
+
+</div>
+
+<div class="sidebar-node">
+<h3>Tagged</h3>
+<ul id="categories"><li><a href="/tag/c" rel="tag">C</a></li>
+<li><a href="/tag/shell" rel="tag">Shell</a></li>
+<li><a href="/tag/nm" rel="tag">nm</a></li></ul>
+
+</div>
+
+<div class="sidebar-node">
+<h3>Chain</h3>
+<ul>
+<li><a accesskey="n" href="/articles/stop-the-clock-squash-the-bug.html" title="Next article">&laquo; Stop the clock, squash the bug</a></li>
+<li><a accesskey="p" href="/articles/programming-nirvana-plan-b.html" title="Previous article">&raquo; Programming Nirvana, Plan B</a></li>
+</ul>
+
+
+</div>
+
+<div class="sidebar-node">
+<h3>Feeds</h3>
+
+<ul>
+<li><a href="http://feeds.wordaligned.org/wordaligned"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Articles</a></li>
+<li><a href="http://feeds.wordaligned.org/wordaligned/comments"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Comments</a></li>
+</ul>
+
+
+</div>
+
+    </div>
+  </div>
+  <div id="footer">
+<hr />
+<p><a href="http://tag.wordaligned.org">Thomas Guest</a></p>
+</div>
+
+</div>
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-3373724-1']);
+  _gaq.push(['_trackPageview']);
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ga);
+  })();
+</script>
+</body>
+
+</html>

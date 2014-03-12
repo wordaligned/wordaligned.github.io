@@ -1,0 +1,170 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<link rel="icon" href="/images/favicon.png" type="image/png"/>
+<link href="/styles/application.css" media="all" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="/scripts/prettify.js"></script>
+<script type="text/javascript" src="/scripts/lang-lisp.js"></script>
+<title>Patience Sorted</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="author" content="Thomas Guest" />
+<meta name="description" content="A Word Aligned article posted 2013-03-14, tagged Algorithms, Puzzles, Self." />
+<meta name="keywords" content="Algorithms, Puzzles, Self" />
+<link rel="alternate" type="application/rss+xml" title="Feed" href="http://feeds.wordaligned.org/wordaligned" />
+</head>
+
+<body onload="prettyPrint()">
+<div id="container">
+  <div id="header">
+<h1><span><a accesskey="h" href="/">Word Aligned</a></span></h1>
+<h2>think about it</h2>
+<a class="button" href="http://feeds.wordaligned.org/wordaligned" title="Subscribe to Word Aligned"><img style="float: right;" src="/images/feed.png" alt="Feed Logo" height="28" width="28"/></a>
+</div>
+
+  <div id="page">
+    <div id="content">
+      <div class="atomentry" id="patience-sorted.html">
+<h2 class="title"><a href="/articles/patience-sorted.html">Patience Sorted</a></h2>
+<p class="meta"><abbr class="published" title="2013-03-14">2013-03-14</abbr> &bull; <a href="/tag/algorithms" rel="tag">Algorithms</a>, <a href="/tag/puzzles" rel="tag">Puzzles</a>, <a href="/tag/self" rel="tag">Self</a> &bull; <a href="/articles/patience-sorted.html#disqus_thread">Comments</a></p>
+<p>I gave a lightning talk today about patience sorting and its application to the longest increasing subsequence problem. It&#8217;s a subject I&#8217;ve <a href="/articles/patience-sort.html" title="Patience sort and the longest increasing subsequence">written about</a> before. My computer has been put through several million simulations. I&#8217;ve even coded up a <a href="/pages/psort">javascript demo</a> which deals out virtual playing cards and sorts them at the click of a button.
+</p>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.1/jquery.min.js"></script>
+<script type="text/javascript">
+var zz = 0;
+
+var xtop  = ["330px", "302px", "275px", "255px", "234px", "209px", "187px", "158px", "128px", "99px", "70px", "43px", "15px"];
+var ytop  = ["26px", "30px", "28px", "29px", "31px", "28px", "27px", "28px", "28px", "30px", "26px", "30px", "29px"];
+var xpile = ["10px", "13px", "12px", "115px", "14px", "220px", "220px", "319px", "15px", "216px", "118px", "118px", "321px"];
+var ypile = ["205px", "233px", "266px", "206px", "295px", "206px", "236px", "209px", "325px", "267px", "235px", "263px", "234px"];
+var result = ["#card7", "#card6", "#card3", "#card2"];
+
+function reset_cards() {
+    jQuery("img").stop();
+    zz += 13;
+    for (var j = 0; j != 13; ++j, --zz) {
+        jQuery("#card" + j)
+        .css({"z-index":zz, "margin-left":xtop[j], "margin-top":ytop[j], "border-width":0});
+    }
+    zz += 13;
+}
+
+function lis(j) {
+    var it = jQuery(result[j]);
+    if (it.length > 0) {
+        it.animate({borderWidth : "5px"}, "slow", 0, function(){lis(++j);});
+    }
+}
+
+function psort(j) {
+    var it = jQuery("#card"+j);
+    if (it.length != 0) {
+        it
+        .animate({marginLeft : xpile[j], marginTop: ypile[j]}, "slow", 0, function(){psort(++j);})
+        .css({"z-index" : ++zz});
+    } else {
+        lis(0);
+    }
+}
+
+function animate() {
+    reset_cards();
+    psort(0);
+}
+</script>
+
+<div class="cardtable" style="background-color: #093; width:440px; height:480px;">
+<img id="card0" style="border: 0 orange solid; position: absolute; margin-left: 330px; margin-top: 27px; z-index: 13;" src="/images/cards/1s.png" alt="Ace of Spades"/>
+<img id="card1" style="border: 0 orange solid; position: absolute; margin-left: 302px; margin-top: 27px; z-index: 12;" src="/images/cards/10s.png" alt="10 of Spades"/>
+<img id="card2" style="border: 0 orange solid; position: absolute; margin-left: 275px; margin-top: 27px; z-index: 11;" src="/images/cards/6s.png" alt="6 of Spades"/>
+<img id="card3" style="border: 0 orange solid; position: absolute; margin-left: 255px; margin-top: 26px; z-index: 10;" src="/images/cards/7s.png" alt="7 of Spades"/>
+<img id="card4" style="border: 0 orange solid; position: absolute; margin-left: 234px; margin-top: 28px; z-index: 9;" src="/images/cards/5s.png" alt="5 of Spades"/>
+<img id="card5" style="border: 0 orange solid; position: absolute; margin-left: 209px; margin-top: 26px; z-index: 8;" src="/images/cards/13s.png" alt="King of Spades"/>
+<img id="card6" style="border: 0 orange solid; position: absolute; margin-left: 187px; margin-top: 31px; z-index: 7;" src="/images/cards/9s.png" alt="9 of Spades"/>
+<img id="card7" style="border: 0 orange solid; position: absolute; margin-left: 158px; margin-top: 27px; z-index: 6;" src="/images/cards/12s.png" alt="Queen of Spades"/>
+<img id="card8" style="border: 0 orange solid; position: absolute; margin-left: 128px; margin-top: 29px; z-index: 5;" src="/images/cards/2s.png" alt="2 of Spades"/>
+<img id="card9" style="border: 0 orange solid; position: absolute; margin-left: 99px; margin-top: 29px; z-index: 4;" src="/images/cards/8s.png" alt="8 of Spades"/>
+<img id="card10" style="border: 0 orange solid; position: absolute; margin-left: 70px; margin-top: 26px; z-index: 3;" src="/images/cards/4s.png" alt="4 of Spades"/>
+<img id="card11" style="border: 0 orange solid; position: absolute; margin-left: 43px; margin-top: 27px; z-index: 2;" src="/images/cards/3s.png" alt="3 of Spades"/>
+<img id="card12" style="border: 0 orange solid; position: absolute; margin-left: 15px; margin-top: 28px; z-index: 1;" src="/images/cards/11s.png" alt="Knave of Spades"/>
+</div><div><p><button onclick="reset_cards();">Reset</button><button onclick="animate();">Play</button></p></div>
+
+<p>Today I used real playing cards; a linen-finished standard deck. For any talk it&#8217;s nice to have a prop.
+</p>
+<p><a href="http://www.flickr.com/photos/thomasguest/8558343442/" title="Rock &amp; Pop Legends by Thomas Guest, on Flickr"><img src="http://farm9.staticflickr.com/8100/8558343442_0402f04e83.jpg" width="500" height="361" alt="Rock &amp; Pop Legends"></a>
+</p>
+<p>Now, I <strong>thought</strong> I understood the patience sort algorithm but until yesterday I&#8217;d never actually played it with real cards. I&#8217;ve been surprised by how much this physical dimension has developed my understanding.
+</p>
+<p>I&#8217;ll be testing my new cards on some other sorting algorithms; I have high hopes. It would be good to find a similarly simple prop for linked data structures so I can balance trees, flip lists and walk graphs.
+</p>
+</div>
+
+<div class="comments"><hr/><div id="disqus_thread"></div><script type="text/javascript" src="http://disqus.com/forums/wordaligned/embed.js"></script></div>
+      
+<div id="comments"><script type="text/javascript">
+//<![CDATA[
+(function() {
+    var links = document.getElementsByTagName('a');
+    var query = '?';
+    for(var i = 0; i < links.length; i++) {
+        if(links[i].href.indexOf('#disqus_thread') >= 0) {
+            query += 'url' + i + '=' + encodeURIComponent(links[i].href) + '&amp;';
+        }
+    }
+    document.write('<script type="text/javascript" src="http://disqus.com/forums/wordaligned/get_num_replies.js' + query + '"></' + 'script>');
+})();
+//]]>
+</script></div>
+
+    </div>
+    <div id="sidebar">
+      
+<div class="sidebar-node">
+<h3>Tagged</h3>
+<ul id="categories"><li><a href="/tag/algorithms" rel="tag">Algorithms</a></li>
+<li><a href="/tag/puzzles" rel="tag">Puzzles</a></li>
+<li><a href="/tag/self" rel="tag">Self</a></li></ul>
+
+</div>
+
+<div class="sidebar-node">
+<h3>Chain</h3>
+<ul>
+<li><a accesskey="n" href="/articles/an-exploration-of-the-phenomenology-of-software-development.html" title="Next article">&laquo; An Exploration of the Phenomenology of Software Development</a></li>
+<li><a accesskey="p" href="/articles/hosting-for-life-textdrive-revived.html" title="Previous article">&raquo; Hosting for Life? TextDrive revived!</a></li>
+</ul>
+
+
+</div>
+
+<div class="sidebar-node">
+<h3>Feeds</h3>
+
+<ul>
+<li><a href="http://feeds.wordaligned.org/wordaligned"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Articles</a></li>
+<li><a href="http://feeds.wordaligned.org/wordaligned/comments"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Comments</a></li>
+</ul>
+
+
+</div>
+
+    </div>
+  </div>
+  <div id="footer">
+<hr />
+<p><a href="http://tag.wordaligned.org">Thomas Guest</a></p>
+</div>
+
+</div>
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-3373724-1']);
+  _gaq.push(['_trackPageview']);
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ga);
+  })();
+</script>
+</body>
+
+</html>

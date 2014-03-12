@@ -1,0 +1,141 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<link rel="icon" href="/images/favicon.png" type="image/png"/>
+<link href="/styles/application.css" media="all" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="/scripts/prettify.js"></script>
+<script type="text/javascript" src="/scripts/lang-lisp.js"></script>
+<script type="text/javascript" src="http://www.haloscan.com/load/wordaligned"></script>
+
+<title>Fun with Erlang, ACCU 2008</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="author" content="Thomas Guest" />
+<meta name="description" content="A Word Aligned article posted 2008-04-01, tagged ACCU, Erlang, Self, Haskell." />
+<meta name="keywords" content="ACCU, Erlang, Self, Haskell" />
+<link rel="alternate" type="application/rss+xml" title="Feed" href="http://feeds.wordaligned.org/wordaligned" />
+</head>
+
+<body onload="prettyPrint()">
+<div id="container">
+  <div id="header">
+<h1><span><a accesskey="h" href="/">Word Aligned</a></span></h1>
+<h2>professionalism in programming</h2>
+<a class="button" href="http://feeds.wordaligned.org/wordaligned" title="Subscribe to Word Aligned"><img style="float: right;" src="/images/feed.png" alt="Feed Logo" height="28" width="28"/></a>
+</div>
+
+  <div id="page">
+    <div id="content">
+      <div class="atomentry" id="fun-with-erlang-accu-2008.html">
+<h2 class="title"><a href="/articles/fun-with-erlang-accu-2008.html">Fun with Erlang, ACCU 2008</a></h2>
+<p class="meta"><abbr class="published" title="2008-04-01">2008-04-01</abbr> &bull; <a href="/tag/accu" rel="tag">ACCU</a>, <a href="/tag/erlang" rel="tag">Erlang</a>, <a href="/tag/self" rel="tag">Self</a>, <a href="/tag/haskell" rel="tag">Haskell</a> &bull; <a href="/articles/fun-with-erlang-accu-2008.html#disqus_thread">Comments</a></p>
+<p>I&#8217;ve just got back from a <a href="http://accu.org/index.php/conferences/accu_conference_2008/accu2008_sessions#Fun%20with%20Erlang">one day course on Erlang</a> given by its inventor, Joe Armstrong, at day 0 of the <a href="http://accu.org/index.php/conferences/accu_conference_2008">ACCU 2008 conference</a>. Actually, he crammed as much as he could from a three day course into a single day. I&#8217;m not too disappointed we didn&#8217;t reach the stated aim of the course, of developing and running a networked application and changing it on the fly: I&#8217;m happy enough to have written some <a href="http://erlang.org">Erlang</a> code and been exposed to some new ideas.
+</p>
+<div class="amazon"><a href="http://www.amazon.com/gp/product/193435600X?ie=UTF8&amp;tag=wordalig-20&amp;linkCode=as2&amp;camp=1789&amp;creative=9325&amp;creativeASIN=193435600X"><img src="/images/programming-erlang.jpg" alt="Programming Erlang"/></a></div>
+
+<p>Armstrong is affable and enthusiastic and not afraid to voice his opinions. He&#8217;s a good teacher. I do recommend his book, <a href="http://www.amazon.com/gp/product/193435600X?ie=UTF8&amp;amp;tag=wordalig-20&amp;amp;linkCode=as2&amp;amp;camp=1789&amp;amp;creative=9325&amp;amp;creativeASIN=193435600X">&#8220;Programming Erlang: Software for a Concurrent World&#8221;</a>, but found the tone a bit matey in places. In person he&#8217;s much more direct and engaging.
+</p>
+<p><a href="http://erlang.org">Erlang</a> is a functional programming language which builds in support for multiple processes &#8212; these are <em>not</em> operating system processes; and in some ways, Erlang <em>is</em> the operating system. You define functions and other rules and controls using pattern matching. When patterns are used to dispatch message responses in a <code>receive</code> statement, the code reads well, and functions can be defined using patterns in an elegant and concise way &#8212; no if-this-then-that-else-other.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">-module(accum).
+-export([evens_and_odds/1]).
+-import(lists, [reverse/1]).
+
+evens_and_odds(L) -&gt; evens_and_odds(L,[], []).
+
+evens_and_odds([H|T], E, O) when H rem 2 =:= 0 -&gt; evens_and_odds(T, [H|E], O);
+evens_and_odds([H|T], E, O) -&gt;  evens_and_odds(T, E, [H|O]);
+evens_and_odds([], E, O)    -&gt;  {E, O}.
+
+</pre>
+
+</div>
+
+<p>(I know this example should be coded using <code>lists:partition</code>, it&#8217;s just here to show the pattern syntax.)
+</p>
+<p><a href="http://www.sics.se/~joe/images/mc.jpg" title="Joe Armstrong and the big thumper"><img src="http://www.sics.se/~joe/images/joe_mc.jpg" alt="Joe Armstrong and the big thumper" style="float:right;"/></a>
+</p>
+<p>Erlang is no academic pure functional language, though. It originated at <a href="http://www.ericsson.com">Ericsson</a> over 20 years ago and has been used to develop <em>extremely</em> reliable distributed concurrent systems. Hence the current interest: Erlang can take advantage of multiple processor cores on multiple machines, which is why it&#8217;s been adopted by up and coming projects like <a href="http://couchdb.org">CouchDB</a>. Given its proprietary origins, I think we&#8217;re lucky to find the language available under an open source license. (Armstrong has some stories to tell about that!) On the other hand, Armstrong admitted that some of the documentation was weak &#8212; at Ericsson you could always  ask one of the Erlang developers if you didn&#8217;t understand something. Personally, I&#8217;d be wary of the OTP platform, a full-featured distributed application framework built on top of Erlang.
+</p>
+<p>Processes communicate by messages and by generating exceptions. You can link processes together. This doesn&#8217;t mean designing a distributed system is easy, but I&#8217;d say it gives us an appropriate language for such systems. Or as Armstrong puts it:
+</p>
+<blockquote><p>&#8220;You cannot describe concurrent systems in sequential languages.&#8221;
+</p>
+</blockquote><hr />
+
+<p>By the way, I&#8217;ll be back at the conference on Thursday, to hear what <a href="/articles/programming-nirvana-plan-b.html">Simon Peyton Jones has to say about functional programming and Haskell</a>. See some of you then.
+</p>
+</div>
+
+<div class="comments"><hr/><div id="disqus_thread"></div><script type="text/javascript" src="http://disqus.com/forums/wordaligned/embed.js"></script></div>
+      
+<div id="comments"><script type="text/javascript">
+//<![CDATA[
+(function() {
+    var links = document.getElementsByTagName('a');
+    var query = '?';
+    for(var i = 0; i < links.length; i++) {
+        if(links[i].href.indexOf('#disqus_thread') >= 0) {
+            query += 'url' + i + '=' + encodeURIComponent(links[i].href) + '&amp;';
+        }
+    }
+    document.write('<script type="text/javascript" src="http://disqus.com/forums/wordaligned/get_num_replies.js' + query + '"></' + 'script>');
+})();
+//]]>
+</script></div>
+
+    </div>
+    <div id="sidebar">
+      
+<div class="sidebar-node">
+<h3>Tagged</h3>
+<ul id="categories"><li><a href="/tag/accu" rel="tag">ACCU</a></li>
+<li><a href="/tag/erlang" rel="tag">Erlang</a></li>
+<li><a href="/tag/self" rel="tag">Self</a></li>
+<li><a href="/tag/haskell" rel="tag">Haskell</a></li></ul>
+
+</div>
+
+<div class="sidebar-node">
+<h3>Chain</h3>
+<ul>
+<li><a accesskey="n" href="/articles/programming-nirvana-plan-b.html" title="Next article">&laquo; Programming Nirvana, Plan B</a></li>
+<li><a accesskey="p" href="/articles/white-black-knight.html" title="Previous article">&raquo; White black knight then black white knight</a></li>
+</ul>
+
+
+</div>
+
+<div class="sidebar-node">
+<h3>Feeds</h3>
+
+<ul>
+<li><a href="http://feeds.wordaligned.org/wordaligned"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Articles</a></li>
+<li><a href="http://feeds.wordaligned.org/wordaligned/comments"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Comments</a></li>
+</ul>
+
+
+</div>
+
+    </div>
+  </div>
+  <div id="footer">
+<hr />
+<p><a href="http://tag.wordaligned.org">Thomas Guest</a></p>
+</div>
+
+</div>
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-3373724-1']);
+  _gaq.push(['_trackPageview']);
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ga);
+  })();
+</script>
+</body>
+
+</html>

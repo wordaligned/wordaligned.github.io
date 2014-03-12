@@ -1,0 +1,212 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<link rel="icon" href="/images/favicon.png" type="image/png"/>
+<link href="/styles/application.css" media="all" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="/scripts/prettify.js"></script>
+<script type="text/javascript" src="/scripts/lang-lisp.js"></script>
+<script type="text/javascript" src="http://www.haloscan.com/load/wordaligned"></script>
+
+<title>Me, Myself and OpenID</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="author" content="Thomas Guest" />
+<meta name="description" content="Setting up a personal OpenID server using phpMyID A Word Aligned article posted 2008-07-09, tagged openid, php, Python, lighttpd." />
+<meta name="keywords" content="openid, php, Python, lighttpd" />
+<link rel="alternate" type="application/rss+xml" title="Feed" href="http://feeds.wordaligned.org/wordaligned" />
+</head>
+
+<body onload="prettyPrint()">
+<div id="container">
+  <div id="header">
+<h1><span><a accesskey="h" href="/">Word Aligned</a></span></h1>
+<h2>space sensitive programming</h2>
+<a class="button" href="http://feeds.wordaligned.org/wordaligned" title="Subscribe to Word Aligned"><img style="float: right;" src="/images/feed.png" alt="Feed Logo" height="28" width="28"/></a>
+</div>
+
+  <div id="page">
+    <div id="content">
+      <div class="atomentry" id="me-myself-and-openid.html">
+<h2 class="title"><a href="/articles/me-myself-and-openid.html">Me, Myself and OpenID</a></h2>
+<p class="meta"><abbr class="published" title="2008-07-09">2008-07-09</abbr> &bull; <a href="/tag/openid" rel="tag">openid</a>, <a href="/tag/php" rel="tag">php</a>, <a href="/tag/python" rel="tag">Python</a>, <a href="/tag/lighttpd" rel="tag">lighttpd</a> &bull; <a href="/articles/me-myself-and-openid.html#disqus_thread">Comments</a></p>
+<h3>That&#8217;s not strictly Python</h3>
+<p><a href="http://www.pyconuk.org"><img src="http://www.pyconuk.org/images/pyconuk_logo_72x72.png" alt="[PyCon UK]" style="float:right"/></a>
+</p>
+<p>At the opening day of <a href="http://www.pyconuk.org">PyCon UK</a> 2007 <a href="http://simonwillison.net">Simon Willison</a> delivered a keynote presentation entitled &#8220;Building the Social Web with OpenID&#8221;. Willison is an assured and expert presenter, and it took him just an hour to work through 146 multimedia <a href="http://www.slideshare.net/simon/building-the-social-web-with-openid">slides</a> pitching <a href="http://openid.net">OpenID</a> as, in a sentence:
+</p>
+<blockquote><p>&#8220;single sign-on for the web.&#8221;
+</p>
+</blockquote><p>At the time I felt disappointed: I&#8217;d expected something more directly related to Python. Looking back from almost a year on, I realise that the presentation I got most from at that conference also had little directly to do with Python (<a href="http://jon.es/terry.html">Dr. Terry Jones</a>, &#8220;Fluidinfo - towards the next everything&#8221;<a id="fn1link" href="#fn1"><sup>[1]</sup></a>). For me, conferences are a chance to step back and reflect, to learn about new things, which is why, this year, I chose to attend the more eclectic <a href="http://accu.org/index.php/conferences/accu_conference_2008">ACCU 2008 conference</a>.
+</p>
+<span id="continue-reading"/>
+
+
+<h3>Viral networks</h3>
+<p>Simon Willison&#8217;s 2007 keynote has turned out to be a slow-burner. I&#8217;m a curmudgeon when it comes to the social web: I didn&#8217;t start instant-messaging until recently, and although I&#8217;ve signed up for FaceSpace, HookdUp! and InKrowd<a id="fn2link" href="#fn2"><sup>[2]</sup></a> I forget why and can&#8217;t claim to get what they&#8217;re about. 
+</p>
+<p>Despite my reticence, invitations to join some new social network regularly appear in my inbox, usually from my oldest nephew. He&#8217;s not trying to rescue me; I just happen to be in his address book, and he doesn&#8217;t think twice about handing over the keys to his online identity whenever he signs up to some network. There&#8217;ll be a prompt:
+</p>
+<blockquote><p>Let your friends know you&#8217;ve joined MeeToo!
+</p>
+</blockquote><p>All you then have to do is enter your Microyahooglesoft! password and anyone you&#8217;ve ever emailled will receive your invitation to connect; thus the invitations replicate, like a chain letter, but without the expense of copying or postage. 
+</p>
+<p>What you will have to do, though, and keep doing, is reinvent yourself by claiming a new username and password for every network you join. Inevitably you&#8217;ll recycle passwords. And so your disparate online identities share a common vulnerability.
+</p>
+
+<h3>OpenID</h3>
+<p><a href="http://openid.net"><img style="float:right" src="http://openid.net/logo-graphics/openid-icon-100x100.png" alt="[OpenID]"/></a>
+</p>
+<p><a href="http://openid.net">OpenID</a> aims to address several problems with this picture.
+</p>
+<ul>
+ <li>
+     If a website allows you the chance to sign-up using OpenID, you don&#8217;t have to create a new identity to use that site. You don&#8217;t have to trust the site with your credentials at all. Authentication is done off-site by your chosen OpenID provider. Here&#8217;s a short clip in which Simon Willison demonstrates how it works:
+ </li>
+</ul>
+<p><object width="425" height="344"><param name="movie" value="http://www.youtube.com/v/Vq0R1Y1A2rE&amp;hl=en&amp;fs=1&amp;color1=0xe1600f&amp;color2=0xfebd01"></param><param name="allowFullScreen" value="true"></param><embed src="http://www.youtube.com/v/Vq0R1Y1A2rE&amp;hl=en&amp;fs=1&amp;color1=0xe1600f&amp;color2=0xfebd01" type="application/x-shockwave-flash" allowfullscreen="true" width="425" height="344"></embed></object>
+</p>
+<ul>
+ <li><p>Like all that&#8217;s good about the internet, OpenID is an <a href="http://openid.net/developers/specs/">open and free standard</a>. I&#8217;m hoping this means it really is secure! It also means developers have a choice of <a href="http://wiki.openid.net/Libraries">implementations</a> and users have a choice of <a href="http://openid.net/get/">providers</a>.
+</p>
+
+ </li>
+
+ <li><p>The OpenID tagline, &#8220;single sign-on for the web&#8221;, can be misleading. You&#8217;re not limited to a single identity. It&#8217;s perfectly valid to create separate identities for separate roles, just as fiction writers might choose to publish in different genres using different names.
+</p>
+
+ </li>
+
+ <li><p>Leading blog sites already support OpenID, meaning you can maintain an identity when, e.g., commenting on WordPress, Blogger and LiveJournal blogs.
+</p>
+
+ </li>
+
+ <li><p>I&#8217;ve noticed an increasing interest in OpenID. More people write about it, more sites offer it. Here&#8217;s a graph on the <a href="http://janrain.com/blog/">JanRain blog</a> showing the increase in Unique Relying Parties (sites that accept OpenID).
+</p>
+
+ </li>
+</ul>
+<p><a href="http://janrain.com/blog/"><img src="http://janrain.com/wp-content/uploads/2008/06/image0011.png" alt="[OpenID relying parties]" width="80%"/></a>
+</p>
+
+<h3>Mistrust</h3>
+<p>So much for the hype. Software developers have a healthy skepticism for new technologies, as evidenced in <a href="http://accu.org/index.php/blogs/1466">this article by Alan Lenton</a>. Unfortunately the article is weakened by a few misconceptions but the closing paragraph did make me stop and think.
+</p>
+<blockquote><p>Finally, who would you trust your personal information to? Microsoft? Google? Yahoo? IBM? VeriSign? Not a cat in hell&#8217;s chance!
+</p>
+</blockquote><p>Well, an OpenID identifier is just a URL which you can prove you own. If you already own a domain you can use a URL within that domain, and it&#8217;s possible to change your OpenID provider without changing your identity using <a href="http://openid.net/specs/openid-authentication-1_1.html#delegating_authentication">delegation</a>. You just add a couple of links to the head of the page at this URL. The OpenID specification shows how an end user would delegate to their LiveJournal account.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">&lt;link rel="openid.server" href="http://www.livejournal.com/openid/server.bml"&gt;
+&lt;link rel="openid.delegate" href="http://exampleuser.livejournal.com/"&gt;
+
+</pre>
+
+</div>
+
+<p>This simple indirection allows you to maintain an identifier while changing providers. With just a little more effort you can <a href="http://wiki.openid.net/Run_your_own_identity_server">host your own identity server</a>. Of course there&#8217;s much to be said for using a specialist third party but I wanted to see how easy a do-it-yourself approach could be.
+</p>
+<p>For me, the easiest way turned out to be <a href="http://siege.org/projects/phpMyID/">phpMyID</a>, a standalone, single user, OpenID Identity Provider implemented in just two files. One, a configuration file, you edit, supplying your username and a secure hash of your chosen password; the other contains an OpenID implementation in PHP. Upload both files to your webserver. And that&#8217;s it.
+</p>
+<p>The project <a href="https://www.siege.org/svn/oss/phpMyID/trunk/README">documentation</a> is good. In addition, a fine <a href="http://www.intertwingly.net/blog/2007/01/03/OpenID-for-non-SuperUsers">tutorial</a> by Sam Ruby walks through the process, explaining each step and polishing the URLs, and <a href="http://janrain.com">JanRain</a> provides a form allowing you to <a href="http://www.openidenabled.com/resources/openid-test/checkup">check</a> your OpenID. For the record, my identifier is <code>tag.wordaligned.org</code> and the <a href="http://lighttpd.net">lighttpd</a> server configuration looks like this:
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">$HTTP["host"] == "tag.wordaligned.org" {
+    server.document-root = basedir + "self"
+    fastcgi.server = (
+        ".php" =&gt; ((
+            "bin-path" =&gt; "/usr/local/bin/php-cgi",
+            "socket" =&gt; basedir + "lighttpd/php.socket"
+    ))),
+    index-file.names  = ( "index.php", "index.html" )
+    ...
+}
+
+</pre>
+
+</div>
+
+
+<h3>Next steps</h3>
+<p>Single sign-on for the web is doubly misleading. You can only sign on to those parts of the web which accept OpenID, and that doesn&#8217;t include many of the sites which I&#8217;ve actually bothered signing up for to date. But now that I have an OpenID, I&#8217;ll be using it when I can. Watch this space!
+</p>
+<hr />
+
+<p><a id="fn1" href="#fn1link">[1]</a> I recommend subscribing to Terry Jones&#8217; <a href="http://www.fluidinfo.com/terry/">blog</a>: lots of original, thought-provoking material. <a href="http://simonwillison.net">Simon Willison&#8217;s blog</a> is also an excellent source of material for anyone interested in Web development. You can sign into it using OpenID.
+</p>
+<p><a id="fn2" href="#fn2link">[2]</a> I invented these site names as silly parodies. It turns out they&#8217;ve all been registered and some are indeed operating social networks.
+</p>
+</div>
+
+<div class="comments"><hr/><div id="disqus_thread"></div><script type="text/javascript" src="http://disqus.com/forums/wordaligned/embed.js"></script></div>
+      
+<div id="comments"><script type="text/javascript">
+//<![CDATA[
+(function() {
+    var links = document.getElementsByTagName('a');
+    var query = '?';
+    for(var i = 0; i < links.length; i++) {
+        if(links[i].href.indexOf('#disqus_thread') >= 0) {
+            query += 'url' + i + '=' + encodeURIComponent(links[i].href) + '&amp;';
+        }
+    }
+    document.write('<script type="text/javascript" src="http://disqus.com/forums/wordaligned/get_num_replies.js' + query + '"></' + 'script>');
+})();
+//]]>
+</script></div>
+
+    </div>
+    <div id="sidebar">
+      
+<div class="sidebar-node">
+<h3>Tagged</h3>
+<ul id="categories"><li><a href="/tag/openid" rel="tag">openid</a></li>
+<li><a href="/tag/php" rel="tag">php</a></li>
+<li><a href="/tag/python" rel="tag">Python</a></li>
+<li><a href="/tag/lighttpd" rel="tag">lighttpd</a></li></ul>
+
+</div>
+
+<div class="sidebar-node">
+<h3>Chain</h3>
+<ul>
+<li><a accesskey="n" href="/articles/rewriting-stringleft.html" title="Next article">&laquo; Rewriting String.Left()</a></li>
+<li><a accesskey="p" href="/articles/nonce-sense.html" title="Previous article">&raquo; Nonce Sense</a></li>
+</ul>
+
+
+</div>
+
+<div class="sidebar-node">
+<h3>Feeds</h3>
+
+<ul>
+<li><a href="http://feeds.wordaligned.org/wordaligned"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Articles</a></li>
+<li><a href="http://feeds.wordaligned.org/wordaligned/comments"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Comments</a></li>
+</ul>
+
+
+</div>
+
+    </div>
+  </div>
+  <div id="footer">
+<hr />
+<p><a href="http://tag.wordaligned.org">Thomas Guest</a></p>
+</div>
+
+</div>
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-3373724-1']);
+  _gaq.push(['_trackPageview']);
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ga);
+  })();
+</script>
+</body>
+
+</html>

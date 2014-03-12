@@ -1,0 +1,133 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<link rel="icon" href="/images/favicon.png" type="image/png"/>
+<link href="/styles/application.css" media="all" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="/scripts/prettify.js"></script>
+<script type="text/javascript" src="/scripts/lang-lisp.js"></script>
+<title>Define pedantic</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="author" content="Thomas Guest" />
+<meta name="description" content="A Word Aligned article posted 2010-11-02, tagged C++, Perl." />
+<meta name="keywords" content="C++, Perl" />
+<link rel="alternate" type="application/rss+xml" title="Feed" href="http://feeds.wordaligned.org/wordaligned" />
+</head>
+
+<body onload="prettyPrint()">
+<div id="container">
+  <div id="header">
+<h1><span><a accesskey="h" href="/">Word Aligned</a></span></h1>
+<h2>sweating the small stuff</h2>
+<a class="button" href="http://feeds.wordaligned.org/wordaligned" title="Subscribe to Word Aligned"><img style="float: right;" src="/images/feed.png" alt="Feed Logo" height="28" width="28"/></a>
+</div>
+
+  <div id="page">
+    <div id="content">
+      <div class="atomentry" id="define-pedantic.html">
+<h2 class="title"><a href="/articles/define-pedantic.html">Define pedantic</a></h2>
+<p class="meta"><abbr class="published" title="2010-11-02">2010-11-02</abbr> &bull; <a href="/tag/c++" rel="tag">C++</a>, <a href="/tag/perl" rel="tag">Perl</a> &bull; <a href="/articles/define-pedantic.html#disqus_thread">Comments</a></p>
+<p>My dictionary <span id="definition">defines a pedant</span> as:
+</p>
+<blockquote><p><strong>pedant</strong> <em>n.</em> <strong>1.</strong> A person who relies too much on academic learning or who is concerned chiefly with academic detail.
+</p>
+</blockquote><p>Apparently the word derives from the Italian, <em>pedante</em>, meaning teacher. During my career as a computer programmer a number of my colleagues have been surprisingly pedantic about the proper use of English.
+</p>
+<blockquote><p>&#8220;I refuse to join a supermarket queue marked <strong>10 items or less</strong>.&#8221;
+</p>
+<p>&#8220;I do wish people would stop using <strong>target</strong> as a verb. You <strong>aim</strong> at a target, you don&#8217;t <strong>target</strong> it.&#8221;
+</p>
+<p>&#8220;I am an exceptionally <strong>skilled grammarian</strong> in English &#8230; Take that rule and shove it!&#8221;
+</p>
+</blockquote><p>Some of this fussiness may well be a reaction against <a href="http://news.bbc.co.uk/1/hi/7457287.stm">corporate double-speak</a>. Still, I wouldn&#8217;t have expected programmers to be 1) so particular and 2) so certain they&#8217;re right. Maybe this attitude comes from all those years of writing code. Programming languages are strict about what they&#8217;ll accept: after all, they have standards!
+</p>
+<p><a href="http://www.flickr.com/photos/thomasguest/5142421926/" title="The C++ Standard vs Perl in a Nutshell by Thomas Guest, on Flickr"><img src="http://farm2.static.flickr.com/1072/5142421926_6b76c52749_m.jpg" width="240" height="183" alt="The C++ Standard vs Perl in a Nutshell" /></a>
+</p>
+<span id="continue-reading"/>
+
+<p>Some programming languages are more pedantic than others. Paul Graham memorably characterises C++ as a pernickety aunt<a id="fn1link" href="#fn1"><sup>[1]</sup></a>. By contrast, Perl won&#8217;t pick nits. Designed by Larry Wall to be his software <a href="http://www.wall.org/~larry/pm.html" title="Perl, the first postmodern computer language. Larry Wall">butler</a>, Perl interprets your ill-expressed wishes with discretion and assurance. Hence you can end up with a Perl program which gets on with its job but which no-one fully understands.
+</p>
+<p>Pedants, by definition, take things too far, but pedantry in programming isn&#8217;t all bad. GCC has a useful <a href="http://gcc.gnu.org/onlinedocs/gcc/Standards.html"><code>-pedantic</code></a> flag. It helps you write portable programs. Perl has a <a href="http://perldoc.perl.org/strict.html"><code>use strict</code></a> pragma which recasts the butler as a personal trainer. 
+</p>
+<p>When it comes to correctness, attention to detail matters. What if this input parameter goes negative? Will that file be closed when an exception is thrown? Can your algorithm handle an empty container?
+</p>
+<p>I recently fixed a defect in some (of my own) code which assumed conformant input. When faced with garbage-in this code failed even to generate garbage-out, instead getting caught in an infinite loop. Should a pedantic program insist on correct inputs or should it consider how to handle all possible inputs? <a href="#definition">Define pedantic</a>.
+</p>
+<hr />
+
+<p><a id="fn1" href="#fn1link">[1]</a>: It turns out my memory is at fault here. When I checked the reference I discovered Paul Graham makes no explicit mention of C++. 
+</p>
+<blockquote><p>We need a language that lets us scribble and smudge and smear, not a language where you have to sit with a teacup of types balanced on your knee and make polite conversation with a strict old aunt of a compiler. &#8212; Paul Graham, <a href="http://www.paulgraham.com/hp.html" title="Hackers and Painters">Hackers and Painters</a>
+</p>
+</blockquote><p>You might have guessed which language he&#8217;s promoting for scribbling but there&#8217;s no mention of Lisp either in this particular essay. In fact only one programming language earns a name-check. I&#8217;ll let you find out which one for yourselves.
+</p>
+</div>
+
+<div class="comments"><hr/><div id="disqus_thread"></div><script type="text/javascript" src="http://disqus.com/forums/wordaligned/embed.js"></script></div>
+      
+<div id="comments"><script type="text/javascript">
+//<![CDATA[
+(function() {
+    var links = document.getElementsByTagName('a');
+    var query = '?';
+    for(var i = 0; i < links.length; i++) {
+        if(links[i].href.indexOf('#disqus_thread') >= 0) {
+            query += 'url' + i + '=' + encodeURIComponent(links[i].href) + '&amp;';
+        }
+    }
+    document.write('<script type="text/javascript" src="http://disqus.com/forums/wordaligned/get_num_replies.js' + query + '"></' + 'script>');
+})();
+//]]>
+</script></div>
+
+    </div>
+    <div id="sidebar">
+      
+<div class="sidebar-node">
+<h3>Tagged</h3>
+<ul id="categories"><li><a href="/tag/c++" rel="tag">C++</a></li>
+<li><a href="/tag/perl" rel="tag">Perl</a></li></ul>
+
+</div>
+
+<div class="sidebar-node">
+<h3>Chain</h3>
+<ul>
+<li><a accesskey="n" href="/articles/setinsert-or-setadd.html" title="Next article">&laquo; Set.insert or set.add?</a></li>
+<li><a accesskey="p" href="/articles/boost-iterator-facade.html" title="Previous article">&raquo; Hiding iterator boilerplate behind a Boost facade</a></li>
+</ul>
+
+
+</div>
+
+<div class="sidebar-node">
+<h3>Feeds</h3>
+
+<ul>
+<li><a href="http://feeds.wordaligned.org/wordaligned"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Articles</a></li>
+<li><a href="http://feeds.wordaligned.org/wordaligned/comments"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Comments</a></li>
+</ul>
+
+
+</div>
+
+    </div>
+  </div>
+  <div id="footer">
+<hr />
+<p><a href="http://tag.wordaligned.org">Thomas Guest</a></p>
+</div>
+
+</div>
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-3373724-1']);
+  _gaq.push(['_trackPageview']);
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ga);
+  })();
+</script>
+</body>
+
+</html>

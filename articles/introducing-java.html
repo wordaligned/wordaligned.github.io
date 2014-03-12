@@ -1,0 +1,268 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<link rel="icon" href="/images/favicon.png" type="image/png"/>
+<link href="/styles/application.css" media="all" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="/scripts/prettify.js"></script>
+<script type="text/javascript" src="/scripts/lang-lisp.js"></script>
+<script type="text/javascript" src="http://www.haloscan.com/load/wordaligned"></script>
+
+<title>Introducing Java</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="author" content="Thomas Guest" />
+<meta name="description" content="A Word Aligned article posted 2007-05-17, tagged C++, Python, Ruby, Java, Self." />
+<meta name="keywords" content="C++, Python, Ruby, Java, Self" />
+<link rel="alternate" type="application/rss+xml" title="Feed" href="http://feeds.wordaligned.org/wordaligned" />
+</head>
+
+<body onload="prettyPrint()">
+<div id="container">
+  <div id="header">
+<h1><span><a accesskey="h" href="/">Word Aligned</a></span></h1>
+<h2>sweating the small stuff</h2>
+<a class="button" href="http://feeds.wordaligned.org/wordaligned" title="Subscribe to Word Aligned"><img style="float: right;" src="/images/feed.png" alt="Feed Logo" height="28" width="28"/></a>
+</div>
+
+  <div id="page">
+    <div id="content">
+      <div class="atomentry" id="introducing-java.html">
+<h2 class="title"><a href="/articles/introducing-java.html">Introducing Java</a></h2>
+<p class="meta"><abbr class="published" title="2007-05-17">2007-05-17</abbr> &bull; <a href="/tag/c++" rel="tag">C++</a>, <a href="/tag/python" rel="tag">Python</a>, <a href="/tag/ruby" rel="tag">Ruby</a>, <a href="/tag/java" rel="tag">Java</a>, <a href="/tag/self" rel="tag">Self</a> &bull; <a href="/articles/introducing-java.html#disqus_thread">Comments</a></p>
+<div class="toc">
+<h2>Contents</h2>
+<ul>
+ <li><a href="#tocgarbage-collection" name="toc0" id="toc0">Garbage collection</a>
+ </li>
+
+ <li><a href="#tocruntime-errors" name="toc1" id="toc1">Runtime Errors</a>
+ </li>
+
+ <li><a href="#tocverbosity" name="toc2" id="toc2">Verbosity</a>
+ </li>
+
+ <li><a href="#tocthe-march-of-ides" name="toc3" id="toc3">The March of IDEs</a>
+ </li>
+
+ <li><a href="#tocin-java-everything-is-an-object" name="toc4" id="toc4">In Java, everything is an Object</a>
+ </li>
+
+ <li><a href="#toccompilation" name="toc5" id="toc5">Compilation</a>
+ </li>
+
+ <li><a href="#toclibraries" name="toc6" id="toc6">Libraries</a>
+ </li>
+
+ <li><a href="#tocjavadoc" name="toc7" id="toc7">Javadoc</a>
+ </li>
+
+ <li><a href="#tocjunit" name="toc8" id="toc8">JUnit</a>
+ </li>
+
+ <li><a href="#tocjava-versus-c" name="toc9" id="toc9">Java versus C++?</a>
+ </li>
+
+ <li><a href="#tocthe-jvm-platform" name="toc10" id="toc10">The JVM Platform</a>
+ </li>
+
+ <li><a href="#toclanguage-wars" name="toc11" id="toc11">Language Wars</a>
+ </li>
+</ul>
+</div><p>I didn&#8217;t get to use Java until relatively recently in my programming
+   career. <span id="excerpt0"/>As a C++ programmer brought up on C, I suppose I suffered the
+   usual prejudice: that Java would be a feeble language designed to stop
+   feeble programmers from getting hurt too badly. The truth turned out
+   to be rather different.
+</p>
+<span id="continue-reading"/>
+
+
+<h3><a href="#toc0" name="tocgarbage-collection" id="tocgarbage-collection">Garbage collection</a></h3>
+<p>One headline difference between Java and C++ is of course garbage
+   collection. On the face of it, C++ provides the best of all worlds:
+   there are <a href="http://boost.org/libs/smart_ptr/index.html">techniques</a> to precisely encapsulate resource lifecycle;
+   there are <a href="http://www.hpl.hp.com/personal/Hans_Boehm/gc/">libraries</a> you can get hold of to collect garbage for you; and, finally, it looks like <a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2006/n2129.pdf">C++09 will include garbage collection</a>.
+</p>
+<p>The sad truth is that the techniques I mention aren&#8217;t as widely used
+   as they should be. It&#8217;s hard to blame C++ programmers because the
+   various smart pointer classes haven&#8217;t yet been formally standardised
+   and most C++ books fail to mention them (and the one smart pointer
+   which did make it into the standard library is notoriously
+   slippery). So we&#8217;ll have to wait for C++09, roll our own, or get hold of a TR1 implementation &#8212; and without considerable discipline there&#8217;s
+   nothing to stop rogue programmers on the team using <code>new</code> and <code>delete</code>
+   as a high-level interface to heap management.
+</p>
+<p>Garbage collection <a href="http://www.octopull.demon.co.uk/java/ImmortalityAtaPrice.html">doesn&#8217;t release programmers from thinking about
+the way a program uses resources</a>, but it sure does release us
+   from some tiresome defects. Running a program though
+   <a href="http://valgrind.org">valgrind</a> (or similar) doesn&#8217;t prove it&#8217;s clean.
+</p>
+
+<h3><a href="#toc1" name="tocruntime-errors" id="tocruntime-errors">Runtime Errors</a></h3>
+<p>Similarly, Java throws runtime errors as soon as it detects problems C++ may not even notice. If you try and read past the end of an array or access a non-existent object, the runtime signals the error soon as it happens. No need for forensic investigation to figure out what trashed the stack.
+</p>
+<p>The C++ counter-argument is that this kind of checking <em>costs</em>. You have to be pretty dumb to try and read past the end of an array, so why ever pay for a safety check on every array access?  It only took a couple of <code>ArrayIndexOutOfBoundsException</code>s to disabuse me of this notion. Dumb checks save time, especially the ones the programmer doesn&#8217;t have to write; excluding them on the grounds of perceived cost counts as premature optimisation.
+</p>
+
+<h3><a href="#toc2" name="tocverbosity" id="tocverbosity">Verbosity</a></h3>
+<p>Unfortunately, though, if you write Java, you usually have to write a lot of it. I&#8217;ll repeat <a href="http://www.paulgraham.com">Paul Graham</a>&#8217;s joke about the Java implementation of &#8220;Hello, World!&#8221;.
+</p>
+<div class="typocode"><div class="codetitle">Hello, World!</div>
+
+<pre class="prettyprint">public class Hello {
+    public static void main(String[] args) {
+        System.out.println("Hello, world!");
+    }
+}
+
+</pre>
+
+</div>
+
+<blockquote><p>Someone who has never written a program probably looks at this and
+   wonders, why do you need to say so much to get the the computer to
+   print a message? Curiously, the reaction of experienced programmers
+   is identical.
+</p>
+</blockquote><p>An IDE will write a lot of this for you (and Java is rightly famous for its associated IDEs) but you&#8217;ll still have to read it every time you visit the file. Programs are read more often than they&#8217;re written.
+</p>
+
+<h3><a href="#toc3" name="tocthe-march-of-ides" id="tocthe-march-of-ides">The March of IDEs</a></h3>
+<p>I&#8217;ll admit that refactoring IDEs can be useful. If you have to use Java, use a refactoring IDE to keep your code in shape. The relative simplicity of the Java syntax and compilation model means that a Java IDE is always going to be one step ahead of a C++ one for this kind of thing.
+</p>
+<p>While we&#8217;re on the subject of IDEs, I&#8217;ve also noticed some <a href="http://www.regdeveloper.co.uk/2007/02/01/making_sense_ruby/">grumbling</a> about the lack of such IDEs for high-level dynamic languages such as Ruby and Python.  If a variable&#8217;s type isn&#8217;t declared when a program is being written, how&#8217;s an IDE going to auto-complete the methods supported by that variable? I&#8217;m not an IDE designer, but the solution to this would seem to me to be to merge the interpreter and the editor: that is, run and write the program at the same time. If I&#8217;m in the Python interpreter, I can just use <code>dir</code> to tell me what&#8217;s available.
+</p>
+
+<h3><a href="#toc4" name="tocin-java-everything-is-an-object" id="tocin-java-everything-is-an-object">In Java, everything is an Object</a></h3>
+<p>Everything except the built in types, that is. Java couldn&#8217;t quite go the whole way: if it&#8217;s going to compete with C and C++, it&#8217;ll have to measure up on performance, and that seems to mean fixed-width built in types. At least Java <em>does</em> have and always has had an official eight byte long integer, meaning that, for example, millisecond clock values won&#8217;t wrap in the lifetime of this planet.
+</p>
+<p>The downside of making everything an object is that few application domains can be modelled in this way. Sure, a windows-based user interface maps nicely to an object hierarchy, but when you get into the core application engine, you&#8217;re likely to find yourself mapping, filtering and reducing collections &#8212; a more functional style programming. C++ provides far more power here: I&#8217;m reluctant to say it does better, because any heavy use of the STL and templated code requires lengthy build times and a willingness to unpick hideous compilation errors.
+</p>
+
+<h3><a href="#toc5" name="toccompilation" id="toccompilation">Compilation</a></h3>
+<p>Java is much much quicker to compile than C++. You don&#8217;t have to
+   worry about dependencies the way you do in C++. A modern Java IDE
+   compiles as you type and can even run unit tests on the fly (though I
+   never quite got into this myself). Even better, once you&#8217;ve compiled
+   the code, it should run wherever you&#8217;ve got a suitable JVM. Java
+   abstracts the platform nicely enough.
+</p>
+<p>The flip-side of this is that, if you need to dig beneath the JVM and poke at the system level, you&#8217;ll have to work harder. The JNI is fiddly to use and not documented to Java&#8217;s usual high standards. Of the low-level languages, C and C++ have the edge here; and high-level languages built on the C hardware abstraction layer such as Python and Perl fare better.
+</p>
+
+<h3><a href="#toc6" name="toclibraries" id="toclibraries">Libraries</a></h3>
+<p>With Java, if you&#8217;re doing something someone&#8217;s probably done
+   before, they probably have done it before and made a suitably licensed
+   library available. I was very impressed with the range and quality of
+   Java libraries. The fact that Java has a standard and widely followed
+   set of coding conventions makes it easy to work with these libraries, 
+   as does the Javadoc documentation system and the JUnit test framework.
+</p>
+
+<h3><a href="#toc7" name="tocjavadoc" id="tocjavadoc">Javadoc</a></h3>
+<p><a href="http://java.sun.com/j2se/javadoc/">Javadoc</a> may seem like an incidental detail. It&#8217;s not part of the core language and you don&#8217;t need to use it when writing Java. The truth is that Javadoc is a defacto standard &#8212; so much so that it&#8217;s cloned itself into <a href="http://www.doxygen.org">Doxygen</a>, which does a similar job for C++. Not everyone likes the documentation template which Javadoc imposes but few would complain at the end result: a coherent, consistent, hyper-linked documentation suite, and simple tools which allow you to generate your own documentation in the same format.
+</p>
+
+<h3><a href="#toc8" name="tocjunit" id="tocjunit">JUnit</a></h3>
+<p><a href="http://www.junit.org">JUnit</a>, like Javadoc, is a defacto standard &#8212; a simple and well-documented test framework with great tool support built around it. Again, it&#8217;s been cloned into other languages even when they don&#8217;t naturally support such a framework.
+</p>
+
+<h3><a href="#toc9" name="tocjava-versus-c" id="tocjava-versus-c">Java versus C++?</a></h3>
+<p>Java versus C++ for <em>what</em> exactly? As a general purpose programming language for doing XML-y database-y user-interface-y internet-y things, Java has the edge. Then again, C# probably has the edge over Java in this same domain &#8212; it certainly should do since it&#8217;s had the opportunity to learn from Java&#8217;s mistakes, and it surely has enough brains and backing behind it. I don&#8217;t speak from experience: I&#8217;ve never used C# and I don&#8217;t see any pressing need to use it. In fact, I don&#8217;t see the need to use Java. I&#8217;m convinced that high-level languages such as Python knock the spots off Java and any Java clone in the application development domain.
+</p>
+<p>As a general purpose programming language which needs to mix low-level platform access and high-performance algorithms, C++ is probably still where it&#8217;s at. If you&#8217;re prepared to invest the effort to learn it (which I wouldn&#8217;t recommend!) then I&#8217;d say C++ is a more expressive language than Java. I&#8217;d rather be able to overload operators than have to put all my functions in classes. Structs beat beans.
+</p>
+
+<h3><a href="#toc10" name="tocthe-jvm-platform" id="tocthe-jvm-platform">The JVM Platform</a></h3>
+<p>Java welcomes high-level languages. Just put the Java &#8220;J&#8221; in front of Python, Ruby, &#8230; and you&#8217;ll find an implementation of your favourite language running on the JVM. Then there are the JVM natives such as Groovy and Scala and no doubt many others. Russel Winder <a href="http://www.accu.org/index.php/conferences/accu_conference_2007/accu2007_sessions#C++%20has%20no%20useful%20purpose">comments</a>:
+</p>
+<blockquote><p>What about Java? It survives as the assembly language for Groovy programming.
+</p>
+</blockquote>
+<h3><a href="#toc11" name="toclanguage-wars" id="toclanguage-wars">Language Wars</a></h3>
+<p>Reading through all this, I realise I&#8217;ve not said anything radical or original. At the outset I declared myself &#8220;a C++ programmer brought up on C&#8221; &#8212; which is pretty much what I was doing when I first encountered Java (though my not-so-secret mission was to write code using high-level languages). The truth now is that I&#8217;m actually a Python programmer brought up on C/C++, and as such, anything which might have seemed radical or original about Java seems, well &#8230; ordinary and bland.
+</p>
+<p>Certainly I&#8217;ve been cured of any prejudice about Java being a feeble language designed to stop feeble programmers from getting hurt. It&#8217;s the other way round; Java is a powerful language and it&#8217;s the C++ programmers who revel in <a href="http://www.artima.com/weblogs/viewpost.jsp?thread=104707">pain</a>.
+</p>
+<p>It took me about a year to get round to writing this note, a year in which I&#8217;ve barely touched Java. I haven&#8217;t missed it.
+</p>
+</div>
+
+<div class="comments"><hr/><div id="disqus_thread"></div><script type="text/javascript" src="http://disqus.com/forums/wordaligned/embed.js"></script></div>
+      
+<div id="comments"><script type="text/javascript">
+//<![CDATA[
+(function() {
+    var links = document.getElementsByTagName('a');
+    var query = '?';
+    for(var i = 0; i < links.length; i++) {
+        if(links[i].href.indexOf('#disqus_thread') >= 0) {
+            query += 'url' + i + '=' + encodeURIComponent(links[i].href) + '&amp;';
+        }
+    }
+    document.write('<script type="text/javascript" src="http://disqus.com/forums/wordaligned/get_num_replies.js' + query + '"></' + 'script>');
+})();
+//]]>
+</script></div>
+
+    </div>
+    <div id="sidebar">
+      <div class="sidebar-node">
+<h3>Excerpt</h3>
+<p><a href="#excerpt0">As a C++ programmer brought up on C, I suppose I suffered the
+usual prejudice: that Java would be a feeble language designed to stop
+feeble programmers from getting hurt too badly.</a></p>
+
+</div>
+
+<div class="sidebar-node">
+<h3>Tagged</h3>
+<ul id="categories"><li><a href="/tag/c++" rel="tag">C++</a></li>
+<li><a href="/tag/python" rel="tag">Python</a></li>
+<li><a href="/tag/ruby" rel="tag">Ruby</a></li>
+<li><a href="/tag/java" rel="tag">Java</a></li>
+<li><a href="/tag/self" rel="tag">Self</a></li></ul>
+
+</div>
+
+<div class="sidebar-node">
+<h3>Chain</h3>
+<ul>
+<li><a accesskey="n" href="/articles/oberon-cromarty-lisa-waggledance-ariel.html" title="Next article">&laquo; Oberon, Cromarty, Lisa, Waggledance, Ariel</a></li>
+<li><a accesskey="p" href="/articles/perlish-wisdom.html" title="Previous article">&raquo; Perlish Wisdom</a></li>
+</ul>
+
+
+</div>
+
+<div class="sidebar-node">
+<h3>Feeds</h3>
+
+<ul>
+<li><a href="http://feeds.wordaligned.org/wordaligned"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Articles</a></li>
+<li><a href="http://feeds.wordaligned.org/wordaligned/comments"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Comments</a></li>
+</ul>
+
+
+</div>
+
+    </div>
+  </div>
+  <div id="footer">
+<hr />
+<p><a href="http://tag.wordaligned.org">Thomas Guest</a></p>
+</div>
+
+</div>
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-3373724-1']);
+  _gaq.push(['_trackPageview']);
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ga);
+  })();
+</script>
+</body>
+
+</html>

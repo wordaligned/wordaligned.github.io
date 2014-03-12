@@ -1,0 +1,158 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<link rel="icon" href="/images/favicon.png" type="image/png"/>
+<link href="/styles/application.css" media="all" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="/scripts/prettify.js"></script>
+<script type="text/javascript" src="/scripts/lang-lisp.js"></script>
+<script type="text/javascript" src="http://www.haloscan.com/load/wordaligned"></script>
+
+<title>Curling for web sites</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="author" content="Thomas Guest" />
+<meta name="description" content="A script using curl and bash to detect when a website status changes. A Word Aligned article posted 2008-05-27, tagged Shell, Curl." />
+<meta name="keywords" content="Shell, Curl" />
+<link rel="alternate" type="application/rss+xml" title="Feed" href="http://feeds.wordaligned.org/wordaligned" />
+</head>
+
+<body onload="prettyPrint()">
+<div id="container">
+  <div id="header">
+<h1><span><a accesskey="h" href="/">Word Aligned</a></span></h1>
+<h2>tales from the code face</h2>
+<a class="button" href="http://feeds.wordaligned.org/wordaligned" title="Subscribe to Word Aligned"><img style="float: right;" src="/images/feed.png" alt="Feed Logo" height="28" width="28"/></a>
+</div>
+
+  <div id="page">
+    <div id="content">
+      <div class="atomentry" id="curling-for-web-sites.html">
+<h2 class="title"><a href="/articles/curling-for-web-sites.html">Curling for web sites</a></h2>
+<p class="meta"><abbr class="published" title="2008-05-27">2008-05-27</abbr> &bull; <a href="/tag/shell" rel="tag">Shell</a>, <a href="/tag/curl" rel="tag">Curl</a> &bull; <a href="/articles/curling-for-web-sites.html#disqus_thread">Comments</a></p>
+<p>I wanted information about ISO 3166-1 alpha-2 country codes. Google found me the definitive link (<a href="http://www.iso.org/iso/country_codes/iso_3166_code_lists.htm" title="ISO 3166 country code lists">http://www.iso.org/iso/country_codes/iso_3166_code_lists.htm</a>) but clicking on it showed the ISO website to be temporarily down for maintenance.
+</p>
+<p><a href="http://www.iso.org/error/sitedown.html" title="ISO site down page"><img style="border: 2px solid orange;" src="/images/iso-down.png" alt="ISO website out of action" /></a>
+</p>
+<p>Rather than check back again every few minutes or hunt for stale information in the google cache, I got <code>curl</code> and <code>bash</code> to notify me when the site went live.
+</p>
+<pre>
+$ url=http://www.iso.org/iso/country_codes/iso_3166_code_lists.htm
+$ curl -I $url
+HTTP/1.1 302 Found
+Date: Tue, 27 May 2008 08:00:44 GMT
+Server: BIG-IP
+Location: http://www.iso.org/error/sitedown.html
+Via: 1.1 www.iso.org
+Connection: close
+Content-Type: text/html
+</pre>
+
+<p><code>Curl -I</code> fetches the page header only, which in this case uses a <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html">302 status code</a> to temporarily redirect clients to the <code>sitedown.html</code> page. Using this information I wrote a simple while loop to ping the site every minute and determine when this status changed.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">$ http_status() { curl -I -s $1 | head -1 | cut -d " " -f 2; }
+$ while [ $(http_status $url) == 302 ]; do sleep 60; done; open $url
+
+</pre>
+
+</div>
+
+<p><code>Open</code> is an OS X thing: when the loop completes <code>open</code> just opens the web page in a browser tab.
+</p>
+<p>To run this command in the background, <code>&amp;</code> it.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">$ (while [ $(http_status $url) == 302 ]; do sleep 60; done; open $url)&amp;
+[1] 808
+
+</pre>
+
+</div>
+
+<p>Here, the job has a handle of <code>1</code> and a process id of <code>808</code>. You can recover this information using <code>jobs</code>.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">$ jobs
+[1]+  Running                 ( while [ $(http_status $url) == 302 ]; do
+    sleep 300;
+done; open $url ) &amp;
+
+</pre>
+
+</div>
+
+<p>If you need to kill the job, <code>kill %1</code> does the trick.
+</p>
+</div>
+
+<div class="comments"><hr/><div id="disqus_thread"></div><script type="text/javascript" src="http://disqus.com/forums/wordaligned/embed.js"></script></div>
+      
+<div id="comments"><script type="text/javascript">
+//<![CDATA[
+(function() {
+    var links = document.getElementsByTagName('a');
+    var query = '?';
+    for(var i = 0; i < links.length; i++) {
+        if(links[i].href.indexOf('#disqus_thread') >= 0) {
+            query += 'url' + i + '=' + encodeURIComponent(links[i].href) + '&amp;';
+        }
+    }
+    document.write('<script type="text/javascript" src="http://disqus.com/forums/wordaligned/get_num_replies.js' + query + '"></' + 'script>');
+})();
+//]]>
+</script></div>
+
+    </div>
+    <div id="sidebar">
+      
+<div class="sidebar-node">
+<h3>Tagged</h3>
+<ul id="categories"><li><a href="/tag/shell" rel="tag">Shell</a></li>
+<li><a href="/tag/curl" rel="tag">Curl</a></li></ul>
+
+</div>
+
+<div class="sidebar-node">
+<h3>Chain</h3>
+<ul>
+<li><a accesskey="n" href="/articles/eurovision-2008-charts.html" title="Next article">&laquo; Eurovision 2008 charts</a></li>
+<li><a accesskey="p" href="/articles/fixing-compiler-warnings-the-hard-way.html" title="Previous article">&raquo; Fixing Compiler Warnings the Hard Way</a></li>
+</ul>
+
+
+</div>
+
+<div class="sidebar-node">
+<h3>Feeds</h3>
+
+<ul>
+<li><a href="http://feeds.wordaligned.org/wordaligned"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Articles</a></li>
+<li><a href="http://feeds.wordaligned.org/wordaligned/comments"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Comments</a></li>
+</ul>
+
+
+</div>
+
+    </div>
+  </div>
+  <div id="footer">
+<hr />
+<p><a href="http://tag.wordaligned.org">Thomas Guest</a></p>
+</div>
+
+</div>
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-3373724-1']);
+  _gaq.push(['_trackPageview']);
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ga);
+  })();
+</script>
+</body>
+
+</html>

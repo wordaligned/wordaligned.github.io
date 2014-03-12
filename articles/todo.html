@@ -1,0 +1,616 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<link rel="icon" href="/images/favicon.png" type="image/png"/>
+<link href="/styles/application.css" media="all" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="/scripts/prettify.js"></script>
+<script type="text/javascript" src="/scripts/lang-lisp.js"></script>
+<script type="text/javascript" src="http://www.haloscan.com/load/wordaligned"></script>
+
+<title>The case against TODO</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="author" content="Thomas Guest" />
+<meta name="description" content="A neat label for work in progress or an easy way to disguise the flaws in a codebase? A Word Aligned article posted 2005-06-07, tagged C++, ACCU." />
+<meta name="keywords" content="C++, ACCU" />
+<link rel="alternate" type="application/rss+xml" title="Feed" href="http://feeds.wordaligned.org/wordaligned" />
+</head>
+
+<body onload="prettyPrint()">
+<div id="container">
+  <div id="header">
+<h1><span><a accesskey="h" href="/">Word Aligned</a></span></h1>
+<h2>sweating the small stuff</h2>
+<a class="button" href="http://feeds.wordaligned.org/wordaligned" title="Subscribe to Word Aligned"><img style="float: right;" src="/images/feed.png" alt="Feed Logo" height="28" width="28"/></a>
+</div>
+
+  <div id="page">
+    <div id="content">
+      <div class="atomentry" id="todo.html">
+<h2 class="title"><a href="/articles/todo.html">The case against TODO</a></h2>
+<p class="meta"><abbr class="published" title="2005-06-07">2005-06-07</abbr> &bull; <a href="/tag/c++" rel="tag">C++</a>, <a href="/tag/accu" rel="tag">ACCU</a> &bull; <a href="/articles/todo.html#disqus_thread">Comments</a></p>
+<div class="toc">
+<h2>Contents</h2>
+<ul>
+ <li><a href="#tocintroduction" name="toc0" id="toc0">Introduction</a>
+ </li>
+
+ <li><a href="#tocwhat-does-todo-mean" name="toc1" id="toc1">What Does TODO Mean?</a>
+ </li>
+
+ <li><a href="#tocask-the-code" name="toc2" id="toc2">Ask The Code</a>
+ </li>
+
+ <li><a href="#tocuse-cases-and-alternatives" name="toc3" id="toc3">Use Cases And Alternatives</a>
+ </li>
+
+ <li><a href="#tocplace-holders" name="toc4" id="toc4">Place Holders</a>
+ </li>
+
+ <li><a href="#tocgenerated-code" name="toc5" id="toc5">Generated Code</a>
+ </li>
+
+ <li><a href="#tocworkinprogress" name="toc6" id="toc6">Work-in-progress</a>
+ </li>
+
+ <li><a href="#tocnotes-to-self" name="toc7" id="toc7">Notes to Self</a>
+ </li>
+
+ <li><a href="#toclatent-defects" name="toc8" id="toc8">Latent Defects</a>
+ </li>
+
+ <li><a href="#tocgrand-designs" name="toc9" id="toc9">Grand Designs</a>
+ </li>
+
+ <li><a href="#tocfuture-optimisations" name="toc10" id="toc10">Future Optimisations</a>
+ </li>
+
+ <li><a href="#tocthe-hideous-hack" name="toc11" id="toc11">The Hideous Hack</a>
+ </li>
+
+ <li><a href="#toctest-frameworks" name="toc12" id="toc12">Test Frameworks</a>
+ </li>
+
+ <li><a href="#tocthe-case-against-todo" name="toc13" id="toc13">The Case Against TODO</a>
+ </li>
+</ul>
+</div>
+<h3><a href="#toc0" name="tocintroduction" id="tocintroduction">Introduction</a></h3>
+<pre>
+TODO, TO_DO, TO DO, @todo, 
+FIXME, FIX_ME, FIX ME, HACK
+</pre>
+
+<p>No other keyword has so many aliases. No other keyword is quite as open to
+   interpretation.
+</p>
+<p>Don&#8217;t worry, our compiler hasn&#8217;t gone soft on us. <code>TODO</code> isn&#8217;t really a
+   keyword: it lives in comments and can therefore take whatever form a
+   programmer chooses, safe in the knowledge it won&#8217;t cause trouble at compile or
+   run time.
+</p>
+<p>On the surface, <code>TODO</code> seems both useful and inevitable. No piece of
+   code is ever really finished: there will always be something more to
+   do, and where better to record this information than in the code
+   itself? If we think more carefully though, we realise that <code>TODO</code>
+   actually indicates a point at which a decision was made &#8212;a decision
+   to defer action, a decision, in fact, to <strong>not</strong> do something.  Clearly
+   this decision is less than ideal. 
+</p>
+<p>This article investigates the use of <code>TODO</code> and friends more closely.
+   First, we shall consider what it is meant to mean and what it often
+   turns out to mean. Next, we&#8217;ll search through some code, uncover some
+   use cases, and think about the alternatives. 
+</p>
+<p>These alternatives are usually better.  <code>TODO</code>, it turns out, is not
+   so innocent after all. When used as a shorthand for &#8220;more work
+   required&#8221; it tells us too little &#8212; and often too late &#8212; and when
+   used as a convenient label for broken code, it can cause serious
+   damage to a codebase.
+</p>
+
+<h3><a href="#toc1" name="tocwhat-does-todo-mean" id="tocwhat-does-todo-mean">What Does TODO Mean?</a></h3>
+<p>As stated in the introduction, <code>TODO</code> isn&#8217;t a keyword, it&#8217;s a
+   comment. Its exact meaning will depend on the local coding culture and
+   often individual programming style. For example, the Sun 
+   <a href="http://java.sun.com/docs/codeconv/">Java programming conventions</a> state:
+</p>
+<blockquote><p><strong>10.5.4 Special Comments</strong> Use XXX in a comment to flag something that is bogus but works. Use FIXME to flag something that is bogus and broken.
+</p>
+</blockquote><p>Already we&#8217;ve found a shocking new member of our <code>TODO</code> set: <code>XXX</code>!
+</p>
+<p>I think it&#8217;s clear, though, that the phrase <code>TODO</code> in a comment indicates 
+   something more is required. With any luck, the rest of the comment will
+   indicate exactly what that something is.
+</p>
+<p><code>FIXME</code> often seems to be used interchangeably with <code>TODO</code> but carries a
+   stronger suggestion that something is broken &#8212; if <code>TODO</code> is a feature
+   request, then <code>FIXME</code> is a defect report. Again, with luck, the rest of the
+   comment will explain what needs fixing.
+</p>
+<p>Unfortunately the rest of the comment is often inadequate. Sometimes we&#8217;ll
+   find a bare:
+</p>
+<pre><code>// TODO
+</code></pre><p>sometimes an initialled note-to-self:
+</p>
+<pre><code>// FIXME TAG
+</code></pre><p>sometimes a plea for attention:
+</p>
+<pre><code>// TODO Fix this hack !!!
+</code></pre><p>and sometimes even a garbled attempt to cover all bases:
+</p>
+<pre><code>// TODO FIXME XXX HACK
+</code></pre><p>Of course, <code>TODO</code> isn&#8217;t meant to be pretty.  The capital letters shout at the
+   reader, drawing attention to the deficiency.  The noise will continue
+   until something gets done.
+</p>
+
+<h3><a href="#toc2" name="tocask-the-code" id="tocask-the-code">Ask The Code</a></h3>
+<p>Maybe I&#8217;m being unfair. Let&#8217;s take a look at <code>TODO</code> in action by
+   searching some source code. On a Unix platform the following command should
+   output matches in any files beneath the current working directory:
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">$ grep -ERi "TO[_ ]?DO|FIX[_ ]?ME|HACK|XXX" *
+
+</pre>
+
+</div>
+
+<p>I cannot publish the output of this search on any of the proprietary code I
+   work on. It&#8217;s confidential information. (The small amount of open source code
+   I have written or contributed to is <code>TODO</code> free.) Nor am I going to publish
+   the output of this search on any of the open source code I use &#8212; I do not
+   think it would be fair, since this article questions the use of <code>TODO</code>. I
+   should stress, though, that I&#8217;m grateful to have source access, so that any
+   such comments are at least visible to me.
+</p>
+<p>I would be interested to know how useful the output of your search is. Does
+   the <code>TODO</code> list correlate with work-in-progress? Are the <code>FIXME</code>s
+   actively being fixed? Or have we merely generated a list of half-baked ideas,
+   abandoned experiments and neglected suggestions?
+</p>
+<p>The next section considers some specific use cases which I hope
+   overlap with our search results.
+</p>
+
+<h3><a href="#toc3" name="tocuse-cases-and-alternatives" id="tocuse-cases-and-alternatives">Use Cases And Alternatives</a></h3>
+
+<h4><a href="#toc4" name="tocplace-holders" id="tocplace-holders">Place Holders</a></h4>
+<p>In another <a href="http://wordaligned.org/metaprogramming/index.html
+article">article</a>, I describe my use of an Emacs <code>elisp</code> program to generate a
+   skeleton C++ file, which &#8212; amongst other things &#8212; inserts
+   placeholders for <code>Doxygen</code> comments.
+</p>
+<p>These placeholders had <code>TODO</code>s in them for me to fill in. Or at least they
+   used to! I have now decided I would rather leave a class undocumented than 
+   have it ever look like this:
+</p>
+<pre><code>/**
+ * TODO write a description of MyNewClass.
+ */
+class MyNewClass {
+    ....
+};
+</code></pre><p>The <code>TODO</code> in the example above serves no useful purpose &#8212; I&#8217;m well aware the
+   new class needs describing, <code>Doxygen</code> will warn me should I forget &#8212; and as
+   a consequence my <code>elisp</code> now generates smaller but better-formed skeleton
+   files. This reflects more accurately the way I aspire to work: no
+   broken code.
+</p>
+<p>While we&#8217;re on the subject, note that editor macros make it all too easy to
+   create unfinished or extravagent comments. A block of asterisks is a poor way
+   to fill a source file:
+</p>
+<pre>
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *                                                     *
+ *           M Y   N E W    C L A S S                  *
+ *                                                     *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+</pre>
+
+
+<h4><a href="#toc5" name="tocgenerated-code" id="tocgenerated-code">Generated Code</a></h4>
+<p>My <code>elisp</code> metaprogram is of course a code-generator. When I realised it was
+   producing broken output I stepped in and fixed it. With third-party code
+   generators we may not be so lucky.
+</p>
+<p>Consider a GUI builder which allows us to design our user interface and map
+   buttons events to actions. The output of this builder is some auto-generated
+   code with placeholders:
+</p>
+<pre><code>void MyDialog::OnButtonClick(Button button) {
+    // TODO. Insert button action code here.
+}
+</code></pre><p>Clearly there&#8217;s a potential problem if the auto-generation is repeated. Will
+   any callbacks we implement be replaced with <code>TODO</code>&#8217;s?
+</p>
+<p>There&#8217;s not much we can do about this &#8212; unless we are GUI builder writers, in
+   which case we might consider better ways to separate the generated code from
+   the application-specific implementation.
+</p>
+<p>Perhaps this is why many seasoned GUI developers drop the framework early on,
+   preferring the control they get from hand-crafted code?
+</p>
+
+<h4><a href="#toc6" name="tocworkinprogress" id="tocworkinprogress">Work-in-progress</a></h4>
+<p>Suppose a programmer creates a new class, <code>NewClass</code>, whose interface offers
+   clients, amongst other things, a pair of serialization functions:
+</p>
+<pre><code>NewClass {
+    ....
+public: // Serialization 
+    void put(std::ostream &amp; put_to) const;
+    void get(std::istream &amp; get_from);
+    ....
+};
+</code></pre><p>The output function is quickly coded up. The input function turns out to be
+   rather trickier. Now, the programmer sensibly wishes to put work-in-progress
+   into the source management system as soon as possible, and hence checks in an
+   empty implementation:
+</p>
+<pre><code>void NewClass::get(std::istream &amp; get_from) {
+    // TODO
+}
+</code></pre><p>Here, we understand the <code>TODO</code> to mean that, although the code compiles, the
+   implementation is incomplete. Client code shouldn&#8217;t try to <code>get</code> instances of
+   this new class just yet.
+</p>
+<p>The trouble is, as far as client code is concerned &#8212; at both compile and run
+   time &#8212; the comment has no effect. It&#8217;s not hard to imagine a scenario where
+   we accidentally end up reading in a <code>NewClass</code>, leading to some unwanted
+   effect downstream, possibly in an apparently unrelated piece of code.
+</p>
+<p>Any time spent tracking down such a problem has been wasted. The moment the
+   <code>TODO</code> was written, we were aware of its exact location and cause.
+</p>
+<p>A better technique is to call a function:
+</p>
+<pre><code>void NewClass::get(std::istream &amp; from) const {
+    NotYetImplemented();
+}
+</code></pre><p>Here, <code>NotYetImplemented()</code> might fire an assertion, raise an exception, or
+   log an error message. At the very simplest, we could put a rough
+   and ready macro into service:
+</p>
+<pre><code>#define NotYetImplemented() assert(!"Not yet implemented!")
+</code></pre><p>As usual, the move from comment to code improves things. Now the system offers
+   more useful diagnostics in the event of an unimplemented function being
+   called: but it won&#8217;t save us from trouble if this event happens once the
+   software has been shipped. We are still reliant on someone
+   remembering to finish what got started. Here, test-driven development
+   techniques are invaluable. They are so important they merit fuller discussion
+   later in this article.
+</p>
+
+<h4><a href="#toc7" name="tocnotes-to-self" id="tocnotes-to-self">Notes to Self</a></h4>
+<p>Consider the following struct:
+</p>
+<pre><code>struct FileSize { // TODO 64 bit
+    unsigned long ms_4_bytes;
+    unsigned long ls_4_bytes;  
+};
+</code></pre><p>I classify this <code>TODO</code> as a note-to-self since it may not be obvious to anyone
+   but the programmer who wrote the comment exactly what should be done to
+   the code on a 64 bit platform. If we <code>grep</code> around surrounding source
+   files, we&#8217;ll probably find a few similar comments and get a better idea of
+   what&#8217;s required.
+</p>
+<p>Sometimes it&#8217;s even more clear that we&#8217;re dealing with a note-to-self.
+</p>
+<pre><code>struct FileSize { // TODO 64 bit. TAG
+    ....
+};
+</code></pre><p>Here, the author uses his initials to stake a claim on the <code>struct</code>. He
+   seems to be saying, &#8220;I know what needs doing, and I&#8217;ll probably be the one who
+   does it&#8221;. Ideally, of course, when we undertake a 64 bit port, he will still
+   be around to tie up these loose ends; even if he isn&#8217;t, he has left us some
+   useful pointers.
+</p>
+<p>This isn&#8217;t a bad use of <code>TODO</code>. It&#8217;s certainly preferable to the programmer
+   keeping the <code>TODO</code> list in his head, or even in his log book. The information is
+   where it needs to be, often down to individual lines of code. My only quibble
+   is with the note-to-self attitude. When we check in code, we release it
+   to a wider audience; we are publishing our work. These notes-to-self should
+   really be notes-to-everyone.
+</p>
+<p>In an ideal world, then, there will be a little more documentation explaining
+   the porting task in more detail. Pair-programming, peer review and open source
+   development can help us maintain a disciplined approach.
+</p>
+
+<h3><a href="#toc8" name="toclatent-defects" id="toclatent-defects">Latent Defects</a></h3>
+<p>Suppose we&#8217;re digging around some legacy code<a id="fn1link"
+href="#fn1"><sup>[1]</sup></a> and we discover the following bizarre integer
+   literal in an assignment:
+</p>
+<pre><code>flags &amp;= 0xFFFFFFF7;
+</code></pre><p>What to do? Evidently bit three of the <code>unsigned int flags</code> variable is
+   being cleared, but so are bits thirty-two and above. Is this the intended
+   behaviour?
+</p>
+<p>Now, the code in question is regarded as sound. It works. Target
+   platforms have always had thirty-two bit <code>int</code>s, and will continue to do so for
+   the forseeable future.
+</p>
+<p>We could make a note in the code and move on:
+</p>
+<pre><code>flags &amp;= 0xFFFFFFF7; // FIXME this assumes 32 bit ints
+</code></pre><p>If we&#8217;re feeling less confident, the note might read:
+</p>
+<pre><code>flags &amp;= 0xFFFFFFF7; // TODO doesn't this assume 32 bit ints !?
+</code></pre><p>Or, if we&#8217;re feeling more confident, we make the fix directly:
+</p>
+<pre><code>flags &amp;= ~(1U &lt;&lt; 3);
+</code></pre><p>Personally, I dislike adding comments as shown above. Yes, it&#8217;s better than
+   ignoring the problem, but only marginally. By adding a comment we&#8217;re ducking the
+   issue. On the other hand it&#8217;s also risky to modify legacy code even when we
+   think we&#8217;re fixing it. Who knows what compensating code there might be elsewhere
+   in the system?
+</p>
+<p>A more responsible reaction is to dig a little deeper and find exactly how
+   pervasive the problem is. The assumption that <code>int</code>s occupy thirty-two bits
+   may cut across many lines in many files &#8212; and yet, as stated earlier, this
+   assumption may actually be reasonable, at least for the forseeable future. Not
+   all code needs to be portable.
+</p>
+<p>Even if we are prepared to continue with this assumption about target
+   platforms, the important thing is not to throw away our insight. With barely
+   any extra effort we can replace the <code>TODO</code> with a <a href="http://boost.org/doc/html/boost_staticassert.html">compile-time assertion</a>.
+</p>
+<pre><code>BOOST_STATIC_ASSERT(sizeof(int) * CHAR_BIT == 32);
+</code></pre><p>With this assertion in place, the code won&#8217;t even compile if we try and port to
+   a platform which doesn&#8217;t meet this assumption.
+</p>
+<p>On the other hand, if digging deeper reveals more latent defects, and if
+   we already have reason to believe the <a href="#fn1">legacy code</a> is in poor shape, then more
+   radical action may be needed.
+</p>
+
+<h4><a href="#toc9" name="tocgrand-designs" id="tocgrand-designs">Grand Designs</a></h4>
+<p>At the other end of the scale are the <code>TODO</code>s which claim a glorious
+   future for a sound &#8212; if straightforward &#8212; block of code.
+</p>
+<pre><code>// TODO use an adaptive search algorithm:
+// 1) keep a log of past commands
+// 2) when the system is idle, review this log to predict the next command
+// 3) pre-fetch the results of the predicted command.
+// This should make the UI more responsive.
+</code></pre><p>Let&#8217;s hope this ingenious scheme isn&#8217;t attempted until careful analysis shows
+   that it really is necessary and calibrated test runs prove that it really can
+   improve response times.
+</p>
+<p>Until then, this particular <code>TODO</code> is simply an incitement to over-engineering.
+</p>
+
+<h3><a href="#toc10" name="tocfuture-optimisations" id="tocfuture-optimisations">Future Optimisations</a></h3>
+<p>Closely related to Grand Designs are those points in a code-base where a
+   progammer uses <code>TODO</code> to indicate where a sub-optimal solution has been used.
+   Maybe a hand-crafted container might offer client code quicker lookups
+   than the one which was picked, for convenience, from the C++ Standard
+   Library.
+</p>
+<pre><code>typedef std::map&lt;person, phone_number&gt; phone_book; 
+// TODO replace with a hash map for efficiency
+</code></pre><p>This <code>TODO</code> looks reasonable enough, but again I think it may lead us astray.
+   Why should we consider making this replacement? Why should the suggestion be
+   repeated every time we look at this code?
+</p>
+<p>If we do find our code runs too slowly we need to measure first. The
+   hand-rolled hash map might make no perceptible difference; but simplifying the
+   arithmetic in that innocent looking loop the profiler warned us about might
+   realise a 50% speed-up with far less effort.
+</p>
+
+<h3><a href="#toc11" name="tocthe-hideous-hack" id="tocthe-hideous-hack">The Hideous Hack</a></h3>
+<p>Consider the following scenario. Testing reveals that a peculiar &#8212;
+   but reproducible &#8212; combination of events can lead to deadlock. A
+   SHOWSTOPPER defect is raised and assigned to some unfortunate
+   programmer. The programmer must delay her current task to
+   investigate. After a couple of frustrating days of poring over log
+   files she narrows the problem down. It looks very like a race
+   condition in a particular function.
+</p>
+<p>To test her suspicions, she injects a ten millisecond delay into one of the
+   calling threads. The defect goes away!
+</p>
+<p>Armed with this evidence, she consults the programmers involved. The original
+   author of the function has nothing helpful to say &#8212; clearly it&#8217;s the client
+   code (which does the synchronisation) which is at fault. Equally unhelpfully,
+   the authors of the client code suggest the proper solution is to move
+   responsibility for synchronisation into the function itself.
+</p>
+<p>All this blame-storming is holding up development. The project manager
+   makes the call: check in the ten millisecond delay, change the defect
+   to LOW priority, get on with new features.
+</p>
+<p>I don&#8217;t think it will come as a surprise to find out that the code still reads
+   as follows:
+</p>
+<pre><code>Sleep(10); // HACK. Workaround a race condition.
+           // See DEFECT 5678 for details.
+</code></pre><p>Nor should it surprise us to learn that the defect hasn&#8217;t really gone away,
+   it has just gone under cover. The software still deadlocks. Less often, less
+   reproducibly, but just as disastrously.
+</p>
+<p>This article is about the use of <code>TODO</code>, not dysfunctional development teams.
+   A proper solution will involve the organisation as much as the code-base, and
+   will have to remain beyond the scope of this article.
+</p>
+<p>Clearly, though, something very wrong has happened. I&#8217;m not claiming that
+   <code>TODO</code> &#8212;or, in this case, its unsavoury relative, <code>HACK</code> &#8212;is to blame.
+   What I do suggest is that this use of <code>HACK</code> opens the door 
+   (breaks the window perhaps?<a id="fn2link" href="#fn2"><sup>[2]</sup></a>) 
+   to similar abuse in future. When we introduce such
+   code into our system we sanction the approach it takes, inviting more of the
+   same.
+</p>
+<p>Sure enough, as features continue to be added, we find more and more
+   Sleep()s, HACKs and TODOs attempting to disguise a broken threading
+   model.
+</p>
+
+<h3><a href="#toc12" name="toctest-frameworks" id="toctest-frameworks">Test Frameworks</a></h3>
+<p>Remember the programmer who checked a stubbed function into the
+   source management system?
+</p>
+<pre><code>void NewClass::get(std::istream &amp; get_from) {
+    // TODO
+}
+</code></pre><p>In a test-first environment, the <code>TODO</code> is superfluous. The accompanying unit
+   tests show exactly what needs doing. In a console window, we see
+   something like:
+</p>
+<pre><code>Test    : testNewClassGet
+testNewClass.cpp(57): Expected "foo" but got "bar"
+Ran 13 tests, 12 Passed, 1 Failed.
+</code></pre><p>Here, the feedback is swift and accurate, and continues to be so even once
+   the class is complete (that is to say, once it passes its tests). Should
+   something cause <code>NewClass</code> to regress, a good set of tests will isolate the
+   error even before the offending code gets checked in.
+</p>
+<p>In other words, the <code>TODO</code> list and the <code>FIXME</code> list have been replaced by
+   test results. We have done the best we can to ensure our <code>NewClass</code> does
+   not end up being yet another <code>LegacyClass</code>.
+</p>
+<p>Now remember the <code>HACK</code> which covered up a broken threading model. We will need
+   to work much harder to stop the rot advancing any further (in both the
+   code-base and the organisation), but again, my main recommendation would be to
+   invest in a test framework &#8212; a system test framework in this case.
+</p>
+<p>If we can create a suite of tests which exercise the code to systematically
+   expose the threading problems, we may have a chance of understanding them. If
+   we can automate these tests and publish results in a user-friendly form &#8212;
+   bearing in mind that users are not just engineers, but everyone with an
+   interest in the code-base &#8212; then we may yet fix them.
+</p>
+
+<h3><a href="#toc13" name="tocthe-case-against-todo" id="tocthe-case-against-todo">The Case Against TODO</a></h3>
+<p>This article has covered the use and abuse of <code>TODO</code>. In some cases, it is
+   redundant; in others inadequate; in others misleading; and in yet others it
+   could more usefully be replaced by code. <code>TODO</code> is sometimes a note written in
+   some personal shorthand, which, like many such notes, is in danger of becoming
+   meaningless to even its originator.
+</p>
+<p>I have no major problem with any of these uses, though personally I avoid
+   them. It&#8217;s the times when <code>TODO</code> (or <code>FIXME</code> or <code>HACK</code>) gets roped in to defer
+   the proper treatment of a defect which make it suspect.
+</p>
+<p>In <a href="http://accu.org/index.php/journals/284">Overload 68</a>, Alan Griffiths writes:
+</p>
+<blockquote><p>The worst thing that can be done on encountering a problem is to
+   ignore it on the basis that &#8220;someone else&#8221; should deal with it. The
+   next worst thing is to bury it in a write-only &#8220;issues list&#8221; in the
+   hope that one day someone will deal with it. If everyone behaves like
+   that then nobody deals with anything.
+</p>
+</blockquote><p>Griffiths is talking about problems in a wider sense, perhaps, than this
+   article, but he expresses my frustration with <code>TODO</code> perfectly. A search
+   through code for <code>TODO</code>s is all too likely to reveal a &#8220;write only issues
+   list&#8221;. Too often, <code>FIXME</code> silently marks a place where we know something is
+   wrong, but we haven&#8217;t bothered to do anything about it. Worst of all, <code>HACK</code>
+   gets deployed when we know something is wrong and we fear we might have
+   made it worse.
+</p>
+<hr />
+
+<p><a id="fn1" href="#fn1link">[1] Legacy Code</a> I haven&#8217;t defined what I mean by
+   legacy code here &#8212; but the risk associated with change is surely a defining
+   characteristic. In his book &#8220;Working Effectively with Legacy Code&#8221;, Michael
+   Feathers chooses a specific and objective definition: legacy code is code which
+   has no unit tests. He goes on to offer some sound advice on how to work with
+   such code: that is, how to put it under test. Once the tests are in place, the
+   risks associated with change reduce.
+</p>
+<p><a id="fn2" href="#fn2link">[2] Broken Windows.</a> In &#8220;The Pragmatic
+   Programmer: From Journeyman to Master&#8221; Andrew Hunt and Dave Thomas advise us not
+   to live with broken windows:
+</p>
+<blockquote><p>One broken window, left unrepaired for any substantial length of time,
+   instills in the inhabitants of the building a sense of abandonment &#8212;a
+   sense that the powers that be don&#8217;t care about the building. So another
+   window gets broken. People start littering. Graffiti appears. Serious
+   structural damage begins. In a relatively short space of time, the
+   building becomes damaged beyond the owner&#8217;s desire to fix it, and the
+   sense of abandonment becomes reality.&#8221;
+</p>
+</blockquote><p>Hunt and Thomas suggest the same is true of software: when we
+   discover something is broken, we must repair it promptly. Deferring the
+   repair work with a <code>TODO</code> or a <code>FIXME</code> risks making things worse. The next
+   programmer to visit the code is unlikely to make the fix, but may well
+   be encouraged to adopt <code>TODO</code> to defer the treatment of similar problems
+   elsewhere.
+</p>
+</div>
+
+<div class="comments"><hr/><div id="disqus_thread"></div><script type="text/javascript" src="http://disqus.com/forums/wordaligned/embed.js"></script></div>
+      
+<div id="comments"><script type="text/javascript">
+//<![CDATA[
+(function() {
+    var links = document.getElementsByTagName('a');
+    var query = '?';
+    for(var i = 0; i < links.length; i++) {
+        if(links[i].href.indexOf('#disqus_thread') >= 0) {
+            query += 'url' + i + '=' + encodeURIComponent(links[i].href) + '&amp;';
+        }
+    }
+    document.write('<script type="text/javascript" src="http://disqus.com/forums/wordaligned/get_num_replies.js' + query + '"></' + 'script>');
+})();
+//]]>
+</script></div>
+
+    </div>
+    <div id="sidebar">
+      
+<div class="sidebar-node">
+<h3>Tagged</h3>
+<ul id="categories"><li><a href="/tag/c++" rel="tag">C++</a></li>
+<li><a href="/tag/accu" rel="tag">ACCU</a></li></ul>
+
+</div>
+
+<div class="sidebar-node">
+<h3>Chain</h3>
+<ul>
+<li><a accesskey="n" href="/articles/built-in-type-safety.html" title="Next article">&laquo; Built in Type Safety?</a></li>
+<li><a accesskey="p" href="/articles/metaprogramming.html" title="Previous article">&raquo; Metaprogramming is Your Friend</a></li>
+</ul>
+
+
+</div>
+
+<div class="sidebar-node">
+<h3>Feeds</h3>
+
+<ul>
+<li><a href="http://feeds.wordaligned.org/wordaligned"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Articles</a></li>
+<li><a href="http://feeds.wordaligned.org/wordaligned/comments"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Comments</a></li>
+</ul>
+
+
+</div>
+
+    </div>
+  </div>
+  <div id="footer">
+<hr />
+<p><a href="http://tag.wordaligned.org">Thomas Guest</a></p>
+</div>
+
+</div>
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-3373724-1']);
+  _gaq.push(['_trackPageview']);
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ga);
+  })();
+</script>
+</body>
+
+</html>

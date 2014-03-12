@@ -1,0 +1,1252 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" >
+<channel>
+<title>Word Aligned</title>
+<link>http://wordaligned.org</link>
+<description>tales from the code face</description>
+<dc:creator>tag@wordaligned.org</dc:creator>
+<language>en-gb</language>
+<item>
+<title>Life goes on</title>
+<description>&lt;p&gt;&lt;a href="http://www.flickr.com/photos/anachrocomputer/6951474448/" title="Testing the Wincor-Nixdorf Customer Display by anachrocomputer, on Flickr"&gt;&lt;img src="http://farm6.staticflickr.com/5340/6951474448_f83069b7cf.jpg" width="500" height="333" alt="Testing the Wincor-Nixdorf Customer Display"&gt;&lt;/a&gt;
+&lt;/p&gt;
+&lt;p&gt;In my &lt;a href="http://wordaligned.org/articles/life-on-canvas.html" title="Game of life"&gt;previous post&lt;/a&gt; I described John Conway&amp;#8217;s Game of Life as a &lt;a href="http://programmer.97things.oreilly.com/wiki/index.php/Learn_to_say_Hello_World" title="Learn to say 'Hello, World'"&gt;hello world&lt;/a&gt; for computer graphics. Actually, it goes beyond that. Hello world is a complete program, a proof the toolchain works, but it&amp;#8217;s not a particularly interesting program. An implementation of the game of life does more than demonstrate you can put pixels on screens: the evolution of those pixel colonies turns out to be a subject &lt;a href="http://pentadecathlon.com/lifeNews/2010/02/prime_numbers.html" title="A Life pattern to calculate prime numbers"&gt;worth studying&lt;/a&gt; in itself.
+&lt;/p&gt;
+&lt;p&gt;That said, I&amp;#8217;m primarily interested in Life as an exercise in learning new things. I&amp;#8217;ve continued to develop my &lt;a href="http://diveintohtml5.info/canvas.html" title="Mark Pilgrim dives into HTML5's canvas element"&gt;canvas&lt;/a&gt; implementation, adding some &lt;a href="http://jqueryui.com" title="The official jQuery user interface library"&gt;jQuery UI&lt;/a&gt; effects. The code is on &lt;a href="https://github.com/wordaligned/game-of-life.git" title="Wordaligned's game-of-life repository on Github"&gt;Github&lt;/a&gt; &amp;#8212; yes, it&amp;#8217;s high time I learned about that too &amp;#8212; though note there are dependencies on jQuery, jQuery UI, Imagemagick, and on pattern files downloaded from &lt;a href="http://www.conwaylife.com/wiki/Main_Page"&gt;conwaylife.com&lt;/a&gt;.
+&lt;/p&gt;
+&lt;p&gt;A working version can be found at &lt;a href="http://wordaligned.org/life.html" title="Life on Canvas"&gt;wordaligned.org/life&lt;/a&gt;. Click the graphic below to give it a go. Your web client does support HTML5 Canvas, right?
+&lt;/p&gt;
+&lt;div style="border:1px solid #333"&gt;&lt;a href="http://wordaligned.org/life" title="Play the game of life"&gt;&lt;img src="http://wordaligned.org/images/life-on-canvas.png" alt="Play the game of life"/&gt;&lt;/a&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;hr /&gt;
+   Thanks, &lt;a href="http://www.flickr.com/photos/anachrocomputer" title="anachrocomputer's photostream"&gt;anachrocomputer&lt;/a&gt;, for the delightful hello world photo
+&lt;/p&gt;</description>
+<dc:date>2012-06-29</dc:date>
+<guid>http://wordaligned.org/articles/life-goes-on.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/life-goes-on.html</link>
+<category>Graphics</category>
+</item>
+
+<item>
+<title>Life on Canvas</title>
+<description>&lt;p&gt;I was lucky enough to be taught maths by &lt;a href="http://www.math.princeton.edu/directory/john-conway" title="John Conway, now at Princeton University"&gt;John Horton Conway&lt;/a&gt;, if only for an hour a week for a single term. He was lucky enough to be teaching number theory: a subject packed with treasures picked from the full history of mathematics.
+&lt;/p&gt;
+&lt;p&gt;I remember him as animated and unkempt. He bustled into that first lecture with a carrier bag and started pulling out groceries one by one. How many items were in the bag, he wondered? Could he count them all &amp;#8212; it was a &lt;em&gt;very&lt;/em&gt; large bag &amp;#8212; and what exactly did &lt;a href="http://mathworld.wolfram.com/Aleph-0.html" title="The 'small' infinite set of integers"&gt;infinity&lt;/a&gt; mean? Later I would see him pacing along Kings Parade dragging a shopping tolley, lost in thought.
+&lt;/p&gt;
+&lt;p&gt;Number theory may be as old as mathematics but it remains very much alive. Some 40 years ago Professor Conway discovered a primitive and novel mathematical life form: the Game of Life. 
+&lt;/p&gt;
+&lt;p&gt;The rules are simple. A colony of cells inhabits a two dimensional grid. At any one time each cell is either alive or dead, and as time advances the fate of a cell is determined entirely by its immediate 8 neighbours:
+&lt;/p&gt;
+&lt;ul&gt;
+ &lt;li&gt;
+     reproduction: a dead cell with exactly 3 live neighbours becomes alive
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     survival: a live cell with 2 or 3 live neighbours lives on
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     overcrowding or loneliness: in all other cases the cell dies or stays dead
+ &lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;In code, we might represent the colony as a two dimensional array filled with &lt;code&gt;1&lt;/code&gt;&amp;#8217;s and &lt;code&gt;0&lt;/code&gt;&amp;#8217;s for live and dead cells and code up the rules like this:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;// Determine the fate of cell i, j in the next generation.
+// Return 1 for "lives", 0 for "dies"
+function fate(cells, i, j) {
+    var neighbours = [[-1,-1],[-1,0],[-1,1],
+                      [0,-1],        [0,1],
+                      [1,-1], [1,0], [1,1]];
+        live_neighbours = 0;
+    neighbours.forEach(function(n) { 
+        live_neighbours += cells[i + n[0]][j + n[1]];
+    });
+    return (live_neighbours == 3 || 
+            cells[i][j] == 1 &amp;amp;&amp;amp; live_neighbours == 2) ? 1 : 0;
+}
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;It turns out these simple rules generate an astonishing ecosystem. Simple patterns flourish, evolving into complex patterns which, many generations later may decay into stable forms and repeating patterns, or, occasionally, become extinct. 
+&lt;/p&gt;
+&lt;p&gt;Can a finite pattern grow indefinitely? Conway originally conjectured no, this was impossible, offering $50 to the first person who could prove or disprove the his conjecture before the end of 1970. In November of that year a team from MIT led by Bill Gosper claimed the prize, disproving the conjecture with a glider gun pattern which spits out a new spaceship every 30 generations.
+&lt;/p&gt;
+&lt;img src=http://upload.wikimedia.org/wikipedia/commons/e/e5/Gospers_glider_gun.gif alt="Gosper's glider gun, Wikimedia commons" style="border:1px solid black;"&gt;
+
+&lt;span id="continue-reading"/&gt;
+
+&lt;p&gt;A 2 dimensional array can naturally be represented on the most basic computer screen &amp;#8212; think raster graphics, pixels &amp;#8212; and the parallel emergence and development of the personal computer helps explain life&amp;#8217;s continuing appeal&lt;a id="fn1link" href="http://wordaligned.org/articles/life-on-canvas.html#fn1"&gt;&lt;sup&gt;[1]&lt;/sup&gt;&lt;/a&gt;. The game of life has become the &lt;a href="http://programmer.97things.oreilly.com/wiki/index.php/Learn_to_Say_%22Hello%2C_World%22" title="Laern to say Hello, world"&gt;hello world&lt;/a&gt; of graphics frameworks. In 2012 we can use the HTML5 canvas, a 2 dimensional surface for drawing on.
+&lt;/p&gt;
+&lt;p&gt;&lt;canvas id="lifecanvas" width="480" height="320" style="border:1px solid black;"&gt;Unfortunately your client does not support the &lt;a href="http://www.w3.org/TR/html5/the-canvas-element.html#the-canvas-element"&gt;HTML5 canvas element&lt;/a&gt;. If you are using a feed reader, try visiting the &lt;a href="http://wordaligned.org/articles/life-on-canvas.html"&gt;original page&lt;/a&gt;.&lt;/canvas&gt;
+   &lt;div&gt;
+   &lt;button type="button" id="random" title="Random pattern" style="vertical-align:top;width:50px;height:50px;"&gt;&lt;img src="http://wordaligned.org/images/glyphicons_322_playing_dices.png" /&gt;&lt;/button&gt;
+   &lt;button type="button" id="clear" title="Clear screen" style="vertical-align:top;width:50px;height:50px;"&gt;&lt;img src="http://wordaligned.org/images/glyphicons_192_circle_remove.png" /&gt;&lt;/button&gt;
+   &lt;button type="button" id="toggle" title="Play/Pause" style="vertical-align:top;width:50px;height:50px;"&gt;&lt;img src="http://wordaligned.org/images/glyphicons_174_pause.png" /&gt;&lt;/button&gt;
+   &lt;button type="button" id="step" title="Single step" style="vertical-align:top;width:50px;height:50px;"&gt;&lt;img src="http://wordaligned.org/images/glyphicons_178_step_forward.png" /&gt;&lt;/button&gt;
+   &lt;button type="button" id="info" title="Help" style="vertical-align:top;width:50px;height:50px;"&gt;&lt;img src="http://wordaligned.org/images/glyphicons_195_circle_info.png" /&gt;&lt;/button&gt;
+   &lt;/div&gt;
+   &lt;script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"&gt;&lt;/script&gt;
+   &lt;script type="text/javascript" src="http://wordaligned.org/scripts/simple-life.js"&gt;&lt;/script&gt;
+&lt;/p&gt;
+&lt;p&gt;After a little experimentation you&amp;#8217;re sure to uncover life&amp;#8217;s three main domains: still lives, which remain unchanged; oscillators, which repeat; and spaceships, which move across the board. Then there are methuselahs, puffers, guns &amp;#8230;
+&lt;/p&gt;
+&lt;p&gt;Here&amp;#8217;s a pulsar, an oscillator with period 3.
+&lt;/p&gt;
+&lt;img src="http://wordaligned.org/images/pulsar.gif" alt="Pulsar"/&gt;
+
+&lt;p&gt;And here&amp;#8217;s a glider, classed as a diagonal spaceship, &lt;a href="http://www.catb.org/hacker-emblem/" title="When you put the glider emblem on your web page, or wear it on clothing, or display it in some other way, you are visibly associating yourself with the hacker culture"&gt;a pattern chosen&lt;/a&gt; by Eric S Raymond as a hackers&amp;#8217; emblem.
+&lt;/p&gt;
+&lt;img src="http://wordaligned.org/images/glider.gif" alt="Glider, an orthogonal spaceship"/&gt;
+
+&lt;p&gt;Here&amp;#8217;s another 5 cell pattern &amp;#8212; the R-pentomino. Clear the canvas, pick out an R-pentomino cluster of cells with the mouse, click play, and watch what evolves!
+&lt;/p&gt;
+&lt;img src="http://wordaligned.org/images/Rpentomino.png" alt="Rpentomino"/&gt;
+
+&lt;p&gt;&lt;a href="http://www.conwaylife.com/wiki/Turtle" title="An orthogonal c/3 spaceship"&gt;Turtle&lt;/a&gt;, &lt;a href="http://www.conwaylife.com/wiki/Garden_of_Eden" title="A pattern that has no parents and thus can only occur in generation 0"&gt;garden&lt;/a&gt;, &lt;a href="http://www.conwaylife.com/wiki/Unicycle" title="Unicycle is a period 6 oscillator made up of four copies of unix"&gt;unicycle&lt;/a&gt;: animal, vegetable, mineral. The kingdom of life is inclusive and extensive, a delight for naturalists and taxonomists alike. It&amp;#8217;s seduced logophiles and lexicographers too: reading through Stephen A. Silver&amp;#8217;s comprehensive &lt;a href="http://www.argentum.freeserve.co.uk/lex.htm" title="A lexicon of terms relating to John Horton Conway's Game of Life, by Stephen Silver"&gt;Life Lexicon&lt;/a&gt;, I learned that an anteater consumes ants, a &lt;a href="http://www.argentum.freeserve.co.uk/lex_c.htm#caterpillar"&gt;caterpillar&lt;/a&gt; works by laying tracks at its front end, a baker&amp;#8217;s dozen is a loaf &lt;a href="http://www.argentum.freeserve.co.uk/lex_h.htm#hassler"&gt;hassled&lt;/a&gt; by two blocks and two caterers, and an &lt;a href="http://www.argentum.freeserve.co.uk/lex_a.htm#ak47reaction"&gt;AK47&lt;/a&gt; reaction occurs when a honey farm predecessor, catalysed by an eater and a block, reappears at another location 47 generations later, having produced a glider and a traffic light. I could go on&amp;#8230;
+&lt;/p&gt;
+&lt;hr /&gt;
+
+&lt;p&gt;&lt;a id="fn1" href="http://wordaligned.org/articles/life-on-canvas.html#fn1link"&gt;[1]&lt;/a&gt;: I&amp;#8217;m glossing over details here. The true game of life is played out on an infinite grid, and patterns such as &lt;a href="http://en.wikipedia.org/wiki/Gun_(cellular_automaton)"&gt;Gosper&amp;#8217;s glider gun&lt;/a&gt; show that it really does have to be infinite. Computers have trouble with such an unconstrained requirement, and a computer animation might try and adapt the screen as the pattern grows, or limit the region of interest. Another approach is to wrap the canvas, left to right, top to bottom, so the game of life is played out on what&amp;#8217;s topologically a toriodal surface. That&amp;#8217;s what the canvas shown here does.
+&lt;/p&gt;
+&lt;p style="text-align:center"&gt;&amp;sect;&lt;/p&gt;
+
+&lt;p&gt;The icons used on this page were downloaded from &lt;a href="http://glyphicons.com"&gt;http://glyphicons.com&lt;/a&gt; and are licensed under the &lt;a href=http://creativecommons.org/licenses/by/3.0/deed.en&gt;CC BY 3.0&lt;/a&gt; terms. The animated gifs were placed in the public domain by their authors.
+&lt;/p&gt;</description>
+<dc:date>2012-06-27</dc:date>
+<guid>http://wordaligned.org/articles/life-on-canvas.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/life-on-canvas.html</link>
+<category>Graphics</category>
+</item>
+
+<item>
+<title>DEFLATE: run-length encoding, but better</title>
+<description>&lt;h3&gt;Run-length encoding&lt;/h3&gt;
+&lt;p&gt;&lt;a href="http://en.wikipedia.org/wiki/Run-length_encoding"&gt;Run-length encoding&lt;/a&gt; is a simple compression scheme in which runs of equal values are represented by the value and a repeat count. For example, a supermarket cashier might process this line of shopping
+&lt;/p&gt;
+&lt;img src="http://wordaligned.org/images/fruit-line.png" alt="Fruit salad"/&gt;
+
+&lt;p&gt;as
+&lt;/p&gt;
+&lt;ul&gt;
+ &lt;li&gt;
+     4 bananas
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     3 apples
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     2 bananas
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     1 pineapple
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     3 apples
+ &lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Unix packs in its very own run length encoder, &lt;code&gt;uniq -c&lt;/code&gt;. It works just fine &amp;#8212; so long as the values you want to encode are newline separated byte strings, that is.
+&lt;/p&gt;
+&lt;p&gt;Let&amp;#8217;s use a sequence of coin tosses as an example stream. &lt;code&gt;$RANDOM&lt;/code&gt; generates random numbers. We use the least significant bit of these numbers as an index into an array containing the values &lt;code&gt;heads&lt;/code&gt;, &lt;code&gt;tails&lt;/code&gt;.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;$ HT=(heads tails)
+$ toss() { echo ${HT[$RANDOM&amp;amp;1]}; }
+$ toss; toss; toss
+heads
+tails
+tails
+$ tosses() { while [ 1 ]; do toss; done; }
+$ tosses | head
+tails
+tails
+tails
+heads
+tails
+heads
+heads
+heads
+tails
+tails
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;&lt;img src="http://wordaligned.org/images/tails.jpg" alt="tails"/&gt;
+   &lt;img src="http://wordaligned.org/images/tails.jpg" alt="tails"/&gt;
+   &lt;img src="http://wordaligned.org/images/tails.jpg" alt="tails"/&gt;
+   &lt;img src="http://wordaligned.org/images/heads.jpg" alt="heads"/&gt;
+   &lt;img src="http://wordaligned.org/images/tails.jpg" alt="tails"/&gt;
+   &lt;img src="http://wordaligned.org/images/heads.jpg" alt="heads"/&gt;
+   &lt;img src="http://wordaligned.org/images/heads.jpg" alt="heads"/&gt;
+   &lt;img src="http://wordaligned.org/images/heads.jpg" alt="heads"/&gt;
+   &lt;img src="http://wordaligned.org/images/tails.jpg" alt="tails"/&gt;
+   &lt;img src="http://wordaligned.org/images/tails.jpg" alt="tails"/&gt;
+&lt;/p&gt;
+&lt;span id="continue-reading"/&gt;
+
+&lt;p&gt;Passing a fresh sample from this same stream through our run-length encoder we get:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;$ tosses | uniq -c | head
+   2 heads
+   1 tails
+   1 heads
+   1 tails
+   1 heads
+   6 tails
+   3 heads
+   1 tails
+   4 heads
+   1 tails
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;An &lt;code&gt;awk&lt;/code&gt; script can be used as a run-length decoder. (There must be a neater way, using &lt;code&gt;sed&lt;/code&gt; maybe?)
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;$ runlendec() { awk '{ while ($1--) print $2 }'; }
+$ tosses | head | tee orig.log | uniq -c | runlendec | tee encdec.log
+heads
+tails
+heads
+tails
+heads
+heads
+tails
+tails
+heads
+heads
+$ diff orig.log encdec.log
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Here, we toss a coin 10 times teeing the original sequence to a file. The next two links in the pipeline compress and decompress the sequence, teeing the results to another file. Finally, as a sanity check, we confirm the round trip results are the same.
+&lt;/p&gt;
+
+&lt;h3&gt;Run-length encoding in Python&lt;/h3&gt;
+&lt;p&gt;This Unix run-length codec is fun, but of limited practical use. One good feature, though, is the way it operates on streams of data (including infinite streams), leaving clients free to decide how best to slice and buffer these streams.
+&lt;/p&gt;
+&lt;p&gt;Python has a fine library of high-level &lt;a href="http://docs.python.org/library/itertools.html"&gt;stream transformation tools&lt;/a&gt; from which we can build a generic and flexible run-length codec in just a few lines. Since I want to progress from run-length coding to something more advanced, I&amp;#8217;ll leave discussing how to implement this codec for now, but if you&amp;#8217;d like to write your own version, here&amp;#8217;s a description suitable for &lt;a href="http://docs.python.org/library/doctest#simple-usage-checking-examples-in-a-text-file"&gt;doctesting&lt;/a&gt;.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;Import the run-length codec functions and compress a short string.
+&amp;gt;&amp;gt;&amp;gt; from runlength import compress, decompress
+&amp;gt;&amp;gt;&amp;gt; comp = compress('AABBBACC')
+
+The returned compressor is a stream (an iterable).
+&amp;gt;&amp;gt;&amp;gt; next(comp)
+(2, 'A')
+
+Pull the rest of the stream into memory.
+&amp;gt;&amp;gt;&amp;gt; rest = list(comp)
+&amp;gt;&amp;gt;&amp;gt; rest
+[(3, 'B'), (1, 'A'), (2, 'C')]
+
+Simple decompress example.
+&amp;gt;&amp;gt;&amp;gt; concat = ''.join
+&amp;gt;&amp;gt;&amp;gt; concat(decompress(rest))
+'BBBACC'
+
+Compress, decompress also work with infinite streams, like the 
+a2b3 stream, which repeatedly cycles two pairs. 
+&amp;gt;&amp;gt;&amp;gt; from itertools import cycle, islice
+&amp;gt;&amp;gt;&amp;gt; a2b3 = cycle([(2, 'a'), (3, 'b')])
+&amp;gt;&amp;gt;&amp;gt; dec = decompress(a2b3)
+
+Pull 8 values from the decompressed stream.
+&amp;gt;&amp;gt;&amp;gt; concat(islice(dec, 8))
+'aabbbaab'
+
+Now compress the decompressed stream, and explore a few items.
+&amp;gt;&amp;gt;&amp;gt; comp = compress(dec)
+&amp;gt;&amp;gt;&amp;gt; next(comp)
+(2, 'b')
+&amp;gt;&amp;gt;&amp;gt; list(islice(comp, 2))
+[(2, 'a'), (3, 'b')]
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+
+&lt;h3&gt;DEFLATE&lt;/h3&gt;
+&lt;img style="border: 2px solid #ccc;" src="http://wordaligned.org/images/chessboard-monochrome.png" alt="Chessboard"/&gt;
+
+&lt;p&gt;The Wikipedia page on &lt;a href="http://en.wikipedia.org/wiki/Run-length_encoding"&gt;run-length encoding&lt;/a&gt; identifies monochrome images as good candidates for run-length compression. The white and black pixels typically group into long runs. Indeed, any simple image using a limited palette should reduce well using this compression scheme.
+&lt;/p&gt;
+&lt;p&gt;The chessboard above is 256&amp;times;256 pixels, each square being 32&amp;times;32 pixels. We &lt;em&gt;could&lt;/em&gt; run-length encode this 64K pixel image as 256&amp;times;8 = 2K runs of 32 pixels, a decent saving. (Actually, we should do slightly better, noting that there are runs of length 64 at the chessboard rank boundaries, but  you get the idea.)
+&lt;/p&gt;
+&lt;pre&gt;
+(32,W)(32,B)(32,W)(32,B)(32,W)(32,B)(32,W)(32,B),
+(32,W)(32,B)(32,W)(32,B)(32,W)(32,B)(32,W)(32,B),
+....
+(32,B)(32,W)(32,B)(32,W)(32,B)(32,W)(32,B)(32,W)
+&lt;/pre&gt;
+
+&lt;p&gt;Like a paletted image, a block of text &amp;#8212; the web page you&amp;#8217;re reading now, for example &amp;#8212; employs a limited alphabet. Although the characters in this text don&amp;#8217;t usually group into long runs there&amp;#8217;s plenty of repetition, especially in the raw HTML: all the occurrences of &lt;code&gt;&amp;lt;div&amp;gt;&lt;/code&gt;, &lt;code&gt;&amp;lt;span&amp;gt;&lt;/code&gt; and &lt;code&gt;class&lt;/code&gt; used for CSS styling, for example. The &lt;a href="http://en.wikipedia.org/wiki/DEFLATE"&gt;DEFLATE&lt;/a&gt; compression algorithm uses a clever twist on run-length encoding to remove this redundancy:
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;The compressed data consists of a series of elements of two types: literal bytes (of strings that have not been detected as duplicated within the previous 32K input bytes), and pointers to duplicated strings, where a pointer is represented as a pair &amp;lt;length, backward distance&amp;gt;. (&lt;a href="http://tools.ietf.org/html/rfc1951"&gt;RFC-1951&lt;/a&gt;)
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;(In addition, a multiple-level dynamic Huffman encoding scheme reduces the space needed for the strings, distances and lengths themselves.)
+&lt;/p&gt;
+&lt;p&gt;There&amp;#8217;s more to these pointer elements than first appears: the length can exceed the backward distance. Thus the sequence:
+&lt;/p&gt;
+&lt;pre&gt;
+heads
+heads
+heads
+heads
+heads
+&lt;/pre&gt;
+
+&lt;p&gt;can be deflated as the literal type &lt;code&gt;heads\n&lt;/code&gt; followed by the pointer type &lt;code&gt;&amp;lt;24, 6&amp;gt;&lt;/code&gt;. 
+&lt;/p&gt;
+&lt;p&gt;If you&amp;#8217;ve spotted the potential for recursion, good! The inflating stream can reference itself, which can reference itself, which can &amp;#8230; &lt;a href="http://steike.com/code/useless/zip-file-quine/" title="Best ever Quine!"&gt;Confusing?&lt;/a&gt;
+&lt;/p&gt;
+
+&lt;h3&gt;Zipping pixels&lt;/h3&gt;
+&lt;p&gt;&lt;a href="http://www.libpng.org/pub/png/" title="Check out the graphics on the PNG home page!"&gt;PNG&lt;/a&gt; images use DEFLATE compression (as implemented by &lt;a href="http://www.zlib.net"&gt;zlib&lt;/a&gt;) to save on pixel storage space. Here&amp;#8217;s a binary view of the raw data in the chessboard graphic shown above, all &lt;strong&gt;137 bytes&lt;/strong&gt; of it. The 64K pixels themselves compress into a 88 byte IDAT chunk, of which the final 8 bytes are a checksum and (I think?) some padding. Maybe the image could be &lt;a href="http://drj11.wordpress.com/2009/02/20/i-crush-optipng/"&gt;squeezed harder&lt;/a&gt;, but I&amp;#8217;m impressed!
+&lt;/p&gt;
+&lt;pre&gt;
+8950 4e47 0d0a 1a0a 0000 000d 4948 4452  .&lt;b&gt;PNG&lt;/b&gt;........&lt;b&gt;IHDR&lt;/b&gt;
+0000 0100 0000 0100 0100 0000 0074 0995  .............t..
+cb00 0000 5049 4441 5468 81ed ceb1 0d00  ....P&lt;b&gt;IDAT&lt;/b&gt;h......
+200c 0341 f65f 1a58 803a 2f74 6e52 e424   ..A._.X.:/tnR.$
+7bed 9b75 f3ba cf07 0000 df83 ca0e 0000  {..u............
+7a60 ba1f 0080 2ea8 ec00 00a0 07a6 fb01  z`..............
+00e8 82ca 0e00 007a 60ba 1f00 802e a8ec  .......z`.......
+0000 2007 0e8a 69f0 e2b9 9471 c700 0000  .. ...i....q....
+0049 454e 44ae 4260 82                   .&lt;b&gt;IEND&lt;/b&gt;.B`.
+&lt;/pre&gt;
+
+&lt;p&gt;Here&amp;#8217;s a trace of how zlib inflates the compressed pixels in this &lt;a href="http://www.libpng.org/pub/png/spec/1.2/PNG-Chunks.html"&gt;IDAT chunk&lt;/a&gt;. (Source code available via anonymous SVN at &lt;a href="http://wordaligned.org/svn/etc/zlib_trace"&gt;http://wordaligned.org/svn/etc/zlib_trace&lt;/a&gt;.)
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;inflate: allocated
+inflate: reset
+inflate:   zlib header ok
+inflate:     dynamic codes block (last)
+inflate:       table sizes ok
+inflate:       code lengths ok
+inflate:       codes ok
+inflate:         literal 0x00
+inflate:         literal 0xff
+inflate:         length 3
+inflate:         distance 1
+inflate:         literal 0x00
+inflate:         length 3
+inflate:         distance 1
+inflate:         length 24
+inflate:         distance 8
+inflate:         length 25
+inflate:         distance 25
+inflate:         length 258
+inflate:         distance 33
+....
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;I&amp;#8217;ve attempted to show the first few stages of the genesis of the uncompressed stream in the picture below. The way the stream recursively inflates itself is quite beautiful.
+&lt;/p&gt;
+&lt;img style="border: 2px solid #ccc;" src="http://wordaligned.org/images/inflate.png" alt="Inflating pixels"/&gt;
+
+&lt;ol&gt;
+ &lt;li&gt;
+     put 00
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     put ff
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     go back 1 (to ff), put 3
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     put 00
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     go back 1 (to 00), put 3
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     go back 8 (to 00 00 00 00 ff ff ff ff)
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     put 24
+ &lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Two elements later, and the repeat length has grown to 258. In fact, the entire chessboard is generated from just 3 literal and 43 pointer elements.
+&lt;/p&gt;
+&lt;p&gt;(Not all graphics have such a regular pattern, of course, so we can&amp;#8217;t always achieve such dramatic compression.)
+&lt;/p&gt;
+
+&lt;h3&gt;Deflated HTML&lt;/h3&gt;
+&lt;p&gt;Web servers can and do save on band-width by transferring &lt;a href="http://www.gzip.org/"&gt;gzip&lt;/a&gt; compressed HTML to gzip capable clients. (Gzip is a simple wrapper around DEFLATE.) Any PNG images transferred will also have their pixels DEFLATE compressed.
+&lt;/p&gt;
+&lt;pre&gt;
+$ curl http://wordaligned.org --head --compress
+HTTP/1.1 200 OK
+Date: Sun, 17 May 2009 17:41:53 GMT
+Server: lighttpd | Word Aligned
+Content-Type: text/html; charset=UTF-8
+....
+Vary: Accept-Encoding
+&lt;b&gt;Content-Encoding: gzip&lt;/b&gt;
+Content-Length: 20
+&lt;/pre&gt;
+
+&lt;p&gt;The Word Aligned &lt;a href="http://wordaligned.org/"&gt;front page&lt;/a&gt; contains about 75Kb of HTML, which gzips to just 16Kb &amp;#8212; a decent saving. Relevant lines from the &lt;a href="http://redmine.lighttpd.net/projects/lighttpd/wiki/Docs:ModCompress"&gt;lighttpd configuration file&lt;/a&gt; read:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;lighttpd mod_compress&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;server.modules = (
+    ....
+    "mod_compress"
+)
+compress.cache-dir = basedir + "lighttpd/cache/compress/"
+compress.filetype  = ("text/plain", "text/html", "text/css")
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;I uphold Gzip (built on zlib, which implements DEFLATE) as a hero of the web. As we&amp;#8217;ve seen, it implements a powerful and elegant algorithm, but perhaps the best thing about it is that it&amp;#8217;s free to use, a freedom worth fighting for. Check out this battle report from the &lt;a href="http://www.gzip.org/#faq"&gt;FAQ&lt;/a&gt;.
+&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;h3&gt;What about patents?&lt;/h3&gt;
+&lt;p&gt;&lt;em&gt;gzip&lt;/em&gt; was developed as a replacement for compress because of the UNISYS and IBM &lt;a href="http://www.faqs.org/faqs/compression-faq/part1/section-6.html"&gt;patents&lt;/a&gt; covering the &lt;a href="http://www.faqs.org/faqs/compression-faq/part2/section-1.html"&gt;LZW&lt;/a&gt; algorithm used by compress.
+&lt;/p&gt;
+&lt;p&gt;I have probably spent more time studying data compression patents than actually implementing data compression algorithms. I maintain a list of several hundred patents on lossless data compression algorithms, and I made sure that &lt;em&gt;gzip&lt;/em&gt; isn&amp;#8217;t covered by any of them. In particular, the &lt;code&gt;--fast&lt;/code&gt; option of gzip is not as fast it could, precisely to avoid a patented technique.  &amp;#8212; Jean-Loup Gailly, &lt;a href="http://www.gzip.org/#faq11"&gt;Gzip FAQ&lt;/a&gt;
+&lt;/p&gt;
+&lt;/blockquote&gt;</description>
+<dc:date>2009-05-21</dc:date>
+<guid>http://wordaligned.org/articles/deflate-runlength-encoding-but-better.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/deflate-runlength-encoding-but-better.html</link>
+<category>Graphics</category>
+</item>
+
+<item>
+<title>Steganography made simple</title>
+<description>&lt;p&gt;&lt;a href="http://www.flickr.com/photos/thomasguest/3122529935/" title="What's hidden in this image?"&gt;&lt;img src="http://farm4.static.flickr.com/3264/3122529935_dfe6550cf6_o.png" width="294" height="450" alt="What's hidden in this image?" /&gt;&lt;/a&gt;
+&lt;/p&gt;
+&lt;p&gt;As programmers, our code should be readable, not cryptic; but sometimes it&amp;#8217;s fun to &lt;a href="http://svn.python.org/view/python/trunk/Lib/antigravity.py?rev=66902&amp;amp;view=markup" title="python3.0 -c 'import antigravity'"&gt;surprise&lt;/a&gt;, &lt;a href="http://www.ioccc.org/main.html"&gt;obfuscate&lt;/a&gt; or &lt;a href="http://en.wikipedia.org/wiki/Easter_egg_(media)"&gt;conceal&lt;/a&gt;. &lt;a href="http://en.wikipedia.org/wiki/Steganography"&gt;Wikipedia&lt;/a&gt; says:
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;&lt;a href="http://en.wikipedia.org/wiki/Steganography"&gt;Steganography&lt;/a&gt; is the art and science of writing hidden messages in such a way that no-one apart from the sender and intended recipient even realizes there &lt;em&gt;is&lt;/em&gt; a hidden message. By contrast, cryptography obscures the meaning of a message, but it does not conceal the fact that there &lt;em&gt;is&lt;/em&gt; a message.
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;Lemon juice on paper never worked for me, and (as I discovered when I tried to devise a title for &lt;a href="http://wordaligned.org/articles/a-little-teaser.html"&gt;an earlier post&lt;/a&gt;) it&amp;#8217;s hard work hiding a text message as a pattern within a larger text message. Sadly my hair is too fine for Histiaeus&amp;#8217;s inspired shave-a-slave trick.
+&lt;/p&gt;
+&lt;p&gt;In a digital age, steganographers have it easier. The larger the carrier message the easier it is to disguise a payload within it. My mobile phone has a 3 megapixel camera; I could embed the entire text content of &lt;a href="http://wordaligned.org"&gt;this website&lt;/a&gt; (tarred and bzipped) within a single one of its photos without anyone noticing. The &lt;a href="http://en.wikipedia.org/wiki/Steganography"&gt;Wikipedia page on steganography&lt;/a&gt; has a remarkable example of a picture of a tree which, after some bit-shifting, turns into a passable picture of a cat!
+&lt;/p&gt;
+&lt;span id="continue-reading"/&gt;
+
+&lt;p&gt;The &lt;a href="http://www.pythonware.com/products/pil/"&gt;Python Imaging Library (PIL)&lt;/a&gt; makes tinkering with images a snip. Here&amp;#8217;s a short program to hide messages in images, and to reveal such messages. PIL isn&amp;#8217;t ready for Python 3.0 yet, so I&amp;#8217;m using 2.6. Note in passing the use of a couple of recent additions to my favourite module, &lt;a href="http://docs.python.org/library/itertools.html#itertools.product"&gt;itertools.product&lt;/a&gt; and &lt;a href="http://docs.python.org/library/itertools.html#itertools.izip_longest"&gt;itertools.izip_longest&lt;/a&gt;. 
+&lt;/p&gt;
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;PIL steganography&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;'''Digital image steganography based on the Python Imaging Library (PIL)
+
+Any message can be hidden, provided the image is large enough. The message is
+packed into the least significant bits of the pixel colour bands. A 4 byte
+header (packed in the same way) carries the message payload length.
+'''
+import Image
+import itertools as its
+
+def n_at_a_time(items, n, fillvalue):
+    '''Returns an iterator which groups n items at a time.
+    
+    Any final partial tuple will be padded with the fillvalue
+    
+    &amp;gt;&amp;gt;&amp;gt; list(n_at_a_time([1, 2, 3, 4, 5], 2, 'X'))
+    [(1, 2), (3, 4), (5, 'X')]
+    '''
+    it = iter(items)
+    return its.izip_longest(*[it] * n, fillvalue=fillvalue)
+
+def biterator(data):
+    '''Returns a biterator over the input data.
+    
+    &amp;gt;&amp;gt;&amp;gt; list(biterator(chr(0b10110101)))
+    [1, 0, 1, 1, 0, 1, 0, 1]
+    '''
+    return ((ord(ch) &amp;gt;&amp;gt; shift) &amp;amp; 1
+            for ch, shift in its.product(data, range(7, -1, -1)))
+
+def header(n):
+    '''Return n packed in a 4 byte string.'''
+    bytes = (chr(n &amp;gt;&amp;gt; s &amp;amp; 0xff) for s in range(24, -8, -8))
+    return ('%s' * 4) % tuple(bytes)
+
+def setlsb(cpt, bit):
+    '''Set least significant bit of a colour component.'''
+    return cpt &amp;amp; ~1 | bit
+
+def hide_bits(pixel, bits):
+    '''Hide a bit in each pixel component, returning the resulting pixel.'''
+    return tuple(its.starmap(setlsb, zip(pixel, bits)))
+
+def hide_bit(pixel, bit):
+    '''Similar to the above, but for single band images.'''
+    return setlsb(pixel, bit[0])
+
+def unpack_lsbits_from_image(image):
+    '''Unpack least significant bits from image pixels.'''
+    # Return depends on number of colour bands. See also hide_bit(s)
+    if len(image.getbands()) == 1:
+        return (px &amp;amp; 1 for px in image.getdata())
+    else:
+        return (cc &amp;amp; 1 for px in image.getdata() for cc in px)
+
+def call(f): # (Used to defer evaluation of f)
+    return f()
+
+def disguise(image, data):
+    '''Disguise data by packing it into an image.
+    
+    On success, the image is modified and returned to the caller.
+    On failure, None is returned and the image is unchanged.
+    '''
+    payload = '%s%s' % (header(len(data)), data)
+    npixels = image.size[0] * image.size[1]
+    nbands = len(image.getbands())
+    if len(payload) * 8 &amp;lt;= npixels * nbands:
+        new_pixel = hide_bit if nbands == 1 else hide_bits
+        pixels = image.getdata()
+        bits = n_at_a_time(biterator(payload), nbands, 0)
+        new_pixels = its.starmap(new_pixel, its.izip(pixels, bits))
+        image.putdata(list(new_pixels))
+        return image
+
+def reveal(image):
+    '''Returns any message disguised in the supplied image file, or None.'''
+    bits = unpack_lsbits_from_image(image)
+    def accum_bits(n):
+        return reduce(lambda a, b: a &amp;lt;&amp;lt; 1 | b, its.islice(bits, n), 0)
+    def next_ch():
+        return chr(accum_bits(8))
+    npixels = image.size[0] * image.size[1] 
+    nbands = len(image.getbands())
+    data_length = accum_bits(32)
+    if npixels * nbands &amp;gt; 32 + data_length * 8:
+        return ''.join(its.imap(call, its.repeat(next_ch, data_length)))
+
+if __name__ == "__main__":
+    import urllib
+    droste = urllib.urlopen("http://is.gd/cHqT").read()
+    open("droste.png", "wb").write(droste)
+    droste = Image.open("droste.png")
+    while droste:
+        droste.show()
+        droste = reveal(droste)
+        if droste:
+            open("droste.png", "wb").write(droste)
+            droste = Image.open("droste.png")
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;The code is available via anonymous SVN access at &lt;a href="http://svn.wordaligned.org/svn/etc/steganography"&gt;http://svn.wordaligned.org/svn/etc/steganography&lt;/a&gt;.
+&lt;/p&gt;
+&lt;p&gt;&amp;#x2621; For brevity, I haven&amp;#8217;t provided a nice user interface to &lt;code&gt;disguise()&lt;/code&gt; and &lt;code&gt;reveal()&lt;/code&gt;. The short main program is (intentionally) lightly obfuscated. &lt;code&gt;Disguise()&lt;/code&gt; modifies the supplied image argument &amp;#8212; use &lt;code&gt;Image.copy()&lt;/code&gt; if this is a problem. You must also choose a lossless format to save the disguised image: I recommend PNG, but please do check &lt;code&gt;reveal()&lt;/code&gt; works on any saved image.
+&lt;/p&gt;
+&lt;hr /&gt;
+
+&lt;p&gt;&lt;a href="http://steike.com/code/useless/zip-file-quine/" title="Your perfect post, perhaps?"&gt;Keen on quines and cocoa?&lt;/a&gt;
+&lt;/p&gt;</description>
+<dc:date>2008-12-30</dc:date>
+<guid>http://wordaligned.org/articles/steganography.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/steganography.html</link>
+<category>Graphics</category>
+</item>
+
+<item>
+<title>What&#8217;s in the box?</title>
+<description>&lt;p&gt;Last week I posted &lt;a href="http://wordaligned.org/articles/a-little-teaser.html"&gt;a little teaser&lt;/a&gt; which hid a series of clues in and around the page&amp;#8217;s HTML and the referenced graphic. Thanks to everyone who joined in. Some of you said you learned something in the process, which is good; and &lt;a href="http://netpbm.sourceforge.net/"&gt;I did too&lt;/a&gt;, which is better!
+&lt;/p&gt;
+&lt;p&gt;Filip Salomonsson completed the treasure hunt first. Extra credits go to Robin Stocker for his &lt;a href="http://www.flickr.com/photos/thomasguest/3106269463/"&gt;Swiss version&lt;/a&gt;, &lt;a href="http://chneukirchen.org/"&gt;Christian Neukirchen&lt;/a&gt; for a solution which requires no programming, and to Shiar who spotted the answer at once but nevertheless followed the clues to the end! 
+&lt;/p&gt;
+&lt;p&gt;A full solution appears below, &lt;a href="http://fliptitle.com"&gt;ROT-180&amp;deg;&lt;/a&gt; encoded.
+&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://wordaligned.org/articles/a-little-teaser.html"&gt;&lt;img src="http://wordaligned.org/images/top-row-flipped.png" alt="What's this? Answer below!"/&gt;&lt;/a&gt;
+&lt;/p&gt;
+&lt;div style="text-align:right;"&gt;&lt;p&gt;&amp;#x02D9;&amp;#x01DD;&amp;#x0279;&amp;#x01DD;&amp;#x0265; p&amp;#x01DD;&amp;#x028C;&amp;#x0131;&amp;#x0279;&amp;#x0279;&amp;#x0250; &amp;#x01DD;&amp;#x028C;,no&amp;#x028E; &amp;#x028D;ou&amp;#x029E; &amp;#x01DD;&amp;#x026F; &amp;#x0287;&amp;#x01DD;l o&amp;#x0287; &amp;#x0183;&amp;#x0279;o&amp;#x02D9;p&amp;#x01DD;u&amp;#x0183;&amp;#x0131;l&amp;#x0250;p&amp;#x0279;o&amp;#x028D;@s&amp;#x028E;&amp;#x01DD;&amp;#x029E;&amp;#x0287;l&amp;#x0250;:o&amp;#x0287;l&amp;#x0131;&amp;#x0250;&amp;#x026F; &amp;#x01DD;s&amp;#x0250;&amp;#x01DD;ld &amp;#x02D9;(-&amp;#x061B; p&amp;#x01DD;u&amp;#x0183;&amp;#x0131;l&amp;#x0250; p&amp;#x0279;o&amp;#x028D; o&amp;#x0287; uo&amp;#x0131;&amp;#x0287;d&amp;#x0131;&amp;#x0279;&amp;#x0254;sqns &amp;#x0183;uol&amp;#x01DD;&amp;#x025F;&amp;#x0131;l &amp;#x01DD;&amp;#x01DD;&amp;#x0279;&amp;#x025F; &amp;#x0250; s&amp;#x0131; &amp;#x01DD;z&amp;#x0131;&amp;#x0279;d &amp;#x0279;no&amp;#x028E; &amp;#x00A1;&amp;#x01DD;uop ll&amp;#x01DD;&amp;#x028D; &amp;#x02D9;&lt;a href="http://www.flickr.com/photos/thomasguest/3104398656/"&gt;&amp;#x01DD;&amp;#x0279;&amp;#x01DD;&amp;#x0265;&lt;/a&gt; s&amp;#x0279;&amp;#x01DD;&amp;#x0287;&amp;#x0254;&amp;#x0250;&amp;#x0279;&amp;#x0250;&amp;#x0265;&amp;#x0254; &amp;#x025F;o s&amp;#x028D;o&amp;#x0279; &amp;#x01DD;&amp;#x01DD;&amp;#x0279;&amp;#x0265;&amp;#x0287; ll&amp;#x0250; &amp;#x01DD;&amp;#x01DD;s u&amp;#x0250;&amp;#x0254; no&amp;#x028E; &amp;#x02D9;&amp;#x028E;&amp;#x01DD;&amp;#x029E; &amp;#x0287;l&amp;#x0250; &amp;#x01DD;&amp;#x0265;&amp;#x0287; u&amp;#x028D;op &amp;#x0183;u&amp;#x0131;plo&amp;#x0265; &amp;#x01DD;l&amp;#x0131;&amp;#x0265;&amp;#x028D; p&amp;#x0279;&amp;#x0250;oq&amp;#x028E;&amp;#x01DD;&amp;#x029E; &amp;#x028E;&amp;#x0287;&amp;#x0279;&amp;#x01DD;&amp;#x028D;b &amp;#x0254;&amp;#x0250;&amp;#x026F; &amp;#x01DD;ldd&amp;#x0250; u&amp;#x0250; uo s&amp;#x0279;&amp;#x01DD;&amp;#x0287;&amp;#x0254;&amp;#x0250;&amp;#x0279;&amp;#x0250;&amp;#x0265;&amp;#x0254; &amp;#x025F;o &amp;#x028D;o&amp;#x0279; do&amp;#x0287; &amp;#x01DD;&amp;#x0265;&amp;#x0287; u&amp;#x0131; &amp;#x01DD;d&amp;#x028E;&amp;#x0287; &amp;#8216;&amp;#x01DD;&amp;#x0183;&amp;#x0250;&amp;#x026F;&amp;#x0131; s&amp;#x0131;&amp;#x0265;&amp;#x0287; &amp;#x01DD;&amp;#x0287;&amp;#x0250;&amp;#x0279;&amp;#x01DD;u&amp;#x01DD;&amp;#x0183; o&amp;#x0287; :uo&amp;#x0131;&amp;#x0287;nlos&lt;/p&gt;&lt;p&gt;&amp;#x02D9;004 &amp;#x0254;- p&amp;#x0250;&amp;#x01DD;&amp;#x0265; | &amp;#x0183;ud&amp;#x02D9;&amp;#x028D;o&amp;#x0279;-do&amp;#x0287; &amp;#x0250;&amp;#x0265;dl&amp;#x0250;- &amp;#x026F;udo&amp;#x0287;&amp;#x0183;ud :&amp;#x0183;u&amp;#x0131;&amp;#x026F;&amp;#x026F;&amp;#x0250;&amp;#x0279;&amp;#x0183;o&amp;#x0279;d &amp;#x028E;u&amp;#x0250; &amp;#x0183;u&amp;#x0131;&amp;#x0279;&amp;#x0131;nb&amp;#x01DD;&amp;#x0279; &amp;#x0287;no&amp;#x0265;&amp;#x0287;&amp;#x0131;&amp;#x028D; &amp;#x0279;&amp;#x01DD;&amp;#x028D;su&amp;#x0250; &amp;#x01DD;&amp;#x0265;&amp;#x0287; s&amp;#x0287;&amp;#x01DD;&amp;#x0183; &amp;#x0265;&amp;#x0254;&amp;#x0131;&amp;#x0265;&amp;#x028D; &amp;#x026F;udo&amp;#x0287;&amp;#x0183;ud &amp;#x0287;&amp;#x0250; &amp;#x01DD;&amp;#x026F; p&amp;#x01DD;&amp;#x0287;u&amp;#x0131;od u&amp;#x01DD;&amp;#x0265;&amp;#x0254;&amp;#x0279;&amp;#x0131;&amp;#x029E;n&amp;#x01DD;u u&amp;#x0250;&amp;#x0131;&amp;#x0287;s&amp;#x0131;&amp;#x0279;&amp;#x0265;&amp;#x0254; &amp;#x02D9;s&amp;#x01DD;nl&amp;#x0250;&amp;#x028C; &amp;#x0250;&amp;#x0265;dl&amp;#x0250; &amp;#x01DD;&amp;#x0265;&amp;#x0287; &amp;#x0287;&amp;#x01DD;&amp;#x0183; o&amp;#x0287; &amp;#x0287;d&amp;#x0131;&amp;#x0279;&amp;#x0254;s &amp;#x01DD;ld&amp;#x026F;&amp;#x0131;s &amp;#x0250; &amp;#x01DD;&amp;#x0287;&amp;#x0131;&amp;#x0279;&amp;#x028D; o&amp;#x0287; &amp;#x028E;&amp;#x0279;&amp;#x0250;&amp;#x0279;q&amp;#x0131;l &amp;#x0183;u&amp;#x0131;&amp;#x0183;&amp;#x0250;&amp;#x026F;&amp;#x0131; uo&amp;#x0265;&amp;#x0287;&amp;#x028E;d &amp;#x01DD;&amp;#x0265;&amp;#x0287; p&amp;#x01DD;sn &amp;#x0131;&lt;/p&gt;&lt;p&gt;&amp;#x02D9;&amp;#x01DD;nl&amp;#x0254; &amp;#x0287;x&amp;#x01DD;u &amp;#x01DD;&amp;#x0265;&amp;#x0287; &amp;#x0287;no ll&amp;#x01DD;ds &amp;#x0183;ud s&amp;#x0131;&amp;#x0265;&amp;#x0287; &amp;#x025F;o &amp;#x028D;o&amp;#x0279; do&amp;#x0287; &amp;#x01DD;&amp;#x0265;&amp;#x0287; u&amp;#x0131; s&amp;#x01DD;nl&amp;#x0250;&amp;#x028C; &amp;#x0250;&amp;#x0265;dl&amp;#x0250; &amp;#x01DD;&amp;#x0265;&amp;#x0287; :s&amp;#x028E;&amp;#x0250;s &amp;#x0265;&amp;#x0254;&amp;#x0131;&amp;#x0265;&amp;#x028D; &amp;#8216;&amp;#x0287;u&amp;#x01DD;&amp;#x026F;&amp;#x026F;o&amp;#x0254; &amp;#x01DD;&amp;#x0265;&amp;#x0287; p&amp;#x0250;&amp;#x01DD;&amp;#x0279; o&amp;#x0287; &amp;#x0183;ud&amp;#x02D9;&amp;#x028D;o&amp;#x0279;-do&amp;#x0287; &amp;#x01DD;soq&amp;#x0279;&amp;#x01DD;&amp;#x028C;- &amp;#x028E;&amp;#x025F;&amp;#x0131;&amp;#x0287;u&amp;#x01DD;p&amp;#x0131; &amp;#x029E;&amp;#x0254;&amp;#x0131;&amp;#x0183;&amp;#x0250;&amp;#x026F;&amp;#x01DD;&amp;#x0183;&amp;#x0250;&amp;#x026F;&amp;#x0131; p&amp;#x01DD;sn &amp;#x0131; &amp;#x02D9;&amp;#x028E;ll&amp;#x0250;&amp;#x0254;ol &amp;#x0183;ud &amp;#x01DD;&amp;#x0265;&amp;#x0287; &amp;#x01DD;&amp;#x028C;&amp;#x0250;s&lt;/p&gt;&lt;p&gt;&amp;#x02D9;&amp;#x0183;ud &amp;#x01DD;&amp;#x0265;&amp;#x0287; &amp;#x025F;o &amp;#x029E;un&amp;#x0265;&amp;#x0254; &amp;#x0287;x&amp;#x0287;z &amp;#x01DD;&amp;#x0265;&amp;#x0287; u&amp;#x0131; &amp;#x0287;u&amp;#x01DD;&amp;#x026F;&amp;#x026F;o&amp;#x0254; &amp;#x01DD;&amp;#x0265;&amp;#x0287; p&amp;#x0250;&amp;#x01DD;&amp;#x0279; &amp;#8216;&amp;#x01DD;nl&amp;#x0254; &amp;#x0287;x&amp;#x01DD;u &amp;#x01DD;&amp;#x0265;&amp;#x0287; &amp;#x0279;o&amp;#x025F; :&amp;#x01DD;&amp;#x01DD;s ll,no&amp;#x028E; &amp;#x02D9;&amp;#x01DD;sno&amp;#x026F; &amp;#x0279;no&amp;#x028E; &amp;#x0183;u&amp;#x0131;sn &amp;#x0279;&amp;#x0250;q&amp;#x01DD;p&amp;#x0131;s &amp;#x01DD;&amp;#x0265;&amp;#x0287; &amp;#x0287;&amp;#x0254;&amp;#x01DD;l&amp;#x01DD;s&lt;/p&gt;&lt;p&gt;&amp;#x02D9;&amp;#x0279;&amp;#x0250;q&amp;#x01DD;p&amp;#x0131;s &amp;#x01DD;&amp;#x0265;&amp;#x0287; u&amp;#x0131; &amp;#x0287;x&amp;#x01DD;&amp;#x0287; &amp;#x01DD;&amp;#x0287;&amp;#x0131;&amp;#x0265;&amp;#x028D; uo &amp;#x01DD;&amp;#x0287;&amp;#x0131;&amp;#x0265;&amp;#x028D; &amp;#x01DD;&amp;#x0265;&amp;#x0287; &amp;#x0287;&amp;#x0265;&amp;#x0183;&amp;#x0131;l&amp;#x0265;&amp;#x0183;&amp;#x0131;&amp;#x0265; &amp;#8216;&amp;#x01DD;nl&amp;#x0254; &amp;#x0287;x&amp;#x01DD;u &amp;#x01DD;&amp;#x0265;&amp;#x0287; &amp;#x01DD;&amp;#x01DD;s o&amp;#x0287; :sp&amp;#x0250;&amp;#x01DD;&amp;#x0279; l&amp;#x026F;&amp;#x0287;&amp;#x0265; &amp;#x01DD;&amp;#x0265;&amp;#x0287; u&amp;#x0131; &amp;#x0287;u&amp;#x01DD;&amp;#x026F;&amp;#x026F;o&amp;#x0254; &amp;#x0250; &amp;#x02D9;xo&amp;#x025F;&amp;#x01DD;&amp;#x0279;&amp;#x0131;&amp;#x025F; uo n+l&amp;#x0279;&amp;#x0287;&amp;#x0254; (&amp;#x02D9;&amp;#x0183;&amp;#x02D9;&amp;#x01DD;) &amp;#x0183;u&amp;#x0131;sn l&amp;#x026F;&amp;#x0287;&amp;#x0265; &amp;#x01DD;&amp;#x0265;&amp;#x0287; &amp;#x028D;&amp;#x01DD;&amp;#x0131;&amp;#x028C;&lt;/p&gt;&lt;/div&gt;
+
+&lt;span id="continue-reading"/&gt;
+
+&lt;p&gt;Some found the teaser too easy. Others asked if I&amp;#8217;d be posting a follow up.
+&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://www.flickr.com/photos/thomasguest/3122529935/" title="What's in the box?"&gt;&lt;img src="http://farm4.static.flickr.com/3264/3122529935_dfe6550cf6_o.png" width="294" height="450" alt="What's in the box?" /&gt;&lt;/a&gt;
+&lt;/p&gt;
+&lt;p&gt;Sorry. Maybe.
+&lt;/p&gt;</description>
+<dc:date>2008-12-20</dc:date>
+<guid>http://wordaligned.org/articles/whats-in-the-box.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/whats-in-the-box.html</link>
+<category>Graphics</category>
+</item>
+
+<item>
+<title>A Little Teaser. Keen Eyes? You&#8217;ll See!</title>
+<description>&lt;p&gt;This curious document turned up in the lost+found. Can anyone help me &lt;a href="http://www.imagemagick.org/www/identify.html" title="First hint!"&gt;identify&lt;/a&gt; it?
+&lt;/p&gt;
+&lt;img src="http://wordaligned.org/images/top-row.png" alt="What's this?"/&gt;
+
+&lt;p&gt;(View &lt;a href="http://wordaligned.org/articles/a-little-teaser.html"&gt;this page&amp;#8217;s&lt;/a&gt; source for a clue.)
+&lt;/p&gt;
+&lt;!-- To see the next clue, highlight the white on white text in the sidebar --&gt;</description>
+<dc:date>2008-12-12</dc:date>
+<guid>http://wordaligned.org/articles/a-little-teaser.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/a-little-teaser.html</link>
+<category>Graphics</category>
+</item>
+
+<item>
+<title>White black knight then black white knight</title>
+<description>&lt;img src="http://wordaligned.org/images/chess-pos-small-font.png" alt="Small chess board" style="float:right;"/&gt;
+
+&lt;p&gt;At the end of &lt;a href="http://wordaligned.org/articles/drawing-chess-positions.html"&gt;yesterday&amp;#8217;s article&lt;/a&gt; I admitted defeat. I&amp;#8217;d developed a script to render chess positions, using a suitable font as a source of scalable bitmasks to represent the pieces. Sadly, you could clearly see the board through the pieces, which meant white pieces on black squares looked wrong. I couldn&amp;#8217;t see an easy fix.
+&lt;/p&gt;
+&lt;p&gt;Happily one of my readers was &lt;a href="http://www.haloscan.com/comments/wordaligned/drawing_chess_positions/#14496"&gt;more resourceful&lt;/a&gt;:
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;You can make white pieces by drawing a &amp;#8220;black&amp;#8221; piece in white, then overlaying that with a &amp;#8220;white&amp;#8221; piece in black.
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;This is a clever trick which I wish I&amp;#8217;d thought of! The redrawn pictures do look better.
+&lt;/p&gt;
+&lt;img src="http://wordaligned.org/images/chess-font-fixed.png" alt="Fixed chess board"/&gt;
+
+&lt;p&gt;We need three more lines of code and comments apiece.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;def chess_position_font(fen, font_file, sq_size):
+    ....
+    for sq, piece in filter(not_blank, zip(sqs, pieces)):
+        if is_white_piece(piece):
+            # Use the equivalent black piece, drawn white,
+            # for the 'body' of the piece, so the background
+            # square doesn't show through.
+            filler = unichr_pieces[piece.lower()]
+            put_piece(sq, filler, fill='white', font=font)
+        put_piece(sq, unichr_pieces[piece], fill='black', font=font)
+    return board
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Note, in passing, that &lt;span /&gt;I &lt;strong&gt;don&amp;#8217;t&lt;/strong&gt; think comments can or should be entirely eliminated from source code &amp;#8212; here&amp;#8217;s a case where they help.
+&lt;/p&gt;
+&lt;p&gt;Even after this hack, the pictures aren&amp;#8217;t pixel perfect. But I do like the grey mane you get when a white knight occupies a dark square.
+&lt;/p&gt;
+&lt;img src="http://wordaligned.org/images/white-knight-on-black-square.png" alt="White knight on a black square"/&gt;</description>
+<dc:date>2008-03-31</dc:date>
+<guid>http://wordaligned.org/articles/white-black-knight.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/white-black-knight.html</link>
+<category>Graphics</category>
+</item>
+
+<item>
+<title>Drawing Chess Positions</title>
+<description>&lt;div class="toc"&gt;
+&lt;h2&gt;Contents&lt;/h2&gt;
+&lt;ul&gt;
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/drawing-chess-positions.html#tocdominus-connects" name="toc0" id="toc0"&gt;Dominus Connects&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/drawing-chess-positions.html#tocchessboards-revisited" name="toc1" id="toc1"&gt;Chessboards Revisited&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/drawing-chess-positions.html#tocprogram-input" name="toc2" id="toc2"&gt;Program Input&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/drawing-chess-positions.html#tocascii-chess-positions" name="toc3" id="toc3"&gt;ASCII Chess Positions&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/drawing-chess-positions.html#tocunicode--css" name="toc4" id="toc4"&gt;Unicode + CSS&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/drawing-chess-positions.html#tocwiki-macros" name="toc5" id="toc5"&gt;Wiki Macros&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/drawing-chess-positions.html#tocpython-imaging-library" name="toc6" id="toc6"&gt;Python Imaging Library&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/drawing-chess-positions.html#tocinteracting-with-images" name="toc7" id="toc7"&gt;Interacting with Images&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/drawing-chess-positions.html#tocthe-details" name="toc8" id="toc8"&gt;The details&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/drawing-chess-positions.html#tocusing-a-font-with-pil" name="toc9" id="toc9"&gt;Using a font with PIL&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/drawing-chess-positions.html#toclatex" name="toc10" id="toc10"&gt;LaTeX&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/drawing-chess-positions.html#tocconclusions" name="toc11" id="toc11"&gt;Conclusions&lt;/a&gt;
+ &lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/drawing-chess-positions.html#toc0" name="tocdominus-connects" id="tocdominus-connects"&gt;Dominus Connects&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;In a recent &lt;a href="http://blog.plover.com/prog/perl/lines.html"&gt;article&lt;/a&gt; Mark Dominus describes how he grew frustrated with his graphical editor and wrote a script to draw connectors:
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;Here&amp;#8217;s what I did instead. I wrote a program that would read an input like this:&lt;/p&gt;
+&lt;pre&gt;
+        &amp;gt;-v-&amp;lt;
+        '-+-`
+&lt;/pre&gt;
+&lt;p&gt;and produce a jpeg file that looks like this:
+&lt;img src="http://pic.blog.plover.com/prog/perl/lines/demo1.jpg" alt="Line and box graphic"/&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;I haven&amp;#8217;t tried running the software, which, Dominus admits, isn&amp;#8217;t his most polished. What interests me is: the way he devises a mini-language for describing these connectors, then combines hand-built and standard tools to produce the required result; and how quickly he ditches the &lt;a href="http://www.gimp.org"&gt;Gimp&lt;/a&gt; and settles on this approach. Clearly he&amp;#8217;s done this sort of thing before.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/drawing-chess-positions.html#toc1" name="tocchessboards-revisited" id="tocchessboards-revisited"&gt;Chessboards Revisited&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Recently I wrote about a rather easier graphics problem, of &lt;a href="http://wordaligned.org/articles/drawing-chessboards.html"&gt;drawing chessboards&lt;/a&gt;. My real mission, though, was to promote scripted graphics. A chessboard would make a good starting point, I thought. I planned to go on to describe a more advanced drawing problem, of putting pieces on the board &amp;#8212; a problem requiring more pixel bashing and more thought about inputs.
+&lt;/p&gt;
+&lt;p&gt;This article tackles that follow-on problem. What I didn&amp;#8217;t realise &amp;#8212; but really should have guessed &amp;#8212; is that it&amp;#8217;s a problem which has been solved many times before in many different domains. You can find &lt;a href="http://www.ctan.org/tex-archive/fonts/chess/skak/"&gt;LaTeX packages&lt;/a&gt; and &lt;a href="http://emacs-chess.sourceforge.net/"&gt;emacs modes&lt;/a&gt; for it. There&amp;#8217;s even a &lt;a href="http://en.wikipedia.org/wiki/Template:Chess_diagram"&gt;MediaWiki macro&lt;/a&gt;. So if you need to draw chess positions please investigate what&amp;#8217;s &lt;a href="http://www.enpassant.dk/chess/diaeng.htm"&gt;already out there&lt;/a&gt;.
+&lt;/p&gt;
+&lt;p&gt;That said, the rest of this article follows on from its &lt;a href="http://wordaligned.org/articles/drawing-chessboards.html"&gt;predecessor&lt;/a&gt;. We&amp;#8217;ll settle on a suitable notation for describing chess positions and use this as a basis for creating ASCII, Unicode + CSS, and PNG graphics. We&amp;#8217;ll also discuss the advantages of using an interpreted, dynamic language for image processing.
+&lt;/p&gt;
+&lt;span id="continue-reading"/&gt;
+
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/drawing-chess-positions.html#toc2" name="tocprogram-input" id="tocprogram-input"&gt;Program Input&lt;/a&gt;&lt;/h3&gt;
+&lt;div class="info"&gt;Things I learned while writing this article: Forsyth-Edwards Notation (FEN) is a standard way to record a chess position.&lt;/div&gt;
+
+&lt;p&gt;Mark Dominus invented his own input notation. We needn&amp;#8217;t. The Forsyth-Edwards notation for recording a particular board position is compact, simple and standard.
+&lt;/p&gt;
+&lt;p&gt;From &lt;a href="http://en.wikipedia.org/wiki/Forsyth-Edwards_Notation"&gt;Wikipedia&lt;/a&gt;:
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;A FEN &amp;#8220;record&amp;#8221; defines a particular game position, all in one text line and using only the ASCII character set. A FEN record contains six fields. The separator between fields is a space. The fields are:
+&lt;/p&gt;
+&lt;ol&gt;
+ &lt;li&gt;
+     Piece placement (from white&amp;#8217;s perspective). Each rank is described, starting with rank 8 and ending with rank 1; within each rank, the contents of each square are described from file a through file h. Following the Standard Algebraic Notation (SAN), each piece is identified by a single letter taken from the standard English names (pawn = &amp;#8220;P&amp;#8221;, knight = &amp;#8220;N&amp;#8221;, bishop = &amp;#8220;B&amp;#8221;, rook = &amp;#8220;R&amp;#8221;, queen = &amp;#8220;Q&amp;#8221; and king = &amp;#8220;K&amp;#8221;). White pieces are designated using upper-case letters (&amp;#8220;PNBRQK&amp;#8221;) while Black take lowercase (&amp;#8220;pnbrqk&amp;#8221;). Blank squares are noted using digits 1 through 8 (the number of blank squares), and &amp;#8220;/&amp;#8221; separate ranks.
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     &amp;#8230;
+ &lt;/li&gt;
+&lt;/ol&gt;
+&lt;/blockquote&gt;&lt;p&gt;The remaining five fields store other pieces of state (whose turn it is, who can castle etc.) required for resuming a game. We&amp;#8217;ll omit them from our input.
+&lt;/p&gt;
+&lt;p&gt;So, for example, we record the start position:
+&lt;/p&gt;
+&lt;pre&gt;rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR&lt;/pre&gt;
+
+&lt;p&gt;Some moves later, the game might be at:
+&lt;/p&gt;
+&lt;pre&gt;r2q1rk1/pp2ppbp/1np2np1/2Q3B1/3PP1b1/2N2N2/PP3PPP/3RKB1R&lt;/pre&gt;
+
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/drawing-chess-positions.html#toc3" name="tocascii-chess-positions" id="tocascii-chess-positions"&gt;ASCII Chess Positions&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;The first field of the FEN record is already close to an ASCII representation of a chessboard. If we expand the digits into the spaces they represent and switch the forward slashes for newlines, then printing the resulting string gives an 8x8 text square. (By the way, I&amp;#8217;ve fixed the chessboard size at 8 rather than make it an input parameter since the FEN notation won&amp;#8217;t work for a board size of 10x10 or bigger.) It&amp;#8217;s not hard to add some ASCII dividers to tart up this simple graphic.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;def expand_blanks(fen):
+    '''Expand the digits in an FEN string into spaces
+    
+    &amp;gt;&amp;gt;&amp;gt; expand_blanks("rk4q3")
+    'rk    q   '
+    '''
+    def expand(match):
+        return ' ' * int(match.group(0))
+    return re.compile(r'\d').sub(expand, fen)
+    
+def outer_join(sep, ss):
+    '''Like string.join, but encloses the result with outer separators.
+    
+    Example:
+    &amp;gt;&amp;gt;&amp;gt; outer_join('|', ['1', '2', '3'])
+    '|1|2|3|'
+    '''
+    return '%s%s%s' % (sep, sep.join(ss), sep)
+    
+def ascii_draw_chess_position(fen):
+    '''Returns an ASCII picture of pieces on a chessboard.'''
+    pieces = expand_blanks(fen).replace('/', '')
+    divider = '+-+-+-+-+-+-+-+-+\n'
+    rows = ((outer_join('|', pieces[r: r + 8]) + '\n')
+            for r in range(0, 8 * 8, 8))
+    return outer_join(divider, rows)
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;An example:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; fen = "r2q1rk1/pp2ppbp/1np2np1/2Q3B1/3PP1b1/2N2N2/PP3PPP/3RKB1R"
+&amp;gt;&amp;gt;&amp;gt; print ascii_draw_chess_position(fen)
++-+-+-+-+-+-+-+-+
+|r| | |q| |r|k| |
++-+-+-+-+-+-+-+-+
+|p|p| | |p|p|b|p|
++-+-+-+-+-+-+-+-+
+| |n|p| | |n|p| |
++-+-+-+-+-+-+-+-+
+| | |Q| | | |B| |
++-+-+-+-+-+-+-+-+
+| | | |P|P| |b| |
++-+-+-+-+-+-+-+-+
+| | |N| | |N| | |
++-+-+-+-+-+-+-+-+
+|P|P| | | |P|P|P|
++-+-+-+-+-+-+-+-+
+| | | |R|K|B| |R|
++-+-+-+-+-+-+-+-+
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/drawing-chess-positions.html#toc4" name="tocunicode--css" id="tocunicode--css"&gt;Unicode + CSS&lt;/a&gt;&lt;/h3&gt;
+&lt;div class="info"&gt;Things I learned while writing this article: Unicode has code points for the black and white chess pieces.&lt;/div&gt;
+
+&lt;p&gt;This means we can get a rather better picture of a chess position using nothing more than text. Note that these Unicode characters solve the internationalisation problem without the need for translators. (We will need a suitable font though!)
+&lt;/p&gt;
+&lt;p&gt;Here&amp;#8217;s how we can create a dictionary which maps the FEN piece ASCII names to their HTML entity codes.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;unicode_pieces=dict(
+    zip("KQRBNPkqrbnp",
+        ("&amp;amp;#x%x;" % uc for uc in range(0x2654, 0x2660))))
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;I&amp;#8217;ve used this dictionary to create the block of text shown below. I&amp;#8217;ve tried using CSS to colour and place squares on the board &amp;#8212; sorry if it doesn&amp;#8217;t work in your browser, I&amp;#8217;m no CSS expert!
+&lt;/p&gt;
+&lt;div class="chessboard"&gt;
+&lt;pre&gt;
+&lt;span class="white_sq"&gt;&amp;#x265c;&lt;/span&gt;&lt;span class="black_sq"&gt; &lt;/span&gt;&lt;span class="white_sq"&gt; &lt;/span&gt;&lt;span class="black_sq"&gt;&amp;#x265b;&lt;/span&gt;&lt;span class="white_sq"&gt; &lt;/span&gt;&lt;span class="black_sq"&gt;&amp;#x265c;&lt;/span&gt;&lt;span class="white_sq"&gt;&amp;#x265a;&lt;/span&gt;&lt;span class="black_sq"&gt; &lt;/span&gt;&lt;br/&gt;
+&lt;span class="black_sq"&gt;&amp;#x265f;&lt;/span&gt;&lt;span class="white_sq"&gt;&amp;#x265f;&lt;/span&gt;&lt;span class="black_sq"&gt; &lt;/span&gt;&lt;span class="white_sq"&gt; &lt;/span&gt;&lt;span class="black_sq"&gt;&amp;#x265f;&lt;/span&gt;&lt;span class="white_sq"&gt;&amp;#x265f;&lt;/span&gt;&lt;span class="black_sq"&gt;&amp;#x265d;&lt;/span&gt;&lt;span class="white_sq"&gt;&amp;#x265f;&lt;/span&gt;&lt;br/&gt;
+&lt;span class="white_sq"&gt; &lt;/span&gt;&lt;span class="black_sq"&gt;&amp;#x265e;&lt;/span&gt;&lt;span class="white_sq"&gt;&amp;#x265f;&lt;/span&gt;&lt;span class="black_sq"&gt; &lt;/span&gt;&lt;span class="white_sq"&gt; &lt;/span&gt;&lt;span class="black_sq"&gt;&amp;#x265e;&lt;/span&gt;&lt;span class="white_sq"&gt;&amp;#x265f;&lt;/span&gt;&lt;span class="black_sq"&gt; &lt;/span&gt;&lt;br/&gt;
+&lt;span class="black_sq"&gt; &lt;/span&gt;&lt;span class="white_sq"&gt; &lt;/span&gt;&lt;span class="black_sq"&gt;&amp;#x2655;&lt;/span&gt;&lt;span class="white_sq"&gt; &lt;/span&gt;&lt;span class="black_sq"&gt; &lt;/span&gt;&lt;span class="white_sq"&gt; &lt;/span&gt;&lt;span class="black_sq"&gt;&amp;#x2657;&lt;/span&gt;&lt;span class="white_sq"&gt; &lt;/span&gt;&lt;br/&gt;
+&lt;span class="white_sq"&gt; &lt;/span&gt;&lt;span class="black_sq"&gt; &lt;/span&gt;&lt;span class="white_sq"&gt; &lt;/span&gt;&lt;span class="black_sq"&gt;&amp;#x2659;&lt;/span&gt;&lt;span class="white_sq"&gt;&amp;#x2659;&lt;/span&gt;&lt;span class="black_sq"&gt; &lt;/span&gt;&lt;span class="white_sq"&gt;&amp;#x265d;&lt;/span&gt;&lt;span class="black_sq"&gt; &lt;/span&gt;&lt;br/&gt;
+&lt;span class="black_sq"&gt; &lt;/span&gt;&lt;span class="white_sq"&gt; &lt;/span&gt;&lt;span class="black_sq"&gt;&amp;#x2658;&lt;/span&gt;&lt;span class="white_sq"&gt; &lt;/span&gt;&lt;span class="black_sq"&gt; &lt;/span&gt;&lt;span class="white_sq"&gt;&amp;#x2658;&lt;/span&gt;&lt;span class="black_sq"&gt; &lt;/span&gt;&lt;span class="white_sq"&gt; &lt;/span&gt;&lt;br/&gt;
+&lt;span class="white_sq"&gt;&amp;#x2659;&lt;/span&gt;&lt;span class="black_sq"&gt;&amp;#x2659;&lt;/span&gt;&lt;span class="white_sq"&gt; &lt;/span&gt;&lt;span class="black_sq"&gt; &lt;/span&gt;&lt;span class="white_sq"&gt; &lt;/span&gt;&lt;span class="black_sq"&gt;&amp;#x2659;&lt;/span&gt;&lt;span class="white_sq"&gt;&amp;#x2659;&lt;/span&gt;&lt;span class="black_sq"&gt;&amp;#x2659;&lt;/span&gt;&lt;br/&gt;
+&lt;span class="black_sq"&gt; &lt;/span&gt;&lt;span class="white_sq"&gt; &lt;/span&gt;&lt;span class="black_sq"&gt; &lt;/span&gt;&lt;span class="white_sq"&gt;&amp;#x2656;&lt;/span&gt;&lt;span class="black_sq"&gt;&amp;#x2654;&lt;/span&gt;&lt;span class="white_sq"&gt;&amp;#x2657;&lt;/span&gt;&lt;span class="black_sq"&gt; &lt;/span&gt;&lt;span class="white_sq"&gt;&amp;#x2656;&lt;/span&gt;
+&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;This image isn&amp;#8217;t ideal: the board background is visible through the pieces, which is particularly noticeable for white pieces on dark squares. I haven&amp;#8217;t figured out how to eliminate this flaw!
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/drawing-chess-positions.html#toc5" name="tocwiki-macros" id="tocwiki-macros"&gt;Wiki Macros&lt;/a&gt;&lt;/h3&gt;
+&lt;div class="info"&gt;Things I learned while writing this article: MediaWiki has a fully-featured macro for chess diagrams.&lt;/div&gt;
+
+&lt;p&gt;Here&amp;#8217;s the opening chess position as a MediaWiki macro. If this seems like too much effort to type, David A. Wheeler provides an online &lt;a href="http://www.dwheeler.com/misc/fen2wikipedia.html"&gt;FEN-to-Wikipedia conversion tool&lt;/a&gt;.
+&lt;/p&gt;
+&lt;pre&gt;{{Chess diagram|=
+| tright
+| 
+|=
+ 8 |rd|nd|bd|qd|kd|bd|nd|rd|=
+ 7 |pd|pd|pd|pd|pd|pd|pd|pd|=
+ 6 |  |  |  |  |  |  |  |  |=
+ 5 |  |  |  |  |  |  |  |  |=
+ 4 |  |  |  |  |  |  |  |  |=
+ 3 |  |  |  |  |  |  |  |  |=
+ 2 |pl|pl|pl|pl|pl|pl|pl|pl|=
+ 1 |rl|nl|bl|ql|kl|bl|nl|rl|=
+    a  b  c  d  e  f  g  h
+| 
+}}&lt;/pre&gt;
+
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/drawing-chess-positions.html#toc6" name="tocpython-imaging-library" id="tocpython-imaging-library"&gt;Python Imaging Library&lt;/a&gt;&lt;/h3&gt;
+&lt;div class="info"&gt;Things I learned while writing this article: OS X has problems distinguishing upper- and lower-case filenames.&lt;/div&gt;
+
+&lt;p&gt;The OS X filename limitation came as a nasty surprise. Most of the time I use my Mac like any other Unix box and so I naturally expected that &lt;code&gt;K.png&lt;/code&gt; and &lt;code&gt;k.png&lt;/code&gt; would co-reside happily in the same directory. They can&amp;#8217;t! Apparently it&amp;#8217;s for &lt;a href="http://www.jms1.net/osx-case-sensitive-fs.shtml"&gt;backwards compatibility&lt;/a&gt;, to keep old software alive. Yuck!
+&lt;/p&gt;
+&lt;p&gt;Anyway, to render a chess position using the &lt;a href="http://effbot.org/imagingbook/pil-index.htm"&gt;Python Imaging Library&lt;/a&gt; (PIL), we&amp;#8217;ll need some suitable pictures of the pieces. I downloaded some from Wikipedia (thanks!) It&amp;#8217;s important these images have an alpha channel. (The alpha channel assigns an opacity to each pixel, which will be used when we compose the image with another: when we put the piece on the board, that is. Without an alpha channel, we wouldn&amp;#8217;t see the squares underneath the pieces.)
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/drawing-chess-positions.html#toc7" name="tocinteracting-with-images" id="tocinteracting-with-images"&gt;Interacting with Images&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;An interpreted language comes into its own when working with an image. Here&amp;#8217;s a session in which we open a PNG (the black king) and poke around at it to find:
+&lt;/p&gt;
+&lt;ul&gt;
+ &lt;li&gt;
+     what it looks like
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     its mode and size
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     whether all pixels are grey
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     how many transparent and opaque pixels it has
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     the contents of a few pixels on the left of the image
+ &lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; import Image
+&amp;gt;&amp;gt;&amp;gt; king = Image.open('k.png')
+&amp;gt;&amp;gt;&amp;gt; king.show()
+&amp;gt;&amp;gt;&amp;gt; king.mode
+'RGBA'
+&amp;gt;&amp;gt;&amp;gt; king.size
+(45, 45)
+&amp;gt;&amp;gt;&amp;gt; pixels = king.load()
+&amp;gt;&amp;gt;&amp;gt; def is_grey(rgba):
+... 	r, g, b, a = rgba
+... 	return r == g == b
+... 
+&amp;gt;&amp;gt;&amp;gt; W, H = king.size
+&amp;gt;&amp;gt;&amp;gt; xys = [(x, y) for y in range(H) for x in range(W)]
+&amp;gt;&amp;gt;&amp;gt; all(is_grey(pixels[xy]) for xy in xys) 
+True
+&amp;gt;&amp;gt;&amp;gt; sum(1 for xy in xys if pixels[xy][3] == 0)
+1243
+&amp;gt;&amp;gt;&amp;gt; sum(1 for xy in xys if pixels[xy][3] == 255)
+612
+&amp;gt;&amp;gt;&amp;gt; print "\n".join(map(repr, (pixels[x, 20] for x in range(10))))
+(0, 0, 0, 0)
+(0, 0, 0, 0)
+(0, 0, 0, 0)
+(0, 0, 0, 0)
+(0, 0, 0, 0)
+(15, 15, 15, 170)
+(247, 247, 247, 255)
+(148, 148, 148, 255)
+(0, 0, 0, 255)
+(0, 0, 0, 255)
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;To place this piece on top of a background image we use &lt;a href="http://effbot.org/imagingbook/image.htm#tag-Image.Image.paste"&gt;Image.paste&lt;/a&gt;. Again, we can experiment interactively.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; red_sq = Image.new('RGBA', king.size, 'red')
+&amp;gt;&amp;gt;&amp;gt; help(red_sq.paste)
+Help on method paste in module Image:
+
+paste(self, im, box=None, mask=None) method of Image.Image instance
+    Paste other image into region
+
+&amp;gt;&amp;gt;&amp;gt; mask = king.split()[3]
+&amp;gt;&amp;gt;&amp;gt; red_sq.paste(king, None, mask)
+&amp;gt;&amp;gt;&amp;gt; red_sq.show()
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Note that &lt;a href="http://effbot.org/imagingbook/image.htm#tag-Image.Image.show"&gt;Image.show&lt;/a&gt; allows us to view the image using some platform dependent utility.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/drawing-chess-positions.html#toc8" name="tocthe-details" id="tocthe-details"&gt;The details&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Once we&amp;#8217;ve figured out how to put pieces on the board using &lt;a href="http://effbot.org/imagingbook/image.htm#tag-Image.Image.paste"&gt;Image.paste&lt;/a&gt;, the rest is all details. I&amp;#8217;ve decided to create a class for rendering chess positions. Creating a class instance pre-loads the piece graphics and sketches in the board background; each time we call draw, the background is copied and the pieces are pasted into place. The resulting image is returned directly to the client, who can choose what to do with it.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;#! /usr/bin/env python
+'''Code to draw chess board and pieces.
+
+FEN notation to describe the arrangement of peices on a chess board.
+
+White pieces are coded: K, Q, B, N, R, P, for king, queen, bishop,
+rook knight, pawn. Black pieces use lowercase k, q, b, n, r, p. Blank
+squares are noted with digits, and the "/" separates ranks.
+
+As an example, the game starts at:
+
+rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR
+
+See: http://en.wikipedia.org/wiki/Forsyth-Edwards_Notation
+'''
+import re
+import Image
+import ImageDraw
+
+class BadChessboard(ValueError):
+    pass
+    
+def expand_blanks(fen):
+    '''Expand the digits in an FEN string into spaces
+    
+    &amp;gt;&amp;gt;&amp;gt; expand_blanks("rk4q3")
+    'rk    q   '
+    '''
+    def expand(match):
+        return ' ' * int(match.group(0))
+    return re.compile(r'\d').sub(expand, fen)
+    
+def check_valid(expanded_fen):
+    '''Asserts an expanded FEN string is valid'''
+    match = re.compile(r'([KQBNRPkqbnrp ]{8}/){8}$').match
+    if not match(expanded_fen + '/'):
+        raise BadChessboard()
+    
+def expand_fen(fen):
+    '''Preprocesses a fen string into an internal format.
+    
+    Each square on the chessboard is represented by a single 
+    character in the output string. The rank separator characters
+    are removed. Invalid inputs raise a BadChessboard error.
+    '''
+    expanded = expand_blanks(fen)
+    check_valid(expanded)
+    return expanded.replace('/', '')
+    
+def draw_board(n=8, sq_size=(20, 20)):
+    '''Return an image of a chessboard.
+    
+    The board has n x n squares each of the supplied size.'''
+    from itertools import cycle
+    def square(i, j):
+        return i * sq_size[0], j * sq_size[1]
+    opaque_grey_background = 192, 255
+    board = Image.new('LA', square(n, n), opaque_grey_background) 
+    draw_square = ImageDraw.Draw(board).rectangle
+    whites = ((square(i, j), square(i + 1, j + 1))
+              for i_start, j in zip(cycle((0, 1)), range(n))
+              for i in range(i_start, n, 2))
+    for white_square in whites:
+        draw_square(white_square, fill='white')
+    return board
+    
+class DrawChessPosition(object):
+    '''Chess position renderer.
+    
+    Create an instance of this class, then call 
+    '''
+    def __init__(self):
+        '''Initialise, preloading pieces and creating a blank board.''' 
+        self.n = 8
+        self.create_pieces()
+        self.create_blank_board()
+    
+    def create_pieces(self):
+        '''Load the chess pieces from disk.
+        
+        Also extracts and caches the alpha masks for these pieces. 
+        '''
+        whites = 'KQBNRP'
+        piece_images = dict(
+            zip(whites, (Image.open('pieces/w%s.png' % p) for p in whites)))
+        blacks = 'kqbnrp'
+        piece_images.update(dict(
+            zip(blacks, (Image.open('pieces/%s.png' % p) for p in blacks))))
+        piece_sizes = set(piece.size for piece in piece_images.values())
+        # Sanity check: the pieces should all be the same size
+        assert len(piece_sizes) == 1
+        self.piece_w, self.piece_h = piece_sizes.pop()
+        self.piece_images = piece_images
+        self.piece_masks = dict((pc, img.split()[3]) for pc, img in
+                                 self.piece_images.iteritems())
+    
+    def create_blank_board(self):
+        '''Pre-render a blank board.'''
+        self.board = draw_board(sq_size=(self.piece_w, self.piece_h))
+    
+    def point(self, i, j):
+        '''Return the top left of the square at (i, j).'''
+        w, h = self.piece_w, self.piece_h
+        return i * h, j * w
+    
+    def square(self, i, j):
+        '''Return the square at (i, j).'''
+        t, l = self.point(i, j)
+        b, r = self.point(i + 1, j + 1)
+        return t, l, b, r
+    
+    def draw(self, fen):
+        '''Return an image depicting the input position.
+        
+        fen - the first record of a FEN chess position.
+        Clients are responsible for resizing this image and saving it,
+        if required.
+        '''
+        board = self.board.copy()
+        pieces = expand_fen(fen)
+        images, masks, n = self.piece_images, self.piece_masks, self.n
+        pts = (self.point(i, j) for j in range(n) for i in range(n))
+        def not_blank(pt_pc):
+            return pt_pc[1] != ' '
+        for pt, piece in filter(not_blank, zip(pts, pieces)):
+            board.paste(images[piece], pt, masks[piece])
+        return board
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;This code depends on PNGs for the pieces being available in the current directory, filed under the (case-sensitive!) names: &lt;code&gt;{K,Q,B,N,R,P,k,q,b,n,r,p}.png&lt;/code&gt;. It also requires all these PNGs to have the same dimensions. Here&amp;#8217;s how to use it:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; renderer = DrawChessPosition()
+&amp;gt;&amp;gt;&amp;gt; fen = "r2q1rk1/pp2ppbp/1np2np1/2Q3B1/3PP1b1/2N2N2/PP3PPP/3RKB1R"
+&amp;gt;&amp;gt;&amp;gt; board = renderer.draw(fen)
+&amp;gt;&amp;gt;&amp;gt; board.show()
+&amp;gt;&amp;gt;&amp;gt; board.save("%s.png" % fen.replace('/', '-'))
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;And here&amp;#8217;s the resulting image (with a CSS double border):
+&lt;/p&gt;
+&lt;img style="border-style:double;" src="http://wordaligned.org/images/r2q1rk1-pp2ppbp-1np2np1-2Q3B1-3PP1b1-2N2N2-PP3PPP-3RKB1R.png" alt="Chess position with FEN r2q1rk1/pp2ppbp/1np2np1/2Q3B1/3PP1b1/2N2N2/PP3PPP/3RKB1R"/&gt;
+
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/drawing-chess-positions.html#toc9" name="tocusing-a-font-with-pil" id="tocusing-a-font-with-pil"&gt;Using a font with PIL&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;There is a problem with the approach taken in the previous section. We only get a good graphic if we save the returned image at its native size: scaling it up or down results in a suboptimal picture. That&amp;#8217;s because the scaling doesn&amp;#8217;t have enough information to go on &amp;#8212; it has to work from a pixel raster when it really needs strokes or vector graphics.
+&lt;/p&gt;
+&lt;p&gt;So if we scale the linear dimensions up or down:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; fen = "r2q1rk1/pp2ppbp/1np2np1/2Q3B1/3PP1b1/2N2N2/PP3PPP/3RKB1R"
+&amp;gt;&amp;gt;&amp;gt; renderer = DrawChessPosition()
+&amp;gt;&amp;gt;&amp;gt; board = renderer.draw(fen)
+&amp;gt;&amp;gt;&amp;gt; board.size
+(360, 360)
+&amp;gt;&amp;gt;&amp;gt; small_board = board.resize((160, 160))
+&amp;gt;&amp;gt;&amp;gt; big_board = board.resize((640, 640))
+&amp;gt;&amp;gt;&amp;gt; big_4_squares = big_board.crop([80, 160, 240, 320])
+&amp;gt;&amp;gt;&amp;gt; big_4_squares.show()
+&amp;gt;&amp;gt;&amp;gt; small_board.show()
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;we&amp;#8217;ll get something like this:
+&lt;/p&gt;
+&lt;p&gt;&lt;img src="http://wordaligned.org/images/chess-pos-small.png" alt="Small chess board"/&gt;
+   &lt;img src="http://wordaligned.org/images/chess-pos-big4.png" alt="Section of large chess board"/&gt;
+&lt;/p&gt;
+&lt;p&gt;The way to avoid the aliasing problems is to work directly from a stroke representation of the chess pieces; for example, by using a &lt;a href="http://mip.noekeon.org/HTMLTTChess/install.html"&gt;suitable font&lt;/a&gt;. Once again, PIL can do the job (though you&amp;#8217;ll need to have installed PIL with FreeType support). I found a freely available unicode true type &lt;a href="http://mip.noekeon.org/HTMLTTChess/install.html"&gt;font&lt;/a&gt; and plugged it into the following code:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;unichr_pieces=dict(
+    zip("KQRBNPkqrbnp",
+        (unichr(uc) for uc in range(0x2654, 0x2660))))
+    
+def chess_position_using_font(fen, font_file, sq_size):
+    '''Return a chess position image.
+    
+    font_file - the name of a font file
+    sq_size - the size of each square on the chess board
+    '''
+    font = ImageFont.truetype(font_file, sq_size)
+    pieces = expand_fen(fen)
+    board = draw_board(sq_size=(sq_size, sq_size))
+    put_piece = ImageDraw.Draw(board).text
+    def point(i, j):
+        return i * sq_size, j * sq_size
+    def not_blank(pt_pce):
+        return pt_pce[1] != ' '
+    pts = (point(i, j) for j in range(8) for i in range(8))
+    for pt, piece in filter(not_blank, zip(pts, pieces)):
+        put_piece(pt, unichr_pieces[piece], fill='black', font=font)
+    return board
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;If we use this code to create small and large chess pictures, much as before, we&amp;#8217;ll see something like this:
+&lt;/p&gt;
+&lt;p&gt;&lt;img src="http://wordaligned.org/images/chess-pos-small-font.png" alt="Small chess board"/&gt;
+   &lt;img src="http://wordaligned.org/images/chess-pos-big4-font.png" alt="Section of large chess board"/&gt;
+&lt;/p&gt;
+&lt;p&gt;As with our CSS + Unicode picture, this image isn&amp;#8217;t ideal since the board shows through the interiors of the pieces. And once again, I haven&amp;#8217;t figured out how to work around this problem.
+&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Update, 2008-03-31.&lt;/strong&gt; A reader has worked out a &lt;a href="http://www.haloscan.com/comments/wordaligned/drawing_chess_positions/#14496"&gt;cunning solution&lt;/a&gt;:
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;You can make white pieces by drawing a &amp;#8220;black&amp;#8221; piece in white, then overlaying that with a &amp;#8220;white&amp;#8221; piece in black.
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;I&amp;#8217;ve given this idea a try and &lt;a href="http://wordaligned.org/articles/white-black-knight.html"&gt;written up the results&lt;/a&gt;. Here&amp;#8217;s the knight at square c3 &amp;#8212; a definite  improvement!
+&lt;/p&gt;
+&lt;img src="http://wordaligned.org/images/white-knight-on-black-square.png" alt="White knight on a black square"/&gt;
+
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/drawing-chess-positions.html#toc10" name="toclatex" id="toclatex"&gt;LaTeX&lt;/a&gt;&lt;/h3&gt;
+&lt;div class="info"&gt;Things I learned while writing this article: the &lt;a href="http://www.ctan.org/tex-archive/fonts/chess/skak/"&gt;skak package&lt;/a&gt; does chess with LaTeX.&lt;/div&gt;
+
+&lt;p&gt;My thanks Ivan Uemlianin for pointing out that I&amp;#8217;d neglected to mention LaTeX as a suitable chess position type-setter, as &lt;a href="http://www.llaisdy.com/blog/2008/04/19/drawing-chess-positions/"&gt;shown in his blog&lt;/a&gt;. LaTeX has been high on my list of things I really ought to learn about for well over a decade, and I simply wasn&amp;#8217;t aware it could do this.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/drawing-chess-positions.html#toc11" name="tocconclusions" id="tocconclusions"&gt;Conclusions&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;This article has shown, again, the merits of scripting graphics. We&amp;#8217;ve also seen that &lt;span /&gt;an interpreted language has much to offer in this area, allowing us to query and shape images dynamically, effectively bridging the gap between our program and a GUI driven graphics package.
+&lt;/p&gt;
+&lt;p&gt;The &lt;a href="http://effbot.org/imagingbook/pil-index.htm"&gt;Python Imaging Library&lt;/a&gt; has shown itself capable of working with shapes, colours, text and fonts. It&amp;#8217;s a great tool.
+&lt;/p&gt;
+&lt;p&gt;We&amp;#8217;ve not done so well at our motivating task, of drawing a chess position. As I said at the outset, if that&amp;#8217;s why you&amp;#8217;re here I&amp;#8217;d suggest taking another look at the alternatives.
+&lt;/p&gt;
+&lt;p&gt;The subtext of this article is platform-dependence. I don&amp;#8217;t know if the Unicode + CSS combination works in your browser or feed-reader, or indeed any other user agent; it depends on font contents and CSS rendering. 
+&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://www.libpng.org/pub/png/"&gt;&lt;img style="float:right;" src="http://www.libpng.org/pub/png/img_png/pngnow.png" alt="[PNG now!]"/&gt;&lt;/a&gt;
+&lt;/p&gt;
+&lt;p&gt;The &amp;#8220;P&amp;#8221; in PNG stands for &amp;#8220;Portable&amp;#8221;, and I would hope you can see the IMGs, which all source from PNGs &amp;#8212; all except the off-site JPEG, another well supported format.
+&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://www.freetype.org/index2.html"&gt;&lt;img style="float:right;" src="http://upload.wikimedia.org/wikipedia/en/thumb/3/3a/Freetype.png/160px-Freetype.png" alt="[FreeType now!]"/&gt;&lt;/a&gt;
+&lt;/p&gt;
+&lt;p&gt;&lt;span /&gt;One reason I like Python and writing about Python is its platform independence. Linux, Windows, OS X etc. &amp;mdash; we can all run the same code. For this particular application, that&amp;#8217;s less true. For a start, you&amp;#8217;ll need to install the non-standard &lt;a href="http://effbot.org/imagingbook/pil-index.htm"&gt;PIL&lt;/a&gt; module. Then there&amp;#8217;s the filename case-insensitivity (which is easy to work around, but nonetheless an embarrassment). The capabilities of PIL itself depend on the presence of other thirdparty libraries: to get you going with this article you&amp;#8217;ll need &lt;a href="http://www.libpng.org/pub/png/"&gt;libpng&lt;/a&gt;, which in turn depends on &lt;a href="http://www.zlib.net/"&gt;zlib&lt;/a&gt;, and &lt;a href="http://www.freetype.org/index2.html"&gt;FreeType&lt;/a&gt;, which again depends on zlib. On my Linux machine &lt;a href="http://effbot.org/imagingbook/image.htm#tag-Image.Image.show"&gt;Image.show&lt;/a&gt; didn&amp;#8217;t work until I&amp;#8217;d installed &lt;a href="http://www.trilon.com/xv/"&gt;xv&lt;/a&gt; from source, and that source needed some tweaking before it would build. So the code in this article is only portable once you&amp;#8217;ve suitably prepared your platform &amp;#8212; that is, the code isn&amp;#8217;t really portable!
+&lt;/p&gt;</description>
+<dc:date>2008-03-30</dc:date>
+<guid>http://wordaligned.org/articles/drawing-chess-positions.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/drawing-chess-positions.html</link>
+<category>Graphics</category>
+</item>
+
+</channel>
+</rss>

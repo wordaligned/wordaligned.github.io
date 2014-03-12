@@ -1,0 +1,126 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<link rel="icon" href="/images/favicon.png" type="image/png"/>
+<link href="/styles/application.css" media="all" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="/scripts/prettify.js"></script>
+<script type="text/javascript" src="/scripts/lang-lisp.js"></script>
+<script type="text/javascript" src="http://www.haloscan.com/load/wordaligned"></script>
+
+<title>Pcl-cvs and Psvn Incompatibilities</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="author" content="Thomas Guest" />
+<meta name="description" content="A Word Aligned article posted 2006-10-07, tagged Subversion, CVS, Emacs." />
+<meta name="keywords" content="Subversion, CVS, Emacs" />
+<link rel="alternate" type="application/rss+xml" title="Feed" href="http://feeds.wordaligned.org/wordaligned" />
+</head>
+
+<body onload="prettyPrint()">
+<div id="container">
+  <div id="header">
+<h1><span><a accesskey="h" href="/">Word Aligned</a></span></h1>
+<h2>tales from the code face</h2>
+<a class="button" href="http://feeds.wordaligned.org/wordaligned" title="Subscribe to Word Aligned"><img style="float: right;" src="/images/feed.png" alt="Feed Logo" height="28" width="28"/></a>
+</div>
+
+  <div id="page">
+    <div id="content">
+      <div class="atomentry" id="pcl-cvs-and-psvn-incompatibilities">
+<h2 class="title"><a href="/articles/pcl-cvs-and-psvn-incompatibilities">Pcl-cvs and Psvn Incompatibilities</a></h2>
+<p class="meta"><abbr class="published" title="2006-10-07">2006-10-07</abbr> &bull; <a href="/tag/subversion" rel="tag">Subversion</a>, <a href="/tag/cvs" rel="tag">CVS</a>, <a href="/tag/emacs" rel="tag">Emacs</a> &bull; <a href="/articles/pcl-cvs-and-psvn-incompatibilities#disqus_thread">Comments</a></p>
+<p>I think I <a href="/articles/version-control-for-third-party-software.html">already mentioned</a>
+   that I&#8217;m using both <a href="http://www.nongnu.org/cvs/">CVS</a> and
+   <a href="http://subversion.tigris.org">Subversion</a> now: <a href="http://subversion.tigris.org">Subversion</a> at home, <a href="http://www.nongnu.org/cvs/">CVS</a> at work. In
+   general the similarities between the two make the context switch
+   fairly painless, but there&#8217;s one gotcha which keeps on getting me.
+</p>
+<p>I use <a href="http://www.cs.utah.edu/dept/old/texinfo/cvs/pcl-cvs_toc.html">pcl-cvs</a> as my <a href="http://www.nongnu.org/cvs/">CVS</a> client: it&#8217;s not perfect but it&#8217;s more
+   than good enough if you&#8217;re prepared to use the <code>cvs</code> command line
+   client every so often for advanced merging and similar. One of the
+   routine <a href="http://www.cs.utah.edu/dept/old/texinfo/cvs/pcl-cvs_toc.html">pcl-cvs</a> commands I use is <code>U</code> which <em>undoes</em> local
+   modifications.
+</p>
+<p>I use <a href="http://www.xsteve.at/prg/emacs/psvn.el">psvn</a> as my <a href="http://subversion.tigris.org">Subversion</a> client: it&#8217;s not perfect but it&#8217;s
+   more than good enough if you&#8217;re prepared to use the <code>svn</code> command line
+   client every so often for advanced merging and similar. One of the
+   routine commands I use is <code>U</code>, which <em>updates</em> everything.
+</p>
+<p>Ouch! <code>U</code> means <em>update</em> in <a href="http://www.xsteve.at/prg/emacs/psvn.el">psvn</a> and <em>undo</em> in <a href="http://www.cs.utah.edu/dept/old/texinfo/cvs/pcl-cvs_toc.html">pcl-cvs</a>. For
+   once I&#8217;m glad of the confirmation dialog which appears in the status bar:
+</p>
+<blockquote><p>Undo N files? (yes or no)
+</p>
+</blockquote><p>That&#8217;s a no! I suppose I could hack the elisp &#8230;
+</p>
+</div>
+
+<div class="comments"><hr/><div id="disqus_thread"></div><script type="text/javascript" src="http://disqus.com/forums/wordaligned/embed.js"></script></div>
+      
+<div id="comments"><script type="text/javascript">
+//<![CDATA[
+(function() {
+    var links = document.getElementsByTagName('a');
+    var query = '?';
+    for(var i = 0; i < links.length; i++) {
+        if(links[i].href.indexOf('#disqus_thread') >= 0) {
+            query += 'url' + i + '=' + encodeURIComponent(links[i].href) + '&amp;';
+        }
+    }
+    document.write('<script type="text/javascript" src="http://disqus.com/forums/wordaligned/get_num_replies.js' + query + '"></' + 'script>');
+})();
+//]]>
+</script></div>
+
+    </div>
+    <div id="sidebar">
+      
+<div class="sidebar-node">
+<h3>Tagged</h3>
+<ul id="categories"><li><a href="/tag/subversion" rel="tag">Subversion</a></li>
+<li><a href="/tag/cvs" rel="tag">CVS</a></li>
+<li><a href="/tag/emacs" rel="tag">Emacs</a></li></ul>
+
+</div>
+
+<div class="sidebar-node">
+<h3>Chain</h3>
+<ul>
+<li><a accesskey="n" href="/articles/from-cvs-to-subversion" title="Next article">&laquo; From CVS to Subversion</a></li>
+<li><a accesskey="p" href="/articles/sounds-of-the-tokyo-metro" title="Previous article">&raquo; Sounds of the Tokyo Metro</a></li>
+</ul>
+
+
+</div>
+
+<div class="sidebar-node">
+<h3>Feeds</h3>
+
+<ul>
+<li><a href="http://feeds.wordaligned.org/wordaligned"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Articles</a></li>
+<li><a href="http://feeds.wordaligned.org/wordaligned/comments"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Comments</a></li>
+</ul>
+
+
+</div>
+
+    </div>
+  </div>
+  <div id="footer">
+<hr />
+<p><a href="http://tag.wordaligned.org">Thomas Guest</a></p>
+</div>
+
+</div>
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-3373724-1']);
+  _gaq.push(['_trackPageview']);
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ga);
+  })();
+</script>
+</body>
+
+</html>

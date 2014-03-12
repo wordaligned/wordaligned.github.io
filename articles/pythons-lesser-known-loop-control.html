@@ -1,0 +1,154 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<link rel="icon" href="/images/favicon.png" type="image/png"/>
+<link href="/styles/application.css" media="all" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="/scripts/prettify.js"></script>
+<script type="text/javascript" src="/scripts/lang-lisp.js"></script>
+<title>Python&#8217;s lesser known loop control</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="author" content="Thomas Guest" />
+<meta name="description" content="A Word Aligned article posted 2013-01-14, tagged Python." />
+<meta name="keywords" content="Python" />
+<link rel="alternate" type="application/rss+xml" title="Feed" href="http://feeds.wordaligned.org/wordaligned" />
+</head>
+
+<body onload="prettyPrint()">
+<div id="container">
+  <div id="header">
+<h1><span><a accesskey="h" href="/">Word Aligned</a></span></h1>
+<h2>space sensitive programming</h2>
+<a class="button" href="http://feeds.wordaligned.org/wordaligned" title="Subscribe to Word Aligned"><img style="float: right;" src="/images/feed.png" alt="Feed Logo" height="28" width="28"/></a>
+</div>
+
+  <div id="page">
+    <div id="content">
+      <div class="atomentry" id="pythons-lesser-known-loop-control.html">
+<h2 class="title"><a href="/articles/pythons-lesser-known-loop-control.html">Python&#8217;s lesser known loop control</a></h2>
+<p class="meta"><abbr class="published" title="2013-01-14">2013-01-14</abbr> &bull; <a href="/tag/python" rel="tag">Python</a> &bull; <a href="/articles/pythons-lesser-known-loop-control.html#disqus_thread">Comments</a></p>
+<p>I&#8217;ll break out of a loop if I have to but generally prefer to recast code so no <code>break</code> is needed. It&#8217;s not about avoiding the keyword; but rather that the loop control expression should tell readers when and why the loop exits.
+</p>
+<p>In C and C++ such recasting is rarely a problem. Python separates statements and expressions which makes things more difficult. You can&#8217;t assign to a variable in a loop control expression, for example. Consider a function which processes a file one chunk at a time, until the file is exhausted.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">while True:
+    data = fp.read(4096)
+    if not data:
+        break
+    ...
+
+</pre>
+
+</div>
+
+<p>The control expression, <code>while True</code>, suggests an infinite loop, which isn&#8217;t what actually happens, but readers must poke around in the loop body to find the actual termination condition.
+</p>
+<p>As already mentioned, an assignment statement isn&#8217;t an expression, so we can&#8217;t write this:
+</p>
+<div class="typocode"><div class="codetitle">Syntax error!</div>
+
+<pre class="prettyprint">while data = fp.read(4096):
+    ...
+
+</pre>
+
+</div>
+
+<p>You could implement a file reader <a href="http://docs.python.org/3/howto/functional.html#generators">generator function</a> which yields chunks of data, allowing clients to write:
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">for data in chunked_file_reader(fp):
+    ...
+
+</pre>
+
+</div>
+
+<p>This at least localises the problem to <code>chunked_file_reader()</code>.
+</p>
+<p>Another solution is to use the two argument flavour of <a href="http://docs.python.org/3.3/library/functions.html#iter">iter</a>, <code>iter(object, sentinel)</code>. Here, <code>object</code> is a callable and <code>sentinel</code> is a terminal value. <code>Object</code> is called with no arguments: use <code><a href="http://docs.python.org/3/library/functools.html#functools.partial">functools.partial</a></code> to set the chunk size passed to <code>file.read</code>; and stop when this function returns the empty string.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">import functools
+
+chunked_file_reader = functools.partial(fp.read, 4096)
+
+for data in iter(chunked_file_reader, ''):
+    ...
+
+</pre>
+
+</div>
+</div>
+
+<div class="comments"><hr/><div id="disqus_thread"></div><script type="text/javascript" src="http://disqus.com/forums/wordaligned/embed.js"></script></div>
+      
+<div id="comments"><script type="text/javascript">
+//<![CDATA[
+(function() {
+    var links = document.getElementsByTagName('a');
+    var query = '?';
+    for(var i = 0; i < links.length; i++) {
+        if(links[i].href.indexOf('#disqus_thread') >= 0) {
+            query += 'url' + i + '=' + encodeURIComponent(links[i].href) + '&amp;';
+        }
+    }
+    document.write('<script type="text/javascript" src="http://disqus.com/forums/wordaligned/get_num_replies.js' + query + '"></' + 'script>');
+})();
+//]]>
+</script></div>
+
+    </div>
+    <div id="sidebar">
+      
+<div class="sidebar-node">
+<h3>Tagged</h3>
+<ul id="categories"><li><a href="/tag/python" rel="tag">Python</a></li></ul>
+
+</div>
+
+<div class="sidebar-node">
+<h3>Chain</h3>
+<ul>
+<li><a accesskey="n" href="/articles/c++-concurrency-in-action.html" title="Next article">&laquo; C++ Concurrency in Action</a></li>
+<li><a accesskey="p" href="/articles/two-star-programming.html" title="Previous article">&raquo; Two star programming</a></li>
+</ul>
+
+
+</div>
+
+<div class="sidebar-node">
+<h3>Feeds</h3>
+
+<ul>
+<li><a href="http://feeds.wordaligned.org/wordaligned"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Articles</a></li>
+<li><a href="http://feeds.wordaligned.org/wordaligned/comments"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Comments</a></li>
+</ul>
+
+
+</div>
+
+    </div>
+  </div>
+  <div id="footer">
+<hr />
+<p><a href="http://tag.wordaligned.org">Thomas Guest</a></p>
+</div>
+
+</div>
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-3373724-1']);
+  _gaq.push(['_trackPageview']);
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ga);
+  })();
+</script>
+</body>
+
+</html>

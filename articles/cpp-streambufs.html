@@ -1,0 +1,524 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<link rel="icon" href="/images/favicon.png" type="image/png"/>
+<link href="/styles/application.css" media="all" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="/scripts/prettify.js"></script>
+<script type="text/javascript" src="/scripts/lang-lisp.js"></script>
+<title>Copy, load, redirect and tee using C++ streambufs</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="author" content="Thomas Guest" />
+<meta name="description" content="The C++ iostream library separates formatting from lower level read/write operations. This article shows how to use C++ stream buffers to copy, load, redirect and tee streams. A Word Aligned article posted 2009-05-13, tagged C++, Streams." />
+<meta name="keywords" content="C++, Streams" />
+<link rel="alternate" type="application/rss+xml" title="Feed" href="http://feeds.wordaligned.org/wordaligned" />
+</head>
+
+<body onload="prettyPrint()">
+<div id="container">
+  <div id="header">
+<h1><span><a accesskey="h" href="/">Word Aligned</a></span></h1>
+<h2>sweating the small stuff</h2>
+<a class="button" href="http://feeds.wordaligned.org/wordaligned" title="Subscribe to Word Aligned"><img style="float: right;" src="/images/feed.png" alt="Feed Logo" height="28" width="28"/></a>
+</div>
+
+  <div id="page">
+    <div id="content">
+      <div class="atomentry" id="cpp-streambufs.html">
+<h2 class="title"><a href="/articles/cpp-streambufs.html">Copy, load, redirect and tee using C++ streambufs</a></h2>
+<p class="meta"><abbr class="published" title="2009-05-13">2009-05-13</abbr> &bull; <a href="/tag/c++" rel="tag">C++</a>, <a href="/tag/streams" rel="tag">Streams</a> &bull; <a href="/articles/cpp-streambufs.html#disqus_thread">Comments</a></p>
+<div class="toc">
+<h2>Contents</h2>
+<ul>
+ <li><a href="#toccout-or-printf" name="toc0" id="toc0">Cout or printf?</a>
+ </li>
+
+ <li><a href="#tocexposed-buffers" name="toc1" id="toc1">Exposed buffers</a>
+ </li>
+
+ <li><a href="#toccopy-streams" name="toc2" id="toc2">Copy streams</a>
+ </li>
+
+ <li><a href="#tocload-streams" name="toc3" id="toc3">Load streams</a>
+ </li>
+
+ <li><a href="#tocredirect-streams" name="toc4" id="toc4">Redirect streams</a>
+ </li>
+
+ <li><a href="#toctee-streams" name="toc5" id="toc5">Tee streams</a>
+ </li>
+
+ <li><a href="#toca-generic-version" name="toc6" id="toc6">A generic version</a>
+ </li>
+</ul>
+</div><div class="typocode">
+
+<pre class="prettyprint">out &lt;&lt; std::setw(3) &lt;&lt; place &lt;&lt; ". "
+    &lt;&lt; "Name " &lt;&lt; name
+    &lt;&lt; ", Score " 
+    &lt;&lt; std::fixed &lt;&lt; std::setprecision(2) 
+    &lt;&lt; score &lt;&lt; '\n';
+
+fprintf(out, "%3d. Name %s, Score %.2f\n", 
+        place, name, score);
+
+</pre>
+
+</div>
+
+
+<h3><a href="#toc0" name="toccout-or-printf" id="toccout-or-printf">Cout or printf?</a></h3>
+<p>Towards the end of an interview I was asked:
+</p>
+<blockquote><p>&#8220;Cout or printf?&#8221;
+</p>
+</blockquote><p>The question made me smile. It signalled that I&#8217;d done well enough in the technical section and now we&#8217;d be moving on to a more relaxed discussion. Similar tailing-off questions include:
+</p>
+<ul>
+ <li>
+     <a href="/articles/accidental-emacs.html" title="Emacs, of course!">Which editor</a> do you use?
+ </li>
+
+ <li>
+     Tabs or spaces?
+ </li>
+
+ <li>
+     Are <a href="http://code.activestate.com/recipes/66531/" title="Yes, and borgs are no better">singletons evil</a>?
+ </li>
+</ul>
+<p>(Come to think of it, the correct answer to the <code>cout</code> vs. <code>printf</code> question is probably &#8220;No!&#8221; Both provide global access to the standard output stream, and globals, like singletons, are dangerous. <a href="http://accu.org/index.php/journals/1411">Parametrise from above</a>, pass down <code>ostreams</code> or <code>FILE *</code> handles as needed. Do the right thing! Anyway&#8230;)
+</p>
+<div class="amazon"><a href="http://www.amazon.com/gp/product/0201379260?ie=UTF8&amp;tag=wordalig-20"><img src="/images/books/josuttis-cpp-book.jpg" alt="The C++ Standard Library: A Tutorial and Reference cover"/></a></div>
+
+<p>I answered something suitably vague. The interview moved on. The truth is, the C++ iostream library may be technically superior to its C predecessor &#8212; safer to use, easier to extend &#8212; but it&#8217;s failed to supplant it. Does anyone truly find all those chained shift operators and manipulators easier to read than a succinct format string? Does the <code>char</code>, <code>wchar_t</code>, <code>&lt;your-char&gt;</code> dimension really help? Even Nicolai Josuttis&#8217; excellent book, <a href="http://www.amazon.com/gp/product/0201379260?ie=UTF8&amp;tag=wordalig-20">The C++ Standard Library: A Tutorial and Reference</a>, shies away:
+</p>
+<blockquote><p>This chapter does not attempt to discuss all aspects of the IOStream library in detail; to do that would take an entire book by itself.
+</p>
+</blockquote>
+<h3><a href="#toc1" name="tocexposed-buffers" id="tocexposed-buffers">Exposed buffers</a></h3>
+<p>I&#8217;m not the only person to find iostream formatting <a href="http://www.fastformat.org/" title="Ultimate robustness! Unlimited flexibility! Unbeatable performance! (a Matthew Wilson production)">somewhat</a> <a href="http://www.boost.org/doc/libs/1_39_0/libs/format/index.html" title="Boost format - featuring operator %">clunky</a>, but input/output is more than just formatting. There&#8217;s also buffering and synchronising, for example. One under-appreciated feature of the iostream library is that the low-level read and write operations are delegated to separate stream buffer objects. 
+</p>
+<p>C++ streams allow direct access to their underlying buffers. You can customise these buffers. You can swap them around. In some ways, C++ goes in at a lower level than C. Poke around in the <a href="http://www.cplusplus.com/reference/iostream/streambuf/">streambuf</a> class, and you&#8217;ll find the member function names even sound like assembler instructions: <code>egptr</code>, <code>xsputn</code>, <code>pbump</code>, <code>epptr</code>, for example.
+</p>
+<p>The remainder of this article works through some examples which use <code>std::streambuf</code>s to copy, load, redirect and tee streams.
+</p>
+<span id="continue-reading"/>
+
+
+<h3><a href="#toc2" name="toccopy-streams" id="toccopy-streams">Copy streams</a></h3>
+<div class="typocode">
+
+<pre class="prettyprint">void stream_copy(std::ostream &amp; dst, std::istream &amp; src)
+{
+    dst &lt;&lt; src.rdbuf();
+}
+
+</pre>
+
+</div>
+
+<p>How does this work? <code>Std::stream</code> derives from <code>std::ios</code>, and <code><a href="http://www.cplusplus.com/reference/iostream/ios/rdbuf/">ios::rdbuf()</a></code> returns a pointer to the source stream&#8217;s buffer. A suitable specialisation of <code><a href="http://www.cplusplus.com/reference/iostream/ostream/operator%3C%3C/">ostream::operator&lt;&lt;()</a></code> reads from this buffer until the source stream empties. Note that <code>stream_copy</code> typically does <strong>not</strong> result in the entire contents of either the source or destination stream being held in memory at any one time &#8212; everything goes through the stream buffers in the usual way. Except, of course, if we&#8217;re using an in-memory <code>std::stringstream</code>, used below to load the contents of a file into a string.
+</p>
+
+<h3><a href="#toc3" name="tocload-streams" id="tocload-streams">Load streams</a></h3>
+<div class="typocode">
+
+<pre class="prettyprint">// Return a named file's contents as a string
+std::string load_file(char const * filepath)
+{
+    std::ifstream src(filepath);
+    std::ostringstream buf;
+    buf &lt;&lt; src.rdbuf();
+    return buf.str();
+}
+
+</pre>
+
+</div>
+
+<p>I&#8217;ve used this simple recipe in test code to load binary data from a file.
+</p>
+
+<h3><a href="#toc4" name="tocredirect-streams" id="tocredirect-streams">Redirect streams</a></h3>
+<p>Everyone knows how to use a command shell to redirect the output of a program to a log file.
+</p>
+<pre>
+$ echo Hello, world! &gt; hello-world.log
+$ cat hello-world.log
+Hello, world!
+</pre>
+
+<p>Stream buffers allow for more flexible stream redirection from <strong>within</strong> the program, once again using <code>ios::rdbuf()</code>, this time to both get and set a stream&#8217;s buffer.
+</p>
+<p>Here&#8217;s a simple redirecter class, designed for use on the stack, allowing the constructor and destructor to <a href="http://c2.com/cgi-bin/wiki?ExecuteAroundMethod" title="Execute around sounds better than RAII to me">execute around</a> a block of code.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">#include &lt;ostream&gt;
+
+// Stream redirecter.
+class redirecter
+{
+public:
+    // Constructing an instance of this class causes
+    // anything written to the source stream to be redirected
+    // to the destination stream.
+    redirecter(std::ostream &amp; dst, std::ostream &amp; src)
+        : src(src)
+        , srcbuf(src.rdbuf())
+    {
+        src.rdbuf(dst.rdbuf());
+    }
+    
+    // The destructor restores the original source stream buffer
+    ~redirecter()
+    {
+        src.rdbuf(srcbuf);
+    }
+private:
+    std::ostream &amp; src;
+    std::streambuf * const srcbuf;
+};
+
+</pre>
+
+</div>
+
+<p>Incidentally, when ios.rdbuf() is used in set mode it returns the original value of the stream&#8217;s buffer, allowing us to write a slightly more compact constructor as shown in the complete program below.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">#include &lt;fstream&gt;
+#include &lt;iostream&gt;
+
+class redirecter
+{
+public:
+    redirecter(std::ostream &amp; dst, std::ostream &amp; src)
+        : src(src), sbuf(src.rdbuf(dst.rdbuf())) {}
+    ~redirecter() { src.rdbuf(sbuf); }
+private:
+    std::ostream &amp; src;
+    std::streambuf * const sbuf;
+};
+
+void hello_world()
+{
+    std::cout &lt;&lt; "Hello, world!\n";
+}
+
+int main()
+{
+    std::ofstream log("hello-world.log");
+    redirecter redirect(log, std::cout);
+    hello_world();
+    return 0;
+}
+
+</pre>
+
+</div>
+
+<p>Running this program prints nothing to standard output. Instead the file <code>hello-world.log</code> contains the redirected output, <code>Hello, world!</code>.
+</p>
+<p>Note that <code>redirect</code> will be destroyed before <code>log</code>, thus restoring <code>std::cout</code>&#8217;s original buffer. This detail is crucial, since destroying the file closes it and destroys its stream buffer, so we must not allow <code>std::cout</code> to continue using this buffer.
+</p>
+<div class="typocode"><div class="codetitle">A bus error on my platform</div>
+
+<pre class="prettyprint">#include &lt;fstream&gt;
+#include &lt;iostream&gt;
+
+int main()
+{
+    std::ofstream log("oops.log");
+    std::cout.rdbuf(log.rdbuf());
+    std::cout &lt;&lt; "Oops!\n";
+    return 0;
+}
+
+</pre>
+
+</div>
+
+
+<h3><a href="#toc5" name="toctee-streams" id="toctee-streams">Tee streams</a></h3>
+<p>You could argue the redirection example is somewhat contrived. If <code>hello_world()</code> had been properly written to accept an <code>ostream</code> as a function argument, rather than rely on the global <code>std::cout</code>, then we could simply pass it the <code>ofstream</code> of our choice and be done. We could equally pass it an <code>ostringstream</code> and check the contents of this stream to test that <code>hello_world()</code> does indeed print what it&#8217;s supposed to<a id="fn1link" href="#fn1"><sup>[1]</sup></a>.
+</p>
+<p>How about teeing streams? In a command shell the standard <a href="http://www.gnu.org/software/coreutils/manual/html_node/tee-invocation.html">tee</a> connector allows us to replicate a stream. The snippet below shows the output from <a href="http://www.gnu.org/software/coreutils/manual/html_node/echo-invocation.html#echo-invocation">echo</a> appearing on standard output and teed to a log file.
+</p>
+<pre>
+$ echo Hello, world! | tee hello-world.log
+Hello, world!
+$ cat hello-world.log 
+Hello, world!
+</pre>
+
+<p>Within a program, a clever stream buffer customisation can do the same job. Here&#8217;s the declaration of a minimal teebuf class, which specialises a standard streambuf. The idea is that we can assign such a teebuf to a stream, causing anything written to the stream to be diverted through both teed output buffers.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">#include &lt;streambuf&gt;
+
+class teebuf: public std::streambuf
+{
+public:
+    // Construct a streambuf which tees output to both input
+    // streambufs.
+    teebuf(std::streambuf * sb1, std::streambuf * sb2);
+protected:
+    virtual int overflow(int char);
+private:
+    std::streambuf * sb1;
+    std::streambuf * sb2;
+};
+
+</pre>
+
+</div>
+
+<p>Before fleshing out the implementation, I&#8217;d like to discuss what lies beneath the surface of this simple declaration. We&#8217;re specialising a <code>std::streambuf</code>, which is itself a typedef for <code>basic_streambuf&lt;char&gt;</code>. We&#8217;ll show how to make this code more generic <a href="#toca-generic-solution">later</a>.
+</p>
+<p>The base class, <code>std::streambuf</code>, despite its name, has no buffer. This base class provides two public member functions for outputting character data, <code>sputc</code> and <code>sputn</code>, which output a single character and a run of characters respectively. If the internal buffer is full (always the case here, since there is no buffer) then the virtual overflow method ends up being called. Thus a suitable override of this method will do the job.
+</p>
+<p>For details, consult a good reference. On my platform the actual (GNU) header files are well written and, of course, 100% accurate. The HTML documents generated from them can also be found <a href="http://gcc.gnu.org/onlinedocs/libstdc++/libstdc++-html-USERS-4.4/a00216.html">online</a>.
+</p>
+<p>You may wonder why <code>overflow</code> deals in <code>int</code>s and not <code>char</code>s. That&#8217;s because, in the case of an error, it returns a sentinel value, <code>EOF</code>, which does not fit in a <code>char</code>. (More generically, it deals with <code>traits::int_type</code>s and returns a <code>traits::eof()</code> to indicate an error condition).
+</p>
+<p>Actually, I can understand why <code>overflow</code> returns an <code>int_type</code> but I&#8217;m unsure why it should accept an <code>int_type</code> argument when external clients only put characters into the stream. A footnote in the <a href="http://www.open-std.org/jtc1/sc22/wg21/docs/standards">standard</a> reads:
+</p>
+<blockquote><p>Typically, <code>overflow</code> returns c to indicate success, except when <code>traits::eq_int_type(c,traits::eof())</code> returns <code>true</code>, in which case it returns <code>traits::not_eof(c)</code>.
+</p>
+</blockquote><p>I&#8217;m not sure that helps me much.
+</p>
+<p>Nonetheless, here&#8217;s a <code>teebuf</code> implementation. I&#8217;ve changed both <code>overflow</code> to be private which stops anyone deriving from this class. Any actual buffering will be delegated to the teed buffers. We&#8217;ve also over-ridden the virtual <code>sync()</code> method: the default implementation does nothing, but here we sync the teed buffers. I can&#8217;t see any way the <code>(c == EOF)</code> test could ever return <code>true</code> for instances of this class but I&#8217;ve followed the advice from the footnote in the standard anyway.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">#include &lt;streambuf&gt;
+
+class teebuf: public std::streambuf
+{
+public:
+    // Construct a streambuf which tees output to both input
+    // streambufs.
+    teebuf(std::streambuf * sb1, std::streambuf * sb2)
+        : sb1(sb1)
+        , sb2(sb2)
+    {
+    }
+private:
+    // This tee buffer has no buffer. So every character "overflows"
+    // and can be put directly into the teed buffers.
+    virtual int overflow(int c)
+    {
+        if (c == EOF)
+        {
+            return !EOF;
+        }
+        else
+        {
+            int const r1 = sb1-&gt;sputc(c);
+            int const r2 = sb2-&gt;sputc(c);
+            return r1 == EOF || r2 == EOF ? EOF : c;
+        }
+    }
+    
+    // Sync both teed buffers.
+    virtual int sync()
+    {
+        int const r1 = sb1-&gt;pubsync();
+        int const r2 = sb2-&gt;pubsync();
+        return r1 == 0 &amp;&amp; r2 == 0 ? 0 : -1;
+    }   
+private:
+    std::streambuf * sb1;
+    std::streambuf * sb2;
+};
+
+</pre>
+
+</div>
+
+<p>Here&#8217;s a simple helper class to create a tee stream from two input streams. (My thanks to Tony Yu for pointing out a problem with the code originally posted here.)
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">class teestream : public std::ostream
+{
+public:
+    // Construct an ostream which tees output to the supplied
+    // ostreams.
+    teestream(std::ostream &amp; o1, std::ostream &amp; o2);
+private:
+    teebuf tbuf;
+};
+
+teestream::teestream(std::ostream &amp; o1, std::ostream &amp; o2)
+  : std::ostream(&amp;tbuf)
+  , tbuf(o1.rdbuf(), o2.rdbuf())
+{
+}
+
+</pre>
+
+</div>
+
+<p>And here&#8217;s a short program showing how to use these elements.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">#include &lt;fstream&gt;
+#include &lt;iostream&gt;
+#include &lt;teestream&gt;
+
+int main()
+{
+    std::ofstream log("hello-world.log");
+    teestream tee(std::cout, log);
+    tee &lt;&lt; "Hello, world!\n";
+    return 0;
+}
+
+</pre>
+
+</div>
+
+<p>Running this program prints the message <code>Hello, world!</code> followed by a newline to standard output, and the file <code>hello-world.log</code> contains this same output.
+</p>
+
+<h3><a href="#toc6" name="toca-generic-version" id="toca-generic-version">A generic version</a></h3>
+<div class="typocode">
+
+<pre class="prettyprint">template &lt;typename char_type,
+          typename traits = std::char_traits&lt;char_type&gt; &gt;
+class basic_teebuf:
+    public std::basic_streambuf&lt;char_type, traits&gt;
+{
+public:
+    typedef typename traits::int_type int_type;
+    
+    basic_teebuf(std::basic_streambuf&lt;char_type, traits&gt; * sb1,
+                 std::basic_streambuf&lt;char_type, traits&gt; * sb2)
+      : sb1(sb1)
+      , sb2(sb2)
+    {
+    }
+    
+private:    
+    virtual int sync()
+    {
+        int const r1 = sb1-&gt;pubsync();
+        int const r2 = sb2-&gt;pubsync();
+        return r1 == 0 &amp;&amp; r2 == 0 ? 0 : -1;
+    }
+    
+    virtual int_type overflow(int_type c)
+    {
+        int_type const eof = traits::eof();
+        
+        if (traits::eq_int_type(c, eof))
+        {
+            return traits::not_eof(c);
+        }
+        else
+        {
+            char_type const ch = traits::to_char_type(c);
+            int_type const r1 = sb1-&gt;sputc(ch);
+            int_type const r2 = sb2-&gt;sputc(ch);
+            
+            return
+                traits::eq_int_type(r1, eof) ||
+                traits::eq_int_type(r2, eof) ? eof : c;
+        }
+    }
+    
+private:
+    std::basic_streambuf&lt;char_type, traits&gt; * sb1;
+    std::basic_streambuf&lt;char_type, traits&gt; * sb2;
+};
+
+typedef basic_teebuf&lt;char&gt; teebuf;
+
+</pre>
+
+</div>
+
+<hr />
+
+<p>I am placing the code samples presented here in the public domain.
+</p>
+<hr />
+
+<p><a id="fn1" href="#fn1link">[1]</a> This demonstrates one reason why globals such as <code>cout</code> are a bad idea &#8212; it becomes harder to test code which accesses them. 
+</p>
+</div>
+
+<div class="comments"><hr/><div id="disqus_thread"></div><script type="text/javascript" src="http://disqus.com/forums/wordaligned/embed.js"></script></div>
+      
+<div id="comments"><script type="text/javascript">
+//<![CDATA[
+(function() {
+    var links = document.getElementsByTagName('a');
+    var query = '?';
+    for(var i = 0; i < links.length; i++) {
+        if(links[i].href.indexOf('#disqus_thread') >= 0) {
+            query += 'url' + i + '=' + encodeURIComponent(links[i].href) + '&amp;';
+        }
+    }
+    document.write('<script type="text/javascript" src="http://disqus.com/forums/wordaligned/get_num_replies.js' + query + '"></' + 'script>');
+})();
+//]]>
+</script></div>
+
+    </div>
+    <div id="sidebar">
+      
+<div class="sidebar-node">
+<h3>Tagged</h3>
+<ul id="categories"><li><a href="/tag/c++" rel="tag">C++</a></li>
+<li><a href="/tag/streams" rel="tag">Streams</a></li></ul>
+
+</div>
+
+<div class="sidebar-node">
+<h3>Chain</h3>
+<ul>
+<li><a accesskey="n" href="/articles/deflate-runlength-encoding-but-better.html" title="Next article">&laquo; DEFLATE: run-length encoding, but better</a></li>
+<li><a accesskey="p" href="/articles/generic-documentation.html" title="Previous article">&raquo; Generic documentation</a></li>
+</ul>
+
+
+</div>
+
+<div class="sidebar-node">
+<h3>Feeds</h3>
+
+<ul>
+<li><a href="http://feeds.wordaligned.org/wordaligned"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Articles</a></li>
+<li><a href="http://feeds.wordaligned.org/wordaligned/comments"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Comments</a></li>
+</ul>
+
+
+</div>
+
+    </div>
+  </div>
+  <div id="footer">
+<hr />
+<p><a href="http://tag.wordaligned.org">Thomas Guest</a></p>
+</div>
+
+</div>
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-3373724-1']);
+  _gaq.push(['_trackPageview']);
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ga);
+  })();
+</script>
+</body>
+
+</html>

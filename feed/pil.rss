@@ -1,0 +1,1700 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" >
+<channel>
+<title>Word Aligned</title>
+<link>http://wordaligned.org</link>
+<description>tales from the code face</description>
+<dc:creator>tag@wordaligned.org</dc:creator>
+<language>en-gb</language>
+<item>
+<title>Steganography made simple</title>
+<description>&lt;p&gt;&lt;a href="http://www.flickr.com/photos/thomasguest/3122529935/" title="What's hidden in this image?"&gt;&lt;img src="http://farm4.static.flickr.com/3264/3122529935_dfe6550cf6_o.png" width="294" height="450" alt="What's hidden in this image?" /&gt;&lt;/a&gt;
+&lt;/p&gt;
+&lt;p&gt;As programmers, our code should be readable, not cryptic; but sometimes it&amp;#8217;s fun to &lt;a href="http://svn.python.org/view/python/trunk/Lib/antigravity.py?rev=66902&amp;amp;view=markup" title="python3.0 -c 'import antigravity'"&gt;surprise&lt;/a&gt;, &lt;a href="http://www.ioccc.org/main.html"&gt;obfuscate&lt;/a&gt; or &lt;a href="http://en.wikipedia.org/wiki/Easter_egg_(media)"&gt;conceal&lt;/a&gt;. &lt;a href="http://en.wikipedia.org/wiki/Steganography"&gt;Wikipedia&lt;/a&gt; says:
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;&lt;a href="http://en.wikipedia.org/wiki/Steganography"&gt;Steganography&lt;/a&gt; is the art and science of writing hidden messages in such a way that no-one apart from the sender and intended recipient even realizes there &lt;em&gt;is&lt;/em&gt; a hidden message. By contrast, cryptography obscures the meaning of a message, but it does not conceal the fact that there &lt;em&gt;is&lt;/em&gt; a message.
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;Lemon juice on paper never worked for me, and (as I discovered when I tried to devise a title for &lt;a href="http://wordaligned.org/articles/a-little-teaser.html"&gt;an earlier post&lt;/a&gt;) it&amp;#8217;s hard work hiding a text message as a pattern within a larger text message. Sadly my hair is too fine for Histiaeus&amp;#8217;s inspired shave-a-slave trick.
+&lt;/p&gt;
+&lt;p&gt;In a digital age, steganographers have it easier. The larger the carrier message the easier it is to disguise a payload within it. My mobile phone has a 3 megapixel camera; I could embed the entire text content of &lt;a href="http://wordaligned.org"&gt;this website&lt;/a&gt; (tarred and bzipped) within a single one of its photos without anyone noticing. The &lt;a href="http://en.wikipedia.org/wiki/Steganography"&gt;Wikipedia page on steganography&lt;/a&gt; has a remarkable example of a picture of a tree which, after some bit-shifting, turns into a passable picture of a cat!
+&lt;/p&gt;
+&lt;span id="continue-reading"/&gt;
+
+&lt;p&gt;The &lt;a href="http://www.pythonware.com/products/pil/"&gt;Python Imaging Library (PIL)&lt;/a&gt; makes tinkering with images a snip. Here&amp;#8217;s a short program to hide messages in images, and to reveal such messages. PIL isn&amp;#8217;t ready for Python 3.0 yet, so I&amp;#8217;m using 2.6. Note in passing the use of a couple of recent additions to my favourite module, &lt;a href="http://docs.python.org/library/itertools.html#itertools.product"&gt;itertools.product&lt;/a&gt; and &lt;a href="http://docs.python.org/library/itertools.html#itertools.izip_longest"&gt;itertools.izip_longest&lt;/a&gt;. 
+&lt;/p&gt;
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;PIL steganography&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;'''Digital image steganography based on the Python Imaging Library (PIL)
+
+Any message can be hidden, provided the image is large enough. The message is
+packed into the least significant bits of the pixel colour bands. A 4 byte
+header (packed in the same way) carries the message payload length.
+'''
+import Image
+import itertools as its
+
+def n_at_a_time(items, n, fillvalue):
+    '''Returns an iterator which groups n items at a time.
+    
+    Any final partial tuple will be padded with the fillvalue
+    
+    &amp;gt;&amp;gt;&amp;gt; list(n_at_a_time([1, 2, 3, 4, 5], 2, 'X'))
+    [(1, 2), (3, 4), (5, 'X')]
+    '''
+    it = iter(items)
+    return its.izip_longest(*[it] * n, fillvalue=fillvalue)
+
+def biterator(data):
+    '''Returns a biterator over the input data.
+    
+    &amp;gt;&amp;gt;&amp;gt; list(biterator(chr(0b10110101)))
+    [1, 0, 1, 1, 0, 1, 0, 1]
+    '''
+    return ((ord(ch) &amp;gt;&amp;gt; shift) &amp;amp; 1
+            for ch, shift in its.product(data, range(7, -1, -1)))
+
+def header(n):
+    '''Return n packed in a 4 byte string.'''
+    bytes = (chr(n &amp;gt;&amp;gt; s &amp;amp; 0xff) for s in range(24, -8, -8))
+    return ('%s' * 4) % tuple(bytes)
+
+def setlsb(cpt, bit):
+    '''Set least significant bit of a colour component.'''
+    return cpt &amp;amp; ~1 | bit
+
+def hide_bits(pixel, bits):
+    '''Hide a bit in each pixel component, returning the resulting pixel.'''
+    return tuple(its.starmap(setlsb, zip(pixel, bits)))
+
+def hide_bit(pixel, bit):
+    '''Similar to the above, but for single band images.'''
+    return setlsb(pixel, bit[0])
+
+def unpack_lsbits_from_image(image):
+    '''Unpack least significant bits from image pixels.'''
+    # Return depends on number of colour bands. See also hide_bit(s)
+    if len(image.getbands()) == 1:
+        return (px &amp;amp; 1 for px in image.getdata())
+    else:
+        return (cc &amp;amp; 1 for px in image.getdata() for cc in px)
+
+def call(f): # (Used to defer evaluation of f)
+    return f()
+
+def disguise(image, data):
+    '''Disguise data by packing it into an image.
+    
+    On success, the image is modified and returned to the caller.
+    On failure, None is returned and the image is unchanged.
+    '''
+    payload = '%s%s' % (header(len(data)), data)
+    npixels = image.size[0] * image.size[1]
+    nbands = len(image.getbands())
+    if len(payload) * 8 &amp;lt;= npixels * nbands:
+        new_pixel = hide_bit if nbands == 1 else hide_bits
+        pixels = image.getdata()
+        bits = n_at_a_time(biterator(payload), nbands, 0)
+        new_pixels = its.starmap(new_pixel, its.izip(pixels, bits))
+        image.putdata(list(new_pixels))
+        return image
+
+def reveal(image):
+    '''Returns any message disguised in the supplied image file, or None.'''
+    bits = unpack_lsbits_from_image(image)
+    def accum_bits(n):
+        return reduce(lambda a, b: a &amp;lt;&amp;lt; 1 | b, its.islice(bits, n), 0)
+    def next_ch():
+        return chr(accum_bits(8))
+    npixels = image.size[0] * image.size[1] 
+    nbands = len(image.getbands())
+    data_length = accum_bits(32)
+    if npixels * nbands &amp;gt; 32 + data_length * 8:
+        return ''.join(its.imap(call, its.repeat(next_ch, data_length)))
+
+if __name__ == "__main__":
+    import urllib
+    droste = urllib.urlopen("http://is.gd/cHqT").read()
+    open("droste.png", "wb").write(droste)
+    droste = Image.open("droste.png")
+    while droste:
+        droste.show()
+        droste = reveal(droste)
+        if droste:
+            open("droste.png", "wb").write(droste)
+            droste = Image.open("droste.png")
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;The code is available via anonymous SVN access at &lt;a href="http://svn.wordaligned.org/svn/etc/steganography"&gt;http://svn.wordaligned.org/svn/etc/steganography&lt;/a&gt;.
+&lt;/p&gt;
+&lt;p&gt;&amp;#x2621; For brevity, I haven&amp;#8217;t provided a nice user interface to &lt;code&gt;disguise()&lt;/code&gt; and &lt;code&gt;reveal()&lt;/code&gt;. The short main program is (intentionally) lightly obfuscated. &lt;code&gt;Disguise()&lt;/code&gt; modifies the supplied image argument &amp;#8212; use &lt;code&gt;Image.copy()&lt;/code&gt; if this is a problem. You must also choose a lossless format to save the disguised image: I recommend PNG, but please do check &lt;code&gt;reveal()&lt;/code&gt; works on any saved image.
+&lt;/p&gt;
+&lt;hr /&gt;
+
+&lt;p&gt;&lt;a href="http://steike.com/code/useless/zip-file-quine/" title="Your perfect post, perhaps?"&gt;Keen on quines and cocoa?&lt;/a&gt;
+&lt;/p&gt;</description>
+<dc:date>2008-12-30</dc:date>
+<guid>http://wordaligned.org/articles/steganography.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/steganography.html</link>
+<category>PIL</category>
+</item>
+
+<item>
+<title>Scatter pictures with Google Charts</title>
+<description>&lt;p&gt;In a recent &lt;a href="http://www.mattcutts.com/blog/pacman-graph-in-google-chart-api/"&gt;post on his blog&lt;/a&gt; Matt Cutts asks:
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;I almost wanted to call this post &amp;#8220;Stupid Google Tricks&amp;#8221; :-) What fun diagrams can you imagine making with the &lt;a href="http://code.google.com/apis/chart/"&gt;Google Charts Service&lt;/a&gt;?
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;Here&amp;#8217;s a stupid trick: you can use the &lt;a href="http://www.pythonware.com/library/pil/handbook/"&gt;Python Imaging Library&lt;/a&gt; to convert a picture into a URL which &lt;a href="http://code.google.com/apis/chart/"&gt;Google charts&lt;/a&gt; will render as the original picture.
+&lt;/p&gt;
+&lt;p&gt;Here&amp;#8217;s the original picture:
+&lt;/p&gt;
+&lt;img src="http://wordaligned.org/images/buttons/spider-bw-61.png" alt="Spider"/&gt;
+
+&lt;p&gt;here&amp;#8217;s the version served up by Google charts:
+&lt;/p&gt;
+&lt;img src="http://chart.apis.google.com/chart?cht=s&amp;amp;chd=s:DDEEEEEEEEEEEEEFFFFFFFFFFFFFFGGGGGGGGGGGGHHHHHHHHHHHHHHIIIIIIIIIIIIIIIIIJJJJJJJJJJJJJJJKKKKKKKKKKLLLLLLLMMMMMMMMNNNNNNNNNNNNNNOOOOOOOOOOOOOOOOOOOOOOOOOPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQRRRRRRRRRRRRRRRRRRRSSSSSSSSSSSSSSSSSSSSTTTTTTTTTTTTTTTTTTUUUUUUUUUUUUUUUUUVVVVVVVVVVVVVVVVVWWWWWWWWWWWWWWWWWWWWWXXXXXXXXXXXXXXXXXXXXXXXXYYYYYYYYYYYYYYYYYYYYYYYYYYZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbccccccccccccccccccccccccccddddddddddddddddddddeeeeeeeeeeeeeeeeeeeeeeeefffffffffffffffffffgggggggggggggggghhhhhhhhhhhhhhhhhhhhiiiiiiiiiiiiiiiiiiiiijjjjjjjjjjjjjjjjjjjjjjjjjkkkkkkkkkkkkkkkkkkkkklllllllllllllllllllmmmmmmmmmmmmmmmmmmmmmnnnnnnnnnnnnnnnnnnnnoooooooooooooooooppppppppppppppppppqqqqqqqqqqqqqqqqqqqqrrrrrrrrrrrrrrrrrssssssssssssssssssssttttttttttttttttuuuuuuuuuuuuuuuuvvvvvvvvvvvvvwwwwwwwxxxxxxxyyyyyyyyzzzzzzzzzzzzzzz00000000000000111111111111111122222222222222333333333333444444444555556666777,YWaZYXWVUTSRQPObaZYXWVUTSRQPOsdcbaZUTSRQPutsrqplkjidcbavutsrqponmlkjiedcwvuqponmlkjihdcxwvonjihdcxwjihdcyxjihdcRzjihdcTSRQPNJHihgdcbaZYUTSRQPONMLKJIHGFtsrjihgfedcbaZYXWVUTSONMLKJIHGFEDvutsrqihgfedcbaZYXWVUTKIHGFEDCvutqpmlihgfedcWVUTSwvponmlkjihgfedVUTSRvqponmlkjihedcTSRQrqponmlkjihedSRQPsrqponmlkjedRQPOLysrqponmlkjdcRQPONMLKyxtsrqponmlkdcSRQPONMLKJyxtsrqponmldcbUTSRQPONMLKJyxtsrqponmlihgfedcbaZWVUTSPONMKJIyxwtsrqponmljihgfedcbaZYXWVUTPONJIHxwvutsrqponmkjihgfedcbaZYXWVUONMJIHGvusrqponmlkjifedcbZXONIHGFsrqponmlkjedcONMHGFE65432rqponmlkjedcONMGFED3210qponmlkjiedcONE10nmlkjigfedPONM0zonmlkjihgfedYXVPON0zonmjihgfeZYXWVUTPON0zqponmlihgfaZYXWVUTSRQPO0zyrqpnmlbaZYVUTSRQPOzytsrqpmlkcbaZTSRQPzyxwvutsrqmlkjcbaTSRQyxwvutsnmlkjicbUTSRQponmlkjihdcbWVUTSqponjihgdcbZYXWVUTrqponjihgfedcbaZYXWVsrqpjihgfedcbaZYXsrqjifedcbaZYXTSRQPOsrkjYXWVUTSRQPONsrkjYXWVUTSQPONMsrqkjXWVUONMLsrqkjihsrqkjihsrqjihgVsrqihgfZYXWVUTSsrqhgfeaZYXWVUsrqpogfedcbaZYXWsrqponfedcbaZYrqponmedcbaZonmlkedcbmlkdclkjijih&amp;amp;chm=s,000000,1,2.0,3.0,0&amp;amp;chs=186x186" alt="Google Chart Spider"/&gt;
+
+&lt;p&gt;here&amp;#8217;s the code:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;import Image
+import string
+
+def scatter_pixels(img_file):
+    """Return the URL of a scatter plot of the supplied image
+    
+    The image will be rendered square and black on white. Adapt the
+    code if you want something else.
+    """
+    # Use simple chart encoding. To make things really simple
+    # use a square image where each X or Y position corresponds
+    # to a single encode value.
+    simple = string.uppercase + string.lowercase + string.digits
+    rsimple = simple[::-1] # Google charts Y reverses PIL Y
+    w = len(simple)
+    W = w * 3
+    img = Image.open(img_file).resize((w, w)).convert("1")
+    pels = img.load()
+    black_pels = [(x, y) for x in range(w) for y in range(w)
+                  if pels[x, y] == 0]
+    xs = "".join(simple[x] for x, _ in black_pels)
+    ys = "".join(rsimple[y] for _, y in black_pels)
+    sqside = 3.0
+    return (
+        "http://chart.apis.google.com/chart?"
+        "cht=s&amp;amp;"                          # Draw a scatter graph
+        "chd=s:%(xs)s,%(ys)s&amp;amp;"            # using simple encoding and
+        "chm=s,000000,1,2.0,%(sqside)r,0&amp;amp;"# square black markers
+        "chs=%(W)rx%(W)r"                 # at this size.
+        ) % locals()
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;and here&amp;#8217;s the url it generates:
+&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://chart.apis.google.com/chart?cht=s&amp;amp;chd=s:DDEEEEEEEEEEEEEFFFFFFFFFFFFFFGGGGGGGGGGGGHHHHHHHHHHHHHHIIIIIIIIIIIIIIIIIJJJJJJJJJJJJJJJKKKKKKKKKKLLLLLLLMMMMMMMMNNNNNNNNNNNNNNOOOOOOOOOOOOOOOOOOOOOOOOOPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQRRRRRRRRRRRRRRRRRRRSSSSSSSSSSSSSSSSSSSSTTTTTTTTTTTTTTTTTTUUUUUUUUUUUUUUUUUVVVVVVVVVVVVVVVVVWWWWWWWWWWWWWWWWWWWWWXXXXXXXXXXXXXXXXXXXXXXXXYYYYYYYYYYYYYYYYYYYYYYYYYYZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbccccccccccccccccccccccccccddddddddddddddddddddeeeeeeeeeeeeeeeeeeeeeeeefffffffffffffffffffgggggggggggggggghhhhhhhhhhhhhhhhhhhhiiiiiiiiiiiiiiiiiiiiijjjjjjjjjjjjjjjjjjjjjjjjjkkkkkkkkkkkkkkkkkkkkklllllllllllllllllllmmmmmmmmmmmmmmmmmmmmmnnnnnnnnnnnnnnnnnnnnoooooooooooooooooppppppppppppppppppqqqqqqqqqqqqqqqqqqqqrrrrrrrrrrrrrrrrrssssssssssssssssssssttttttttttttttttuuuuuuuuuuuuuuuuvvvvvvvvvvvvvwwwwwwwxxxxxxxyyyyyyyyzzzzzzzzzzzzzzz00000000000000111111111111111122222222222222333333333333444444444555556666777,YWaZYXWVUTSRQPObaZYXWVUTSRQPOsdcbaZUTSRQPutsrqplkjidcbavutsrqponmlkjiedcwvuqponmlkjihdcxwvonjihdcxwjihdcyxjihdcRzjihdcTSRQPNJHihgdcbaZYUTSRQPONMLKJIHGFtsrjihgfedcbaZYXWVUTSONMLKJIHGFEDvutsrqihgfedcbaZYXWVUTKIHGFEDCvutqpmlihgfedcWVUTSwvponmlkjihgfedVUTSRvqponmlkjihedcTSRQrqponmlkjihedSRQPsrqponmlkjedRQPOLysrqponmlkjdcRQPONMLKyxtsrqponmlkdcSRQPONMLKJyxtsrqponmldcbUTSRQPONMLKJyxtsrqponmlihgfedcbaZWVUTSPONMKJIyxwtsrqponmljihgfedcbaZYXWVUTPONJIHxwvutsrqponmkjihgfedcbaZYXWVUONMJIHGvusrqponmlkjifedcbZXONIHGFsrqponmlkjedcONMHGFE65432rqponmlkjedcONMGFED3210qponmlkjiedcONE10nmlkjigfedPONM0zonmlkjihgfedYXVPON0zonmjihgfeZYXWVUTPON0zqponmlihgfaZYXWVUTSRQPO0zyrqpnmlbaZYVUTSRQPOzytsrqpmlkcbaZTSRQPzyxwvutsrqmlkjcbaTSRQyxwvutsnmlkjicbUTSRQponmlkjihdcbWVUTSqponjihgdcbZYXWVUTrqponjihgfedcbaZYXWVsrqpjihgfedcbaZYXsrqjifedcbaZYXTSRQPOsrkjYXWVUTSRQPONsrkjYXWVUTSQPONMsrqkjXWVUONMLsrqkjihsrqkjihsrqjihgVsrqihgfZYXWVUTSsrqhgfeaZYXWVUsrqpogfedcbaZYXWsrqponfedcbaZYrqponmedcbaZonmlkedcbmlkdclkjijih&amp;amp;chm=s,000000,1,2.0,3.0,0&amp;amp;chs=186x186"&gt;http://chart.apis.google.com/chart?cht=s&amp;amp;chd=s:DDEEEEEEE&amp;#8230;&amp;amp;chs=186x186&lt;/a&gt;
+&lt;/p&gt;
+&lt;hr /&gt;
+
+&lt;p style="font-size:75%"&gt;&lt;strong&gt;Smallprint&lt;/strong&gt;. Google charts may return a 400 error for an image with a long URL (meaning lots of black pixels in this case). The upper limit on URL length doesn&amp;#8217;t seem to be &lt;a href="http://code.google.com/apis/chart/"&gt;documented&lt;/a&gt; but a quick &lt;a href="http://groups.google.com/group/google-chart-api/search?group=google-chart-api&amp;amp;q=url+length&amp;amp;qt_g=Search+this+group"&gt;trawl through topics on the google charts group&lt;/a&gt; suggests others have bumped into it too. Connoisseurs of whacky pictures should pay &lt;a href="http://www.romancortes.com/blog/homer-css/"&gt;CSS Homer Simpson&lt;/a&gt; a visit.&lt;/p&gt;</description>
+<dc:date>2008-04-25</dc:date>
+<guid>http://wordaligned.org/articles/scatter-pictures-with-google-charts.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/scatter-pictures-with-google-charts.html</link>
+<category>PIL</category>
+</item>
+
+<item>
+<title>White black knight then black white knight</title>
+<description>&lt;img src="http://wordaligned.org/images/chess-pos-small-font.png" alt="Small chess board" style="float:right;"/&gt;
+
+&lt;p&gt;At the end of &lt;a href="http://wordaligned.org/articles/drawing-chess-positions.html"&gt;yesterday&amp;#8217;s article&lt;/a&gt; I admitted defeat. I&amp;#8217;d developed a script to render chess positions, using a suitable font as a source of scalable bitmasks to represent the pieces. Sadly, you could clearly see the board through the pieces, which meant white pieces on black squares looked wrong. I couldn&amp;#8217;t see an easy fix.
+&lt;/p&gt;
+&lt;p&gt;Happily one of my readers was &lt;a href="http://www.haloscan.com/comments/wordaligned/drawing_chess_positions/#14496"&gt;more resourceful&lt;/a&gt;:
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;You can make white pieces by drawing a &amp;#8220;black&amp;#8221; piece in white, then overlaying that with a &amp;#8220;white&amp;#8221; piece in black.
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;This is a clever trick which I wish I&amp;#8217;d thought of! The redrawn pictures do look better.
+&lt;/p&gt;
+&lt;img src="http://wordaligned.org/images/chess-font-fixed.png" alt="Fixed chess board"/&gt;
+
+&lt;p&gt;We need three more lines of code and comments apiece.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;def chess_position_font(fen, font_file, sq_size):
+    ....
+    for sq, piece in filter(not_blank, zip(sqs, pieces)):
+        if is_white_piece(piece):
+            # Use the equivalent black piece, drawn white,
+            # for the 'body' of the piece, so the background
+            # square doesn't show through.
+            filler = unichr_pieces[piece.lower()]
+            put_piece(sq, filler, fill='white', font=font)
+        put_piece(sq, unichr_pieces[piece], fill='black', font=font)
+    return board
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Note, in passing, that &lt;span /&gt;I &lt;strong&gt;don&amp;#8217;t&lt;/strong&gt; think comments can or should be entirely eliminated from source code &amp;#8212; here&amp;#8217;s a case where they help.
+&lt;/p&gt;
+&lt;p&gt;Even after this hack, the pictures aren&amp;#8217;t pixel perfect. But I do like the grey mane you get when a white knight occupies a dark square.
+&lt;/p&gt;
+&lt;img src="http://wordaligned.org/images/white-knight-on-black-square.png" alt="White knight on a black square"/&gt;</description>
+<dc:date>2008-03-31</dc:date>
+<guid>http://wordaligned.org/articles/white-black-knight.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/white-black-knight.html</link>
+<category>PIL</category>
+</item>
+
+<item>
+<title>Drawing Chess Positions</title>
+<description>&lt;div class="toc"&gt;
+&lt;h2&gt;Contents&lt;/h2&gt;
+&lt;ul&gt;
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/drawing-chess-positions.html#tocdominus-connects" name="toc0" id="toc0"&gt;Dominus Connects&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/drawing-chess-positions.html#tocchessboards-revisited" name="toc1" id="toc1"&gt;Chessboards Revisited&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/drawing-chess-positions.html#tocprogram-input" name="toc2" id="toc2"&gt;Program Input&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/drawing-chess-positions.html#tocascii-chess-positions" name="toc3" id="toc3"&gt;ASCII Chess Positions&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/drawing-chess-positions.html#tocunicode--css" name="toc4" id="toc4"&gt;Unicode + CSS&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/drawing-chess-positions.html#tocwiki-macros" name="toc5" id="toc5"&gt;Wiki Macros&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/drawing-chess-positions.html#tocpython-imaging-library" name="toc6" id="toc6"&gt;Python Imaging Library&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/drawing-chess-positions.html#tocinteracting-with-images" name="toc7" id="toc7"&gt;Interacting with Images&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/drawing-chess-positions.html#tocthe-details" name="toc8" id="toc8"&gt;The details&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/drawing-chess-positions.html#tocusing-a-font-with-pil" name="toc9" id="toc9"&gt;Using a font with PIL&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/drawing-chess-positions.html#toclatex" name="toc10" id="toc10"&gt;LaTeX&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/drawing-chess-positions.html#tocconclusions" name="toc11" id="toc11"&gt;Conclusions&lt;/a&gt;
+ &lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/drawing-chess-positions.html#toc0" name="tocdominus-connects" id="tocdominus-connects"&gt;Dominus Connects&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;In a recent &lt;a href="http://blog.plover.com/prog/perl/lines.html"&gt;article&lt;/a&gt; Mark Dominus describes how he grew frustrated with his graphical editor and wrote a script to draw connectors:
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;Here&amp;#8217;s what I did instead. I wrote a program that would read an input like this:&lt;/p&gt;
+&lt;pre&gt;
+        &amp;gt;-v-&amp;lt;
+        '-+-`
+&lt;/pre&gt;
+&lt;p&gt;and produce a jpeg file that looks like this:
+&lt;img src="http://pic.blog.plover.com/prog/perl/lines/demo1.jpg" alt="Line and box graphic"/&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;I haven&amp;#8217;t tried running the software, which, Dominus admits, isn&amp;#8217;t his most polished. What interests me is: the way he devises a mini-language for describing these connectors, then combines hand-built and standard tools to produce the required result; and how quickly he ditches the &lt;a href="http://www.gimp.org"&gt;Gimp&lt;/a&gt; and settles on this approach. Clearly he&amp;#8217;s done this sort of thing before.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/drawing-chess-positions.html#toc1" name="tocchessboards-revisited" id="tocchessboards-revisited"&gt;Chessboards Revisited&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Recently I wrote about a rather easier graphics problem, of &lt;a href="http://wordaligned.org/articles/drawing-chessboards.html"&gt;drawing chessboards&lt;/a&gt;. My real mission, though, was to promote scripted graphics. A chessboard would make a good starting point, I thought. I planned to go on to describe a more advanced drawing problem, of putting pieces on the board &amp;#8212; a problem requiring more pixel bashing and more thought about inputs.
+&lt;/p&gt;
+&lt;p&gt;This article tackles that follow-on problem. What I didn&amp;#8217;t realise &amp;#8212; but really should have guessed &amp;#8212; is that it&amp;#8217;s a problem which has been solved many times before in many different domains. You can find &lt;a href="http://www.ctan.org/tex-archive/fonts/chess/skak/"&gt;LaTeX packages&lt;/a&gt; and &lt;a href="http://emacs-chess.sourceforge.net/"&gt;emacs modes&lt;/a&gt; for it. There&amp;#8217;s even a &lt;a href="http://en.wikipedia.org/wiki/Template:Chess_diagram"&gt;MediaWiki macro&lt;/a&gt;. So if you need to draw chess positions please investigate what&amp;#8217;s &lt;a href="http://www.enpassant.dk/chess/diaeng.htm"&gt;already out there&lt;/a&gt;.
+&lt;/p&gt;
+&lt;p&gt;That said, the rest of this article follows on from its &lt;a href="http://wordaligned.org/articles/drawing-chessboards.html"&gt;predecessor&lt;/a&gt;. We&amp;#8217;ll settle on a suitable notation for describing chess positions and use this as a basis for creating ASCII, Unicode + CSS, and PNG graphics. We&amp;#8217;ll also discuss the advantages of using an interpreted, dynamic language for image processing.
+&lt;/p&gt;
+&lt;span id="continue-reading"/&gt;
+
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/drawing-chess-positions.html#toc2" name="tocprogram-input" id="tocprogram-input"&gt;Program Input&lt;/a&gt;&lt;/h3&gt;
+&lt;div class="info"&gt;Things I learned while writing this article: Forsyth-Edwards Notation (FEN) is a standard way to record a chess position.&lt;/div&gt;
+
+&lt;p&gt;Mark Dominus invented his own input notation. We needn&amp;#8217;t. The Forsyth-Edwards notation for recording a particular board position is compact, simple and standard.
+&lt;/p&gt;
+&lt;p&gt;From &lt;a href="http://en.wikipedia.org/wiki/Forsyth-Edwards_Notation"&gt;Wikipedia&lt;/a&gt;:
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;A FEN &amp;#8220;record&amp;#8221; defines a particular game position, all in one text line and using only the ASCII character set. A FEN record contains six fields. The separator between fields is a space. The fields are:
+&lt;/p&gt;
+&lt;ol&gt;
+ &lt;li&gt;
+     Piece placement (from white&amp;#8217;s perspective). Each rank is described, starting with rank 8 and ending with rank 1; within each rank, the contents of each square are described from file a through file h. Following the Standard Algebraic Notation (SAN), each piece is identified by a single letter taken from the standard English names (pawn = &amp;#8220;P&amp;#8221;, knight = &amp;#8220;N&amp;#8221;, bishop = &amp;#8220;B&amp;#8221;, rook = &amp;#8220;R&amp;#8221;, queen = &amp;#8220;Q&amp;#8221; and king = &amp;#8220;K&amp;#8221;). White pieces are designated using upper-case letters (&amp;#8220;PNBRQK&amp;#8221;) while Black take lowercase (&amp;#8220;pnbrqk&amp;#8221;). Blank squares are noted using digits 1 through 8 (the number of blank squares), and &amp;#8220;/&amp;#8221; separate ranks.
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     &amp;#8230;
+ &lt;/li&gt;
+&lt;/ol&gt;
+&lt;/blockquote&gt;&lt;p&gt;The remaining five fields store other pieces of state (whose turn it is, who can castle etc.) required for resuming a game. We&amp;#8217;ll omit them from our input.
+&lt;/p&gt;
+&lt;p&gt;So, for example, we record the start position:
+&lt;/p&gt;
+&lt;pre&gt;rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR&lt;/pre&gt;
+
+&lt;p&gt;Some moves later, the game might be at:
+&lt;/p&gt;
+&lt;pre&gt;r2q1rk1/pp2ppbp/1np2np1/2Q3B1/3PP1b1/2N2N2/PP3PPP/3RKB1R&lt;/pre&gt;
+
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/drawing-chess-positions.html#toc3" name="tocascii-chess-positions" id="tocascii-chess-positions"&gt;ASCII Chess Positions&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;The first field of the FEN record is already close to an ASCII representation of a chessboard. If we expand the digits into the spaces they represent and switch the forward slashes for newlines, then printing the resulting string gives an 8x8 text square. (By the way, I&amp;#8217;ve fixed the chessboard size at 8 rather than make it an input parameter since the FEN notation won&amp;#8217;t work for a board size of 10x10 or bigger.) It&amp;#8217;s not hard to add some ASCII dividers to tart up this simple graphic.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;def expand_blanks(fen):
+    '''Expand the digits in an FEN string into spaces
+    
+    &amp;gt;&amp;gt;&amp;gt; expand_blanks("rk4q3")
+    'rk    q   '
+    '''
+    def expand(match):
+        return ' ' * int(match.group(0))
+    return re.compile(r'\d').sub(expand, fen)
+    
+def outer_join(sep, ss):
+    '''Like string.join, but encloses the result with outer separators.
+    
+    Example:
+    &amp;gt;&amp;gt;&amp;gt; outer_join('|', ['1', '2', '3'])
+    '|1|2|3|'
+    '''
+    return '%s%s%s' % (sep, sep.join(ss), sep)
+    
+def ascii_draw_chess_position(fen):
+    '''Returns an ASCII picture of pieces on a chessboard.'''
+    pieces = expand_blanks(fen).replace('/', '')
+    divider = '+-+-+-+-+-+-+-+-+\n'
+    rows = ((outer_join('|', pieces[r: r + 8]) + '\n')
+            for r in range(0, 8 * 8, 8))
+    return outer_join(divider, rows)
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;An example:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; fen = "r2q1rk1/pp2ppbp/1np2np1/2Q3B1/3PP1b1/2N2N2/PP3PPP/3RKB1R"
+&amp;gt;&amp;gt;&amp;gt; print ascii_draw_chess_position(fen)
++-+-+-+-+-+-+-+-+
+|r| | |q| |r|k| |
++-+-+-+-+-+-+-+-+
+|p|p| | |p|p|b|p|
++-+-+-+-+-+-+-+-+
+| |n|p| | |n|p| |
++-+-+-+-+-+-+-+-+
+| | |Q| | | |B| |
++-+-+-+-+-+-+-+-+
+| | | |P|P| |b| |
++-+-+-+-+-+-+-+-+
+| | |N| | |N| | |
++-+-+-+-+-+-+-+-+
+|P|P| | | |P|P|P|
++-+-+-+-+-+-+-+-+
+| | | |R|K|B| |R|
++-+-+-+-+-+-+-+-+
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/drawing-chess-positions.html#toc4" name="tocunicode--css" id="tocunicode--css"&gt;Unicode + CSS&lt;/a&gt;&lt;/h3&gt;
+&lt;div class="info"&gt;Things I learned while writing this article: Unicode has code points for the black and white chess pieces.&lt;/div&gt;
+
+&lt;p&gt;This means we can get a rather better picture of a chess position using nothing more than text. Note that these Unicode characters solve the internationalisation problem without the need for translators. (We will need a suitable font though!)
+&lt;/p&gt;
+&lt;p&gt;Here&amp;#8217;s how we can create a dictionary which maps the FEN piece ASCII names to their HTML entity codes.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;unicode_pieces=dict(
+    zip("KQRBNPkqrbnp",
+        ("&amp;amp;#x%x;" % uc for uc in range(0x2654, 0x2660))))
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;I&amp;#8217;ve used this dictionary to create the block of text shown below. I&amp;#8217;ve tried using CSS to colour and place squares on the board &amp;#8212; sorry if it doesn&amp;#8217;t work in your browser, I&amp;#8217;m no CSS expert!
+&lt;/p&gt;
+&lt;div class="chessboard"&gt;
+&lt;pre&gt;
+&lt;span class="white_sq"&gt;&amp;#x265c;&lt;/span&gt;&lt;span class="black_sq"&gt; &lt;/span&gt;&lt;span class="white_sq"&gt; &lt;/span&gt;&lt;span class="black_sq"&gt;&amp;#x265b;&lt;/span&gt;&lt;span class="white_sq"&gt; &lt;/span&gt;&lt;span class="black_sq"&gt;&amp;#x265c;&lt;/span&gt;&lt;span class="white_sq"&gt;&amp;#x265a;&lt;/span&gt;&lt;span class="black_sq"&gt; &lt;/span&gt;&lt;br/&gt;
+&lt;span class="black_sq"&gt;&amp;#x265f;&lt;/span&gt;&lt;span class="white_sq"&gt;&amp;#x265f;&lt;/span&gt;&lt;span class="black_sq"&gt; &lt;/span&gt;&lt;span class="white_sq"&gt; &lt;/span&gt;&lt;span class="black_sq"&gt;&amp;#x265f;&lt;/span&gt;&lt;span class="white_sq"&gt;&amp;#x265f;&lt;/span&gt;&lt;span class="black_sq"&gt;&amp;#x265d;&lt;/span&gt;&lt;span class="white_sq"&gt;&amp;#x265f;&lt;/span&gt;&lt;br/&gt;
+&lt;span class="white_sq"&gt; &lt;/span&gt;&lt;span class="black_sq"&gt;&amp;#x265e;&lt;/span&gt;&lt;span class="white_sq"&gt;&amp;#x265f;&lt;/span&gt;&lt;span class="black_sq"&gt; &lt;/span&gt;&lt;span class="white_sq"&gt; &lt;/span&gt;&lt;span class="black_sq"&gt;&amp;#x265e;&lt;/span&gt;&lt;span class="white_sq"&gt;&amp;#x265f;&lt;/span&gt;&lt;span class="black_sq"&gt; &lt;/span&gt;&lt;br/&gt;
+&lt;span class="black_sq"&gt; &lt;/span&gt;&lt;span class="white_sq"&gt; &lt;/span&gt;&lt;span class="black_sq"&gt;&amp;#x2655;&lt;/span&gt;&lt;span class="white_sq"&gt; &lt;/span&gt;&lt;span class="black_sq"&gt; &lt;/span&gt;&lt;span class="white_sq"&gt; &lt;/span&gt;&lt;span class="black_sq"&gt;&amp;#x2657;&lt;/span&gt;&lt;span class="white_sq"&gt; &lt;/span&gt;&lt;br/&gt;
+&lt;span class="white_sq"&gt; &lt;/span&gt;&lt;span class="black_sq"&gt; &lt;/span&gt;&lt;span class="white_sq"&gt; &lt;/span&gt;&lt;span class="black_sq"&gt;&amp;#x2659;&lt;/span&gt;&lt;span class="white_sq"&gt;&amp;#x2659;&lt;/span&gt;&lt;span class="black_sq"&gt; &lt;/span&gt;&lt;span class="white_sq"&gt;&amp;#x265d;&lt;/span&gt;&lt;span class="black_sq"&gt; &lt;/span&gt;&lt;br/&gt;
+&lt;span class="black_sq"&gt; &lt;/span&gt;&lt;span class="white_sq"&gt; &lt;/span&gt;&lt;span class="black_sq"&gt;&amp;#x2658;&lt;/span&gt;&lt;span class="white_sq"&gt; &lt;/span&gt;&lt;span class="black_sq"&gt; &lt;/span&gt;&lt;span class="white_sq"&gt;&amp;#x2658;&lt;/span&gt;&lt;span class="black_sq"&gt; &lt;/span&gt;&lt;span class="white_sq"&gt; &lt;/span&gt;&lt;br/&gt;
+&lt;span class="white_sq"&gt;&amp;#x2659;&lt;/span&gt;&lt;span class="black_sq"&gt;&amp;#x2659;&lt;/span&gt;&lt;span class="white_sq"&gt; &lt;/span&gt;&lt;span class="black_sq"&gt; &lt;/span&gt;&lt;span class="white_sq"&gt; &lt;/span&gt;&lt;span class="black_sq"&gt;&amp;#x2659;&lt;/span&gt;&lt;span class="white_sq"&gt;&amp;#x2659;&lt;/span&gt;&lt;span class="black_sq"&gt;&amp;#x2659;&lt;/span&gt;&lt;br/&gt;
+&lt;span class="black_sq"&gt; &lt;/span&gt;&lt;span class="white_sq"&gt; &lt;/span&gt;&lt;span class="black_sq"&gt; &lt;/span&gt;&lt;span class="white_sq"&gt;&amp;#x2656;&lt;/span&gt;&lt;span class="black_sq"&gt;&amp;#x2654;&lt;/span&gt;&lt;span class="white_sq"&gt;&amp;#x2657;&lt;/span&gt;&lt;span class="black_sq"&gt; &lt;/span&gt;&lt;span class="white_sq"&gt;&amp;#x2656;&lt;/span&gt;
+&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;This image isn&amp;#8217;t ideal: the board background is visible through the pieces, which is particularly noticeable for white pieces on dark squares. I haven&amp;#8217;t figured out how to eliminate this flaw!
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/drawing-chess-positions.html#toc5" name="tocwiki-macros" id="tocwiki-macros"&gt;Wiki Macros&lt;/a&gt;&lt;/h3&gt;
+&lt;div class="info"&gt;Things I learned while writing this article: MediaWiki has a fully-featured macro for chess diagrams.&lt;/div&gt;
+
+&lt;p&gt;Here&amp;#8217;s the opening chess position as a MediaWiki macro. If this seems like too much effort to type, David A. Wheeler provides an online &lt;a href="http://www.dwheeler.com/misc/fen2wikipedia.html"&gt;FEN-to-Wikipedia conversion tool&lt;/a&gt;.
+&lt;/p&gt;
+&lt;pre&gt;{{Chess diagram|=
+| tright
+| 
+|=
+ 8 |rd|nd|bd|qd|kd|bd|nd|rd|=
+ 7 |pd|pd|pd|pd|pd|pd|pd|pd|=
+ 6 |  |  |  |  |  |  |  |  |=
+ 5 |  |  |  |  |  |  |  |  |=
+ 4 |  |  |  |  |  |  |  |  |=
+ 3 |  |  |  |  |  |  |  |  |=
+ 2 |pl|pl|pl|pl|pl|pl|pl|pl|=
+ 1 |rl|nl|bl|ql|kl|bl|nl|rl|=
+    a  b  c  d  e  f  g  h
+| 
+}}&lt;/pre&gt;
+
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/drawing-chess-positions.html#toc6" name="tocpython-imaging-library" id="tocpython-imaging-library"&gt;Python Imaging Library&lt;/a&gt;&lt;/h3&gt;
+&lt;div class="info"&gt;Things I learned while writing this article: OS X has problems distinguishing upper- and lower-case filenames.&lt;/div&gt;
+
+&lt;p&gt;The OS X filename limitation came as a nasty surprise. Most of the time I use my Mac like any other Unix box and so I naturally expected that &lt;code&gt;K.png&lt;/code&gt; and &lt;code&gt;k.png&lt;/code&gt; would co-reside happily in the same directory. They can&amp;#8217;t! Apparently it&amp;#8217;s for &lt;a href="http://www.jms1.net/osx-case-sensitive-fs.shtml"&gt;backwards compatibility&lt;/a&gt;, to keep old software alive. Yuck!
+&lt;/p&gt;
+&lt;p&gt;Anyway, to render a chess position using the &lt;a href="http://effbot.org/imagingbook/pil-index.htm"&gt;Python Imaging Library&lt;/a&gt; (PIL), we&amp;#8217;ll need some suitable pictures of the pieces. I downloaded some from Wikipedia (thanks!) It&amp;#8217;s important these images have an alpha channel. (The alpha channel assigns an opacity to each pixel, which will be used when we compose the image with another: when we put the piece on the board, that is. Without an alpha channel, we wouldn&amp;#8217;t see the squares underneath the pieces.)
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/drawing-chess-positions.html#toc7" name="tocinteracting-with-images" id="tocinteracting-with-images"&gt;Interacting with Images&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;An interpreted language comes into its own when working with an image. Here&amp;#8217;s a session in which we open a PNG (the black king) and poke around at it to find:
+&lt;/p&gt;
+&lt;ul&gt;
+ &lt;li&gt;
+     what it looks like
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     its mode and size
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     whether all pixels are grey
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     how many transparent and opaque pixels it has
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     the contents of a few pixels on the left of the image
+ &lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; import Image
+&amp;gt;&amp;gt;&amp;gt; king = Image.open('k.png')
+&amp;gt;&amp;gt;&amp;gt; king.show()
+&amp;gt;&amp;gt;&amp;gt; king.mode
+'RGBA'
+&amp;gt;&amp;gt;&amp;gt; king.size
+(45, 45)
+&amp;gt;&amp;gt;&amp;gt; pixels = king.load()
+&amp;gt;&amp;gt;&amp;gt; def is_grey(rgba):
+... 	r, g, b, a = rgba
+... 	return r == g == b
+... 
+&amp;gt;&amp;gt;&amp;gt; W, H = king.size
+&amp;gt;&amp;gt;&amp;gt; xys = [(x, y) for y in range(H) for x in range(W)]
+&amp;gt;&amp;gt;&amp;gt; all(is_grey(pixels[xy]) for xy in xys) 
+True
+&amp;gt;&amp;gt;&amp;gt; sum(1 for xy in xys if pixels[xy][3] == 0)
+1243
+&amp;gt;&amp;gt;&amp;gt; sum(1 for xy in xys if pixels[xy][3] == 255)
+612
+&amp;gt;&amp;gt;&amp;gt; print "\n".join(map(repr, (pixels[x, 20] for x in range(10))))
+(0, 0, 0, 0)
+(0, 0, 0, 0)
+(0, 0, 0, 0)
+(0, 0, 0, 0)
+(0, 0, 0, 0)
+(15, 15, 15, 170)
+(247, 247, 247, 255)
+(148, 148, 148, 255)
+(0, 0, 0, 255)
+(0, 0, 0, 255)
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;To place this piece on top of a background image we use &lt;a href="http://effbot.org/imagingbook/image.htm#tag-Image.Image.paste"&gt;Image.paste&lt;/a&gt;. Again, we can experiment interactively.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; red_sq = Image.new('RGBA', king.size, 'red')
+&amp;gt;&amp;gt;&amp;gt; help(red_sq.paste)
+Help on method paste in module Image:
+
+paste(self, im, box=None, mask=None) method of Image.Image instance
+    Paste other image into region
+
+&amp;gt;&amp;gt;&amp;gt; mask = king.split()[3]
+&amp;gt;&amp;gt;&amp;gt; red_sq.paste(king, None, mask)
+&amp;gt;&amp;gt;&amp;gt; red_sq.show()
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Note that &lt;a href="http://effbot.org/imagingbook/image.htm#tag-Image.Image.show"&gt;Image.show&lt;/a&gt; allows us to view the image using some platform dependent utility.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/drawing-chess-positions.html#toc8" name="tocthe-details" id="tocthe-details"&gt;The details&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Once we&amp;#8217;ve figured out how to put pieces on the board using &lt;a href="http://effbot.org/imagingbook/image.htm#tag-Image.Image.paste"&gt;Image.paste&lt;/a&gt;, the rest is all details. I&amp;#8217;ve decided to create a class for rendering chess positions. Creating a class instance pre-loads the piece graphics and sketches in the board background; each time we call draw, the background is copied and the pieces are pasted into place. The resulting image is returned directly to the client, who can choose what to do with it.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;#! /usr/bin/env python
+'''Code to draw chess board and pieces.
+
+FEN notation to describe the arrangement of peices on a chess board.
+
+White pieces are coded: K, Q, B, N, R, P, for king, queen, bishop,
+rook knight, pawn. Black pieces use lowercase k, q, b, n, r, p. Blank
+squares are noted with digits, and the "/" separates ranks.
+
+As an example, the game starts at:
+
+rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR
+
+See: http://en.wikipedia.org/wiki/Forsyth-Edwards_Notation
+'''
+import re
+import Image
+import ImageDraw
+
+class BadChessboard(ValueError):
+    pass
+    
+def expand_blanks(fen):
+    '''Expand the digits in an FEN string into spaces
+    
+    &amp;gt;&amp;gt;&amp;gt; expand_blanks("rk4q3")
+    'rk    q   '
+    '''
+    def expand(match):
+        return ' ' * int(match.group(0))
+    return re.compile(r'\d').sub(expand, fen)
+    
+def check_valid(expanded_fen):
+    '''Asserts an expanded FEN string is valid'''
+    match = re.compile(r'([KQBNRPkqbnrp ]{8}/){8}$').match
+    if not match(expanded_fen + '/'):
+        raise BadChessboard()
+    
+def expand_fen(fen):
+    '''Preprocesses a fen string into an internal format.
+    
+    Each square on the chessboard is represented by a single 
+    character in the output string. The rank separator characters
+    are removed. Invalid inputs raise a BadChessboard error.
+    '''
+    expanded = expand_blanks(fen)
+    check_valid(expanded)
+    return expanded.replace('/', '')
+    
+def draw_board(n=8, sq_size=(20, 20)):
+    '''Return an image of a chessboard.
+    
+    The board has n x n squares each of the supplied size.'''
+    from itertools import cycle
+    def square(i, j):
+        return i * sq_size[0], j * sq_size[1]
+    opaque_grey_background = 192, 255
+    board = Image.new('LA', square(n, n), opaque_grey_background) 
+    draw_square = ImageDraw.Draw(board).rectangle
+    whites = ((square(i, j), square(i + 1, j + 1))
+              for i_start, j in zip(cycle((0, 1)), range(n))
+              for i in range(i_start, n, 2))
+    for white_square in whites:
+        draw_square(white_square, fill='white')
+    return board
+    
+class DrawChessPosition(object):
+    '''Chess position renderer.
+    
+    Create an instance of this class, then call 
+    '''
+    def __init__(self):
+        '''Initialise, preloading pieces and creating a blank board.''' 
+        self.n = 8
+        self.create_pieces()
+        self.create_blank_board()
+    
+    def create_pieces(self):
+        '''Load the chess pieces from disk.
+        
+        Also extracts and caches the alpha masks for these pieces. 
+        '''
+        whites = 'KQBNRP'
+        piece_images = dict(
+            zip(whites, (Image.open('pieces/w%s.png' % p) for p in whites)))
+        blacks = 'kqbnrp'
+        piece_images.update(dict(
+            zip(blacks, (Image.open('pieces/%s.png' % p) for p in blacks))))
+        piece_sizes = set(piece.size for piece in piece_images.values())
+        # Sanity check: the pieces should all be the same size
+        assert len(piece_sizes) == 1
+        self.piece_w, self.piece_h = piece_sizes.pop()
+        self.piece_images = piece_images
+        self.piece_masks = dict((pc, img.split()[3]) for pc, img in
+                                 self.piece_images.iteritems())
+    
+    def create_blank_board(self):
+        '''Pre-render a blank board.'''
+        self.board = draw_board(sq_size=(self.piece_w, self.piece_h))
+    
+    def point(self, i, j):
+        '''Return the top left of the square at (i, j).'''
+        w, h = self.piece_w, self.piece_h
+        return i * h, j * w
+    
+    def square(self, i, j):
+        '''Return the square at (i, j).'''
+        t, l = self.point(i, j)
+        b, r = self.point(i + 1, j + 1)
+        return t, l, b, r
+    
+    def draw(self, fen):
+        '''Return an image depicting the input position.
+        
+        fen - the first record of a FEN chess position.
+        Clients are responsible for resizing this image and saving it,
+        if required.
+        '''
+        board = self.board.copy()
+        pieces = expand_fen(fen)
+        images, masks, n = self.piece_images, self.piece_masks, self.n
+        pts = (self.point(i, j) for j in range(n) for i in range(n))
+        def not_blank(pt_pc):
+            return pt_pc[1] != ' '
+        for pt, piece in filter(not_blank, zip(pts, pieces)):
+            board.paste(images[piece], pt, masks[piece])
+        return board
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;This code depends on PNGs for the pieces being available in the current directory, filed under the (case-sensitive!) names: &lt;code&gt;{K,Q,B,N,R,P,k,q,b,n,r,p}.png&lt;/code&gt;. It also requires all these PNGs to have the same dimensions. Here&amp;#8217;s how to use it:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; renderer = DrawChessPosition()
+&amp;gt;&amp;gt;&amp;gt; fen = "r2q1rk1/pp2ppbp/1np2np1/2Q3B1/3PP1b1/2N2N2/PP3PPP/3RKB1R"
+&amp;gt;&amp;gt;&amp;gt; board = renderer.draw(fen)
+&amp;gt;&amp;gt;&amp;gt; board.show()
+&amp;gt;&amp;gt;&amp;gt; board.save("%s.png" % fen.replace('/', '-'))
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;And here&amp;#8217;s the resulting image (with a CSS double border):
+&lt;/p&gt;
+&lt;img style="border-style:double;" src="http://wordaligned.org/images/r2q1rk1-pp2ppbp-1np2np1-2Q3B1-3PP1b1-2N2N2-PP3PPP-3RKB1R.png" alt="Chess position with FEN r2q1rk1/pp2ppbp/1np2np1/2Q3B1/3PP1b1/2N2N2/PP3PPP/3RKB1R"/&gt;
+
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/drawing-chess-positions.html#toc9" name="tocusing-a-font-with-pil" id="tocusing-a-font-with-pil"&gt;Using a font with PIL&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;There is a problem with the approach taken in the previous section. We only get a good graphic if we save the returned image at its native size: scaling it up or down results in a suboptimal picture. That&amp;#8217;s because the scaling doesn&amp;#8217;t have enough information to go on &amp;#8212; it has to work from a pixel raster when it really needs strokes or vector graphics.
+&lt;/p&gt;
+&lt;p&gt;So if we scale the linear dimensions up or down:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; fen = "r2q1rk1/pp2ppbp/1np2np1/2Q3B1/3PP1b1/2N2N2/PP3PPP/3RKB1R"
+&amp;gt;&amp;gt;&amp;gt; renderer = DrawChessPosition()
+&amp;gt;&amp;gt;&amp;gt; board = renderer.draw(fen)
+&amp;gt;&amp;gt;&amp;gt; board.size
+(360, 360)
+&amp;gt;&amp;gt;&amp;gt; small_board = board.resize((160, 160))
+&amp;gt;&amp;gt;&amp;gt; big_board = board.resize((640, 640))
+&amp;gt;&amp;gt;&amp;gt; big_4_squares = big_board.crop([80, 160, 240, 320])
+&amp;gt;&amp;gt;&amp;gt; big_4_squares.show()
+&amp;gt;&amp;gt;&amp;gt; small_board.show()
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;we&amp;#8217;ll get something like this:
+&lt;/p&gt;
+&lt;p&gt;&lt;img src="http://wordaligned.org/images/chess-pos-small.png" alt="Small chess board"/&gt;
+   &lt;img src="http://wordaligned.org/images/chess-pos-big4.png" alt="Section of large chess board"/&gt;
+&lt;/p&gt;
+&lt;p&gt;The way to avoid the aliasing problems is to work directly from a stroke representation of the chess pieces; for example, by using a &lt;a href="http://mip.noekeon.org/HTMLTTChess/install.html"&gt;suitable font&lt;/a&gt;. Once again, PIL can do the job (though you&amp;#8217;ll need to have installed PIL with FreeType support). I found a freely available unicode true type &lt;a href="http://mip.noekeon.org/HTMLTTChess/install.html"&gt;font&lt;/a&gt; and plugged it into the following code:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;unichr_pieces=dict(
+    zip("KQRBNPkqrbnp",
+        (unichr(uc) for uc in range(0x2654, 0x2660))))
+    
+def chess_position_using_font(fen, font_file, sq_size):
+    '''Return a chess position image.
+    
+    font_file - the name of a font file
+    sq_size - the size of each square on the chess board
+    '''
+    font = ImageFont.truetype(font_file, sq_size)
+    pieces = expand_fen(fen)
+    board = draw_board(sq_size=(sq_size, sq_size))
+    put_piece = ImageDraw.Draw(board).text
+    def point(i, j):
+        return i * sq_size, j * sq_size
+    def not_blank(pt_pce):
+        return pt_pce[1] != ' '
+    pts = (point(i, j) for j in range(8) for i in range(8))
+    for pt, piece in filter(not_blank, zip(pts, pieces)):
+        put_piece(pt, unichr_pieces[piece], fill='black', font=font)
+    return board
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;If we use this code to create small and large chess pictures, much as before, we&amp;#8217;ll see something like this:
+&lt;/p&gt;
+&lt;p&gt;&lt;img src="http://wordaligned.org/images/chess-pos-small-font.png" alt="Small chess board"/&gt;
+   &lt;img src="http://wordaligned.org/images/chess-pos-big4-font.png" alt="Section of large chess board"/&gt;
+&lt;/p&gt;
+&lt;p&gt;As with our CSS + Unicode picture, this image isn&amp;#8217;t ideal since the board shows through the interiors of the pieces. And once again, I haven&amp;#8217;t figured out how to work around this problem.
+&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Update, 2008-03-31.&lt;/strong&gt; A reader has worked out a &lt;a href="http://www.haloscan.com/comments/wordaligned/drawing_chess_positions/#14496"&gt;cunning solution&lt;/a&gt;:
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;You can make white pieces by drawing a &amp;#8220;black&amp;#8221; piece in white, then overlaying that with a &amp;#8220;white&amp;#8221; piece in black.
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;I&amp;#8217;ve given this idea a try and &lt;a href="http://wordaligned.org/articles/white-black-knight.html"&gt;written up the results&lt;/a&gt;. Here&amp;#8217;s the knight at square c3 &amp;#8212; a definite  improvement!
+&lt;/p&gt;
+&lt;img src="http://wordaligned.org/images/white-knight-on-black-square.png" alt="White knight on a black square"/&gt;
+
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/drawing-chess-positions.html#toc10" name="toclatex" id="toclatex"&gt;LaTeX&lt;/a&gt;&lt;/h3&gt;
+&lt;div class="info"&gt;Things I learned while writing this article: the &lt;a href="http://www.ctan.org/tex-archive/fonts/chess/skak/"&gt;skak package&lt;/a&gt; does chess with LaTeX.&lt;/div&gt;
+
+&lt;p&gt;My thanks Ivan Uemlianin for pointing out that I&amp;#8217;d neglected to mention LaTeX as a suitable chess position type-setter, as &lt;a href="http://www.llaisdy.com/blog/2008/04/19/drawing-chess-positions/"&gt;shown in his blog&lt;/a&gt;. LaTeX has been high on my list of things I really ought to learn about for well over a decade, and I simply wasn&amp;#8217;t aware it could do this.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/drawing-chess-positions.html#toc11" name="tocconclusions" id="tocconclusions"&gt;Conclusions&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;This article has shown, again, the merits of scripting graphics. We&amp;#8217;ve also seen that &lt;span /&gt;an interpreted language has much to offer in this area, allowing us to query and shape images dynamically, effectively bridging the gap between our program and a GUI driven graphics package.
+&lt;/p&gt;
+&lt;p&gt;The &lt;a href="http://effbot.org/imagingbook/pil-index.htm"&gt;Python Imaging Library&lt;/a&gt; has shown itself capable of working with shapes, colours, text and fonts. It&amp;#8217;s a great tool.
+&lt;/p&gt;
+&lt;p&gt;We&amp;#8217;ve not done so well at our motivating task, of drawing a chess position. As I said at the outset, if that&amp;#8217;s why you&amp;#8217;re here I&amp;#8217;d suggest taking another look at the alternatives.
+&lt;/p&gt;
+&lt;p&gt;The subtext of this article is platform-dependence. I don&amp;#8217;t know if the Unicode + CSS combination works in your browser or feed-reader, or indeed any other user agent; it depends on font contents and CSS rendering. 
+&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://www.libpng.org/pub/png/"&gt;&lt;img style="float:right;" src="http://www.libpng.org/pub/png/img_png/pngnow.png" alt="[PNG now!]"/&gt;&lt;/a&gt;
+&lt;/p&gt;
+&lt;p&gt;The &amp;#8220;P&amp;#8221; in PNG stands for &amp;#8220;Portable&amp;#8221;, and I would hope you can see the IMGs, which all source from PNGs &amp;#8212; all except the off-site JPEG, another well supported format.
+&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://www.freetype.org/index2.html"&gt;&lt;img style="float:right;" src="http://upload.wikimedia.org/wikipedia/en/thumb/3/3a/Freetype.png/160px-Freetype.png" alt="[FreeType now!]"/&gt;&lt;/a&gt;
+&lt;/p&gt;
+&lt;p&gt;&lt;span /&gt;One reason I like Python and writing about Python is its platform independence. Linux, Windows, OS X etc. &amp;mdash; we can all run the same code. For this particular application, that&amp;#8217;s less true. For a start, you&amp;#8217;ll need to install the non-standard &lt;a href="http://effbot.org/imagingbook/pil-index.htm"&gt;PIL&lt;/a&gt; module. Then there&amp;#8217;s the filename case-insensitivity (which is easy to work around, but nonetheless an embarrassment). The capabilities of PIL itself depend on the presence of other thirdparty libraries: to get you going with this article you&amp;#8217;ll need &lt;a href="http://www.libpng.org/pub/png/"&gt;libpng&lt;/a&gt;, which in turn depends on &lt;a href="http://www.zlib.net/"&gt;zlib&lt;/a&gt;, and &lt;a href="http://www.freetype.org/index2.html"&gt;FreeType&lt;/a&gt;, which again depends on zlib. On my Linux machine &lt;a href="http://effbot.org/imagingbook/image.htm#tag-Image.Image.show"&gt;Image.show&lt;/a&gt; didn&amp;#8217;t work until I&amp;#8217;d installed &lt;a href="http://www.trilon.com/xv/"&gt;xv&lt;/a&gt; from source, and that source needed some tweaking before it would build. So the code in this article is only portable once you&amp;#8217;ve suitably prepared your platform &amp;#8212; that is, the code isn&amp;#8217;t really portable!
+&lt;/p&gt;</description>
+<dc:date>2008-03-30</dc:date>
+<guid>http://wordaligned.org/articles/drawing-chess-positions.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/drawing-chess-positions.html</link>
+<category>PIL</category>
+</item>
+
+<item>
+<title>Drawing Chessboards</title>
+<description>&lt;div class="toc"&gt;
+&lt;h2&gt;Contents&lt;/h2&gt;
+&lt;ul&gt;
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/drawing-chessboards.html#tocthe-python-imaging-library" name="toc0" id="toc0"&gt;The Python Imaging Library&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/drawing-chessboards.html#tocimagemagick" name="toc1" id="toc1"&gt;ImageMagick&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/drawing-chessboards.html#tocgoogle-chart-api" name="toc2" id="toc2"&gt;Google Chart API&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/drawing-chessboards.html#tocascii-text" name="toc3" id="toc3"&gt;ASCII Text&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/drawing-chessboards.html#tocunicode-block-elements" name="toc4" id="toc4"&gt;Unicode Block Elements&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/drawing-chessboards.html#tocand-more" name="toc5" id="toc5"&gt;And more&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/drawing-chessboards.html#tocwhy" name="toc6" id="toc6"&gt;Why?&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/drawing-chessboards.html#tocteaser" name="toc7" id="toc7"&gt;Teaser&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/drawing-chessboards.html#tocthanks" name="toc8" id="toc8"&gt;Thanks&lt;/a&gt;
+ &lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;&lt;p&gt;I wanted a picture of a chessboard. Rather than boot up some drawing software and cut and paste black and white squares I decided to write a program to create the picture.
+&lt;/p&gt;
+&lt;p&gt;If you&amp;#8217;d like to know &lt;strong&gt;why&lt;/strong&gt; anyone would ever create work for themselves in this way, skip to the end of this article, where you&amp;#8217;ll find justification and a more challenging &lt;a href="http://wordaligned.org/articles/drawing-chessboards.html#why"&gt;follow-on problem&lt;/a&gt;. Otherwise, please read on from top to bottom in the usual way.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/drawing-chessboards.html#toc0" name="tocthe-python-imaging-library" id="tocthe-python-imaging-library"&gt;The Python Imaging Library&lt;/a&gt;&lt;/h3&gt;
+&lt;img style="border-style:double;" src="http://wordaligned.org/images/chessboard-pil.png" alt="Chessboard created by PIL"/&gt;
+
+&lt;p&gt;Fredrik Lundh&amp;#8217;s &lt;a href="http://effbot.org/imagingbook/pil-index.htm"&gt;Python Imaging Library&lt;/a&gt; (commonly known as &lt;a href="http://effbot.org/imagingbook/pil-index.htm"&gt;PIL&lt;/a&gt;) must surely rank as one of the most popular Python libraries which doesn&amp;#8217;t come as standard&lt;sup&gt;&lt;a id="fn1link" href="http://wordaligned.org/articles/drawing-chessboards.html#fn1"&gt;[1]&lt;/a&gt;&lt;/sup&gt;. It&amp;#8217;s a fabulous tool which I&amp;#8217;ve used to create the graphic above (though note that the double border around this graphic and subsequent ones is applied by a CSS style property). Here&amp;#8217;s how.
+   &lt;span id="continue-reading"/&gt;
+&lt;/p&gt;
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;PIL chessboard&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;def draw_chessboard(n=8, pixel_width=200):
+    "Draw an n x n chessboard using PIL."
+    import Image, ImageDraw
+    from itertools import cycle
+    def sq_start(i):
+        "Return the x/y start coord of the square at column/row i."
+        return i * pixel_width / n
+    
+    def square(i, j):
+        "Return the square corners, suitable for use in PIL drawings" 
+        return map(sq_start, [i, j, i + 1, j + 1])
+    
+    image = Image.new("L", (pixel_width, pixel_width))
+    draw_square = ImageDraw.Draw(image).rectangle
+    squares = (square(i, j)
+               for i_start, j in zip(cycle((0, 1)), range(n))
+               for i in range(i_start, n, 2))
+    for sq in squares:
+        draw_square(sq, fill='white')
+    image.save("chessboard-pil.png")
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Note:
+&lt;/p&gt;
+&lt;ul&gt;
+ &lt;li&gt;
+     We don&amp;#8217;t draw any black squares, instead relying on the default image background being black.
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     The &amp;#8220;L&amp;#8221; image type (Luminance?) specifies a greyscale image.
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     PIL adopts the usual raster graphics convention, of the origin being in the top-left corner.
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     As we progress &lt;strong&gt;down&lt;/strong&gt; the board row by row, the first white square alternates between being the first and second square of each row. &lt;code&gt;Itertools.cycle((0, 1))&lt;/code&gt; achieves this nicely. 
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     A regular 8 x 8 chessboard will, then, have a black square at the bottom left, which is the usual convention. For odd values of n the bottom-left square would be white.
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     There may be rounding problems with this code if the supplied pixel width isn&amp;#8217;t an integral multiple of &lt;code&gt;n&lt;/code&gt;. It&amp;#8217;s probably better to guarantee the image size, rather than round down the board size.
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     It would be better to parametrise the output file name, or even return the created image to clients. For now, we&amp;#8217;ll just save to a fixed-name PNG.
+ &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/drawing-chessboards.html#toc1" name="tocimagemagick" id="tocimagemagick"&gt;ImageMagick&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;PIL is a general purpose image processing library and it takes a little head-scratching and maths before we can even create something as simple as a chessboard. &lt;a href="http://www.imagemagick.org/script/index.php"&gt;ImageMagick&lt;/a&gt; provides tools to perform a similar job from the command-line, making the chessboard a one-liner.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;ImageMagick chessboard&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;$ N=8
+$ PIXEL_WIDTH=200
+$ convert -size $((N*15))x$((N*15)) pattern:checkerboard \
+  -monochrome -resize $PIXEL_WIDTH chessboard-magick.png
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;img style="border-style:double;float:right;margin-left:4px;" src="http://wordaligned.org/images/chessboard-magick.png" alt="Chessboard created by ImageMagick"/&gt;
+
+&lt;p&gt;Here, the checkerboard pattern is an ImageMagick built-in which, inspecting its output, happens to generate 15x15 squares (hence the 15&amp;#8217;s in the script above). The &lt;code&gt;-monochrome&lt;/code&gt; filter renders the pattern in black and white, rather than its native light- on dark-grey. The &lt;code&gt;-size&lt;/code&gt; and &lt;code&gt;-resize&lt;/code&gt; parameters should need no further explanation. The ((double parentheses)) perform Bash shell arithmetic.
+&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://www.imagemagick.org/script/index.php"&gt;ImageMagick&lt;/a&gt; masquerades as a shell tool but really it&amp;#8217;s a powerful and fully featured programmer&amp;#8217;s imaging tool &amp;#8212; a bit like a command-line version of &lt;a href="http://www.gimp.org"&gt;Gimp&lt;/a&gt;&lt;a id="fn2link" href="http://wordaligned.org/articles/drawing-chessboards.html#fn2"&gt;&lt;sup&gt;[2]&lt;/sup&gt;&lt;/a&gt;. Although well documented, my gut reaction is that it pushes the command-line interface too far. For more advanced image mangling, you&amp;#8217;ll probably need a program to generate the one-liner needed to drive &lt;code&gt;convert&lt;/code&gt;. Despite this reservation, it does the simple things simply, and it can do complex things too. Recommended!
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/drawing-chessboards.html#toc2" name="tocgoogle-chart-api" id="tocgoogle-chart-api"&gt;Google Chart API&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;For a bit of fun, we can persuade Google to render the chessboard for us &amp;#8212; in this case as a scatter plot using a square black markers&lt;a id="fn3link" href="http://wordaligned.org/articles/drawing-chessboards.html#fn3"&gt;&lt;sup&gt;[3]&lt;/sup&gt;&lt;/a&gt;. We flip the PIL processing around, drawing black squares on the (default) white background, and using the usual plotting convention which places the origin at the bottom left.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;Google chart chessboard&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;def chessboard_url(n=8, pixel_width=200):
+    "Returns the URL of a chessboard graphic."
+    def sq_midpt(i):
+        "Return the x/y midpt of a square in column/row i."
+        # For text encoding, the graphic's logical width is 100
+        return (0.5 + i) * 100. / n
+    
+    xys = [(sq_midpt(i), sq_midpt(j))
+           for i_start, j in zip(cycle((0, 1)), range(n))
+           for i in range(i_start, n, 2)]
+    fields = dict(width=pixel_width, sqside=pixel_width/n,
+                  xs=",".join("%.02f" % x for x, _ in xys),
+                  ys=",".join("%.02f" % y for _, y in xys))
+    return (
+        "http://chart.apis.google.com/chart?"
+        "cht=s&amp;amp;"                        # Draw a scatter graph
+        "chd=t:%(xs)s|%(ys)s&amp;amp;"          # using text encoding and
+        "chm=s,000000,1,2.0,%(sqside)r&amp;amp;"# square black markers
+        "chs=%(width)rx%(width)r"       # at this size.
+        ) % fields
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Note that we plot our chart on a logical 100 x 100 rectangle, the coordinate space mandated by the encoding we&amp;#8217;ve chosen, then resize it to the physical dimensions supplied by the client.
+&lt;/p&gt;
+&lt;p&gt;This function actually returns the URL of a PNG which the &lt;a href="http://code.google.com/apis/chart/"&gt;Google chart API&lt;/a&gt; serves up. Paste this URL into your browser address bar to see the graphic, or curl it to a local file.
+&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://chart.apis.google.com/chart?cht=s&amp;amp;chd=t:6.25,31.25,56.25,81.25,18.75,43.75,68.75,93.75,6.25,31.25,56.25,81.25,18.75,43.75,68.75,93.75,6.25,31.25,56.25,81.25,18.75,43.75,68.75,93.75,6.25,31.25,56.25,81.25,18.75,43.75,68.75,93.75|6.25,6.25,6.25,6.25,18.75,18.75,18.75,18.75,31.25,31.25,31.25,31.25,43.75,43.75,43.75,43.75,56.25,56.25,56.25,56.25,68.75,68.75,68.75,68.75,81.25,81.25,81.25,81.25,93.75,93.75,93.75,93.75&amp;amp;chm=s,000000,1,2.0,25.0&amp;amp;chs=200x200"&gt;http://chart.apis.google.com/chart?cht=s&amp;amp;chd=t:6.25,31.25&amp;#8230;&amp;amp;chs=200x200&lt;/a&gt;
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;$ url=`python chessboard_url.py`
+$ curl $url &amp;gt; chessboard.png
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;We could embed the image into HTML using the IMG element, which is how I&amp;#8217;ve embedded the image which you should see below.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; from cgi import escape
+&amp;gt;&amp;gt;&amp;gt; img = '&amp;lt;img src="%s" alt="chessboard graphic"/&amp;gt;'
+&amp;gt;&amp;gt;&amp;gt; img % escape(chessboard_url())
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;img src="http://chart.apis.google.com/chart?cht=s&amp;amp;chd=t:6.25,31.25,56.25,81.25,18.75,43.75,68.75,93.75,6.25,31.25,56.25,81.25,18.75,43.75,68.75,93.75,6.25,31.25,56.25,81.25,18.75,43.75,68.75,93.75,6.25,31.25,56.25,81.25,18.75,43.75,68.75,93.75|6.25,6.25,6.25,6.25,18.75,18.75,18.75,18.75,31.25,31.25,31.25,31.25,43.75,43.75,43.75,43.75,56.25,56.25,56.25,56.25,68.75,68.75,68.75,68.75,81.25,81.25,81.25,81.25,93.75,93.75,93.75,93.75&amp;amp;chm=s,000000,1,2.0,25.0&amp;amp;chs=200x200" alt="Chessboard chart" style="float:right;border-style:double;margin-left:4px;"/&gt;
+
+&lt;p&gt;As you can see, we have plenty of options, but unfortunately the image itself isn&amp;#8217;t suitable. You can&amp;#8217;t get rid of the axes &amp;#8212; or at least, I haven&amp;#8217;t found a way to &amp;#8212; and the rendered chart has some padding to the top and the right. And worse, we&amp;#8217;re pretty much at the end of the line for this hack: if we wanted to do something more interesting, such as place pieces on the board, we&amp;#8217;re out of luck. 
+&lt;/p&gt;
+&lt;p&gt;Of course this isn&amp;#8217;t a flaw in the &lt;a href="http://code.google.com/apis/chart/"&gt;Google Chart API&lt;/a&gt;: we&amp;#8217;ve actually asked it to draw a scatter plot of the centres of black squares on a chessboard, using square black markers, a job it&amp;#8217;s done well enough. Some examples showing the proper use of Google charts can be found in an &lt;a href="http://wordaligned.org/articles/the-maximum-subsequence-problem.html"&gt;article I wrote about maximum sum subsequences&lt;/a&gt;.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/drawing-chessboards.html#toc3" name="tocascii-text" id="tocascii-text"&gt;ASCII Text&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;The chart URL might be considered a text encoding of the image; the actual graphic is returned by a server. There are other, more direct, textual representations.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;ASCII art chessboard&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;def outer_join(sep, ss):
+    """Like string.join, but encloses the result with outer separators.
+    
+    Example:
+    &amp;gt;&amp;gt;&amp;gt; outer_join('|', ['1', '2', '3'])
+    '|1|2|3|'
+    """
+    return "%s%s%s" % (sep, sep.join(ss), sep)
+    
+def ascii_chessboard(n=8):
+    """Draws an ASCII art chessboard.
+    
+    Returns a string representation of an n x n board.
+    """
+    from itertools import islice, cycle
+    divider = outer_join("+", "-" * n) + "\n"
+    row0 = outer_join("|", islice(cycle(" B"), n)) + "\n"
+    row1 = outer_join("|", islice(cycle("B "), n)) + "\n"
+    return outer_join(divider, islice(cycle([row0, row1]), n))
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;I suspect this code was easier for me to write than it is for you to read! It treats the chessboard as a sequence of alternating rows of alternating squares, which are then joined together for output.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; print ascii_chessboard(8)
++-+-+-+-+-+-+-+-+
+| |B| |B| |B| |B|
++-+-+-+-+-+-+-+-+
+|B| |B| |B| |B| |
++-+-+-+-+-+-+-+-+
+| |B| |B| |B| |B|
++-+-+-+-+-+-+-+-+
+|B| |B| |B| |B| |
++-+-+-+-+-+-+-+-+
+| |B| |B| |B| |B|
++-+-+-+-+-+-+-+-+
+|B| |B| |B| |B| |
++-+-+-+-+-+-+-+-+
+| |B| |B| |B| |B|
++-+-+-+-+-+-+-+-+
+|B| |B| |B| |B| |
++-+-+-+-+-+-+-+-+
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Not pretty, but such graphics may be useful in source code, which is typically viewed in a plain-text editor, and where ASCII art provides a way of embedding pictures right where they&amp;#8217;re needed. 
+&lt;/p&gt;
+&lt;p&gt;On which point: if you&amp;#8217;re working through &amp;#8220;Structure and Interpretation of Computer Programs&amp;#8221; you may like to know the book is &lt;a href="http://www.neilvandyke.org/sicp-texi/"&gt;available in Texinfo format&lt;/a&gt;, with the pictures all rendered in ASCII art. So you can split your editor window and run the code on one side, while browsing the book on the other. Here&amp;#8217;s one of the figures:
+&lt;/p&gt;
+&lt;pre&gt;
+*Figure 4.6:* The `or' combination of two queries is produced by
+operating on the stream of frames in parallel and merging the
+results.
+    
+            +---------------------------+
+            |          (or A B)         |
+            |    +---+                  |
+ input      | +-&amp;gt;| A |------------+     |  output
+ stream of  | |  +---+            V     |  stream of
+ frames     | |    ^          +-------+ |  frames
+ -------------*    |          | merge +---------------&amp;gt;
+            | |    |          +-------+ |
+            | |    |              ^     |
+            | |    |   +---+      |     |
+            | +-------&amp;gt;| B +------+     |
+            |      |   +---+            |
+            |      |     ^              |
+            |      |     |              |
+            |      +--*--+              |
+            +---------|-----------------+
+                      |
+                  data base
+&lt;/pre&gt;
+
+&lt;p&gt;Even though I own a copy of the book and the &lt;a href="http://mitpress.mit.edu/sicp/full-text/book/book.html"&gt;full text is available on-line&lt;/a&gt;, this primitive info version has become my preferred format when actually running the code examples and exercises.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/drawing-chessboards.html#toc4" name="tocunicode-block-elements" id="tocunicode-block-elements"&gt;Unicode Block Elements&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Most programming languages may be &lt;a href="http://wordaligned.org/articles/a-yen-for-more-symbols.html"&gt;stuck in ASCII&lt;/a&gt;, but we needn&amp;#8217;t restict ourselves in this way. I found some block elements in the &lt;a href="http://www.unicode.org/charts/symbols.html"&gt;Geometrical Symbols&lt;/a&gt; section of the Unicode code charts (&lt;a href="http://www.unicode.org/charts/PDF/U2580.pdf"&gt;Unicode Block Elements (PDF)&lt;/a&gt;). Here&amp;#8217;s a pre-rendered block of text composed of the light and dark shade block characters, U+2591 LIGHT SHADE and U+2593 DARK SHADE.
+&lt;/p&gt;
+&lt;pre&gt;
+&amp;#x2591;&amp;#x2593;&amp;#x2591;&amp;#x2593;&amp;#x2591;&amp;#x2593;&amp;#x2591;&amp;#x2593;
+&amp;#x2593;&amp;#x2591;&amp;#x2593;&amp;#x2591;&amp;#x2593;&amp;#x2591;&amp;#x2593;&amp;#x2591;
+&amp;#x2591;&amp;#x2593;&amp;#x2591;&amp;#x2593;&amp;#x2591;&amp;#x2593;&amp;#x2591;&amp;#x2593;
+&amp;#x2593;&amp;#x2591;&amp;#x2593;&amp;#x2591;&amp;#x2593;&amp;#x2591;&amp;#x2593;&amp;#x2591;
+&amp;#x2591;&amp;#x2593;&amp;#x2591;&amp;#x2593;&amp;#x2591;&amp;#x2593;&amp;#x2591;&amp;#x2593;
+&amp;#x2593;&amp;#x2591;&amp;#x2593;&amp;#x2591;&amp;#x2593;&amp;#x2591;&amp;#x2593;&amp;#x2591;
+&amp;#x2591;&amp;#x2593;&amp;#x2591;&amp;#x2593;&amp;#x2591;&amp;#x2593;&amp;#x2591;&amp;#x2593;
+&amp;#x2593;&amp;#x2591;&amp;#x2593;&amp;#x2591;&amp;#x2593;&amp;#x2591;&amp;#x2593;&amp;#x2591;
+&lt;/pre&gt;
+
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/drawing-chessboards.html#toc5" name="tocand-more" id="tocand-more"&gt;And more&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;I can think of plenty of other ways to draw a chessboard. My favourite &lt;a href="http://wordaligned.org/articles/drawing-software-design.htmls"&gt;drawing&lt;/a&gt; environments are the &lt;a href="http://blogoscoped.com/archive/2008-02-11-n78.html"&gt;pencil and paper&lt;/a&gt;, and the pen and whiteboard; combine the former with a scanner and the latter with a digital camera and you&amp;#8217;ve got an easy route to an electronic version of your design.
+&lt;/p&gt;
+&lt;p&gt;For an HTML document I suspect &lt;a href="http://www.w3.org/Graphics/SVG/"&gt;SVG&lt;/a&gt; would be a good choice, but I don&amp;#8217;t know enough about SVG to state this with confidence. I bet you could go a long way with &lt;a href="http://www.w3.org/Style/CSS/"&gt;CSS&lt;/a&gt; too. &lt;a href="http://en.wikipedia.org/wiki/Chessboard"&gt;Wikipedia&amp;#8217;s chess board&lt;/a&gt; is a table built on top of two small images, a light and a dark square, which I guess saves on bandwidth.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/drawing-chessboards.html#toc6" name="tocwhy" id="tocwhy"&gt;Why?&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Why ever bother programming when all we want is a simple graphic?
+&lt;/p&gt;
+&lt;p&gt;Well, for one thing, there&amp;#8217;s not &lt;strong&gt;that&lt;/strong&gt; much programming. The actual work of pushing pixels around is done by &lt;a href="http://code.google.com/apis/chart/"&gt;Google&lt;/a&gt;, or &lt;a href="http://effbot.org/imagingbook/pil-index.htm"&gt;PIL&lt;/a&gt;, or &lt;a href="http://www.imagemagick.org/script/index.php"&gt;ImageMagick&lt;/a&gt;.
+&lt;/p&gt;
+&lt;p&gt;Once we&amp;#8217;ve got a program written, it should be easy to adapt it. We&amp;#8217;ve already put in hooks to specify the number of squares and the image dimensions. It&amp;#8217;s equally easy to, for example, write out a JPEG rather than a PNG, or use different colours.
+&lt;/p&gt;
+&lt;p&gt;A programmatic solution is dynamic. Google&amp;#8217;s chart API generates pictures on the fly, based on data points, ranges etc. which clients choose as and when. It&amp;#8217;s rather  like lazy-evaluation: pre-rendering all possibilities isn&amp;#8217;t just expensive, it&amp;#8217;s out of the question.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/drawing-chessboards.html#toc7" name="tocteaser" id="tocteaser"&gt;Teaser&lt;/a&gt;&lt;/h3&gt;
+&lt;img src="http://tbn0.google.com/images?q=tbn:AmRSkxMo-1W5iM:http://web.usna.navy.mil/~wdj/images_chess/chess011.gif" alt="Lurid chessboard" style="float:right;margin-left:4px;"/&gt;
+
+&lt;p&gt;That&amp;#8217;s quite enough pixels and characters for now, so this article will have to appear in two parts. If I&amp;#8217;ve still not convinced you of the merits of creating images programmatically, please consider the following puzzle.
+&lt;/p&gt;
+&lt;p&gt;&lt;span /&gt;How would you draw a position reached in a game of chess, showing both the board and the pieces?
+&lt;/p&gt;
+&lt;p&gt;And if I &lt;strong&gt;have&lt;/strong&gt; convinced you, this exercise makes for a good workout.
+&lt;/p&gt;
+&lt;p&gt;Some Q&amp;amp;A&amp;#8217;s.
+&lt;/p&gt;
+&lt;ul&gt;
+ &lt;li&gt;
+     &lt;strong&gt;Q&lt;/strong&gt;: What position, exactly?
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     &lt;strong&gt;A&lt;/strong&gt;: Any!
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     &lt;strong&gt;Q&lt;/strong&gt;: How will the position be described?
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     &lt;strong&gt;A&lt;/strong&gt;: Your choice &amp;#8212; it&amp;#8217;s an interesting part of the puzzle.
+ &lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;A great starting point would be to solve the puzzle using an ASCII art representation.
+&lt;/p&gt;
+&lt;p&gt;You can find my solution in &lt;a href="http://wordaligned.org/articles/drawing-chess-positions.html"&gt;this follow-up article&lt;/a&gt;.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/drawing-chessboards.html#toc8" name="tocthanks" id="tocthanks"&gt;Thanks&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Thanks to &lt;a href="http://gedmin.as"&gt;Marius Gedminas&lt;/a&gt; and Johannes Hoff for their help bug-fixing this article.
+&lt;/p&gt;
+&lt;hr /&gt;
+
+&lt;p&gt;&lt;a id="fn1" href="http://wordaligned.org/articles/drawing-chessboards.html#fn1link"&gt;[1]&lt;/a&gt;
+   I&amp;#8217;m confused about where exactly PIL belongs; the official homepage seems to be on the PythonWare website (&lt;a href="http://www.pythonware.com/library/pil/handbook/"&gt;http://www.pythonware.com/library/pil/handbook/&lt;/a&gt;), but I usually head for the Effbot site, &lt;a href="http://effbot.org/imagingbook/"&gt;http://effbot.org/imagingbook/&lt;/a&gt;. I think the sites mirror the same information, so it boils down to whether you prefer a blue or green theme, and how off-putting you find all the ads-by-google.
+&lt;/p&gt;
+&lt;p&gt;&lt;a id="fn2" href="http://wordaligned.org/articles/drawing-chessboards.html#fn2link"&gt;[2]&lt;/a&gt;
+   Actually, you can use &lt;a href="http://www.gimp.org/tutorials/Basic_Batch/"&gt;Gimp from the command-line&lt;/a&gt;, and it comes with some tools for creating and editing batch files, and indeed for creating a personal suite of image processing scripts. I&amp;#8217;ve never used &lt;a href="http://www.gimp.org"&gt;Gimp&lt;/a&gt; in this way, so I can&amp;#8217;t say much more about this.
+&lt;/p&gt;
+&lt;p&gt;&lt;a id="fn3" href="http://wordaligned.org/articles/drawing-chessboards.html#fn3link"&gt;[3]&lt;/a&gt;
+   In theory you could use the Google Chart API to render any image in a pointillist manner: just plot enough pixels in the right places.
+&lt;/p&gt;</description>
+<dc:date>2008-03-18</dc:date>
+<guid>http://wordaligned.org/articles/drawing-chessboards.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/drawing-chessboards.html</link>
+<category>PIL</category>
+</item>
+
+<item>
+<title>Animated pair streams</title>
+<description>&lt;div class="toc"&gt;
+&lt;h2&gt;Contents&lt;/h2&gt;
+&lt;ul&gt;
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/animated-pair-streams.html#tocname-that-series" name="toc0" id="toc0"&gt;Name that Series&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/animated-pair-streams.html#tocbounded-pairs" name="toc1" id="toc1"&gt;Bounded Pairs&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/animated-pair-streams.html#tocstreams-of-pairs" name="toc2" id="toc2"&gt;Streams of Pairs&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/animated-pair-streams.html#toca-recursive-scheme" name="toc3" id="toc3"&gt;A Recursive Scheme&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/animated-pair-streams.html#tocinterleaving" name="toc4" id="toc4"&gt;Interleaving&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/animated-pair-streams.html#tocdouble-trouble" name="toc5" id="toc5"&gt;Double Trouble&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/animated-pair-streams.html#tocmemory-use" name="toc6" id="toc6"&gt;Memory Use&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/animated-pair-streams.html#tocproblem-solved" name="toc7" id="toc7"&gt;Problem Solved?&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/animated-pair-streams.html#toctying-up" name="toc8" id="toc8"&gt;Tying up&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/animated-pair-streams.html#toccredits" name="toc9" id="toc9"&gt;Credits&lt;/a&gt;
+ &lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/animated-pair-streams.html#toc0" name="tocname-that-series" id="tocname-that-series"&gt;Name that Series&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;What&amp;#8217;s going on in the animation below?
+&lt;/p&gt;
+&lt;img src="http://wordaligned.org/files/animated-pair-stream.gif" alt="Pair stream slideshow"/&gt;
+
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/animated-pair-streams.html#toc1" name="tocbounded-pairs" id="tocbounded-pairs"&gt;Bounded Pairs&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;While you&amp;#8217;re waiting for the graphic to load, recall a problem we encountered while hunting for &lt;a href="http://wordaligned.org/articles/the-maximum-subsequence-problem.html#programming-pearl"&gt;maximum subsequences&lt;/a&gt;:
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;Given a number n, generate all the pairs (i, j) such that i and j are in the range 0 to n and j is greater than i.
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;A Python solution reads:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;def generate_pairs(n):
+    "Generate all pairs (i, j) such that 0 &amp;lt;= i &amp;lt;= j &amp;lt; n"
+    for i in range(n):
+        for j in range(i, n):
+            yield i, j
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;We can extend this to solve a more general version of the problem:
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;Given two sequences (S, T), generate all pairs (S&lt;sub&gt;i&lt;/sub&gt;, T&lt;sub&gt;j&lt;/sub&gt;) such that j is greater than i.
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;def generate_pairs(s, t):
+    "Generate all pairs s[i], t[j]  such that 0 &amp;lt;= i &amp;lt;= j"
+    s_count = len(s)
+    t_count = len(t)
+    for i in xrange(s_count):
+        for j in xrange(i, t_count):
+            yield s[i], t[j]
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Note:
+&lt;/p&gt;
+&lt;ol&gt;
+ &lt;li&gt;&lt;p&gt;This function requires complete and bounded collections as inputs since it asks for their lengths and accesses elements by index &amp;#8212; think &amp;#8220;lists&amp;#8221; or &amp;#8220;tuples&amp;#8221;. Yet it generates results lazily, giving clients control over just how many pairs they require. This is why I&amp;#8217;ve chosen &lt;code&gt;xrange&lt;/code&gt; in preference to &lt;code&gt;range&lt;/code&gt;, since it too generates numbers, rather than returning a complete list. (Python 3000 simplifies things: &lt;code&gt;range&lt;/code&gt; becomes &lt;code&gt;xrange&lt;/code&gt; and &lt;code&gt;xrange&lt;/code&gt; disappears.)
+&lt;/p&gt;
+
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;p&gt;There&amp;#8217;s no need for extra logic to handle &lt;code&gt;S&lt;/code&gt; being shorter than &lt;code&gt;T&lt;/code&gt; or vice-versa: &lt;code&gt;xrange(start, stop)&lt;/code&gt; is smart enough to handle the case when &lt;code&gt;stop&lt;/code&gt; is less than &lt;code&gt;start&lt;/code&gt;. I&amp;#8217;d say adding such extra logic would count as premature optimisation.
+&lt;/p&gt;
+
+ &lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Here&amp;#8217;s an example of this function in action. We run the generator to exhaustion collecting its output in a list.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; pairs = list(generate_pairs('ABC', (1, 2, 3, 4)))
+&amp;gt;&amp;gt;&amp;gt; print pairs
+[('A', 1), ('A', 2), ('A', 3), ('A', 4), ('B', 2), ('B', 3), ('B', 4), ('C', 3), ('C', 4)]
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;A second example builds a &lt;a href="http://docs.python.org/ref/genexpr.html"&gt;generator expression&lt;/a&gt; from &lt;code&gt;generate_pairs()&lt;/code&gt;. We plug this expression into the built in &lt;code&gt;any&lt;/code&gt; function to determine whether the pair &lt;code&gt;('A', 2)&lt;/code&gt; is in the pair sequence. Note that &lt;code&gt;any&lt;/code&gt; only pulls two elements from the sequence to produce an answer.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; any((p == 'A', 2) for p in generate_pairs('ABC', (1, 2, 3, 4)))
+True
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;So far, so what? For the toy examples shown, lazy evaluation isn&amp;#8217;t an important consideration. But what if our input sequences were very large? What if they were infinite?
+&lt;/p&gt;
+&lt;span id="continue-reading"/&gt;
+
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/animated-pair-streams.html#toc2" name="tocstreams-of-pairs" id="tocstreams-of-pairs"&gt;Streams of Pairs&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;&lt;code&gt;Generate_pairs()&lt;/code&gt; yields results row by row. Here&amp;#8217;s a slideshow for the case when &lt;code&gt;S&lt;/code&gt; and &lt;code&gt;T&lt;/code&gt; have 5 and 20 elements respectively. Brightness indicates age, so the white circle represents the current head of the generated sequence, and the greying circles represent previous elements &amp;#8212; the older the greyer. Remember, it&amp;#8217;s up to clients just how many grey pairs to hold: the generator only ever yields a shiny white new pair.
+&lt;/p&gt;
+&lt;img src="http://wordaligned.org/files/animated-pair-list.gif" alt="Pair list slideshow"/&gt;
+
+&lt;p&gt;A text representation would be as follows, where, as usual, we read top to bottom, left to right.
+&lt;/p&gt;
+&lt;pre&gt;
+S&lt;sub&gt;0&lt;/sub&gt;T&lt;sub&gt;0&lt;/sub&gt;, S&lt;sub&gt;0&lt;/sub&gt;T&lt;sub&gt;1&lt;/sub&gt;, S&lt;sub&gt;0&lt;/sub&gt;T&lt;sub&gt;2&lt;/sub&gt; ...                             S&lt;sub&gt;0&lt;/sub&gt;T&lt;sub&gt;20&lt;/sub&gt;
+      S&lt;sub&gt;1&lt;/sub&gt;T&lt;sub&gt;1&lt;/sub&gt;, S&lt;sub&gt;1&lt;/sub&gt;T&lt;sub&gt;2&lt;/sub&gt;, ...                            S&lt;sub&gt;1&lt;/sub&gt;T&lt;sub&gt;20&lt;/sub&gt;
+            S&lt;sub&gt;2&lt;/sub&gt;T&lt;sub&gt;2&lt;/sub&gt;, ...                           S&lt;sub&gt;2&lt;/sub&gt;T&lt;sub&gt;20&lt;/sub&gt;
+                  ...
+&lt;/pre&gt;
+
+&lt;p&gt;It&amp;#8217;s clear this mode of traversal isn&amp;#8217;t suitable for generating pairs from very large inputs: we don&amp;#8217;t advance through S quickly enough. In fact, if T were infinite, we&amp;#8217;d be stuck on the top row, forever generating pairs of the form &lt;code&gt;S&lt;sub&gt;0&lt;/sub&gt;T&lt;sub&gt;i&lt;/sub&gt;&lt;/code&gt;.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/animated-pair-streams.html#toc3" name="toca-recursive-scheme" id="toca-recursive-scheme"&gt;A Recursive Scheme&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;&lt;a href="http://mitpress.mit.edu/sicp/full-text/book/book.html"&gt;&amp;#8220;Structure and Interpretation of Computer Programs&amp;#8221;&lt;/a&gt; describes an elegant recursive scheme for &lt;a href="http://mitpress.mit.edu/sicp/full-text/book/book-Z-H-24.html#%_sec_Temp_476"&gt;generating pairs&lt;/a&gt;:
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;Call the general stream of pairs (pairs S T), and consider it to be composed of three parts: the pair (S&lt;sub&gt;0&lt;/sub&gt;,T&lt;sub&gt;0&lt;/sub&gt;), the rest of the pairs in the first row, and the remaining pairs:&lt;br/&gt;&lt;br/&gt;
+   &lt;img src="http://mitpress.mit.edu/sicp/full-text/book/ch3-Z-G-47.gif" alt="Stream of pairs structure"/&gt;
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;Based on this insight, we can generate our stream of pairs:
+&lt;/p&gt;
+&lt;ol&gt;
+ &lt;li&gt;
+     yielding the pair, (S&lt;sub&gt;0&lt;/sub&gt;,T&lt;sub&gt;0&lt;/sub&gt;)
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     yield pairs from the first row combined with the stream of remaining pairs
+ &lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Note the recursion: the definition of the pairs stream refers to itself. That&amp;#8217;s not a problem so long as we&amp;#8217;re lazy about evaluating the tail of the stream. Since we always know how to pull the first pair from the stream, we can both bootstrap the process and keep going forever.
+&lt;/p&gt;
+&lt;p&gt;All we now need is a suitable method of combining two the first row and the remaining pairs.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/animated-pair-streams.html#toc4" name="tocinterleaving" id="tocinterleaving"&gt;Interleaving&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;The simplest way to combine the two streams is just to interleave them, pulling elements from each in turn. A simple (too simple!) implementation of &lt;code&gt;interleave()&lt;/code&gt; reads:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;Simple interleave&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;def interleave(s, t):
+    while True:
+        yield s.next()
+        yield t.next()
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;(The problem here is that &lt;code&gt;interleave()&lt;/code&gt; stops as soon as either of the the input streams is exhausted, which isn&amp;#8217;t an issue for infinite streams, but isn&amp;#8217;t ideal in the case when either of the inputs are bounded. You get the idea. I&amp;#8217;ll provide better implementation &lt;a href="http://wordaligned.org/articles/animated-pair-streams.html#tying-up"&gt;later&lt;/a&gt;.)
+&lt;/p&gt;
+&lt;p&gt;We can now code our pairs generator:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;Pairs generator&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;import itertools
+
+def pairs(s, t):
+    """ Generate a stream of pairs taken from s, t.
+    
+    Yields a stream of pairs (si, tj) where i &amp;lt;= j.
+    The input streams may be finite or bounded, but must be iterable.
+    """
+    first = s.next(), t.next()
+    yield first
+    t, t_top = itertools.tee(t)
+    s0 = first[0]
+    top_row = ((s0, tt) for tt in t_top)
+    for st in interleave(top_row, pairs(s, t)):
+        yield st
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Here&amp;#8217;s a slideshow of this algorithm in action.
+&lt;/p&gt;
+&lt;img src="http://wordaligned.org/files/animated-pair-stream.gif" alt="Pair stream slideshow"/&gt;
+
+&lt;p&gt;Even though Python (CPython, to be specific) and recursion don&amp;#8217;t generally get along well (unlike in a proper functional programming language), this implementation doesn&amp;#8217;t &lt;em&gt;appear&lt;/em&gt; to fall foul of CPython&amp;#8217;s maximum recursion limits &lt;strong&gt;even though pairs() repeatedly calls itself&lt;/strong&gt;.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;No maximum recursion depth exceeded error here!&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; integers = itertools.count
+&amp;gt;&amp;gt;&amp;gt; for ij in pairs(integers, integers):
+... 	print ij
+... 
+(0, 0)
+(0, 1)
+(1, 1)
+(0, 2)
+(1, 2)
+(0, 3)
+(2, 2)
+....
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;When I dug a little deeper, I started to understand why: the function can&amp;#8217;t run indefinitely since it eats up memory. It continually tees up iterators over &lt;code&gt;t&lt;/code&gt; and creates new generator expressions.
+&lt;/p&gt;
+&lt;p&gt;That said, I was surprised just how quickly it consumes memory. After all, generator expressions and iterators shouldn&amp;#8217;t take up much space. For the purposes of comparison, I compared how it fared against a Scheme program designed to do the same thing. Both had consumed a gigabyte of memory after running just a few minutes (and, for what it&amp;#8217;s worth, the Python program had generated an order of magnitude more pairs by this point).
+&lt;/p&gt;
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;Scheme pair generator&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;(require (lib "40.ss" "srfi")) ;; Scheme stream support
+
+(define (interleave s1 s2)
+  (if (stream-null? s1)
+      s2
+      (stream-cons (stream-car s1)
+                   (interleave s2 (stream-cdr s1)))))
+
+(define (pairs s t)
+  (stream-cons
+   (list (stream-car s) (stream-car t))
+   (interleave
+    (stream-map (lambda (x) (list (stream-car s) x))
+                (stream-cdr t))
+    (pairs (stream-cdr s) (stream-cdr t)))))
+
+(define ones (stream-cons 1 ones))
+
+(define (stream-add s t) (stream-map + s t))
+
+(define integers
+  (stream-cons 0 (stream-add ones integers)))
+
+(stream-for-each
+  (lambda (x) (newline) (display x))
+  (pairs integers integers))
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/animated-pair-streams.html#toc5" name="tocdouble-trouble" id="tocdouble-trouble"&gt;Double Trouble&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Let&amp;#8217;s look a little further into the stream. Here&amp;#8217;s the genesis of the first 120 pairs.
+&lt;/p&gt;
+&lt;img src="http://wordaligned.org/files/animated-pair-stream-120.gif" alt="Pair stream slideshow"/&gt;
+
+&lt;p&gt;Now the pattern becomes clear. Evidently the interleave strategy gives a heavy bias towards advancing rightwards; downwards motion is relatively slow.
+&lt;/p&gt;
+&lt;p&gt;Let&amp;#8217;s filter out the &lt;code&gt;i == j&lt;/code&gt; diagonal to try and quantify this.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; ints = itertools.count
+&amp;gt;&amp;gt;&amp;gt; izip = itertools.izip
+&amp;gt;&amp;gt;&amp;gt; pp = pairs(ints(), ints())
+&amp;gt;&amp;gt;&amp;gt; diagonal = ((ix, (i, j))
+...             for ix, (i, j) in izip(ints(1), pp) if i == j))
+&amp;gt;&amp;gt;&amp;gt; for d in itertools.islice(diagonal, 10):
+...     print d
+...
+(1, (0, 0))
+(3, (1, 1))
+(7, (2, 2))
+(15, (3, 3))
+(31, (4, 4))
+(63, (5, 5))
+(127, (6, 6))
+(255, (7, 7))
+(511, (8, 8))
+(1023, (9, 9))
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;The output shows that pair (0, 0) is the 1&lt;sup&gt;st&lt;/sup&gt; element of the stream, (1, 1) the 3&lt;sup&gt;rd&lt;/sup&gt;, (2, 2) the 7&lt;sup&gt;th&lt;/sup&gt;, and so on.
+&lt;/p&gt;
+&lt;p&gt;Any computer scientist ought to quickly spot the pattern, and any mathematician ought to be able to prove why diagonal advances are exponentially infrequent.
+&lt;/p&gt;
+&lt;p&gt;Loosely speaking, if D&lt;sub&gt;i&lt;/sub&gt; is the stream of positions in the pairs stream of elements which lie on the diagonal (i.e. the stream 1, 3, 7, 15, &amp;#8230; shown in the interpreted Python session), then the elements of D must satisfy the recurrence relation:
+&lt;/p&gt;
+&lt;pre&gt;
+D&lt;sub&gt;i+1&lt;/sub&gt; = 1 + 2&amp;times;D&lt;sub&gt;i&lt;/sub&gt;
+&lt;/pre&gt;
+
+&lt;p&gt;This relation derives directly from the recursive definition of &lt;code&gt;pairs()&lt;/code&gt;: yield a single element, then alternate the rest of yourself with the generated top row.
+&lt;/p&gt;
+&lt;p&gt;Here are some slides showing the points at which the first 5 diagonal elements appear. Watch the recursive pattern emerge.
+&lt;/p&gt;
+&lt;p&gt;&lt;img src="http://wordaligned.org/files/pairs-1.png" alt="diagonal pairs image"/&gt;
+   &lt;img src="http://wordaligned.org/files/pairs-3.png" alt="diagonal pairs image"/&gt;
+   &lt;img src="http://wordaligned.org/files/pairs-7.png" alt="diagonal pairs image"/&gt;
+   &lt;img src="http://wordaligned.org/files/pairs-15.png" alt="diagonal pairs image"/&gt;
+   &lt;img src="http://wordaligned.org/files/pairs-31.png" alt="diagonal pairs image"/&gt;
+&lt;/p&gt;
+&lt;p&gt;The solution to the recurrence relation is &lt;code&gt;D&lt;sub&gt;i&lt;/sub&gt; = 2&lt;sup&gt;i&lt;/sup&gt; &amp;minus; 1&lt;/code&gt;. These diagonal advances correspond to recursive calls to &lt;code&gt;pairs()&lt;/code&gt;. So if our Python session has a recursion limit set to 1000 (try &lt;code&gt;sys.getrecursionlimit()&lt;/code&gt;), and our pairs generator were to yield a result every nanosecond, and we had a machine with infinite memory, it would take quite a few millenia before we run into this limit.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;How many millenia until we hit the recursion limit?&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; (2 ** 1000 - 1)/(1.e9 * 60 * 60 * 24 * 365 * 1000) 
+3.3977315042689856e+281
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/animated-pair-streams.html#toc6" name="tocmemory-use" id="tocmemory-use"&gt;Memory Use&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;It should also now be clear why this particular algorithm burns memory. Teeing an iterator doesn&amp;#8217;t magically mean we don&amp;#8217;t have to store any elements we&amp;#8217;ve iterated past. The greater the distance between the teed iterators, the more that need storing.
+&lt;/p&gt;
+&lt;p&gt;If that&amp;#8217;s not clear, run the following Python session and keep an eye on memory consumption (and be ready to interrupt the infinite loop!). You&amp;#8217;ll see memory use rapidly increase as &lt;code&gt;i&lt;/code&gt; and &lt;code&gt;j&lt;/code&gt; diverge, since &lt;code&gt;j&lt;/code&gt; needs to remember everything &lt;code&gt;i&lt;/code&gt; produces.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; from itertools import *
+&amp;gt;&amp;gt;&amp;gt; i, j = tee(repeat(0))
+&amp;gt;&amp;gt;&amp;gt; for x in i: pass
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;By contrast, if we zip through &lt;code&gt;i&lt;/code&gt; and &lt;code&gt;j&lt;/code&gt; in parallel, memory use is stable.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; i, j = tee(repeat(0))
+&amp;gt;&amp;gt;&amp;gt; for ij in izip(i, j): pass
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Our pair generator has to remember more and more elements from the &lt;code&gt;T&lt;/code&gt; stream (and also, to a lesser extent, from the &lt;code&gt;S&lt;/code&gt; stream). That&amp;#8217;s why it&amp;#8217;s so hungry. Any general purpose infinite pair generator function must suffer this problem, I think, since we &lt;strong&gt;have&lt;/strong&gt; to accumulate increasing portions of the streams into memory, but if it&amp;#8217;s just integer pairs we want we can work around the issue:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;def integer_pairs(i=0):
+    "Generate a stream of integer pairs (i, j) with i &amp;lt;= j"
+    yield i, i
+    top_row = ((i, j) for j in itertools.count(i + 1))
+    for ij in interleave(top_row, integer_pairs(i + 1)):
+        yield ij
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Here, rather than &lt;code&gt;tee()&lt;/code&gt; streams of integers, we use &lt;code&gt;itertools.count()&lt;/code&gt; to create new ones as required. This pair generator will run happily for extended periods. It will very gradually ask for more memory, as numbers get bigger and the number of rows increases. As before, it won&amp;#8217;t hit any embarrassing recursion limits in the lifetime of this galaxy.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/animated-pair-streams.html#toc7" name="tocproblem-solved" id="tocproblem-solved"&gt;Problem Solved?&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;So, does &lt;code&gt;integer_pairs()&lt;/code&gt; solve the problem of generating an infinite stream of pairs for the special case when both input streams are integers? 
+&lt;/p&gt;
+&lt;p&gt;Not really, no!
+&lt;/p&gt;
+&lt;p&gt;The interleave strategy for combining the top row with the remaining pairs has the great merit of simplicity, but is otherwise far from ideal. I don&amp;#8217;t think a one-size-fits-all strategy for streaming pairs exists, so we should allow clients to supply one. And that will have to be the subject of another article.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/animated-pair-streams.html#toc8" name="toctying-up" id="toctying-up"&gt;Tying up&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;It&amp;#8217;s not hard to fix the problem we noticed with &lt;code&gt;interleave()&lt;/code&gt;.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;def interleave(s, t):
+    """Generate an interleaved stream of elements from s and t.
+    
+    If one of the streams finishes, elements continue to be generated
+    from the other until it too is finished. 
+    """
+    for ss, tt in itertools.izip(s, t):
+        yield ss
+        yield tt
+    for s_or_t in itertools.chain(s, t):
+        yield s_or_t
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Here&amp;#8217;s the script I used to generate the animated GIFs. Although it&amp;#8217;s very much geared to doing the single job which it was designed to do, it&amp;#8217;s short enough to be used as a basis for similar tasks. I hope this article helps demonstrate the merits of visualising an algorithm in action.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;pairs-animation.py&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;#! /usr/bin/env python
+"""Script which accepts a list of (i, j) pairs, creating slides and
+   an animated GIF showing the positions of these pairs.
+
+Example use:
+$ echo '((0, 0) (0, 1) (1, 1) (0, 2) (1, 2) (0, 3) (2, 2)' | pairs-animation.py
+
+Dependencies:
+- Python Imaging Library (PIL), http://effbot.org/imagingbook/
+- aggdraw, anti-aliased graphics drawing package,
+  http://effbot.org/zone/pythondoc-aggdraw.htm
+- ImageMagick, http://www.imagemagick.org
+"""
+import Image
+import aggdraw
+import itertools
+
+# Script wide drawing configuration
+block_w = 16
+block_pad = 2
+
+def fading_brushes():
+    "Generate a sequence of fading grey brushes."
+    darkgrey = itertools.repeat(16)
+    greyscale = itertools.chain(range(255, 0, -16), darkgrey)
+    def brush(g):
+        "Return a grey brush."
+        return aggdraw.Brush('rgb(%d,%d,%d)' % (g, g, g))
+    return itertools.imap(brush, greyscale)
+
+def block_start(i):
+    "Return the coordinate (X or Y) at which the ith block starts."
+    return (block_w + block_pad) * i + block_pad
+
+def read_ij(data):
+    """Return pairs of integers found in the input string.
+    
+    Note: this function is extremely unfussy about the string format!
+    &amp;gt;&amp;gt;&amp;gt; read_ij('1 2 3 4')
+    [(1, 2), (3, 4)]
+    &amp;gt;&amp;gt;&amp;gt; read_ij('(1, 2), (3, 4)')
+    [(1, 2), (3, 4)]
+    """
+    import re
+    ij = itertools.imap(int, re.compile(r'-?\d+').findall(data))
+    return zip(ij, ij)
+
+def dimensions(ij):
+    "Return dimensions of an image big enough to contain blocks at ij positions."
+    import operator
+    max_i = max(map(operator.itemgetter(0), ij))
+    max_j = max(map(operator.itemgetter(1), ij))
+    return block_start(max_j + 1), block_start(max_i + 1)
+
+def block_xy(ij):
+    "Return the left, top, right, bottom coords of a block at ij."
+    ylo, xlo = map(block_start, ij)
+    return xlo, ylo, xlo + block_w, ylo + block_w
+
+def draw_blocks(image, blocks):
+    "Draws the supplied blocks onto the input image."
+    draw = aggdraw.Draw(image)
+    brushes = fading_brushes()
+    # Reverse the blocks so the newest are brightest
+    for block, brush in itertools.izip(reversed(blocks), brushes):
+        # The 'ellipse' will be circular since the block is square
+        draw.ellipse(block_xy(block), brush)
+    draw.flush()
+
+def main(ij_data):
+    "Creates slides and an animation from the ij block positions."
+    import os
+    ij = read_ij(ij_data)
+    dims = dimensions(ij)
+    # Create the slides
+    slides = ['pairs-%d.gif' % n for n in range(len(ij) + 1)]
+    for n, slide in enumerate(slides):
+        image = Image.new('L', dims)
+        draw_blocks(image, ij[:n])
+        image.save(slide)
+    # Use ImageMagick to create an animation
+    # -loop 0 =&amp;gt; loop forever, -delay units are .01 seconds
+    os.system('convert -delay 100 -loop 0 %s animation.gif'
+              % ' '.join(slides))
+
+if __name__ == '__main__':
+    import sys
+    main(sys.stdin.read())
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/animated-pair-streams.html#toc9" name="toccredits" id="toccredits"&gt;Credits&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;The inspiration for this article comes directly from &lt;a href="http://mitpress.mit.edu/sicp/full-text/book/book-Z-H-24.html#%_sec_Temp_476"&gt;&amp;#8220;Structure and Interpretation of Computer Programs&amp;#8221;&lt;/a&gt;, which presents some great examples of how to develop and use these pair streams.
+&lt;/p&gt;</description>
+<dc:date>2008-01-13</dc:date>
+<guid>http://wordaligned.org/articles/animated-pair-streams.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/animated-pair-streams.html</link>
+<category>PIL</category>
+</item>
+
+</channel>
+</rss>

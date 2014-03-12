@@ -1,0 +1,164 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<link rel="icon" href="/images/favicon.png" type="image/png"/>
+<link href="/styles/application.css" media="all" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="/scripts/prettify.js"></script>
+<script type="text/javascript" src="/scripts/lang-lisp.js"></script>
+<script type="text/javascript" src="http://www.haloscan.com/load/wordaligned"></script>
+
+<title>Too big or too clever?</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="author" content="Thomas Guest" />
+<meta name="description" content="Steve Yegge says that, for large applications, size is an enemy best controlled by dynamic languages. Alex Martelli says a language can be too dynamic for a large application. Who's right? A Word Aligned article posted 2007-12-20, tagged Python, Ruby, Perl." />
+<meta name="keywords" content="Python, Ruby, Perl" />
+<link rel="alternate" type="application/rss+xml" title="Feed" href="http://feeds.wordaligned.org/wordaligned" />
+</head>
+
+<body onload="prettyPrint()">
+<div id="container">
+  <div id="header">
+<h1><span><a accesskey="h" href="/">Word Aligned</a></span></h1>
+<h2>space sensitive programming</h2>
+<a class="button" href="http://feeds.wordaligned.org/wordaligned" title="Subscribe to Word Aligned"><img style="float: right;" src="/images/feed.png" alt="Feed Logo" height="28" width="28"/></a>
+</div>
+
+  <div id="page">
+    <div id="content">
+      <div class="atomentry" id="too-big-or-too-clever.html">
+<h2 class="title"><a href="/articles/too-big-or-too-clever.html">Too big or too clever?</a></h2>
+<p class="meta"><abbr class="published" title="2007-12-20">2007-12-20</abbr> &bull; <a href="/tag/python" rel="tag">Python</a>, <a href="/tag/ruby" rel="tag">Ruby</a>, <a href="/tag/perl" rel="tag">Perl</a> &bull; <a href="/articles/too-big-or-too-clever.html#disqus_thread">Comments</a></p>
+<p>When it comes to programming languages, not everyone equates <em>dynamic</em> with <em>better</em>, but I was surprised to read Alex Martelli cautioning against it. Here he is though, in a recent <a href="http://groups.google.com/group/comp.lang.python/msg/28422d707512283">post</a> on <code>comp.lang.python</code>, responding eloquently to the topic &#8220;What&#8217;s better about Ruby than Python?&#8221;. 
+</p>
+<span id="continue-reading"/>
+
+
+<h3>Too clever</h3>
+<p>Martelli identifies a fundamental difference between the two languages:
+</p>
+<blockquote><p>&#8230; Ruby&#8217;s TOTAL, unbridled &#8220;dynamicity&#8221;, including the ability to &#8220;reopen&#8221; any existing class, including all built-in ones, and change its behavior at run-time &#8212; vs Python&#8217;s vast but <em>bounded</em> dynamicity, which never changes the behavior of existing built-in classes and their instances.
+</p>
+</blockquote><p>He considers this:
+</p>
+<blockquote><p>&#8230; a crucial issue &#8212; one that makes Ruby much more suitable for &#8220;tinkering&#8221;, BUT Python equally more suitable for use in large production applications.  It&#8217;s funny, in a way, because both languages are so MUCH more dynamic than most others, that in the end the key difference between them from my POV should hinge on that &#8212; that Ruby &#8220;goes to eleven&#8221; in this regard (the reference here is to &#8220;Spinal Tap&#8221;, of course).  In Ruby, there are no limits to my creativity &#8212; if I decide that all string comparisons must become case-insensitive, I CAN DO THAT!  I.e., I can dynamically alter the built-in string class so that</p>
+<pre>
+    a = "Hello World"
+    b = "hello world"
+    if a == b
+        print "equal!\n"
+    else
+        print "different!\n"
+    end
+</pre>
+<p>WILL print &#8220;equal&#8221;.</p>
+<p>In python, there is NO way I can do
+that.  For the purposes of metaprogramming, implementing
+experimental frameworks, and the like, this amazing dynamic
+ability of Ruby is _extremely_ appealing.  BUT &#8212; if we&#8217;re
+talking about large applications, developed by many people
+and maintained by even more, including all kinds of libraries
+from diverse sources, and needing to go into production in
+client sites&#8230; well, I don&#8217;t WANT a language that is QUITE
+so dynamic, thank you very much.</p>
+</blockquote>
+
+<p>I&#8217;ve heard this opinion before, nudged even further along the static-dynamic scale. Some argue Python is <a href="/articles/pitching-python-in-three-syllables.html">too dynamic</a> for large applications; that you&#8217;re better off with something more disciplined, statically typed, enterprise ready, something with decent IDEs to keep your code in shape &#8212; something like Java.
+</p>
+
+<h3>Too Big</h3>
+<p>In <a href="http://steve-yegge.blogspot.com/2007/12/codes-worst-enemy.html">&#8220;Code&#8217;s Worst Enemy&#8221;</a> Steve Yegge rants about his own large application:
+</p>
+<blockquote><p>&#8230; a beautiful game [written] in an ugly language &#8230; lovely on the outside and quite horrific internally
+</p>
+</blockquote><p>The ugly language turns out to be Java, 500,000 lines of it. Eclipse won&#8217;t load it. The code base has collapsed under its own weight.
+</p>
+<p>Yegge identifies size as the enemy. More controversially, he argues some of our conventional allies in countering this enemy are, in fact, traitors. Refactoring, for one: applied to Java, it can result in code bloat. And all that design-pattern boiler-plate. Look, even our precious IDEs deceive us!
+</p>
+<blockquote><p>Java-style IDEs intrinsically create a circular problem. The circularity stems from the nature of programming languages: the &#8220;game piece&#8221; shapes are determined by the language&#8217;s static type system. Java&#8217;s game pieces don&#8217;t permit code elimination because Java&#8217;s static type system doesn&#8217;t have any compression facilities &#8212; no macros, no lambdas, no declarative data structures, no templates, nothing that would permit the removal of the copy-and-paste duplication patterns that Java programmers think of as &#8220;inevitable boilerplate&#8221;, but which are in fact easily factored out in dynamic languages.
+</p>
+<p>Completing the circle, dynamic features make it more difficult for IDEs to work their static code-base-management magic. IDEs don&#8217;t work as well with dynamic code features, so IDEs are responsible for encouraging the use of languages that require&#8230; IDEs. Ouch.
+</p>
+</blockquote><p>I think Yegge gets a lot wrong in this rant, but it&#8217;s clear he speaks from experience, and for all his swagger it&#8217;s also clear he&#8217;s thought hard about what he says. I agree with his main point: <strong>size is the enemy</strong>. And I agree with his conclusion too. You need a language which allows you to dispense with boiler-plate, a language in which you <a href="http://c2.com/cgi/wiki?DontRepeatYourself">don&#8217;t have to repeat yourself</a>. A powerful language. A dynamic language.
+</p>
+
+<h3>Who&#8217;s Right?</h3>
+<p>So, who&#8217;s right? 
+</p>
+<p>For a large application developed by a large team and maintained by a larger one could a language like Ruby be <strong>too dynamic</strong>? 
+</p>
+<p>Or is <strong>size the enemy</strong>? Do we need a language so powerful it <a href="http://blog.plover.com/prog/design-patterns.html">absorbs design patterns</a>, so dynamic we never need repeat ourselves, so succinct we can <a href="http://www.paulgraham.com/head.html">fit the code in our heads</a>?
+</p>
+<p>I&#8217;d say the latter. A dynamic language might be too slow (for a few parts of a system) but it can&#8217;t be too dynamic. Meta-programming requires taste and restraint, of course, not to mention boundaries; and we mustn&#8217;t expect any one programming language to fix our design. For any large system, I&#8217;d expect multiple components, layers of abstraction &#8212; and layers of languages.
+</p>
+</div>
+
+<div class="comments"><hr/><div id="disqus_thread"></div><script type="text/javascript" src="http://disqus.com/forums/wordaligned/embed.js"></script></div>
+      
+<div id="comments"><script type="text/javascript">
+//<![CDATA[
+(function() {
+    var links = document.getElementsByTagName('a');
+    var query = '?';
+    for(var i = 0; i < links.length; i++) {
+        if(links[i].href.indexOf('#disqus_thread') >= 0) {
+            query += 'url' + i + '=' + encodeURIComponent(links[i].href) + '&amp;';
+        }
+    }
+    document.write('<script type="text/javascript" src="http://disqus.com/forums/wordaligned/get_num_replies.js' + query + '"></' + 'script>');
+})();
+//]]>
+</script></div>
+
+    </div>
+    <div id="sidebar">
+      
+<div class="sidebar-node">
+<h3>Tagged</h3>
+<ul id="categories"><li><a href="/tag/python" rel="tag">Python</a></li>
+<li><a href="/tag/ruby" rel="tag">Ruby</a></li>
+<li><a href="/tag/perl" rel="tag">Perl</a></li></ul>
+
+</div>
+
+<div class="sidebar-node">
+<h3>Chain</h3>
+<ul>
+<li><a accesskey="n" href="/articles/file-shifting-using-lftp-and-rsync.html" title="Next article">&laquo; File shifting using lftp and rsync</a></li>
+<li><a accesskey="p" href="/articles/maybe-we-live-in-a-scripting-universe.html" title="Previous article">&raquo; Maybe we live in a scripting universe</a></li>
+</ul>
+
+
+</div>
+
+<div class="sidebar-node">
+<h3>Feeds</h3>
+
+<ul>
+<li><a href="http://feeds.wordaligned.org/wordaligned"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Articles</a></li>
+<li><a href="http://feeds.wordaligned.org/wordaligned/comments"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Comments</a></li>
+</ul>
+
+
+</div>
+
+    </div>
+  </div>
+  <div id="footer">
+<hr />
+<p><a href="http://tag.wordaligned.org">Thomas Guest</a></p>
+</div>
+
+</div>
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-3373724-1']);
+  _gaq.push(['_trackPageview']);
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ga);
+  })();
+</script>
+</body>
+
+</html>

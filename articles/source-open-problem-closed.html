@@ -1,0 +1,153 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<link rel="icon" href="/images/favicon.png" type="image/png"/>
+<link href="/styles/application.css" media="all" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="/scripts/prettify.js"></script>
+<script type="text/javascript" src="/scripts/lang-lisp.js"></script>
+<script type="text/javascript" src="http://www.haloscan.com/load/wordaligned"></script>
+
+<title>Source open, problem closed</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="author" content="Thomas Guest" />
+<meta name="description" content="An example of the open source advantage. A Word Aligned article posted 2007-06-27, tagged Python, Web Applications, Subversion, Trac." />
+<meta name="keywords" content="Python, Web Applications, Subversion, Trac" />
+<link rel="alternate" type="application/rss+xml" title="Feed" href="http://feeds.wordaligned.org/wordaligned" />
+</head>
+
+<body onload="prettyPrint()">
+<div id="container">
+  <div id="header">
+<h1><span><a accesskey="h" href="/">Word Aligned</a></span></h1>
+<h2>space sensitive programming</h2>
+<a class="button" href="http://feeds.wordaligned.org/wordaligned" title="Subscribe to Word Aligned"><img style="float: right;" src="/images/feed.png" alt="Feed Logo" height="28" width="28"/></a>
+</div>
+
+  <div id="page">
+    <div id="content">
+      <div class="atomentry" id="source-open-problem-closed.html">
+<h2 class="title"><a href="/articles/source-open-problem-closed.html">Source open, problem closed</a></h2>
+<p class="meta"><abbr class="published" title="2007-06-27">2007-06-27</abbr> &bull; <a href="/tag/python" rel="tag">Python</a>, <a href="/tag/web-applications" rel="tag">Web Applications</a>, <a href="/tag/subversion" rel="tag">Subversion</a>, <a href="/tag/trac" rel="tag">Trac</a> &bull; <a href="/articles/source-open-problem-closed.html#disqus_thread">Comments</a></p>
+<p>I <a href="/articles/trac-not-just-a-pretty-interface.html">wrote</a> a while back about <a href="http://trac.edgewall.org">trac</a>. I continued to be impressed by it. Although it was fiddly to install, I notice that this should be improved by the next <a href="http://trac.edgewall.org/wiki/TracDev/ReleaseNotes/0.11">point release</a>, which will be packaged in a <a href="http://peak.telecommunity.com/DevCenter/PythonEggs">python egg</a>. And although the version we&#8217;re using is only 0.10.2, it&#8217;s proven itself remarkably solid. In fact we haven&#8217;t encountered any bugs. Or at least we hadn&#8217;t until today, when someone discovered that attempting to attach a small file to a wiki page resulted in an application error.
+</p>
+<span id="continue-reading"/>
+
+<p>Up until today we&#8217;d been attaching pictures which had always worked just fine. Attempting to upload a small text file resulted in the web browser showing a big red error page filled with the following stack trace.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">Traceback (most recent call last):
+  File "/usr/local/lib/python2.5/site-packages/trac/web/main.py", line 387, in dispatch_request
+    dispatcher.dispatch(req)
+  File "/usr/local/lib/python2.5/site-packages/trac/web/main.py", line 238, in dispatch
+    resp = chosen_handler.process_request(req)
+  File "/usr/local/lib/python2.5/site-packages/trac/attachment.py", line 361, in process_request
+    self._do_save(req, attachment)
+  File "/usr/local/lib/python2.5/site-packages/trac/attachment.py", line 449, in _do_save
+    size = upload.file.len
+AttributeError: 'cStringIO.StringO' object has no attribute 'len'
+
+</pre>
+
+</div>
+
+<p><a href="http://trac.edgewall.org">Trac</a> is a popular piece of software, and I had to believe someone else would have run into this bug. Sure enough, googling [<code>AttributeError: 'cStringIO.StringO' object has no attribute 'len'</code>][Q] led me straight to <a href="http://trac.edgewall.org/ticket/4311">trac ticket #4311</a>, and the happy news that this particular problem had been fixed. If you look at the ticket, you&#8217;ll notice that it cross-references the actual <a href="http://trac.edgewall.org/changeset/4459">repository diff</a> of the changes which fixed the problem &#8212; a simple three line change to a single file in this case, and a nice demonstration of how <a href="http://trac.edgewall.org">trac</a> integrates source control, defect tracking and a wiki.
+</p>
+<p>Since I didn&#8217;t want to upgrade our trac installation just yet I applied the patch directly to <code>/usr/local/lib/python2.5/site-packages/trac/attachment.py</code> (the file identified in the traceback), and all was well.
+</p>
+<p>This is of course an every day story from the world of open source software. If you stop and think about it, though, there are several layers of openness.
+</p>
+<ol>
+ <li><p>The error message was open and obvious. I didn&#8217;t have to search through a server log. Application developers are usually taught hide tracebacks from end users &#8212; they&#8217;re deemed too frightening.  In this case, though, I didn&#8217;t even have to leave my web browser to diagnose and find a fix to the problem.
+</p>
+
+ </li>
+
+ <li><p>Trac opens up its own defect database for public access. As we&#8217;ve seen, this provides a great example of trac in action. <span id="excerpt0"/>Many closed source projects would regard it as a sign of weakness to publish this kind of information, though I do think (perhaps due to the influence of the open source movement) this attitude is changing.
+</p>
+
+ </li>
+
+ <li><p>The source files behind the application were open. All I had to do was tweak one of them using a text editor. No rebuild required.
+</p>
+
+ </li>
+</ol>
+</div>
+
+<div class="comments"><hr/><div id="disqus_thread"></div><script type="text/javascript" src="http://disqus.com/forums/wordaligned/embed.js"></script></div>
+      
+<div id="comments"><script type="text/javascript">
+//<![CDATA[
+(function() {
+    var links = document.getElementsByTagName('a');
+    var query = '?';
+    for(var i = 0; i < links.length; i++) {
+        if(links[i].href.indexOf('#disqus_thread') >= 0) {
+            query += 'url' + i + '=' + encodeURIComponent(links[i].href) + '&amp;';
+        }
+    }
+    document.write('<script type="text/javascript" src="http://disqus.com/forums/wordaligned/get_num_replies.js' + query + '"></' + 'script>');
+})();
+//]]>
+</script></div>
+
+    </div>
+    <div id="sidebar">
+      <div class="sidebar-node">
+<h3>Excerpt</h3>
+<p><a href="#excerpt0">Many closed source projects would regard it as a sign of weakness to publish this kind of information</a></p>
+
+</div>
+
+<div class="sidebar-node">
+<h3>Tagged</h3>
+<ul id="categories"><li><a href="/tag/python" rel="tag">Python</a></li>
+<li><a href="/tag/web-applications" rel="tag">Web Applications</a></li>
+<li><a href="/tag/subversion" rel="tag">Subversion</a></li>
+<li><a href="/tag/trac" rel="tag">Trac</a></li></ul>
+
+</div>
+
+<div class="sidebar-node">
+<h3>Chain</h3>
+<ul>
+<li><a accesskey="n" href="/articles/why-python-programmers-should-learn-python.html" title="Next article">&laquo; Why Python programmers should learn Python</a></li>
+<li><a accesskey="p" href="/articles/how-many-restarts.html" title="Previous article">&raquo; How many restarts?</a></li>
+</ul>
+
+
+</div>
+
+<div class="sidebar-node">
+<h3>Feeds</h3>
+
+<ul>
+<li><a href="http://feeds.wordaligned.org/wordaligned"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Articles</a></li>
+<li><a href="http://feeds.wordaligned.org/wordaligned/comments"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Comments</a></li>
+</ul>
+
+
+</div>
+
+    </div>
+  </div>
+  <div id="footer">
+<hr />
+<p><a href="http://tag.wordaligned.org">Thomas Guest</a></p>
+</div>
+
+</div>
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-3373724-1']);
+  _gaq.push(['_trackPageview']);
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ga);
+  })();
+</script>
+</body>
+
+</html>

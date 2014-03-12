@@ -1,0 +1,186 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<link rel="icon" href="/images/favicon.png" type="image/png"/>
+<link href="/styles/application.css" media="all" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="/scripts/prettify.js"></script>
+<script type="text/javascript" src="/scripts/lang-lisp.js"></script>
+<script type="text/javascript" src="http://www.haloscan.com/load/wordaligned"></script>
+
+<title>Syntactic Sugar</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="author" content="Thomas Guest" />
+<meta name="description" content="A Word Aligned article posted 2008-09-04, tagged C++, Python, Syntax, Documentation." />
+<meta name="keywords" content="C++, Python, Syntax, Documentation" />
+<link rel="alternate" type="application/rss+xml" title="Feed" href="http://feeds.wordaligned.org/wordaligned" />
+</head>
+
+<body onload="prettyPrint()">
+<div id="container">
+  <div id="header">
+<h1><span><a accesskey="h" href="/">Word Aligned</a></span></h1>
+<h2>sweating the small stuff</h2>
+<a class="button" href="http://feeds.wordaligned.org/wordaligned" title="Subscribe to Word Aligned"><img style="float: right;" src="/images/feed.png" alt="Feed Logo" height="28" width="28"/></a>
+</div>
+
+  <div id="page">
+    <div id="content">
+      <div class="atomentry" id="syntactic-sugar.html">
+<h2 class="title"><a href="/articles/syntactic-sugar.html">Syntactic Sugar</a></h2>
+<p class="meta"><abbr class="published" title="2008-09-04">2008-09-04</abbr> &bull; <a href="/tag/c++" rel="tag">C++</a>, <a href="/tag/python" rel="tag">Python</a>, <a href="/tag/syntax" rel="tag">Syntax</a>, <a href="/tag/documentation" rel="tag">Documentation</a> &bull; <a href="/articles/syntactic-sugar.html#disqus_thread">Comments</a></p>
+<p><a href="http://www.sgi.com/tech/stl/"><img style="float:right;" src="http://www.sgi.com/images/common/sgilogo.gif" alt="SGI logo"/></a>
+</p>
+<p>The SGI STL documentation <a href="http://www.sgi.com/tech/stl/Map.html#3">notes that</a> <code>std::map::operator[]</code> is redundant:
+</p>
+<blockquote><p>Strictly speaking, this member function is unnecessary: it exists only for convenience.
+</p>
+</blockquote><p>This sentence pretty much nails what&#8217;s meant by &#8220;syntactic sugar&#8221;, <a href="http://en.wikipedia.org/wiki/Syntactic_sugar">defined more formally in Wikipedia</a> as:
+</p>
+<blockquote><p>&#8230; a term coined by Peter J. Landin for additions to the syntax of a computer language that do not affect its functionality but make it &#8220;sweeter&#8221; for humans to use.
+</p>
+</blockquote><p><a href="http://uncyclopedia.org/wiki/Semicolon_Cancer"><img style="float:right;" src="http://images.wikia.com/uncyclopedia/images/4/4a/Semicolon.png" alt="Cancer of the semicolon"/></a>
+</p>
+<p>For example, Python&#8217;s <a href="/articles/echo.html">@decorator</a> syntax sweetens the practice of wrapping functions. In C++, operator overloading adds nothing which couldn&#8217;t be achieved using standard function call syntax, but it opens the door to some <a href="http://www.boost.org/doc/libs/1_36_0/libs/spirit/classic/doc/introduction.html" title="Spirit imitates EBNF in C++ using operator overloading">inventive and expressive techniques</a>. Haskell has a <a href="http://www.haskell.org/haskellwiki/Syntactic_sugar">nice syntax</a> for custom infix operators, and so on. 
+</p>
+<p>Lisp values its <a href="http://paulgraham.com/hundred.html" title="As few axioms as possible, says Paul Graham">spare syntax</a> and certainly won&#8217;t allow infix operators, but even a <a href="http://schemers.org">minimalist dialect like Scheme</a> allows lists to be <a href="http://www.r6rs.org/final/html/r6rs/r6rs-Z-H-7.html#node_sec_4.3.2">represented</a> like this <code>(a b c d e)</code> rather than <code>(a . (b . (c . (d . (e . ())))))</code>.
+</p>
+<p>Perl comes laced and frosted with syntactic sugar. <a href="http://www.wall.org/~larry/">Larry Wall</a> explains why he doesn&#8217;t heed Alan Perlis&#8217;s famous warning about <a href="http://www.cs.yale.edu/quotes.html" title="Syntactic sugar causes cancer of the semicolon, says Alan J. Perlis">cancer of the semicolon</a>.
+</p>
+<blockquote><p>To me, one of the most agonizing aspects of language design is coming up with a useful system of operators. To other language designers, this may seem like a silly thing to agonize over. After all, you can view all operators as mere syntactic sugar &#8212; operators are just funny looking function calls. Some languages make a feature of leveling all function calls into one syntax. As a result, the so-called functional languages tend to wear out your parenthesis keys, while OO languages tend to wear out your dot key. &#8212; <a href="http://dev.perl.org/perl6/doc/design/apo/A03.html">Larry Wall, Apocalypse 3, Operators</a>
+</p>
+</blockquote><p>(Perl, of course, tends to wear out your shift key &#8230;)
+</p>
+<span id="continue-reading"/>
+
+<p>There&#8217;s not much in C++ you couldn&#8217;t manage using C, given enough effort. I <a href="http://www.research.att.com/~bs/blast.html" title="Be tolerant, refrain from hyperbole, says Bjarne Stroustrup">both use and bitch about C++</a> and sometimes it&#8217;s good to get back to the plain and wholesome taste of C. Not for long though: I start to miss the standard containers and algorithms, operator overloading, exceptions etc.
+</p>
+<p>I mention this because I&#8217;ve been thinking about what <a href="/articles/entertaining-documentation.html">makes good software documentation</a>. If I&#8217;m working with the C standard library, I tend to refer to the <code>man</code> pages for help, and very fine they are too. Apparently <code>man</code> pages for the C++ standard library exist but they don&#8217;t come as standard on my platform and I haven&#8217;t installed them &#8212; instead I refer to the <a href="http://www.sgi.com/tech/stl/">SGI STL Programmer&#8217;s Guide</a>, which I&#8217;ve downloaded locally for instant and offline access. Now, it&#8217;s clear this guide hasn&#8217;t been actively maintained (the <a href="http://www.sgi.com/tech/stl/whats_new.html">&#8220;What&#8217;s New&#8221;</a> page lists nothing more recent than June 2000): it includes non-standard extensions and in some places I&#8217;ve found it&#8217;s no longer correct<a id="fn1link" href="#fn1"><sup>[1]</sup></a>. Nonetheless, its clear exposition and clean layout make it my first point of reference.
+</p>
+<p>C++&#8217;s standard <code>map</code> container bears a superficial resemblance to Python&#8217;s <code>dict</code>, associating keys with values (under the surface, a <code>map</code> is a balanced tree and a <code>dict</code> is a hash table<a id="fn2link" href="#fn2"><sup>[2]</sup></a>). Like Python, the <code>[]</code> operator syntax can be used for container access. Unlike Python, accessing the value associated with a key not present in the map succeeds &#8212; the key gets added and the value is default constructed<a id="fn3link" href="#fn3"><sup>[3]</sup></a>. <a href="http://www.sgi.com/tech/stl/Map.html#3">Here&#8217;s how the SGI guide documents</a> this overloading of <code>operator[]</code> (emphasis mine).
+</p>
+<blockquote><p>Since <code>operator[]</code> might insert a new element into the <code>map</code>, it can&#8217;t possibly be a <code>const</code> member function. Note that the definition of <code>operator[]</code> is <strong>extremely simple</strong>: <code>m[k]</code> is equivalent to <code>(*((m.insert(value_type(k, data_type()))).first)).second</code>. Strictly speaking, this member function is unnecessary: it exists only for convenience.
+</p>
+</blockquote><p><a href="/articles/entertaining-documentation.html">Should reference documentation entertain?</a> This paragraph may not have had me rolling on the floor with laughter, but I did snort in my coffee.
+</p>
+<p>Here&#8217;s some compact C++ code designed to showcase the convenience of the operator overload, in this case calculating word frequencies in an istream:
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">typedef std::string Word;
+typedef std::map&lt;Word, int&gt; WordCounts;
+
+void count_words(std::istream &amp; text, WordCounts &amp; word_counts)
+{
+    Word word;
+    while (text &gt;&gt; word)
+    {
+        ++word_counts[word];
+    }
+}
+
+</pre>
+
+</div>
+
+<p>Using the supplied definition of <code>operator[]</code>, the loop reads:
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">    while (text &gt;&gt; word)
+    {
+        ++(*((word_counts.insert
+              (WordCounts::value_type(word, WordCounts::mapped_type()))
+              .first))).second;
+    }
+
+</pre>
+
+</div>
+
+<p>Now, I realise you have to be clever to use C++, and I&#8217;m sure there&#8217;s a better way of laying out this expression, but can really anyone find it <strong>extremely simple</strong>?
+</p>
+<p>Syntactic sugar. Pour it on!
+</p>
+<p><a href="http://www.flickr.com/photos/thomasguest/2828100509/" title="sugar by Thomas Guest, on Flickr"><img src="http://farm4.static.flickr.com/3240/2828100509_2e0c61bfdd_m.jpg" width="180" height="240" alt="sugar" /></a>
+</p>
+<hr />
+
+<p><a id="fn1" href="#fn1link">[1]</a> For example, in the quoted documentation for <code>operator[]</code>, <code>data_type()</code> should now read <code>mapped_type()</code>.
+</p>
+<p><a id="fn2" href="#fn2link">[2]</a> TR1 at last brings a standard hash table to C++, which goes under the unlikely name of <code>std::tr1::unordered_map</code>.
+</p>
+<p><a id="fn3" href="#fn3link">[3]</a> Python provides <a href="http://docs.python.org/lib/defaultdict-objects.html">collections.defaultdict</a> if you want this behaviour.
+</p>
+</div>
+
+<div class="comments"><hr/><div id="disqus_thread"></div><script type="text/javascript" src="http://disqus.com/forums/wordaligned/embed.js"></script></div>
+      
+<div id="comments"><script type="text/javascript">
+//<![CDATA[
+(function() {
+    var links = document.getElementsByTagName('a');
+    var query = '?';
+    for(var i = 0; i < links.length; i++) {
+        if(links[i].href.indexOf('#disqus_thread') >= 0) {
+            query += 'url' + i + '=' + encodeURIComponent(links[i].href) + '&amp;';
+        }
+    }
+    document.write('<script type="text/javascript" src="http://disqus.com/forums/wordaligned/get_num_replies.js' + query + '"></' + 'script>');
+})();
+//]]>
+</script></div>
+
+    </div>
+    <div id="sidebar">
+      
+<div class="sidebar-node">
+<h3>Tagged</h3>
+<ul id="categories"><li><a href="/tag/c++" rel="tag">C++</a></li>
+<li><a href="/tag/python" rel="tag">Python</a></li>
+<li><a href="/tag/syntax" rel="tag">Syntax</a></li>
+<li><a href="/tag/documentation" rel="tag">Documentation</a></li></ul>
+
+</div>
+
+<div class="sidebar-node">
+<h3>Chain</h3>
+<ul>
+<li><a accesskey="n" href="/articles/looping-forever-and-ever.html" title="Next article">&laquo; Looping forever and ever</a></li>
+<li><a accesskey="p" href="/articles/macros-with-halos.html" title="Previous article">&raquo; Macros with halos</a></li>
+</ul>
+
+
+</div>
+
+<div class="sidebar-node">
+<h3>Feeds</h3>
+
+<ul>
+<li><a href="http://feeds.wordaligned.org/wordaligned"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Articles</a></li>
+<li><a href="http://feeds.wordaligned.org/wordaligned/comments"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Comments</a></li>
+</ul>
+
+
+</div>
+
+    </div>
+  </div>
+  <div id="footer">
+<hr />
+<p><a href="http://tag.wordaligned.org">Thomas Guest</a></p>
+</div>
+
+</div>
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-3373724-1']);
+  _gaq.push(['_trackPageview']);
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ga);
+  })();
+</script>
+</body>
+
+</html>

@@ -1,0 +1,260 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<link rel="icon" href="/images/favicon.png" type="image/png"/>
+<link href="/styles/application.css" media="all" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="/scripts/prettify.js"></script>
+<script type="text/javascript" src="/scripts/lang-lisp.js"></script>
+<script type="text/javascript" src="http://www.haloscan.com/load/wordaligned"></script>
+
+<title>Readable Code</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="author" content="Thomas Guest" />
+<meta name="description" content="A Word Aligned article posted 2006-08-06, tagged C++, Java, Python, Ruby, SICP." />
+<meta name="keywords" content="C++, Java, Python, Ruby, SICP" />
+<link rel="alternate" type="application/rss+xml" title="Feed" href="http://feeds.wordaligned.org/wordaligned" />
+</head>
+
+<body onload="prettyPrint()">
+<div id="container">
+  <div id="header">
+<h1><span><a accesskey="h" href="/">Word Aligned</a></span></h1>
+<h2>sweating the small stuff</h2>
+<a class="button" href="http://feeds.wordaligned.org/wordaligned" title="Subscribe to Word Aligned"><img style="float: right;" src="/images/feed.png" alt="Feed Logo" height="28" width="28"/></a>
+</div>
+
+  <div id="page">
+    <div id="content">
+      <div class="atomentry" id="readable-code">
+<h2 class="title"><a href="/articles/readable-code">Readable Code</a></h2>
+<p class="meta"><abbr class="published" title="2006-08-06">2006-08-06</abbr> &bull; <a href="/tag/c++" rel="tag">C++</a>, <a href="/tag/java" rel="tag">Java</a>, <a href="/tag/python" rel="tag">Python</a>, <a href="/tag/ruby" rel="tag">Ruby</a>, <a href="/tag/sicp" rel="tag">SICP</a> &bull; <a href="/articles/readable-code#disqus_thread">Comments</a></p>
+<p>In an <a href="/articles/my-test-first-ruby-program.html">earlier post</a> I described how I got started with <a href="http://www.ruby-lang.org" title="Ruby home">Ruby</a>
+   not by studying the language, but by reading then adapting some
+   existing code. Of course I was lucky in that the code I started from
+   was good. (At least I&#8217;m pretty sure it was: it came from a trusted
+   source, it had unit tests, looked clean &#8212; I think I can recognise
+   good code even without knowing the language it&#8217;s been written in.)
+   <span id="excerpt0"/>This approach of learning how to program by reading code is far from
+   radical but is perhaps better suited to some languages than others.
+</p>
+<span id="continue-reading"/>
+
+
+<h4>Learning to Program by Reading</h4>
+<p>The suggestion that we can learn how to program by reading code is far
+   from original. In his essay <a href="http://catb.org/~esr/faqs/hacker-howto.html">How to Become a
+Hacker</a> <a href="http://catb.org/~esr/" title="Eric Raymond">Eric
+Raymond</a> says:
+</p>
+<blockquote><p>Learning to program is like learning to write good natural
+   language. <em>The best way to do it is to read some stuff written by masters of the form</em>,
+   write some things yourself, read a lot more,
+   write a little more, read a lot more, write some more &#8230; and repeat
+   until your writing begins to develop the kind of strength and
+   economy you see in your models.
+</p>
+</blockquote><p>In <a href="http://www.norvig.com/21-days.html">Teach Yourself Programming in Ten Years</a>
+   <a href="http://www.norvig.com">Peter Norvig</a> recommends:
+</p>
+<blockquote><p>Talk to other programmers; <em>read other programs</em>. This is more
+   important than any book or training course.
+</p>
+</blockquote><p>We must also remember <a href="http://allankelly.net" title="No single link here, but Allan has lots to say about learning">learning</a> never stops
+   &#8212; meaning that we should always be reading good code.
+</p>
+
+<h4>Finding Good Code</h4>
+<p>Where, then, do we find good code to read? Maybe you&#8217;re lucky enough
+   to work with some excellent programmers &#8212; I guess many of us put in
+   more time reading code written by colleagues than by anyone else, since
+   that&#8217;s what we&#8217;re paid to do. Aside from that, you&#8217;re probably looking at
+   code you found somewhere on the internet.
+</p>
+<p>Of course, the code will have to be open source (meaning, in this
+   case, that you have access to source code, not compiled binaries) and,
+   if you wish to adapt it, suitably licensed.
+</p>
+
+<h4>Dynamic Languages</h4>
+<p>One thing I like about the dynamic languages (<a href="http://python.org" title="Python home">Python</a>, <a href="http://www.ruby-lang.org" title="Ruby home">Ruby</a>,
+   <a href="http://www.perl.org" title="The Perl directory">Perl</a>, etc.) is their open nature. It may be possible to scramble a
+   <a href="http://python.org" title="Python home">Python</a> program so it can&#8217;t be read but I don&#8217;t know how to
+   do it &#8212; and it&#8217;s certainly not part of the language tradition.
+</p>
+<p>Another thing I like is the tradition of, and indeed support for, unit
+   testing in these languages. Some form of reflection makes unit testing
+   much easier. As does the ability to <a href="http://docs.python.org/lib/module-doctest.html" title="doctest">dynamically execute
+code</a>.
+   Unit tests actually make code easy to read: if you want to know how to
+   use a library, look at its unit tests. <a href="http://docs.python.org/lib/module-doctest.html" title="doctest">Python&#8217;s doctest</a> presses this
+   point home by blurring the boundaries between code, tests and documentation.
+</p>
+<p>So, if, for example, you want to learn how to program using <a href="http://python.org" title="Python home">Python</a>,
+   the Python standard library is a great starting point. You&#8217;ll find it in your
+   Python installation. It&#8217;s the code you actually run when you use
+   Python, it&#8217;s of excellent quality, and of course there are
+   comprehensive unit tests.
+</p>
+<p>Finally, dynamic languages are terse, so there&#8217;s less code to read.
+   Have a look, for example, at Peter Norvig&#8217;s <a href="http://norvig.com/sudoku.html">Sudoku
+solver</a> &#8212; or even <a href="http://wordaligned.org/sudoku.cgi">my
+own</a>!
+</p>
+
+<h4>Not So Dynamic Languages</h4>
+<p>To be fair, <a href="http://java.sun.com">Java</a> also has a fine tradition of
+   openness.  It&#8217;s far from my favourite language but you don&#8217;t have to
+   look to hard to find superb Java source code published by the likes of
+   <a href="http://www.sun.com">Sun</a> and <a href="http://www.apache.org">Apache</a>.
+</p>
+<p>You can also find good C code without trouble. C has been around long
+   enough that:
+</p>
+<ol>
+ <li>
+     the language is stable, and
+ </li>
+
+ <li>
+     we know how to use it
+ </li>
+</ol>
+<p>C is often used as a portability layer for open source projects. Good
+   starting points to find good, readable C code would be
+   <a href="http://www.gnu.org/">GNU</a>, the Linux kernel, the C-Python
+   implementation.
+</p>
+
+<h4>Readable C++</h4>
+<p>Good C++ is rather harder to find &#8212; or at least C++ which is both
+   good and readable. Part of the reason for this is that there&#8217;s no
+   single way to write good C++. A C++ program which looked OK ten years
+   ago probably looks dated now (_&#8221;That&#8217;s not exception safe!&#8221;_,
+   <em>&#8220;Why ever didn&#8217;t they use the STL?&#8221;</em>,
+   <em>&#8220;Surely we need a bit of template metaprograming here?&#8221;</em>).
+   If the code hasn&#8217;t been actively maintained,
+   it probably doesn&#8217;t even compile: even though the standard is mature,
+   different implementations interpret it in different ways &#8212; and their
+   interpretations are subject to change.
+</p>
+<p>You can probably examine much of your standard library implementation
+   &#8212; much of it is templated code delivered in header files &#8212; but some
+   of the platform specific ifs and buts may make it hard to read. This
+   stuff is heavily optimised, and, when optimisation and readability are
+   in opposition, as they often are, your standard library implementation
+   is likely to prefer the former.
+</p>
+<p><a href="http://boost.org">Boost</a> is packed
+   with superb, peer-reviewed, tested, open-source C++ code; but I
+   wouldn&#8217;t describe it as an easy read: certainly, it&#8217;s not for
+   beginners.
+</p>
+
+<h4>And Finally</h4>
+<p>I&#8217;m going to return to this subject. For now, I&#8217;ll close with a
+   favourite quotation, taken from the preface to <a href="http://mitpress.mit.edu/sicp/full-text/book/book.html">the Wizard
+Book</a>.
+</p>
+<blockquote><p>Programs should be written for people to read, and only incidentally
+   for machines to execute.
+</p>
+</blockquote><p>Happy reading!
+</p>
+</div>
+
+<h5><a name="feedback">Feedback</a></h5>
+<div id="feedback_div">
+<ol id="feedback" class="feedback">
+
+<li class="feedbackitem" id="feedback-245">
+<div class="author">   
+<cite><a href="http://wordaligned.org">Thomas Guest</a></cite>
+2007-02-04
+</div>
+<div class="content">
+<p>On the subject or readable C code: I recently worked with <a href="http://www.freetype.org" rel="nofollow">FreeType</a>, and it reminded me just how good C can be -- a truly excellent library.</p>
+
+</div>
+</li>
+
+</ol>
+</div>
+
+<div class="comments"><hr/><div id="disqus_thread"></div><script type="text/javascript" src="http://disqus.com/forums/wordaligned/embed.js"></script></div>
+      
+<div id="comments"><script type="text/javascript">
+//<![CDATA[
+(function() {
+    var links = document.getElementsByTagName('a');
+    var query = '?';
+    for(var i = 0; i < links.length; i++) {
+        if(links[i].href.indexOf('#disqus_thread') >= 0) {
+            query += 'url' + i + '=' + encodeURIComponent(links[i].href) + '&amp;';
+        }
+    }
+    document.write('<script type="text/javascript" src="http://disqus.com/forums/wordaligned/get_num_replies.js' + query + '"></' + 'script>');
+})();
+//]]>
+</script></div>
+
+    </div>
+    <div id="sidebar">
+      <div class="sidebar-node">
+<h3>Excerpt</h3>
+<p><a href="#excerpt0">This approach of learning how to program by reading code is far from
+radical but is perhaps better suited to some languages than others.</a></p>
+
+</div>
+
+<div class="sidebar-node">
+<h3>Tagged</h3>
+<ul id="categories"><li><a href="/tag/c++" rel="tag">C++</a></li>
+<li><a href="/tag/java" rel="tag">Java</a></li>
+<li><a href="/tag/python" rel="tag">Python</a></li>
+<li><a href="/tag/ruby" rel="tag">Ruby</a></li>
+<li><a href="/tag/sicp" rel="tag">SICP</a></li></ul>
+
+</div>
+
+<div class="sidebar-node">
+<h3>Chain</h3>
+<ul>
+<li><a accesskey="n" href="/articles/binary-literals" title="Next article">&laquo; Binary Literals</a></li>
+<li><a accesskey="p" href="/articles/keyword-substitution-just-say-no" title="Previous article">&raquo; Keyword Substitution - Just say No!</a></li>
+</ul>
+
+
+</div>
+
+<div class="sidebar-node">
+<h3>Feeds</h3>
+
+<ul>
+<li><a href="http://feeds.wordaligned.org/wordaligned"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Articles</a></li>
+<li><a href="http://feeds.wordaligned.org/wordaligned/comments"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Comments</a></li>
+</ul>
+
+
+</div>
+
+    </div>
+  </div>
+  <div id="footer">
+<hr />
+<p><a href="http://tag.wordaligned.org">Thomas Guest</a></p>
+</div>
+
+</div>
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-3373724-1']);
+  _gaq.push(['_trackPageview']);
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ga);
+  })();
+</script>
+</body>
+
+</html>

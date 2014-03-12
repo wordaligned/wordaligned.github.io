@@ -1,0 +1,322 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<link rel="icon" href="/images/favicon.png" type="image/png"/>
+<link href="/styles/application.css" media="all" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="/scripts/prettify.js"></script>
+<script type="text/javascript" src="/scripts/lang-lisp.js"></script>
+<script type="text/javascript" src="http://www.haloscan.com/load/wordaligned"></script>
+
+<title>Zippy triples served with Python</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="author" content="Thomas Guest" />
+<meta name="description" content="How do you generate previous, this, next, triples from a collection. A stream-based solution in Python. A Word Aligned article posted 2007-11-20, tagged Python, Puzzles, Functional Programming, Streams." />
+<meta name="keywords" content="Python, Puzzles, Functional Programming, Streams" />
+<link rel="alternate" type="application/rss+xml" title="Feed" href="http://feeds.wordaligned.org/wordaligned" />
+</head>
+
+<body onload="prettyPrint()">
+<div id="container">
+  <div id="header">
+<h1><span><a accesskey="h" href="/">Word Aligned</a></span></h1>
+<h2>space sensitive programming</h2>
+<a class="button" href="http://feeds.wordaligned.org/wordaligned" title="Subscribe to Word Aligned"><img style="float: right;" src="/images/feed.png" alt="Feed Logo" height="28" width="28"/></a>
+</div>
+
+  <div id="page">
+    <div id="content">
+      <div class="atomentry" id="zippy-triples-served-with-python.html">
+<h2 class="title"><a href="/articles/zippy-triples-served-with-python.html">Zippy triples served with Python</a></h2>
+<p class="meta"><abbr class="published" title="2007-11-20">2007-11-20</abbr> &bull; <a href="/tag/python" rel="tag">Python</a>, <a href="/tag/puzzles" rel="tag">Puzzles</a>, <a href="/tag/functional-programming" rel="tag">Functional Programming</a>, <a href="/tag/streams" rel="tag">Streams</a> &bull; <a href="/articles/zippy-triples-served-with-python.html#disqus_thread">Comments</a></p>
+<h3>The Problem</h3>
+<p>Here&#8217;s a problem I encountered when writing the HTML generator for this site. Logically, Word Aligned is a time-ordered collection of articles. I wanted each article to link to its predecessor and successor. So the general problem is: 
+   <strong>How do you iterate through a collection yielding (previous, this, next) triples?</strong>
+</p>
+<span id="continue-reading"/>
+
+
+<h3>Specification</h3>
+<p>Some test cases make things clearer. Let&#8217;s name the function we&#8217;re developing <code>prev_this_next()</code>.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">&gt;&gt;&gt; long_weekend = 'Fri', 'Sat', 'Sun', 'Mon',
+&gt;&gt;&gt; yesterday_today_tomorrow = prev_this_next(long_weekend)
+&gt;&gt;&gt; yesterday_today_tomorrow.next()
+(None, 'Fri', 'Sat')
+&gt;&gt;&gt; yesterday_today_tomorrow.next()
+('Fri', 'Sat', 'Sun')
+&gt;&gt;&gt; yesterday_today_tomorrow.next()
+('Sat', 'Sun', 'Mon')
+&gt;&gt;&gt; yesterday_today_tomorrow.next()
+('Sun', 'Mon', None)
+&gt;&gt;&gt; yesterday_today_tomorrow.next()
+Traceback (most recent call last):
+    ...
+StopIteration
+&gt;&gt;&gt; for ptn in prev_this_next(range(5)):
+...     print ptn
+... 
+(None, 0, 1)
+(0, 1, 2)
+(1, 2, 3)
+(2, 3, 4)
+(3, 4, None)
+&gt;&gt;&gt; print "\n".join(map(repr, prev_this_next("XYZ")))
+(None, 'X', 'Y')
+('X', 'Y', 'Z')
+('Y', 'Z', None)
+
+</pre>
+
+</div>
+
+<p>You&#8217;ll notice we&#8217;ve specified behaviour at the boundaries: the first item in the collection has no predecessor, thus the first triple returned has its first item set to <code>None</code>; and similarly the final triple has its third item set to <code>None</code>. We might equally well have chosen to return a user supplied default, or to wrap the collection at its ends. For now, let&#8217;s go with the simple behaviour shown.
+</p>
+<p>You&#8217;ll also have noticed I&#8217;m writing Python &#8212; fair enough, since this web site is generated off-line using Python. The <code>long_weekend</code> example drives the Python iterator protocol by hand, calling <code>yesterday_today_tomorrow.next()</code> until a <code>StopIteration</code> exception terminates the iteration. It&#8217;s quite rare to use iterators in this way: more commonly, you just loop through them using <code>for</code>, or plug them into container operations. The second and third test cases show more typical usage.
+</p>
+
+<h3>First Implementation</h3>
+<p>If this were C++, we&#8217;d prefer our collection to support bi-directional iteration: think of a doubly-linked <code>std::list</code>, or a plain old random access <code>std::vector</code>. Then we could just decrement/increment each iterator from the collection to find its neighbours. 
+</p>
+<p>In Python, we might decide to assume a random access container and write something like this:
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">def get_default(items):
+    "Return an item getter function."
+    n_items = len(items)
+    def inner(index):
+        "Return items[index] or None if index is out of range."
+        if index &lt; 0 or index &gt;= n_items:
+            return None
+        else:
+            return items[index]
+    return inner
+
+def prev_this_next(items):
+    get = get_default(items)
+    for ix, item in enumerate(items):
+        yield get(ix - 1), item, get(ix + 1)
+
+</pre>
+
+</div>
+
+<p>This code isn&#8217;t elegant but it does pass our tests. Incidentally, an attempt to implement <code>get_default</code> using <a href="/articles/permission-and-forgiveness.html">EAFP</a>, as shown below, would fail. Can you see why?
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">def inner(index):
+    try:
+        return items[index]
+    except IndexError:
+        return None
+
+</pre>
+
+</div>
+
+<p>This fails because accessing <code>items[-1]</code> doesn&#8217;t raise an <code>IndexError</code> (unless <code>items</code> is empty); it&#8217;s a convenient way to access the final element of <code>items</code>.
+</p>
+<p>Even with the correct version of <code>get_default</code>, if our collection of items is a stream &#8212; by which I mean a lazily-evaluated iterable &#8212; this code raises an exception. We don&#8217;t know how long the stream will be (indeed, it could be infinite) and we can&#8217;t just access elements from it at random. For C++ programmers, think of sequentially reading a file using an input iterator.
+</p>
+
+<h3>Stream Test Case</h3>
+<p>Let&#8217;s adapt one of our test cases to expose this flaw.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">&gt;&gt;&gt; long_weekend = iter(('Fri', 'Sat', 'Sun', 'Mon'))
+&gt;&gt;&gt; yesterday_today_tomorrow = prev_this_next(long_weekend)
+...
+
+</pre>
+
+</div>
+
+<p>Running this code raises an exception:
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">Traceback (most recent call last):
+    ...
+TypeError: object of type 'tupleiterator' has no len()
+
+</pre>
+
+</div>
+
+
+<h3>Stream Solution</h3>
+<p>Thinking of this problem in terms of streams gives us a solution which is both more general and more simple. All we have to do is tee up three independent iterators into the stream, stagger them, then zip them back together. <span id="excerpt0"/>The itertools module supplies the components. We connect.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">import itertools
+
+def prev_this_next(items):
+    extend = itertools.chain([None], items, [None])
+    prev, this, next = itertools.tee(extend, 3)
+    try:
+        this.next()
+        next.next()
+        next.next()
+    except StopIteration:
+        pass
+    return itertools.izip(prev, this, next)
+
+</pre>
+
+</div>
+
+<p>This code works on any iterable, infinite, finite or empty, lazy or eager. Some more testcases:
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">&gt;&gt;&gt; [ptn for ptn in prev_this_next(list())]
+[]
+&gt;&gt;&gt; [ptn for ptn in prev_this_next(set([1]))]
+[(None, 1, None)]
+&gt;&gt;&gt; ptn = prev_this_next(itertools.count())
+&gt;&gt;&gt; itertools.islice(ptn, 100, 101).next()
+(99, 100, 101)
+
+</pre>
+
+</div>
+
+
+<h3>Triples Times Two</h3>
+<p>Now suppose you want to peel items from an iterable, three at a time. Let&#8217;s call this function <code>three_at_a_time()</code> and let&#8217;s specify its behaviour with some simple tests:
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">&gt;&gt;&gt; t = three_at_a_time((1, 2, 3, 4, 5, 6))
+&gt;&gt;&gt; t.next()
+(1, 2, 3)
+&gt;&gt;&gt; t.next()
+(4, 5, 6)
+&gt;&gt;&gt; t.next()
+Traceback (most recent call last):
+    ...
+StopIteration
+&gt;&gt;&gt; ttt = three_at_a_time((1, 2, 3, 4))
+&gt;&gt;&gt; [t for t in ttt]
+[(1, 2, 3)]
+&gt;&gt;&gt; ttt = three_at_a_time(itertools.count())
+&gt;&gt;&gt; ttt = itertools.islice(ttt, 0, 9, 3)
+&gt;&gt;&gt; [t for t in ttt]
+[(0, 1, 2), (9, 10, 11), (18, 19, 20)]
+&gt;&gt;&gt; "".join(chain(*three_at_a_time("Word Aligned")))
+'Word Aligned'
+
+</pre>
+
+</div>
+
+<p>Note that any trailing single element or pair at the end of the collection is discarded. We might equally have decided to pad the collection with a user-supplied default or throw an exception.
+</p>
+<p>Here&#8217;s one implementation.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">def three_at_a_time(items):
+    it = iter(items)
+    return itertools.izip(it, it, it)
+
+</pre>
+
+</div>
+
+<p>Here&#8217;s another.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">def n_at_a_time(items, n):
+    it = iter(items)
+    return itertools.izip(* [it] * n)
+
+three_at_a_time = lambda items: n_at_a_time(items, 3)
+
+</pre>
+
+</div>
+</div>
+
+<div class="comments"><hr/><div id="disqus_thread"></div><script type="text/javascript" src="http://disqus.com/forums/wordaligned/embed.js"></script></div>
+      
+<div id="comments"><script type="text/javascript">
+//<![CDATA[
+(function() {
+    var links = document.getElementsByTagName('a');
+    var query = '?';
+    for(var i = 0; i < links.length; i++) {
+        if(links[i].href.indexOf('#disqus_thread') >= 0) {
+            query += 'url' + i + '=' + encodeURIComponent(links[i].href) + '&amp;';
+        }
+    }
+    document.write('<script type="text/javascript" src="http://disqus.com/forums/wordaligned/get_num_replies.js' + query + '"></' + 'script>');
+})();
+//]]>
+</script></div>
+
+    </div>
+    <div id="sidebar">
+      <div class="sidebar-node">
+<h3>Excerpt</h3>
+<p><a href="#excerpt0">The itertools module supplies the components. We connect.</a></p>
+
+</div>
+
+<div class="sidebar-node">
+<h3>Tagged</h3>
+<ul id="categories"><li><a href="/tag/python" rel="tag">Python</a></li>
+<li><a href="/tag/puzzles" rel="tag">Puzzles</a></li>
+<li><a href="/tag/functional-programming" rel="tag">Functional Programming</a></li>
+<li><a href="/tag/streams" rel="tag">Streams</a></li></ul>
+
+</div>
+
+<div class="sidebar-node">
+<h3>Chain</h3>
+<ul>
+<li><a accesskey="n" href="/articles/ever-wish-youd-branched-first.html" title="Next article">&laquo; Ever wish you&#8217;d branched first?</a></li>
+<li><a accesskey="p" href="/articles/paging-through-the-manual-using-access-keys.html" title="Previous article">&raquo; Paging through the Manual using Access Keys</a></li>
+</ul>
+
+
+</div>
+
+<div class="sidebar-node">
+<h3>Feeds</h3>
+
+<ul>
+<li><a href="http://feeds.wordaligned.org/wordaligned"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Articles</a></li>
+<li><a href="http://feeds.wordaligned.org/wordaligned/comments"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Comments</a></li>
+</ul>
+
+
+</div>
+
+    </div>
+  </div>
+  <div id="footer">
+<hr />
+<p><a href="http://tag.wordaligned.org">Thomas Guest</a></p>
+</div>
+
+</div>
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-3373724-1']);
+  _gaq.push(['_trackPageview']);
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ga);
+  })();
+</script>
+</body>
+
+</html>

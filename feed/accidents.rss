@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" >
+<channel>
+<title>Word Aligned</title>
+<link>http://wordaligned.org</link>
+<description>tales from the code face</description>
+<dc:creator>tag@wordaligned.org</dc:creator>
+<language>en-gb</language>
+<item>
+<title>Launching missiles and other unhappy accidents</title>
+<description>&lt;h3&gt;Team work&lt;/h3&gt;
+&lt;p&gt;&lt;a href="http://en.wikipedia.org/wiki/Buses_in_London"&gt;&lt;img style="float:right;" src="http://upload.wikimedia.org/wikipedia/commons/thumb/d/d0/Routemaster.JPG/180px-Routemaster.JPG" alt="Routemaster bus"/&gt;&lt;/a&gt;
+&lt;/p&gt;
+&lt;p&gt;Only Iain really understood the application engine, a particularly subtle and complex part of our system. We depended on him alone for any modifications in this area. To reduce the risk, the project manager paired me with Iain to work on a new feature for the engine. After all,
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;&amp;#8220;What would happen if Iain fell under a bus?&amp;#8221;
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;Well, if something that terrible happened, I don&amp;#8217;t suppose I&amp;#8217;d have cared much about the app engine. As it turned out we never got started on that feature. A customer reported a critical bug in the graphics library &amp;#8212; a more straightforward part of the system, but one which only &lt;strong&gt;I&lt;/strong&gt; knew about &amp;#8212; and by the time I&amp;#8217;d turned in a fix Iain was heading off for the weekend. Celtic were at home to Rangers. He had a plane to catch.
+&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://www.celticfc.net"&gt;&lt;img  src="http://www.celticfc.net/images/doc/celticcrest.png" alt="Celtic FC Logo"/&gt;&lt;/a&gt;
+&lt;/p&gt;
+
+&lt;h3&gt;Haskell makes the A-Z&lt;/h3&gt;
+&lt;p&gt;&lt;a href="http://haskell.org"&gt;&lt;img src="http://haskell.org/wikistatic/haskellwiki_logo.png" alt="Haskell wiki logo" style="float:right;"/&gt;&lt;/a&gt;
+&lt;/p&gt;
+&lt;p&gt;Switching from buses and planes to Haskell, &lt;a href="http://www.computerworld.com.au/index.php/id;1974033854"&gt;Computerworld&amp;#8217;s great A-Z of Programming Languages series&lt;/a&gt; recently featured &lt;a href="http://research.microsoft.com/~simonpj/"&gt;Simon Peyton Jones&lt;/a&gt; talking with characteristic exuberance about the language.
+&lt;/p&gt;
+&lt;p&gt;Haskell&amp;#8217;s roots are in academia. Unlike, say, C++ or Erlang, it wasn&amp;#8217;t created with a particular real world application in mind. Rather, the language aimed at rigorously investigating an approach to programming, that approach being strongly-typed lazily-evaluated functional programming. Pure functional programming, if you like. As the language continues to evolve its purity has not been watered down &amp;#8212; what&amp;#8217;s more, as computer architectures develop, the real world seems to be turning towards Haskell.
+&lt;/p&gt;
+&lt;p&gt;So much for the summary. It&amp;#8217;s the terrible side effects I&amp;#8217;d like to pick up on.
+&lt;/p&gt;
+&lt;span id="continue-reading"/&gt;
+
+
+&lt;h3&gt;Launching Missiles&lt;/h3&gt;
+&lt;p&gt;In the interview Simon Peyton Jones talks about pure functions and side effects, a subject &lt;a href="http://wordaligned.org/articles/programming-nirvana-plan-b.html"&gt;I was lucky enough to hear him present&lt;/a&gt; on at this year&amp;#8217;s ACCU conference.
+&lt;/p&gt;
+&lt;p&gt;Advantage number 1. Pure functions can execute in parallel.
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;If the functions that you call do not have any side effect effects behind the scenes, if all they do is compute a value from the input values that you give them, then if you have two such things, you can clearly do them both at the same time. And that&amp;#8217;s purely functional programming. Mainstream languages are, by default, dangerous for parallel evaluation. And purely functional languages are by default fine at parallel evaluation.
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;Advantage number 2. Pure functions are safer.
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;Functional, whether lazy or non-lazy, means no side effect. It doesn&amp;#8217;t mess about behind the scenes &amp;#8212; it doesn&amp;#8217;t launch the missiles, it doesn&amp;#8217;t write to the disk.
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;&lt;a href="http://en.wikipedia.org/wiki/Ballistic_missile"&gt;&lt;img src="http://upload.wikimedia.org/wikipedia/commons/thumb/6/60/Minuteman3launch.jpg/300px-Minuteman3launch.jpg" alt="Missile launch"/&gt;&lt;/a&gt;
+&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Launching missiles?&lt;/strong&gt; As a side effect, it&amp;#8217;s certainly more dangerous than printing &amp;#8220;Hello, World&amp;#8221; to a terminal. Simon Peyton Jones again, in this case discussing what&amp;#8217;s meant by evaluation order, and why strictness matters.
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;In theory, lazy evaluation means that you can&amp;#8217;t take the ML or Scheme route of just saying &amp;#8216;oh well, we&amp;#8217;ll just allow you to do input/output side effects&amp;#8217;, as you don&amp;#8217;t know what order they&amp;#8217;ll happen in. You wouldn&amp;#8217;t know if you armed the missiles before launching them, or launched them before arming them.
+&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h3&gt;Safety Critical&lt;/h3&gt;
+&lt;p&gt;Haskell&amp;#8217;s roots, as already mentioned, are in academia, but funnily enough Simon Peyton Jones has more teaching experience with a language more traditionally associated with missiles and the military.
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;While I was at Glasgow I was exclusively engaged in first year teaching of Ada &amp;#8230;
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;Let&amp;#8217;s suppose Haskell were used to control a hypothetical missile launcher. It&amp;#8217;s true that the &lt;strong&gt;language&lt;/strong&gt; allows programmers to formally partition the system between the safe, pure functions, and those which risk changing the world by probing the launch device; but to be truly confident, we must also test the &lt;strong&gt;platform&lt;/strong&gt;, by which I mean the compiler, the machine code it generates, and indeed the underlying machine which that code executes on.
+&lt;/p&gt;
+&lt;p&gt;Haskell compiler writers have a big responsibility!
+&lt;/p&gt;
+&lt;p&gt;Here&amp;#8217;s an even bigger irony: C, a language as side-effectful as they come, is often used to program military devices for the reason that C, as a platform, is easier to ratify. You compile sample programs, you cross-check the generated assembler.
+&lt;/p&gt;
+&lt;p&gt;OK, I know, I&amp;#8217;m reading far too much into the &amp;#8220;launch the missiles&amp;#8221; example, but I&amp;#8217;ll admit the phrase makes me shiver, much like the hacker term &lt;a href="http://www.catb.org/jargon/html/I/ICBM-address.html"&gt;&amp;#8220;ICBM address&amp;#8221;&lt;/a&gt; for geo-tagging does &amp;#8212; and indeed the suggestion that bus accidents should motivate team work.
+&lt;/p&gt;
+&lt;p&gt;Somewhere out there, computer programs really do have the power to launch missiles. I couldn&amp;#8217;t find any report of disaster caused by such a program but I did find &lt;a href="http://www.wired.com/science/discoveries/news/2007/09/dayintech_0926"&gt;this story&lt;/a&gt; about a satellite early warning system reporting &lt;strong&gt;in error&lt;/strong&gt; that five ballistic missiles had been launched at Russia. 
+   Fortunately duty officer Lt. Col. Stanislav Petrov smelled a rat.
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;&amp;#8220;I had a funny feeling in my gut&amp;#8221; that this was a false alarm. For one thing, the report indicated that only five missiles had been fired. Had the United States been launching an actual nuclear attack, he reasoned, ICBMs would be raining down on them.
+&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h3&gt;Falling under a bus&lt;/h3&gt;
+&lt;p&gt;There was no sign of Iain at work on the Monday morning, and he&amp;#8217;d normally be one of the first in. I had a funny feeling in my gut when the project manager summarily told us to stop what we were doing and gather for an all-hands meeting. Something serious had happened. Maybe we&amp;#8217;d been taken over or someone had been sacked. Actually, it was worse than that.
+&lt;/p&gt;
+&lt;p&gt;We all stood in the centre of the open-plan office, shuffling, shutting phones down, waiting. The project manager broke the news. This morning he&amp;#8217;d had a call. On Saturday, Iain had been at the match with some friends. Afterwards, heading away from the ground, no doubt jostled by the crowd, he&amp;#8217;d fallen into the road. He&amp;#8217;d been hit by a bus. Emergency brain surgery &amp;#8230; a helicopter flight &amp;#8230; more surgery to follow &amp;#8230; the situation looked bad &amp;#8230; would keep us all informed.
+&lt;/p&gt;
+
+&lt;h3&gt;Outcome&lt;/h3&gt;
+&lt;p&gt;After a long period of convalescence Iain returned to work. He has some chilling scars and trouble with tinnitus. Otherwise, he was lucky. Now, when we shuffle work around so as not to depend on one person, we don&amp;#8217;t talk about falling under buses.
+&lt;/p&gt;</description>
+<dc:date>2008-09-28</dc:date>
+<guid>http://wordaligned.org/articles/launching-missiles-and-other-unhappy-accidents.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/launching-missiles-and-other-unhappy-accidents.html</link>
+<category>Accidents</category>
+</item>
+
+</channel>
+</rss>

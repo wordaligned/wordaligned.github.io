@@ -1,0 +1,346 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<link rel="icon" href="/images/favicon.png" type="image/png"/>
+<link href="/styles/application.css" media="all" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="/scripts/prettify.js"></script>
+<script type="text/javascript" src="/scripts/lang-lisp.js"></script>
+<script type="text/javascript" src="http://www.haloscan.com/load/wordaligned"></script>
+
+<title>Brackets Off!</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="author" content="Thomas Guest" />
+<meta name="description" content="Thoughts on operator precedence. A Word Aligned article posted 2004-05-06, tagged C, ACCU, Java, Python." />
+<meta name="keywords" content="C, ACCU, Java, Python" />
+<link rel="alternate" type="application/rss+xml" title="Feed" href="http://feeds.wordaligned.org/wordaligned" />
+</head>
+
+<body onload="prettyPrint()">
+<div id="container">
+  <div id="header">
+<h1><span><a accesskey="h" href="/">Word Aligned</a></span></h1>
+<h2>professionalism in programming</h2>
+<a class="button" href="http://feeds.wordaligned.org/wordaligned" title="Subscribe to Word Aligned"><img style="float: right;" src="/images/feed.png" alt="Feed Logo" height="28" width="28"/></a>
+</div>
+
+  <div id="page">
+    <div id="content">
+      <div class="atomentry" id="brackets-off.html">
+<h2 class="title"><a href="/articles/brackets-off.html">Brackets Off!</a></h2>
+<p class="meta"><abbr class="published" title="2004-05-06">2004-05-06</abbr> &bull; <a href="/tag/c" rel="tag">C</a>, <a href="/tag/accu" rel="tag">ACCU</a>, <a href="/tag/java" rel="tag">Java</a>, <a href="/tag/python" rel="tag">Python</a> &bull; <a href="/articles/brackets-off.html#disqus_thread">Comments</a></p>
+<p>The mathematical formula:
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">v = u + at
+
+</pre>
+
+</div>
+
+<p>calculates the speed, <code>v</code>, of an object, with initial speed <code>u</code> and constant acceleration <code>a</code>, after time <code>t</code>. Placing the <code>a</code> next to the <code>t</code> is a convenient shorthand for &#8220;multiply <code>a</code> by <code>t</code>&#8221;, which also makes it apparent that the multiplication must be done before the addition.
+</p>
+<p>When the same formula is written in C, the multiplication operator needs
+   explicit representation:
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">v = u + a * t;
+
+</pre>
+
+</div>
+
+<p>The layout of this expression no longer makes it clear that the multiplication should be done before the addition, so a programmer might choose to parenthesise:
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">v = u + (a * t)
+
+</pre>
+
+</div>
+
+<p>Are these parentheses required to guarantee correct evaluation of <code>v</code>? If not, should they be included anyway, to help convey the meaning of the expression? How can coding standards help with such choices?
+</p>
+<p>This article aims to answer these questions. It first presents some examples of the operator precedence and associativity rules in action, then offers some guidelines on when to parenthesise expressions, and finally argues that these guidelines should be replaced by a single rule.
+</p>
+
+<h3>Examples</h3>
+<div class="typocode">
+
+<pre class="prettyprint">v = u + a * t,
+x = 8 - 4 - 2,
+r = h &lt;&lt; 4 + 1,
+str += ((errors == 0) ? "succeeded" : "failed"),
+*utf++ = 0x80 | ucs &gt;&gt; 6 &amp; 0x6f;
+
+</pre>
+
+</div>
+
+<p>Our first example, <code>v = u + a * t</code> contains three operators: assignment, addition and multiplication. These operators &#8212; indeed all operators &#8212; follow a strict precedence which defines the order of evaluation. Since multiplication has higher precedence than addition, which in turn has higher precedence than assigment, the expression is equivalent to:
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">v = (u + (a * t))
+
+</pre>
+
+</div>
+
+<p>This means the compiler can be trusted with the expression as first presented.
+   No parentheses are required. Good, the language does what we expect.
+</p>
+<p>In the second example, subtraction binds more tightly (i.e. has higher precedence than) assignment, so the subtractions are performed first. Since all the arithmetic operators associate left to right the expression is equivalent to:
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">x = ((8 - 4) - 2)
+
+</pre>
+
+</div>
+
+<p>In <code>r = h &lt;&lt; 4 + 1</code> the arithmetic addition operator binds more tightly than the shift operator, so the expression is equivalent to:
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">r = (h &lt;&lt; (4 + 1))
+
+</pre>
+
+</div>
+
+<p>Why did the programmer not write <code>r = h &lt;&lt; 5</code>? Probably because the intention was:
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">r = (h &lt;&lt; 4) + 1
+
+</pre>
+
+</div>
+
+<p>but bit shifting (like, say, finding the address of something, or subscripting
+   an array) somehow seems closer to the machine and feels as if it ought to be
+   of higher precedence than addition, so the crucial parentheses were missed <a id="fn1link" href="#footnote1">[1]</a>.
+</p>
+<p>The parentheses are unneccessary in our fourth example. We could rewrite:
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">str += ((errors == 0) ? "succeeded" : "failed")
+
+</pre>
+
+</div>
+
+<p>as:
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">str += errors == 0 ? "succeeded" : "failed"
+
+</pre>
+
+</div>
+
+<p>since the comparison operators bind more tightly than the conditional operator, which in turn binds more tightly than the assignment operators. Do the parentheses help you understand the meaning of this expression? Would you have left them out &#8212; and if so, would one of your team-mates have complained?
+</p>
+<p>How should the fifth example be parenthesised, to make its meaning clear? It is equivalent to:
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">(*(utf++)) = (0x80 | ((ucs &gt;&gt; 6) &amp; 0x6f))
+
+</pre>
+
+</div>
+
+<p>which shows how complicated an expression looks when parentheses are added indiscriminately.
+</p>
+
+<h3>Coding Standards</h3>
+<p>In general &#8212; at least, in my experience &#8212; <a href="/articles/retro-fitting-coding-standards.html">coding standards</a> do not provide rules on how to parenthesise expressions. I suspect this is for two reasons.
+</p>
+<p>Firstly, because although all programmers use parentheses to clarify the meaning of expressions, they may well disagree on what makes an expression clear. Clarity seems a matter of taste. While programmers in a team may agree (to differ) on whether tabs or spaces are to be used for indentation, their coding standard leaves them free to rewrite Example 4 as:
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">str += errors == 0 ? "succeeded" : "failed"
+
+</pre>
+
+</div>
+
+<p>And secondly, if a coding standard were to rule on how to parenthesise, it would be difficult to find a middle ground. This leaves as candidate rules the two extremes:
+</p>
+<ol>
+ <li>
+     parenthesise everything
+ </li>
+
+ <li>
+     never parenthesise
+ </li>
+</ol>
+<p>The first quickly leads to unreadable code. The second seems overly proscriptive.
+</p>
+<p>In the absence of a hard rule, here are some guidelines which I hope are
+   non-contentious and which may help us reach a conclusion:
+</p>
+<ul>
+ <li>
+     have the operator precedence tables to hand and understand how to interpret expressions using them   <br />
+ </li>
+
+ <li>
+     understand the logic behind the operator precedence tables, but be aware of the traps and pitfalls
+ </li>
+
+ <li>
+     remember, parentheses are not the only way to make order of evaluation clear. For example, our fourth example could be rewritten:
+ </li>
+</ul>
+<div class="typocode">
+
+<pre class="prettyprint">*utf++ = 0x80 | 
+              ucs &gt;&gt; 6 &amp; 
+              0x6f
+
+</pre>
+
+</div>
+
+<ul>
+ <li>
+     or even:
+ </li>
+</ul>
+<div class="typocode">
+
+<pre class="prettyprint">*utf = ucs &gt;&gt; 6; 
+*utf &amp;= 0x6f; 
+*utf |= 0x80; 
+++utf;
+
+</pre>
+
+</div>
+
+<ul>
+ <li>
+     if an expression is hard to understand, break it down into simpler steps, or extract it out as a function with a meaningful name
+ </li>
+
+ <li>
+     trust the compiler: it might not implement partial template specialisation correctly, but it will get operator precedence right every time
+ </li>
+
+ <li>
+     never use parentheses simply because you aren&#8217;t sure of how an expression will be evaluated without them: treat doubt as an opportunity to learn
+ </li>
+
+ <li>
+     all macro arguments must be parenthesised.
+ </li>
+</ul>
+
+<h3>Concluding Thoughts</h3>
+<p>Any effort put into becoming familiar with precedence tables is likely to pay off across a range of languages. For example, although C++ introduces several new operators over C, there are no surprises. The precedence rules remain in force even if the operators have been overloaded (but that&#8217;s the subject of another article). Java operator precedence is almost a subset of C&#8217;s. Similarly, scripting languages are generally compatible with C, even where C&#8217;s precedence rules are slightly <a id="fn2link" href="#footnote2">[2]</a>. So, while Perl introduces lower precedence versions of the logical operators <code>not</code>, <code>and</code>, and <code>or</code>, it ensures that <code>not</code> binds more tightly than <code>and</code> which in turn binds more tightly than <code>or</code>. Interestingly, in <a href="http://python.org">Python</a>, where whitespace is syntactically significant, parentheses can be used not just to indicate order of evaluation, but also to wrap lengthy expressions over several lines.
+</p>
+<p>The more experienced I become as programmer, the fewer parentheses I use. Coming from a mathematical background, it was several months into my first job before I dared use the conditional operator &#8212; and when I finally did start using it, I parenthesised all the sub-expressions for safety. Later on in my career, when I first found myself working with the bitwise operators, again, I enclosed sub-expressions with brackets. As my confidence has increased, the brackets have peeled away.
+</p>
+<p>This, though, is simply evolution. Familiarity with the languages you use makes it easier to read expressions without the unnecessary noise of parentheses. Evolving in this way, however, leaves a programmer vulnerable when working on code written by a more experienced team-mate, unless the experienced programmer writes to a lowest common denominator.
+</p>
+<p>Surely it would be better for everyone to raise their game. The operator precedence tables are a fundamental part of the language. The rules for using them are simple. Although there are many precedence levels, the operators do group logically. Update your coding standards. Prohibit unnecessary parentheses. Brackets off!
+</p>
+<hr />
+
+
+<h3>Notes</h3>
+<div class="amazon"><a href="http://www.amazon.com/gp/product/0201179288?ie=UTF8&amp;tag=wordalig-20&amp;linkCode=as2&amp;camp=1789&amp;creative=9325&amp;creativeASIN=0201179288"><img  src="/images/books/c-traps-and-pitfalls.jpg" alt="Book cover"/></a></div>
+
+<p><a href="#fn1link" id="footnote1">[1]</a> I&#8217;ve taken this example directly from Andrew Koenig&#8217;s <a href="http://www.amazon.com/gp/product/0201179288?ie=UTF8&amp;amp;tag=wordalig-20&amp;amp;linkCode=as2&amp;amp;camp=1789&amp;amp;creative=9325&amp;amp;creativeASIN=0201179288">&#8220;C Traps and Pitfalls&#8221;</a>. This is a nice little book which expands on the ideas presented in a <a href="http://www.literateprogramming.com/ctraps.pdf">paper of the same name [PDF]</a>.
+</p>
+<p><a href="#fn2link" id="footnote2">[2]</a> According to Koenig, some of C&#8217;s
+   peculiarities can be blamed on its heritage:
+</p>
+<blockquote><p>The precedence of the C logical operators comes about for historical reasons. B, the predecessor of C, had logical operators that corresponded roughly to C&#8217;s <code>&amp;</code> and <code>|</code> operators. Although they were defined to act on bits, the compiler would treat them as <code>&amp;&amp;</code> and <code>||</code> if they were in a conditional context. When the two usages were split apart in C, it was deemed too dangerous to change the precedence much.
+</p>
+</blockquote><p>This article first appeared appeared in <a href="http://accu.org/index.php/aboutus/aboutjournals">C Vu</a> 15.6, and I am grateful to all at C Vu for their help.
+</p>
+</div>
+
+<div class="comments"><hr/><div id="disqus_thread"></div><script type="text/javascript" src="http://disqus.com/forums/wordaligned/embed.js"></script></div>
+      
+<div id="comments"><script type="text/javascript">
+//<![CDATA[
+(function() {
+    var links = document.getElementsByTagName('a');
+    var query = '?';
+    for(var i = 0; i < links.length; i++) {
+        if(links[i].href.indexOf('#disqus_thread') >= 0) {
+            query += 'url' + i + '=' + encodeURIComponent(links[i].href) + '&amp;';
+        }
+    }
+    document.write('<script type="text/javascript" src="http://disqus.com/forums/wordaligned/get_num_replies.js' + query + '"></' + 'script>');
+})();
+//]]>
+</script></div>
+
+    </div>
+    <div id="sidebar">
+      
+<div class="sidebar-node">
+<h3>Tagged</h3>
+<ul id="categories"><li><a href="/tag/c" rel="tag">C</a></li>
+<li><a href="/tag/accu" rel="tag">ACCU</a></li>
+<li><a href="/tag/java" rel="tag">Java</a></li>
+<li><a href="/tag/python" rel="tag">Python</a></li></ul>
+
+</div>
+
+<div class="sidebar-node">
+<h3>Chain</h3>
+<ul>
+<li><a accesskey="n" href="/articles/code-in-comments.html" title="Next article">&laquo; Code in Comments</a></li>
+
+</ul>
+
+
+</div>
+
+<div class="sidebar-node">
+<h3>Feeds</h3>
+
+<ul>
+<li><a href="http://feeds.wordaligned.org/wordaligned"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Articles</a></li>
+<li><a href="http://feeds.wordaligned.org/wordaligned/comments"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Comments</a></li>
+</ul>
+
+
+</div>
+
+    </div>
+  </div>
+  <div id="footer">
+<hr />
+<p><a href="http://tag.wordaligned.org">Thomas Guest</a></p>
+</div>
+
+</div>
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-3373724-1']);
+  _gaq.push(['_trackPageview']);
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ga);
+  })();
+</script>
+</body>
+
+</html>

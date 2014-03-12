@@ -1,0 +1,372 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<link rel="icon" href="/images/favicon.png" type="image/png"/>
+<link href="/styles/application.css" media="all" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="/scripts/prettify.js"></script>
+<script type="text/javascript" src="/scripts/lang-lisp.js"></script>
+<script type="text/javascript" src="http://www.haloscan.com/load/wordaligned"></script>
+
+<title>Takewhile drops one</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="author" content="Thomas Guest" />
+<meta name="description" content="A Word Aligned article posted 2008-04-23, tagged Python, Streams, Shell, Algorithms." />
+<meta name="keywords" content="Python, Streams, Shell, Algorithms" />
+<link rel="alternate" type="application/rss+xml" title="Feed" href="http://feeds.wordaligned.org/wordaligned" />
+</head>
+
+<body onload="prettyPrint()">
+<div id="container">
+  <div id="header">
+<h1><span><a accesskey="h" href="/">Word Aligned</a></span></h1>
+<h2>space sensitive programming</h2>
+<a class="button" href="http://feeds.wordaligned.org/wordaligned" title="Subscribe to Word Aligned"><img style="float: right;" src="/images/feed.png" alt="Feed Logo" height="28" width="28"/></a>
+</div>
+
+  <div id="page">
+    <div id="content">
+      <div class="atomentry" id="takewhile-drops-one.html">
+<h2 class="title"><a href="/articles/takewhile-drops-one.html">Takewhile drops one</a></h2>
+<p class="meta"><abbr class="published" title="2008-04-23">2008-04-23</abbr> &bull; <a href="/tag/python" rel="tag">Python</a>, <a href="/tag/streams" rel="tag">Streams</a>, <a href="/tag/shell" rel="tag">Shell</a>, <a href="/tag/algorithms" rel="tag">Algorithms</a> &bull; <a href="/articles/takewhile-drops-one.html#disqus_thread">Comments</a></p>
+<p>Here&#8217;s some naughty code.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">from itertools import takewhile
+    
+def take_some(pred, xs):
+    while True:
+        for x in takewhile(pred, xs):
+            yield x
+
+</pre>
+
+</div>
+
+<p>This code abuses the &#8220;iterator building block&#8221; foundations of Python&#8217;s <a href="http://docs.python.org/lib/module-itertools.html">itertools module</a>. Once you&#8217;ve chopped a stream&#8217;s head off using <code>takewhile</code> you can&#8217;t resume processing its tail &#8230; Or can you?
+</p>
+<span id="continue-reading"/>
+
+<p>A casual inspection of this function <em>suggests</em> it does little more than heat up the machine: we return elements, <code>x</code>, from a stream, <code>xs</code>, for which <code>pred(x)</code> holds, then we spin at the first element for which the predicate does not hold.
+</p>
+<p>When we actually run the code, things turn out rather differently:
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">&gt;&gt;&gt; from itertools import count, islice
+&gt;&gt;&gt; def is_even(x):
+... 	return x % 2 == 0
+... 
+&gt;&gt;&gt; xs = take_some(is_even, count())
+&gt;&gt;&gt; xs.next()
+0
+&gt;&gt;&gt; xs.next()
+2
+&gt;&gt;&gt; xs.next()
+4
+&gt;&gt;&gt; list(islice(xs, 10))
+[6, 8, 10, 12, 14, 16, 18, 20, 22, 24]
+
+</pre>
+
+</div>
+
+
+<h3>Dropwhile, ifilter, izip</h3>
+<p>Nothing overheats. In fact <code>take_some</code> behaves suspiciously like <code>ifilter</code>. Let&#8217;s explore that hypothesis by zipping together an <code>ifilter</code> stream and a <code>take_some</code> stream and seeing if they diverge.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">&gt;&gt;&gt; from itertools import dropwhile, ifilter, izip
+&gt;&gt;&gt; xs = take_some(is_even, count())
+&gt;&gt;&gt; ys = ifilter(is_even, count())
+&gt;&gt;&gt; diverge = dropwhile(lambda xy: xy[0] == xy[1], izip(xs, ys))
+&gt;&gt;&gt; diverge.next()
+  C-c C-cTraceback (most recent call last):
+  ...
+KeyboardInterrupt
+&gt;&gt;&gt;
+
+</pre>
+
+</div>
+
+<p>Here <code>itertools.dropwhile</code> iterates through the zipped stream yielding items as soon as it detects a difference in the first and second element of a pair. This time, as you can see, we <em>do</em> start spinning, and we have to interrupt execution to regain control.
+</p>
+
+<h3>Small print</h3>
+<p>Our casual interpretation of <code>take_some</code> was wrong. The actual documentation for <code>itertools.takewhile</code> reads:
+</p>
+<blockquote>
+<p><b>takewhile</b>(<i>predicate, iterable</i>)</p>
+<p>Make an iterator that returns elements from the iterable as long as the predicate is true. Equivalent to:</p>
+<pre>
+     def takewhile(predicate, iterable):
+         for x in iterable:
+             if predicate(x):
+                 yield x
+             else:
+                 break
+</pre>
+</blockquote>
+
+<p>There you have it! Once a stream returned by <code>takewhile</code> has run its course, the original <code>iterable</code> is poised to yield the element immediately after the first element for which the predicate fails. That is, we drop the first element for which the predicate fails. So repeatedly applying <code>takewhile</code> to a stream drops the elements for which the predicate doesn&#8217;t hold, which is to say it generates the elements for which the predicate holds, which is of course <code>ifilter</code>.
+</p>
+
+<h3>Bug fixes</h3>
+<p>Yes, kind of. I could point out a couple of bugs in <code>take_some</code>. First, it doesn&#8217;t work for lists. Give it a list and each application of <code>takewhile</code> resumes iteration from the beginning of the list, meaning <code>take_some</code> either repeats the first element of the list forever, or it spins without yielding anything:
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">&gt;&gt;&gt; ys = take_some(is_even, [1, 2, 3, 4])
+&gt;&gt;&gt; ys.next()
+ ...
+KeyboardInterrupt
+&gt;&gt;&gt; ys = take_some(is_even, [0, 1, 2, 3])
+&gt;&gt;&gt; ys.next()
+0
+&gt;&gt;&gt; ys.next()
+0
+&gt;&gt;&gt; set(islice(ys, 1000000))
+set([0])
+
+</pre>
+
+</div>
+
+<p>We can fix that defect easily by applying <code>iter</code> to the input iterable, but that exposes the second bug, that <code>take_some</code> only works for infinite streams. Once we bang into the end of an iterable, we stay there, stuck in the while loop. To fix both defects we might end up with something like:
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">from itertools import takewhile, tee
+    
+def take_some(pred, xs):
+    while True:
+        xs, ys = tee(xs)
+        try:
+            ys.next()
+        except StopIteration:
+            return
+        for x in takewhile(pred, xs):
+            yield x
+
+</pre>
+
+</div>
+
+
+<h3>The real bug fix</h3>
+<p>Actually, the real bug, which I admitted to at the outset, is in our thinking. This code abuses the iterator-building-blocks paradigm at the heart of the <a href="http://docs.python.org/lib/module-itertools.html">itertools module</a>. <code>Takewhile</code> converts one stream into another stream; the original stream has gone and if we wanted it we should have teed it first.
+</p>
+<p><a href="/tag/shell/" title="Articles about shell"><img style="float:right;" src="/images/buttons/crab.jpg" alt="Picture of a crab"/></a>
+</p>
+<p>The Unix shell embeds this concept at the core of the language to great effect. <span id="excerpt0"/>Once again our building block is the stream but our connector, the pipeline operator, |, doesn&#8217;t allow this kind of abuse; all you can do is put a stream to its left and another to its right. The syntax won&#8217;t allow you to get the head and tail of the same stream in a single pipeline.
+</p>
+<p>Here&#8217;s an awkless variant of the recent <a href="http://www.google.com/search?q=shell+history+meme">shell history meme</a> which shows a shell pipeline in action.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">$ history | tr -s ' ' | cut -f 3 -d ' ' | sort | uniq -c | sort -rn
+    172 cd
+    147 svn
+     73 bin/mheg
+     57 make
+     54 ls
+     40 emacs
+     37 pwd
+     ...
+
+</pre>
+
+</div>
+
+<p>Here&#8217;s a slightly more interesting variant which only shows commands appearing after a pipeline operator. (It&#8217;s not bombproof, but it&#8217;ll do for now.)
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">$ history | grep -Eo '\| *\w+' | tr -d '| ' | sort | uniq -c | sort -rn
+     10 head
+      8 cut
+      7 grep
+      6 tr
+      5 xargs
+      4 sort
+      3 wc
+      3 uniq
+      3 less
+      ...
+
+</pre>
+
+</div>
+
+
+<h3>Pipe Links</h3>
+<p>By way of an apology for wasting your time, here are some solid gold links.
+</p>
+<ol>
+ <li><p><a href="http://www.dabeaz.com/generators/">&#8220;Generator Tricks for Systems Programmers&#8221;</a>, a presentation made by David M. Beazley at PyCon&#8217;08. I wasn&#8217;t there, but for once <a href="http://www.dabeaz.com/generators/Generators.pdf">the slides (PDF)</a> standalone well, and despite the title it&#8217;s neither tricksy nor just for systems programmers. Experienced Python programmers might choose to skip over the first few slides; by the end of the presentation, the material gets much more advanced<a id="fn1link" href="#fn1"><sup>[1]</sup></a>.
+</p>
+
+ </li>
+
+ <li><p><a href="http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/276960">&#8220;Shell-like data processing&#8221;</a> by Maxim Krikun in the online Python Cookbook, which overloads the bitwise or operator, <code>|</code>, to implement a Pythonic pipeline, an idea you can find  extended in <a href="http://egofile.com/blog/python/pipes.html">&#8220;Assembly Line Syntax&#8221;</a> by Patrick Roberts and <a href="http://www.voidspace.org.uk/python/weblog/arch_d7_2008_03_22.shtml#e954">revised by Michael Foord</a>, this time using the right shift operator as a connector.
+</p>
+
+ </li>
+</ol>
+
+<h3>Pipelined Python</h3>
+<div class="typocode"><div class="codetitle">Apache httpd log</div>
+
+<pre class="prettyprint">81.107.39.38 -  ... "GET /ply/ HTTP/1.1" 200 7587 
+81.107.39.38 -  ... "GET /favicon.ico HTTP/1.1" 404 133 
+81.107.39.38 -  ... "GET /ply/bookplug.gif HTTP/1.1" 200 23903 
+81.107.39.38 -  ... "GET /ply/ply.html HTTP/1.1" 200 97238 
+81.107.39.38 -  ... "GET /ply/example.html HTTP/1.1" 200 2359 
+66.249.72.134 - ... "GET /index.html HTTP/1.1" 200 4447 
+...
+
+</pre>
+
+</div>
+
+<p>In his presentation David Beazley shows some elegant and idiomatic Python code to sum the total number of bytes transferred in an <a href="http://httpd.apache.org/docs/trunk/logs.html">Apache httpd server log</a> (the final field on each line of the log file shown above). You&#8217;ll notice how clean and declarative it is. Each generator expression builds upon the one on the preceding line. The source of the stream, <code>wwwlog</code>, is a file object which, in the iterable context shown here, yields lines on demand. Nothing really happens until the final reduction, <code>sum</code>, at which point data flows smoothly through. Stream elements &#8212; lines, words, ints &#8212; are processed one at a time, and nothing accumulates except the final total. 
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">wwwlog     = open("access-log") 
+bytecolumn = (line.rsplit(None,1)[1] for line in wwwlog) 
+bytes      = (int(x) for x in bytecolumn if x != '-') 
+print "Total", sum(bytes)
+
+</pre>
+
+</div>
+
+<p>Here&#8217;s an alternative using the Python pipeline approach mentioned in the previous section. Note that in my <a href="http://trac.lighttpd.net/trac/wiki/Docs%3AModAccessLog">server access logs</a> it&#8217;s the 9th field (whitespace separated, counting from zero) which gives the number of bytes transferred, and for variety I&#8217;m pattern matching this field to a string of digits.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">wwwlog = open("access-log") 
+bytes = wwwlog | cut(9) | grep(r'\d+') | xlate(int)
+print "Total", sum(bytes)
+
+</pre>
+
+</div>
+
+<p><code>Cut</code>, <code>grep</code> and <code>xlate</code> are simple classes which implement the numeric <a href="http://docs.python.org/ref/numeric-types.html">__ror__ method</a>.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">import itertools
+import re
+
+class xlate(object):
+    "Translate the input stream by applying a function to each item". 
+    def __init__(self, fn):
+        self.fn = fn
+    def __ror__(self, stream):
+        return itertools.imap(self.fn, stream)
+    
+class cut(xlate):
+    "Cuts a whitespace separated column from a stream of lines."
+    def __init__(self, column):
+        super(cut, self).__init__(lambda s: s.split()[column])
+
+class grep(object):
+    "Grep lines which match an re from a stream of lines."
+    def __init__(self, pattern):
+        self.match = re.compile(pattern).match
+    def __ror__(self, stream):
+        return itertools.ifilter(self.match, stream)
+
+</pre>
+
+</div>
+
+<hr />
+
+<p><a id="fn1" href="#fn1link">[1]</a> It could be that I&#8217;m reading too much into the pipe metaphor, but I&#8217;m intrigued by the caption to the photo on <a href="http://www.dabeaz.com">David M. Beazley&#8217;s homepage</a>. What can he mean?
+</p>
+<blockquote><p><a href="http://www.dabeaz.com" title="Is David working on Tubes?"><img src="http://www.dabeaz.com/images/Davetubes.jpg" alt="David Beazley"/></a></p>
+<p>Dave working on his latest project &#8212; &#8220;you know, it&#8217;s a series of tubes.&#8221;</p></blockquote>
+</div>
+
+<div class="comments"><hr/><div id="disqus_thread"></div><script type="text/javascript" src="http://disqus.com/forums/wordaligned/embed.js"></script></div>
+      
+<div id="comments"><script type="text/javascript">
+//<![CDATA[
+(function() {
+    var links = document.getElementsByTagName('a');
+    var query = '?';
+    for(var i = 0; i < links.length; i++) {
+        if(links[i].href.indexOf('#disqus_thread') >= 0) {
+            query += 'url' + i + '=' + encodeURIComponent(links[i].href) + '&amp;';
+        }
+    }
+    document.write('<script type="text/javascript" src="http://disqus.com/forums/wordaligned/get_num_replies.js' + query + '"></' + 'script>');
+})();
+//]]>
+</script></div>
+
+    </div>
+    <div id="sidebar">
+      <div class="sidebar-node">
+<h3>Excerpt</h3>
+<p><a href="#excerpt0">Once again our building block is the stream but our connector, the pipeline operator, |, doesn't allow this kind of abuse</a></p>
+
+</div>
+
+<div class="sidebar-node">
+<h3>Tagged</h3>
+<ul id="categories"><li><a href="/tag/python" rel="tag">Python</a></li>
+<li><a href="/tag/streams" rel="tag">Streams</a></li>
+<li><a href="/tag/shell" rel="tag">Shell</a></li>
+<li><a href="/tag/algorithms" rel="tag">Algorithms</a></li></ul>
+
+</div>
+
+<div class="sidebar-node">
+<h3>Chain</h3>
+<ul>
+<li><a accesskey="n" href="/articles/scatter-pictures-with-google-charts.html" title="Next article">&laquo; Scatter pictures with Google Charts</a></li>
+<li><a accesskey="p" href="/articles/stop-the-clock-squash-the-bug.html" title="Previous article">&raquo; Stop the clock, squash the bug</a></li>
+</ul>
+
+
+</div>
+
+<div class="sidebar-node">
+<h3>Feeds</h3>
+
+<ul>
+<li><a href="http://feeds.wordaligned.org/wordaligned"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Articles</a></li>
+<li><a href="http://feeds.wordaligned.org/wordaligned/comments"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Comments</a></li>
+</ul>
+
+
+</div>
+
+    </div>
+  </div>
+  <div id="footer">
+<hr />
+<p><a href="http://tag.wordaligned.org">Thomas Guest</a></p>
+</div>
+
+</div>
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-3373724-1']);
+  _gaq.push(['_trackPageview']);
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ga);
+  })();
+</script>
+</body>
+
+</html>

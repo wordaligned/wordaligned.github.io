@@ -1,0 +1,2365 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" >
+<channel>
+<title>Word Aligned</title>
+<link>http://wordaligned.org</link>
+<description>tales from the code face</description>
+<dc:creator>tag@wordaligned.org</dc:creator>
+<language>en-gb</language>
+<item>
+<title>Man or man(1)?</title>
+<description>&lt;p&gt;How careless, we&amp;#8217;d forgotten to configure &lt;a href="http://gd.tuwien.ac.at/linuxcommand.org/man_pages/logrotate8.html"&gt;log rotation&lt;/a&gt;. So our application had gone with a default designed for a less verbose age, rotating files as soon as they exceeded a megabyte in size, and never throwing any of them away. Oh, and it was putting these log files at the root of the file system where they&amp;#8217;d somehow gone unnoticed for some time. As a consequence, the file system had become clogged up with squillions of files.
+&lt;/p&gt;
+&lt;pre&gt;
+$ cd /
+$ ls
+...
+server.log.736624
+server.log.736625
+server.log.736626
+server.log.736627
+...
+&lt;/pre&gt;
+
+&lt;p&gt;&lt;a href="http://www.flickr.com/photos/fdecomite/2318674303"&gt;&lt;img src="http://farm3.static.flickr.com/2206/2318674303_a3c9d8bef4.jpg" alt="20 levels by fdecomit"/&gt;&lt;/a&gt;
+&lt;/p&gt;
+&lt;span id="continue-reading"/&gt;
+
+&lt;p&gt;How many files, exactly?
+&lt;/p&gt;
+&lt;pre&gt;
+$ ls | wc -l
+^C
+&lt;/pre&gt;
+
+&lt;p&gt;No time to wait. Too many! We had to act fast.
+&lt;/p&gt;
+&lt;p&gt;We changed the log rotate configuration to something more appropriate, restarted the application, and set about cleaning up. Now, this is when you &lt;strong&gt;don&amp;#8217;t&lt;/strong&gt; want to open a file browser and drag files into trash can, not unless you like watching egg-timers. The desktop metaphor fails when you have squillions of files on your desk. Alarmingly, the shell complains too.
+&lt;/p&gt;
+&lt;pre&gt;
+$ rm server.log.*
+-bash: /bin/rm: Argument list too long
+&lt;/pre&gt;
+
+&lt;p&gt;At this point, a clear head and a steady hand is needed. I use pathname expansion and &lt;code&gt;rm&lt;/code&gt; all the time and I&amp;#8217;m confident the commands I type will have the right effect. But in my current situation &amp;#8212; as root user, in the root directory, on a machine running an unfamiliar flavour of Unix, about to combine &lt;code&gt;find&lt;/code&gt; with &lt;code&gt;xargs&lt;/code&gt; and &lt;code&gt;rm&lt;/code&gt; &amp;#8212; I grow nervous.
+&lt;/p&gt;
+&lt;p&gt;How to stop &lt;code&gt;find&lt;/code&gt; from descending? &lt;code&gt;-Maxdepth&lt;/code&gt;, I think, but level &lt;code&gt;0&lt;/code&gt; or &lt;code&gt;1&lt;/code&gt;? Is &lt;code&gt;-print&lt;/code&gt; required? Should I create a scratch directory and practise.
+&lt;/p&gt;
+&lt;p&gt;Enough questions already! Are you a man or a &lt;code&gt;man(1)&lt;/code&gt; reader?
+&lt;/p&gt;
+&lt;pre&gt;
+$ find / -maxdepth 1 -name 'server.log.*' | xargs rm -f
+&lt;/pre&gt;
+
+&lt;p&gt;&lt;a href="http://www.flickr.com/photos/sarahandmikeprobably/3356749485/"&gt;&lt;img src="http://farm4.static.flickr.com/3660/3356749485_66f532e6c0.jpg" alt="74/365: Falling Cards, by Sarah and Mike ...probably"/&gt;&lt;/a&gt;
+&lt;/p&gt;
+&lt;p&gt;Done!
+&lt;/p&gt;</description>
+<dc:date>2010-05-19</dc:date>
+<guid>http://wordaligned.org/articles/man-man.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/man-man.html</link>
+<category>Shell</category>
+</item>
+
+<item>
+<title>DEFLATE: run-length encoding, but better</title>
+<description>&lt;h3&gt;Run-length encoding&lt;/h3&gt;
+&lt;p&gt;&lt;a href="http://en.wikipedia.org/wiki/Run-length_encoding"&gt;Run-length encoding&lt;/a&gt; is a simple compression scheme in which runs of equal values are represented by the value and a repeat count. For example, a supermarket cashier might process this line of shopping
+&lt;/p&gt;
+&lt;img src="http://wordaligned.org/images/fruit-line.png" alt="Fruit salad"/&gt;
+
+&lt;p&gt;as
+&lt;/p&gt;
+&lt;ul&gt;
+ &lt;li&gt;
+     4 bananas
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     3 apples
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     2 bananas
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     1 pineapple
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     3 apples
+ &lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Unix packs in its very own run length encoder, &lt;code&gt;uniq -c&lt;/code&gt;. It works just fine &amp;#8212; so long as the values you want to encode are newline separated byte strings, that is.
+&lt;/p&gt;
+&lt;p&gt;Let&amp;#8217;s use a sequence of coin tosses as an example stream. &lt;code&gt;$RANDOM&lt;/code&gt; generates random numbers. We use the least significant bit of these numbers as an index into an array containing the values &lt;code&gt;heads&lt;/code&gt;, &lt;code&gt;tails&lt;/code&gt;.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;$ HT=(heads tails)
+$ toss() { echo ${HT[$RANDOM&amp;amp;1]}; }
+$ toss; toss; toss
+heads
+tails
+tails
+$ tosses() { while [ 1 ]; do toss; done; }
+$ tosses | head
+tails
+tails
+tails
+heads
+tails
+heads
+heads
+heads
+tails
+tails
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;&lt;img src="http://wordaligned.org/images/tails.jpg" alt="tails"/&gt;
+   &lt;img src="http://wordaligned.org/images/tails.jpg" alt="tails"/&gt;
+   &lt;img src="http://wordaligned.org/images/tails.jpg" alt="tails"/&gt;
+   &lt;img src="http://wordaligned.org/images/heads.jpg" alt="heads"/&gt;
+   &lt;img src="http://wordaligned.org/images/tails.jpg" alt="tails"/&gt;
+   &lt;img src="http://wordaligned.org/images/heads.jpg" alt="heads"/&gt;
+   &lt;img src="http://wordaligned.org/images/heads.jpg" alt="heads"/&gt;
+   &lt;img src="http://wordaligned.org/images/heads.jpg" alt="heads"/&gt;
+   &lt;img src="http://wordaligned.org/images/tails.jpg" alt="tails"/&gt;
+   &lt;img src="http://wordaligned.org/images/tails.jpg" alt="tails"/&gt;
+&lt;/p&gt;
+&lt;span id="continue-reading"/&gt;
+
+&lt;p&gt;Passing a fresh sample from this same stream through our run-length encoder we get:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;$ tosses | uniq -c | head
+   2 heads
+   1 tails
+   1 heads
+   1 tails
+   1 heads
+   6 tails
+   3 heads
+   1 tails
+   4 heads
+   1 tails
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;An &lt;code&gt;awk&lt;/code&gt; script can be used as a run-length decoder. (There must be a neater way, using &lt;code&gt;sed&lt;/code&gt; maybe?)
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;$ runlendec() { awk '{ while ($1--) print $2 }'; }
+$ tosses | head | tee orig.log | uniq -c | runlendec | tee encdec.log
+heads
+tails
+heads
+tails
+heads
+heads
+tails
+tails
+heads
+heads
+$ diff orig.log encdec.log
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Here, we toss a coin 10 times teeing the original sequence to a file. The next two links in the pipeline compress and decompress the sequence, teeing the results to another file. Finally, as a sanity check, we confirm the round trip results are the same.
+&lt;/p&gt;
+
+&lt;h3&gt;Run-length encoding in Python&lt;/h3&gt;
+&lt;p&gt;This Unix run-length codec is fun, but of limited practical use. One good feature, though, is the way it operates on streams of data (including infinite streams), leaving clients free to decide how best to slice and buffer these streams.
+&lt;/p&gt;
+&lt;p&gt;Python has a fine library of high-level &lt;a href="http://docs.python.org/library/itertools.html"&gt;stream transformation tools&lt;/a&gt; from which we can build a generic and flexible run-length codec in just a few lines. Since I want to progress from run-length coding to something more advanced, I&amp;#8217;ll leave discussing how to implement this codec for now, but if you&amp;#8217;d like to write your own version, here&amp;#8217;s a description suitable for &lt;a href="http://docs.python.org/library/doctest#simple-usage-checking-examples-in-a-text-file"&gt;doctesting&lt;/a&gt;.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;Import the run-length codec functions and compress a short string.
+&amp;gt;&amp;gt;&amp;gt; from runlength import compress, decompress
+&amp;gt;&amp;gt;&amp;gt; comp = compress('AABBBACC')
+
+The returned compressor is a stream (an iterable).
+&amp;gt;&amp;gt;&amp;gt; next(comp)
+(2, 'A')
+
+Pull the rest of the stream into memory.
+&amp;gt;&amp;gt;&amp;gt; rest = list(comp)
+&amp;gt;&amp;gt;&amp;gt; rest
+[(3, 'B'), (1, 'A'), (2, 'C')]
+
+Simple decompress example.
+&amp;gt;&amp;gt;&amp;gt; concat = ''.join
+&amp;gt;&amp;gt;&amp;gt; concat(decompress(rest))
+'BBBACC'
+
+Compress, decompress also work with infinite streams, like the 
+a2b3 stream, which repeatedly cycles two pairs. 
+&amp;gt;&amp;gt;&amp;gt; from itertools import cycle, islice
+&amp;gt;&amp;gt;&amp;gt; a2b3 = cycle([(2, 'a'), (3, 'b')])
+&amp;gt;&amp;gt;&amp;gt; dec = decompress(a2b3)
+
+Pull 8 values from the decompressed stream.
+&amp;gt;&amp;gt;&amp;gt; concat(islice(dec, 8))
+'aabbbaab'
+
+Now compress the decompressed stream, and explore a few items.
+&amp;gt;&amp;gt;&amp;gt; comp = compress(dec)
+&amp;gt;&amp;gt;&amp;gt; next(comp)
+(2, 'b')
+&amp;gt;&amp;gt;&amp;gt; list(islice(comp, 2))
+[(2, 'a'), (3, 'b')]
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+
+&lt;h3&gt;DEFLATE&lt;/h3&gt;
+&lt;img style="border: 2px solid #ccc;" src="http://wordaligned.org/images/chessboard-monochrome.png" alt="Chessboard"/&gt;
+
+&lt;p&gt;The Wikipedia page on &lt;a href="http://en.wikipedia.org/wiki/Run-length_encoding"&gt;run-length encoding&lt;/a&gt; identifies monochrome images as good candidates for run-length compression. The white and black pixels typically group into long runs. Indeed, any simple image using a limited palette should reduce well using this compression scheme.
+&lt;/p&gt;
+&lt;p&gt;The chessboard above is 256&amp;times;256 pixels, each square being 32&amp;times;32 pixels. We &lt;em&gt;could&lt;/em&gt; run-length encode this 64K pixel image as 256&amp;times;8 = 2K runs of 32 pixels, a decent saving. (Actually, we should do slightly better, noting that there are runs of length 64 at the chessboard rank boundaries, but  you get the idea.)
+&lt;/p&gt;
+&lt;pre&gt;
+(32,W)(32,B)(32,W)(32,B)(32,W)(32,B)(32,W)(32,B),
+(32,W)(32,B)(32,W)(32,B)(32,W)(32,B)(32,W)(32,B),
+....
+(32,B)(32,W)(32,B)(32,W)(32,B)(32,W)(32,B)(32,W)
+&lt;/pre&gt;
+
+&lt;p&gt;Like a paletted image, a block of text &amp;#8212; the web page you&amp;#8217;re reading now, for example &amp;#8212; employs a limited alphabet. Although the characters in this text don&amp;#8217;t usually group into long runs there&amp;#8217;s plenty of repetition, especially in the raw HTML: all the occurrences of &lt;code&gt;&amp;lt;div&amp;gt;&lt;/code&gt;, &lt;code&gt;&amp;lt;span&amp;gt;&lt;/code&gt; and &lt;code&gt;class&lt;/code&gt; used for CSS styling, for example. The &lt;a href="http://en.wikipedia.org/wiki/DEFLATE"&gt;DEFLATE&lt;/a&gt; compression algorithm uses a clever twist on run-length encoding to remove this redundancy:
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;The compressed data consists of a series of elements of two types: literal bytes (of strings that have not been detected as duplicated within the previous 32K input bytes), and pointers to duplicated strings, where a pointer is represented as a pair &amp;lt;length, backward distance&amp;gt;. (&lt;a href="http://tools.ietf.org/html/rfc1951"&gt;RFC-1951&lt;/a&gt;)
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;(In addition, a multiple-level dynamic Huffman encoding scheme reduces the space needed for the strings, distances and lengths themselves.)
+&lt;/p&gt;
+&lt;p&gt;There&amp;#8217;s more to these pointer elements than first appears: the length can exceed the backward distance. Thus the sequence:
+&lt;/p&gt;
+&lt;pre&gt;
+heads
+heads
+heads
+heads
+heads
+&lt;/pre&gt;
+
+&lt;p&gt;can be deflated as the literal type &lt;code&gt;heads\n&lt;/code&gt; followed by the pointer type &lt;code&gt;&amp;lt;24, 6&amp;gt;&lt;/code&gt;. 
+&lt;/p&gt;
+&lt;p&gt;If you&amp;#8217;ve spotted the potential for recursion, good! The inflating stream can reference itself, which can reference itself, which can &amp;#8230; &lt;a href="http://steike.com/code/useless/zip-file-quine/" title="Best ever Quine!"&gt;Confusing?&lt;/a&gt;
+&lt;/p&gt;
+
+&lt;h3&gt;Zipping pixels&lt;/h3&gt;
+&lt;p&gt;&lt;a href="http://www.libpng.org/pub/png/" title="Check out the graphics on the PNG home page!"&gt;PNG&lt;/a&gt; images use DEFLATE compression (as implemented by &lt;a href="http://www.zlib.net"&gt;zlib&lt;/a&gt;) to save on pixel storage space. Here&amp;#8217;s a binary view of the raw data in the chessboard graphic shown above, all &lt;strong&gt;137 bytes&lt;/strong&gt; of it. The 64K pixels themselves compress into a 88 byte IDAT chunk, of which the final 8 bytes are a checksum and (I think?) some padding. Maybe the image could be &lt;a href="http://drj11.wordpress.com/2009/02/20/i-crush-optipng/"&gt;squeezed harder&lt;/a&gt;, but I&amp;#8217;m impressed!
+&lt;/p&gt;
+&lt;pre&gt;
+8950 4e47 0d0a 1a0a 0000 000d 4948 4452  .&lt;b&gt;PNG&lt;/b&gt;........&lt;b&gt;IHDR&lt;/b&gt;
+0000 0100 0000 0100 0100 0000 0074 0995  .............t..
+cb00 0000 5049 4441 5468 81ed ceb1 0d00  ....P&lt;b&gt;IDAT&lt;/b&gt;h......
+200c 0341 f65f 1a58 803a 2f74 6e52 e424   ..A._.X.:/tnR.$
+7bed 9b75 f3ba cf07 0000 df83 ca0e 0000  {..u............
+7a60 ba1f 0080 2ea8 ec00 00a0 07a6 fb01  z`..............
+00e8 82ca 0e00 007a 60ba 1f00 802e a8ec  .......z`.......
+0000 2007 0e8a 69f0 e2b9 9471 c700 0000  .. ...i....q....
+0049 454e 44ae 4260 82                   .&lt;b&gt;IEND&lt;/b&gt;.B`.
+&lt;/pre&gt;
+
+&lt;p&gt;Here&amp;#8217;s a trace of how zlib inflates the compressed pixels in this &lt;a href="http://www.libpng.org/pub/png/spec/1.2/PNG-Chunks.html"&gt;IDAT chunk&lt;/a&gt;. (Source code available via anonymous SVN at &lt;a href="http://wordaligned.org/svn/etc/zlib_trace"&gt;http://wordaligned.org/svn/etc/zlib_trace&lt;/a&gt;.)
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;inflate: allocated
+inflate: reset
+inflate:   zlib header ok
+inflate:     dynamic codes block (last)
+inflate:       table sizes ok
+inflate:       code lengths ok
+inflate:       codes ok
+inflate:         literal 0x00
+inflate:         literal 0xff
+inflate:         length 3
+inflate:         distance 1
+inflate:         literal 0x00
+inflate:         length 3
+inflate:         distance 1
+inflate:         length 24
+inflate:         distance 8
+inflate:         length 25
+inflate:         distance 25
+inflate:         length 258
+inflate:         distance 33
+....
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;I&amp;#8217;ve attempted to show the first few stages of the genesis of the uncompressed stream in the picture below. The way the stream recursively inflates itself is quite beautiful.
+&lt;/p&gt;
+&lt;img style="border: 2px solid #ccc;" src="http://wordaligned.org/images/inflate.png" alt="Inflating pixels"/&gt;
+
+&lt;ol&gt;
+ &lt;li&gt;
+     put 00
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     put ff
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     go back 1 (to ff), put 3
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     put 00
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     go back 1 (to 00), put 3
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     go back 8 (to 00 00 00 00 ff ff ff ff)
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     put 24
+ &lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Two elements later, and the repeat length has grown to 258. In fact, the entire chessboard is generated from just 3 literal and 43 pointer elements.
+&lt;/p&gt;
+&lt;p&gt;(Not all graphics have such a regular pattern, of course, so we can&amp;#8217;t always achieve such dramatic compression.)
+&lt;/p&gt;
+
+&lt;h3&gt;Deflated HTML&lt;/h3&gt;
+&lt;p&gt;Web servers can and do save on band-width by transferring &lt;a href="http://www.gzip.org/"&gt;gzip&lt;/a&gt; compressed HTML to gzip capable clients. (Gzip is a simple wrapper around DEFLATE.) Any PNG images transferred will also have their pixels DEFLATE compressed.
+&lt;/p&gt;
+&lt;pre&gt;
+$ curl http://wordaligned.org --head --compress
+HTTP/1.1 200 OK
+Date: Sun, 17 May 2009 17:41:53 GMT
+Server: lighttpd | Word Aligned
+Content-Type: text/html; charset=UTF-8
+....
+Vary: Accept-Encoding
+&lt;b&gt;Content-Encoding: gzip&lt;/b&gt;
+Content-Length: 20
+&lt;/pre&gt;
+
+&lt;p&gt;The Word Aligned &lt;a href="http://wordaligned.org/"&gt;front page&lt;/a&gt; contains about 75Kb of HTML, which gzips to just 16Kb &amp;#8212; a decent saving. Relevant lines from the &lt;a href="http://redmine.lighttpd.net/projects/lighttpd/wiki/Docs:ModCompress"&gt;lighttpd configuration file&lt;/a&gt; read:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;lighttpd mod_compress&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;server.modules = (
+    ....
+    "mod_compress"
+)
+compress.cache-dir = basedir + "lighttpd/cache/compress/"
+compress.filetype  = ("text/plain", "text/html", "text/css")
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;I uphold Gzip (built on zlib, which implements DEFLATE) as a hero of the web. As we&amp;#8217;ve seen, it implements a powerful and elegant algorithm, but perhaps the best thing about it is that it&amp;#8217;s free to use, a freedom worth fighting for. Check out this battle report from the &lt;a href="http://www.gzip.org/#faq"&gt;FAQ&lt;/a&gt;.
+&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;h3&gt;What about patents?&lt;/h3&gt;
+&lt;p&gt;&lt;em&gt;gzip&lt;/em&gt; was developed as a replacement for compress because of the UNISYS and IBM &lt;a href="http://www.faqs.org/faqs/compression-faq/part1/section-6.html"&gt;patents&lt;/a&gt; covering the &lt;a href="http://www.faqs.org/faqs/compression-faq/part2/section-1.html"&gt;LZW&lt;/a&gt; algorithm used by compress.
+&lt;/p&gt;
+&lt;p&gt;I have probably spent more time studying data compression patents than actually implementing data compression algorithms. I maintain a list of several hundred patents on lossless data compression algorithms, and I made sure that &lt;em&gt;gzip&lt;/em&gt; isn&amp;#8217;t covered by any of them. In particular, the &lt;code&gt;--fast&lt;/code&gt; option of gzip is not as fast it could, precisely to avoid a patented technique.  &amp;#8212; Jean-Loup Gailly, &lt;a href="http://www.gzip.org/#faq11"&gt;Gzip FAQ&lt;/a&gt;
+&lt;/p&gt;
+&lt;/blockquote&gt;</description>
+<dc:date>2009-05-21</dc:date>
+<guid>http://wordaligned.org/articles/deflate-runlength-encoding-but-better.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/deflate-runlength-encoding-but-better.html</link>
+<category>Shell</category>
+</item>
+
+<item>
+<title>Fixing header file dependencies</title>
+<description>&lt;h3&gt;DEPENDS&lt;/h3&gt;
+&lt;img src="http://wordaligned.org/images/dependencies.png" alt="Dependencies"/&gt;
+
+&lt;p&gt;Without care C++ header files can &lt;a href="http://yosefk.com/c++fqa/defective.html#defect-3" title="Have you read the C++ FQA yet?"&gt;deteriorate&lt;/a&gt;, so I was interested to find some sensible advice in the &lt;a href="http://google-styleguide.googlecode.com/svn/trunk/cppguide.xml#names_and_Order_of_Includes" title="Google style guide advice on dependencies"&gt;Google C++ Style Guide&lt;/a&gt;.
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;h4&gt;Names and Orders of Includes&lt;/h4&gt;&lt;p&gt;Use standard order for readability and to avoid hidden dependencies: C library, C++ library, other libraries&amp;#8217; &lt;code&gt;.h&lt;/code&gt;, your project&amp;#8217;s &lt;code&gt;.h&lt;/code&gt;.&lt;/p&gt;&lt;p&gt;&amp;#8230;&lt;/p&gt;&lt;p&gt;The preferred ordering reduces hidden dependencies. We want every header file to be compilable on its own. The easiest way to achieve this is to make sure that every one of them is the first &lt;code&gt;.h&lt;/code&gt; file #included in some &lt;code&gt;.cc&lt;/code&gt;.&lt;/p&gt;&lt;/blockquote&gt;
+
+&lt;p&gt;I agree, hidden dependencies are bad, and I&amp;#8217;m not about to quibble with the &amp;#8220;standard order&amp;#8221; defined by the &lt;a href="http://google-styleguide.googlecode.com/svn/trunk/cppguide.xml"&gt;guide&lt;/a&gt;, even if I&amp;#8217;m used to a slightly different ordering. Certainly headers should be compilable on their own; but I suggest the easiest way to achieve this is, well, &lt;strong&gt;to compile them on their own&lt;/strong&gt;. 
+&lt;/p&gt;
+&lt;span id="continue-reading"/&gt;
+
+
+&lt;h3&gt;README&lt;/h3&gt;
+&lt;p&gt;You don&amp;#8217;t need a project file or even a makefile if you want to compile something. It&amp;#8217;s easy to create a script which confirms a header has no hidden dependencies by including and compiling it&lt;a id="fn1link" href="http://wordaligned.org/articles/fixing-header-file-dependencies.html#fn1"&gt;&lt;sup&gt;[1]&lt;/sup&gt;&lt;/a&gt;. Create a file called &lt;code&gt;check-header&lt;/code&gt; and paste in the following:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;check-header&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;#!/bin/bash
+cat &amp;lt;&amp;lt;EOF &amp;gt;tmp.cc &amp;amp;&amp;amp; g++ $CPPFLAGS tmp.cc
+#include "$1"
+int main() { return 0; }
+EOF
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Make sure &lt;code&gt;check-header&lt;/code&gt; is executable. Put it somewhere on your &lt;code&gt;PATH&lt;/code&gt;. Export suitable &lt;code&gt;CPPFLAGS&lt;/code&gt; for your codebase (here, I&amp;#8217;m choosing to treat warnings as errors).
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;$ chmod a+x check-header
+$ mv check-header ~/bin
+$ export CPPFLAGS="-Wall -Werror"
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Given a header file, &lt;code&gt;check-header&lt;/code&gt; redirects a &lt;a href="http://www.gnu.org/software/bash/manual/bashref.html#Redirections"&gt;here document&lt;/a&gt; into a temporary source file. The source file contains a minimal C++ program which does nothing more than include the header. &lt;code&gt;Check-header&lt;/code&gt; compiles that program. Compilation diagnostics, if any, appear on standard error. The exit status will be 0 if the header compiles cleanly, non-zero otherwise.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;$ check-header standalone.h
+$ echo $?
+0
+$ cat &amp;gt; depends_on_x.h
+void f(X x);
+$ check-header depends_on_x.h
+depends_on_x.h:1: error: variable or field 'f' declared void
+depends_on_x.h:1: error: 'X' was not declared in this scope
+$ echo $?
+1
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+
+&lt;h3&gt;INSTALL&lt;/h3&gt;
+&lt;p&gt;It gets tiresome to run this command on one header at a time. Happily we can use it in a compound command to check all the headers in the current directory&lt;a id="fn2link" href="http://wordaligned.org/articles/fixing-header-file-dependencies.html#fn2"&gt;&lt;sup&gt;[2]&lt;/sup&gt;&lt;/a&gt;:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;$ for header in *.h; do check-header $header; done
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Or on all headers beneath the current directory: 
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;$ find . -name "*.h" | xargs -L 1 check-header
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;(The &lt;code&gt;-L 1&lt;/code&gt; is required because &lt;code&gt;check-header&lt;/code&gt; can only handle one file at a time.)
+&lt;/p&gt;
+&lt;p&gt;Make this part of your overnight build, and you&amp;#8217;ve got an easy way to monitor dependencies in header files.
+&lt;/p&gt;
+
+&lt;h3&gt;BUGS&lt;/h3&gt;
+&lt;p&gt;The script shown here is about the simplest thing which could possibly work. Just a single compiler is used, the temporary file name is hard-wired, no clean-up is done, there&amp;#8217;s a dependency on the shell environment, diagnostics are limited, there isn&amp;#8217;t even any command-line help. A grubby header can sneak past this script by using preprocessor defines for conditional compilation, and different (versions of) compilers will disagree on what&amp;#8217;s clean. 
+&lt;/p&gt;
+&lt;p&gt;The truth is that I usually recreate this script and variants of it as and when required. My real intention is to demonstrate the rather obvious idea that we should &lt;span /&gt;use the compiler to detect compilation problems.
+&lt;/p&gt;
+
+&lt;h3&gt;TODO&lt;/h3&gt;
+&lt;p&gt;Once your headers include all they depend on, maybe you&amp;#8217;d like to tackle the flip side of the problem, of determining which includes they don&amp;#8217;t or shouldn&amp;#8217;t depend on. 
+&lt;/p&gt;
+&lt;p&gt;Can another &lt;a href="http://google-styleguide.googlecode.com/svn/trunk/cppguide.xml#Header_File_Dependencies" title="Google Style Guide rule on dependency reduction"&gt;tip&lt;/a&gt; from the Google Style Guide be automated?
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;Use forward declarations to minimize use of &lt;code&gt;#include&lt;/code&gt; in &lt;code&gt;.h&lt;/code&gt; files.
+&lt;/p&gt;
+&lt;p&gt;&amp;#8230;
+&lt;/p&gt;
+&lt;p&gt; You can significantly minimize the number of header files you need to include in your own header files by using forward declarations. For example, if your header file uses the &lt;code&gt;File&lt;/code&gt; class in ways that do not require access to the declaration of the &lt;code&gt;File&lt;/code&gt; class, your header file can just forward declare &lt;code&gt;class File;&lt;/code&gt; instead of having to &lt;code&gt;#include "file/base/file.h"&lt;/code&gt;.
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;div class="amazon"&gt;&lt;a href="http://www.amazon.com/gp/product/0321113586?ie=UTF8&amp;amp;tag=wordalig-20"&gt;&lt;img  src="http://wordaligned.org/images/books/cpp-coding-standards.jpg" alt="Book cover"/&gt;&lt;/a&gt;&lt;/div&gt;
+
+&lt;p&gt;I don&amp;#8217;t think many of us would dispute this advice, though &lt;a href="http://wordaligned.org/articles/retro-fitting-coding-standards.html#tocask-the-experts"&gt;I&amp;#8217;m not sure it belongs in a style guide&lt;/a&gt; &amp;#8212; it&amp;#8217;s just good C++ practice, the stuff you should be getting &lt;a href="http://www.amazon.com/gp/product/0321113586?ie=UTF8&amp;amp;tag=wordalig-20" title="Amazon affiliates link to C++ Coding Standards by Sutter and Alexandrescu"&gt;from a book&lt;/a&gt;. What I&amp;#8217;d like is a refactoring tool which does it for me, something like Eclipse&amp;#8217;s &lt;a href="http://help.eclipse.org/ganymede/index.jsp?topic=/org.eclipse.jdt.doc.user/gettingStarted/qs-OrganizeImports.htm"&gt;&amp;#8220;organize imports&amp;#8221;&lt;/a&gt;. A script might be able to do some of this, but it will have to be considerably more complex than &lt;code&gt;check-header&lt;/code&gt;, and without access to the compiler internals it will be limited in power.
+&lt;/p&gt;
+&lt;hr /&gt;
+
+&lt;p&gt;&lt;a id="fn1" href="http://wordaligned.org/articles/fixing-header-file-dependencies.html#fn1link"&gt;[1]&lt;/a&gt; While writing this article I discovered &lt;a href="http://gcc.gnu.org/"&gt;GCC&lt;/a&gt; allows you to precompile header files, reducing the need to create even a minimal script like &lt;code&gt;check-header&lt;/code&gt;. Running &lt;code&gt;gcc $CPPFLAGS header.h&lt;/code&gt; generates &lt;code&gt;header.gch&lt;/code&gt; for a valid and self-contained header file, and compiler diagnostics otherwise. As the &lt;a href="http://gcc.gnu.org/onlinedocs/gcc/Precompiled-Headers.html"&gt;documentation&lt;/a&gt; says:
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;There are many other possibilities, limited only by your imagination, good sense, and the constraints of your build system.
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;&lt;a id="fn2" href="http://wordaligned.org/articles/fixing-header-file-dependencies.html#fn2link"&gt;[2]&lt;/a&gt; It would be better to tweak &lt;code&gt;check-header&lt;/code&gt; to work on a list of input files.
+&lt;/p&gt;</description>
+<dc:date>2008-07-02</dc:date>
+<guid>http://wordaligned.org/articles/fixing-header-file-dependencies.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/fixing-header-file-dependencies.html</link>
+<category>Shell</category>
+</item>
+
+<item>
+<title>Curling for web sites</title>
+<description>&lt;p&gt;I wanted information about ISO 3166-1 alpha-2 country codes. Google found me the definitive link (&lt;a href="http://www.iso.org/iso/country_codes/iso_3166_code_lists.htm" title="ISO 3166 country code lists"&gt;http://www.iso.org/iso/country_codes/iso_3166_code_lists.htm&lt;/a&gt;) but clicking on it showed the ISO website to be temporarily down for maintenance.
+&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://www.iso.org/error/sitedown.html" title="ISO site down page"&gt;&lt;img style="border: 2px solid orange;" src="http://wordaligned.org/images/iso-down.png" alt="ISO website out of action" /&gt;&lt;/a&gt;
+&lt;/p&gt;
+&lt;p&gt;Rather than check back again every few minutes or hunt for stale information in the google cache, I got &lt;code&gt;curl&lt;/code&gt; and &lt;code&gt;bash&lt;/code&gt; to notify me when the site went live.
+&lt;/p&gt;
+&lt;pre&gt;
+$ url=http://www.iso.org/iso/country_codes/iso_3166_code_lists.htm
+$ curl -I $url
+HTTP/1.1 302 Found
+Date: Tue, 27 May 2008 08:00:44 GMT
+Server: BIG-IP
+Location: http://www.iso.org/error/sitedown.html
+Via: 1.1 www.iso.org
+Connection: close
+Content-Type: text/html
+&lt;/pre&gt;
+
+&lt;p&gt;&lt;code&gt;Curl -I&lt;/code&gt; fetches the page header only, which in this case uses a &lt;a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html"&gt;302 status code&lt;/a&gt; to temporarily redirect clients to the &lt;code&gt;sitedown.html&lt;/code&gt; page. Using this information I wrote a simple while loop to ping the site every minute and determine when this status changed.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;$ http_status() { curl -I -s $1 | head -1 | cut -d " " -f 2; }
+$ while [ $(http_status $url) == 302 ]; do sleep 60; done; open $url
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;&lt;code&gt;Open&lt;/code&gt; is an OS X thing: when the loop completes &lt;code&gt;open&lt;/code&gt; just opens the web page in a browser tab.
+&lt;/p&gt;
+&lt;p&gt;To run this command in the background, &lt;code&gt;&amp;amp;&lt;/code&gt; it.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;$ (while [ $(http_status $url) == 302 ]; do sleep 60; done; open $url)&amp;amp;
+[1] 808
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Here, the job has a handle of &lt;code&gt;1&lt;/code&gt; and a process id of &lt;code&gt;808&lt;/code&gt;. You can recover this information using &lt;code&gt;jobs&lt;/code&gt;.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;$ jobs
+[1]+  Running                 ( while [ $(http_status $url) == 302 ]; do
+    sleep 300;
+done; open $url ) &amp;amp;
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;If you need to kill the job, &lt;code&gt;kill %1&lt;/code&gt; does the trick.
+&lt;/p&gt;</description>
+<dc:date>2008-05-27</dc:date>
+<guid>http://wordaligned.org/articles/curling-for-web-sites.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/curling-for-web-sites.html</link>
+<category>Shell</category>
+</item>
+
+<item>
+<title>Takewhile drops one</title>
+<description>&lt;p&gt;Here&amp;#8217;s some naughty code.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;from itertools import takewhile
+    
+def take_some(pred, xs):
+    while True:
+        for x in takewhile(pred, xs):
+            yield x
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;This code abuses the &amp;#8220;iterator building block&amp;#8221; foundations of Python&amp;#8217;s &lt;a href="http://docs.python.org/lib/module-itertools.html"&gt;itertools module&lt;/a&gt;. Once you&amp;#8217;ve chopped a stream&amp;#8217;s head off using &lt;code&gt;takewhile&lt;/code&gt; you can&amp;#8217;t resume processing its tail &amp;#8230; Or can you?
+&lt;/p&gt;
+&lt;span id="continue-reading"/&gt;
+
+&lt;p&gt;A casual inspection of this function &lt;em&gt;suggests&lt;/em&gt; it does little more than heat up the machine: we return elements, &lt;code&gt;x&lt;/code&gt;, from a stream, &lt;code&gt;xs&lt;/code&gt;, for which &lt;code&gt;pred(x)&lt;/code&gt; holds, then we spin at the first element for which the predicate does not hold.
+&lt;/p&gt;
+&lt;p&gt;When we actually run the code, things turn out rather differently:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; from itertools import count, islice
+&amp;gt;&amp;gt;&amp;gt; def is_even(x):
+... 	return x % 2 == 0
+... 
+&amp;gt;&amp;gt;&amp;gt; xs = take_some(is_even, count())
+&amp;gt;&amp;gt;&amp;gt; xs.next()
+0
+&amp;gt;&amp;gt;&amp;gt; xs.next()
+2
+&amp;gt;&amp;gt;&amp;gt; xs.next()
+4
+&amp;gt;&amp;gt;&amp;gt; list(islice(xs, 10))
+[6, 8, 10, 12, 14, 16, 18, 20, 22, 24]
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+
+&lt;h3&gt;Dropwhile, ifilter, izip&lt;/h3&gt;
+&lt;p&gt;Nothing overheats. In fact &lt;code&gt;take_some&lt;/code&gt; behaves suspiciously like &lt;code&gt;ifilter&lt;/code&gt;. Let&amp;#8217;s explore that hypothesis by zipping together an &lt;code&gt;ifilter&lt;/code&gt; stream and a &lt;code&gt;take_some&lt;/code&gt; stream and seeing if they diverge.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; from itertools import dropwhile, ifilter, izip
+&amp;gt;&amp;gt;&amp;gt; xs = take_some(is_even, count())
+&amp;gt;&amp;gt;&amp;gt; ys = ifilter(is_even, count())
+&amp;gt;&amp;gt;&amp;gt; diverge = dropwhile(lambda xy: xy[0] == xy[1], izip(xs, ys))
+&amp;gt;&amp;gt;&amp;gt; diverge.next()
+  C-c C-cTraceback (most recent call last):
+  ...
+KeyboardInterrupt
+&amp;gt;&amp;gt;&amp;gt;
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Here &lt;code&gt;itertools.dropwhile&lt;/code&gt; iterates through the zipped stream yielding items as soon as it detects a difference in the first and second element of a pair. This time, as you can see, we &lt;em&gt;do&lt;/em&gt; start spinning, and we have to interrupt execution to regain control.
+&lt;/p&gt;
+
+&lt;h3&gt;Small print&lt;/h3&gt;
+&lt;p&gt;Our casual interpretation of &lt;code&gt;take_some&lt;/code&gt; was wrong. The actual documentation for &lt;code&gt;itertools.takewhile&lt;/code&gt; reads:
+&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;b&gt;takewhile&lt;/b&gt;(&lt;i&gt;predicate, iterable&lt;/i&gt;)&lt;/p&gt;
+&lt;p&gt;Make an iterator that returns elements from the iterable as long as the predicate is true. Equivalent to:&lt;/p&gt;
+&lt;pre&gt;
+     def takewhile(predicate, iterable):
+         for x in iterable:
+             if predicate(x):
+                 yield x
+             else:
+                 break
+&lt;/pre&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;There you have it! Once a stream returned by &lt;code&gt;takewhile&lt;/code&gt; has run its course, the original &lt;code&gt;iterable&lt;/code&gt; is poised to yield the element immediately after the first element for which the predicate fails. That is, we drop the first element for which the predicate fails. So repeatedly applying &lt;code&gt;takewhile&lt;/code&gt; to a stream drops the elements for which the predicate doesn&amp;#8217;t hold, which is to say it generates the elements for which the predicate holds, which is of course &lt;code&gt;ifilter&lt;/code&gt;.
+&lt;/p&gt;
+
+&lt;h3&gt;Bug fixes&lt;/h3&gt;
+&lt;p&gt;Yes, kind of. I could point out a couple of bugs in &lt;code&gt;take_some&lt;/code&gt;. First, it doesn&amp;#8217;t work for lists. Give it a list and each application of &lt;code&gt;takewhile&lt;/code&gt; resumes iteration from the beginning of the list, meaning &lt;code&gt;take_some&lt;/code&gt; either repeats the first element of the list forever, or it spins without yielding anything:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; ys = take_some(is_even, [1, 2, 3, 4])
+&amp;gt;&amp;gt;&amp;gt; ys.next()
+ ...
+KeyboardInterrupt
+&amp;gt;&amp;gt;&amp;gt; ys = take_some(is_even, [0, 1, 2, 3])
+&amp;gt;&amp;gt;&amp;gt; ys.next()
+0
+&amp;gt;&amp;gt;&amp;gt; ys.next()
+0
+&amp;gt;&amp;gt;&amp;gt; set(islice(ys, 1000000))
+set([0])
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;We can fix that defect easily by applying &lt;code&gt;iter&lt;/code&gt; to the input iterable, but that exposes the second bug, that &lt;code&gt;take_some&lt;/code&gt; only works for infinite streams. Once we bang into the end of an iterable, we stay there, stuck in the while loop. To fix both defects we might end up with something like:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;from itertools import takewhile, tee
+    
+def take_some(pred, xs):
+    while True:
+        xs, ys = tee(xs)
+        try:
+            ys.next()
+        except StopIteration:
+            return
+        for x in takewhile(pred, xs):
+            yield x
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+
+&lt;h3&gt;The real bug fix&lt;/h3&gt;
+&lt;p&gt;Actually, the real bug, which I admitted to at the outset, is in our thinking. This code abuses the iterator-building-blocks paradigm at the heart of the &lt;a href="http://docs.python.org/lib/module-itertools.html"&gt;itertools module&lt;/a&gt;. &lt;code&gt;Takewhile&lt;/code&gt; converts one stream into another stream; the original stream has gone and if we wanted it we should have teed it first.
+&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://wordaligned.org/tag/shell/" title="Articles about shell"&gt;&lt;img style="float:right;" src="http://wordaligned.org/images/buttons/crab.jpg" alt="Picture of a crab"/&gt;&lt;/a&gt;
+&lt;/p&gt;
+&lt;p&gt;The Unix shell embeds this concept at the core of the language to great effect. &lt;span /&gt;Once again our building block is the stream but our connector, the pipeline operator, |, doesn&amp;#8217;t allow this kind of abuse; all you can do is put a stream to its left and another to its right. The syntax won&amp;#8217;t allow you to get the head and tail of the same stream in a single pipeline.
+&lt;/p&gt;
+&lt;p&gt;Here&amp;#8217;s an awkless variant of the recent &lt;a href="http://www.google.com/search?q=shell+history+meme"&gt;shell history meme&lt;/a&gt; which shows a shell pipeline in action.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;$ history | tr -s ' ' | cut -f 3 -d ' ' | sort | uniq -c | sort -rn
+    172 cd
+    147 svn
+     73 bin/mheg
+     57 make
+     54 ls
+     40 emacs
+     37 pwd
+     ...
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Here&amp;#8217;s a slightly more interesting variant which only shows commands appearing after a pipeline operator. (It&amp;#8217;s not bombproof, but it&amp;#8217;ll do for now.)
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;$ history | grep -Eo '\| *\w+' | tr -d '| ' | sort | uniq -c | sort -rn
+     10 head
+      8 cut
+      7 grep
+      6 tr
+      5 xargs
+      4 sort
+      3 wc
+      3 uniq
+      3 less
+      ...
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+
+&lt;h3&gt;Pipe Links&lt;/h3&gt;
+&lt;p&gt;By way of an apology for wasting your time, here are some solid gold links.
+&lt;/p&gt;
+&lt;ol&gt;
+ &lt;li&gt;&lt;p&gt;&lt;a href="http://www.dabeaz.com/generators/"&gt;&amp;#8220;Generator Tricks for Systems Programmers&amp;#8221;&lt;/a&gt;, a presentation made by David M. Beazley at PyCon&amp;#8217;08. I wasn&amp;#8217;t there, but for once &lt;a href="http://www.dabeaz.com/generators/Generators.pdf"&gt;the slides (PDF)&lt;/a&gt; standalone well, and despite the title it&amp;#8217;s neither tricksy nor just for systems programmers. Experienced Python programmers might choose to skip over the first few slides; by the end of the presentation, the material gets much more advanced&lt;a id="fn1link" href="http://wordaligned.org/articles/takewhile-drops-one.html#fn1"&gt;&lt;sup&gt;[1]&lt;/sup&gt;&lt;/a&gt;.
+&lt;/p&gt;
+
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;p&gt;&lt;a href="http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/276960"&gt;&amp;#8220;Shell-like data processing&amp;#8221;&lt;/a&gt; by Maxim Krikun in the online Python Cookbook, which overloads the bitwise or operator, &lt;code&gt;|&lt;/code&gt;, to implement a Pythonic pipeline, an idea you can find  extended in &lt;a href="http://egofile.com/blog/python/pipes.html"&gt;&amp;#8220;Assembly Line Syntax&amp;#8221;&lt;/a&gt; by Patrick Roberts and &lt;a href="http://www.voidspace.org.uk/python/weblog/arch_d7_2008_03_22.shtml#e954"&gt;revised by Michael Foord&lt;/a&gt;, this time using the right shift operator as a connector.
+&lt;/p&gt;
+
+ &lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h3&gt;Pipelined Python&lt;/h3&gt;
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;Apache httpd log&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;81.107.39.38 -  ... "GET /ply/ HTTP/1.1" 200 7587 
+81.107.39.38 -  ... "GET /favicon.ico HTTP/1.1" 404 133 
+81.107.39.38 -  ... "GET /ply/bookplug.gif HTTP/1.1" 200 23903 
+81.107.39.38 -  ... "GET /ply/ply.html HTTP/1.1" 200 97238 
+81.107.39.38 -  ... "GET /ply/example.html HTTP/1.1" 200 2359 
+66.249.72.134 - ... "GET /index.html HTTP/1.1" 200 4447 
+...
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;In his presentation David Beazley shows some elegant and idiomatic Python code to sum the total number of bytes transferred in an &lt;a href="http://httpd.apache.org/docs/trunk/logs.html"&gt;Apache httpd server log&lt;/a&gt; (the final field on each line of the log file shown above). You&amp;#8217;ll notice how clean and declarative it is. Each generator expression builds upon the one on the preceding line. The source of the stream, &lt;code&gt;wwwlog&lt;/code&gt;, is a file object which, in the iterable context shown here, yields lines on demand. Nothing really happens until the final reduction, &lt;code&gt;sum&lt;/code&gt;, at which point data flows smoothly through. Stream elements &amp;#8212; lines, words, ints &amp;#8212; are processed one at a time, and nothing accumulates except the final total. 
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;wwwlog     = open("access-log") 
+bytecolumn = (line.rsplit(None,1)[1] for line in wwwlog) 
+bytes      = (int(x) for x in bytecolumn if x != '-') 
+print "Total", sum(bytes)
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Here&amp;#8217;s an alternative using the Python pipeline approach mentioned in the previous section. Note that in my &lt;a href="http://trac.lighttpd.net/trac/wiki/Docs%3AModAccessLog"&gt;server access logs&lt;/a&gt; it&amp;#8217;s the 9th field (whitespace separated, counting from zero) which gives the number of bytes transferred, and for variety I&amp;#8217;m pattern matching this field to a string of digits.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;wwwlog = open("access-log") 
+bytes = wwwlog | cut(9) | grep(r'\d+') | xlate(int)
+print "Total", sum(bytes)
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;&lt;code&gt;Cut&lt;/code&gt;, &lt;code&gt;grep&lt;/code&gt; and &lt;code&gt;xlate&lt;/code&gt; are simple classes which implement the numeric &lt;a href="http://docs.python.org/ref/numeric-types.html"&gt;__ror__ method&lt;/a&gt;.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;import itertools
+import re
+
+class xlate(object):
+    "Translate the input stream by applying a function to each item". 
+    def __init__(self, fn):
+        self.fn = fn
+    def __ror__(self, stream):
+        return itertools.imap(self.fn, stream)
+    
+class cut(xlate):
+    "Cuts a whitespace separated column from a stream of lines."
+    def __init__(self, column):
+        super(cut, self).__init__(lambda s: s.split()[column])
+
+class grep(object):
+    "Grep lines which match an re from a stream of lines."
+    def __init__(self, pattern):
+        self.match = re.compile(pattern).match
+    def __ror__(self, stream):
+        return itertools.ifilter(self.match, stream)
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;&lt;a id="fn1" href="http://wordaligned.org/articles/takewhile-drops-one.html#fn1link"&gt;[1]&lt;/a&gt; It could be that I&amp;#8217;m reading too much into the pipe metaphor, but I&amp;#8217;m intrigued by the caption to the photo on &lt;a href="http://www.dabeaz.com"&gt;David M. Beazley&amp;#8217;s homepage&lt;/a&gt;. What can he mean?
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;&lt;a href="http://www.dabeaz.com" title="Is David working on Tubes?"&gt;&lt;img src="http://www.dabeaz.com/images/Davetubes.jpg" alt="David Beazley"/&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;Dave working on his latest project &amp;#8212; &amp;#8220;you know, it&amp;#8217;s a series of tubes.&amp;#8221;&lt;/p&gt;&lt;/blockquote&gt;</description>
+<dc:date>2008-04-23</dc:date>
+<guid>http://wordaligned.org/articles/takewhile-drops-one.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/takewhile-drops-one.html</link>
+<category>Shell</category>
+</item>
+
+<item>
+<title>Hunting down globals with nm</title>
+<description>&lt;p&gt;It was an old library, in need of attention &amp;#8212; we all knew that &amp;#8212; but it worked well, and we saw no reason to change it. Until, that is, we wanted more than one of it. The problem being, it was riddled with globals. A typical file looked something like this:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;Too many globals&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;#include &amp;lt;string.h&amp;gt;
+#define MSG_BUF_SIZE 256
+
+char const * g_libname = "TOO.MANY.GLOBALS";
+
+void initialise()
+{
+    static int s_initialised = 0;    
+    if (s_initialised == 0)
+    {
+        s_initialised = 1;
+        ....
+    }
+}
+
+char g_msg_buf[MSG_BUF_SIZE];
+
+static void clear_message()
+{
+    memset(g_msg_buf, 0, sizeof(g_msg_buf));
+}
+
+....
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;In the snippet above, the &lt;code&gt;g_msg_buf&lt;/code&gt; has external linkage. Other files in the library accessed it freely. The local static int, &lt;code&gt;s_initialised&lt;/code&gt;, is better contained, but still stood in our way. How could we initialise two library instances?
+&lt;/p&gt;
+&lt;p&gt;Don&amp;#8217;t worry, we&amp;#8217;re not about to discuss the evils of globals and singletons. We all know what needs doing here: initialising the library should return clients a handle, and each client would use its returned handle for subsequent access to the library. Internally, the handle would be a pointer to a struct, the details of which would be private to the library, packaging its internal state.
+&lt;/p&gt;
+&lt;span id="continue-reading"/&gt;
+
+&lt;p&gt;Sadly no refactoring IDE could cope with this job. Our immediate problem was simply sizing up the task. So we had to count up the &lt;code&gt;s_initialised&lt;/code&gt;&amp;#8217;s and &lt;code&gt;g_msg_buf&lt;/code&gt;&amp;#8217;s and so on. One obvious way of getting a number would be to browse the code and build a list of these globals. Indeed, this approach has some merit: we&amp;#8217;re building familiarity with the code, code we&amp;#8217;ll ultimately have to change. An exact answer isn&amp;#8217;t really needed at this stage.
+&lt;/p&gt;
+&lt;p&gt;Shell hackers might attempt an instant estimate by combining &lt;code&gt;grep&lt;/code&gt;, &lt;code&gt;sort&lt;/code&gt; and &lt;code&gt;uniq&lt;/code&gt; &amp;#8212; if we&amp;#8217;re confident that the &lt;code&gt;s_&lt;/code&gt; and &lt;code&gt;g_&lt;/code&gt; prefixes are consistently used in the library.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;$ grep -Eioh "\b[sg]_[[:alnum:]_]*\b" nm.c | sort | uniq
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Such text based approaches are better than nothing. We can review the result for  false hits, inspect the code to see if we&amp;#8217;ve missed anything obvious, adapt the pattern if required, and pipe the result to &lt;code&gt;wc -l&lt;/code&gt; for a final count.
+&lt;/p&gt;
+&lt;p&gt;&lt;span /&gt;But the best route to an accurate answer is easier and quicker. The compiler &lt;em&gt;has to know&lt;/em&gt; exactly what&amp;#8217;s global, what&amp;#8217;s local, what&amp;#8217;s data and what&amp;#8217;s missing, and that information gets put in the object code it generates. Since reading object code is tough, we&amp;#8217;ll ask &lt;code&gt;nm&lt;/code&gt; to do it for us. Here&amp;#8217;s what I get if I compile the snippet above and inspect the output object file with &lt;code&gt;nm&lt;/code&gt;. (What you get should be similar, but the details will depend on your platform.)
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;$ gcc -c too_many_globals.c &amp;amp;&amp;amp; nm too_many_globals.o
+00000018 t clear_message
+00000000 D g_libname
+00000100 C g_msg_buf
+00000000 T initialise
+         U memset
+00000000 b s_initialised.0
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;The &lt;code&gt;nm&lt;/code&gt; manual tells us how to interpret the output:
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;Nm displays the name list (symbol table) of each object file in the argument list &amp;#8230; Each symbol name is preceded  by  its  value (blanks if undefined) &amp;#8230; this value is followed by one of the following  characters,  representing  the symbol type: U (undefined), A (absolute), T (text section symbol), D (data section  symbol), B (bss section  symbol), C (common  symbol) &amp;#8230;. If the symbol is local (non-external), the symbol&amp;#8217;s type is instead represented  by  the  corresponding lowercase letter.
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;&lt;code&gt;Nm&lt;/code&gt; works on object files, libraries (static and dynamic) and executables. You don&amp;#8217;t have to be an expert on object code to correlate the &lt;code&gt;nm&lt;/code&gt; output shown above with the source code. It&amp;#8217;s telling us:
+&lt;/p&gt;
+&lt;ul&gt;
+ &lt;li&gt;
+     &lt;code&gt;clear_message&lt;/code&gt; is a local function
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     &lt;code&gt;g_libname&lt;/code&gt; is constant global data 
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     &lt;code&gt;initialise&lt;/code&gt; is an external function
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     &lt;code&gt;memset&lt;/code&gt; is undefined (it&amp;#8217;s part of the standard C library)
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     &lt;code&gt;g_msg_buf&lt;/code&gt; and &lt;code&gt;s_initialised&lt;/code&gt; are the bad boys we&amp;#8217;re hunting down
+ &lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Once we&amp;#8217;ve discovered &lt;code&gt;nm&lt;/code&gt; we can pick out the globals accurately and swiftly.  Running &lt;code&gt;nm libtoo_many_globals.a&lt;/code&gt; outputs text which we can pipe through standard Unix tools as before to get &lt;em&gt;exact&lt;/em&gt; metrics.
+&lt;/p&gt;
+&lt;p&gt;The &lt;a href="http://www.gnu.org/software/binutils/manual/html_chapter/binutils_2.html"&gt;GNU version of nm&lt;/a&gt; has some bells and whistles &amp;#8212; it can demangle C++ symbols, for example. Object code is platform dependent and the details of &lt;code&gt;nm&lt;/code&gt;&amp;#8217;s output will similarly vary across platforms, so I suggest you look at the manual, but most of the time &lt;code&gt;nm OBJECTFILE&lt;/code&gt; is all you&amp;#8217;ll need.
+&lt;/p&gt;
+
+&lt;h3&gt;Global constants&lt;/h3&gt;
+&lt;p&gt;Note that &lt;code&gt;nm&lt;/code&gt; has nothing to say about the preprocessor definition, MSG_BUF_SIZE, which vanishes well before the object file gets written. Since MSG_BUF_SIZE can&amp;#8217;t be changed at run time or even after compilation, it won&amp;#8217;t stop us from safely using more than one library instance. &lt;code&gt;Nm&lt;/code&gt; does tell us about &lt;code&gt;g_libname&lt;/code&gt;, a string constant has been placed in the data section of the object file. Like MSG_BUF_SIZE, multiple library instances can safely share this read-only data.
+&lt;/p&gt;
+&lt;p&gt;Just because something can be done doesn&amp;#8217;t make it &lt;a href="http://accu.org/index.php/journals/1411"&gt;good practice&lt;/a&gt;. I don&amp;#8217;t think there&amp;#8217;s enough information here to definitively rule against these two &amp;#8220;safe&amp;#8221; globals, but they certainly look suspect. At the very least, the scope of the library name string should be reduced. It would be better to review use of constant data throughout the library; by passing this data in, perhaps as an initialisation parameter, the library may become more flexible and easier to test.
+&lt;/p&gt;</description>
+<dc:date>2008-04-08</dc:date>
+<guid>http://wordaligned.org/articles/hunting-down-globals-with-nm.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/hunting-down-globals-with-nm.html</link>
+<category>Shell</category>
+</item>
+
+<item>
+<title>Top Ten Tags</title>
+<description>&lt;div class="toc"&gt;
+&lt;h2&gt;Contents&lt;/h2&gt;
+&lt;ul&gt;
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/top-ten-tags.html#tocmaximum" name="toc0" id="toc0"&gt;Maximum&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/top-ten-tags.html#tocsort-and-slice" name="toc1" id="toc1"&gt;Sort and Slice&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/top-ten-tags.html#tocpartial-sort" name="toc2" id="toc2"&gt;Partial Sort&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/top-ten-tags.html#tocpartial-sorting-with-heaps" name="toc3" id="toc3"&gt;Partial Sorting with Heaps&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/top-ten-tags.html#tocpartitioning-with-heaps" name="toc4" id="toc4"&gt;Partitioning with Heaps?&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/top-ten-tags.html#tocsorting-with-heaps" name="toc5" id="toc5"&gt;Sorting with Heaps&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/top-ten-tags.html#tocn-largest-in-python" name="toc6" id="toc6"&gt;N Largest in Python&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/top-ten-tags.html#tocn-largest-in-shell" name="toc7" id="toc7"&gt;N Largest in Shell&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/top-ten-tags.html#tocparallel-algorithm-analysis" name="toc8" id="toc8"&gt;Parallel Algorithm Analysis&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/top-ten-tags.html#tocchoosing-an-algorithm" name="toc9" id="toc9"&gt;Choosing an algorithm&lt;/a&gt;
+ &lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;&lt;p&gt;Reworking this website reminded me of another classic sorting algorithm. The sidebar on the front page now has a &lt;strong&gt;Top Tags&lt;/strong&gt; node which lists, in order, the 10 most frequently used tags for articles on this site. What&amp;#8217;s the best way to find these?
+&lt;/p&gt;
+&lt;p&gt;More generally:
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;How do you select the N largest items, in order, from a collection?
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;span id="continue-reading"/&gt;
+
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/top-ten-tags.html#toc0" name="tocmaximum" id="tocmaximum"&gt;Maximum&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;When N is 1, the standard maximum function does the job. That would be &lt;code&gt;std::max_element&lt;/code&gt; in C++ or simply &lt;code&gt;max&lt;/code&gt; in Python. Python&amp;#8217;s &lt;code&gt;max&lt;/code&gt; has an optional &lt;code&gt;key&lt;/code&gt; parameter, allowing you to supply your own comparison function; C++ similarly has an overload of &lt;code&gt;max_element&lt;/code&gt; which accepts a comparison predicate.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/top-ten-tags.html#toc1" name="tocsort-and-slice" id="tocsort-and-slice"&gt;Sort and Slice&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;If N isn&amp;#8217;t 1, you could sort the whole collection then slice the N largest elements from the end. In Python:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;nlargest = sorted(collection)[-N:]
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;And in shell:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;$ sort FILE | tail -$N
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/top-ten-tags.html#toc2" name="tocpartial-sort" id="tocpartial-sort"&gt;Partial Sort&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;A full sort isn&amp;#8217;t required if you just need the top 10, though. For large collections and small N, gains can be had from partially sorting the collection. C++ provides an algorithm, &lt;a href="http://www.sgi.com/tech/stl/partial_sort.html"&gt;std::partial_sort&lt;/a&gt;, which does just that, shuffling the collection in place until the first N elements are ordered and at the front of that collection.
+&lt;/p&gt;
+&lt;p&gt;Here&amp;#8217;s a complete program based on the C++ partial sort algorithm. It reads integers from standard input into memory then writes the first 10 of them to standard output.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;// Program reads integer values from standard input and
+// writes the N largest of these values, largest first,
+// to standard output.
+#include &amp;lt;algorithm&amp;gt;
+#include &amp;lt;functional&amp;gt;
+#include &amp;lt;iostream&amp;gt;
+#include &amp;lt;iterator&amp;gt;
+#include &amp;lt;vector&amp;gt;
+
+int main()
+{
+    typedef std::vector&amp;lt;long&amp;gt; numbers;
+    typedef numbers::iterator iter;
+    typedef std::istream_iterator&amp;lt;numbers::value_type&amp;gt; in;
+    typedef std::ostream_iterator&amp;lt;numbers::value_type&amp;gt; out;
+    
+    // Read numbers from standard input
+    numbers results;
+    copy(in(std::cin), in(), back_inserter(results));
+    
+    // Make sure we cope with N &amp;gt; size of results.
+    numbers::size_type const N = 10u;
+    numbers::size_type const n = std::min(results.size(), N);
+    
+    // Find the N largest (hence the "greater" predicate)
+    iter const first = results.begin();
+    iter const middle = first + n;
+    iter const last = results.end();
+    partial_sort(first, middle, last, std::greater&amp;lt;long&amp;gt;());
+    
+    // Copy these to standard out
+    copy(first, middle, out(std::cout, " "));
+    return 0;
+}
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;The C++ standard guarantees the complexity of &lt;code&gt;partial_sort&lt;/code&gt;:
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;It takes approximately &lt;code&gt;(last - first) * log(middle - first)&lt;/code&gt; comparisons.
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;The corresponding complexity for a full &lt;a href="http://www.sgi.com/tech/stl/sort.html"&gt;sort&lt;/a&gt; is:
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;Approximately &lt;code&gt;(last - first) * log(last - first)&lt;/code&gt;.
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;So the speed up is theoretically of the order of &lt;code&gt;log(S)/log(N)&lt;/code&gt;. Logarithms grow slowly so the gains aren&amp;#8217;t spectacular, but they may well be worth having. I ran some tests on collections of 31 bit numbers generated by the standard C &lt;code&gt;random()&lt;/code&gt; function, with the collection size, S, ranging between 2 million and 10 million.
+&lt;/p&gt;
+&lt;table&gt;&lt;tr&gt;&lt;th&gt;S/million&lt;/th&gt;&lt;th&gt;Partial/ms&lt;/th&gt;&lt;th&gt;Full/ms&lt;/th&gt;&lt;th&gt;Full/Partial&lt;/th&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;2&lt;/td&gt;&lt;td&gt;4&lt;/td&gt;&lt;td&gt;217&lt;/td&gt;&lt;td&gt;54&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;4&lt;/td&gt;&lt;td&gt;8&lt;/td&gt;&lt;td&gt;451&lt;/td&gt;&lt;td&gt;56&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;6&lt;/td&gt;&lt;td&gt;12&lt;/td&gt;&lt;td&gt;697&lt;/td&gt;&lt;td&gt;58&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;8&lt;/td&gt;&lt;td&gt;16&lt;/td&gt;&lt;td&gt;944&lt;/td&gt;&lt;td&gt;56&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;10&lt;/td&gt;&lt;td&gt;29&lt;/td&gt;&lt;td&gt;1200&lt;/td&gt;&lt;td&gt;41&lt;/td&gt;&lt;/tr&gt;
+&lt;/table&gt;
+
+&lt;p&gt;As you can see, for these test cases the partial sort runs around 50 times more quickly than the full sort; better than expected or predicted!
+&lt;/p&gt;
+&lt;p&gt;It&amp;#8217;s also worth noting that we can find the top N elements without altering or (fully) copying the original collection: see &lt;a href="http://www.sgi.com/tech/stl/partial_sort_copy.html"&gt;std::partial_sort_copy()&lt;/a&gt; for details.
+&lt;/p&gt;
+&lt;p&gt;C++&amp;#8217;s in-place partial sort works well with a paging model. To sketch the idea, &lt;code&gt;partial_sort(first, first + N, last)&lt;/code&gt; yields the first page of results, then, if required, &lt;code&gt;partial_sort(first + N, first + 2 * N, last)&lt;/code&gt; yields the second page, and so on. Of course, if we anticipate paging through a large portion of the entire collection, a full sort gets the job done up front.
+&lt;/p&gt;
+&lt;p&gt;The complexity guarantee for &lt;code&gt;partial_sort&lt;/code&gt; is the same as for &lt;code&gt;sort&lt;/code&gt; in the limiting case, when &lt;code&gt;middle&lt;/code&gt; equals &lt;code&gt;last&lt;/code&gt;. So an implementation could, I think, claim conformance by implementing &lt;code&gt;sort&lt;/code&gt; on top of &lt;code&gt;partial_sort&lt;/code&gt;.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/top-ten-tags.html#toc3" name="tocpartial-sorting-with-heaps" id="tocpartial-sorting-with-heaps"&gt;Partial Sorting with Heaps&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;In fact the partial and full sort functions use quite different algorithms. Partial sort is based on the heap data structure and, on my present platform, is implemented largely in terms of the standard heap functions. Here&amp;#8217;s the important part of the code, which I&amp;#8217;ve reformatted for the purposes of this article. Please, compare against the same function in your own implementation.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;template&amp;lt;typename RanIt&amp;gt;
+void partial_sort(RanIt first, RanIt middle, RanIt last)
+{
+    typedef typename iterator_traits&amp;lt;RanIt&amp;gt;::value_type V;
+    
+    std::make_heap(first, middle);
+    for (RanIt i = middle; i &amp;lt; last; ++i)
+        if (*i &amp;lt; *first)
+            std::__pop_heap(first, middle, i, V(*i));
+    std::sort_heap(first, middle);
+}
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;This function starts by making the half open range &lt;code&gt;[first, middle)&lt;/code&gt; into a heap, which has the result that &lt;code&gt;*first&lt;/code&gt; is the largest element in this range.
+&lt;/p&gt;
+&lt;p&gt;It then iterates through the elements &lt;code&gt;[middle, last)&lt;/code&gt;. Each time an element is smaller than &lt;code&gt;*first&lt;/code&gt; &amp;#8212; that is, smaller than the largest element of &lt;code&gt;[middle, first)&lt;/code&gt; &amp;#8212; it calls the implementation&amp;#8217;s private &lt;code&gt;std::__pop_heap()&lt;/code&gt; function. This in turn swaps the values at positions &lt;code&gt;*first&lt;/code&gt; and &lt;code&gt;i&lt;/code&gt; and adjusts the range [first, middle) to once more be a heap. Again, look in your standard library for details.
+&lt;/p&gt;
+&lt;p&gt;Loosely speaking, every time we see an element in the tail of the collection which is smaller than the largest element in the head of the collection, we swap these elements.
+&lt;/p&gt;
+&lt;p&gt;More precisely, the loop invariant is that &lt;code&gt;[first, middle)&lt;/code&gt; is a heap, and all the elements in the range &lt;code&gt;[middle, i]&lt;/code&gt; are greater than all the elements in &lt;code&gt;[first, middle)&lt;/code&gt;. &lt;span /&gt;It&amp;#8217;s subtle, efficient, and dazzlingly clever!
+&lt;/p&gt;
+&lt;p&gt;Once the iterator &lt;code&gt;i&lt;/code&gt; gets to the end of the range (&lt;code&gt;last&lt;/code&gt;, that is), the container has been partitioned so the smallest N elements are at its front. All that remains is to sort these elements; and since the front of the container has already been heapified, we can just heap_sort it.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/top-ten-tags.html#toc4" name="tocpartitioning-with-heaps" id="tocpartitioning-with-heaps"&gt;Partitioning with Heaps?&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Note the distinction between finding the ordered top ten items in a collection and finding the ten largest items in a collection: the ten largest elements needn&amp;#8217;t be ordered.
+&lt;/p&gt;
+&lt;p&gt;You may have spotted that if we pull out of the &lt;code&gt;partial_sort()&lt;/code&gt; implementation shown above before applying the final &lt;code&gt;sort_heap()&lt;/code&gt;, then we&amp;#8217;ve partitioned the collection so that items in the range &lt;code&gt;[first, middle)&lt;/code&gt; are larger than items in the range &lt;code&gt;[middle, last)&lt;/code&gt;.
+&lt;/p&gt;
+&lt;p&gt;In fact, there&amp;#8217;s a a better way of partitioning the collection to put the N largest elements at the front. It doesn&amp;#8217;t use heaps, and, amazingly, can be achieved with a linear algorithm. The C++ standard library provides just such an algorithm filed under the slightly misleading name of &lt;a href="http://www.sgi.com/tech/stl/nth_element.html"&gt;std::nth_element&lt;/a&gt;.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/top-ten-tags.html#toc5" name="tocsorting-with-heaps" id="tocsorting-with-heaps"&gt;Sorting with Heaps&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;I claimed earlier that C++ sort implementers could reuse a special case of partial sort and still meet the C++ Standard&amp;#8217;s complexity guarantee. It would be a hard trick to pull off though, since the constant factors differ. Sort is likely to be based on quicksort, acknowledged the most efficient general purpose sorting algorithm. Partial sort, as already mentioned, is a heap sort.
+&lt;/p&gt;
+&lt;p&gt;On my platform, &lt;code&gt;std::sort()&lt;/code&gt; in fact delegates to an &lt;a href="http://en.wikipedia.org/wiki/Introsort"&gt;introsort&lt;/a&gt; &amp;#8212; a hybrid algorithm which starts with a quicksort and bottoms out to &lt;code&gt;std::partial_sort()&lt;/code&gt; once a heuristically determined recursion depth is exceeded.
+&lt;/p&gt;
+&lt;p&gt;I ran a full partial sort head to head against standard sort on my machine, feeding both algorithms large-ish (size up to 10 million) arrays of 31 bit numbers generated using the standard C &lt;code&gt;random()&lt;/code&gt; function. The results indicate sort runs around four times faster than partial sort; someone&amp;#8217;s probably got a theoretical proof of the exact multiplier.
+&lt;/p&gt;
+&lt;img alt="Full Sort vs Full Partial Sort chart" src="http://chart.apis.google.com/chart?
+cht=lc
+&amp;amp;chtt=Full+Sort+vs.+Full+Partial+Sort
+&amp;amp;chs=400x300
+&amp;amp;chxt=x,y,x,y
+&amp;amp;chxl=0:|0|2|4|6|8|10|1:|0|1|2|3|4|5|6|2:||N+%28Millions%29||3:||Time+%28seconds%29|
+&amp;amp;chd=t:0.0,3.7,7.7,11.8,16.0,20.2|0.0,10.0,26.3,46.7,65.7,88.7
+&amp;amp;chco=ff0000,0000ff
+&amp;amp;chls=2,0,0|2,0,0
+&amp;amp;chdl=Full|Partial" /&gt;
+
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/top-ten-tags.html#toc6" name="tocn-largest-in-python" id="tocn-largest-in-python"&gt;N Largest in Python&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Python makes no complexity guarantees, but the location of the &lt;code&gt;nlargest&lt;/code&gt; function in the &lt;code&gt;heapq&lt;/code&gt; module gives a pretty big hint about its implementation! Note that &lt;code&gt;nlargest&lt;/code&gt; returns its results in order; it&amp;#8217;s more than just a partitioning. Note too that it&amp;#8217;s generous enough to handle the case when N is larger than the size of the collection.
+&lt;/p&gt;
+&lt;p&gt;Here&amp;#8217;s a Python script which imitates our earlier C++ program:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;from sys import stdin
+from heapq import nlargest
+
+numbers = map(int, stdin.read().split())
+top_ten = nlargest(10, numbers)
+print "\n".join(map(repr, top_ten))
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;For the purpose of comparison, I timed the &lt;code&gt;nlargest()&lt;/code&gt; part of this function. I also timed a full (Python) sort of the numbers. Again, I ran on random collections of size S ranging from 2 to 10 million.
+&lt;/p&gt;
+&lt;table&gt;&lt;tr&gt;&lt;th&gt;S/million&lt;/th&gt;&lt;th&gt;Partial/ms&lt;/th&gt;&lt;th&gt;Full/ms&lt;/th&gt;&lt;th&gt;Full/Partial&lt;/th&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;2&lt;/td&gt;&lt;td&gt;100&lt;/td&gt;&lt;td&gt;2590&lt;/td&gt;&lt;td&gt;26&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;4&lt;/td&gt;&lt;td&gt;190&lt;/td&gt;&lt;td&gt;5800&lt;/td&gt;&lt;td&gt;31&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;6&lt;/td&gt;&lt;td&gt;290&lt;/td&gt;&lt;td&gt;9300&lt;/td&gt;&lt;td&gt;32&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;8&lt;/td&gt;&lt;td&gt;410&lt;/td&gt;&lt;td&gt;12880&lt;/td&gt;&lt;td&gt;31&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;10&lt;/td&gt;&lt;td&gt;510&lt;/td&gt;&lt;td&gt;16670&lt;/td&gt;&lt;td&gt;33&lt;/td&gt;&lt;/tr&gt;
+&lt;/table&gt;
+
+&lt;p&gt;This time, the partial sort ran about 30 times more quickly than the full sort. C++ proved about 13 times quicker than Python for the full sort, and 24 times quicker for partial sort.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/top-ten-tags.html#toc7" name="tocn-largest-in-shell" id="tocn-largest-in-shell"&gt;N Largest in Shell&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;The Python script shown relies on being able to read the entire file into memory (that&amp;#8217;s not a limitation of Python, just of the rather simplistic approach taken by the script). The C++ solution only needs space for the numbers, the input buffering being nicely handled by the iostreams framework. For sizable inputs &amp;#8212; of the order of a GB, say, on a modern computer &amp;#8212; we&amp;#8217;d need to use secondary storage.
+&lt;/p&gt;
+&lt;p&gt;The Unix shell pipeline shown earlier has no such limitation. Given enough time and secondary storage, the following command finds the 10 largest numbers in BIGFILE, even if we can&amp;#8217;t hold all these numbers in RAM.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;$ sort -r -n BIGFILE | head
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Executing this command on a ~9GB input file holding one billion 31 bit random numbers took over an hour and a half on my machine.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/top-ten-tags.html#toc8" name="tocparallel-algorithm-analysis" id="tocparallel-algorithm-analysis"&gt;Parallel Algorithm Analysis&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;The &lt;a href="http://en.wikipedia.org/wiki/Big_O_notation"&gt;language&lt;/a&gt; used in this article for discussing algorithm analysis works best for a single process running a single uninterrupted thread of execution. If we want to budget time for an algorithm which makes &lt;code&gt;N * log(N)&lt;/code&gt; comparisons we plug in N, divide by the processor speed, and multiply by the number of cycles required for each comparison.
+&lt;/p&gt;
+&lt;p&gt;I wonder how well this language will survive in a world where processors have multiple cores. Will a new family of algorithms evolve, ones better equipped to use the new hardware?
+&lt;/p&gt;
+&lt;p&gt;This evolution is underway already. In a sequence of articles published in &lt;a href="http://ddj.com"&gt;Dr. Dobbs Journal&lt;/a&gt;, Herb Sutter teaches programmers &lt;a href="http://herbsutter.spaces.live.com/?_c11_BlogPart_BlogPart=blogview&amp;amp;_c=BlogPart&amp;amp;partqs=cat%3dConcurrency" title="I hope this link to Herb Sutter's blog works!"&gt;the traditional C++ way of doing things&lt;/a&gt;; a low-level, platform-dependent approach based on forking threads and locking resources. I&amp;#8217;ve come to regard these techniques as a sure route to subtle bugs. On the systems I&amp;#8217;ve worked on, a more C-style approach has worked well. At its simplest, a Unix pipeline distributes the load; this archetype generalises to a multi-process architecture, where we develop and prove each (single-threaded!) component in isolation.
+&lt;/p&gt;
+&lt;img src="http://erlang.org/images/erlang.gif" alt="erlang GIF"/&gt;
+
+&lt;p&gt;There are &lt;a href="http://erlang.org"&gt;higher level languages&lt;/a&gt; though. Why limit ourselves to a single machine if we can devise a language which blurs the distinction between multiple processors on a single machine and multiple processors on a network? And why not build in some regulation of low level failures? When a task is distributed between workers, it&amp;#8217;s natural to ask what should happen if a worker fails, or simply lags behind.
+&lt;/p&gt;
+&lt;p&gt;Functional programming turns out to have much to offer in this new, parallel world &amp;#8212; &lt;a href="http://labs.google.com/papers/mapreduce.html"&gt;Google&amp;#8217;s Map-Reduce framework&lt;/a&gt;, for example &amp;#8212; and it&amp;#8217;s nice to know the fundamental ideas are far from being new: rather, their time has come.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/top-ten-tags.html#toc9" name="tocchoosing-an-algorithm" id="tocchoosing-an-algorithm"&gt;Choosing an algorithm&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;When discussing algorithms it&amp;#8217;s all too easy to fret about what happens when inputs grow massive. If we&amp;#8217;ve used the standard libraries then resource use for sorting &amp;#8212; both memory and CPU cycles &amp;#8212; may not be a concern. The code in this article demonstrates highly efficient general purpose sorting routines; and in any final system it&amp;#8217;s likely we could use full- and partial- sorting interchangeably without noticeably affecting overall performance. 
+&lt;/p&gt;
+&lt;p&gt;What is always a concern, though, is &lt;a href="http://wordaligned.org/articles/readable-code.html"&gt;readability&lt;/a&gt;. If it&amp;#8217;s the largest few elements of a collection we want, calling &lt;code&gt;std::partial_sort()&lt;/code&gt; in C++ or &lt;code&gt;heapq.nlargest()&lt;/code&gt; in Python nicely expresses that desire.
+&lt;/p&gt;</description>
+<dc:date>2008-02-19</dc:date>
+<guid>http://wordaligned.org/articles/top-ten-tags.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/top-ten-tags.html</link>
+<category>Shell</category>
+</item>
+
+<item>
+<title>File shifting using lftp and rsync</title>
+<description>&lt;p&gt;On a daily basis I work on at least three different platforms, hosted locally, virtually, remotely. Shifting files from place to place is a problem I need to resolve every day, and I have more than one solution.
+&lt;/p&gt;
+&lt;p&gt;I&amp;#8217;m not a fan of file browsers, graphical ftp clients and similar. They clutter the desktop, vary from platform to platform, take ages to drive &amp;#8212; especially with a touch pad &amp;#8212; and prompt for input at all the wrong times. It&amp;#8217;s hard to undo an operation when your pointer slips. By contrast, using simple commands in a shell window puts the power back at your fingertips, whatever platform you&amp;#8217;re on. Recovering from mistakes is as easy as recalling your command history.
+&lt;/p&gt;
+&lt;span id="continue-reading"/&gt;
+
+
+&lt;h3&gt;Local File Systems&lt;/h3&gt;
+&lt;p&gt;For simple operations on a local file system, I tend to use &lt;code&gt;cp&lt;/code&gt; or Emacs dired mode simply because my immediate context is usually Emacs or a shell window, and often both. For bulky and recursive directory operations, a good starting point is:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;$ tar c SRC | tar x -C DST
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;You can vary this command line to reorganise file systems, though sometimes sprinkling a few soft links around may be worth considering.
+&lt;/p&gt;
+
+&lt;h3&gt;Remote File Systems&lt;/h3&gt;
+&lt;p&gt;Things can get tricky for remote file systems. Preserving permissions and ownership causes problems, as does the security layer. NFS and Samba may seem like the right solutions for a private network but I&amp;#8217;ve grown to regard them as troublesome; they work best on stable networks with well known machines at well-known addresses, and, as usual, I prefer a dynamic model to a static one.
+&lt;/p&gt;
+&lt;p&gt;Again, command line tools can do the job. To save the overhead of re-entering your username/password credentials, you&amp;#8217;ll want to &lt;a href="http://www.linuxproblem.org/art_9.html"&gt;store SSH keys&lt;/a&gt; on the machines you frequent. The most basic remote copy command is &lt;code&gt;scp&lt;/code&gt;. Use it much like &lt;code&gt;cp&lt;/code&gt;, but specify a destination machine on the command line.
+&lt;/p&gt;
+
+&lt;h4&gt;Extended Tar&lt;/h4&gt;
+&lt;p&gt;For more complex filesystems, we can extend our &lt;code&gt;tar&lt;/code&gt; command using &lt;code&gt;ssh&lt;/code&gt; on the far side of the pipeline. The following command tars up the local SRC directory then extracts the archive on the REMOTE machine in directory DST.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;$ tar c SRC | ssh REMOTE tar x -C DST
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;If this isn&amp;#8217;t possible, I sometimes use &lt;code&gt;netcat&lt;/code&gt; to listen at a port on the remote machine:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;Listen to port 2345&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;nc -l -p 2345 | tar x -C DST
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Then, on the source machine, kick off the &lt;code&gt;tar&lt;/code&gt; process:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;tar c SRC &amp;gt; /dev/tcp/DOTTED.IP.OF.MIRROR/2345
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+
+&lt;h4&gt;Lftp&lt;/h4&gt;
+&lt;p&gt;Suppose you want or need to transfer files using the venerable FTP protocol. If you haven&amp;#8217;t already discovered &lt;a href="http://lftp.yar.ru/"&gt;lftp&lt;/a&gt;, then it&amp;#8217;s time to investigate. When you connect to a remote machine using &lt;code&gt;lftp&lt;/code&gt; it&amp;#8217;s rather like having a shell session open on that machine: you can navigate using tab completion and the usual shell tools relating to file and directory operations are there, as well as extra goodies like &lt;code&gt;mirror&lt;/code&gt; and a decent help system.
+&lt;/p&gt;
+
+&lt;h4&gt;Rsync&lt;/h4&gt;
+&lt;p&gt;Rsync is another great command-line file-system shifter. It&amp;#8217;s designed to keep two directory structures in sync, and to do so efficiently by just transmitting deltas between the two. Typically the source and destination directories reside on separate machines, and &lt;code&gt;rsync&lt;/code&gt; is often invoked automatically as a scheduled job. &lt;code&gt;Rsync&lt;/code&gt; forms the backbone of many a backup system. I&amp;#8217;ve often used it to complement more heavy-weight coporate backup systems which would require me to ask an administrator to restore my own files.
+&lt;/p&gt;
+&lt;p&gt;I use &lt;code&gt;rsync&lt;/code&gt; to post updates to this website, and indeed to mirror this website to other machines I use. My publish script is as simple as:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;publish.sh&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;#! /bin/sh
+rsync -avz www wordaligned@wordaligned.org:~
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Here, local directory structure &lt;code&gt;www&lt;/code&gt; will be mirrored to &lt;code&gt;~wordaligned/www&lt;/code&gt; on remote machine &lt;code&gt;wordaligned.org&lt;/code&gt;. I supply the remote username &lt;code&gt;wordaligned&lt;/code&gt; explicitly since it differs from my local username &lt;code&gt;tag&lt;/code&gt;. The &lt;code&gt;-v&lt;/code&gt; &lt;em&gt;verbose&lt;/em&gt; option gives me a warm fuzzy feeling that the updates I want to post are indeed being posted, the &lt;code&gt;-z&lt;/code&gt; &lt;em&gt;compress&lt;/em&gt; option reduces network traffic by compressing file data, and the &lt;code&gt;-a&lt;/code&gt; &lt;em&gt;archive&lt;/em&gt; shorthand option recurses and preserves permissions and ownerships.
+&lt;/p&gt;
+&lt;p&gt;By the way, I&amp;#8217;m implicitly using &lt;code&gt;ssh&lt;/code&gt; (the &lt;code&gt;rsync&lt;/code&gt; default) to access the remote machine. No password is required for user &lt;code&gt;tag&lt;/code&gt; to copy files to user &lt;code&gt;wordaligned&lt;/code&gt;&amp;#8217;s home directory since I&amp;#8217;ve &lt;a href="http://www.linuxproblem.org/art_9.html"&gt;configured SSH&lt;/a&gt; to allow this.
+&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;Rsync&lt;/code&gt; comes with many more options, but they&amp;#8217;re all well documented. A simple &lt;code&gt;-a&lt;/code&gt; is usually all that&amp;#8217;s required.
+&lt;/p&gt;
+
+&lt;h4&gt;More Thoughts on File Shifting&lt;/h4&gt;
+&lt;p&gt;At the start of this note I unfairly dismissed GUI driven file system tools. The truth is that I do often use them. &lt;span /&gt;I&amp;#8217;m generally unprincipled and promiscuous when it comes to tool selection: whatever works and is to hand will do. Thus, while both &lt;code&gt;lftp&lt;/code&gt; and &lt;code&gt;rsync&lt;/code&gt; come with a plethora of options &amp;#8212; &lt;code&gt;lftp&lt;/code&gt; does everything any GUI driven FTP client can do, and probably more, and &lt;code&gt;rsync&lt;/code&gt; similarly defeats graphical file browsers &amp;#8212; &lt;span /&gt;the irony is that I only use them for basic stuff, and may well resort to something with a GUI when attempting something out of the ordinary. A bit of interactive pointing and clicking often appeals more than paging through a rather dry manual.
+&lt;/p&gt;
+&lt;p&gt;What &lt;code&gt;scp&lt;/code&gt; and &lt;code&gt;rsync&lt;/code&gt; won&amp;#8217;t do is find a directory on a remote file system; you can&amp;#8217;t use TAB completion at the far end &lt;a href="http://wordaligned.org/articles/file-shifting-using-lftp-and-rsync.html#footnote1"&gt;&lt;sup&gt;[1]&lt;/sup&gt;&lt;/a&gt;. An interactive &lt;code&gt;lftp&lt;/code&gt; session &lt;em&gt;does&lt;/em&gt; support basic TAB completion on a remote filesystem, but not more powerful tools like &lt;code&gt;find&lt;/code&gt; or &lt;code&gt;locate&lt;/code&gt;.
+&lt;/p&gt;
+&lt;p&gt;In general you can reduce this problem by adopting a disciplined approach to structuring your workspace on whatever platforms you use. If you find yourself typing a command-line like:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;$ scp -r ~/tmp/dev-2008-01-06 cromarty:~/scratch/work-copy2
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;then I&amp;#8217;d suggest something has gone wrong.
+&lt;/p&gt;
+&lt;p&gt;One way to combat this disorganisation is to place your &lt;a href="http://wordaligned.org/articles/personal-version-control.html"&gt;home directory under version control&lt;/a&gt;. Make sure the version control system you use for this is flexible enough to allow you to rename entries, though. If you do adopt this model, your version control system becomes the home for all your files, and transfers between machines become a matter of check-in, check-out.
+&lt;/p&gt;
+&lt;p&gt;I use &lt;a href="http://subversion.tigris.org"&gt;Subversion&lt;/a&gt; in this way, to a degree. There are plenty of files, though, which I don&amp;#8217;t version control &amp;#8212; in general, large files or files which only make sense on certain platforms. I&amp;#8217;ve often found it useful to make these available for access via a webserver, either somewhere on a Wiki, or just served by a &lt;a href="http://www.lighttpd.net"&gt;lighttpd&lt;/a&gt; instance with &lt;a href="http://trac.lighttpd.net/trac/wiki/Docs%3AModDirlisting"&gt;directory listing enabled&lt;/a&gt;.
+&lt;/p&gt;
+&lt;p&gt;&lt;hr /&gt;
+   &lt;a id="footnote1"&gt;[1]&lt;/a&gt;
+   I had a suspicion when I wrote this I&amp;#8217;d turn out to be wrong! &lt;a href="http://here.the.ycros.be/"&gt;Michael Kedzierski&lt;/a&gt; emailled me:
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;I&amp;#8217;m actually using bash completion on Ubuntu and I get remote-side tab completion with scp, it&amp;#8217;s great.
+&lt;/p&gt;
+&lt;/blockquote&gt;</description>
+<dc:date>2008-01-06</dc:date>
+<guid>http://wordaligned.org/articles/file-shifting-using-lftp-and-rsync.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/file-shifting-using-lftp-and-rsync.html</link>
+<category>Shell</category>
+</item>
+
+<item>
+<title>svn help patch</title>
+<description>&lt;p&gt;Suppose you want to temporarily revert local changes made to your working
+   copy, then later restore your work in progress. There are a few ways to
+   do this. Perhaps the simplest would be to move, replicate, then
+   revert.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;$ mv working_copy working_copy_mine
+$ cp -R working_copy_mine working_copy
+$ svn revert -R working_copy
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Now all your changes to &lt;code&gt;working_copy&lt;/code&gt; have been reverted and it
+   contains what you originally checked out (the &lt;em&gt;BASE&lt;/em&gt; revision, in
+   &lt;a href="http://subversion.tigris.org"&gt;Subversion&lt;/a&gt; terminology, and note that this revision has been
+   cached locally in the &lt;code&gt;.svn&lt;/code&gt; directories, so &lt;code&gt;svn revert&lt;/code&gt; has no need
+   to visit the server). When you&amp;#8217;re done, tidy up and put your
+   modifications back.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;$ rm -rf working_copy
+$ mv working_copy_mine working_copy
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;If it&amp;#8217;s a large working copy you can save time, disk space and
+   keystrokes by avoiding the replication. First, save local differences
+   made to your working copy, then revert it.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;$ svn diff working_copy &amp;gt; working_copy.patch
+$ svn revert -R working_copy
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Incidentally, you can fiddle around with &lt;code&gt;working_copy&lt;/code&gt; as much as
+   you want now; &lt;code&gt;svn revert&lt;/code&gt; will always restore the BASE revision.
+&lt;/p&gt;
+&lt;p&gt;When done, &lt;code&gt;patch&lt;/code&gt; your changes back in. Note there is no &lt;code&gt;svn patch&lt;/code&gt;
+   command; Subversion&amp;#8217;s native command for this kind of thing is
+   &lt;code&gt;svn merge&lt;/code&gt; which only works on changes actually committed to the
+   repository. Instead, you&amp;#8217;ll have to use good old &lt;code&gt;patch&lt;/code&gt;.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;$ patch -p0 working_copy &amp;lt; working_copy.patch
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;&lt;strong&gt;Take care&lt;/strong&gt;, though. If you&amp;#8217;ve modified your working copy&amp;#8217;s
+   structure (&lt;code&gt;svn add|delete|move&lt;/code&gt;) or changed its properties (&lt;code&gt;svn
+propset|propedit|propdel&lt;/code&gt;), this technique won&amp;#8217;t work. 
+&lt;/p&gt;
+&lt;p&gt;I&amp;#8217;d also suggest that if you regularly find yourself wanting to
+   shuffle tentative changes in this way, you probably ought to be
+   committing them on a private code branch where Subversion
+   can manage them for you.
+&lt;/p&gt;</description>
+<dc:date>2007-10-03</dc:date>
+<guid>http://wordaligned.org/articles/svn-help-patch.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/svn-help-patch.html</link>
+<category>Shell</category>
+</item>
+
+<item>
+<title>PyCon UK: statistics, pictures and perennial problems</title>
+<description>&lt;p&gt;I&amp;#8217;m delighted to have attended &lt;a href="http://pyconuk.org/index.html"&gt;PyCon UK&lt;/a&gt;, even if only for a day. It&amp;#8217;s given me lots to think about.
+&lt;/p&gt;
+&lt;p&gt;The organisers had kept the prices &lt;em&gt;very&lt;/em&gt; low, a decision which must have helped encourage a stronger turn out than they&amp;#8217;d even hoped for. They had no problem accomodating the excess numbers: everything ran on time without anyone appearing over-stressed.
+&lt;/p&gt;
+&lt;p&gt;I liked the venue, even if it suffered the same over-heating problem I recall from more than one &lt;a href="http://accu.org"&gt;ACCU&lt;/a&gt; conference. One nice side-effect of the combination of a generous gap in the schedule and proximity to the &lt;a href="http://www.bmag.org.uk/"&gt;Birmingham Museum and Art Gallery&lt;/a&gt; was that I could cool off by visiting the Paula Rego exhibition (even if it meant going past a puerile rugby world cup roadshow).
+&lt;/p&gt;
+&lt;img src="http://www.bmag.org.uk/images/events/regol.jpg" alt="Paula Rego picture" /&gt;
+
+&lt;p&gt;I half wish I&amp;#8217;d got my act together a little sooner and put forward a presentation myself. On the other hand, that would have meant missing someone else&amp;#8217;s session. In the event, I managed to squeeze in a 5 minute &lt;a href="http://wordaligned.org/articles/pitching-python-in-three-syllables.html"&gt;lightning talk&lt;/a&gt;, which solved the problem of missing action elsewhere and meant I could reach everyone at once &amp;#8212; and I didn&amp;#8217;t even have to fret about that other perennial conference problem, of trying to connect a laptop to a projector (no time for that in 5 mins).
+&lt;/p&gt;
+&lt;p&gt;I&amp;#8217;ve invented some statistics about the conference.
+&lt;/p&gt;
+&lt;ol&gt;
+ &lt;li&gt;
+     123% better attended than first predicted
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     72% of laptops used were apple macs
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     50% of keynote speakers were female
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     20% of conference organisers were female
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     Less than 1% of the remaining delegates were female
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     Sessions were 99% punctual
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     Virgin trains to and from Bristol were 68% punctual
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     &lt;a href="http://beautifulcode.oreillynet.com/"&gt;Beautiful Code&lt;/a&gt;, a book I&amp;#8217;d hoped to browse at the book-stand before buying, was 100% sold out just 10% into the conference
+ &lt;/li&gt;
+&lt;/ol&gt;</description>
+<dc:date>2007-09-10</dc:date>
+<guid>http://wordaligned.org/articles/pyconuk-stats-pics-probs.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/pyconuk-stats-pics-probs.html</link>
+<category>Shell</category>
+</item>
+
+<item>
+<title>The Granny&#8212;Stroustrup Scale</title>
+<description>&lt;p&gt;I finally booked up for &lt;a href="http://www.pyconuk.org/index.html"&gt;Pycon UK&lt;/a&gt; (I&amp;#8217;ll be there on the Saturday), and when I steered my shopping cart to the checkout I had to fill out a form assessing my programming ability:
+&lt;/p&gt;
+&lt;ul&gt;
+ &lt;li&gt;
+     Novice
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     Basic
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     Experienced
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     Guru
+ &lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;I went with &amp;#8220;Experienced&amp;#8221; &amp;#8212; it came easily enough since I&amp;#8217;ve been describing myself either as an &lt;a href="http://www.google.com/search?hl=en&amp;amp;q=%22enthusiastic+and+experienced+computer+programmer%22"&gt;enthusiastic and experienced programmer&lt;/a&gt; or an &lt;a href="http://www.google.com/search?hl=en&amp;amp;q=%22experienced+and+enthusiastic+computer+programmer%22"&gt;experienced and enthusiastic programmer&lt;/a&gt; for a while now. I hope we don&amp;#8217;t get tested before admission.
+&lt;/p&gt;
+&lt;p&gt;It reminded me of a technical interview I once took for a programming job. Right at the start I had to rate myself on a scale of 1 to 10 where:
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;&lt;span /&gt;1 is your grandmother and 10 is Bjarne Stroustrup.
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;There followed a thorough written test, a whiteboard session and some technical Q &amp;amp; A&amp;#8217;s. At the end I was invited to regrade myself on the Granny&amp;#8212;Stroustrup scale. I think the idea was that I should humbly knock myself down a point or two. I didn&amp;#8217;t, but as it happens, I was offered the job, accepted it, and a very good job it turned out to be.
+&lt;/p&gt;
+&lt;p&gt;Eventually I found myself on the other side of the table in the technical expert role. The Granny&amp;#8212;Stroustrup rating questions were dropped from the process.
+&lt;/p&gt;</description>
+<dc:date>2007-09-05</dc:date>
+<guid>http://wordaligned.org/articles/the-granny-stroustrup-scale.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/the-granny-stroustrup-scale.html</link>
+<category>Shell</category>
+</item>
+
+<item>
+<title>He Sells Shell Scripts to Intersect Sets</title>
+<description>&lt;div class="toc"&gt;
+&lt;h2&gt;Contents&lt;/h2&gt;
+&lt;ul&gt;
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/shell-script-sets.html#tocintroduction" name="toc0" id="toc0"&gt;Introduction&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/shell-script-sets.html#tocan-example-apache-server-logs" name="toc1" id="toc1"&gt;An Example: Apache Server Logs&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/shell-script-sets.html#tocset-creation" name="toc2" id="toc2"&gt;Set Creation&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/shell-script-sets.html#tocmultiset-creation" name="toc3" id="toc3"&gt;Multiset Creation&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/shell-script-sets.html#tocset-union" name="toc4" id="toc4"&gt;Set Union&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/shell-script-sets.html#tocset-intersection" name="toc5" id="toc5"&gt;Set Intersection&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/shell-script-sets.html#tocset-symmetric-difference" name="toc6" id="toc6"&gt;Set Symmetric Difference&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/shell-script-sets.html#tocset-subtraction" name="toc7" id="toc7"&gt;Set Subtraction&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/shell-script-sets.html#tocsets-of-sets" name="toc8" id="toc8"&gt;Sets of Sets&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/shell-script-sets.html#tocmore-set-operations" name="toc9" id="toc9"&gt;More Set Operations&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/shell-script-sets.html#tocextending-the-toolset" name="toc10" id="toc10"&gt;Extending the Toolset&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/shell-script-sets.html#toca-scripts-got-to-know-its-limitations" name="toc11" id="toc11"&gt;A Script&amp;#8217;s Got to Know its Limitations&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/shell-script-sets.html#tocconclusion" name="toc12" id="toc12"&gt;Conclusion&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/shell-script-sets.html#toccredits" name="toc13" id="toc13"&gt;Credits&lt;/a&gt;
+ &lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;&lt;p&gt;A short article of mine promoting shell scripting has appeared in the excellent &lt;a href="http://accu.org"&gt;ACCU&lt;/a&gt; publication, &lt;a href="http://accu.org/index.php/overloadonline"&gt;Overload&lt;/a&gt;. Since Overload is available online, you can read the original version &lt;a href="http://accu.org/index.php/journals/1410"&gt;there&lt;/a&gt;. Alternatively, I&amp;#8217;ve republished it here, and added a couple of important revisions based on reader comments, so just keep reading &amp;#8230;
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/shell-script-sets.html#toc0" name="tocintroduction" id="tocintroduction"&gt;Introduction&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;&lt;span /&gt;The Unix command shell contains a lot of what I like in a programming environment: it&amp;#8217;s dynamic, high-level, interpreted, flexible, succinct. It&amp;#8217;s even reasonably portable now that bash seems to have become the shell of choice. Although there&amp;#8217;s much about shell scripting I don&amp;#8217;t like, on many occasions it turns out to be the best tool for the job.
+&lt;/p&gt;
+&lt;p&gt;In this article we shall demonstrate how simple shell scripts can be used to implement sets, providing one line recipes for set creation, set union, set intersection and more. Having explored the power of the Unix shell we&amp;#8217;ll consider its limitations, before finally  discussing the more general lessons we can learn from the Unix tools.
+&lt;/p&gt;
+&lt;span id="continue-reading"/&gt;
+
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/shell-script-sets.html#toc1" name="tocan-example-apache-server-logs" id="tocan-example-apache-server-logs"&gt;An Example: Apache Server Logs&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;As an example, let&amp;#8217;s suppose we want to analyse sets of IP addresses contained in a couple of Apache HTTP Server &lt;a href="http://httpd.apache.org/docs/2.0/logs.html#accesslog"&gt;access logs&lt;/a&gt;, &lt;code&gt;access_log1&lt;/code&gt; and &lt;code&gt;access_log2&lt;/code&gt;. Each log file contains many thousands of lines which look something like this:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;65.214.44.29 - - [25/Jun/2007:00:03:21 +0000] ...
+74.6.87.40 - - [25/Jun/2007:00:03:24 +0000] ...
+65.214.44.29 - - [25/Jun/2007:00:03:24 +0000] ...
+74.6.86.212 - - [25/Jun/2007:00:03:36 +0000] ...
+...
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;We can &lt;code&gt;cut&lt;/code&gt; this file down to leave just the IP address at the start of each line. &lt;code&gt;Cut&lt;/code&gt; is a simple tool which we&amp;#8217;ll be using again later, and here we pass it options &lt;code&gt;-f1&lt;/code&gt; to select the first field from each line and &lt;code&gt;-d" "&lt;/code&gt; to use the space character as a field separator.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;$ cut -f1 -d" " access_log1
+65.214.44.29
+74.6.87.40
+65.214.44.29
+74.6.86.212
+...
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/shell-script-sets.html#toc2" name="tocset-creation" id="tocset-creation"&gt;Set Creation&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;The output from this command is likely to be full of duplicates. Regular site visitors typically hit the web server a few times; web spiders and robots are much more hungry. To obtain the &lt;strong&gt;sets&lt;/strong&gt; of unique IP addresses contained in each log file, we could do this:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;$ cut -f1 -d" " access_log1 | sort | uniq &amp;gt; IP1
+$ cut -f1 -d" " access_log2 | sort | uniq &amp;gt; IP2
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Here &lt;code&gt;cut&lt;/code&gt; picks out the IP addresses, &lt;code&gt;sort&lt;/code&gt; orders the results, &lt;code&gt;uniq&lt;/code&gt; eliminates duplicates, and we&amp;#8217;ve redirected the output into files IP1 and IP2. By the way, we could have eliminated a link from the pipeline using the &lt;code&gt;-u&lt;/code&gt; option to sort. The Unix shell tools aren&amp;#8217;t entirely orthogonal!
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;$ cut -f1 -d" " access_log1 | sort -u &amp;gt; IP1
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;The resulting sets are ordered &amp;#8212; a set implementation which should be familiar to C++ programmers. The IP addresses will be lexicographically rather than numerically ordered, since we went with the &lt;code&gt;sort&lt;/code&gt; defaults. This means that, for example, &lt;code&gt;122.152.128.10&lt;/code&gt; appears before &lt;code&gt;58.167.213.128&lt;/code&gt; because &lt;code&gt;1&lt;/code&gt; alphabetically precedes &lt;code&gt;5&lt;/code&gt;. With a little more effort, we could probably persuade &lt;code&gt;sort&lt;/code&gt; to yield a numeric ordering (no, &lt;code&gt;sort -n&lt;/code&gt; isn&amp;#8217;t good enough).
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/shell-script-sets.html#toc3" name="tocmultiset-creation" id="tocmultiset-creation"&gt;Multiset Creation&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;If instead we wanted a &lt;strong&gt;multiset&lt;/strong&gt; &amp;#8212; that is, a set in which elements may appear more than once, we could count the number of times items are repeated in the sorted output using the &lt;code&gt;-c&lt;/code&gt; option to &lt;code&gt;uniq&lt;/code&gt;.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;$ cut -f1 -d" " access_log1 | sort | uniq -c
+   8 12.153.20.132
+   2 12.217.178.11
+  14 12.30.66.226
+   1 122.152.128.49
+  ...
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Here, each IP address is prefixed by the number of times it occurred in the log file, so our multiset contains &lt;code&gt;12.153.20.132&lt;/code&gt; 8 times, etc. This will be useful later when we come to intersection operations.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/shell-script-sets.html#toc4" name="tocset-union" id="tocset-union"&gt;Set Union&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Let&amp;#8217;s assume we&amp;#8217;ve followed the steps above and IP1 and IP1 contain the set of IP addresses in the two access logs.  Forming the &lt;strong&gt;union&lt;/strong&gt; of these sets is simple.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;$ sort -m IP1 IP2 | uniq &amp;gt; IP1_union_IP2
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;The &lt;code&gt;-m&lt;/code&gt; &lt;em&gt;merge&lt;/em&gt; option to &lt;code&gt;sort&lt;/code&gt; is purely for efficiency and the result would be equally correct without it. Since the inputs are already sorted, we can just merge them together, line by line. For C++ users, it&amp;#8217;s the difference between the &lt;code&gt;std::sort&lt;/code&gt; and &lt;code&gt;std::merge&lt;/code&gt; algorithms.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/shell-script-sets.html#toc5" name="tocset-intersection" id="tocset-intersection"&gt;Set Intersection&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Finding the &lt;strong&gt;intersection&lt;/strong&gt; of IP1 and IP2 can be done in a similar fashion. We merge them together then use the &lt;code&gt;-d&lt;/code&gt; option to &lt;code&gt;uniq&lt;/code&gt; to pick out duplicates. Since the original sets contained no duplicates, the elements output by this command are those common to both inputs; the set intersection, that is.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;$ sort -m IP1 IP2 | uniq -d &amp;gt; IP1_intersection_IP2
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Brief though this command is, we needn&amp;#8217;t type it all in. Exploiting its similarity to the previous command and using the magic of shell history, we just hit the up arrow key &amp;uarr; and edit the previous line.
+&lt;/p&gt;
+&lt;p&gt;A more succinct alternative would be to use &lt;code&gt;comm&lt;/code&gt;, a specialised tool for selecting or rejecting lines common to two files.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;$ comm -12 IP1 IP2 &amp;gt; IP1_intersection_IP2
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;&lt;code&gt;Comm&lt;/code&gt; requires the input text files to be lexically sorted, and by default outputs three columns: lines only in the first file; lines only in the second file; and lines common to both files. By supplying the &lt;code&gt;-12&lt;/code&gt; option we choose to select just the third column, again generating the desired intersection.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/shell-script-sets.html#toc6" name="tocset-symmetric-difference" id="tocset-symmetric-difference"&gt;Set Symmetric Difference&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;We can tweak the first intersection recipe to find the &lt;strong&gt;set symmetric difference&lt;/strong&gt; between IP1 and IP2 (the IP addresses in just one of IP1 and IP2 that is). Again, the up arrow key &amp;uarr; recalls the command, and this time we use &lt;code&gt;uniq&lt;/code&gt;&amp;#8217;s &lt;code&gt;-u&lt;/code&gt; option to suppress repeated elements.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;$ sort -m IP1 IP2 | uniq -u &amp;gt; IP1_symmetric_diff_IP2
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;We could also have used &lt;code&gt;comm -3 | tr -d "\t"&lt;/code&gt; (note the use of &lt;code&gt;tr&lt;/code&gt; to delete unwanted tab characters from &lt;code&gt;comm&lt;/code&gt;&amp;#8217;s output).
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/shell-script-sets.html#toc7" name="tocset-subtraction" id="tocset-subtraction"&gt;Set Subtraction&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;What about the elements in IP1 but not IP2? Again, &lt;code&gt;comm&lt;/code&gt; does the job. This time, we suppress columns 2 and 3.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;$ comm -23 IP1 IP2 &amp;gt; IP1_subtract_IP2
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/shell-script-sets.html#toc8" name="tocsets-of-sets" id="tocsets-of-sets"&gt;Sets of Sets&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Uniting a set of sets is easy. &lt;code&gt;Sort&lt;/code&gt; handles as many files as you pass it.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;$ sort -mu IP1 IP2 IP3 .... IPN &amp;gt; IP_unite_all
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;To intersect N sets we could iterate through them, maintaining their cumulative intersection so far by using pair-wise intersection at each step. An alternative approach does away with the explicit iteration by forming their multiset union, then extracting elements which appear N times. Here&amp;#8217;s an example when N is 3.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;$ sort -m IP1 IP2 IP3 | uniq -c | grep "^ *3" \
+    | tr -s " " | cut -f3 -d" "
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Let&amp;#8217;s unpick this pipeline. First, &lt;code&gt;sort -m IP1 IP2 IP3 | uniq -c&lt;/code&gt; generates the multiset of IP addresses in IP1, IP2 and IP2. Since IP1, IP2 and IP3 are sets and therefore &lt;em&gt;individually&lt;/em&gt; contain no repeats, the resulting multiset looks something like this:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;$ sort -m IP1 IP2 IP3 | uniq -c
+   1 12.30.66.226
+   3 122.152.128.10
+   2 122.152.128.49
+   1 122.152.129.54
+   ...
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Each line in the output starts with a count which &lt;em&gt;must&lt;/em&gt; be either 1, 2 or 3. Lines starting with 3 correspond to IP addresses common to all three files &amp;#8212;  and these are the IP addresses which form the intersection of IP1, IP2 and IP3. Now we can use some standard pattern matching and extraction techniques to pick out the desired fields.
+&lt;/p&gt;
+&lt;p&gt;First &lt;code&gt;grep&lt;/code&gt; picks out lines starting with any number of spaces followed by a &lt;code&gt;3&lt;/code&gt;. Next &lt;code&gt;tr -s " "&lt;/code&gt; squeezes repeated spaces from each line, making the output suitable for use with &lt;code&gt;cut&lt;/code&gt; using the space character as a field delimiter. Finally &lt;code&gt;cut&lt;/code&gt; itself extracts the column we want (the one with the IP address).
+&lt;/p&gt;
+&lt;p&gt;This approach generalises to the following shell script.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;intersect&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;#! /bin/sh
+# Intersect a collection of lexicographically sorted input sets
+sort -m $@ | uniq -c | grep "^ *$# " | tr -s " " | cut -f3 -d" "
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;The rather cryptic looking &lt;code&gt;$@&lt;/code&gt; and &lt;code&gt;$#&lt;/code&gt; which appear in this script are special shell parameters: the first expands to the parameters passed to &lt;code&gt;intersect&lt;/code&gt;, the second to the number of these parameters. This function generates output on &lt;code&gt;stdout&lt;/code&gt;, and is ready for use in yet bigger shell scripts.
+&lt;/p&gt;
+&lt;p&gt;If you call this function with no inputs, it appears to hang &amp;#8212; that&amp;#8217;s because &lt;code&gt;sort&lt;/code&gt;, given no input files, processes &lt;code&gt;stdin&lt;/code&gt;. This breaks &lt;code&gt;intersect&lt;/code&gt;. We can fix the problem in a couple of ways. 
+&lt;/p&gt;
+&lt;p&gt;We could add a conditional check that callers have supplied at least one file, printing usage information and returning an error code if not. 
+&lt;/p&gt;
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;intersect&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;#! /bin/sh
+if [ $# -eq 0 ]
+then
+    echo 1&amp;gt;&amp;amp;2 "Usage: $0 SET1 SET2..."
+    exit 127
+fi
+sort -m $@ | uniq -c | grep "^ *$# " | tr -s " " | cut -f3 -d" "
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Alternatively, we could take the view that intersecting the empty set of sets is fine and should yield the empty set. We can avoid a conditional check by using the shell&amp;#8217;s own version of the &lt;a href="http://www.cs.oberlin.edu/~jwalker/nullObjPattern/"&gt;Null Object pattern&lt;/a&gt;.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;sort -m /dev/null $@ | ....
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/shell-script-sets.html#toc9" name="tocmore-set-operations" id="tocmore-set-operations"&gt;More Set Operations&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;One of the nice things about set operations is there aren&amp;#8217;t many of them. We&amp;#8217;ve already covered the important ones, and these can easily be extended. Try and work out what set operations are going on in the the command history shown below.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;$ comm -13 S1 S2
+$ comm -23 S1 S2
+$ diff S1 S2
+$ head -1 S1
+$ sort -m S1 S2 S3 | uniq -c | grep -c "^ *3"
+$ tail -1 S2
+$ wc -l S1
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;As a hint, the answers in lexicographical order are:
+&lt;/p&gt;
+&lt;ul&gt;
+ &lt;li&gt;
+     are two sets disjoint?
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     are two sets the same?
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     how big is the intersection of three sets?
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     how many elements in a set?
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     is a subset of?
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     largest element of a set
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     smallest element of a set
+ &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/shell-script-sets.html#toc10" name="tocextending-the-toolset" id="tocextending-the-toolset"&gt;Extending the Toolset&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;The command shell is a powerful, dynamic and extensible programming environment. Even these simple one-line scripts can be stored as functions which can be sourced when a new shell is started; you can add command-line help to them, you can find them using tab-completion, you can keep them in your source control system. In this way you can create your own customised shell working environment and port it from platform to platform just by &lt;a href="http://wordaligned.org/articles/personal-version-control.html"&gt;checking it out&lt;/a&gt;.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/shell-script-sets.html#toc11" name="toca-scripts-got-to-know-its-limitations" id="toca-scripts-got-to-know-its-limitations"&gt;A Script&amp;#8217;s Got to Know its Limitations&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Apache server logs are no more and no less than line oriented text. Each record in the log is terminated by a newline character, and each field within each record is delimited in an obvious way: by brackets, spaces, quotation marks, whatever &amp;#8212; who needs XML? This is the kind of format shell scripts handle well. Conversely, anything more complicated, XML for example, or records which span multiple lines, is likely to push the shell tools too far. Maybe &lt;code&gt;awk&lt;/code&gt; could cope, but I don&amp;#8217;t think many people bother learning &lt;code&gt;awk&lt;/code&gt; these days: it&amp;#8217;s better to use one of the popular high-level languages when basic shell commands won&amp;#8217;t do.
+&lt;/p&gt;
+&lt;p&gt;Shell scripts tend not to fail safely. For example, the following command is meant to clear out files in a temporary directory:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;# Don't try this at home!
+$ rm -rf $TEMP_WORK_DIR/*
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;You can imagine what happens if TEMP_WORK_DIR has not been set. In general, the Unix commands build on a couple of dangerous assumptions: that programmers know what they are doing; and that the show must go on &amp;#8212; by which I mean that, given malformed input, a shell script will not throw an exception. The IP filters we discussed in this article work quite happily with any old text file as input &amp;#8212; if it wasn&amp;#8217;t an Apache http server log, the only indication of failure may well be smaller sets than expected.
+&lt;/p&gt;
+&lt;p&gt;I&amp;#8217;ll admit that I personally avoid writing any shell scripts much longer than the ones shown here. As with Makefiles, I admire and respect the technology but I&amp;#8217;d rather have someone else deal with the details. The &lt;code&gt;bash&lt;/code&gt; manual may be brief to a fault, but I&amp;#8217;ve yet to get to grips with its finer details. Sometimes it&amp;#8217;s just too subtle.
+&lt;/p&gt;
+&lt;p&gt;On the subject of details, earlier in this article I said that by default &lt;code&gt;sort&lt;/code&gt; uses lexicographical ordering, which isn&amp;#8217;t perhaps the ordering we&amp;#8217;d prefer for IP addresses; and I also said that a numeric &lt;code&gt;sort -n&lt;/code&gt; wouldn&amp;#8217;t do the job either: IP addresses aren&amp;#8217;t really numbers, they&amp;#8217;re dot separated number quartets. You &lt;em&gt;can&lt;/em&gt; use &lt;code&gt;sort&lt;/code&gt; to place IP addresses in a more natural order, but the command you&amp;#8217;ll need is anything but natural.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;# "Natural" ordering of IP addresses
+$ sort -t. +0n -1n +1n -2n +2n -3n +3n IP
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;If you want to know how this works you&amp;#8217;ll have to read the manual. The code, on its own, is &lt;a href="http://wordaligned.org/articles/readable-code.html"&gt;unreadable&lt;/a&gt;. If you don&amp;#8217;t know where the manual is, just open a shell window and type &lt;code&gt;man&lt;/code&gt;. If the output from this command doesn&amp;#8217;t help, try &lt;code&gt;man man&lt;/code&gt;, and if you don&amp;#8217;t know how to open a shell window, I&amp;#8217;m surprised you&amp;#8217;re even reading this sentence!
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/shell-script-sets.html#toc12" name="tocconclusion" id="tocconclusion"&gt;Conclusion&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Modern graphical development environments tend to hide the shell and the command line, probably with good reason, and I don&amp;#8217;t suppose this article will persuade anyone they&amp;#8217;re worth hunting out. And yet the Unix shell embodies so much which is modern and, I suspect, future, best practice.
+&lt;/p&gt;
+&lt;p&gt;&lt;span /&gt;For me, it&amp;#8217;s not just what the shell tools can do, it&amp;#8217;s the example they set. Look again at some of the recipes presented in this article and you&amp;#8217;ll see container operations without explicit loops. You&amp;#8217;ll see flexible and generic algorithms. You&amp;#8217;ll see functional programming. You&amp;#8217;ll see programs which can parallel-process data without a thread or a mutex in sight; no chance of shared memory corruption or race conditions here. The original design of the shell tools may have become somewhat polluted &amp;#8212; we&amp;#8217;ve already seen that &lt;code&gt;sort&lt;/code&gt; does some of what &lt;code&gt;uniq&lt;/code&gt; can do &amp;#8212; but I think the intent shines through as clearly as ever: &lt;span /&gt;we have a compact suite of tools, each with its own responsibility, which cooperate using simple interfaces. We would do well to emulate this model in our own software designs.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/shell-script-sets.html#toc13" name="toccredits" id="toccredits"&gt;Credits&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;I would like to thank the Overload editorial team for their help with this article. I would also like to thank &lt;a href="http://drj11.wordpress.com/"&gt;David Jones&lt;/a&gt; and Don for their suggestions.
+&lt;/p&gt;</description>
+<dc:date>2007-08-18</dc:date>
+<guid>http://wordaligned.org/articles/shell-script-sets.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/shell-script-sets.html</link>
+<category>Shell</category>
+</item>
+
+<item>
+<title>Shells, Logs and Pipes</title>
+<description>&lt;p&gt;I needed to make sense of a lengthy log file. The server had been
+   running over the weekend and the log file showed an increasing packet
+   error count.  (Don&amp;#8217;t worry what a packet error is, it doesn&amp;#8217;t really
+   matter as far as this post goes).  This post explains how the standard
+   Unix tools helped me dissect the log file, and indeed any other log
+   file.
+&lt;/p&gt;
+&lt;span id="continue-reading"/&gt;
+
+
+&lt;h3&gt;Heads and Tails&lt;/h3&gt;
+&lt;p&gt;First, I needed the initial and final error counts.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;Initial and final error counts&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;$ head logfile | grep "packet errors"
+Info: Fri 17:34:05, packet errors: 0
+$ tail logfile | grep "packet errors"
+Info: Mon 08:32:11, packet errors: 11323
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;So what exactly had gone wrong, and when? Paging through the filtered output
+   would take some time since the number of reported packet error counts
+   ran to five figures.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;Paging through the filtered output&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;$ grep "packet errors" logfile | less
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;How many errors were reported?&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;$ grep "packet errors" logfile | wc -l
+125220
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+
+&lt;h3&gt;Uniq&lt;/h3&gt;
+&lt;p&gt;Part of the problem was that whatever logged the message simply
+   printed out the error count every couple of seconds, whether or not
+   this error count had changed. Going back to Friday, reconfiguring
+   the logger and re-running the experiment wasn&amp;#8217;t an option, but luckily
+   I had too much information rather than too little: all I had to do was
+   process it correctly.
+&lt;/p&gt;
+&lt;p&gt;What looked more useful was filtering just the lines at which the
+   error count had changed. Filtering out repeated lines using &lt;code&gt;uniq&lt;/code&gt;
+   wouldn&amp;#8217;t work, since every line&amp;#8217;s timestamp made it unique. Happily,
+   &lt;code&gt;uniq&lt;/code&gt; has an option to ignore a specified number of fields.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;Finding when the error count changed&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;$ grep "packet errors" logfile | uniq -f 3
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Piping this command to &lt;code&gt;wc -l&lt;/code&gt; indicated that the number of
+   interesting lines had been thinned down to around three thousand &amp;#8212;
+   the kind of report which could be paged through comfortably enough.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;Counting error count changes&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;$ grep "packet errors" logfile | uniq -f 3 | wc -l
+3432
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+
+&lt;h3&gt;Sort&lt;/h3&gt;
+&lt;p&gt;It&amp;#8217;s also possible to home in on other points of
+   interest. For example, we could investigate the maximum period of
+   stability by finding when the error count doesn&amp;#8217;t change for
+   longest. This can be done using the &lt;code&gt;-c&lt;/code&gt; option to &lt;code&gt;uniq&lt;/code&gt;, which
+   precedes each output line with a count of the the number of times that
+   line was repeated in the input; then sorting using this count field as
+   a numeric key; then picking the last output value from the
+   pipeline.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;Locating the most stable period&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;$ grep "packet errors" logfile | \
+  uniq -f 3 -c | sort -k1 -n | tail -1
+    277 Info: Sat 23:00:15, packet errors: 4645
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;This tells us that on Saturday evening the error count remained stable
+   for longest &amp;#8212; in fact, an error count of 4645 repeated 277 times
+   in the logfile, a duration of just 9 minutes (given that the packet
+   error count repeated every couple of seconds).
+&lt;/p&gt;
+
+&lt;h3&gt;Et cetera&lt;/h3&gt;
+&lt;p&gt;This is just a flavour of what the Unix shell tools can do when piped
+   together. We&amp;#8217;ve combined some simple tools (&lt;code&gt;less&lt;/code&gt;,
+   &lt;code&gt;head&lt;/code&gt;, &lt;code&gt;tail&lt;/code&gt;, &lt;code&gt;uniq&lt;/code&gt;, &lt;code&gt;sort&lt;/code&gt;, &lt;code&gt;wc&lt;/code&gt;, &lt;code&gt;grep&lt;/code&gt;) into complex and powerful commands
+   using just a few keystrokes. Imagine trying to design a GUI which
+   would allow you to analyse a log file as shown above. &lt;span /&gt;Now try
+   designing a GUI which can analyse any log file ever.
+&lt;/p&gt;
+&lt;p&gt;I wouldn&amp;#8217;t pretend the Unix shell tools are user-friendly. In fact some
+   are distinctly arcane (&lt;code&gt;find&lt;/code&gt; comes to mind). When I started out, I
+   found the Unix manual difficult to use, and although &lt;code&gt;info&lt;/code&gt; has
+   improved things it&amp;#8217;s still hard to find out about a command without
+   knowing its name. And if there&amp;#8217;s a decent, hyper-linked online
+   reference, I&amp;#8217;ve yet to find it.
+&lt;/p&gt;
+
+&lt;h3&gt;Extending the Toolset&lt;/h3&gt;
+&lt;p&gt;Shell tools aren&amp;#8217;t always capable of even the kind of text processing
+   described in this article. For example, if the logfile had more
+   structure to it &amp;#8212; or even was written out as XML &amp;#8212; then we&amp;#8217;d
+   probably be find ourselves struggling.  Fortunately a scripting
+   language is very happy to help out in such cases. Perl remains a good
+   choice, if it&amp;#8217;s one-liners you like. &lt;a href="http://python.org"&gt;Python&lt;/a&gt; and &lt;a href="http://www.ruby-lang.org"&gt;Ruby&lt;/a&gt; are
+   better for longer-lived scripts.
+&lt;/p&gt;
+&lt;p&gt;Equally, there&amp;#8217;s a point at which you need to convert text into
+   something more visual &amp;#8212; a graph or a histogram, perhaps. Text
+   processing can be used to generate a format suitable for importing
+   into a &lt;a href="http://www.gnuplot.info/"&gt;plotting&lt;/a&gt; package.
+&lt;/p&gt;
+
+&lt;h3&gt;Further Reading&lt;/h3&gt;
+&lt;p&gt;A Unix expert once told me that the difference between a Unix expert
+   and a non-expert wasn&amp;#8217;t aptitude or years of accumulated knowledge
+   &amp;#8212; rather it came down to a willingness to read carefully through the
+   manual.  I&amp;#8217;m no expert, but regard this as sound advice.
+&lt;/p&gt;
+&lt;p&gt;For more on the Unix philosophy, and how it applies to software
+   development in general, I recommend &lt;a href="http://www.catb.org/~esr/writings/taoup/"&gt;&amp;#8220;The Art of Unix Programming&amp;#8221;&lt;/a&gt; by
+   &lt;a href="http://www.catb.org/~esr"&gt;Eric S. Raymond&lt;/a&gt;.
+&lt;/p&gt;</description>
+<dc:date>2007-03-05</dc:date>
+<guid>http://wordaligned.org/articles/shells-logs-and-pipes.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/shells-logs-and-pipes.html</link>
+<category>Shell</category>
+</item>
+
+<item>
+<title>Ignoring .svn directories</title>
+<description>&lt;p&gt;Files checked out from a &lt;a href="http://subversion.tigris.org"&gt;Subversion&lt;/a&gt; server get replicated into
+   hidden &lt;code&gt;.svn&lt;/code&gt; directories in your working copy. This behaviour
+   derives from the guiding principle that disk space costs less than
+   network access. It means, for example, you can see what changes you&amp;#8217;ve
+   made to files without needing to visit the server &amp;#8212; and indeed revert
+   these changes without server access.
+&lt;/p&gt;
+&lt;p&gt;An unwanted side-effect of this is that you may get false hits when
+   you search through a working copy. You match the cached base revisions
+   in the &lt;code&gt;.svn&lt;/code&gt; directory as well as the files you&amp;#8217;re really working on.
+&lt;/p&gt;
+&lt;span id="continue-reading"/&gt;
+
+
+&lt;h4&gt;Using find&amp;#8217;s -prune option&lt;/h4&gt;
+&lt;p&gt;To tell &lt;code&gt;find&lt;/code&gt; to exclude &lt;code&gt;.svn&lt;/code&gt; directories, use the &lt;code&gt;-prune&lt;/code&gt; option:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;find . -path '*/.svn' -prune -o -type f -print | \
+      xargs -e grep -I -n -e PATTERN
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+
+&lt;h4&gt;Customising Emacs&lt;/h4&gt;
+&lt;p&gt;You probably don&amp;#8217;t want to have to type in that command all of the
+   time. Since I live inside &lt;a href="http://www.gnu.org/software/emacs/"&gt;emacs&lt;/a&gt; I just added the
+   following lines to my &lt;code&gt;.emacs&lt;/code&gt; configuration file:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;(global-set-key [f3] 'grep-find)
+(setq grep-find-command
+  "find . -path '*/.svn' -prune -o -type f -print | xargs -e grep -I -n -e ")
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Now when I hit F3 my preferred &lt;code&gt;find&lt;/code&gt; command appears. I just append the
+   pattern I want to look for and hit return. The &lt;code&gt;-n&lt;/code&gt; argument to &lt;code&gt;grep&lt;/code&gt;
+   causes line numbers to be generated in the grep-find results, meaning
+   I can jump (&lt;code&gt;CTRL-X-TICK&lt;/code&gt;) to the right place in a matching file.
+&lt;/p&gt;</description>
+<dc:date>2006-08-14</dc:date>
+<guid>http://wordaligned.org/articles/ignoring-svn-directories.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/ignoring-svn-directories.html</link>
+<category>Shell</category>
+</item>
+
+<item>
+<title>A Subversion Pre-Commit Hook</title>
+<description>&lt;p&gt;Subversion&amp;#8217;s &lt;a href="http://svnbook.red-bean.com/en/1.2/svn.reposadmin.create.html#svn.reposadmin.create.hooks"&gt;hook scripts&lt;/a&gt; provide a powerful and
+   flexible way to associate actions with repository events. For example,
+   the &lt;a href="http://svnbook.red-bean.com/en/1.2/svn.reposadmin.create.html#svn.reposadmin.create.hooks"&gt;pre-commit&lt;/a&gt; hook allows you to check &amp;#8212; and possibly abort &amp;#8212; a
+   transaction before it actually gets committed. This entry describes
+   how to install and test a simple &lt;a href="http://python.org"&gt;Python&lt;/a&gt; hook script to prohibit
+   tabs from C++ files.
+&lt;/p&gt;
+&lt;span id="continue-reading"/&gt;
+
+
+&lt;h4&gt;Creating and Installing a Hook Script&lt;/h4&gt;
+&lt;p&gt;Your &lt;a href="http://subversion.tigris.org"&gt;Subversion&lt;/a&gt; repository already has some template hook scripts. For
+   example, the &lt;a href="http://svnbook.red-bean.com/en/1.2/svn.reposadmin.create.html#svn.reposadmin.create.hooks"&gt;pre-commit&lt;/a&gt; template is in
+   &lt;code&gt;PATH_TO_REPOS/hooks/pre-commit.tmpl&lt;/code&gt;. These templates contain
+   instructions on what the hook script does and what parameters it can expect.
+&lt;/p&gt;
+&lt;p&gt;Here, then, is the most direct route to creating and activating a
+   &lt;a href="http://svnbook.red-bean.com/en/1.2/svn.reposadmin.create.html#svn.reposadmin.create.hooks"&gt;pre-commit&lt;/a&gt; hook:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;su - svn                      # As user svn
+cd PATH_TO_REPOS/hooks        # Change to the hooks directory
+cp pre-commit.tmpl pre-commit # Create a pre-commit script
+emacs pre-commit              # Edit to taste
+chmod u+x pre-commit          # It needs to be executable
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;And that&amp;#8217;s it.
+&lt;/p&gt;
+&lt;p&gt;&lt;span /&gt;You haven&amp;#8217;t actually tested your new hook script so it probably
+   doesn&amp;#8217;t do what you meant it to. Either you can sit back and wait for
+   users to complain or you can think of a way to test your hook before
+   you install it.
+&lt;/p&gt;
+
+&lt;h4&gt;System Testing a Hook Script&lt;/h4&gt;
+&lt;p&gt;I&amp;#8217;ve used a couple of strategies:
+&lt;/p&gt;
+&lt;ol&gt;
+ &lt;li&gt;
+     Set up a throw away &lt;a href="http://wordaligned.org/articles/creating-a-temporary-subversion-repository.html"&gt;temporary repository&lt;/a&gt; and use this as a
+  &lt;a href="http://en.wikipedia.org/wiki/Sandbox_%28software_development%29"&gt;sandbox&lt;/a&gt; in which
+  to develop your hook script.
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     Find a way to test your &lt;a href="http://svnbook.red-bean.com/en/1.2/svn.reposadmin.create.html#svn.reposadmin.create.hooks"&gt;hook script&lt;/a&gt; on the live
+  repository &lt;em&gt;before&lt;/em&gt; you actually install it.
+ &lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;In the case of a pre-commit hook the second strategy is quite
+   attractive. Pre-commit hooks are typically used to enforce checks on a
+   transaction before it gets committed and becomes a new
+   repository revision. They are often introduced when a faulty revision gets
+   into the repository and someone says: &amp;#8220;Couldn&amp;#8217;t Subversion have stopped this
+   from happening?&amp;#8221;
+&lt;/p&gt;
+&lt;p&gt;&lt;span /&gt;With a little ingenuity you can test how the pre-commit hook would have
+   responded to such a faulty transaction which, in future, we would like
+   to prohibit.
+&lt;/p&gt;
+
+&lt;h4&gt;Svnlook&lt;/h4&gt;
+&lt;p&gt;&lt;code&gt;Svnlook&lt;/code&gt; is the &lt;a href="http://subversion.tigris.org"&gt;Subversion&lt;/a&gt; administrator&amp;#8217;s friend. It can be used
+   on the Subversion server to examine the repository without changing
+   it. A hook script typically uses &lt;code&gt;svnlook&lt;/code&gt; to examine a repository
+   event and take appropriate action. Thus, for example, to see what
+   files were changed by revision 1234, we run:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;svnlook changed PATH_TO_REPOS --revision 1234
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;To find what files &lt;em&gt;might&lt;/em&gt; be changed by transaction 1234-1 (if
+   nothing goes wrong) the command is similar:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;svnlook changed PATH_TO_REPOS --transaction 1234-1
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Examining transactions using &lt;code&gt;svnlook&lt;/code&gt; is tricky since transactions
+   are transient. When a transaction becomes a revision you can no longer
+   look at it.
+&lt;/p&gt;
+
+&lt;h4&gt;The Pre-commit Hook&lt;/h4&gt;
+&lt;p&gt;The &lt;code&gt;pre-commit&lt;/code&gt; hook gives you an opportunity to catch the
+   transaction just before it becomes a revision. &lt;a href="http://subversion.tigris.org"&gt;Subversion&lt;/a&gt;
+   passes this hook two parameters:
+&lt;/p&gt;
+&lt;ol&gt;
+ &lt;li&gt;
+     the path to the root of the repository
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     the transaction identifier
+ &lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;The pre-commit can fail the transaction by printing an informative
+   message to standard error and returning non-zero. A return code of
+   zero allows the transaction to complete successfully.
+&lt;/p&gt;
+&lt;p&gt;For testing we can add an extra switch, &lt;code&gt;--revision&lt;/code&gt;, to our test
+   pre-commit hook. This switch is to indicate that the second parameter
+   is in fact a revision number. Now we can system-test our hook script
+   on &lt;em&gt;exisiting&lt;/em&gt; repository revisions, and confirm that it does indeed
+   return non-zero for the bad ones and zero for the good ones.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;test-pre-commit PATH_TO_REPOS --revision 1234
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+
+&lt;h4&gt;An Example Pre-commit Hook&lt;/h4&gt;
+&lt;p&gt;Here, then, is a pre-commit hook to ban the TAB character from C++
+   source files. Test it using the &lt;code&gt;--revision&lt;/code&gt; option. Command line
+   help is available using &lt;code&gt;--help&lt;/code&gt;.
+&lt;/p&gt;
+&lt;p&gt;It uses two different flavours of &lt;code&gt;svnlook&lt;/code&gt; to examine the repository:
+&lt;/p&gt;
+&lt;ol&gt;
+ &lt;li&gt;
+     &lt;code&gt;svnlook changed&lt;/code&gt; &amp;#8212; to find which files were changed by a transaction/revision
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     &lt;code&gt;svnlook cat&lt;/code&gt; &amp;#8212; to find the contents of a file in a transaction/revision
+ &lt;/li&gt;
+&lt;/ol&gt;
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;pre-commit&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;#!/bin/env python
+" Example Subversion pre-commit hook. "
+
+def command_output(cmd):
+  " Capture a command's standard output. "
+  import subprocess
+  return subprocess.Popen(
+      cmd.split(), stdout=subprocess.PIPE).communicate()[0]
+
+def files_changed(look_cmd):
+  """ List the files added or updated by this transaction.
+
+"svnlook changed" gives output like:
+  U   trunk/file1.cpp
+  A   trunk/file2.cpp
+  """
+  def filename(line):
+      return line[4:]
+  def added_or_updated(line):
+      return line and line[0] in ("A", "U")
+  return [
+      filename(line)
+      for line in command_output(look_cmd % "changed").split("\n")
+      if added_or_updated(line)]
+
+def file_contents(filename, look_cmd):
+  " Return a file's contents for this transaction. "
+  return command_output(
+     "%s %s" % (look_cmd % "cat", filename))
+
+def contains_tabs(filename, look_cmd):
+  " Return True if this version of the file contains tabs. "
+  return "\t" in file_contents(filename, look_cmd)
+
+def check_cpp_files_for_tabs(look_cmd):
+  " Check C++ files in this transaction are tab-free. "
+  def is_cpp_file(fname):
+      import os
+      return os.path.splitext(fname)[1] in ".cpp .cxx .h".split()
+  cpp_files_with_tabs = [
+      ff for ff in files_changed(look_cmd)
+      if is_cpp_file(ff) and contains_tabs(ff, look_cmd)]
+  if len(cpp_files_with_tabs) &amp;gt; 0:
+      sys.stderr.write("The following files contain tabs:\n%s\n"
+                       % "\n".join(cpp_files_with_tabs))
+  return len(cpp_files_with_tabs)
+
+def main():
+  usage = """usage: %prog REPOS TXN
+
+Run pre-commit options on a repository transaction."""
+  from optparse import OptionParser
+  parser = OptionParser(usage=usage)
+  parser.add_option("-r", "--revision",
+                    help="Test mode. TXN actually refers to a revision.",
+                    action="store_true", default=False)
+  errors = 0
+  try:
+      (opts, (repos, txn_or_rvn)) = parser.parse_args()
+      look_opt = ("--transaction", "--revision")[opts.revision]
+      look_cmd = "svnlook %s %s %s %s" % (
+          "%s", repos, look_opt, txn_or_rvn)
+      errors += check_cpp_files_for_tabs(look_cmd)
+  except:
+      parser.print_help()
+      errors += 1
+  return errors
+
+if __name__ == "__main__":
+  import sys
+  sys.exit(main())
+
+&lt;/pre&gt;
+
+&lt;/div&gt;</description>
+<dc:date>2006-08-09</dc:date>
+<guid>http://wordaligned.org/articles/a-subversion-pre-commit-hook.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/a-subversion-pre-commit-hook.html</link>
+<category>Shell</category>
+</item>
+
+</channel>
+</rss>

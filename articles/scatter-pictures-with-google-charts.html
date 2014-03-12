@@ -1,0 +1,164 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<link rel="icon" href="/images/favicon.png" type="image/png"/>
+<link href="/styles/application.css" media="all" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="/scripts/prettify.js"></script>
+<script type="text/javascript" src="/scripts/lang-lisp.js"></script>
+<script type="text/javascript" src="http://www.haloscan.com/load/wordaligned"></script>
+
+<title>Scatter pictures with Google Charts</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="author" content="Thomas Guest" />
+<meta name="description" content="A Word Aligned article posted 2008-04-25, tagged PIL, Google, Drawing, Python, Charts." />
+<meta name="keywords" content="PIL, Google, Drawing, Python, Charts" />
+<link rel="alternate" type="application/rss+xml" title="Feed" href="http://feeds.wordaligned.org/wordaligned" />
+</head>
+
+<body onload="prettyPrint()">
+<div id="container">
+  <div id="header">
+<h1><span><a accesskey="h" href="/">Word Aligned</a></span></h1>
+<h2>space sensitive programming</h2>
+<a class="button" href="http://feeds.wordaligned.org/wordaligned" title="Subscribe to Word Aligned"><img style="float: right;" src="/images/feed.png" alt="Feed Logo" height="28" width="28"/></a>
+</div>
+
+  <div id="page">
+    <div id="content">
+      <div class="atomentry" id="scatter-pictures-with-google-charts.html">
+<h2 class="title"><a href="/articles/scatter-pictures-with-google-charts.html">Scatter pictures with Google Charts</a></h2>
+<p class="meta"><abbr class="published" title="2008-04-25">2008-04-25</abbr> &bull; <a href="/tag/pil" rel="tag">PIL</a>, <a href="/tag/google" rel="tag">Google</a>, <a href="/tag/drawing" rel="tag">Drawing</a>, <a href="/tag/python" rel="tag">Python</a>, <a href="/tag/charts" rel="tag">Charts</a> &bull; <a href="/articles/scatter-pictures-with-google-charts.html#disqus_thread">Comments</a></p>
+<p>In a recent <a href="http://www.mattcutts.com/blog/pacman-graph-in-google-chart-api/">post on his blog</a> Matt Cutts asks:
+</p>
+<blockquote><p>I almost wanted to call this post &#8220;Stupid Google Tricks&#8221; :-) What fun diagrams can you imagine making with the <a href="http://code.google.com/apis/chart/">Google Charts Service</a>?
+</p>
+</blockquote><p>Here&#8217;s a stupid trick: you can use the <a href="http://www.pythonware.com/library/pil/handbook/">Python Imaging Library</a> to convert a picture into a URL which <a href="http://code.google.com/apis/chart/">Google charts</a> will render as the original picture.
+</p>
+<p>Here&#8217;s the original picture:
+</p>
+<img src="/images/buttons/spider-bw-61.png" alt="Spider"/>
+
+<p>here&#8217;s the version served up by Google charts:
+</p>
+<img src="http://chart.apis.google.com/chart?cht=s&amp;chd=s:DDEEEEEEEEEEEEEFFFFFFFFFFFFFFGGGGGGGGGGGGHHHHHHHHHHHHHHIIIIIIIIIIIIIIIIIJJJJJJJJJJJJJJJKKKKKKKKKKLLLLLLLMMMMMMMMNNNNNNNNNNNNNNOOOOOOOOOOOOOOOOOOOOOOOOOPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQRRRRRRRRRRRRRRRRRRRSSSSSSSSSSSSSSSSSSSSTTTTTTTTTTTTTTTTTTUUUUUUUUUUUUUUUUUVVVVVVVVVVVVVVVVVWWWWWWWWWWWWWWWWWWWWWXXXXXXXXXXXXXXXXXXXXXXXXYYYYYYYYYYYYYYYYYYYYYYYYYYZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbccccccccccccccccccccccccccddddddddddddddddddddeeeeeeeeeeeeeeeeeeeeeeeefffffffffffffffffffgggggggggggggggghhhhhhhhhhhhhhhhhhhhiiiiiiiiiiiiiiiiiiiiijjjjjjjjjjjjjjjjjjjjjjjjjkkkkkkkkkkkkkkkkkkkkklllllllllllllllllllmmmmmmmmmmmmmmmmmmmmmnnnnnnnnnnnnnnnnnnnnoooooooooooooooooppppppppppppppppppqqqqqqqqqqqqqqqqqqqqrrrrrrrrrrrrrrrrrssssssssssssssssssssttttttttttttttttuuuuuuuuuuuuuuuuvvvvvvvvvvvvvwwwwwwwxxxxxxxyyyyyyyyzzzzzzzzzzzzzzz00000000000000111111111111111122222222222222333333333333444444444555556666777,YWaZYXWVUTSRQPObaZYXWVUTSRQPOsdcbaZUTSRQPutsrqplkjidcbavutsrqponmlkjiedcwvuqponmlkjihdcxwvonjihdcxwjihdcyxjihdcRzjihdcTSRQPNJHihgdcbaZYUTSRQPONMLKJIHGFtsrjihgfedcbaZYXWVUTSONMLKJIHGFEDvutsrqihgfedcbaZYXWVUTKIHGFEDCvutqpmlihgfedcWVUTSwvponmlkjihgfedVUTSRvqponmlkjihedcTSRQrqponmlkjihedSRQPsrqponmlkjedRQPOLysrqponmlkjdcRQPONMLKyxtsrqponmlkdcSRQPONMLKJyxtsrqponmldcbUTSRQPONMLKJyxtsrqponmlihgfedcbaZWVUTSPONMKJIyxwtsrqponmljihgfedcbaZYXWVUTPONJIHxwvutsrqponmkjihgfedcbaZYXWVUONMJIHGvusrqponmlkjifedcbZXONIHGFsrqponmlkjedcONMHGFE65432rqponmlkjedcONMGFED3210qponmlkjiedcONE10nmlkjigfedPONM0zonmlkjihgfedYXVPON0zonmjihgfeZYXWVUTPON0zqponmlihgfaZYXWVUTSRQPO0zyrqpnmlbaZYVUTSRQPOzytsrqpmlkcbaZTSRQPzyxwvutsrqmlkjcbaTSRQyxwvutsnmlkjicbUTSRQponmlkjihdcbWVUTSqponjihgdcbZYXWVUTrqponjihgfedcbaZYXWVsrqpjihgfedcbaZYXsrqjifedcbaZYXTSRQPOsrkjYXWVUTSRQPONsrkjYXWVUTSQPONMsrqkjXWVUONMLsrqkjihsrqkjihsrqjihgVsrqihgfZYXWVUTSsrqhgfeaZYXWVUsrqpogfedcbaZYXWsrqponfedcbaZYrqponmedcbaZonmlkedcbmlkdclkjijih&amp;chm=s,000000,1,2.0,3.0,0&amp;chs=186x186" alt="Google Chart Spider"/>
+
+<p>here&#8217;s the code:
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">import Image
+import string
+
+def scatter_pixels(img_file):
+    """Return the URL of a scatter plot of the supplied image
+    
+    The image will be rendered square and black on white. Adapt the
+    code if you want something else.
+    """
+    # Use simple chart encoding. To make things really simple
+    # use a square image where each X or Y position corresponds
+    # to a single encode value.
+    simple = string.uppercase + string.lowercase + string.digits
+    rsimple = simple[::-1] # Google charts Y reverses PIL Y
+    w = len(simple)
+    W = w * 3
+    img = Image.open(img_file).resize((w, w)).convert("1")
+    pels = img.load()
+    black_pels = [(x, y) for x in range(w) for y in range(w)
+                  if pels[x, y] == 0]
+    xs = "".join(simple[x] for x, _ in black_pels)
+    ys = "".join(rsimple[y] for _, y in black_pels)
+    sqside = 3.0
+    return (
+        "http://chart.apis.google.com/chart?"
+        "cht=s&amp;"                          # Draw a scatter graph
+        "chd=s:%(xs)s,%(ys)s&amp;"            # using simple encoding and
+        "chm=s,000000,1,2.0,%(sqside)r,0&amp;"# square black markers
+        "chs=%(W)rx%(W)r"                 # at this size.
+        ) % locals()
+
+</pre>
+
+</div>
+
+<p>and here&#8217;s the url it generates:
+</p>
+<p><a href="http://chart.apis.google.com/chart?cht=s&amp;chd=s:DDEEEEEEEEEEEEEFFFFFFFFFFFFFFGGGGGGGGGGGGHHHHHHHHHHHHHHIIIIIIIIIIIIIIIIIJJJJJJJJJJJJJJJKKKKKKKKKKLLLLLLLMMMMMMMMNNNNNNNNNNNNNNOOOOOOOOOOOOOOOOOOOOOOOOOPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQRRRRRRRRRRRRRRRRRRRSSSSSSSSSSSSSSSSSSSSTTTTTTTTTTTTTTTTTTUUUUUUUUUUUUUUUUUVVVVVVVVVVVVVVVVVWWWWWWWWWWWWWWWWWWWWWXXXXXXXXXXXXXXXXXXXXXXXXYYYYYYYYYYYYYYYYYYYYYYYYYYZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbccccccccccccccccccccccccccddddddddddddddddddddeeeeeeeeeeeeeeeeeeeeeeeefffffffffffffffffffgggggggggggggggghhhhhhhhhhhhhhhhhhhhiiiiiiiiiiiiiiiiiiiiijjjjjjjjjjjjjjjjjjjjjjjjjkkkkkkkkkkkkkkkkkkkkklllllllllllllllllllmmmmmmmmmmmmmmmmmmmmmnnnnnnnnnnnnnnnnnnnnoooooooooooooooooppppppppppppppppppqqqqqqqqqqqqqqqqqqqqrrrrrrrrrrrrrrrrrssssssssssssssssssssttttttttttttttttuuuuuuuuuuuuuuuuvvvvvvvvvvvvvwwwwwwwxxxxxxxyyyyyyyyzzzzzzzzzzzzzzz00000000000000111111111111111122222222222222333333333333444444444555556666777,YWaZYXWVUTSRQPObaZYXWVUTSRQPOsdcbaZUTSRQPutsrqplkjidcbavutsrqponmlkjiedcwvuqponmlkjihdcxwvonjihdcxwjihdcyxjihdcRzjihdcTSRQPNJHihgdcbaZYUTSRQPONMLKJIHGFtsrjihgfedcbaZYXWVUTSONMLKJIHGFEDvutsrqihgfedcbaZYXWVUTKIHGFEDCvutqpmlihgfedcWVUTSwvponmlkjihgfedVUTSRvqponmlkjihedcTSRQrqponmlkjihedSRQPsrqponmlkjedRQPOLysrqponmlkjdcRQPONMLKyxtsrqponmlkdcSRQPONMLKJyxtsrqponmldcbUTSRQPONMLKJyxtsrqponmlihgfedcbaZWVUTSPONMKJIyxwtsrqponmljihgfedcbaZYXWVUTPONJIHxwvutsrqponmkjihgfedcbaZYXWVUONMJIHGvusrqponmlkjifedcbZXONIHGFsrqponmlkjedcONMHGFE65432rqponmlkjedcONMGFED3210qponmlkjiedcONE10nmlkjigfedPONM0zonmlkjihgfedYXVPON0zonmjihgfeZYXWVUTPON0zqponmlihgfaZYXWVUTSRQPO0zyrqpnmlbaZYVUTSRQPOzytsrqpmlkcbaZTSRQPzyxwvutsrqmlkjcbaTSRQyxwvutsnmlkjicbUTSRQponmlkjihdcbWVUTSqponjihgdcbZYXWVUTrqponjihgfedcbaZYXWVsrqpjihgfedcbaZYXsrqjifedcbaZYXTSRQPOsrkjYXWVUTSRQPONsrkjYXWVUTSQPONMsrqkjXWVUONMLsrqkjihsrqkjihsrqjihgVsrqihgfZYXWVUTSsrqhgfeaZYXWVUsrqpogfedcbaZYXWsrqponfedcbaZYrqponmedcbaZonmlkedcbmlkdclkjijih&amp;chm=s,000000,1,2.0,3.0,0&amp;chs=186x186">http://chart.apis.google.com/chart?cht=s&amp;chd=s:DDEEEEEEE&#8230;&amp;chs=186x186</a>
+</p>
+<hr />
+
+<p style="font-size:75%"><strong>Smallprint</strong>. Google charts may return a 400 error for an image with a long URL (meaning lots of black pixels in this case). The upper limit on URL length doesn&#8217;t seem to be <a href="http://code.google.com/apis/chart/">documented</a> but a quick <a href="http://groups.google.com/group/google-chart-api/search?group=google-chart-api&amp;q=url+length&amp;qt_g=Search+this+group">trawl through topics on the google charts group</a> suggests others have bumped into it too. Connoisseurs of whacky pictures should pay <a href="http://www.romancortes.com/blog/homer-css/">CSS Homer Simpson</a> a visit.</p>
+</div>
+
+<div class="comments"><hr/><div id="disqus_thread"></div><script type="text/javascript" src="http://disqus.com/forums/wordaligned/embed.js"></script></div>
+      
+<div id="comments"><script type="text/javascript">
+//<![CDATA[
+(function() {
+    var links = document.getElementsByTagName('a');
+    var query = '?';
+    for(var i = 0; i < links.length; i++) {
+        if(links[i].href.indexOf('#disqus_thread') >= 0) {
+            query += 'url' + i + '=' + encodeURIComponent(links[i].href) + '&amp;';
+        }
+    }
+    document.write('<script type="text/javascript" src="http://disqus.com/forums/wordaligned/get_num_replies.js' + query + '"></' + 'script>');
+})();
+//]]>
+</script></div>
+
+    </div>
+    <div id="sidebar">
+      
+<div class="sidebar-node">
+<h3>Tagged</h3>
+<ul id="categories"><li><a href="/tag/pil" rel="tag">PIL</a></li>
+<li><a href="/tag/google" rel="tag">Google</a></li>
+<li><a href="/tag/drawing" rel="tag">Drawing</a></li>
+<li><a href="/tag/python" rel="tag">Python</a></li>
+<li><a href="/tag/charts" rel="tag">Charts</a></li></ul>
+
+</div>
+
+<div class="sidebar-node">
+<h3>Chain</h3>
+<ul>
+<li><a accesskey="n" href="/articles/accidental-emacs.html" title="Next article">&laquo; Accidental Emacs</a></li>
+<li><a accesskey="p" href="/articles/takewhile-drops-one.html" title="Previous article">&raquo; Takewhile drops one</a></li>
+</ul>
+
+
+</div>
+
+<div class="sidebar-node">
+<h3>Feeds</h3>
+
+<ul>
+<li><a href="http://feeds.wordaligned.org/wordaligned"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Articles</a></li>
+<li><a href="http://feeds.wordaligned.org/wordaligned/comments"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Comments</a></li>
+</ul>
+
+
+</div>
+
+    </div>
+  </div>
+  <div id="footer">
+<hr />
+<p><a href="http://tag.wordaligned.org">Thomas Guest</a></p>
+</div>
+
+</div>
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-3373724-1']);
+  _gaq.push(['_trackPageview']);
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ga);
+  })();
+</script>
+</body>
+
+</html>

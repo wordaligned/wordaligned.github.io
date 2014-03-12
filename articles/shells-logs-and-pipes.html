@@ -1,0 +1,258 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<link rel="icon" href="/images/favicon.png" type="image/png"/>
+<link href="/styles/application.css" media="all" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="/scripts/prettify.js"></script>
+<script type="text/javascript" src="/scripts/lang-lisp.js"></script>
+<script type="text/javascript" src="http://www.haloscan.com/load/wordaligned"></script>
+
+<title>Shells, Logs and Pipes</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="author" content="Thomas Guest" />
+<meta name="description" content="A Word Aligned article posted 2007-03-05, tagged Python, Perl, Ruby, Self, Shell." />
+<meta name="keywords" content="Python, Perl, Ruby, Self, Shell" />
+<link rel="alternate" type="application/rss+xml" title="Feed" href="http://feeds.wordaligned.org/wordaligned" />
+</head>
+
+<body onload="prettyPrint()">
+<div id="container">
+  <div id="header">
+<h1><span><a accesskey="h" href="/">Word Aligned</a></span></h1>
+<h2>space sensitive programming</h2>
+<a class="button" href="http://feeds.wordaligned.org/wordaligned" title="Subscribe to Word Aligned"><img style="float: right;" src="/images/feed.png" alt="Feed Logo" height="28" width="28"/></a>
+</div>
+
+  <div id="page">
+    <div id="content">
+      <div class="atomentry" id="shells-logs-and-pipes.html">
+<h2 class="title"><a href="/articles/shells-logs-and-pipes.html">Shells, Logs and Pipes</a></h2>
+<p class="meta"><abbr class="published" title="2007-03-05">2007-03-05</abbr> &bull; <a href="/tag/python" rel="tag">Python</a>, <a href="/tag/perl" rel="tag">Perl</a>, <a href="/tag/ruby" rel="tag">Ruby</a>, <a href="/tag/self" rel="tag">Self</a>, <a href="/tag/shell" rel="tag">Shell</a> &bull; <a href="/articles/shells-logs-and-pipes.html#disqus_thread">Comments</a></p>
+<p>I needed to make sense of a lengthy log file. The server had been
+   running over the weekend and the log file showed an increasing packet
+   error count.  (Don&#8217;t worry what a packet error is, it doesn&#8217;t really
+   matter as far as this post goes).  This post explains how the standard
+   Unix tools helped me dissect the log file, and indeed any other log
+   file.
+</p>
+<span id="continue-reading"/>
+
+
+<h3>Heads and Tails</h3>
+<p>First, I needed the initial and final error counts.
+</p>
+<div class="typocode"><div class="codetitle">Initial and final error counts</div>
+
+<pre class="prettyprint">$ head logfile | grep "packet errors"
+Info: Fri 17:34:05, packet errors: 0
+$ tail logfile | grep "packet errors"
+Info: Mon 08:32:11, packet errors: 11323
+
+</pre>
+
+</div>
+
+<p>So what exactly had gone wrong, and when? Paging through the filtered output
+   would take some time since the number of reported packet error counts
+   ran to five figures.
+</p>
+<div class="typocode"><div class="codetitle">Paging through the filtered output</div>
+
+<pre class="prettyprint">$ grep "packet errors" logfile | less
+
+</pre>
+
+</div>
+
+<div class="typocode"><div class="codetitle">How many errors were reported?</div>
+
+<pre class="prettyprint">$ grep "packet errors" logfile | wc -l
+125220
+
+</pre>
+
+</div>
+
+
+<h3>Uniq</h3>
+<p>Part of the problem was that whatever logged the message simply
+   printed out the error count every couple of seconds, whether or not
+   this error count had changed. Going back to Friday, reconfiguring
+   the logger and re-running the experiment wasn&#8217;t an option, but luckily
+   I had too much information rather than too little: all I had to do was
+   process it correctly.
+</p>
+<p>What looked more useful was filtering just the lines at which the
+   error count had changed. Filtering out repeated lines using <code>uniq</code>
+   wouldn&#8217;t work, since every line&#8217;s timestamp made it unique. Happily,
+   <code>uniq</code> has an option to ignore a specified number of fields.
+</p>
+<div class="typocode"><div class="codetitle">Finding when the error count changed</div>
+
+<pre class="prettyprint">$ grep "packet errors" logfile | uniq -f 3
+
+</pre>
+
+</div>
+
+<p>Piping this command to <code>wc -l</code> indicated that the number of
+   interesting lines had been thinned down to around three thousand &#8212;
+   the kind of report which could be paged through comfortably enough.
+</p>
+<div class="typocode"><div class="codetitle">Counting error count changes</div>
+
+<pre class="prettyprint">$ grep "packet errors" logfile | uniq -f 3 | wc -l
+3432
+
+</pre>
+
+</div>
+
+
+<h3>Sort</h3>
+<p>It&#8217;s also possible to home in on other points of
+   interest. For example, we could investigate the maximum period of
+   stability by finding when the error count doesn&#8217;t change for
+   longest. This can be done using the <code>-c</code> option to <code>uniq</code>, which
+   precedes each output line with a count of the the number of times that
+   line was repeated in the input; then sorting using this count field as
+   a numeric key; then picking the last output value from the
+   pipeline.
+</p>
+<div class="typocode"><div class="codetitle">Locating the most stable period</div>
+
+<pre class="prettyprint">$ grep "packet errors" logfile | \
+  uniq -f 3 -c | sort -k1 -n | tail -1
+    277 Info: Sat 23:00:15, packet errors: 4645
+
+</pre>
+
+</div>
+
+<p>This tells us that on Saturday evening the error count remained stable
+   for longest &#8212; in fact, an error count of 4645 repeated 277 times
+   in the logfile, a duration of just 9 minutes (given that the packet
+   error count repeated every couple of seconds).
+</p>
+
+<h3>Et cetera</h3>
+<p>This is just a flavour of what the Unix shell tools can do when piped
+   together. We&#8217;ve combined some simple tools (<code>less</code>,
+   <code>head</code>, <code>tail</code>, <code>uniq</code>, <code>sort</code>, <code>wc</code>, <code>grep</code>) into complex and powerful commands
+   using just a few keystrokes. Imagine trying to design a GUI which
+   would allow you to analyse a log file as shown above. <span id="excerpt0"/>Now try
+   designing a GUI which can analyse any log file ever.
+</p>
+<p>I wouldn&#8217;t pretend the Unix shell tools are user-friendly. In fact some
+   are distinctly arcane (<code>find</code> comes to mind). When I started out, I
+   found the Unix manual difficult to use, and although <code>info</code> has
+   improved things it&#8217;s still hard to find out about a command without
+   knowing its name. And if there&#8217;s a decent, hyper-linked online
+   reference, I&#8217;ve yet to find it.
+</p>
+
+<h3>Extending the Toolset</h3>
+<p>Shell tools aren&#8217;t always capable of even the kind of text processing
+   described in this article. For example, if the logfile had more
+   structure to it &#8212; or even was written out as XML &#8212; then we&#8217;d
+   probably be find ourselves struggling.  Fortunately a scripting
+   language is very happy to help out in such cases. Perl remains a good
+   choice, if it&#8217;s one-liners you like. <a href="http://python.org">Python</a> and <a href="http://www.ruby-lang.org">Ruby</a> are
+   better for longer-lived scripts.
+</p>
+<p>Equally, there&#8217;s a point at which you need to convert text into
+   something more visual &#8212; a graph or a histogram, perhaps. Text
+   processing can be used to generate a format suitable for importing
+   into a <a href="http://www.gnuplot.info/">plotting</a> package.
+</p>
+
+<h3>Further Reading</h3>
+<p>A Unix expert once told me that the difference between a Unix expert
+   and a non-expert wasn&#8217;t aptitude or years of accumulated knowledge
+   &#8212; rather it came down to a willingness to read carefully through the
+   manual.  I&#8217;m no expert, but regard this as sound advice.
+</p>
+<p>For more on the Unix philosophy, and how it applies to software
+   development in general, I recommend <a href="http://www.catb.org/~esr/writings/taoup/">&#8220;The Art of Unix Programming&#8221;</a> by
+   <a href="http://www.catb.org/~esr">Eric S. Raymond</a>.
+</p>
+</div>
+
+<div class="comments"><hr/><div id="disqus_thread"></div><script type="text/javascript" src="http://disqus.com/forums/wordaligned/embed.js"></script></div>
+      
+<div id="comments"><script type="text/javascript">
+//<![CDATA[
+(function() {
+    var links = document.getElementsByTagName('a');
+    var query = '?';
+    for(var i = 0; i < links.length; i++) {
+        if(links[i].href.indexOf('#disqus_thread') >= 0) {
+            query += 'url' + i + '=' + encodeURIComponent(links[i].href) + '&amp;';
+        }
+    }
+    document.write('<script type="text/javascript" src="http://disqus.com/forums/wordaligned/get_num_replies.js' + query + '"></' + 'script>');
+})();
+//]]>
+</script></div>
+
+    </div>
+    <div id="sidebar">
+      <div class="sidebar-node">
+<h3>Excerpt</h3>
+<p><a href="#excerpt0">Now try
+designing a GUI which can analyse any log file ever.</a></p>
+
+</div>
+
+<div class="sidebar-node">
+<h3>Tagged</h3>
+<ul id="categories"><li><a href="/tag/python" rel="tag">Python</a></li>
+<li><a href="/tag/perl" rel="tag">Perl</a></li>
+<li><a href="/tag/ruby" rel="tag">Ruby</a></li>
+<li><a href="/tag/self" rel="tag">Self</a></li>
+<li><a href="/tag/shell" rel="tag">Shell</a></li></ul>
+
+</div>
+
+<div class="sidebar-node">
+<h3>Chain</h3>
+<ul>
+<li><a accesskey="n" href="/articles/why-software-development-isnt-like-construction.html" title="Next article">&laquo; Why Software Development isn&#8217;t Like Construction</a></li>
+<li><a accesskey="p" href="/articles/drawing-software-designs.html" title="Previous article">&raquo; Drawing Software Designs</a></li>
+</ul>
+
+
+</div>
+
+<div class="sidebar-node">
+<h3>Feeds</h3>
+
+<ul>
+<li><a href="http://feeds.wordaligned.org/wordaligned"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Articles</a></li>
+<li><a href="http://feeds.wordaligned.org/wordaligned/comments"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Comments</a></li>
+</ul>
+
+
+</div>
+
+    </div>
+  </div>
+  <div id="footer">
+<hr />
+<p><a href="http://tag.wordaligned.org">Thomas Guest</a></p>
+</div>
+
+</div>
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-3373724-1']);
+  _gaq.push(['_trackPageview']);
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ga);
+  })();
+</script>
+</body>
+
+</html>

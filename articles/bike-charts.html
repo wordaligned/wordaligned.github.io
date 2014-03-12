@@ -1,0 +1,135 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<link rel="icon" href="/images/favicon.png" type="image/png"/>
+<link href="/styles/application.css" media="all" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="/scripts/prettify.js"></script>
+<script type="text/javascript" src="/scripts/lang-lisp.js"></script>
+<title>Bike charts by Google</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="author" content="Thomas Guest" />
+<meta name="description" content="Using the google chart API for something ... different A Word Aligned article posted 2010-02-18, tagged Google, Cycling, Charts." />
+<meta name="keywords" content="Google, Cycling, Charts" />
+<link rel="alternate" type="application/rss+xml" title="Feed" href="http://feeds.wordaligned.org/wordaligned" />
+</head>
+
+<body onload="prettyPrint()">
+<div id="container">
+  <div id="header">
+<h1><span><a accesskey="h" href="/">Word Aligned</a></span></h1>
+<h2>tales from the code face</h2>
+<a class="button" href="http://feeds.wordaligned.org/wordaligned" title="Subscribe to Word Aligned"><img style="float: right;" src="/images/feed.png" alt="Feed Logo" height="28" width="28"/></a>
+</div>
+
+  <div id="page">
+    <div id="content">
+      <div class="atomentry" id="bike-charts.html">
+<h2 class="title"><a href="/articles/bike-charts.html">Bike charts by Google</a></h2>
+<p class="meta"><abbr class="published" title="2010-02-18">2010-02-18</abbr> &bull; <a href="/tag/google" rel="tag">Google</a>, <a href="/tag/cycling" rel="tag">Cycling</a>, <a href="/tag/charts" rel="tag">Charts</a> &bull; <a href="/articles/bike-charts.html#disqus_thread">Comments</a></p>
+<p>I&#8217;ve liked the <a href="http://code.google.com/apis/chart/">Google chart API</a> ever since <a href="/articles/the-maximum-subsequence-problem.html" title="My first charts using the google API">I first discovered it</a>. Pack a text definition of an image into a URL <code>http://chart.apis.google.com/chart?YOUR-IMAGE-HERE</code> and you&#8217;ll be served up a freshly cooked PNG. It&#8217;s free. There&#8217;s not even a watermark.
+</p>
+<img width="320px" height="160px" src="http://chart.apis.google.com/chart?chs=320x160&amp;cht=gom&amp;chd=t:70&amp;chl=Nice!" alt="Swing-o-meter, Nice!"/>
+
+<pre>
+http://chart.apis.google.com/chart?  # A chart, please
+    &chs=320x160                     # sized 320x160 pixels
+    &cht=gom                         # of type swin<b>gom</b>eter
+    &chd=t:70                        # with 70% swing
+    &chl=Nice!                       # labeled "Nice!"
+</pre>
+
+<p>Gone are the days when the <a href="http://code.google.com/apis/chart/docs/making_charts.html" title="main entry point to the google chart API docs">documentation</a> fitted on a single web-page. The API has fattened up and filled out. Every time I visit something new has been added: <a href="http://code.google.com/apis/chart/docs/gallery/formulas.html" title="or should that be formulas?">mathematical formulae</a> written in TeX; a <a href="http://code.google.com/apis/chart/docs/chart_playground.html" title="Live chart playground">playground</a> where you can sketch a chart directly; a <a href="http://code.google.com/intl/uk/apis/chart/docs/debugging.html">validation</a> option which tells you where you went wrong &#8212; much more helpful than a bare 404.
+</p>
+<span id="continue-reading"/>
+
+<p>New to me: <a href="http://code.google.com/apis/chart/docs/gallery/dynamic_icons.html" title="dynamic icons - callouts, bubbles, pins, and other graphics">dynamic icons</a>, which let you create &#8220;a variety of interesting callouts, pins, or bubbles that mix text and images&#8221;. 
+</p>
+<img src="http://chart.apis.google.com/chart?chst=d_fnote&amp;chld=thought|2|993300|h|We+could+have+|fun+with+this!" alt="here's a thought..."/>
+
+<img src="http://chart.apis.google.com/chart?chst=d_bubble_icon_texts_big&amp;chld=bicycle|bb|ffff33|663300|Classic+Tour+Finishes|Let's+make+some+charts+which+depict|classic+stage+finishes+in+the+Tour+de+France" alt="classic cycle charts"/>
+
+<img src="http://chart.apis.google.com/chart?chst=d_bubble_text_small&amp;chld=bbbr|Good+idea,+go+for+it!|ffff33|663300" alt="Go for it!"/>
+
+<p>Mercurial manxman Mark Cavendish won an incredible <strong>6 stages</strong> of last year&#8217;s Tour. Here he is, becoming the first Briton ever to win the final showdown on the Champs-&Eacute;lys&eacute;es, and winning it by an immense margin. For me, it was a bitter-sweet moment: that sprint should have put Cav in the green jersey, but he&#8217;d thrown away his chance in the points competition earlier in the race with an <a href="http://tag.wordaligned.org/posts/cav-wants-race">act of petulance</a> which I still struggle to understand.
+</p>
+<img alt="Cavendish, first on the the Champs-&Eacute;lys&eacute;es" src="http://chart.apis.google.com/chart?&amp;cht=lc&amp;chs=540x280&amp;chls=4,3,0&amp;chd=s:ZZZZZZZZZZZZZZZZZZZ&amp;chco=aaaaaa&amp;chm=B,0000ff,0,0:7,0|B,ffffff,0,6:12,0|B,ff0000,0,12:,0,&amp;chem=y;s=simple_text_icon_left;d=,14,000,bicycle,24,000,FFF;of=0,10;dp=15|y;s=simple_text_icon_left;d=,14,000,helicopter,24,000,FFF;of=0,120;dp=11|y;s=simple_text_icon_left;d=,14,000,bicycle,24,000,FFF;of=0,10;dp=10|y;s=simple_text_icon_left;d=,14,000,bicycle,24,000,FFF;of=0,10;dp=9|y;s=simple_text_icon_left;d=,14,000,bicycle,24,000,FFF;of=0,10;dp=range,3,9,.8|y;s=simple_text_icon_left;d=,14,000,civic-building,24,000,FFF;of=0,14;dp=1"/>
+
+<p>The Champs-&Eacute;lys&eacute;es may have a cobbled surface but it&#8217;s level and straight &#8212; definitely one for the sprinters. How about something twisted and mountainous? This second tableau recreates Fabian Cancellara&#8217;s dare-devil descent during stage 7 of last year&#8217;s tour. Defending the maillot jaune, Cancellara got dropped by the peleton following a wheel change. Watch him weave between team cars and camera bikes at top speed to regain his place. <a href="http://www.youtube.com/watch?v=RxXqQqAc2pA" title="Watch Cancellara's descent on YouTube">Awesome!</a>
+</p>
+<img alt="Cancellara descending" src="http://chart.apis.google.com/chart?cht=lc&amp;chs=540x280&amp;chls=4,3,0&amp;chd=s:zyxwwvuttsrppponmmlkjihgfedcbaZYXVUUUTSRQONNMLKJIHHHGFEEEDCCCCCBBBBB&amp;chco=aaaaaa&amp;chm=B,ffff33,0,0,0&amp;chem=y;s=simple_text_icon_left;d=,14,000,bicycle,24,000,FFF;of=4,8;dp=11|y;s=simple_text_icon_left;d=,14,000,car-dealer,24,000,FFF;of=0,10;dp=range,15,24,4|y;s=simple_text_icon_left;d=,14,000,helicopter,24,000,FFF;of=0,80;dp=16|y;s=simple_text_icon_left;d=,14,000,motorcycle,24,000,FFF;of=0,6;dp=range,7,21,9|y;s=simple_text_icon_left;d=,14,000,bicycle,24,000,FFF;of=4,8;dp=range,45,60,2"/>
+
+<p>Now for a real classic &#8212; when Stephen Roche dug deep during an epic mountain stage in the 1987 Tour. Pedro Delgado, wearing yellow, had built a substantial lead over his rival on the climb up La Plagne. Yet somehow Roche clawed his way back into contention, appearing at the finish line just 5 seconds down on Delgado. He surprised everyone. He collapsed, exhausted, and had to be given oxygen, but he&#8217;d done enough. Roche went on to win the Tour. <a href="http://www.youtube.com/watch?v=sQojh-wqL04" title="Roche at La Plagne, commentary by Phil Liggett">Formidable!</a>
+</p>
+<img alt="IT'S STEPHEN ROCHE!" src="http://chart.apis.google.com/chart?cht=lc&amp;chs=540x280&amp;chls=4,3,0&amp;chd=s:ACDEHIJKMOQSTUVXYabcdfghjkmnoppqqrssttuu&amp;chco=aaaaaa&amp;chm=B,ffff33,0,0,0&amp;chem=y;s=simple_text_icon_left;d=,14,000,bicycle,24,000,FFF;of=0,10;dp=29|y;s=simple_text_icon_left;d=,14,000,bicycle,24,000,FFF;of=0,12;dp=32|y;s=simple_text_icon_left;d=,14,000,wc-male,24,000,FFF;of=0,16;dp=35|y;s=simple_text_icon_left;d=,14,000,medical,24,000,FFF;of=0,16;dp=37|y;s=bubble_text_small;d=bbbr,that+looks+like+Stephen+Roche....+IT'S+STEPHEN+ROCHE!,ffff00,000000;of=40,230"/>
+</div>
+
+<div class="comments"><hr/><div id="disqus_thread"></div><script type="text/javascript" src="http://disqus.com/forums/wordaligned/embed.js"></script></div>
+      
+<div id="comments"><script type="text/javascript">
+//<![CDATA[
+(function() {
+    var links = document.getElementsByTagName('a');
+    var query = '?';
+    for(var i = 0; i < links.length; i++) {
+        if(links[i].href.indexOf('#disqus_thread') >= 0) {
+            query += 'url' + i + '=' + encodeURIComponent(links[i].href) + '&amp;';
+        }
+    }
+    document.write('<script type="text/javascript" src="http://disqus.com/forums/wordaligned/get_num_replies.js' + query + '"></' + 'script>');
+})();
+//]]>
+</script></div>
+
+    </div>
+    <div id="sidebar">
+      
+<div class="sidebar-node">
+<h3>Tagged</h3>
+<ul id="categories"><li><a href="/tag/google" rel="tag">Google</a></li>
+<li><a href="/tag/cycling" rel="tag">Cycling</a></li>
+<li><a href="/tag/charts" rel="tag">Charts</a></li></ul>
+
+</div>
+
+<div class="sidebar-node">
+<h3>Chain</h3>
+<ul>
+<li><a accesskey="n" href="/articles/pi-seconds.html" title="Next article">&laquo; Pi seconds is a nanocentury</a></li>
+<li><a accesskey="p" href="/articles/comments-on-comments.html" title="Previous article">&raquo; When you comment on a comment</a></li>
+</ul>
+
+
+</div>
+
+<div class="sidebar-node">
+<h3>Feeds</h3>
+
+<ul>
+<li><a href="http://feeds.wordaligned.org/wordaligned"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Articles</a></li>
+<li><a href="http://feeds.wordaligned.org/wordaligned/comments"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Comments</a></li>
+</ul>
+
+
+</div>
+
+    </div>
+  </div>
+  <div id="footer">
+<hr />
+<p><a href="http://tag.wordaligned.org">Thomas Guest</a></p>
+</div>
+
+</div>
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-3373724-1']);
+  _gaq.push(['_trackPageview']);
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ga);
+  })();
+</script>
+</body>
+
+</html>

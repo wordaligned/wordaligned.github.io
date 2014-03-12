@@ -1,0 +1,209 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<link rel="icon" href="/images/favicon.png" type="image/png"/>
+<link href="/styles/application.css" media="all" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="/scripts/prettify.js"></script>
+<script type="text/javascript" src="/scripts/lang-lisp.js"></script>
+<title>Maximum of an empty sequence?</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="author" content="Thomas Guest" />
+<meta name="description" content="A Word Aligned article posted 2009-03-03, tagged Python, Algorithms." />
+<meta name="keywords" content="Python, Algorithms" />
+<link rel="alternate" type="application/rss+xml" title="Feed" href="http://feeds.wordaligned.org/wordaligned" />
+</head>
+
+<body onload="prettyPrint()">
+<div id="container">
+  <div id="header">
+<h1><span><a accesskey="h" href="/">Word Aligned</a></span></h1>
+<h2>space sensitive programming</h2>
+<a class="button" href="http://feeds.wordaligned.org/wordaligned" title="Subscribe to Word Aligned"><img style="float: right;" src="/images/feed.png" alt="Feed Logo" height="28" width="28"/></a>
+</div>
+
+  <div id="page">
+    <div id="content">
+      <div class="atomentry" id="maximum-of-an-empty-sequence.html">
+<h2 class="title"><a href="/articles/maximum-of-an-empty-sequence.html">Maximum of an empty sequence?</a></h2>
+<p class="meta"><abbr class="published" title="2009-03-03">2009-03-03</abbr> &bull; <a href="/tag/python" rel="tag">Python</a>, <a href="/tag/algorithms" rel="tag">Algorithms</a> &bull; <a href="/articles/maximum-of-an-empty-sequence.html#disqus_thread">Comments</a></p>
+<p>So it happened: as of Python 3.0, <code>reduce()</code> is no longer a built-in function. In the <a href="http://docs.python.org/dev/3.0/whatsnew/3.0.html#builtins">&#8220;What&#8217;s New?&#8221;</a> Guido van Rossum can&#8217;t resist firing a parting shot.
+</p>
+<blockquote><p>Removed <code>reduce()</code>. Use <code><a href="http://docs.python.org/3.0/library/functools.html#functools.reduce">functools.reduce()</a></code> if you really need it; however, 99 percent of the time an explicit <code><a href="http://docs.python.org/3.0/reference/compound_stmts.html#for">for</a></code> loop is more readable.
+</p>
+</blockquote><p>Take that!
+</p>
+<p>As I&#8217;ve noted before, reduce can be side-lined in this way without causing pain because other built-ins cover the common reductions:
+</p>
+<ul>
+ <li>
+     <code>sum</code>
+ </li>
+
+ <li>
+     <code>all</code>, <code>any</code>
+ </li>
+
+ <li>
+     <code>max</code>, <code>min</code>
+ </li>
+</ul>
+<p>and the <code>join</code> method concatenates built-in string and bytes types.
+</p>
+<p>These standard functions are flexible enough to work on any iterable, be it an in-memory sequence like a list, or a stream generated one element at a time. Beware the boundary case! What if an iterable generates no elements? We can&#8217;t determine its length up front, and we don&#8217;t want to pull it all into memory at once just to find out if it&#8217;s empty.
+</p>
+<span id="continue-reading"/>
+
+<p>Let&#8217;s fire up a Python interpreter to experiment. Happily lambda survived the version 3.0 transition, and we can use it to build a mini factory function for empty streams.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">&gt;&gt;&gt; zs = lambda: iter(set())
+&gt;&gt;&gt; zs()
+&lt;set_iterator object at 0x6f49f8&gt;
+
+</pre>
+
+</div>
+
+<p>(Incidentally, have you discovered Python 3.0&#8217;s new set literal syntax? For example, <code>{True, False}</code> is the set of boolean values. Sadly <code>{}</code> creates an empty dict, just like it always did, and not an empty set, &empty;.)
+</p>
+<p>Can we reduce these empty iterables? No problem!
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">&gt;&gt;&gt; all(zs())
+True
+&gt;&gt;&gt; any(zs())
+False
+&gt;&gt;&gt; '!?'.join(zs())
+''
+&gt;&gt;&gt; sum(zs())
+0
+
+</pre>
+
+</div>
+
+<p>Hang on though!
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">&gt;&gt;&gt; max(zs())
+Traceback (most recent call last):
+  File "&lt;stdin&gt;", line 1, in &lt;module&gt;
+ValueError: max() arg is an empty sequence
+
+</pre>
+
+</div>
+
+<p>So what exactly did we expect the maximum value of an empty sequence to be? The only plausible answer is to bounce the question back to clients and allow them to supply a default. Since the built-in max function doesn&#8217;t allow this, we&#8217;d need to write something like:
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">&gt;&gt;&gt; def maximum(iterable, default):
+...     '''Like max(), but returns a default value if xs is empty.'''
+...     try:
+...         return max(iterable)
+...     except ValueError:
+...         return default
+... 
+&gt;&gt;&gt; maximum(zs(), -1)
+-1
+
+</pre>
+
+</div>
+
+<p>Alternatively, the recently demoted reduce <strong>does</strong> admit an initial value.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">&gt;&gt;&gt; from functools import reduce, partial
+&gt;&gt;&gt; maximum = partial(reduce, max)
+&gt;&gt;&gt; maximum(range(42))
+41
+&gt;&gt;&gt; maximum(zs(), -1)
+-1
+
+</pre>
+
+</div>
+
+<hr />
+
+<p>I guess I should point out that the final version of <code>maximum()</code> repeatedly calls the two argument flavour of <code>max()</code>, and may prove suboptimal for large sequences.
+</p>
+<p>This may all seem trivial, but it&#8217;s an issue I really did encounter recently &#8212; <a href="http://feeds.wordaligned.org/wordaligned">stay tuned</a> for details. I&#8217;m not convinced Python gets things right, so I had a quick look at the support built into other languages. Some avoid the problem, only offering a two argument version of <code>max()</code>. Algorithms in the standard C++ library typically deal with half-open iterator ranges, and the range end forms a natural sentinel which <code><a href="http://www.sgi.com/tech/stl/max_element.html">std::max_element()</a></code> can return given an empty range. Perl also <a href="http://perldoc.perl.org/List/Util.html#max-LIST">returns a sentinel value</a> if <code>max</code> is called on an empty list.
+</p>
+</div>
+
+<div class="comments"><hr/><div id="disqus_thread"></div><script type="text/javascript" src="http://disqus.com/forums/wordaligned/embed.js"></script></div>
+      
+<div id="comments"><script type="text/javascript">
+//<![CDATA[
+(function() {
+    var links = document.getElementsByTagName('a');
+    var query = '?';
+    for(var i = 0; i < links.length; i++) {
+        if(links[i].href.indexOf('#disqus_thread') >= 0) {
+            query += 'url' + i + '=' + encodeURIComponent(links[i].href) + '&amp;';
+        }
+    }
+    document.write('<script type="text/javascript" src="http://disqus.com/forums/wordaligned/get_num_replies.js' + query + '"></' + 'script>');
+})();
+//]]>
+</script></div>
+
+    </div>
+    <div id="sidebar">
+      
+<div class="sidebar-node">
+<h3>Tagged</h3>
+<ul id="categories"><li><a href="/tag/python" rel="tag">Python</a></li>
+<li><a href="/tag/algorithms" rel="tag">Algorithms</a></li></ul>
+
+</div>
+
+<div class="sidebar-node">
+<h3>Chain</h3>
+<ul>
+<li><a accesskey="n" href="/articles/a-race-within-a-race.html" title="Next article">&laquo; A race within a race</a></li>
+<li><a accesskey="p" href="/articles/emoticrabs.html" title="Previous article">&raquo; Emoticrab invasion, CSS breakdown</a></li>
+</ul>
+
+
+</div>
+
+<div class="sidebar-node">
+<h3>Feeds</h3>
+
+<ul>
+<li><a href="http://feeds.wordaligned.org/wordaligned"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Articles</a></li>
+<li><a href="http://feeds.wordaligned.org/wordaligned/comments"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Comments</a></li>
+</ul>
+
+
+</div>
+
+    </div>
+  </div>
+  <div id="footer">
+<hr />
+<p><a href="http://tag.wordaligned.org">Thomas Guest</a></p>
+</div>
+
+</div>
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-3373724-1']);
+  _gaq.push(['_trackPageview']);
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ga);
+  })();
+</script>
+</body>
+
+</html>

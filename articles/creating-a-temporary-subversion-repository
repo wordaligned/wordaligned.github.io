@@ -1,0 +1,246 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<link rel="icon" href="/images/favicon.png" type="image/png"/>
+<link href="/styles/application.css" media="all" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="/scripts/prettify.js"></script>
+<script type="text/javascript" src="/scripts/lang-lisp.js"></script>
+<script type="text/javascript" src="http://www.haloscan.com/load/wordaligned"></script>
+
+<title>Creating a Temporary Subversion Repository</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="author" content="Thomas Guest" />
+<meta name="description" content="A Word Aligned article posted 2006-08-08, tagged Subversion." />
+<meta name="keywords" content="Subversion" />
+<link rel="alternate" type="application/rss+xml" title="Feed" href="http://feeds.wordaligned.org/wordaligned" />
+</head>
+
+<body onload="prettyPrint()">
+<div id="container">
+  <div id="header">
+<h1><span><a accesskey="h" href="/">Word Aligned</a></span></h1>
+<h2>tales from the code face</h2>
+<a class="button" href="http://feeds.wordaligned.org/wordaligned" title="Subscribe to Word Aligned"><img style="float: right;" src="/images/feed.png" alt="Feed Logo" height="28" width="28"/></a>
+</div>
+
+  <div id="page">
+    <div id="content">
+      <div class="atomentry" id="creating-a-temporary-subversion-repository">
+<h2 class="title"><a href="/articles/creating-a-temporary-subversion-repository">Creating a Temporary Subversion Repository</a></h2>
+<p class="meta"><abbr class="published" title="2006-08-08">2006-08-08</abbr> &bull; <a href="/tag/subversion" rel="tag">Subversion</a> &bull; <a href="/articles/creating-a-temporary-subversion-repository#disqus_thread">Comments</a></p>
+<p>Sometimes you need to create a temporary <a href="http://subversion.tigris.org">Subversion</a> repository for test
+   purposes. Here&#8217;s how.
+</p>
+<span id="continue-reading"/>
+
+
+<h4>Creating the Repository</h4>
+<p>To create a temporary <a href="http://subversion.tigris.org">Subversion</a> repository for test purposes, all you
+   need to do is:
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">svnadmin create /home/tag/tmp/temp_repos
+
+</pre>
+
+</div>
+
+<p>This new repository uses the default <a href="http://svnbook.red-bean.com/en/1.2/svn.reposadmin.html#svn.reposadmin.basics.backends">FSFS</a> database layer.
+</p>
+
+<h4>Local access to the test repository</h4>
+<p>If you simply wish to access this test repository from your local
+   machine, you don&#8217;t even need to start up the <a href="http://subversion.tigris.org">Subversion</a> server. Use
+   the file protocol directly. Here&#8217;s an example, using the <code>svn info</code> command
+   to obtain basic top-level repository information:
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">&gt; svn info file:///home/tag/tmp/testrepo
+Path: testrepo
+URL: file:///home/tag/tmp/testrepo
+Repository Root: file:///home/tag/tmp/testrepo
+Repository UUID: 8d23c088-e23b-4eea-828f-d863b48cbd24
+Revision: 0
+Node Kind: directory
+Last Changed Rev: 0
+Last Changed Date: 2006-08-08 08:50:12 +0100 (Tue, 08 Aug 2006)
+
+</pre>
+
+</div>
+
+<p>You already have full access rights to this test repository without
+   requiring to enter any username/password credentials. Effectively,
+   if you&#8217;re on the <a href="http://subversion.tigris.org">Subversion</a> server you can do what you want!
+</p>
+
+<h4>Remote access to the test repository using svn</h4>
+<p>Local access may well be good enough to run whatever experiments you
+   need to run. If, however, you want to access the repository remotely,
+   you&#8217;ll need to start the server. The easiest way to do this is using
+   the custom <code>svn</code> protocol:
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">svnserve --daemon --root /home/tag/tmp/testrepo
+
+</pre>
+
+</div>
+
+<p>Now you can access this repository using <code>svn</code> URLs.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">svn info svn://svnhostname
+
+</pre>
+
+</div>
+
+<p>By default, you will have read-only access to the test repository.
+</p>
+
+<h4>Read/Write Remote access</h4>
+<p>The simplest way to gain remote read/write access to your test
+   repository is to edit the <code>svnserve.conf</code> file. Of course, you&#8217;ll want
+   to be on the host machine to do this:
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">emacs /home/tag/tmp/temp_repos/conf/svnserve.conf
+
+</pre>
+
+</div>
+
+<p>If you edit this file to read:
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">[general]
+anon-access = write
+
+</pre>
+
+</div>
+
+<p>then anyone has read/write access. Alternatively, configure <a href="http://subversion.tigris.org">Subversion</a>
+   to use a password file for authorisation by editing <code>conf/svnserve.conf</code>
+   and <code>conf/passwd</code>.
+</p>
+<div class="typocode"><div class="codetitle">svnserve.conf</div>
+
+<pre class="prettyprint">[general]
+anon-access = read
+auth-access = write
+password-db = passwd
+
+</pre>
+
+</div>
+
+<div class="typocode"><div class="codetitle">passwd</div>
+
+<pre class="prettyprint">[users]
+harry = harryssecret
+sally = sallyssecret
+
+</pre>
+
+</div>
+
+
+<h4>When you&#8217;re done</h4>
+<p>When you&#8217;re finished with your repository, just throw it away. You can
+   always make another one.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">killall svnserve
+rm -rf /home/tag/tmp/test_repo
+
+</pre>
+
+</div>
+
+
+<h4>Guess What?</h4>
+<p>Creating a real live production <a href="http://subversion.tigris.org">Subversion</a> repository is no different
+   to creating a temporary one. You might make different
+   arrangements to serve it, to back it up, and possibly to access it.
+</p>
+<p>Oh, and you&#8217;ll be careful not to delete it.
+</p>
+</div>
+
+<div class="comments"><hr/><div id="disqus_thread"></div><script type="text/javascript" src="http://disqus.com/forums/wordaligned/embed.js"></script></div>
+      
+<div id="comments"><script type="text/javascript">
+//<![CDATA[
+(function() {
+    var links = document.getElementsByTagName('a');
+    var query = '?';
+    for(var i = 0; i < links.length; i++) {
+        if(links[i].href.indexOf('#disqus_thread') >= 0) {
+            query += 'url' + i + '=' + encodeURIComponent(links[i].href) + '&amp;';
+        }
+    }
+    document.write('<script type="text/javascript" src="http://disqus.com/forums/wordaligned/get_num_replies.js' + query + '"></' + 'script>');
+})();
+//]]>
+</script></div>
+
+    </div>
+    <div id="sidebar">
+      
+<div class="sidebar-node">
+<h3>Tagged</h3>
+<ul id="categories"><li><a href="/tag/subversion" rel="tag">Subversion</a></li></ul>
+
+</div>
+
+<div class="sidebar-node">
+<h3>Chain</h3>
+<ul>
+<li><a accesskey="n" href="/articles/a-subversion-pre-commit-hook" title="Next article">&laquo; A Subversion Pre-Commit Hook</a></li>
+<li><a accesskey="p" href="/articles/binary-literals" title="Previous article">&raquo; Binary Literals</a></li>
+</ul>
+
+
+</div>
+
+<div class="sidebar-node">
+<h3>Feeds</h3>
+
+<ul>
+<li><a href="http://feeds.wordaligned.org/wordaligned"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Articles</a></li>
+<li><a href="http://feeds.wordaligned.org/wordaligned/comments"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Comments</a></li>
+</ul>
+
+
+</div>
+
+    </div>
+  </div>
+  <div id="footer">
+<hr />
+<p><a href="http://tag.wordaligned.org">Thomas Guest</a></p>
+</div>
+
+</div>
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-3373724-1']);
+  _gaq.push(['_trackPageview']);
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ga);
+  })();
+</script>
+</body>
+
+</html>

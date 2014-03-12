@@ -1,0 +1,1313 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" >
+<channel>
+<title>Word Aligned</title>
+<link>http://wordaligned.org</link>
+<description>tales from the code face</description>
+<dc:creator>tag@wordaligned.org</dc:creator>
+<language>en-gb</language>
+<item>
+<title>Programming Nirvana, Plan B</title>
+<description>&lt;h3&gt;Caging the Effects Monster&lt;/h3&gt;
+&lt;p&gt;&lt;a href="http://research.microsoft.com/~simonpj/"&gt;&lt;img src="http://research.microsoft.com/~simonpj/GIFs/spj-snow.jpg" alt="Simon Peyton Jones in the snow" style="float:right;"/&gt;&lt;/a&gt;
+&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://research.microsoft.com/~simonpj/"&gt;Simon Peyton Jones&lt;/a&gt; gave an outstanding &lt;a href="http://accu.org/index.php/conferences/accu_conference_2008/accu2008_sessions#Caging%20the%20Effects%20Monster:%20the%20next%20decade's%20big%20challenge"&gt;keynote&lt;/a&gt; on functional programming at &lt;a href="http://accu.org/index.php/conferences/accu_conference_2008"&gt;ACCU 2008&lt;/a&gt;. A language researcher at Microsoft in Cambridge, he&amp;#8217;s perhaps best known as the man behind the &lt;a href="http://haskell.org"&gt;Haskell&lt;/a&gt; programming language and &lt;a href="http://haskell.org/ghc/"&gt;GHC&lt;/a&gt;, the leading Haskell compiler. He also happens to be a superb presenter who positively exudes enthusiasm. &lt;span /&gt;Not many compiler writers connect so well with an audience.
+&lt;/p&gt;
+&lt;span id="continue-reading"/&gt;
+
+&lt;p&gt;I&amp;#8217;m a huge fan of a functional programming &lt;em&gt;style&lt;/em&gt;, by which I mean I like first class functions, higher order functions, anonymous functions, list comprehensions, closures and so on. In the languages I use most often, &lt;a href="http://wordaligned.org/tags/c++"&gt;C++&lt;/a&gt;, &lt;a href="http://wordaligned.org/tags/python"&gt;Python&lt;/a&gt; and &lt;a href="http://wordaligned.org/tags/shell"&gt;Shell&lt;/a&gt;, functional programming is a central paradigm &amp;#8212; every bit as useful and important as object-oriented and procedural programming.
+&lt;/p&gt;
+&lt;p&gt;For Haskell and other pure functional languages it&amp;#8217;s not just about style. Simon Peyton Jones&amp;#8217; central argument was that &lt;span /&gt;programming will increasingly be about the control of side-effects: to write correct programs, side-effects must be contained. A pure function has &lt;strong&gt;no&lt;/strong&gt; side-effects. Thus you can be sure what it does. You can even &lt;strong&gt;prove&lt;/strong&gt; it correct. A pure program built entirely from pure functions is equally correct but, sadly, of limited use. Haskell&amp;#8217;s type system distinguishes pure functions from impure ones &amp;#8212; the ones which change the world. If you minimise and contain impurity, you&amp;#8217;re winning!
+&lt;/p&gt;
+&lt;img src="http://wordaligned.org/images/the-challenge-of-effects.jpg" alt="The challenge of effects"/&gt;
+
+&lt;p&gt;It&amp;#8217;s certainly a compelling argument. In the languages I use from day to day, as already mentioned, I favour a functional style. I also adopt value-based programming (sometimes known as single assignment programming &amp;#8212; once you&amp;#8217;ve set something, you don&amp;#8217;t change it) as far as possible: it&amp;#8217;s easier to figure out what a program does, and you can avoid a whole class of defects. Simon Peyton Jones describes my approach as &amp;#8220;Plan A&amp;#8221;, the mainstream route towards writing programs which are both useful and safe. He promotes &amp;#8220;Plan B&amp;#8221;, a more radical approach, where &amp;#8220;useless&amp;#8221; languages like Haskell find ways to change the world.
+&lt;/p&gt;
+
+&lt;h3&gt;Strong Static Typing&lt;/h3&gt;
+&lt;p&gt;Static type checking is central to Haskell and the language comes with a rich type system allowing static analysis and compile-time checking. It&amp;#8217;s the type system which determines, rigorously, which parts of a program have side-effects. Unlike C++, the type system doesn&amp;#8217;t seem to get in the way. A lot more is inferred. In fact, some type declarations are unnecessary since the compiler could deduce them from the code &amp;#8212; but in Haskell type declarations, at least for module exports, are seen as a good thing. 
+&lt;/p&gt;
+&lt;p&gt;I found this interesting. Although I like dynamic languages I also like strong typing (yes, you can have both). In theory, static strong typing would be best of all; you eliminate the bug before you run the code. My experience with languages like C++ and Java have caused me to kick against this theory. The C++ type system just seems to get in your way: by the time you&amp;#8217;ve &lt;a href="http://wordaligned.org/articles/koenigs-first-rule-of-debugging.html#a-problem-on-line-106"&gt;wrestled the compiler into submission&lt;/a&gt; and got a program you can actually run you&amp;#8217;ve worked so hard you feel like it &lt;em&gt;must&lt;/em&gt; be good, when actually you&amp;#8217;d have been better off running, testing, revising the code in an iterative manner. You&amp;#8217;d certainly have had more fun! Haskell, though, may cause me to revise my opinion once again. It may indeed offer the benefits of strong static typing without the baggage.
+&lt;/p&gt;
+
+&lt;h3&gt;A Taste of Haskell&lt;/h3&gt;
+&lt;p&gt;&lt;a href="http://haskell.org"&gt;&lt;img src="http://haskell.org/wikistatic/haskellwiki_logo.png" alt="Haskell wiki logo" style="float:right;"/&gt;&lt;/a&gt;
+&lt;/p&gt;
+&lt;p&gt;In the afternoon I attended Simon Peyton Jones&amp;#8217; &lt;a href="http://accu.org/index.php/conferences/accu_conference_2008/accu2008_sessions#A%20Taste%20of%20Haskell"&gt;&amp;#8220;Taste of Haskell&amp;#8221;&lt;/a&gt; tutorial, which went into Haskell in more depth. The room was packed and people had to be turned away. Although I have written and read some Haskell I know very little about it, and three hours training with the world expert on the subject haven&amp;#8217;t really altered that. Nonetheless, I&amp;#8217;d like to record my first impressions here. They may all turn out to be wrong!
+&lt;/p&gt;
+&lt;ul&gt;
+ &lt;li&gt;
+     I still maintain &lt;a href="http://wordaligned.org/articles/from-hash-key-to-haskell.html"&gt;Haskell could do with proper characters&lt;/a&gt; for arrows, lambda, forall, function composition and so on. And guess what: GHC does indeed support Unicode, so you &lt;em&gt;can&lt;/em&gt; write a program which uses &amp;#x2200; instead of &lt;code&gt;forall&lt;/code&gt;, for example. All you have to do is figure out how to input these characters.
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     It&amp;#8217;s not a minimal language, unlike, say, Scheme; there&amp;#8217;s a lot of syntactic sugar, a deliberate decision, but nonetheless a concern. It will take a while before I get used to the syntax even if the concepts seem clear.
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     Most (possibly all?) functions take a single argument; so a function taking two arguments is actually a one-argument function which returns another one-argument function.
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     You can write your own infix operators and set their precedence.
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     Don&amp;#8217;t be frightened by &lt;a href="http://homepages.inf.ed.ac.uk/wadler/topics/monads.html"&gt;Monads&lt;/a&gt;. They should really be called &amp;#8220;warm fluffy things&amp;#8221;.
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     Haskell is, by default, lazily evaluated. So it elegantly solves all the &lt;a href="http://wordaligned.org/tag/streams/"&gt;stream-based&lt;/a&gt; puzzles I&amp;#8217;ve been posing on this site. What was new to me was the suggestion that lazy evaluation somehow removes the need for Lisp-style macros. I wonder &lt;a href="http://reddit.com/r/programming/info/6en91/comments/"&gt;what&amp;#8217;s meant by this&lt;/a&gt;?
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     Perhaps Haskell remains a vehicle for programming language research as well as for practical application. &lt;a href="http://haskell.org/ghc/"&gt;GHC&lt;/a&gt; provides many extensions to the Haskell 98 standard, to the extent that some extensions have effectively become standard.
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     The best book about Haskell hasn&amp;#8217;t been finished yet. It&amp;#8217;s called &lt;a href="http://book.realworldhaskell.org/"&gt;&amp;#8220;Real World Haskell&amp;#8221;&lt;/a&gt; and it&amp;#8217;s being written collaboratively.
+ &lt;/li&gt;
+&lt;/ul&gt;</description>
+<dc:date>2008-04-04</dc:date>
+<guid>http://wordaligned.org/articles/programming-nirvana-plan-b.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/programming-nirvana-plan-b.html</link>
+<category>Functional Programming</category>
+</item>
+
+<item>
+<title>Animated pair streams</title>
+<description>&lt;div class="toc"&gt;
+&lt;h2&gt;Contents&lt;/h2&gt;
+&lt;ul&gt;
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/animated-pair-streams.html#tocname-that-series" name="toc0" id="toc0"&gt;Name that Series&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/animated-pair-streams.html#tocbounded-pairs" name="toc1" id="toc1"&gt;Bounded Pairs&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/animated-pair-streams.html#tocstreams-of-pairs" name="toc2" id="toc2"&gt;Streams of Pairs&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/animated-pair-streams.html#toca-recursive-scheme" name="toc3" id="toc3"&gt;A Recursive Scheme&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/animated-pair-streams.html#tocinterleaving" name="toc4" id="toc4"&gt;Interleaving&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/animated-pair-streams.html#tocdouble-trouble" name="toc5" id="toc5"&gt;Double Trouble&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/animated-pair-streams.html#tocmemory-use" name="toc6" id="toc6"&gt;Memory Use&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/animated-pair-streams.html#tocproblem-solved" name="toc7" id="toc7"&gt;Problem Solved?&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/animated-pair-streams.html#toctying-up" name="toc8" id="toc8"&gt;Tying up&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/animated-pair-streams.html#toccredits" name="toc9" id="toc9"&gt;Credits&lt;/a&gt;
+ &lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/animated-pair-streams.html#toc0" name="tocname-that-series" id="tocname-that-series"&gt;Name that Series&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;What&amp;#8217;s going on in the animation below?
+&lt;/p&gt;
+&lt;img src="http://wordaligned.org/files/animated-pair-stream.gif" alt="Pair stream slideshow"/&gt;
+
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/animated-pair-streams.html#toc1" name="tocbounded-pairs" id="tocbounded-pairs"&gt;Bounded Pairs&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;While you&amp;#8217;re waiting for the graphic to load, recall a problem we encountered while hunting for &lt;a href="http://wordaligned.org/articles/the-maximum-subsequence-problem.html#programming-pearl"&gt;maximum subsequences&lt;/a&gt;:
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;Given a number n, generate all the pairs (i, j) such that i and j are in the range 0 to n and j is greater than i.
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;A Python solution reads:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;def generate_pairs(n):
+    "Generate all pairs (i, j) such that 0 &amp;lt;= i &amp;lt;= j &amp;lt; n"
+    for i in range(n):
+        for j in range(i, n):
+            yield i, j
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;We can extend this to solve a more general version of the problem:
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;Given two sequences (S, T), generate all pairs (S&lt;sub&gt;i&lt;/sub&gt;, T&lt;sub&gt;j&lt;/sub&gt;) such that j is greater than i.
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;def generate_pairs(s, t):
+    "Generate all pairs s[i], t[j]  such that 0 &amp;lt;= i &amp;lt;= j"
+    s_count = len(s)
+    t_count = len(t)
+    for i in xrange(s_count):
+        for j in xrange(i, t_count):
+            yield s[i], t[j]
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Note:
+&lt;/p&gt;
+&lt;ol&gt;
+ &lt;li&gt;&lt;p&gt;This function requires complete and bounded collections as inputs since it asks for their lengths and accesses elements by index &amp;#8212; think &amp;#8220;lists&amp;#8221; or &amp;#8220;tuples&amp;#8221;. Yet it generates results lazily, giving clients control over just how many pairs they require. This is why I&amp;#8217;ve chosen &lt;code&gt;xrange&lt;/code&gt; in preference to &lt;code&gt;range&lt;/code&gt;, since it too generates numbers, rather than returning a complete list. (Python 3000 simplifies things: &lt;code&gt;range&lt;/code&gt; becomes &lt;code&gt;xrange&lt;/code&gt; and &lt;code&gt;xrange&lt;/code&gt; disappears.)
+&lt;/p&gt;
+
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;p&gt;There&amp;#8217;s no need for extra logic to handle &lt;code&gt;S&lt;/code&gt; being shorter than &lt;code&gt;T&lt;/code&gt; or vice-versa: &lt;code&gt;xrange(start, stop)&lt;/code&gt; is smart enough to handle the case when &lt;code&gt;stop&lt;/code&gt; is less than &lt;code&gt;start&lt;/code&gt;. I&amp;#8217;d say adding such extra logic would count as premature optimisation.
+&lt;/p&gt;
+
+ &lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Here&amp;#8217;s an example of this function in action. We run the generator to exhaustion collecting its output in a list.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; pairs = list(generate_pairs('ABC', (1, 2, 3, 4)))
+&amp;gt;&amp;gt;&amp;gt; print pairs
+[('A', 1), ('A', 2), ('A', 3), ('A', 4), ('B', 2), ('B', 3), ('B', 4), ('C', 3), ('C', 4)]
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;A second example builds a &lt;a href="http://docs.python.org/ref/genexpr.html"&gt;generator expression&lt;/a&gt; from &lt;code&gt;generate_pairs()&lt;/code&gt;. We plug this expression into the built in &lt;code&gt;any&lt;/code&gt; function to determine whether the pair &lt;code&gt;('A', 2)&lt;/code&gt; is in the pair sequence. Note that &lt;code&gt;any&lt;/code&gt; only pulls two elements from the sequence to produce an answer.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; any((p == 'A', 2) for p in generate_pairs('ABC', (1, 2, 3, 4)))
+True
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;So far, so what? For the toy examples shown, lazy evaluation isn&amp;#8217;t an important consideration. But what if our input sequences were very large? What if they were infinite?
+&lt;/p&gt;
+&lt;span id="continue-reading"/&gt;
+
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/animated-pair-streams.html#toc2" name="tocstreams-of-pairs" id="tocstreams-of-pairs"&gt;Streams of Pairs&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;&lt;code&gt;Generate_pairs()&lt;/code&gt; yields results row by row. Here&amp;#8217;s a slideshow for the case when &lt;code&gt;S&lt;/code&gt; and &lt;code&gt;T&lt;/code&gt; have 5 and 20 elements respectively. Brightness indicates age, so the white circle represents the current head of the generated sequence, and the greying circles represent previous elements &amp;#8212; the older the greyer. Remember, it&amp;#8217;s up to clients just how many grey pairs to hold: the generator only ever yields a shiny white new pair.
+&lt;/p&gt;
+&lt;img src="http://wordaligned.org/files/animated-pair-list.gif" alt="Pair list slideshow"/&gt;
+
+&lt;p&gt;A text representation would be as follows, where, as usual, we read top to bottom, left to right.
+&lt;/p&gt;
+&lt;pre&gt;
+S&lt;sub&gt;0&lt;/sub&gt;T&lt;sub&gt;0&lt;/sub&gt;, S&lt;sub&gt;0&lt;/sub&gt;T&lt;sub&gt;1&lt;/sub&gt;, S&lt;sub&gt;0&lt;/sub&gt;T&lt;sub&gt;2&lt;/sub&gt; ...                             S&lt;sub&gt;0&lt;/sub&gt;T&lt;sub&gt;20&lt;/sub&gt;
+      S&lt;sub&gt;1&lt;/sub&gt;T&lt;sub&gt;1&lt;/sub&gt;, S&lt;sub&gt;1&lt;/sub&gt;T&lt;sub&gt;2&lt;/sub&gt;, ...                            S&lt;sub&gt;1&lt;/sub&gt;T&lt;sub&gt;20&lt;/sub&gt;
+            S&lt;sub&gt;2&lt;/sub&gt;T&lt;sub&gt;2&lt;/sub&gt;, ...                           S&lt;sub&gt;2&lt;/sub&gt;T&lt;sub&gt;20&lt;/sub&gt;
+                  ...
+&lt;/pre&gt;
+
+&lt;p&gt;It&amp;#8217;s clear this mode of traversal isn&amp;#8217;t suitable for generating pairs from very large inputs: we don&amp;#8217;t advance through S quickly enough. In fact, if T were infinite, we&amp;#8217;d be stuck on the top row, forever generating pairs of the form &lt;code&gt;S&lt;sub&gt;0&lt;/sub&gt;T&lt;sub&gt;i&lt;/sub&gt;&lt;/code&gt;.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/animated-pair-streams.html#toc3" name="toca-recursive-scheme" id="toca-recursive-scheme"&gt;A Recursive Scheme&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;&lt;a href="http://mitpress.mit.edu/sicp/full-text/book/book.html"&gt;&amp;#8220;Structure and Interpretation of Computer Programs&amp;#8221;&lt;/a&gt; describes an elegant recursive scheme for &lt;a href="http://mitpress.mit.edu/sicp/full-text/book/book-Z-H-24.html#%_sec_Temp_476"&gt;generating pairs&lt;/a&gt;:
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;Call the general stream of pairs (pairs S T), and consider it to be composed of three parts: the pair (S&lt;sub&gt;0&lt;/sub&gt;,T&lt;sub&gt;0&lt;/sub&gt;), the rest of the pairs in the first row, and the remaining pairs:&lt;br/&gt;&lt;br/&gt;
+   &lt;img src="http://mitpress.mit.edu/sicp/full-text/book/ch3-Z-G-47.gif" alt="Stream of pairs structure"/&gt;
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;Based on this insight, we can generate our stream of pairs:
+&lt;/p&gt;
+&lt;ol&gt;
+ &lt;li&gt;
+     yielding the pair, (S&lt;sub&gt;0&lt;/sub&gt;,T&lt;sub&gt;0&lt;/sub&gt;)
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     yield pairs from the first row combined with the stream of remaining pairs
+ &lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Note the recursion: the definition of the pairs stream refers to itself. That&amp;#8217;s not a problem so long as we&amp;#8217;re lazy about evaluating the tail of the stream. Since we always know how to pull the first pair from the stream, we can both bootstrap the process and keep going forever.
+&lt;/p&gt;
+&lt;p&gt;All we now need is a suitable method of combining two the first row and the remaining pairs.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/animated-pair-streams.html#toc4" name="tocinterleaving" id="tocinterleaving"&gt;Interleaving&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;The simplest way to combine the two streams is just to interleave them, pulling elements from each in turn. A simple (too simple!) implementation of &lt;code&gt;interleave()&lt;/code&gt; reads:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;Simple interleave&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;def interleave(s, t):
+    while True:
+        yield s.next()
+        yield t.next()
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;(The problem here is that &lt;code&gt;interleave()&lt;/code&gt; stops as soon as either of the the input streams is exhausted, which isn&amp;#8217;t an issue for infinite streams, but isn&amp;#8217;t ideal in the case when either of the inputs are bounded. You get the idea. I&amp;#8217;ll provide better implementation &lt;a href="http://wordaligned.org/articles/animated-pair-streams.html#tying-up"&gt;later&lt;/a&gt;.)
+&lt;/p&gt;
+&lt;p&gt;We can now code our pairs generator:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;Pairs generator&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;import itertools
+
+def pairs(s, t):
+    """ Generate a stream of pairs taken from s, t.
+    
+    Yields a stream of pairs (si, tj) where i &amp;lt;= j.
+    The input streams may be finite or bounded, but must be iterable.
+    """
+    first = s.next(), t.next()
+    yield first
+    t, t_top = itertools.tee(t)
+    s0 = first[0]
+    top_row = ((s0, tt) for tt in t_top)
+    for st in interleave(top_row, pairs(s, t)):
+        yield st
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Here&amp;#8217;s a slideshow of this algorithm in action.
+&lt;/p&gt;
+&lt;img src="http://wordaligned.org/files/animated-pair-stream.gif" alt="Pair stream slideshow"/&gt;
+
+&lt;p&gt;Even though Python (CPython, to be specific) and recursion don&amp;#8217;t generally get along well (unlike in a proper functional programming language), this implementation doesn&amp;#8217;t &lt;em&gt;appear&lt;/em&gt; to fall foul of CPython&amp;#8217;s maximum recursion limits &lt;strong&gt;even though pairs() repeatedly calls itself&lt;/strong&gt;.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;No maximum recursion depth exceeded error here!&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; integers = itertools.count
+&amp;gt;&amp;gt;&amp;gt; for ij in pairs(integers, integers):
+... 	print ij
+... 
+(0, 0)
+(0, 1)
+(1, 1)
+(0, 2)
+(1, 2)
+(0, 3)
+(2, 2)
+....
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;When I dug a little deeper, I started to understand why: the function can&amp;#8217;t run indefinitely since it eats up memory. It continually tees up iterators over &lt;code&gt;t&lt;/code&gt; and creates new generator expressions.
+&lt;/p&gt;
+&lt;p&gt;That said, I was surprised just how quickly it consumes memory. After all, generator expressions and iterators shouldn&amp;#8217;t take up much space. For the purposes of comparison, I compared how it fared against a Scheme program designed to do the same thing. Both had consumed a gigabyte of memory after running just a few minutes (and, for what it&amp;#8217;s worth, the Python program had generated an order of magnitude more pairs by this point).
+&lt;/p&gt;
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;Scheme pair generator&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;(require (lib "40.ss" "srfi")) ;; Scheme stream support
+
+(define (interleave s1 s2)
+  (if (stream-null? s1)
+      s2
+      (stream-cons (stream-car s1)
+                   (interleave s2 (stream-cdr s1)))))
+
+(define (pairs s t)
+  (stream-cons
+   (list (stream-car s) (stream-car t))
+   (interleave
+    (stream-map (lambda (x) (list (stream-car s) x))
+                (stream-cdr t))
+    (pairs (stream-cdr s) (stream-cdr t)))))
+
+(define ones (stream-cons 1 ones))
+
+(define (stream-add s t) (stream-map + s t))
+
+(define integers
+  (stream-cons 0 (stream-add ones integers)))
+
+(stream-for-each
+  (lambda (x) (newline) (display x))
+  (pairs integers integers))
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/animated-pair-streams.html#toc5" name="tocdouble-trouble" id="tocdouble-trouble"&gt;Double Trouble&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Let&amp;#8217;s look a little further into the stream. Here&amp;#8217;s the genesis of the first 120 pairs.
+&lt;/p&gt;
+&lt;img src="http://wordaligned.org/files/animated-pair-stream-120.gif" alt="Pair stream slideshow"/&gt;
+
+&lt;p&gt;Now the pattern becomes clear. Evidently the interleave strategy gives a heavy bias towards advancing rightwards; downwards motion is relatively slow.
+&lt;/p&gt;
+&lt;p&gt;Let&amp;#8217;s filter out the &lt;code&gt;i == j&lt;/code&gt; diagonal to try and quantify this.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; ints = itertools.count
+&amp;gt;&amp;gt;&amp;gt; izip = itertools.izip
+&amp;gt;&amp;gt;&amp;gt; pp = pairs(ints(), ints())
+&amp;gt;&amp;gt;&amp;gt; diagonal = ((ix, (i, j))
+...             for ix, (i, j) in izip(ints(1), pp) if i == j))
+&amp;gt;&amp;gt;&amp;gt; for d in itertools.islice(diagonal, 10):
+...     print d
+...
+(1, (0, 0))
+(3, (1, 1))
+(7, (2, 2))
+(15, (3, 3))
+(31, (4, 4))
+(63, (5, 5))
+(127, (6, 6))
+(255, (7, 7))
+(511, (8, 8))
+(1023, (9, 9))
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;The output shows that pair (0, 0) is the 1&lt;sup&gt;st&lt;/sup&gt; element of the stream, (1, 1) the 3&lt;sup&gt;rd&lt;/sup&gt;, (2, 2) the 7&lt;sup&gt;th&lt;/sup&gt;, and so on.
+&lt;/p&gt;
+&lt;p&gt;Any computer scientist ought to quickly spot the pattern, and any mathematician ought to be able to prove why diagonal advances are exponentially infrequent.
+&lt;/p&gt;
+&lt;p&gt;Loosely speaking, if D&lt;sub&gt;i&lt;/sub&gt; is the stream of positions in the pairs stream of elements which lie on the diagonal (i.e. the stream 1, 3, 7, 15, &amp;#8230; shown in the interpreted Python session), then the elements of D must satisfy the recurrence relation:
+&lt;/p&gt;
+&lt;pre&gt;
+D&lt;sub&gt;i+1&lt;/sub&gt; = 1 + 2&amp;times;D&lt;sub&gt;i&lt;/sub&gt;
+&lt;/pre&gt;
+
+&lt;p&gt;This relation derives directly from the recursive definition of &lt;code&gt;pairs()&lt;/code&gt;: yield a single element, then alternate the rest of yourself with the generated top row.
+&lt;/p&gt;
+&lt;p&gt;Here are some slides showing the points at which the first 5 diagonal elements appear. Watch the recursive pattern emerge.
+&lt;/p&gt;
+&lt;p&gt;&lt;img src="http://wordaligned.org/files/pairs-1.png" alt="diagonal pairs image"/&gt;
+   &lt;img src="http://wordaligned.org/files/pairs-3.png" alt="diagonal pairs image"/&gt;
+   &lt;img src="http://wordaligned.org/files/pairs-7.png" alt="diagonal pairs image"/&gt;
+   &lt;img src="http://wordaligned.org/files/pairs-15.png" alt="diagonal pairs image"/&gt;
+   &lt;img src="http://wordaligned.org/files/pairs-31.png" alt="diagonal pairs image"/&gt;
+&lt;/p&gt;
+&lt;p&gt;The solution to the recurrence relation is &lt;code&gt;D&lt;sub&gt;i&lt;/sub&gt; = 2&lt;sup&gt;i&lt;/sup&gt; &amp;minus; 1&lt;/code&gt;. These diagonal advances correspond to recursive calls to &lt;code&gt;pairs()&lt;/code&gt;. So if our Python session has a recursion limit set to 1000 (try &lt;code&gt;sys.getrecursionlimit()&lt;/code&gt;), and our pairs generator were to yield a result every nanosecond, and we had a machine with infinite memory, it would take quite a few millenia before we run into this limit.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;How many millenia until we hit the recursion limit?&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; (2 ** 1000 - 1)/(1.e9 * 60 * 60 * 24 * 365 * 1000) 
+3.3977315042689856e+281
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/animated-pair-streams.html#toc6" name="tocmemory-use" id="tocmemory-use"&gt;Memory Use&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;It should also now be clear why this particular algorithm burns memory. Teeing an iterator doesn&amp;#8217;t magically mean we don&amp;#8217;t have to store any elements we&amp;#8217;ve iterated past. The greater the distance between the teed iterators, the more that need storing.
+&lt;/p&gt;
+&lt;p&gt;If that&amp;#8217;s not clear, run the following Python session and keep an eye on memory consumption (and be ready to interrupt the infinite loop!). You&amp;#8217;ll see memory use rapidly increase as &lt;code&gt;i&lt;/code&gt; and &lt;code&gt;j&lt;/code&gt; diverge, since &lt;code&gt;j&lt;/code&gt; needs to remember everything &lt;code&gt;i&lt;/code&gt; produces.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; from itertools import *
+&amp;gt;&amp;gt;&amp;gt; i, j = tee(repeat(0))
+&amp;gt;&amp;gt;&amp;gt; for x in i: pass
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;By contrast, if we zip through &lt;code&gt;i&lt;/code&gt; and &lt;code&gt;j&lt;/code&gt; in parallel, memory use is stable.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; i, j = tee(repeat(0))
+&amp;gt;&amp;gt;&amp;gt; for ij in izip(i, j): pass
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Our pair generator has to remember more and more elements from the &lt;code&gt;T&lt;/code&gt; stream (and also, to a lesser extent, from the &lt;code&gt;S&lt;/code&gt; stream). That&amp;#8217;s why it&amp;#8217;s so hungry. Any general purpose infinite pair generator function must suffer this problem, I think, since we &lt;strong&gt;have&lt;/strong&gt; to accumulate increasing portions of the streams into memory, but if it&amp;#8217;s just integer pairs we want we can work around the issue:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;def integer_pairs(i=0):
+    "Generate a stream of integer pairs (i, j) with i &amp;lt;= j"
+    yield i, i
+    top_row = ((i, j) for j in itertools.count(i + 1))
+    for ij in interleave(top_row, integer_pairs(i + 1)):
+        yield ij
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Here, rather than &lt;code&gt;tee()&lt;/code&gt; streams of integers, we use &lt;code&gt;itertools.count()&lt;/code&gt; to create new ones as required. This pair generator will run happily for extended periods. It will very gradually ask for more memory, as numbers get bigger and the number of rows increases. As before, it won&amp;#8217;t hit any embarrassing recursion limits in the lifetime of this galaxy.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/animated-pair-streams.html#toc7" name="tocproblem-solved" id="tocproblem-solved"&gt;Problem Solved?&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;So, does &lt;code&gt;integer_pairs()&lt;/code&gt; solve the problem of generating an infinite stream of pairs for the special case when both input streams are integers? 
+&lt;/p&gt;
+&lt;p&gt;Not really, no!
+&lt;/p&gt;
+&lt;p&gt;The interleave strategy for combining the top row with the remaining pairs has the great merit of simplicity, but is otherwise far from ideal. I don&amp;#8217;t think a one-size-fits-all strategy for streaming pairs exists, so we should allow clients to supply one. And that will have to be the subject of another article.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/animated-pair-streams.html#toc8" name="toctying-up" id="toctying-up"&gt;Tying up&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;It&amp;#8217;s not hard to fix the problem we noticed with &lt;code&gt;interleave()&lt;/code&gt;.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;def interleave(s, t):
+    """Generate an interleaved stream of elements from s and t.
+    
+    If one of the streams finishes, elements continue to be generated
+    from the other until it too is finished. 
+    """
+    for ss, tt in itertools.izip(s, t):
+        yield ss
+        yield tt
+    for s_or_t in itertools.chain(s, t):
+        yield s_or_t
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Here&amp;#8217;s the script I used to generate the animated GIFs. Although it&amp;#8217;s very much geared to doing the single job which it was designed to do, it&amp;#8217;s short enough to be used as a basis for similar tasks. I hope this article helps demonstrate the merits of visualising an algorithm in action.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;pairs-animation.py&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;#! /usr/bin/env python
+"""Script which accepts a list of (i, j) pairs, creating slides and
+   an animated GIF showing the positions of these pairs.
+
+Example use:
+$ echo '((0, 0) (0, 1) (1, 1) (0, 2) (1, 2) (0, 3) (2, 2)' | pairs-animation.py
+
+Dependencies:
+- Python Imaging Library (PIL), http://effbot.org/imagingbook/
+- aggdraw, anti-aliased graphics drawing package,
+  http://effbot.org/zone/pythondoc-aggdraw.htm
+- ImageMagick, http://www.imagemagick.org
+"""
+import Image
+import aggdraw
+import itertools
+
+# Script wide drawing configuration
+block_w = 16
+block_pad = 2
+
+def fading_brushes():
+    "Generate a sequence of fading grey brushes."
+    darkgrey = itertools.repeat(16)
+    greyscale = itertools.chain(range(255, 0, -16), darkgrey)
+    def brush(g):
+        "Return a grey brush."
+        return aggdraw.Brush('rgb(%d,%d,%d)' % (g, g, g))
+    return itertools.imap(brush, greyscale)
+
+def block_start(i):
+    "Return the coordinate (X or Y) at which the ith block starts."
+    return (block_w + block_pad) * i + block_pad
+
+def read_ij(data):
+    """Return pairs of integers found in the input string.
+    
+    Note: this function is extremely unfussy about the string format!
+    &amp;gt;&amp;gt;&amp;gt; read_ij('1 2 3 4')
+    [(1, 2), (3, 4)]
+    &amp;gt;&amp;gt;&amp;gt; read_ij('(1, 2), (3, 4)')
+    [(1, 2), (3, 4)]
+    """
+    import re
+    ij = itertools.imap(int, re.compile(r'-?\d+').findall(data))
+    return zip(ij, ij)
+
+def dimensions(ij):
+    "Return dimensions of an image big enough to contain blocks at ij positions."
+    import operator
+    max_i = max(map(operator.itemgetter(0), ij))
+    max_j = max(map(operator.itemgetter(1), ij))
+    return block_start(max_j + 1), block_start(max_i + 1)
+
+def block_xy(ij):
+    "Return the left, top, right, bottom coords of a block at ij."
+    ylo, xlo = map(block_start, ij)
+    return xlo, ylo, xlo + block_w, ylo + block_w
+
+def draw_blocks(image, blocks):
+    "Draws the supplied blocks onto the input image."
+    draw = aggdraw.Draw(image)
+    brushes = fading_brushes()
+    # Reverse the blocks so the newest are brightest
+    for block, brush in itertools.izip(reversed(blocks), brushes):
+        # The 'ellipse' will be circular since the block is square
+        draw.ellipse(block_xy(block), brush)
+    draw.flush()
+
+def main(ij_data):
+    "Creates slides and an animation from the ij block positions."
+    import os
+    ij = read_ij(ij_data)
+    dims = dimensions(ij)
+    # Create the slides
+    slides = ['pairs-%d.gif' % n for n in range(len(ij) + 1)]
+    for n, slide in enumerate(slides):
+        image = Image.new('L', dims)
+        draw_blocks(image, ij[:n])
+        image.save(slide)
+    # Use ImageMagick to create an animation
+    # -loop 0 =&amp;gt; loop forever, -delay units are .01 seconds
+    os.system('convert -delay 100 -loop 0 %s animation.gif'
+              % ' '.join(slides))
+
+if __name__ == '__main__':
+    import sys
+    main(sys.stdin.read())
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/animated-pair-streams.html#toc9" name="toccredits" id="toccredits"&gt;Credits&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;The inspiration for this article comes directly from &lt;a href="http://mitpress.mit.edu/sicp/full-text/book/book-Z-H-24.html#%_sec_Temp_476"&gt;&amp;#8220;Structure and Interpretation of Computer Programs&amp;#8221;&lt;/a&gt;, which presents some great examples of how to develop and use these pair streams.
+&lt;/p&gt;</description>
+<dc:date>2008-01-13</dc:date>
+<guid>http://wordaligned.org/articles/animated-pair-streams.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/animated-pair-streams.html</link>
+<category>Functional Programming</category>
+</item>
+
+<item>
+<title>The Maximum Sum contiguous subsequence problem</title>
+<description>&lt;div class="toc"&gt;
+&lt;h2&gt;Contents&lt;/h2&gt;
+&lt;ul&gt;
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/the-maximum-subsequence-problem.html#tocwelcome-to-the-pearly-gates" name="toc0" id="toc0"&gt;Welcome to the Pearly Gates&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/the-maximum-subsequence-problem.html#tocprogramming-pearl" name="toc1" id="toc1"&gt;Programming Pearl&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/the-maximum-subsequence-problem.html#toclinear-solution" name="toc2" id="toc2"&gt;Linear Solution&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/the-maximum-subsequence-problem.html#tocstreaming-solution" name="toc3" id="toc3"&gt;Streaming Solution&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/the-maximum-subsequence-problem.html#tocstream-accumulate" name="toc4" id="toc4"&gt;Stream Accumulate&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/the-maximum-subsequence-problem.html#tocstream-floor" name="toc5" id="toc5"&gt;Stream Floor&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/the-maximum-subsequence-problem.html#tocstream-diff" name="toc6" id="toc6"&gt;Stream Diff&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/the-maximum-subsequence-problem.html#tocstreams-and-collections" name="toc7" id="toc7"&gt;Streams and Collections&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/the-maximum-subsequence-problem.html#tocstream-on" name="toc8" id="toc8"&gt;Stream on&amp;#8230;&lt;/a&gt;
+ &lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/the-maximum-subsequence-problem.html#toc0" name="tocwelcome-to-the-pearly-gates" id="tocwelcome-to-the-pearly-gates"&gt;Welcome to the Pearly Gates&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;The Pearly Gates club never closes. Its public entrance, a revolving door, just keeps on spinning. With each rotation some punters enter and others leave. The club&amp;#8217;s owners would like to track this traffic. Specifically, they&amp;#8217;d like to know the maximum increase in people entering the club over a given period.
+&lt;/p&gt;
+&lt;p&gt;The starting point is to track the people who enter/leave with each spin of the door. Here&amp;#8217;s a 5 minute sample of that information. Negative numbers mean more people left than entered during a particular cycle.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;Entries Log&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;0 1 2 -3 3 -1 0 -4 0 -1 -4 2 4 1 1 3 1 0 -2 -3 -3 -2 3 1 1 4 5 -3 -2 -1 ...
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Here&amp;#8217;s the same information plotted on a graph.
+&lt;/p&gt;
+&lt;img alt="Graph of entries to Pearly Gates club" src="http://chart.apis.google.com/chart?
+cht=lc
+&amp;amp;chtt=Entries+to+the+Pearly+Gates+club
+&amp;amp;chs=500x200
+&amp;amp;chxt=x,y
+&amp;amp;chxl=0:|0min|1min|2min|3min|4min|5min
+&amp;amp;chxr=1,-5.0,6.0
+&amp;amp;chd=t:45.5,45.5|45.5,54.5,63.6,18.2,72.7,36.4,45.5,9.1,45.5,36.4,9.1,63.6,81.8,54.5,54.5,72.7,54.5,45.5,27.3,18.2,18.2,27.3,72.7,54.5,54.5,81.8,90.9,18.2,27.3,36.4
+&amp;amp;chco=BBBBBB,0000CC
+&amp;amp;chls=1,1,0|4,1,0
+" /&gt;
+
+&lt;p&gt;The archetypal problem we&amp;#8217;d like to solve can be stated:
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;&lt;strong&gt;Given a sequence of numbers, find the maximum sum of a contiguous subsequence of those numbers.&lt;/strong&gt; 
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;As an example, the maximum sum contiguous subsequence of 0, -1, &lt;strong&gt;2, -1, 3&lt;/strong&gt;, -1, 0 would be 4 (= 2 + -1 + 3).
+&lt;/p&gt;
+&lt;p&gt;This problem is generally known as &lt;strong&gt;the maximum sum contiguous subsequence problem&lt;/strong&gt; and if you haven&amp;#8217;t encountered it before, I&amp;#8217;d recommend trying to solve it before reading on. Even if you have encountered it before, I&amp;#8217;ll invite you to read on anyway &amp;#8212; it&amp;#8217;s well worth another look.
+&lt;/p&gt;
+&lt;span id="continue-reading"/&gt;
+
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/the-maximum-subsequence-problem.html#toc1" name="tocprogramming-pearl" id="tocprogramming-pearl"&gt;Programming Pearl&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;The maximum sum contiguous subsequence problem appears in Jon Bentley&amp;#8217;s &lt;a href="http://www.cs.bell-labs.com/cm/cs/pearls/"&gt;&amp;#8220;Programming Pearls&amp;#8221;&lt;/a&gt;. He first presents a brute force solution which examines all possible contiguous subsequences of the initial sequence and returns the maximum sum of these subsequences.
+&lt;/p&gt;
+&lt;p&gt;A Python implementation might read:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;def generate_pairs(n):
+    "Generate all pairs (i, j) such that 0 &amp;lt;= i &amp;lt;= j &amp;lt; n"
+    for i in range(n):
+        for j in range(i, n):
+            yield i, j
+
+def max_sum_subsequence(seq):
+    "Return the max-sum contiguous subsequence of the input sequence."
+    return max(sum(seq[i:j])
+               for i, j in generate_pairs(len(seq) + 1))
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;It&amp;#8217;s a straightforward piece of code, though note the &lt;code&gt;+ 1&lt;/code&gt; which ensures that we slice to the end of &lt;code&gt;seq&lt;/code&gt;, and also that we include empty slices, which sum to &lt;code&gt;0&lt;/code&gt;, handling the case when every item in the sequence is negative. The trouble is, the algorithm is of cubic complexity: to process just 6 hours of logged activity takes over 2 minutes on a 2GHz Intel Core Duo MacBook, and the cubic nature of the algorithm means we&amp;#8217;d quickly fail to process more substantial log files in real time.
+&lt;/p&gt;
+&lt;img alt="Graph plotting accumulated entries to the Pearly Gates club" src="http://chart.apis.google.com/chart?
+cht=lc
+&amp;amp;chtt=Accumulated+entries+to+the+Pearly+Gates+club
+&amp;amp;chs=500x250
+&amp;amp;chxt=x,y
+&amp;amp;chxl=0:|0min|1min|2min|3min|4min|5min
+&amp;amp;chxr=1,-8.0,10.0
+&amp;amp;chd=t:44.4,50.0,55.6,27.8,61.1,38.9,44.4,22.2,44.4,38.9,22.2,55.6,66.7,50.0,50.0,61.1,50.0,44.4,33.3,27.8,27.8,33.3,61.1,50.0,50.0,66.7,72.2,27.8,33.3,38.9|44.4,50.0,61.1,44.4,61.1,55.6,55.6,33.3,33.3,27.8,5.6,16.7,38.9,44.4,50.0,66.7,72.2,72.2,61.1,44.4,27.8,16.7,33.3,38.9,44.4,66.7,94.4,77.8,66.7,61.1
+&amp;amp;chco=CCCCCC,CC0000
+&amp;amp;chls=3,1,0|3,1,0
+&amp;amp;chdl=Entries|Accum.+Entries
+" /&gt;
+
+&lt;p&gt;A simple optimisation eliminates the repeated calls to &lt;code&gt;sum&lt;/code&gt; by accumulating the input sequence &amp;#8212; the red line in the graph above. Subtracting element &lt;code&gt;i-1&lt;/code&gt; from element &lt;code&gt;j&lt;/code&gt; of this cumulative sequence gives us the sum of elements in the range i, j of the original sequence. We won&amp;#8217;t study the code for this quadratic solution &amp;#8212; it doesn&amp;#8217;t add much to our analysis. Again, some care is needed to avoid &lt;a href="http://wordaligned.org/articles/joined-output-and-the-fencepost-problem.html"&gt;fencepost problems&lt;/a&gt;.
+&lt;/p&gt;
+&lt;p&gt;We won&amp;#8217;t look at the divide-and-conquer NlogN solution either. It&amp;#8217;s hard to understand, and we can do far better.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/the-maximum-subsequence-problem.html#toc2" name="toclinear-solution" id="toclinear-solution"&gt;Linear Solution&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;There is a linear solution. The idea is to scan the sequence from start to finish keeping track of &lt;code&gt;maxsofar&lt;/code&gt;, the maximum sum of a contiguous subsequence seen so far, and &lt;code&gt;maxendinghere&lt;/code&gt;, the maximum sum of a contiguous subsequence which ends at the current position. Bentley&amp;#8217;s pseudo-code reads:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;maxsofar = 0
+maxendinghere = 0
+for i = [0, n)
+    /* invariant: maxendinghere and maxsofar are accurate
+       are accurate for x[0..i-1] */
+    maxendinghere = max(maxendinghere + x[i], 0)
+    maxsofar = max(maxsofar, maxendinghere)
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;This translates directly into Python.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;def max_sum_subsequence(seq):
+    maxsofar = 0
+    maxendinghere = 0
+    for s in seq:
+        # invariant: maxendinghere and maxsofar are accurate
+        # are accurate up to s
+        maxendinghere = max(maxendinghere + s, 0)
+        maxsofar = max(maxsofar, maxendinghere)
+    return maxsofar
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Now, this is a fabulous solution. Bentley describes it as subtle. Such a succinct code snippet hardly &lt;strong&gt;looks&lt;/strong&gt; subtle, but I agree, the loop body &lt;strong&gt;does&lt;/strong&gt; take a bit of understanding:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;maxendinghere = max(maxendinghere + s, 0)
+maxsofar = max(maxsofar, maxendinghere)
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;&lt;strong&gt;Why does this work?&lt;/strong&gt; 
+&lt;/p&gt;
+&lt;p&gt;Well, essentially maxendinghere is what&amp;#8217;s accumulating the subsequences &amp;#8212; it keeps rolling the next element into itself. Should this accumulated sum ever become negative we know that the subsequence-which-ends-here we&amp;#8217;re currently tracking is worse than the empty subsequence-which-restarts-here; so we can reset our subsequence accumulator, and the first clause of the loop invariant still holds. Combine this with the observation that maxsofar tracks peaks in maxendinghere and we&amp;#8217;re done.
+&lt;/p&gt;
+&lt;p&gt;The loop-invariant comment provides a good example of how comments can help us understand an algorithm, even though the code is minimal and the variable names are well-chosen.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/the-maximum-subsequence-problem.html#toc3" name="tocstreaming-solution" id="tocstreaming-solution"&gt;Streaming Solution&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;I prefer to think of this problem in terms of streams &amp;#8212; lazily evaluated sequences. Think of our log file as generating a stream of numbers:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;... 0 1 2 -3 3 -1 0 -4 0 -1 -4 2 4 1 1 3 1 0 -2 -3 -3 -2 3 1 1 4 5 -3 -2 -1 ...
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;The first thing we do is transform this stream to generate another stream, the cumulative sum of numbers seen so far. It&amp;#8217;s an integration of sorts. You&amp;#8217;ll remember we already used this stream, or an in-memory version of it, in our quadratic solution to the problem: the difference between points on it yields subsequence-sums.
+&lt;/p&gt;
+
+&lt;h4&gt;&lt;a href="http://wordaligned.org/articles/the-maximum-subsequence-problem.html#toc4" name="tocstream-accumulate" id="tocstream-accumulate"&gt;Stream Accumulate&lt;/a&gt;&lt;/h4&gt;
+&lt;p&gt;We generate the accumulated stream from our original stream like this:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;def stream_accumulate(stream):
+    total = 0
+    for s in stream:
+        total += s
+        yield total
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;The graph below samples the first five minutes of this stream. The red line accumulates values from the pale grey line.
+&lt;/p&gt;
+&lt;img alt="Graph plotting accumulated entries to the Pearly Gates club" src="http://chart.apis.google.com/chart?
+cht=lc
+&amp;amp;chs=500x250
+&amp;amp;chxt=x,y
+&amp;amp;chxl=0:|0min|1min|2min|3min|4min|5min
+&amp;amp;chxr=1,-8.0,10.0
+&amp;amp;chd=t:44.4,50.0,55.6,27.8,61.1,38.9,44.4,22.2,44.4,38.9,22.2,55.6,66.7,50.0,50.0,61.1,50.0,44.4,33.3,27.8,27.8,33.3,61.1,50.0,50.0,66.7,72.2,27.8,33.3,38.9|44.4,50.0,61.1,44.4,61.1,55.6,55.6,33.3,33.3,27.8,5.6,16.7,38.9,44.4,50.0,66.7,72.2,72.2,61.1,44.4,27.8,16.7,33.3,38.9,44.4,66.7,94.4,77.8,66.7,61.1
+&amp;amp;chm=x,FFCC33,1,10.0,20.0|x,FFCC33,1,26.0,20.0
+&amp;amp;chco=CCCCCC,CC0000
+&amp;amp;chls=3,1,0|3,1,0
+&amp;amp;chdl=Entries|Accum.+Entries
+" /&gt;
+
+&lt;p&gt;These accumulated numbers represent the number of members who have entered the club since we started tracking them. On our graph, the maximum sum contiguous subsequence is simply the greatest Y-increase between any two points on this graph. X&amp;#8217;s mark these points on the graph above. (Note: it&amp;#8217;s &lt;strong&gt;not&lt;/strong&gt; the Y-range of the graph we want since our X-values are time-ordered, and we require X1 &amp;lt;= X2). 
+&lt;/p&gt;
+
+&lt;h4&gt;&lt;a href="http://wordaligned.org/articles/the-maximum-subsequence-problem.html#toc5" name="tocstream-floor" id="tocstream-floor"&gt;Stream Floor&lt;/a&gt;&lt;/h4&gt;
+&lt;p&gt;A second transformation yields the floor of the accumulated stream.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;import sys
+
+def stream_floor(stream):
+    m = 0
+    for s in stream:
+        m = min(m, s)
+        yield m
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;(Note that, for our purposes, the floor of the stream isn&amp;#8217;t exactly the stream of minimum values taken by the stream &amp;#8212; we enforce a baseline at zero. It would be better to allow clients of this function to supply an optional baseline value, but I wanted the simplest possible code that shows the idea.)
+&lt;/p&gt;
+&lt;p&gt;Here&amp;#8217;s a graph plotting the accumulated entries alongside the floor of these entries.
+&lt;/p&gt;
+&lt;img alt="Graph plotting accumulated entries and floor of accumulated entries to the Pearly Gates club" src="http://chart.apis.google.com/chart?
+cht=lc
+&amp;amp;chs=500x250
+&amp;amp;chxt=x,y
+&amp;amp;chxl=0:|0min|1min|2min|3min|4min|5min
+&amp;amp;chxr=1,-8.0,10.0
+&amp;amp;chd=t:44.4,50.0,61.1,44.4,61.1,55.6,55.6,33.3,33.3,27.8,5.6,16.7,38.9,44.4,50.0,66.7,72.2,72.2,61.1,44.4,27.8,16.7,33.3,38.9,44.4,66.7,94.4,77.8,66.7,61.1|44.4,44.4,44.4,44.4,44.4,44.4,44.4,33.3,33.3,27.8,5.6,5.6,5.6,5.6,5.6,5.6,5.6,5.6,5.6,5.6,5.6,5.6,5.6,5.6,5.6,5.6,5.6,5.6,5.6,5.6
+&amp;amp;chco=CC0000,333333
+&amp;amp;chls=3,1,0|3,1,0
+&amp;amp;chm=b,CCCCCC,0,1,0
+&amp;amp;chdl=Accum.+Entries|Floor+Accum.+Entries
+" /&gt;
+
+&lt;p&gt;We&amp;#8217;re very close to what we want now. We can track Y-increases on the graph just by generating the difference between the accumulated stream and its floor &amp;#8212; the shading on the graph.
+&lt;/p&gt;
+
+&lt;h4&gt;&lt;a href="http://wordaligned.org/articles/the-maximum-subsequence-problem.html#toc6" name="tocstream-diff" id="tocstream-diff"&gt;Stream Diff&lt;/a&gt;&lt;/h4&gt;
+&lt;p&gt;Here&amp;#8217;s an implementation of &lt;code&gt;stream_diff&lt;/code&gt;. We can&amp;#8217;t just plug a minus sign &amp;#8220;-&amp;#8221; into the mapping function, so we have to use the less wieldy &lt;code&gt;operator.sub&lt;/code&gt;.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;import itertools
+import operator
+
+def stream_diff(s, t):
+    return itertools.imap(operator.sub, s, t)
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Alternatively, we could generate the new stream with an explicit loop:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;import itertools
+
+def stream_diff(s, t):
+    for ss, tt in itertools.izip(s, t):
+        yield ss - tt
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;The final graph shows us the difference between the accumulated entry count and its floor. I&amp;#8217;ve also added the ceiling of this stream as a thick red line (I&amp;#8217;m sure you can figure out how to implement &lt;code&gt;stream_ceiling&lt;/code&gt;), and this ceiling represents the stream of maximum sum contiguous subsequences. 
+&lt;/p&gt;
+&lt;img alt="Graph plotting Max-ends-here and Max-so-far" src="http://chart.apis.google.com/chart?
+cht=lc
+&amp;amp;chtt=Maximum+Subsequences+at+the+Pearly+Gates+club
+&amp;amp;chs=500x250
+&amp;amp;chxt=x,y
+&amp;amp;chxl=0:|0min|1min|2min|3min|4min|5min
+&amp;amp;chxr=1,0.0,17.0
+&amp;amp;chd=t:0.0,5.9,17.6,17.6,17.6,17.6,17.6,17.6,17.6,17.6,17.6,17.6,35.3,41.2,47.1,64.7,70.6,70.6,70.6,70.6,70.6,70.6,70.6,70.6,70.6,70.6,94.1,94.1,94.1,94.1|0.0,5.9,17.6,0.0,17.6,11.8,11.8,0.0,0.0,0.0,0.0,11.8,35.3,41.2,47.1,64.7,70.6,70.6,58.8,41.2,23.5,11.8,29.4,35.3,41.2,64.7,94.1,76.5,64.7,58.8|0.0,0.0
+&amp;amp;chco=aa0000,333333
+&amp;amp;chls=4,1,0|2,1,0
+&amp;amp;chm=b,CCCCCC,1,2,0
+&amp;amp;chdl=Max-so-far|Max-ending-here
+" /&gt;
+
+&lt;p&gt;We&amp;#8217;ve re-labelled the lines &lt;code&gt;Max-so-far&lt;/code&gt; and &lt;code&gt;Max-ending-here&lt;/code&gt; because they&amp;#8217;re the stream of values taken by the variables &lt;code&gt;maxsofar&lt;/code&gt; and &lt;code&gt;maxendinghere&lt;/code&gt; during Bentley&amp;#8217;s clever solution to the maximum sum contiguous subsequence problem. I think we&amp;#8217;re in a better position to understand how this solution works now.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/the-maximum-subsequence-problem.html#toc7" name="tocstreams-and-collections" id="tocstreams-and-collections"&gt;Streams and Collections&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Please don&amp;#8217;t imagine these streams are bloated. &lt;span /&gt;They may be infinite (remember the Pearly Gates club never closes!) but that doesn&amp;#8217;t mean they take up much space. The graphs shown represent snapshots of their activity, and at no point do our presented algorithms actually store a five minute buffer of entries.
+&lt;/p&gt;
+&lt;p&gt;A final solution to the maximum sum contiguous subsequence problem reads like this. We&amp;#8217;ve pushed the general purpose stream transformation functions into a separate module, &lt;code&gt;stream.py&lt;/code&gt;.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;import itertools
+import stream
+
+def max_sum_subsequence_stream(ss):
+    "Return the stream of max sum contiguous subsequences of the input iterable."
+    accu1, accu2 = itertools.tee(stream.accumulate(ss))
+    return stream.ceil(stream.diff(accu1, 
+                       stream.floor(accu2, baseline=0)))
+
+def max_sum_subsequence(ss):
+    "Return the max sum of a contiguous subsequence of the input iterable."
+    return stream.last(max_sum_subsequence_stream(ss))
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;The iterable supplied to &lt;code&gt;max_sum_subsequence&lt;/code&gt; has its last value read, and should therefore be bounded if we want the function to return. We haven&amp;#8217;t supplied arguments to extract a portion of this iterable (to generate maximum subsequences for the club on a particular day, for example) because that&amp;#8217;s what &lt;code&gt;itertools.islice&lt;/code&gt; is for.
+&lt;/p&gt;
+&lt;p&gt;Note that &lt;code&gt;max_sum_subsequence_stream()&lt;/code&gt; may be more useful to clients than &lt;code&gt;max_sum_subsequence()&lt;/code&gt;. Suppose, for example, we&amp;#8217;re only interested when the maximum sum subsequence exceeds 100. We can do this directly by connecting &lt;code&gt;itertools.dropwhile()&lt;/code&gt; to our function.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;def max_subseq_exceeds(seq, limit=100):
+    max_sub_s = max_sum_subsequence_stream(seq)
+    return itertools.dropwhile(lambda s: s &amp;lt;= limit, max_sub_s)
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Perhaps we&amp;#8217;d like to know if the maximum sum subsequence reaches a plateau; that is, it stays on a level for a while.
+&lt;/p&gt;
+&lt;p&gt;Here&amp;#8217;s the stream module.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;stream.py&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;"General purpose stream generation functions."
+import itertools
+
+def floor(stream, baseline=None):
+    """Generate the stream of minimum values from the input stream.
+    
+    The baseline, if supplied, is an upper limit for the floor.
+    &amp;gt;&amp;gt;&amp;gt; ff = floor((1, 2, -2, 3))
+    &amp;gt;&amp;gt;&amp;gt; assert list(ff) == [1, 1, -2, -2]
+    &amp;gt;&amp;gt;&amp;gt; ff = floor((1, 2, -2, 3), 0)
+    &amp;gt;&amp;gt;&amp;gt; assert list(ff) == [0, 0, -2, -2]    
+    """
+    stream = iter(stream)
+    m = baseline
+    if m is None:
+        try:
+            m = stream.next()
+            yield m
+        except StopIteration:
+            pass
+    for s in stream:
+        m = min(m, s)
+        yield m
+
+def ceil(stream):
+    """Generate the stream of maximum values from the input stream.
+    
+    &amp;gt;&amp;gt;&amp;gt; top = ceil([0, -1, 2, -2, 3])
+    &amp;gt;&amp;gt;&amp;gt; assert list(top) == [0, 0, 2, 2, 3]
+    """
+    stream = iter(stream)
+    try:
+        M = stream.next()
+        yield M
+    except StopIteration:
+        pass
+    for s in stream:
+        M = max(M, s)
+        yield M
+
+def accumulate(stream):
+    """Generate partial sums from the stream.
+    
+    &amp;gt;&amp;gt;&amp;gt; accu = accumulate([1, 2, 3, 4])
+    &amp;gt;&amp;gt;&amp;gt; assert list(accu) == [1, 3, 6, 10]
+    """
+    total = 0
+    for s in stream:
+        total += s
+        yield total
+
+def diff(s, t):
+    """Generate the differences between two streams
+    
+    If the streams are of unequal length, the shorter is truncated.
+    &amp;gt;&amp;gt;&amp;gt; dd = diff([2, 4, 6, 8], [1, 2, 3])
+    &amp;gt;&amp;gt;&amp;gt; assert list(dd) == [1, 2, 3]
+    """
+    import operator
+    return itertools.imap(operator.sub, s, t)
+
+def last(stream, default=None):
+    """Return the last item in the stream or the default if the stream is empty.
+    
+    &amp;gt;&amp;gt;&amp;gt; last('abc')
+    'c'
+    &amp;gt;&amp;gt;&amp;gt; last([], default=-1)
+    -1
+    """
+    s = default
+    for s in stream:
+        pass
+    return s
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/the-maximum-subsequence-problem.html#toc8" name="tocstream-on" id="tocstream-on"&gt;Stream on&amp;#8230;&lt;/a&gt;&lt;/h3&gt;
+&lt;ol&gt;
+ &lt;li&gt;&lt;p&gt;The maximum sum contiguous subsequence problem is described in &lt;a href="http://www.cs.bell-labs.com/cm/cs/pearls/"&gt;&amp;#8220;Programming Pearls&amp;#8221;&lt;/a&gt; by Jon Bentley. 
+&lt;/p&gt;
+
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;p&gt;My favourite introduction to computer programming, &amp;#8220;Structure and Interpretation of Computer Programs&amp;#8221;, has &lt;a href="http://mitpress.mit.edu/sicp/full-text/book/book-Z-H-24.html#%_sec_3.5"&gt;lots to say about streams&lt;/a&gt;, and suggests they have a role in concurrent programming and modelling time. 
+&lt;/p&gt;
+
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;p&gt;Streams are a natural fit with functional programming, and well supported by languages like &lt;a href="http://www.schemers.org"&gt;Scheme&lt;/a&gt; and &lt;a href="http://haskell.org"&gt;Haskell&lt;/a&gt;. Python also handles them nicely: look into &lt;a href="http://www.python.org/dev/peps/pep-0255/"&gt;generators&lt;/a&gt;, &lt;a href="http://www.python.org/dev/peps/pep-0289/"&gt;generator expressions&lt;/a&gt;, the &lt;a href="http://docs.python.org/lib/module-itertools.html"&gt;itertools module&lt;/a&gt;, and study &lt;code&gt;test_generators.py&lt;/code&gt; carefully.
+&lt;/p&gt;
+
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;p&gt;If you liked this article, try more Word Aligned articles &lt;a href="http://wordaligned.org/tag/streams/"&gt;tagged &amp;#8220;streams&amp;#8221;&lt;/a&gt;. And if you like puzzles, there are more articles &lt;a href="http://wordaligned.org/tag/puzzles/"&gt;tagged &amp;#8220;puzzles&amp;#8221;&lt;/a&gt; too.
+&lt;/p&gt;
+
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;p&gt;The graphs in this article are generated using the &lt;a href="http://code.google.com/apis/chart/"&gt;Google chart API&lt;/a&gt;, which is both useful and &lt;span /&gt;a fine example of how to design and document a programming interface.
+&lt;/p&gt;
+
+ &lt;/li&gt;
+&lt;/ol&gt;</description>
+<dc:date>2007-12-17</dc:date>
+<guid>http://wordaligned.org/articles/the-maximum-subsequence-problem.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/the-maximum-subsequence-problem.html</link>
+<category>Functional Programming</category>
+</item>
+
+<item>
+<title>Zippy triples served with Python</title>
+<description>&lt;h3&gt;The Problem&lt;/h3&gt;
+&lt;p&gt;Here&amp;#8217;s a problem I encountered when writing the HTML generator for this site. Logically, Word Aligned is a time-ordered collection of articles. I wanted each article to link to its predecessor and successor. So the general problem is: 
+   &lt;strong&gt;How do you iterate through a collection yielding (previous, this, next) triples?&lt;/strong&gt;
+&lt;/p&gt;
+&lt;span id="continue-reading"/&gt;
+
+
+&lt;h3&gt;Specification&lt;/h3&gt;
+&lt;p&gt;Some test cases make things clearer. Let&amp;#8217;s name the function we&amp;#8217;re developing &lt;code&gt;prev_this_next()&lt;/code&gt;.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; long_weekend = 'Fri', 'Sat', 'Sun', 'Mon',
+&amp;gt;&amp;gt;&amp;gt; yesterday_today_tomorrow = prev_this_next(long_weekend)
+&amp;gt;&amp;gt;&amp;gt; yesterday_today_tomorrow.next()
+(None, 'Fri', 'Sat')
+&amp;gt;&amp;gt;&amp;gt; yesterday_today_tomorrow.next()
+('Fri', 'Sat', 'Sun')
+&amp;gt;&amp;gt;&amp;gt; yesterday_today_tomorrow.next()
+('Sat', 'Sun', 'Mon')
+&amp;gt;&amp;gt;&amp;gt; yesterday_today_tomorrow.next()
+('Sun', 'Mon', None)
+&amp;gt;&amp;gt;&amp;gt; yesterday_today_tomorrow.next()
+Traceback (most recent call last):
+    ...
+StopIteration
+&amp;gt;&amp;gt;&amp;gt; for ptn in prev_this_next(range(5)):
+...     print ptn
+... 
+(None, 0, 1)
+(0, 1, 2)
+(1, 2, 3)
+(2, 3, 4)
+(3, 4, None)
+&amp;gt;&amp;gt;&amp;gt; print "\n".join(map(repr, prev_this_next("XYZ")))
+(None, 'X', 'Y')
+('X', 'Y', 'Z')
+('Y', 'Z', None)
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;You&amp;#8217;ll notice we&amp;#8217;ve specified behaviour at the boundaries: the first item in the collection has no predecessor, thus the first triple returned has its first item set to &lt;code&gt;None&lt;/code&gt;; and similarly the final triple has its third item set to &lt;code&gt;None&lt;/code&gt;. We might equally well have chosen to return a user supplied default, or to wrap the collection at its ends. For now, let&amp;#8217;s go with the simple behaviour shown.
+&lt;/p&gt;
+&lt;p&gt;You&amp;#8217;ll also have noticed I&amp;#8217;m writing Python &amp;#8212; fair enough, since this web site is generated off-line using Python. The &lt;code&gt;long_weekend&lt;/code&gt; example drives the Python iterator protocol by hand, calling &lt;code&gt;yesterday_today_tomorrow.next()&lt;/code&gt; until a &lt;code&gt;StopIteration&lt;/code&gt; exception terminates the iteration. It&amp;#8217;s quite rare to use iterators in this way: more commonly, you just loop through them using &lt;code&gt;for&lt;/code&gt;, or plug them into container operations. The second and third test cases show more typical usage.
+&lt;/p&gt;
+
+&lt;h3&gt;First Implementation&lt;/h3&gt;
+&lt;p&gt;If this were C++, we&amp;#8217;d prefer our collection to support bi-directional iteration: think of a doubly-linked &lt;code&gt;std::list&lt;/code&gt;, or a plain old random access &lt;code&gt;std::vector&lt;/code&gt;. Then we could just decrement/increment each iterator from the collection to find its neighbours. 
+&lt;/p&gt;
+&lt;p&gt;In Python, we might decide to assume a random access container and write something like this:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;def get_default(items):
+    "Return an item getter function."
+    n_items = len(items)
+    def inner(index):
+        "Return items[index] or None if index is out of range."
+        if index &amp;lt; 0 or index &amp;gt;= n_items:
+            return None
+        else:
+            return items[index]
+    return inner
+
+def prev_this_next(items):
+    get = get_default(items)
+    for ix, item in enumerate(items):
+        yield get(ix - 1), item, get(ix + 1)
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;This code isn&amp;#8217;t elegant but it does pass our tests. Incidentally, an attempt to implement &lt;code&gt;get_default&lt;/code&gt; using &lt;a href="http://wordaligned.org/articles/permission-and-forgiveness.html"&gt;EAFP&lt;/a&gt;, as shown below, would fail. Can you see why?
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;def inner(index):
+    try:
+        return items[index]
+    except IndexError:
+        return None
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;This fails because accessing &lt;code&gt;items[-1]&lt;/code&gt; doesn&amp;#8217;t raise an &lt;code&gt;IndexError&lt;/code&gt; (unless &lt;code&gt;items&lt;/code&gt; is empty); it&amp;#8217;s a convenient way to access the final element of &lt;code&gt;items&lt;/code&gt;.
+&lt;/p&gt;
+&lt;p&gt;Even with the correct version of &lt;code&gt;get_default&lt;/code&gt;, if our collection of items is a stream &amp;#8212; by which I mean a lazily-evaluated iterable &amp;#8212; this code raises an exception. We don&amp;#8217;t know how long the stream will be (indeed, it could be infinite) and we can&amp;#8217;t just access elements from it at random. For C++ programmers, think of sequentially reading a file using an input iterator.
+&lt;/p&gt;
+
+&lt;h3&gt;Stream Test Case&lt;/h3&gt;
+&lt;p&gt;Let&amp;#8217;s adapt one of our test cases to expose this flaw.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; long_weekend = iter(('Fri', 'Sat', 'Sun', 'Mon'))
+&amp;gt;&amp;gt;&amp;gt; yesterday_today_tomorrow = prev_this_next(long_weekend)
+...
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Running this code raises an exception:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;Traceback (most recent call last):
+    ...
+TypeError: object of type 'tupleiterator' has no len()
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+
+&lt;h3&gt;Stream Solution&lt;/h3&gt;
+&lt;p&gt;Thinking of this problem in terms of streams gives us a solution which is both more general and more simple. All we have to do is tee up three independent iterators into the stream, stagger them, then zip them back together. &lt;span /&gt;The itertools module supplies the components. We connect.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;import itertools
+
+def prev_this_next(items):
+    extend = itertools.chain([None], items, [None])
+    prev, this, next = itertools.tee(extend, 3)
+    try:
+        this.next()
+        next.next()
+        next.next()
+    except StopIteration:
+        pass
+    return itertools.izip(prev, this, next)
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;This code works on any iterable, infinite, finite or empty, lazy or eager. Some more testcases:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; [ptn for ptn in prev_this_next(list())]
+[]
+&amp;gt;&amp;gt;&amp;gt; [ptn for ptn in prev_this_next(set([1]))]
+[(None, 1, None)]
+&amp;gt;&amp;gt;&amp;gt; ptn = prev_this_next(itertools.count())
+&amp;gt;&amp;gt;&amp;gt; itertools.islice(ptn, 100, 101).next()
+(99, 100, 101)
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+
+&lt;h3&gt;Triples Times Two&lt;/h3&gt;
+&lt;p&gt;Now suppose you want to peel items from an iterable, three at a time. Let&amp;#8217;s call this function &lt;code&gt;three_at_a_time()&lt;/code&gt; and let&amp;#8217;s specify its behaviour with some simple tests:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; t = three_at_a_time((1, 2, 3, 4, 5, 6))
+&amp;gt;&amp;gt;&amp;gt; t.next()
+(1, 2, 3)
+&amp;gt;&amp;gt;&amp;gt; t.next()
+(4, 5, 6)
+&amp;gt;&amp;gt;&amp;gt; t.next()
+Traceback (most recent call last):
+    ...
+StopIteration
+&amp;gt;&amp;gt;&amp;gt; ttt = three_at_a_time((1, 2, 3, 4))
+&amp;gt;&amp;gt;&amp;gt; [t for t in ttt]
+[(1, 2, 3)]
+&amp;gt;&amp;gt;&amp;gt; ttt = three_at_a_time(itertools.count())
+&amp;gt;&amp;gt;&amp;gt; ttt = itertools.islice(ttt, 0, 9, 3)
+&amp;gt;&amp;gt;&amp;gt; [t for t in ttt]
+[(0, 1, 2), (9, 10, 11), (18, 19, 20)]
+&amp;gt;&amp;gt;&amp;gt; "".join(chain(*three_at_a_time("Word Aligned")))
+'Word Aligned'
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Note that any trailing single element or pair at the end of the collection is discarded. We might equally have decided to pad the collection with a user-supplied default or throw an exception.
+&lt;/p&gt;
+&lt;p&gt;Here&amp;#8217;s one implementation.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;def three_at_a_time(items):
+    it = iter(items)
+    return itertools.izip(it, it, it)
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Here&amp;#8217;s another.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;def n_at_a_time(items, n):
+    it = iter(items)
+    return itertools.izip(* [it] * n)
+
+three_at_a_time = lambda items: n_at_a_time(items, 3)
+
+&lt;/pre&gt;
+
+&lt;/div&gt;</description>
+<dc:date>2007-11-20</dc:date>
+<guid>http://wordaligned.org/articles/zippy-triples-served-with-python.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/zippy-triples-served-with-python.html</link>
+<category>Functional Programming</category>
+</item>
+
+<item>
+<title>map, filter, accumulate, lambda</title>
+<description>&lt;p&gt;It looks like &lt;a href="http://www.joelonsoftware.com/"&gt;Joel Spolsky&lt;/a&gt; has just
+   written my next article &lt;a href="http://www.joelonsoftware.com/items/2006/08/01.html"&gt;for
+me&lt;/a&gt;.  I&amp;#8217;m
+   currently &lt;a href="http://wiki.wordaligned.org/sicp"&gt;working&lt;/a&gt; through
+   &lt;a href="http://mitpress.mit.edu/sicp/full-text/book/book.html"&gt;Structure and Interpretation of Computer
+Programs&lt;/a&gt;, and
+   now understand what &lt;a href="http://en.wikipedia.org/wiki/Alan_Perlis"&gt;Alan
+Perlis&lt;/a&gt; meant when he said:
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;Pascal is for building pyramids &amp;#8212; imposing, breathtaking, static
+   structures built by armies pushing heavy blocks into place. Lisp is
+   for building organisms &amp;#8212; imposing, breathtaking, dynamic structures
+   built by squads fitting fluctuating myriads of simpler organisms
+   into place. The organizing principles used are the same in both
+   cases, except for one extraordinarily important difference: The
+   discretionary exportable functionality entrusted to the individual
+   Lisp programmer is more than an order of magnitude greater than that
+   to be found within Pascal enterprises. Lisp programs inflate
+   libraries with functions whose utility transcends the application
+   that produced them. The list, Lisp&amp;#8217;s native data structure, is
+   largely responsible for such growth of utility. The simple structure
+   and natural applicability of lists are reflected in functions that
+   are amazingly nonidiosyncratic. In Pascal the plethora of declarable
+   data structures induces a specialization within functions that
+   inhibits and penalizes casual cooperation. It is better to have 100
+   functions operate on one data structure than to have 10 functions
+   operate on 10 data structures. As a result the pyramid must stand
+   unchanged for a millennium; the organism must evolve or perish.
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;For &amp;#8220;Pascal&amp;#8221;, think &amp;#8220;C++&amp;#8221;, &amp;#8220;Java&amp;#8221; or similar.
+   Functions, lists, &lt;code&gt;map&lt;/code&gt;, &lt;code&gt;filter&lt;/code&gt;, &lt;code&gt;accumulate&lt;/code&gt;, &lt;code&gt;lambda&lt;/code&gt; &amp;#8212;
+   as &lt;a href="http://www.joelonsoftware.com/"&gt;Joel&lt;/a&gt; says:
+   &amp;gt; Can Your Programming Language Do This?&amp;#8221;
+&lt;/p&gt;</description>
+<dc:date>2006-08-01</dc:date>
+<guid>http://wordaligned.org/articles/map-filter-accumulate-lambda.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/map-filter-accumulate-lambda.html</link>
+<category>Functional Programming</category>
+</item>
+
+</channel>
+</rss>

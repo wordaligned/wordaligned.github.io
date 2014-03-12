@@ -1,0 +1,198 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<link rel="icon" href="/images/favicon.png" type="image/png"/>
+<link href="/styles/application.css" media="all" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="/scripts/prettify.js"></script>
+<script type="text/javascript" src="/scripts/lang-lisp.js"></script>
+<script type="text/javascript" src="http://www.haloscan.com/load/wordaligned"></script>
+
+<title>Generating solutions to the 8 Queens Puzzle</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="author" content="Thomas Guest" />
+<meta name="description" content="A Word Aligned article posted 2006-07-21, tagged Python, Puzzles." />
+<meta name="keywords" content="Python, Puzzles" />
+<link rel="alternate" type="application/rss+xml" title="Feed" href="http://feeds.wordaligned.org/wordaligned" />
+</head>
+
+<body onload="prettyPrint()">
+<div id="container">
+  <div id="header">
+<h1><span><a accesskey="h" href="/">Word Aligned</a></span></h1>
+<h2>space sensitive programming</h2>
+<a class="button" href="http://feeds.wordaligned.org/wordaligned" title="Subscribe to Word Aligned"><img style="float: right;" src="/images/feed.png" alt="Feed Logo" height="28" width="28"/></a>
+</div>
+
+  <div id="page">
+    <div id="content">
+      <div class="atomentry" id="generating-solutions-to-the-n-queens-puzzle.html">
+<h2 class="title"><a href="/articles/generating-solutions-to-the-n-queens-puzzle.html">Generating solutions to the 8 Queens Puzzle</a></h2>
+<p class="meta"><abbr class="published" title="2006-07-21">2006-07-21</abbr> &bull; <a href="/tag/python" rel="tag">Python</a>, <a href="/tag/puzzles" rel="tag">Puzzles</a> &bull; <a href="/articles/generating-solutions-to-the-n-queens-puzzle.html#disqus_thread">Comments</a></p>
+<p>Here&#8217;s a <a href="http://www.python.org">Python</a> solution to the
+   <a href="http://en.wikipedia.org/wiki/Eight_queens_puzzle">8 Queens puzzle</a>.
+   I think that generator functions are perfectly suited to this kind of thing:
+   they are easy to code and easy to use, they yield results as soon as
+   they can, and clients have full control over when to stop them
+   yielding results.
+</p>
+<div class="typocode"><div class="codetitle">n-queens.py</div>
+
+<pre class="prettyprint">class Queen:
+    """A queen on a chess board.
+    """
+    def __init__(self, row, col):
+        self.row, self.col = row, col
+    
+    def __str__(self):
+        return "(%d, %d)" % (self.row, self.col)
+    
+    def safe_from(self, queens):
+        """Is this queen safe from the input list of queens?
+        """
+        return not any(self.attacked_by(queen) for queen in queens)
+    
+    def attacked_by(self, queen):
+        """Is this queen attacked by the input queen?
+        """
+        r, c = self.row, self.col
+        qr, qc = queen.row, queen.col
+        def same_row():
+            return r == qr
+        def same_column():
+            return c == qc
+        def same_diagonal():
+            return r + c == qr + qc or r - c == qr - qc
+        return same_row() or same_column() or same_diagonal()
+    
+def queens_puzzle(board_size):
+    """Generate solutions to the Queens puzzle for the input board size.
+    """
+    def queen_columns(cols):
+        if cols == 0:
+            yield list()
+        else:
+            cols -= 1
+            for queens in queen_columns(cols):
+                for row in range(board_size):
+                    new_queen = Queen(row, cols)
+                    if new_queen.safe_from(queens):
+                        yield queens + [new_queen]
+    for queens in queen_columns(board_size):
+        yield queens
+
+def outer_join(s, seq):
+    return "%s%s%s" % (s, s.join(seq), s)
+    
+def print_solution(board_size, queens):
+    line = outer_join("+", "-" * board_size)
+    for row in range(board_size):
+        print line
+        print outer_join("|",
+                         [" Q"[q.row == row] for q in queens])
+    print line
+    print
+    
+try:
+    print """\
+Queens puzzle solver.
+Puts N chess queens on an N by N chessboard such that none of
+them is able to capture any other.
+
+At the prompt, enter the board size or Q to quit.
+"""
+    while True:
+        board_size = int(raw_input("board size (Q to quit)? "))
+        if board_size &lt;= 0:
+            print "Please enter a positive board-size."
+        else:
+            if board_size &gt; 16:
+                print ("That's a tough one but I'll try my best. "
+                       "Press CTRL-C to interrupt.")
+            try:
+                solutions = -1
+                for solutions, queens in enumerate(queens_puzzle(board_size)):
+                    print_solution(board_size, queens)
+                solutions += 1 # Users count from 1, not 0
+                print "There %s %d solution%s to the %d Queen%s puzzle.\n" % (
+                    "is" if solutions == 1 else "are",
+                    solutions, "s"[solutions==1:],
+                    board_size,"s"[board_size==1:])
+            except KeyboardInterrupt:
+                print "Execution interrupted."
+except ValueError, v:
+    print "Bye for now!"
+
+</pre>
+
+</div>
+</div>
+
+<div class="comments"><hr/><div id="disqus_thread"></div><script type="text/javascript" src="http://disqus.com/forums/wordaligned/embed.js"></script></div>
+      
+<div id="comments"><script type="text/javascript">
+//<![CDATA[
+(function() {
+    var links = document.getElementsByTagName('a');
+    var query = '?';
+    for(var i = 0; i < links.length; i++) {
+        if(links[i].href.indexOf('#disqus_thread') >= 0) {
+            query += 'url' + i + '=' + encodeURIComponent(links[i].href) + '&amp;';
+        }
+    }
+    document.write('<script type="text/javascript" src="http://disqus.com/forums/wordaligned/get_num_replies.js' + query + '"></' + 'script>');
+})();
+//]]>
+</script></div>
+
+    </div>
+    <div id="sidebar">
+      
+<div class="sidebar-node">
+<h3>Tagged</h3>
+<ul id="categories"><li><a href="/tag/python" rel="tag">Python</a></li>
+<li><a href="/tag/puzzles" rel="tag">Puzzles</a></li></ul>
+
+</div>
+
+<div class="sidebar-node">
+<h3>Chain</h3>
+<ul>
+<li><a accesskey="n" href="/articles/a-python-syntax-highlighter.html" title="Next article">&laquo; A Python syntax highlighter</a></li>
+<li><a accesskey="p" href="/articles/my-test-first-ruby-program.html" title="Previous article">&raquo; My (Test) First Ruby Program</a></li>
+</ul>
+
+
+</div>
+
+<div class="sidebar-node">
+<h3>Feeds</h3>
+
+<ul>
+<li><a href="http://feeds.wordaligned.org/wordaligned"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Articles</a></li>
+<li><a href="http://feeds.wordaligned.org/wordaligned/comments"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Comments</a></li>
+</ul>
+
+
+</div>
+
+    </div>
+  </div>
+  <div id="footer">
+<hr />
+<p><a href="http://tag.wordaligned.org">Thomas Guest</a></p>
+</div>
+
+</div>
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-3373724-1']);
+  _gaq.push(['_trackPageview']);
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ga);
+  })();
+</script>
+</body>
+
+</html>

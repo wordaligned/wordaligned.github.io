@@ -1,0 +1,374 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<link rel="icon" href="/images/favicon.png" type="image/png"/>
+<link href="/styles/application.css" media="all" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="/scripts/prettify.js"></script>
+<script type="text/javascript" src="/scripts/lang-lisp.js"></script>
+<script type="text/javascript" src="http://www.haloscan.com/load/wordaligned"></script>
+
+<title>Top Ten Tags</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="author" content="Thomas Guest" />
+<meta name="description" content="Choosing the right algorithm to select the N largest items from a collection. A Word Aligned article posted 2008-02-19, tagged Algorithms, C++, Python, Shell." />
+<meta name="keywords" content="Algorithms, C++, Python, Shell" />
+<link rel="alternate" type="application/rss+xml" title="Feed" href="http://feeds.wordaligned.org/wordaligned" />
+</head>
+
+<body onload="prettyPrint()">
+<div id="container">
+  <div id="header">
+<h1><span><a accesskey="h" href="/">Word Aligned</a></span></h1>
+<h2>sweating the small stuff</h2>
+<a class="button" href="http://feeds.wordaligned.org/wordaligned" title="Subscribe to Word Aligned"><img style="float: right;" src="/images/feed.png" alt="Feed Logo" height="28" width="28"/></a>
+</div>
+
+  <div id="page">
+    <div id="content">
+      <div class="atomentry" id="top-ten-tags.html">
+<h2 class="title"><a href="/articles/top-ten-tags.html">Top Ten Tags</a></h2>
+<p class="meta"><abbr class="published" title="2008-02-19">2008-02-19</abbr> &bull; <a href="/tag/algorithms" rel="tag">Algorithms</a>, <a href="/tag/c++" rel="tag">C++</a>, <a href="/tag/python" rel="tag">Python</a>, <a href="/tag/shell" rel="tag">Shell</a> &bull; <a href="/articles/top-ten-tags.html#disqus_thread">Comments</a></p>
+<div class="toc">
+<h2>Contents</h2>
+<ul>
+ <li><a href="#tocmaximum" name="toc0" id="toc0">Maximum</a>
+ </li>
+
+ <li><a href="#tocsort-and-slice" name="toc1" id="toc1">Sort and Slice</a>
+ </li>
+
+ <li><a href="#tocpartial-sort" name="toc2" id="toc2">Partial Sort</a>
+ </li>
+
+ <li><a href="#tocpartial-sorting-with-heaps" name="toc3" id="toc3">Partial Sorting with Heaps</a>
+ </li>
+
+ <li><a href="#tocpartitioning-with-heaps" name="toc4" id="toc4">Partitioning with Heaps?</a>
+ </li>
+
+ <li><a href="#tocsorting-with-heaps" name="toc5" id="toc5">Sorting with Heaps</a>
+ </li>
+
+ <li><a href="#tocn-largest-in-python" name="toc6" id="toc6">N Largest in Python</a>
+ </li>
+
+ <li><a href="#tocn-largest-in-shell" name="toc7" id="toc7">N Largest in Shell</a>
+ </li>
+
+ <li><a href="#tocparallel-algorithm-analysis" name="toc8" id="toc8">Parallel Algorithm Analysis</a>
+ </li>
+
+ <li><a href="#tocchoosing-an-algorithm" name="toc9" id="toc9">Choosing an algorithm</a>
+ </li>
+</ul>
+</div><p>Reworking this website reminded me of another classic sorting algorithm. The sidebar on the front page now has a <strong>Top Tags</strong> node which lists, in order, the 10 most frequently used tags for articles on this site. What&#8217;s the best way to find these?
+</p>
+<p>More generally:
+</p>
+<blockquote><p>How do you select the N largest items, in order, from a collection?
+</p>
+</blockquote><span id="continue-reading"/>
+
+
+<h3><a href="#toc0" name="tocmaximum" id="tocmaximum">Maximum</a></h3>
+<p>When N is 1, the standard maximum function does the job. That would be <code>std::max_element</code> in C++ or simply <code>max</code> in Python. Python&#8217;s <code>max</code> has an optional <code>key</code> parameter, allowing you to supply your own comparison function; C++ similarly has an overload of <code>max_element</code> which accepts a comparison predicate.
+</p>
+
+<h3><a href="#toc1" name="tocsort-and-slice" id="tocsort-and-slice">Sort and Slice</a></h3>
+<p>If N isn&#8217;t 1, you could sort the whole collection then slice the N largest elements from the end. In Python:
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">nlargest = sorted(collection)[-N:]
+
+</pre>
+
+</div>
+
+<p>And in shell:
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">$ sort FILE | tail -$N
+
+</pre>
+
+</div>
+
+
+<h3><a href="#toc2" name="tocpartial-sort" id="tocpartial-sort">Partial Sort</a></h3>
+<p>A full sort isn&#8217;t required if you just need the top 10, though. For large collections and small N, gains can be had from partially sorting the collection. C++ provides an algorithm, <a href="http://www.sgi.com/tech/stl/partial_sort.html">std::partial_sort</a>, which does just that, shuffling the collection in place until the first N elements are ordered and at the front of that collection.
+</p>
+<p>Here&#8217;s a complete program based on the C++ partial sort algorithm. It reads integers from standard input into memory then writes the first 10 of them to standard output.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">// Program reads integer values from standard input and
+// writes the N largest of these values, largest first,
+// to standard output.
+#include &lt;algorithm&gt;
+#include &lt;functional&gt;
+#include &lt;iostream&gt;
+#include &lt;iterator&gt;
+#include &lt;vector&gt;
+
+int main()
+{
+    typedef std::vector&lt;long&gt; numbers;
+    typedef numbers::iterator iter;
+    typedef std::istream_iterator&lt;numbers::value_type&gt; in;
+    typedef std::ostream_iterator&lt;numbers::value_type&gt; out;
+    
+    // Read numbers from standard input
+    numbers results;
+    copy(in(std::cin), in(), back_inserter(results));
+    
+    // Make sure we cope with N &gt; size of results.
+    numbers::size_type const N = 10u;
+    numbers::size_type const n = std::min(results.size(), N);
+    
+    // Find the N largest (hence the "greater" predicate)
+    iter const first = results.begin();
+    iter const middle = first + n;
+    iter const last = results.end();
+    partial_sort(first, middle, last, std::greater&lt;long&gt;());
+    
+    // Copy these to standard out
+    copy(first, middle, out(std::cout, " "));
+    return 0;
+}
+
+</pre>
+
+</div>
+
+<p>The C++ standard guarantees the complexity of <code>partial_sort</code>:
+</p>
+<blockquote><p>It takes approximately <code>(last - first) * log(middle - first)</code> comparisons.
+</p>
+</blockquote><p>The corresponding complexity for a full <a href="http://www.sgi.com/tech/stl/sort.html">sort</a> is:
+</p>
+<blockquote><p>Approximately <code>(last - first) * log(last - first)</code>.
+</p>
+</blockquote><p>So the speed up is theoretically of the order of <code>log(S)/log(N)</code>. Logarithms grow slowly so the gains aren&#8217;t spectacular, but they may well be worth having. I ran some tests on collections of 31 bit numbers generated by the standard C <code>random()</code> function, with the collection size, S, ranging between 2 million and 10 million.
+</p>
+<table><tr><th>S/million</th><th>Partial/ms</th><th>Full/ms</th><th>Full/Partial</th></tr>
+<tr><td>2</td><td>4</td><td>217</td><td>54</td></tr>
+<tr><td>4</td><td>8</td><td>451</td><td>56</td></tr>
+<tr><td>6</td><td>12</td><td>697</td><td>58</td></tr>
+<tr><td>8</td><td>16</td><td>944</td><td>56</td></tr>
+<tr><td>10</td><td>29</td><td>1200</td><td>41</td></tr>
+</table>
+
+<p>As you can see, for these test cases the partial sort runs around 50 times more quickly than the full sort; better than expected or predicted!
+</p>
+<p>It&#8217;s also worth noting that we can find the top N elements without altering or (fully) copying the original collection: see <a href="http://www.sgi.com/tech/stl/partial_sort_copy.html">std::partial_sort_copy()</a> for details.
+</p>
+<p>C++&#8217;s in-place partial sort works well with a paging model. To sketch the idea, <code>partial_sort(first, first + N, last)</code> yields the first page of results, then, if required, <code>partial_sort(first + N, first + 2 * N, last)</code> yields the second page, and so on. Of course, if we anticipate paging through a large portion of the entire collection, a full sort gets the job done up front.
+</p>
+<p>The complexity guarantee for <code>partial_sort</code> is the same as for <code>sort</code> in the limiting case, when <code>middle</code> equals <code>last</code>. So an implementation could, I think, claim conformance by implementing <code>sort</code> on top of <code>partial_sort</code>.
+</p>
+
+<h3><a href="#toc3" name="tocpartial-sorting-with-heaps" id="tocpartial-sorting-with-heaps">Partial Sorting with Heaps</a></h3>
+<p>In fact the partial and full sort functions use quite different algorithms. Partial sort is based on the heap data structure and, on my present platform, is implemented largely in terms of the standard heap functions. Here&#8217;s the important part of the code, which I&#8217;ve reformatted for the purposes of this article. Please, compare against the same function in your own implementation.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">template&lt;typename RanIt&gt;
+void partial_sort(RanIt first, RanIt middle, RanIt last)
+{
+    typedef typename iterator_traits&lt;RanIt&gt;::value_type V;
+    
+    std::make_heap(first, middle);
+    for (RanIt i = middle; i &lt; last; ++i)
+        if (*i &lt; *first)
+            std::__pop_heap(first, middle, i, V(*i));
+    std::sort_heap(first, middle);
+}
+
+</pre>
+
+</div>
+
+<p>This function starts by making the half open range <code>[first, middle)</code> into a heap, which has the result that <code>*first</code> is the largest element in this range.
+</p>
+<p>It then iterates through the elements <code>[middle, last)</code>. Each time an element is smaller than <code>*first</code> &#8212; that is, smaller than the largest element of <code>[middle, first)</code> &#8212; it calls the implementation&#8217;s private <code>std::__pop_heap()</code> function. This in turn swaps the values at positions <code>*first</code> and <code>i</code> and adjusts the range [first, middle) to once more be a heap. Again, look in your standard library for details.
+</p>
+<p>Loosely speaking, every time we see an element in the tail of the collection which is smaller than the largest element in the head of the collection, we swap these elements.
+</p>
+<p>More precisely, the loop invariant is that <code>[first, middle)</code> is a heap, and all the elements in the range <code>[middle, i]</code> are greater than all the elements in <code>[first, middle)</code>. <span id="excerpt0"/>It&#8217;s subtle, efficient, and dazzlingly clever!
+</p>
+<p>Once the iterator <code>i</code> gets to the end of the range (<code>last</code>, that is), the container has been partitioned so the smallest N elements are at its front. All that remains is to sort these elements; and since the front of the container has already been heapified, we can just heap_sort it.
+</p>
+
+<h3><a href="#toc4" name="tocpartitioning-with-heaps" id="tocpartitioning-with-heaps">Partitioning with Heaps?</a></h3>
+<p>Note the distinction between finding the ordered top ten items in a collection and finding the ten largest items in a collection: the ten largest elements needn&#8217;t be ordered.
+</p>
+<p>You may have spotted that if we pull out of the <code>partial_sort()</code> implementation shown above before applying the final <code>sort_heap()</code>, then we&#8217;ve partitioned the collection so that items in the range <code>[first, middle)</code> are larger than items in the range <code>[middle, last)</code>.
+</p>
+<p>In fact, there&#8217;s a a better way of partitioning the collection to put the N largest elements at the front. It doesn&#8217;t use heaps, and, amazingly, can be achieved with a linear algorithm. The C++ standard library provides just such an algorithm filed under the slightly misleading name of <a href="http://www.sgi.com/tech/stl/nth_element.html">std::nth_element</a>.
+</p>
+
+<h3><a href="#toc5" name="tocsorting-with-heaps" id="tocsorting-with-heaps">Sorting with Heaps</a></h3>
+<p>I claimed earlier that C++ sort implementers could reuse a special case of partial sort and still meet the C++ Standard&#8217;s complexity guarantee. It would be a hard trick to pull off though, since the constant factors differ. Sort is likely to be based on quicksort, acknowledged the most efficient general purpose sorting algorithm. Partial sort, as already mentioned, is a heap sort.
+</p>
+<p>On my platform, <code>std::sort()</code> in fact delegates to an <a href="http://en.wikipedia.org/wiki/Introsort">introsort</a> &#8212; a hybrid algorithm which starts with a quicksort and bottoms out to <code>std::partial_sort()</code> once a heuristically determined recursion depth is exceeded.
+</p>
+<p>I ran a full partial sort head to head against standard sort on my machine, feeding both algorithms large-ish (size up to 10 million) arrays of 31 bit numbers generated using the standard C <code>random()</code> function. The results indicate sort runs around four times faster than partial sort; someone&#8217;s probably got a theoretical proof of the exact multiplier.
+</p>
+<img alt="Full Sort vs Full Partial Sort chart" src="http://chart.apis.google.com/chart?
+cht=lc
+&amp;chtt=Full+Sort+vs.+Full+Partial+Sort
+&amp;chs=400x300
+&amp;chxt=x,y,x,y
+&amp;chxl=0:|0|2|4|6|8|10|1:|0|1|2|3|4|5|6|2:||N+%28Millions%29||3:||Time+%28seconds%29|
+&amp;chd=t:0.0,3.7,7.7,11.8,16.0,20.2|0.0,10.0,26.3,46.7,65.7,88.7
+&amp;chco=ff0000,0000ff
+&amp;chls=2,0,0|2,0,0
+&amp;chdl=Full|Partial" />
+
+
+<h3><a href="#toc6" name="tocn-largest-in-python" id="tocn-largest-in-python">N Largest in Python</a></h3>
+<p>Python makes no complexity guarantees, but the location of the <code>nlargest</code> function in the <code>heapq</code> module gives a pretty big hint about its implementation! Note that <code>nlargest</code> returns its results in order; it&#8217;s more than just a partitioning. Note too that it&#8217;s generous enough to handle the case when N is larger than the size of the collection.
+</p>
+<p>Here&#8217;s a Python script which imitates our earlier C++ program:
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">from sys import stdin
+from heapq import nlargest
+
+numbers = map(int, stdin.read().split())
+top_ten = nlargest(10, numbers)
+print "\n".join(map(repr, top_ten))
+
+</pre>
+
+</div>
+
+<p>For the purpose of comparison, I timed the <code>nlargest()</code> part of this function. I also timed a full (Python) sort of the numbers. Again, I ran on random collections of size S ranging from 2 to 10 million.
+</p>
+<table><tr><th>S/million</th><th>Partial/ms</th><th>Full/ms</th><th>Full/Partial</th></tr>
+<tr><td>2</td><td>100</td><td>2590</td><td>26</td></tr>
+<tr><td>4</td><td>190</td><td>5800</td><td>31</td></tr>
+<tr><td>6</td><td>290</td><td>9300</td><td>32</td></tr>
+<tr><td>8</td><td>410</td><td>12880</td><td>31</td></tr>
+<tr><td>10</td><td>510</td><td>16670</td><td>33</td></tr>
+</table>
+
+<p>This time, the partial sort ran about 30 times more quickly than the full sort. C++ proved about 13 times quicker than Python for the full sort, and 24 times quicker for partial sort.
+</p>
+
+<h3><a href="#toc7" name="tocn-largest-in-shell" id="tocn-largest-in-shell">N Largest in Shell</a></h3>
+<p>The Python script shown relies on being able to read the entire file into memory (that&#8217;s not a limitation of Python, just of the rather simplistic approach taken by the script). The C++ solution only needs space for the numbers, the input buffering being nicely handled by the iostreams framework. For sizable inputs &#8212; of the order of a GB, say, on a modern computer &#8212; we&#8217;d need to use secondary storage.
+</p>
+<p>The Unix shell pipeline shown earlier has no such limitation. Given enough time and secondary storage, the following command finds the 10 largest numbers in BIGFILE, even if we can&#8217;t hold all these numbers in RAM.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">$ sort -r -n BIGFILE | head
+
+</pre>
+
+</div>
+
+<p>Executing this command on a ~9GB input file holding one billion 31 bit random numbers took over an hour and a half on my machine.
+</p>
+
+<h3><a href="#toc8" name="tocparallel-algorithm-analysis" id="tocparallel-algorithm-analysis">Parallel Algorithm Analysis</a></h3>
+<p>The <a href="http://en.wikipedia.org/wiki/Big_O_notation">language</a> used in this article for discussing algorithm analysis works best for a single process running a single uninterrupted thread of execution. If we want to budget time for an algorithm which makes <code>N * log(N)</code> comparisons we plug in N, divide by the processor speed, and multiply by the number of cycles required for each comparison.
+</p>
+<p>I wonder how well this language will survive in a world where processors have multiple cores. Will a new family of algorithms evolve, ones better equipped to use the new hardware?
+</p>
+<p>This evolution is underway already. In a sequence of articles published in <a href="http://ddj.com">Dr. Dobbs Journal</a>, Herb Sutter teaches programmers <a href="http://herbsutter.spaces.live.com/?_c11_BlogPart_BlogPart=blogview&amp;_c=BlogPart&amp;partqs=cat%3dConcurrency" title="I hope this link to Herb Sutter's blog works!">the traditional C++ way of doing things</a>; a low-level, platform-dependent approach based on forking threads and locking resources. I&#8217;ve come to regard these techniques as a sure route to subtle bugs. On the systems I&#8217;ve worked on, a more C-style approach has worked well. At its simplest, a Unix pipeline distributes the load; this archetype generalises to a multi-process architecture, where we develop and prove each (single-threaded!) component in isolation.
+</p>
+<img src="http://erlang.org/images/erlang.gif" alt="erlang GIF"/>
+
+<p>There are <a href="http://erlang.org">higher level languages</a> though. Why limit ourselves to a single machine if we can devise a language which blurs the distinction between multiple processors on a single machine and multiple processors on a network? And why not build in some regulation of low level failures? When a task is distributed between workers, it&#8217;s natural to ask what should happen if a worker fails, or simply lags behind.
+</p>
+<p>Functional programming turns out to have much to offer in this new, parallel world &#8212; <a href="http://labs.google.com/papers/mapreduce.html">Google&#8217;s Map-Reduce framework</a>, for example &#8212; and it&#8217;s nice to know the fundamental ideas are far from being new: rather, their time has come.
+</p>
+
+<h3><a href="#toc9" name="tocchoosing-an-algorithm" id="tocchoosing-an-algorithm">Choosing an algorithm</a></h3>
+<p>When discussing algorithms it&#8217;s all too easy to fret about what happens when inputs grow massive. If we&#8217;ve used the standard libraries then resource use for sorting &#8212; both memory and CPU cycles &#8212; may not be a concern. The code in this article demonstrates highly efficient general purpose sorting routines; and in any final system it&#8217;s likely we could use full- and partial- sorting interchangeably without noticeably affecting overall performance. 
+</p>
+<p>What is always a concern, though, is <a href="/articles/readable-code.html">readability</a>. If it&#8217;s the largest few elements of a collection we want, calling <code>std::partial_sort()</code> in C++ or <code>heapq.nlargest()</code> in Python nicely expresses that desire.
+</p>
+</div>
+
+<div class="comments"><hr/><div id="disqus_thread"></div><script type="text/javascript" src="http://disqus.com/forums/wordaligned/embed.js"></script></div>
+      
+<div id="comments"><script type="text/javascript">
+//<![CDATA[
+(function() {
+    var links = document.getElementsByTagName('a');
+    var query = '?';
+    for(var i = 0; i < links.length; i++) {
+        if(links[i].href.indexOf('#disqus_thread') >= 0) {
+            query += 'url' + i + '=' + encodeURIComponent(links[i].href) + '&amp;';
+        }
+    }
+    document.write('<script type="text/javascript" src="http://disqus.com/forums/wordaligned/get_num_replies.js' + query + '"></' + 'script>');
+})();
+//]]>
+</script></div>
+
+    </div>
+    <div id="sidebar">
+      <div class="sidebar-node">
+<h3>Excerpt</h3>
+<p><a href="#excerpt0">It's subtle, efficient, and dazzlingly clever!</a></p>
+
+</div>
+
+<div class="sidebar-node">
+<h3>Tagged</h3>
+<ul id="categories"><li><a href="/tag/algorithms" rel="tag">Algorithms</a></li>
+<li><a href="/tag/c++" rel="tag">C++</a></li>
+<li><a href="/tag/python" rel="tag">Python</a></li>
+<li><a href="/tag/shell" rel="tag">Shell</a></li></ul>
+
+</div>
+
+<div class="sidebar-node">
+<h3>Chain</h3>
+<ul>
+<li><a accesskey="n" href="/articles/top-ten-percent.html" title="Next article">&laquo; Top Ten Percent</a></li>
+<li><a accesskey="p" href="/articles/no-www-yes-comments-no-categories.html" title="Previous article">&raquo; No www, yes comments, no categories</a></li>
+</ul>
+
+
+</div>
+
+<div class="sidebar-node">
+<h3>Feeds</h3>
+
+<ul>
+<li><a href="http://feeds.wordaligned.org/wordaligned"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Articles</a></li>
+<li><a href="http://feeds.wordaligned.org/wordaligned/comments"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Comments</a></li>
+</ul>
+
+
+</div>
+
+    </div>
+  </div>
+  <div id="footer">
+<hr />
+<p><a href="http://tag.wordaligned.org">Thomas Guest</a></p>
+</div>
+
+</div>
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-3373724-1']);
+  _gaq.push(['_trackPageview']);
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ga);
+  })();
+</script>
+</body>
+
+</html>

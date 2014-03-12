@@ -1,0 +1,671 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<link rel="icon" href="/images/favicon.png" type="image/png"/>
+<link href="/styles/application.css" media="all" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="/scripts/prettify.js"></script>
+<script type="text/javascript" src="/scripts/lang-lisp.js"></script>
+<script type="text/javascript" src="http://www.haloscan.com/load/wordaligned"></script>
+
+<title>Drawing Chess Positions</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="author" content="Thomas Guest" />
+<meta name="description" content="A follow-up article on scripting graphics. A Word Aligned article posted 2008-03-30, tagged Python, Graphics, Chess, PIL, Characters." />
+<meta name="keywords" content="Python, Graphics, Chess, PIL, Characters" />
+<link rel="alternate" type="application/rss+xml" title="Feed" href="http://feeds.wordaligned.org/wordaligned" />
+</head>
+
+<body onload="prettyPrint()">
+<div id="container">
+  <div id="header">
+<h1><span><a accesskey="h" href="/">Word Aligned</a></span></h1>
+<h2>space sensitive programming</h2>
+<a class="button" href="http://feeds.wordaligned.org/wordaligned" title="Subscribe to Word Aligned"><img style="float: right;" src="/images/feed.png" alt="Feed Logo" height="28" width="28"/></a>
+</div>
+
+  <div id="page">
+    <div id="content">
+      <div class="atomentry" id="drawing-chess-positions.html">
+<h2 class="title"><a href="/articles/drawing-chess-positions.html">Drawing Chess Positions</a></h2>
+<p class="meta"><abbr class="published" title="2008-03-30">2008-03-30</abbr> &bull; <a href="/tag/python" rel="tag">Python</a>, <a href="/tag/graphics" rel="tag">Graphics</a>, <a href="/tag/chess" rel="tag">Chess</a>, <a href="/tag/pil" rel="tag">PIL</a>, <a href="/tag/characters" rel="tag">Characters</a> &bull; <a href="/articles/drawing-chess-positions.html#disqus_thread">Comments</a></p>
+<div class="toc">
+<h2>Contents</h2>
+<ul>
+ <li><a href="#tocdominus-connects" name="toc0" id="toc0">Dominus Connects</a>
+ </li>
+
+ <li><a href="#tocchessboards-revisited" name="toc1" id="toc1">Chessboards Revisited</a>
+ </li>
+
+ <li><a href="#tocprogram-input" name="toc2" id="toc2">Program Input</a>
+ </li>
+
+ <li><a href="#tocascii-chess-positions" name="toc3" id="toc3">ASCII Chess Positions</a>
+ </li>
+
+ <li><a href="#tocunicode--css" name="toc4" id="toc4">Unicode + CSS</a>
+ </li>
+
+ <li><a href="#tocwiki-macros" name="toc5" id="toc5">Wiki Macros</a>
+ </li>
+
+ <li><a href="#tocpython-imaging-library" name="toc6" id="toc6">Python Imaging Library</a>
+ </li>
+
+ <li><a href="#tocinteracting-with-images" name="toc7" id="toc7">Interacting with Images</a>
+ </li>
+
+ <li><a href="#tocthe-details" name="toc8" id="toc8">The details</a>
+ </li>
+
+ <li><a href="#tocusing-a-font-with-pil" name="toc9" id="toc9">Using a font with PIL</a>
+ </li>
+
+ <li><a href="#toclatex" name="toc10" id="toc10">LaTeX</a>
+ </li>
+
+ <li><a href="#tocconclusions" name="toc11" id="toc11">Conclusions</a>
+ </li>
+</ul>
+</div>
+<h3><a href="#toc0" name="tocdominus-connects" id="tocdominus-connects">Dominus Connects</a></h3>
+<p>In a recent <a href="http://blog.plover.com/prog/perl/lines.html">article</a> Mark Dominus describes how he grew frustrated with his graphical editor and wrote a script to draw connectors:
+</p>
+<blockquote><p>Here&#8217;s what I did instead. I wrote a program that would read an input like this:</p>
+<pre>
+        &gt;-v-&lt;
+        '-+-`
+</pre>
+<p>and produce a jpeg file that looks like this:
+<img src="http://pic.blog.plover.com/prog/perl/lines/demo1.jpg" alt="Line and box graphic"/></p>
+</blockquote>
+
+<p>I haven&#8217;t tried running the software, which, Dominus admits, isn&#8217;t his most polished. What interests me is: the way he devises a mini-language for describing these connectors, then combines hand-built and standard tools to produce the required result; and how quickly he ditches the <a href="http://www.gimp.org">Gimp</a> and settles on this approach. Clearly he&#8217;s done this sort of thing before.
+</p>
+
+<h3><a href="#toc1" name="tocchessboards-revisited" id="tocchessboards-revisited">Chessboards Revisited</a></h3>
+<p>Recently I wrote about a rather easier graphics problem, of <a href="/articles/drawing-chessboards.html">drawing chessboards</a>. My real mission, though, was to promote scripted graphics. A chessboard would make a good starting point, I thought. I planned to go on to describe a more advanced drawing problem, of putting pieces on the board &#8212; a problem requiring more pixel bashing and more thought about inputs.
+</p>
+<p>This article tackles that follow-on problem. What I didn&#8217;t realise &#8212; but really should have guessed &#8212; is that it&#8217;s a problem which has been solved many times before in many different domains. You can find <a href="http://www.ctan.org/tex-archive/fonts/chess/skak/">LaTeX packages</a> and <a href="http://emacs-chess.sourceforge.net/">emacs modes</a> for it. There&#8217;s even a <a href="http://en.wikipedia.org/wiki/Template:Chess_diagram">MediaWiki macro</a>. So if you need to draw chess positions please investigate what&#8217;s <a href="http://www.enpassant.dk/chess/diaeng.htm">already out there</a>.
+</p>
+<p>That said, the rest of this article follows on from its <a href="/articles/drawing-chessboards.html">predecessor</a>. We&#8217;ll settle on a suitable notation for describing chess positions and use this as a basis for creating ASCII, Unicode + CSS, and PNG graphics. We&#8217;ll also discuss the advantages of using an interpreted, dynamic language for image processing.
+</p>
+<span id="continue-reading"/>
+
+
+<h3><a href="#toc2" name="tocprogram-input" id="tocprogram-input">Program Input</a></h3>
+<div class="info">Things I learned while writing this article: Forsyth-Edwards Notation (FEN) is a standard way to record a chess position.</div>
+
+<p>Mark Dominus invented his own input notation. We needn&#8217;t. The Forsyth-Edwards notation for recording a particular board position is compact, simple and standard.
+</p>
+<p>From <a href="http://en.wikipedia.org/wiki/Forsyth-Edwards_Notation">Wikipedia</a>:
+</p>
+<blockquote><p>A FEN &#8220;record&#8221; defines a particular game position, all in one text line and using only the ASCII character set. A FEN record contains six fields. The separator between fields is a space. The fields are:
+</p>
+<ol>
+ <li>
+     Piece placement (from white&#8217;s perspective). Each rank is described, starting with rank 8 and ending with rank 1; within each rank, the contents of each square are described from file a through file h. Following the Standard Algebraic Notation (SAN), each piece is identified by a single letter taken from the standard English names (pawn = &#8220;P&#8221;, knight = &#8220;N&#8221;, bishop = &#8220;B&#8221;, rook = &#8220;R&#8221;, queen = &#8220;Q&#8221; and king = &#8220;K&#8221;). White pieces are designated using upper-case letters (&#8220;PNBRQK&#8221;) while Black take lowercase (&#8220;pnbrqk&#8221;). Blank squares are noted using digits 1 through 8 (the number of blank squares), and &#8220;/&#8221; separate ranks.
+ </li>
+
+ <li>
+     &#8230;
+ </li>
+</ol>
+</blockquote><p>The remaining five fields store other pieces of state (whose turn it is, who can castle etc.) required for resuming a game. We&#8217;ll omit them from our input.
+</p>
+<p>So, for example, we record the start position:
+</p>
+<pre>rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR</pre>
+
+<p>Some moves later, the game might be at:
+</p>
+<pre>r2q1rk1/pp2ppbp/1np2np1/2Q3B1/3PP1b1/2N2N2/PP3PPP/3RKB1R</pre>
+
+
+<h3><a href="#toc3" name="tocascii-chess-positions" id="tocascii-chess-positions">ASCII Chess Positions</a></h3>
+<p>The first field of the FEN record is already close to an ASCII representation of a chessboard. If we expand the digits into the spaces they represent and switch the forward slashes for newlines, then printing the resulting string gives an 8x8 text square. (By the way, I&#8217;ve fixed the chessboard size at 8 rather than make it an input parameter since the FEN notation won&#8217;t work for a board size of 10x10 or bigger.) It&#8217;s not hard to add some ASCII dividers to tart up this simple graphic.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">def expand_blanks(fen):
+    '''Expand the digits in an FEN string into spaces
+    
+    &gt;&gt;&gt; expand_blanks("rk4q3")
+    'rk    q   '
+    '''
+    def expand(match):
+        return ' ' * int(match.group(0))
+    return re.compile(r'\d').sub(expand, fen)
+    
+def outer_join(sep, ss):
+    '''Like string.join, but encloses the result with outer separators.
+    
+    Example:
+    &gt;&gt;&gt; outer_join('|', ['1', '2', '3'])
+    '|1|2|3|'
+    '''
+    return '%s%s%s' % (sep, sep.join(ss), sep)
+    
+def ascii_draw_chess_position(fen):
+    '''Returns an ASCII picture of pieces on a chessboard.'''
+    pieces = expand_blanks(fen).replace('/', '')
+    divider = '+-+-+-+-+-+-+-+-+\n'
+    rows = ((outer_join('|', pieces[r: r + 8]) + '\n')
+            for r in range(0, 8 * 8, 8))
+    return outer_join(divider, rows)
+
+</pre>
+
+</div>
+
+<p>An example:
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">&gt;&gt;&gt; fen = "r2q1rk1/pp2ppbp/1np2np1/2Q3B1/3PP1b1/2N2N2/PP3PPP/3RKB1R"
+&gt;&gt;&gt; print ascii_draw_chess_position(fen)
++-+-+-+-+-+-+-+-+
+|r| | |q| |r|k| |
++-+-+-+-+-+-+-+-+
+|p|p| | |p|p|b|p|
++-+-+-+-+-+-+-+-+
+| |n|p| | |n|p| |
++-+-+-+-+-+-+-+-+
+| | |Q| | | |B| |
++-+-+-+-+-+-+-+-+
+| | | |P|P| |b| |
++-+-+-+-+-+-+-+-+
+| | |N| | |N| | |
++-+-+-+-+-+-+-+-+
+|P|P| | | |P|P|P|
++-+-+-+-+-+-+-+-+
+| | | |R|K|B| |R|
++-+-+-+-+-+-+-+-+
+
+</pre>
+
+</div>
+
+
+<h3><a href="#toc4" name="tocunicode--css" id="tocunicode--css">Unicode + CSS</a></h3>
+<div class="info">Things I learned while writing this article: Unicode has code points for the black and white chess pieces.</div>
+
+<p>This means we can get a rather better picture of a chess position using nothing more than text. Note that these Unicode characters solve the internationalisation problem without the need for translators. (We will need a suitable font though!)
+</p>
+<p>Here&#8217;s how we can create a dictionary which maps the FEN piece ASCII names to their HTML entity codes.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">unicode_pieces=dict(
+    zip("KQRBNPkqrbnp",
+        ("&amp;#x%x;" % uc for uc in range(0x2654, 0x2660))))
+
+</pre>
+
+</div>
+
+<p>I&#8217;ve used this dictionary to create the block of text shown below. I&#8217;ve tried using CSS to colour and place squares on the board &#8212; sorry if it doesn&#8217;t work in your browser, I&#8217;m no CSS expert!
+</p>
+<div class="chessboard">
+<pre>
+<span class="white_sq">&#x265c;</span><span class="black_sq"> </span><span class="white_sq"> </span><span class="black_sq">&#x265b;</span><span class="white_sq"> </span><span class="black_sq">&#x265c;</span><span class="white_sq">&#x265a;</span><span class="black_sq"> </span><br/>
+<span class="black_sq">&#x265f;</span><span class="white_sq">&#x265f;</span><span class="black_sq"> </span><span class="white_sq"> </span><span class="black_sq">&#x265f;</span><span class="white_sq">&#x265f;</span><span class="black_sq">&#x265d;</span><span class="white_sq">&#x265f;</span><br/>
+<span class="white_sq"> </span><span class="black_sq">&#x265e;</span><span class="white_sq">&#x265f;</span><span class="black_sq"> </span><span class="white_sq"> </span><span class="black_sq">&#x265e;</span><span class="white_sq">&#x265f;</span><span class="black_sq"> </span><br/>
+<span class="black_sq"> </span><span class="white_sq"> </span><span class="black_sq">&#x2655;</span><span class="white_sq"> </span><span class="black_sq"> </span><span class="white_sq"> </span><span class="black_sq">&#x2657;</span><span class="white_sq"> </span><br/>
+<span class="white_sq"> </span><span class="black_sq"> </span><span class="white_sq"> </span><span class="black_sq">&#x2659;</span><span class="white_sq">&#x2659;</span><span class="black_sq"> </span><span class="white_sq">&#x265d;</span><span class="black_sq"> </span><br/>
+<span class="black_sq"> </span><span class="white_sq"> </span><span class="black_sq">&#x2658;</span><span class="white_sq"> </span><span class="black_sq"> </span><span class="white_sq">&#x2658;</span><span class="black_sq"> </span><span class="white_sq"> </span><br/>
+<span class="white_sq">&#x2659;</span><span class="black_sq">&#x2659;</span><span class="white_sq"> </span><span class="black_sq"> </span><span class="white_sq"> </span><span class="black_sq">&#x2659;</span><span class="white_sq">&#x2659;</span><span class="black_sq">&#x2659;</span><br/>
+<span class="black_sq"> </span><span class="white_sq"> </span><span class="black_sq"> </span><span class="white_sq">&#x2656;</span><span class="black_sq">&#x2654;</span><span class="white_sq">&#x2657;</span><span class="black_sq"> </span><span class="white_sq">&#x2656;</span>
+</pre>
+</div>
+
+<p>This image isn&#8217;t ideal: the board background is visible through the pieces, which is particularly noticeable for white pieces on dark squares. I haven&#8217;t figured out how to eliminate this flaw!
+</p>
+
+<h3><a href="#toc5" name="tocwiki-macros" id="tocwiki-macros">Wiki Macros</a></h3>
+<div class="info">Things I learned while writing this article: MediaWiki has a fully-featured macro for chess diagrams.</div>
+
+<p>Here&#8217;s the opening chess position as a MediaWiki macro. If this seems like too much effort to type, David A. Wheeler provides an online <a href="http://www.dwheeler.com/misc/fen2wikipedia.html">FEN-to-Wikipedia conversion tool</a>.
+</p>
+<pre>{{Chess diagram|=
+| tright
+| 
+|=
+ 8 |rd|nd|bd|qd|kd|bd|nd|rd|=
+ 7 |pd|pd|pd|pd|pd|pd|pd|pd|=
+ 6 |  |  |  |  |  |  |  |  |=
+ 5 |  |  |  |  |  |  |  |  |=
+ 4 |  |  |  |  |  |  |  |  |=
+ 3 |  |  |  |  |  |  |  |  |=
+ 2 |pl|pl|pl|pl|pl|pl|pl|pl|=
+ 1 |rl|nl|bl|ql|kl|bl|nl|rl|=
+    a  b  c  d  e  f  g  h
+| 
+}}</pre>
+
+
+<h3><a href="#toc6" name="tocpython-imaging-library" id="tocpython-imaging-library">Python Imaging Library</a></h3>
+<div class="info">Things I learned while writing this article: OS X has problems distinguishing upper- and lower-case filenames.</div>
+
+<p>The OS X filename limitation came as a nasty surprise. Most of the time I use my Mac like any other Unix box and so I naturally expected that <code>K.png</code> and <code>k.png</code> would co-reside happily in the same directory. They can&#8217;t! Apparently it&#8217;s for <a href="http://www.jms1.net/osx-case-sensitive-fs.shtml">backwards compatibility</a>, to keep old software alive. Yuck!
+</p>
+<p>Anyway, to render a chess position using the <a href="http://effbot.org/imagingbook/pil-index.htm">Python Imaging Library</a> (PIL), we&#8217;ll need some suitable pictures of the pieces. I downloaded some from Wikipedia (thanks!) It&#8217;s important these images have an alpha channel. (The alpha channel assigns an opacity to each pixel, which will be used when we compose the image with another: when we put the piece on the board, that is. Without an alpha channel, we wouldn&#8217;t see the squares underneath the pieces.)
+</p>
+
+<h3><a href="#toc7" name="tocinteracting-with-images" id="tocinteracting-with-images">Interacting with Images</a></h3>
+<p>An interpreted language comes into its own when working with an image. Here&#8217;s a session in which we open a PNG (the black king) and poke around at it to find:
+</p>
+<ul>
+ <li>
+     what it looks like
+ </li>
+
+ <li>
+     its mode and size
+ </li>
+
+ <li>
+     whether all pixels are grey
+ </li>
+
+ <li>
+     how many transparent and opaque pixels it has
+ </li>
+
+ <li>
+     the contents of a few pixels on the left of the image
+ </li>
+</ul>
+<div class="typocode">
+
+<pre class="prettyprint">&gt;&gt;&gt; import Image
+&gt;&gt;&gt; king = Image.open('k.png')
+&gt;&gt;&gt; king.show()
+&gt;&gt;&gt; king.mode
+'RGBA'
+&gt;&gt;&gt; king.size
+(45, 45)
+&gt;&gt;&gt; pixels = king.load()
+&gt;&gt;&gt; def is_grey(rgba):
+... 	r, g, b, a = rgba
+... 	return r == g == b
+... 
+&gt;&gt;&gt; W, H = king.size
+&gt;&gt;&gt; xys = [(x, y) for y in range(H) for x in range(W)]
+&gt;&gt;&gt; all(is_grey(pixels[xy]) for xy in xys) 
+True
+&gt;&gt;&gt; sum(1 for xy in xys if pixels[xy][3] == 0)
+1243
+&gt;&gt;&gt; sum(1 for xy in xys if pixels[xy][3] == 255)
+612
+&gt;&gt;&gt; print "\n".join(map(repr, (pixels[x, 20] for x in range(10))))
+(0, 0, 0, 0)
+(0, 0, 0, 0)
+(0, 0, 0, 0)
+(0, 0, 0, 0)
+(0, 0, 0, 0)
+(15, 15, 15, 170)
+(247, 247, 247, 255)
+(148, 148, 148, 255)
+(0, 0, 0, 255)
+(0, 0, 0, 255)
+
+</pre>
+
+</div>
+
+<p>To place this piece on top of a background image we use <a href="http://effbot.org/imagingbook/image.htm#tag-Image.Image.paste">Image.paste</a>. Again, we can experiment interactively.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">&gt;&gt;&gt; red_sq = Image.new('RGBA', king.size, 'red')
+&gt;&gt;&gt; help(red_sq.paste)
+Help on method paste in module Image:
+
+paste(self, im, box=None, mask=None) method of Image.Image instance
+    Paste other image into region
+
+&gt;&gt;&gt; mask = king.split()[3]
+&gt;&gt;&gt; red_sq.paste(king, None, mask)
+&gt;&gt;&gt; red_sq.show()
+
+</pre>
+
+</div>
+
+<p>Note that <a href="http://effbot.org/imagingbook/image.htm#tag-Image.Image.show">Image.show</a> allows us to view the image using some platform dependent utility.
+</p>
+
+<h3><a href="#toc8" name="tocthe-details" id="tocthe-details">The details</a></h3>
+<p>Once we&#8217;ve figured out how to put pieces on the board using <a href="http://effbot.org/imagingbook/image.htm#tag-Image.Image.paste">Image.paste</a>, the rest is all details. I&#8217;ve decided to create a class for rendering chess positions. Creating a class instance pre-loads the piece graphics and sketches in the board background; each time we call draw, the background is copied and the pieces are pasted into place. The resulting image is returned directly to the client, who can choose what to do with it.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">#! /usr/bin/env python
+'''Code to draw chess board and pieces.
+
+FEN notation to describe the arrangement of peices on a chess board.
+
+White pieces are coded: K, Q, B, N, R, P, for king, queen, bishop,
+rook knight, pawn. Black pieces use lowercase k, q, b, n, r, p. Blank
+squares are noted with digits, and the "/" separates ranks.
+
+As an example, the game starts at:
+
+rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR
+
+See: http://en.wikipedia.org/wiki/Forsyth-Edwards_Notation
+'''
+import re
+import Image
+import ImageDraw
+
+class BadChessboard(ValueError):
+    pass
+    
+def expand_blanks(fen):
+    '''Expand the digits in an FEN string into spaces
+    
+    &gt;&gt;&gt; expand_blanks("rk4q3")
+    'rk    q   '
+    '''
+    def expand(match):
+        return ' ' * int(match.group(0))
+    return re.compile(r'\d').sub(expand, fen)
+    
+def check_valid(expanded_fen):
+    '''Asserts an expanded FEN string is valid'''
+    match = re.compile(r'([KQBNRPkqbnrp ]{8}/){8}$').match
+    if not match(expanded_fen + '/'):
+        raise BadChessboard()
+    
+def expand_fen(fen):
+    '''Preprocesses a fen string into an internal format.
+    
+    Each square on the chessboard is represented by a single 
+    character in the output string. The rank separator characters
+    are removed. Invalid inputs raise a BadChessboard error.
+    '''
+    expanded = expand_blanks(fen)
+    check_valid(expanded)
+    return expanded.replace('/', '')
+    
+def draw_board(n=8, sq_size=(20, 20)):
+    '''Return an image of a chessboard.
+    
+    The board has n x n squares each of the supplied size.'''
+    from itertools import cycle
+    def square(i, j):
+        return i * sq_size[0], j * sq_size[1]
+    opaque_grey_background = 192, 255
+    board = Image.new('LA', square(n, n), opaque_grey_background) 
+    draw_square = ImageDraw.Draw(board).rectangle
+    whites = ((square(i, j), square(i + 1, j + 1))
+              for i_start, j in zip(cycle((0, 1)), range(n))
+              for i in range(i_start, n, 2))
+    for white_square in whites:
+        draw_square(white_square, fill='white')
+    return board
+    
+class DrawChessPosition(object):
+    '''Chess position renderer.
+    
+    Create an instance of this class, then call 
+    '''
+    def __init__(self):
+        '''Initialise, preloading pieces and creating a blank board.''' 
+        self.n = 8
+        self.create_pieces()
+        self.create_blank_board()
+    
+    def create_pieces(self):
+        '''Load the chess pieces from disk.
+        
+        Also extracts and caches the alpha masks for these pieces. 
+        '''
+        whites = 'KQBNRP'
+        piece_images = dict(
+            zip(whites, (Image.open('pieces/w%s.png' % p) for p in whites)))
+        blacks = 'kqbnrp'
+        piece_images.update(dict(
+            zip(blacks, (Image.open('pieces/%s.png' % p) for p in blacks))))
+        piece_sizes = set(piece.size for piece in piece_images.values())
+        # Sanity check: the pieces should all be the same size
+        assert len(piece_sizes) == 1
+        self.piece_w, self.piece_h = piece_sizes.pop()
+        self.piece_images = piece_images
+        self.piece_masks = dict((pc, img.split()[3]) for pc, img in
+                                 self.piece_images.iteritems())
+    
+    def create_blank_board(self):
+        '''Pre-render a blank board.'''
+        self.board = draw_board(sq_size=(self.piece_w, self.piece_h))
+    
+    def point(self, i, j):
+        '''Return the top left of the square at (i, j).'''
+        w, h = self.piece_w, self.piece_h
+        return i * h, j * w
+    
+    def square(self, i, j):
+        '''Return the square at (i, j).'''
+        t, l = self.point(i, j)
+        b, r = self.point(i + 1, j + 1)
+        return t, l, b, r
+    
+    def draw(self, fen):
+        '''Return an image depicting the input position.
+        
+        fen - the first record of a FEN chess position.
+        Clients are responsible for resizing this image and saving it,
+        if required.
+        '''
+        board = self.board.copy()
+        pieces = expand_fen(fen)
+        images, masks, n = self.piece_images, self.piece_masks, self.n
+        pts = (self.point(i, j) for j in range(n) for i in range(n))
+        def not_blank(pt_pc):
+            return pt_pc[1] != ' '
+        for pt, piece in filter(not_blank, zip(pts, pieces)):
+            board.paste(images[piece], pt, masks[piece])
+        return board
+
+</pre>
+
+</div>
+
+<p>This code depends on PNGs for the pieces being available in the current directory, filed under the (case-sensitive!) names: <code>{K,Q,B,N,R,P,k,q,b,n,r,p}.png</code>. It also requires all these PNGs to have the same dimensions. Here&#8217;s how to use it:
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">&gt;&gt;&gt; renderer = DrawChessPosition()
+&gt;&gt;&gt; fen = "r2q1rk1/pp2ppbp/1np2np1/2Q3B1/3PP1b1/2N2N2/PP3PPP/3RKB1R"
+&gt;&gt;&gt; board = renderer.draw(fen)
+&gt;&gt;&gt; board.show()
+&gt;&gt;&gt; board.save("%s.png" % fen.replace('/', '-'))
+
+</pre>
+
+</div>
+
+<p>And here&#8217;s the resulting image (with a CSS double border):
+</p>
+<img style="border-style:double;" src="/images/r2q1rk1-pp2ppbp-1np2np1-2Q3B1-3PP1b1-2N2N2-PP3PPP-3RKB1R.png" alt="Chess position with FEN r2q1rk1/pp2ppbp/1np2np1/2Q3B1/3PP1b1/2N2N2/PP3PPP/3RKB1R"/>
+
+
+<h3><a href="#toc9" name="tocusing-a-font-with-pil" id="tocusing-a-font-with-pil">Using a font with PIL</a></h3>
+<p>There is a problem with the approach taken in the previous section. We only get a good graphic if we save the returned image at its native size: scaling it up or down results in a suboptimal picture. That&#8217;s because the scaling doesn&#8217;t have enough information to go on &#8212; it has to work from a pixel raster when it really needs strokes or vector graphics.
+</p>
+<p>So if we scale the linear dimensions up or down:
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">&gt;&gt;&gt; fen = "r2q1rk1/pp2ppbp/1np2np1/2Q3B1/3PP1b1/2N2N2/PP3PPP/3RKB1R"
+&gt;&gt;&gt; renderer = DrawChessPosition()
+&gt;&gt;&gt; board = renderer.draw(fen)
+&gt;&gt;&gt; board.size
+(360, 360)
+&gt;&gt;&gt; small_board = board.resize((160, 160))
+&gt;&gt;&gt; big_board = board.resize((640, 640))
+&gt;&gt;&gt; big_4_squares = big_board.crop([80, 160, 240, 320])
+&gt;&gt;&gt; big_4_squares.show()
+&gt;&gt;&gt; small_board.show()
+
+</pre>
+
+</div>
+
+<p>we&#8217;ll get something like this:
+</p>
+<p><img src="/images/chess-pos-small.png" alt="Small chess board"/>
+   <img src="/images/chess-pos-big4.png" alt="Section of large chess board"/>
+</p>
+<p>The way to avoid the aliasing problems is to work directly from a stroke representation of the chess pieces; for example, by using a <a href="http://mip.noekeon.org/HTMLTTChess/install.html">suitable font</a>. Once again, PIL can do the job (though you&#8217;ll need to have installed PIL with FreeType support). I found a freely available unicode true type <a href="http://mip.noekeon.org/HTMLTTChess/install.html">font</a> and plugged it into the following code:
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">unichr_pieces=dict(
+    zip("KQRBNPkqrbnp",
+        (unichr(uc) for uc in range(0x2654, 0x2660))))
+    
+def chess_position_using_font(fen, font_file, sq_size):
+    '''Return a chess position image.
+    
+    font_file - the name of a font file
+    sq_size - the size of each square on the chess board
+    '''
+    font = ImageFont.truetype(font_file, sq_size)
+    pieces = expand_fen(fen)
+    board = draw_board(sq_size=(sq_size, sq_size))
+    put_piece = ImageDraw.Draw(board).text
+    def point(i, j):
+        return i * sq_size, j * sq_size
+    def not_blank(pt_pce):
+        return pt_pce[1] != ' '
+    pts = (point(i, j) for j in range(8) for i in range(8))
+    for pt, piece in filter(not_blank, zip(pts, pieces)):
+        put_piece(pt, unichr_pieces[piece], fill='black', font=font)
+    return board
+
+</pre>
+
+</div>
+
+<p>If we use this code to create small and large chess pictures, much as before, we&#8217;ll see something like this:
+</p>
+<p><img src="/images/chess-pos-small-font.png" alt="Small chess board"/>
+   <img src="/images/chess-pos-big4-font.png" alt="Section of large chess board"/>
+</p>
+<p>As with our CSS + Unicode picture, this image isn&#8217;t ideal since the board shows through the interiors of the pieces. And once again, I haven&#8217;t figured out how to work around this problem.
+</p>
+<p><strong>Update, 2008-03-31.</strong> A reader has worked out a <a href="http://www.haloscan.com/comments/wordaligned/drawing_chess_positions/#14496">cunning solution</a>:
+</p>
+<blockquote><p>You can make white pieces by drawing a &#8220;black&#8221; piece in white, then overlaying that with a &#8220;white&#8221; piece in black.
+</p>
+</blockquote><p>I&#8217;ve given this idea a try and <a href="/articles/white-black-knight.html">written up the results</a>. Here&#8217;s the knight at square c3 &#8212; a definite  improvement!
+</p>
+<img src="/images/white-knight-on-black-square.png" alt="White knight on a black square"/>
+
+
+<h3><a href="#toc10" name="toclatex" id="toclatex">LaTeX</a></h3>
+<div class="info">Things I learned while writing this article: the <a href="http://www.ctan.org/tex-archive/fonts/chess/skak/">skak package</a> does chess with LaTeX.</div>
+
+<p>My thanks Ivan Uemlianin for pointing out that I&#8217;d neglected to mention LaTeX as a suitable chess position type-setter, as <a href="http://www.llaisdy.com/blog/2008/04/19/drawing-chess-positions/">shown in his blog</a>. LaTeX has been high on my list of things I really ought to learn about for well over a decade, and I simply wasn&#8217;t aware it could do this.
+</p>
+
+<h3><a href="#toc11" name="tocconclusions" id="tocconclusions">Conclusions</a></h3>
+<p>This article has shown, again, the merits of scripting graphics. We&#8217;ve also seen that <span id="excerpt0"/>an interpreted language has much to offer in this area, allowing us to query and shape images dynamically, effectively bridging the gap between our program and a GUI driven graphics package.
+</p>
+<p>The <a href="http://effbot.org/imagingbook/pil-index.htm">Python Imaging Library</a> has shown itself capable of working with shapes, colours, text and fonts. It&#8217;s a great tool.
+</p>
+<p>We&#8217;ve not done so well at our motivating task, of drawing a chess position. As I said at the outset, if that&#8217;s why you&#8217;re here I&#8217;d suggest taking another look at the alternatives.
+</p>
+<p>The subtext of this article is platform-dependence. I don&#8217;t know if the Unicode + CSS combination works in your browser or feed-reader, or indeed any other user agent; it depends on font contents and CSS rendering. 
+</p>
+<p><a href="http://www.libpng.org/pub/png/"><img style="float:right;" src="http://www.libpng.org/pub/png/img_png/pngnow.png" alt="[PNG now!]"/></a>
+</p>
+<p>The &#8220;P&#8221; in PNG stands for &#8220;Portable&#8221;, and I would hope you can see the IMGs, which all source from PNGs &#8212; all except the off-site JPEG, another well supported format.
+</p>
+<p><a href="http://www.freetype.org/index2.html"><img style="float:right;" src="http://upload.wikimedia.org/wikipedia/en/thumb/3/3a/Freetype.png/160px-Freetype.png" alt="[FreeType now!]"/></a>
+</p>
+<p><span id="excerpt1"/>One reason I like Python and writing about Python is its platform independence. Linux, Windows, OS X etc. &mdash; we can all run the same code. For this particular application, that&#8217;s less true. For a start, you&#8217;ll need to install the non-standard <a href="http://effbot.org/imagingbook/pil-index.htm">PIL</a> module. Then there&#8217;s the filename case-insensitivity (which is easy to work around, but nonetheless an embarrassment). The capabilities of PIL itself depend on the presence of other thirdparty libraries: to get you going with this article you&#8217;ll need <a href="http://www.libpng.org/pub/png/">libpng</a>, which in turn depends on <a href="http://www.zlib.net/">zlib</a>, and <a href="http://www.freetype.org/index2.html">FreeType</a>, which again depends on zlib. On my Linux machine <a href="http://effbot.org/imagingbook/image.htm#tag-Image.Image.show">Image.show</a> didn&#8217;t work until I&#8217;d installed <a href="http://www.trilon.com/xv/">xv</a> from source, and that source needed some tweaking before it would build. So the code in this article is only portable once you&#8217;ve suitably prepared your platform &#8212; that is, the code isn&#8217;t really portable!
+</p>
+</div>
+
+<div class="comments"><hr/><div id="disqus_thread"></div><script type="text/javascript" src="http://disqus.com/forums/wordaligned/embed.js"></script></div>
+      
+<div id="comments"><script type="text/javascript">
+//<![CDATA[
+(function() {
+    var links = document.getElementsByTagName('a');
+    var query = '?';
+    for(var i = 0; i < links.length; i++) {
+        if(links[i].href.indexOf('#disqus_thread') >= 0) {
+            query += 'url' + i + '=' + encodeURIComponent(links[i].href) + '&amp;';
+        }
+    }
+    document.write('<script type="text/javascript" src="http://disqus.com/forums/wordaligned/get_num_replies.js' + query + '"></' + 'script>');
+})();
+//]]>
+</script></div>
+
+    </div>
+    <div id="sidebar">
+      <div class="sidebar-node">
+<h3>Excerpts</h3>
+<p><a href="#excerpt0">An interpreted language has much to offer in this area, allowing us to query and shape images dynamically</a></p>
+<p><a href="#excerpt1">One reason I like Python and writing about Python is its platform independence. Linux, Windows, OS X etc. &mdash; we can all run the same code. For this particular application, that's less true.</a></p>
+
+</div>
+
+<div class="sidebar-node">
+<h3>Tagged</h3>
+<ul id="categories"><li><a href="/tag/python" rel="tag">Python</a></li>
+<li><a href="/tag/graphics" rel="tag">Graphics</a></li>
+<li><a href="/tag/chess" rel="tag">Chess</a></li>
+<li><a href="/tag/pil" rel="tag">PIL</a></li>
+<li><a href="/tag/characters" rel="tag">Characters</a></li></ul>
+
+</div>
+
+<div class="sidebar-node">
+<h3>Chain</h3>
+<ul>
+<li><a accesskey="n" href="/articles/white-black-knight.html" title="Next article">&laquo; White black knight then black white knight</a></li>
+<li><a accesskey="p" href="/articles/ima-lumberjack-s-hes-ok.html" title="Previous article">&raquo; Ima Lumberjack, (s)he&#8217;s OK</a></li>
+</ul>
+
+
+</div>
+
+<div class="sidebar-node">
+<h3>Feeds</h3>
+
+<ul>
+<li><a href="http://feeds.wordaligned.org/wordaligned"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Articles</a></li>
+<li><a href="http://feeds.wordaligned.org/wordaligned/comments"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Comments</a></li>
+</ul>
+
+
+</div>
+
+    </div>
+  </div>
+  <div id="footer">
+<hr />
+<p><a href="http://tag.wordaligned.org">Thomas Guest</a></p>
+</div>
+
+</div>
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-3373724-1']);
+  _gaq.push(['_trackPageview']);
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ga);
+  })();
+</script>
+</body>
+
+</html>

@@ -1,0 +1,188 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<link rel="icon" href="/images/favicon.png" type="image/png"/>
+<link href="/styles/application.css" media="all" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="/scripts/prettify.js"></script>
+<script type="text/javascript" src="/scripts/lang-lisp.js"></script>
+<script type="text/javascript" src="http://www.haloscan.com/load/wordaligned"></script>
+
+<title>Paralipsis</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="author" content="Thomas Guest" />
+<meta name="description" content="A Word Aligned article posted 2007-09-25, tagged Python, ACCU." />
+<meta name="keywords" content="Python, ACCU" />
+<link rel="alternate" type="application/rss+xml" title="Feed" href="http://feeds.wordaligned.org/wordaligned" />
+</head>
+
+<body onload="prettyPrint()">
+<div id="container">
+  <div id="header">
+<h1><span><a accesskey="h" href="/">Word Aligned</a></span></h1>
+<h2>space sensitive programming</h2>
+<a class="button" href="http://feeds.wordaligned.org/wordaligned" title="Subscribe to Word Aligned"><img style="float: right;" src="/images/feed.png" alt="Feed Logo" height="28" width="28"/></a>
+</div>
+
+  <div id="page">
+    <div id="content">
+      <div class="atomentry" id="paralipsis.html">
+<h2 class="title"><a href="/articles/paralipsis.html">Paralipsis</a></h2>
+<p class="meta"><abbr class="published" title="2007-09-25">2007-09-25</abbr> &bull; <a href="/tag/python" rel="tag">Python</a>, <a href="/tag/accu" rel="tag">ACCU</a> &bull; <a href="/articles/paralipsis.html#disqus_thread">Comments</a></p>
+<p>Reading between the lines, Python has a complex and lengthy relationship with functional programming. A couple of years ago Guido van Rossum <a href="http://www.artima.com/weblogs/viewpost.jsp?thread=98196">wrote</a>:
+</p>
+<blockquote><p>About 12 years ago, Python acquired lambda, reduce(), filter() and map(), courtesy of (I believe) a Lisp hacker who missed them and submitted working patches. But, despite of the PR value, I think these features should be cut from Python 3000.
+</p>
+</blockquote><span id="continue-reading"/>
+
+<p>The argument against <code>map</code> and <code>filter</code> is that list comprehensions serve the
+   same need; and similarly, local functions render <code>lambda</code> inessential. Python
+   prefers there to be a single obvious way to do things. As it happens, <a href="http://mail.python.org/pipermail/python-dev/2006-February/060415.html">lambda
+will persist</a> &#8212; and since Python lambdas are limited to single
+   expressions, they&#8217;re quite hard to abuse. <code>Map</code> and <code>filter</code> <em>are</em> out, sort
+   of. In a subtle but inspired move they&#8217;re being over-written by their lazier
+   counterparts from the <code>itertools</code> module, <code>imap</code> and <code>ifilter</code>. So in Python
+   3000 list comprehensions are <em>the</em> way to create lists from lists (and
+   iterables, of course); and <code>map</code> and <code>filter</code> are two of the most important
+   iterator adaptors/stream processors. All things considered, Pythonic support for
+   <a href="http://docs.python.org/dev/howto/functional.html">functional programming</a> is definitely on the up.
+</p>
+<p><code>Reduce</code> really is to depart from the language core, though I guess homesick
+   Lisp hackers will be able to find it kicking its heels somewhere in
+   <a href="http://docs.python.org/lib/module-functools.html">functools</a>. The primary argument against <code>reduce</code> seems to be that
+   it&#8217;s been abused by naughty programmers to create unreadable and inefficient
+   code.
+</p>
+<p>If I discover my children using their toys inappropriately &#8212; for hitting each other, destroying furniture, blocking plumbing, etc. &#8212; then the toys are confiscated (after fair warning, and temporarily; I&#8217;m a pretty soft dictator). Once removed, these toys become highly desirable; once returned, less so.
+</p>
+<p>I don&#8217;t use <code>reduce</code> much (as the <a href="http://www.artima.com/weblogs/viewpost.jsp?thread=98196">article</a> goes on to point out, efficient container operations such as <code>sum</code>, <code>string.join</code>, <code>max</code>, <code>min</code>, and more recent additions to the language like <code>any</code> and <code>all</code> eliminate any common needs for it), or at least I didn&#8217;t. <span id="excerpt0"/>Now though, despite &ndash; maybe <em>because of</em> &ndash; its imminent demise, <code>reduce</code> refuses to be ignored. Here are some of its greatest hits, all of which I&#8217;ve found useful recently.
+</p>
+<div class="typocode"><div class="codetitle">Reduce&#8217;s greatest hits</div>
+
+<pre class="prettyprint">def unite(sets):
+    return reduce(set.union, sets, set())
+
+def intersect(sets):
+    return reduce(set.intersection, sets) if sets else set()
+
+def bits_to_integer(bits):
+    return reduce(lambda acc, bit: acc &lt;&lt; 1 | bit, bits, 0)
+
+def concatenate(items, initial):
+    from operator import concat
+    return reduce(concat, items, initial)
+
+def product(items):
+    from operator import mul
+    return reduce(mul, items, 1)
+
+</pre>
+
+</div>
+
+<p>Maybe we&#8217;ll see a few of these absorbed into the core language (I&#8217;m kind of surprised that <code>set.intersection</code> and <code>set.union</code> aren&#8217;t already flexible enough to accept more general inputs).
+</p>
+<p>In case it looks as I&#8217;m making a case for keeping <code>reduce</code> as a built-in, here&#8217;s a chunk of hideously inefficient and dys-functional code which demonstrates why I deserve to have it taken away from me.
+</p>
+<div class="typocode"><div class="codetitle">Mixing metaphors midstream</div>
+
+<pre class="prettyprint">from operator import add, mul, div
+from itertools import *
+from functools import partial
+
+accu = lambda terms: reduce(add, terms, 0)
+prod = lambda terms: reduce(mul, terms, 1)
+flip = partial(div, 1.0)
+
+def fact(n):
+    return prod(islice(count(), 2, n + 1))
+
+def sum_n(terms, n):
+    return accu(islice(terms, n))
+
+def e():
+    def terms():
+        return imap(flip, imap(fact, count()))
+    return imap(lambda n: sum_n(terms(), n), count())
+
+</pre>
+
+</div>
+
+<p>For what it&#8217;s worth, (the current version of) <a href="http://svn.python.org/view/sandbox/trunk/2to3/">2to3</a> leaves this code unchanged.
+</p>
+</div>
+
+<div class="comments"><hr/><div id="disqus_thread"></div><script type="text/javascript" src="http://disqus.com/forums/wordaligned/embed.js"></script></div>
+      
+<div id="comments"><script type="text/javascript">
+//<![CDATA[
+(function() {
+    var links = document.getElementsByTagName('a');
+    var query = '?';
+    for(var i = 0; i < links.length; i++) {
+        if(links[i].href.indexOf('#disqus_thread') >= 0) {
+            query += 'url' + i + '=' + encodeURIComponent(links[i].href) + '&amp;';
+        }
+    }
+    document.write('<script type="text/javascript" src="http://disqus.com/forums/wordaligned/get_num_replies.js' + query + '"></' + 'script>');
+})();
+//]]>
+</script></div>
+
+    </div>
+    <div id="sidebar">
+      <div class="sidebar-node">
+<h3>Excerpt</h3>
+<p><a href="#excerpt0">Now though, despite &ndash; maybe <em>because of</em> &ndash; its imminent demise, <code>reduce</code> refuses to be ignored.</a></p>
+
+</div>
+
+<div class="sidebar-node">
+<h3>Tagged</h3>
+<ul id="categories"><li><a href="/tag/python" rel="tag">Python</a></li>
+<li><a href="/tag/accu" rel="tag">ACCU</a></li></ul>
+
+</div>
+
+<div class="sidebar-node">
+<h3>Chain</h3>
+<ul>
+<li><a accesskey="n" href="/articles/ongoing-peer-review.html" title="Next article">&laquo; Ongoing Peer Review</a></li>
+<li><a accesskey="p" href="/articles/fixed-wheels-and-simple-designs.html" title="Previous article">&raquo; Fixed Wheels and Simple Designs</a></li>
+</ul>
+
+
+</div>
+
+<div class="sidebar-node">
+<h3>Feeds</h3>
+
+<ul>
+<li><a href="http://feeds.wordaligned.org/wordaligned"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Articles</a></li>
+<li><a href="http://feeds.wordaligned.org/wordaligned/comments"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Comments</a></li>
+</ul>
+
+
+</div>
+
+    </div>
+  </div>
+  <div id="footer">
+<hr />
+<p><a href="http://tag.wordaligned.org">Thomas Guest</a></p>
+</div>
+
+</div>
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-3373724-1']);
+  _gaq.push(['_trackPageview']);
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ga);
+  })();
+</script>
+</body>
+
+</html>

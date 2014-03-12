@@ -1,0 +1,184 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<link rel="icon" href="/images/favicon.png" type="image/png"/>
+<link href="/styles/application.css" media="all" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="/scripts/prettify.js"></script>
+<script type="text/javascript" src="/scripts/lang-lisp.js"></script>
+<title>Two star programming</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="author" content="Thomas Guest" />
+<meta name="description" content="A Word Aligned article posted 2013-01-08, tagged C, Torvalds, Algorithms." />
+<meta name="keywords" content="C, Torvalds, Algorithms" />
+<link rel="alternate" type="application/rss+xml" title="Feed" href="http://feeds.wordaligned.org/wordaligned" />
+</head>
+
+<body onload="prettyPrint()">
+<div id="container">
+  <div id="header">
+<h1><span><a accesskey="h" href="/">Word Aligned</a></span></h1>
+<h2>tales from the code face</h2>
+<a class="button" href="http://feeds.wordaligned.org/wordaligned" title="Subscribe to Word Aligned"><img style="float: right;" src="/images/feed.png" alt="Feed Logo" height="28" width="28"/></a>
+</div>
+
+  <div id="page">
+    <div id="content">
+      <div class="atomentry" id="two-star-programming.html">
+<h2 class="title"><a href="/articles/two-star-programming.html">Two star programming</a></h2>
+<p class="meta"><abbr class="published" title="2013-01-08">2013-01-08</abbr> &bull; <a href="/tag/c" rel="tag">C</a>, <a href="/tag/torvalds" rel="tag">Torvalds</a>, <a href="/tag/algorithms" rel="tag">Algorithms</a> &bull; <a href="/articles/two-star-programming.html#disqus_thread">Comments</a></p>
+<p>A few weeks ago <a href="http://meta.slashdot.org/story/12/10/11/0030249/linus-torvalds-answers-your-questions">Linus Torvalds answered some questions</a> on slashdot. All his responses make good reading but one in particular caught my eye. Asked to describe his favourite kernel hack, Torvalds grumbles he rarely looks at code these days &#8212; unless it&#8217;s to sort out someone else&#8217;s mess. He then pauses to admit he&#8217;s proud of the kernel&#8217;s fiendishly cunning filename lookup cache before continuing to moan about incompetence.
+</p>
+<blockquote><p>At the opposite end of the spectrum, I actually wish more people understood the really core low-level kind of coding. Not big, complex stuff like the lockless name lookup, but simply good use of pointers-to-pointers etc. For example, I&#8217;ve seen too many people who delete a singly-linked list entry by keeping track of the <code>prev</code> entry, and then to delete the entry, doing something like
+</p>
+<pre><code>if (prev)
+    prev-&gt;next = entry-&gt;next;
+else
+    list_head = entry-&gt;next;
+</code></pre><p>and whenever I see code like that, I just go &#8220;This person doesn&#8217;t understand pointers&#8221;. And it&#8217;s sadly quite common.
+</p>
+<p>People who understand pointers just use a &#8220;pointer to the entry pointer&#8221;, and initialize that with the address of the list_head. And then as they traverse the list, they can remove the entry without using any conditionals, by just doing a <code>*pp = entry-&gt;next</code>.
+</p>
+</blockquote><p>Well I <em>thought</em> I understood pointers but, sad to say, if asked to implement a list removal function I too would have kept track of the previous list node. Here&#8217;s a sketch of the code:
+</p>
+<div class="typocode"><div class="codetitle">This person doesn&#8217;t understand pointers</div>
+
+<pre class="prettyprint">typedef struct node
+{
+    struct node * next;
+    ....
+} node;
+
+typedef bool (* remove_fn)(node const * v);
+
+// Remove all nodes from the supplied list for which the 
+// supplied remove function returns true.
+// Returns the new head of the list.
+node * remove_if(node * head, remove_fn rm)
+{
+    for (node * prev = NULL, * curr = head; curr != NULL; )
+    {
+        node * const next = curr-&gt;next;
+        if (rm(curr))
+        {
+            if (prev)
+                prev-&gt;next = next;
+            else
+                head = next;
+            free(curr);
+        }
+        else
+            prev = curr;
+        curr = next;
+    }
+    return head;
+}
+
+</pre>
+
+</div>
+
+<p>The linked list is a simple but perfectly-formed structure built from nothing more than a pointer-per-node and a sentinel value, but the code to modify such lists can be subtle. No wonder linked lists feature in so many <a href="https://www.google.com/search?q=linked+list+interview+questions" title="Search for linked list interview questions">interview questions</a>!
+</p>
+<p>The subtlety in the implementation shown above is the conditional required to handle any nodes removed from the head of the list.
+</p>
+<p>Now let&#8217;s look at the implementation Linus Torvalds had in mind. In this case we pass in a pointer to the list head, and the list traversal and modification is done using a pointer to the next pointers.
+</p>
+<div class="typocode"><div class="codetitle">Two star programming</div>
+
+<pre class="prettyprint">void remove_if(node ** head, remove_fn rm)
+{
+    for (node** curr = head; *curr; )
+    {
+        node * entry = *curr;
+        if (rm(entry))
+        {
+            *curr = entry-&gt;next;
+            free(entry);
+        }
+        else
+            curr = &amp;entry-&gt;next;
+    }
+}
+
+</pre>
+
+</div>
+
+<p>Much better! The key insight is that the links in a linked list are pointers and so <strong>pointers to pointers</strong> are the prime candidates for modifying such a list.
+</p>
+<p style="text-align:center">&sect;</p>
+
+<p>The improved version of <code>remove_if()</code> is an example of two star programming: the doubled-up asterisks indicate two levels of indirection. A <a href="http://c2.com/cgi/wiki?ThreeStarProgrammer">third star</a> would be one too many.
+</p>
+</div>
+
+<div class="comments"><hr/><div id="disqus_thread"></div><script type="text/javascript" src="http://disqus.com/forums/wordaligned/embed.js"></script></div>
+      
+<div id="comments"><script type="text/javascript">
+//<![CDATA[
+(function() {
+    var links = document.getElementsByTagName('a');
+    var query = '?';
+    for(var i = 0; i < links.length; i++) {
+        if(links[i].href.indexOf('#disqus_thread') >= 0) {
+            query += 'url' + i + '=' + encodeURIComponent(links[i].href) + '&amp;';
+        }
+    }
+    document.write('<script type="text/javascript" src="http://disqus.com/forums/wordaligned/get_num_replies.js' + query + '"></' + 'script>');
+})();
+//]]>
+</script></div>
+
+    </div>
+    <div id="sidebar">
+      
+<div class="sidebar-node">
+<h3>Tagged</h3>
+<ul id="categories"><li><a href="/tag/c" rel="tag">C</a></li>
+<li><a href="/tag/torvalds" rel="tag">Torvalds</a></li>
+<li><a href="/tag/algorithms" rel="tag">Algorithms</a></li></ul>
+
+</div>
+
+<div class="sidebar-node">
+<h3>Chain</h3>
+<ul>
+<li><a accesskey="n" href="/articles/pythons-lesser-known-loop-control.html" title="Next article">&laquo; Python&#8217;s lesser known loop control</a></li>
+<li><a accesskey="p" href="/articles/accu-bristol-and-bath.html" title="Previous article">&raquo; ACCU Bristol and Bath</a></li>
+</ul>
+
+
+</div>
+
+<div class="sidebar-node">
+<h3>Feeds</h3>
+
+<ul>
+<li><a href="http://feeds.wordaligned.org/wordaligned"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Articles</a></li>
+<li><a href="http://feeds.wordaligned.org/wordaligned/comments"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Comments</a></li>
+</ul>
+
+
+</div>
+
+    </div>
+  </div>
+  <div id="footer">
+<hr />
+<p><a href="http://tag.wordaligned.org">Thomas Guest</a></p>
+</div>
+
+</div>
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-3373724-1']);
+  _gaq.push(['_trackPageview']);
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ga);
+  })();
+</script>
+</body>
+
+</html>

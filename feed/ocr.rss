@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" >
+<channel>
+<title>Word Aligned</title>
+<link>http://wordaligned.org</link>
+<description>tales from the code face</description>
+<dc:creator>tag@wordaligned.org</dc:creator>
+<language>en-gb</language>
+<item>
+<title>Could OCR conquer the calligraphylion?</title>
+<description>&lt;p&gt;&lt;a href="http://tesseract-ocr.googlecode.com/files/TesseractOSCON.pdf" title="Tesseract presentation (PDF)"&gt;&lt;img src="http://wordaligned.org/images/ocr-outline.png" width="425px" height="135px" alt="OCR outline"/&gt;&lt;/a&gt;
+&lt;/p&gt;
+&lt;p&gt;Optical character recognition (&lt;a href="http://en.wikipedia.org/wiki/Optical_character_recognition" title="Wikipedia on OCR"&gt;OCR&lt;/a&gt;) algorithms typically process an image in stages:
+&lt;/p&gt;
+&lt;ul&gt;
+ &lt;li&gt;
+     convert the image to monochrome
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     identify blocks of text
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     find lines of text within those blocks
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     separate out words, then characters
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     extract character outlines
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     match outlines to archetypes
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     match candidate words to dictionary
+ &lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;a href="http://tesseract-ocr.googlecode.com/files/TesseractOSCON.pdf" title="Tesseract presentation (PDF)"&gt;&lt;img src="http://wordaligned.org/images/ocr-matching.png" width="425px" height="135px" alt="OCR matching"/&gt;&lt;/a&gt;
+&lt;/p&gt;
+&lt;span id="continue-reading"/&gt;
+
+&lt;p&gt;These algorithms can be tuned and trained, to particular fonts and dictionaries for example, and the later stages can feedback into earlier ones; but the strategy basically tackles the picture character by character. This form of OCR is a mature and successful technology. It works very effectively with, for example, a page from a Western newspaper; but as with all things language-related, varying cultural conventions can lead to complications. The fundamental assumption that the atoms of a text image are characters may no longer be true. &lt;a href="http://code.google.com/p/tesseract-ocr"&gt;Tesseract&lt;/a&gt;, the leading open source OCR engine, &lt;a href="http://code.google.com/p/tesseract-ocr/wiki/TrainingTesseract"&gt;comes clean&lt;/a&gt;
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;Tesseract is unlikely to be able to handle connected scripts like Arabic. It will take some specialized algorithms to handle this case, and right now it doesn&amp;#8217;t have them.
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;Mohammad S. M. Khorsheed&amp;#8217;s &lt;a href="http://www.cl.cam.ac.uk/techreports/UCAM-CL-TR-495.html"&gt;Phd dissertation&lt;/a&gt; describes such algorithms, explaining the dimensions of the challenge in more detail:
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;Arabic scripts are inherently cursive: writing isolated characters in &amp;#8216;block letters&amp;#8217; is an unacceptable and unused writing style. The letters are context sensitive. Certain character combinations form new ligature shapes which are often font dependent. Some ligatures involve vertical stacking of characters. Since not all characters connect, word boundary location becomes an interesting problem, as spacing may not only separate words but also certain characters within a word.
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;Here&amp;#8217;s an illustration of Arabic characters taking on different forms, depending on position.
+&lt;/p&gt;
+&lt;img src="http://wordaligned.org/images/arabic-context-sensitive-characters.png" alt="Context sensitive Arabic characters"/&gt;
+
+&lt;p&gt;There are some commercially available specialised Arabic OCR packages but I haven&amp;#8217;t been able to try them out. They don&amp;#8217;t provide information about the algorithms they use. 
+&lt;/p&gt;
+&lt;p&gt;Could OCR software ever conquer the calligraphylion?
+&lt;/p&gt;
+&lt;img width="512px" height="408px" src="http://wordaligned.org/images/calligraphylion.jpg" alt="Calligraphylion"/&gt;
+
+&lt;p&gt;This magical beast demonstrates OCR in reverse: an image which has been converted by hand into text.
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;This image of a lion originates from Lahore, Pakistan and is part of a rich tradition of zoomorphic calligraphy. This practice, developed in the sixteenth century, employs the flexibility and beauty of Arabic script to delineate living forms such as tigers, parrots, ostriches and cockerels. This is done without disobeying religious injunctions that prohibit their direct depiction.
+&lt;/p&gt;
+&lt;p&gt;&amp;#8212; Tate Gallery, East West exhibition, 2006-2007
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;(More &lt;a href="http://images.google.com/images?q=zoomorphic+calligraphy"&gt;zoomorphic calligraphy&lt;/a&gt;.)
+&lt;/p&gt;</description>
+<dc:date>2009-07-14</dc:date>
+<guid>http://wordaligned.org/articles/calligraphylion.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/calligraphylion.html</link>
+<category>OCR</category>
+</item>
+
+<item>
+<title>OCR. Wrong characters, right meaning! (chuckles)</title>
+<description>&lt;img src="http://wordaligned.org/images/chuckles.png" alt="Chuckles graphic"/&gt;
+
+&lt;p&gt;Run this image through the &lt;a href="http://code.google.com/p/tesseract-ocr"&gt;tesseract&lt;/a&gt; OCR engine and it gets the characters wrong but the meaning right.
+&lt;/p&gt;
+&lt;pre&gt;
+$ curl wordaligned.org/images/chuckles.tif &amp;gt; chuckles.tif
+$ &lt;a href="http://code.google.com/p/tesseract-ocr/"&gt;tesseract&lt;/a&gt; chuckles.tif ocr-chuckles &amp;amp;&amp;amp; cat ocr-chuckles.txt
+&lt;strong&gt;[HEHE]&lt;/strong&gt;
+&lt;/pre&gt;
+
+&lt;p&gt;At first I assumed I&amp;#8217;d chanced on an easter egg but now I&amp;#8217;m not so sure. Crop to the region of interest and all is well.
+&lt;/p&gt;
+&lt;img src="http://wordaligned.org/images/chuckles-cropped.png" alt="Cropped chuckles graphic"/&gt;
+
+&lt;pre&gt;
+$ curl wordaligned.org/images/chuckles-cropped.tif &amp;gt; cropped.tif
+$ tesseract cropped.tif ocr-cropped &amp;amp;&amp;amp; cat ocr-cropped.txt
+&lt;strong&gt;(chuckles)&lt;/strong&gt;
+&lt;/pre&gt;
+
+&lt;p&gt;Just in case you were wondering &amp;#8230; the graphic appears in the subtitles of a TV advert featuring &lt;a href="http://www.rolfharris.com/"&gt;Rolf Harris&lt;/a&gt; and the Churchill dog. Rolf is the one who&amp;#8217;s chuckling.
+&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://www.flickr.com/photos/thomasguest/3351332226/" title="Rolf Harris and Churchill by Thomas Guest, on Flickr"&gt;&lt;img src="http://farm4.static.flickr.com/3650/3351332226_4f2cbbba3d_o.jpg" width="540" height="385" alt="Rolf Harris and Churchill" /&gt;&lt;/a&gt;
+&lt;/p&gt;
+&lt;hr /&gt;
+
+&lt;p&gt;This oddity happened using tesseract 2.03 built on OS X, untrained. The grayscale images shown on this page are PNGs, not TIFFs because &amp;#8212; much to my surprise &amp;#8212; browser support for TIFFs is limited. Tesseract only accepts TIFF images, and the file extension has to be .tif.
+&lt;/p&gt;</description>
+<dc:date>2009-03-19</dc:date>
+<guid>http://wordaligned.org/articles/ocr-chuckle.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/ocr-chuckle.html</link>
+<category>OCR</category>
+</item>
+
+</channel>
+</rss>

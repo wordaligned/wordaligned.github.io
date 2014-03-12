@@ -1,0 +1,1699 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" >
+<channel>
+<title>Word Aligned</title>
+<link>http://wordaligned.org</link>
+<description>tales from the code face</description>
+<dc:creator>tag@wordaligned.org</dc:creator>
+<language>en-gb</language>
+<item>
+<title>Driving down the road of innovation</title>
+<description>&lt;p&gt;On the official Google blog David Drummond announces the company is &lt;a href="http://googleblog.blogspot.com/2008/11/ending-our-agreement-with-yahoo.html"&gt;ending its agreement with Yahoo!&lt;/a&gt; Here&amp;#8217;s a snippet (emphasis mine)
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;We&amp;#8217;re of course disappointed that this deal won&amp;#8217;t be moving ahead. But we&amp;#8217;re not going to let the prospect of a lengthy legal battle distract us from our core mission. &lt;strong&gt;That would be like trying to drive down the road of innovation with the parking brake on.&lt;/strong&gt;
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;This has to be the best traffic inspired metaphor since &lt;a href="http://www.google.com/search?q=information+superhighway"&gt;&amp;#8220;information superhighway&amp;#8221;&lt;/a&gt;.
+&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://www.flickr.com/photos/thomasguest/2882208525/" title="Col finish by Thomas Guest, on Flickr"&gt;&lt;img src="http://farm4.static.flickr.com/3067/2882208525_44746c617c.jpg" width="375" height="500" alt="Col finish" /&gt;&lt;/a&gt;
+&lt;/p&gt;
+&lt;p&gt;The analogy holds more generally. I&amp;#8217;d say it pretty much sums up some aspects of  software development, but I&amp;#8217;m more of a cyclist than a car driver. Recently I&amp;#8217;ve been working on one of Google&amp;#8217;s specialisms &amp;#8212; a novel application with a web interface &amp;#8212; and at times it does feel like I&amp;#8217;m cycling up the hill of innovation with a slow puncture. And a couple of broken spokes. Into a head wind.
+&lt;/p&gt;</description>
+<dc:date>2008-11-05</dc:date>
+<guid>http://wordaligned.org/articles/driving-down-the-road-of-innovation.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/driving-down-the-road-of-innovation.html</link>
+<category>Web Applications</category>
+</item>
+
+<item>
+<title>No www, yes comments, no categories</title>
+<description>&lt;p&gt;I &lt;a href="http://wordaligned.org/articles/metablog.html"&gt;mentioned&lt;/a&gt; a while ago that I&amp;#8217;d decided to roll my own website, and I&amp;#8217;m generally pleased with the results. The up-time and response times have been fine, and I&amp;#8217;ve been able to change things easily.
+&lt;/p&gt;
+
+&lt;h4&gt;No www&lt;/h4&gt;
+&lt;p&gt;&lt;a href="http://no-www.org"&gt;&lt;img style="float:right;" src="http://no-www.org/images/type1/class-b.png" alt="No WWW class B png"&gt;&lt;/img&gt;&lt;/a&gt;
+&lt;/p&gt;
+&lt;p&gt;Inspired by this &lt;a href="http://simonwillison.net/2007/Feb/4/urls/"&gt;article&lt;/a&gt;, I&amp;#8217;ve chopped the www from this site&amp;#8217;s address. Wordaligned.org is four characters fewer to type and a whole seven syllables (!) fewer to say than www.wordaligned.org. From now on anyone visiting &lt;a href="http://www.wordaligned.org"&gt;www.wordaligned.org&lt;/a&gt; will be redirected to &lt;a href="http://wordaligned.org"&gt;wordaligned.org&lt;/a&gt;. 
+&lt;/p&gt;
+&lt;pre&gt;
+$ curl -I www.wordaligned.org
+HTTP/1.1 301 Moved Permanently
+Date: Sun, 10 Feb 2008 19:58:15 GMT
+Server: lighttpd | Word Aligned
+Location: http://wordaligned.org/
+&lt;/pre&gt;
+
+&lt;p&gt;(For what it&amp;#8217;s worth, the bare wordaligned.org host name worked fine before the reconfiguration and was the one I generally chose to use myself.)
+&lt;/p&gt;
+&lt;p&gt;The change itself was trivial &amp;#8212; a single string in a configuration file and a simple &lt;a href="http://trac.lighttpd.net/trac/wiki/Docs%3AModRedirect"&gt;lighttpd redirect&lt;/a&gt;. I guess this is an example of &lt;a href="http://wordaligned.org/articles/why-software-development-isnt-like-construction.html"&gt;why I can&amp;#8217;t agree with the analogy&lt;/a&gt; on which Steve McConnell builds his book, &lt;a href="http://www.cc2e.com"&gt;&amp;#8220;Code Complete&amp;#8221;&lt;/a&gt;, that software development is like construction. &lt;span /&gt;Software is soft: there&amp;#8217;s no problem moving a load-bearing wall.
+&lt;/p&gt;
+&lt;p&gt;In fact, the only place the host name appears explicitly is in the site feed, a feed which, thanks to the indirection offered by &lt;a href="http://www.feedburner.com"&gt;Feedburner&lt;/a&gt;, hasn&amp;#8217;t itself moved. Links-to-self in the various pages appearing on this site are all relative. Despite this, I&amp;#8217;ve had to break backwards compatability, to a degree. I can&amp;#8217;t visit Word Aligned bookmarks on del.icio.us and reddit etc. and change them to suit my new preferences; all I can do is leave a suitable chain of redirects. &lt;a href="http://www.w3.org/Provider/Style/URI"&gt;Cool URIs aren&amp;#8217;t supposed to change&lt;/a&gt;, but I reckon the internet can handle some gentle tweaking.
+&lt;/p&gt;
+
+&lt;h4&gt;Yes comments&lt;/h4&gt;
+&lt;p&gt;I&amp;#8217;ve found a way to enable comments. I &lt;a href="http://wordaligned.org/articles/metablog.html"&gt;ran into problems&lt;/a&gt; with the comment system on my old blog and I&amp;#8217;m hoping that outsourcing comments to &lt;a href="http://www.haloscan.com"&gt;Haloscan&lt;/a&gt; will solve these. My life has already been improved thanks to a &lt;a href="http://www.haloscan.com/comments/wordaligned/attack_of_the_alien_asterisks/?src=hsrs#3580"&gt;comment&lt;/a&gt; from James Slaughter pointing me at a &lt;a href="http://www.google.com/search?q=consolas"&gt;decent monospaced font&lt;/a&gt; for Windows. You&amp;#8217;ll need Javascript enabled to enter comments, I think. The feed is at &lt;a href="http://feeds.wordaligned.org/wordaligned/comments"&gt;feeds.wordaligned.org/wordaligned/comments&lt;/a&gt;.
+&lt;/p&gt;
+&lt;p&gt;On the subject of comments, I&amp;#8217;ve finally got round to importing feedback posted to my old site. I do value this feedback &amp;#8212; I&amp;#8217;ve &lt;a href="http://wordaligned.org/articles/keyword-substitution-just-say-no.html#feedback-152"&gt;learned from it&lt;/a&gt; and I&amp;#8217;m sure others have too &amp;#8212; so I apologise for the time it&amp;#8217;s taken me to post it here. I also appreciate feedback I&amp;#8217;ve had by email, and if I haven&amp;#8217;t adjusted articles to take account of your suggestions etc. it&amp;#8217;s probably because the task remains stacked on my todo list.
+&lt;/p&gt;
+
+&lt;h4&gt;No Categories&lt;/h4&gt;
+&lt;p&gt;I&amp;#8217;ve decided to simplify things and remove the distinction between categories and tags; everything&amp;#8217;s a tag here now. When I designed this site (OK, so I stole the design from just about every other blog out there!) I spent a while trying to figure out the distinction between categories and tags. I think I get it &amp;#8212; an article posted in the &amp;#8220;Blub&amp;#8221; category should largely be about &lt;a href="http://www.paulgraham.com/avg.html"&gt;Blub&lt;/a&gt;, whereas an article tagged &amp;#8220;Blub&amp;#8221; just has to mention &lt;a href="http://www.paulgraham.com/avg.html"&gt;Blub&lt;/a&gt; &amp;#8212; I get it but don&amp;#8217;t really find the distinction worth making.
+&lt;/p&gt;
+
+&lt;h4&gt;Problems?&lt;/h4&gt;
+&lt;p&gt;As ever, please &lt;a href="mailto:tag@wordaligned.org"&gt;let me know&lt;/a&gt; if any of this causes problems or isn&amp;#8217;t working properly. I&amp;#8217;d like to know if the site isn&amp;#8217;t loading or rendering properly, and will do my best to sort it out.
+&lt;/p&gt;
+&lt;p&gt;My next challenge for this site is that ultimate in &lt;a href="http://www.oreillynet.com/onlamp/blog/2007/08/constraints_and_software_devel.html"&gt;constrained software development&lt;/a&gt;: designing a &lt;a href="http://en.wikipedia.org/wiki/Favicon"&gt;graphic to fit in 16x16 pixels&lt;/a&gt; which will somehow embody everything this site is about.
+&lt;/p&gt;</description>
+<dc:date>2008-02-10</dc:date>
+<guid>http://wordaligned.org/articles/no-www-yes-comments-no-categories.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/no-www-yes-comments-no-categories.html</link>
+<category>Web Applications</category>
+</item>
+
+<item>
+<title>So many feeds, so little news</title>
+<description>&lt;p&gt;I consume the internet using &lt;a href="http://www.mozilla.com/firefox/"&gt;a web browser&lt;/a&gt; and &lt;a href="http://reader.google.com"&gt;a feed reader&lt;/a&gt;. Here&amp;#8217;s the pseudo-code:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;find www -follow -type feed -print | sort
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+
+&lt;h4&gt;Find&lt;/h4&gt;
+&lt;p&gt;The &lt;code&gt;find&lt;/code&gt; process seeds itself. When I read something I like I follow promising links; and if I &lt;em&gt;do&lt;/em&gt; like what I then find, I click the feed icon in the browser address bar, and my preferences arrange for the feed to be filed by my news reader.
+&lt;/p&gt;
+&lt;img style="float:right;padding:10px;" width="50%" src="http://www.cricketschirping.com/processing/GraphLayout/GraphLayout.png" alt="Part of a graph" /&gt;
+
+&lt;p&gt;So I&amp;#8217;m recursively walking a massive directed graph. The further I explore, the more there is to be explored. I haven&amp;#8217;t yet added the same node twice (I do at least remember where I&amp;#8217;ve been and what I&amp;#8217;ve already added) but it&amp;#8217;s only a matter of time (and now I think about it, I &lt;em&gt;have&lt;/em&gt; added planets which syndicate feeds I&amp;#8217;ve already subscribed to).
+&lt;/p&gt;
+&lt;p&gt;Should I tire of this auto-discovery, my feed reader will happily, and with unnerving accuracy, offer its own recommendations.
+&lt;/p&gt;
+
+&lt;h4&gt;Sort&lt;/h4&gt;
+&lt;p&gt;The subsequent &lt;code&gt;sort&lt;/code&gt; isn&amp;#8217;t too bad. My reader supports various filing and filtering and viewing operations.
+&lt;/p&gt;
+
+&lt;h4&gt;Uniq&lt;/h4&gt;
+&lt;p&gt;What I&amp;#8217;m starting to want, though, is &lt;code&gt;uniq&lt;/code&gt;.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;find www -type feed -follow -print | sort | uniq
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Last week half a dozen feeds I subscribe to reported that &lt;a href="http://www.python.org/news/index.html#Fri07Dec20071020-0800"&gt;Python3.0a2 had been released&lt;/a&gt;; none added much news to that headline. Similarly lots of people told me about the &lt;a href="http://code.google.com/apis/chart/"&gt;google chart API launch&lt;/a&gt; &amp;#8212; though in in this case, some had something &lt;a href="http://www.dougma.com/archives/56"&gt;original&lt;/a&gt; to report. It&amp;#8217;s fuzzy &lt;code&gt;uniq&lt;/code&gt; I need, a filter which kills hollow echoes and keeps thoughtful commentary.
+&lt;/p&gt;
+&lt;p&gt;My feed reader shows me what&amp;#8217;s been updated. It can&amp;#8217;t show me what&amp;#8217;s new.
+&lt;/p&gt;</description>
+<dc:date>2007-12-11</dc:date>
+<guid>http://wordaligned.org/articles/so-many-feeds-so-little-news.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/so-many-feeds-so-little-news.html</link>
+<category>Web Applications</category>
+</item>
+
+<item>
+<title>Paging through the Manual using Access Keys</title>
+<description>&lt;h3&gt;Random Access&lt;/h3&gt;
+&lt;p&gt;These days most reference manuals are designed to be read in a web browser. This has many advantages, especially for random access. Standard search techniques bring up the page you want &amp;#8212; and section-hopping is a snip.
+&lt;/p&gt;
+
+&lt;h3&gt;Sequential Access&lt;/h3&gt;
+&lt;p&gt;Sequential access may be less convenient. Suppose you actually want to &lt;em&gt;read&lt;/em&gt; the manual. Maybe you&amp;#8217;re evaluating a new &lt;a href="http://scons.org"&gt;build technology&lt;/a&gt;, and you&amp;#8217;d like to flick through the manual to get an overview of how it hangs together. Or maybe you&amp;#8217;ve been charged with &lt;a href="http://wordaligned.org/docs/cvs2svn/index.html"&gt;upgrading your company&amp;#8217;s source control system&lt;/a&gt; from CVS, and you need to read the &lt;a href="http://svnbook.red-bean.com/"&gt;Subversion manual&lt;/a&gt; carefully, from start to finish.
+&lt;/p&gt;
+&lt;p&gt;If the manual is well designed this shouldn&amp;#8217;t be hard. Each page will have a prominent &lt;strong&gt;Next&lt;/strong&gt; link; you keep clicking this link to advance through the manual. This does have problems, though. If the link moves or your mouse moves (which, after all, is what mice are meant to do) you waste effort concentrating on pointer placement instead of following what you&amp;#8217;re reading.
+&lt;/p&gt;
+
+&lt;h3&gt;Hot Keys&lt;/h3&gt;
+&lt;p&gt;My feed reader client, &lt;a href="http://reader.google.com"&gt;Google Reader&lt;/a&gt;, is designed to allow you to skim through a mountain of new material sequentially, and you drive it all using the largest key on the keyboard: the spacebar. This apparent simplicity is a product of good interface design and hardcore javascript.
+&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://docbook.org"&gt;DocBook&lt;/a&gt; offers a number of lo-tech solutions to this problem. The first, which shouldn&amp;#8217;t be neglected, is that it&amp;#8217;s possible to convert DocBook sources into something more suited for paging though at leisure &amp;#8212; hard-copy! 
+&lt;/p&gt;
+&lt;p&gt;Restricting ourselves to HTML output, DocBook can generate output as single block of HTML, which you can then page through using the spacebar (or indeed by using the mouse wheel, but there&amp;#8217;s no need for pointer precision). For chunked HTML, DocBook by default places &lt;a href="http://en.wikipedia.org/wiki/Access_keys"&gt;access keys&lt;/a&gt; on each page:
+&lt;/p&gt;
+&lt;ul&gt;
+ &lt;li&gt;
+     &lt;strong&gt;N&lt;/strong&gt; takes you to the next page 
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     &lt;strong&gt;P&lt;/strong&gt; takes you to the previous page 
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     &lt;strong&gt;U&lt;/strong&gt; takes you up a level
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     &lt;strong&gt;H&lt;/strong&gt; takes you to the top-level
+ &lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Once you discover these keys and once you&amp;#8217;ve worked out how exactly to use them on your platform, you&amp;#8217;ll use them more and more.
+&lt;/p&gt;
+&lt;p&gt;&lt;img src="http://wordaligned.org/docs/images/prev.png" alt="Previous" /&gt;
+   &lt;img src="http://wordaligned.org/docs/images/up.png" alt="Up" /&gt;
+   &lt;img src="http://wordaligned.org/docs/images/home.png" alt="Home" /&gt;
+   &lt;img src="http://wordaligned.org/docs/images/next.png" alt="Next" /&gt;
+&lt;/p&gt;
+
+&lt;h3&gt;Paging through Word Aligned using Access Keys&lt;/h3&gt;
+&lt;p&gt;&lt;a href="http://wordaligned.org/"&gt;Word Aligned&lt;/a&gt; is a time-ordered chain of articles which you can page through using access keys.
+&lt;/p&gt;
+&lt;ul&gt;
+ &lt;li&gt;
+     &lt;strong&gt;N&lt;/strong&gt; takes you to the next article (newer)
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     &lt;strong&gt;P&lt;/strong&gt; takes you to the previous article (older)
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     &lt;strong&gt;H&lt;/strong&gt; takes you home
+ &lt;/li&gt;
+&lt;/ul&gt;</description>
+<dc:date>2007-11-19</dc:date>
+<guid>http://wordaligned.org/articles/paging-through-the-manual-using-access-keys.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/paging-through-the-manual-using-access-keys.html</link>
+<category>Web Applications</category>
+</item>
+
+<item>
+<title>Collaborative documentation tools</title>
+<description>&lt;p&gt;Version control is one of the unquestioned foundations of software development: while there may be discussion about which version control system to use, whether or not to allow concurrent modification, how to secure access to the system etc., noone would think of undertaking any serious project without using version control. Quite simply it&amp;#8217;s how a team of people can work on the same codebase at the same time.
+&lt;/p&gt;
+&lt;p&gt;Yet recently I &lt;a href="http://wordaligned.org/articles/a-world-without-version-control.html"&gt;described&lt;/a&gt; a project where version control was not used. Instead, the team relied on ad-hoc file sharing, circulating source files by email and by copying them to a shared folder. Concurrent modifications were prohibited. System integration was left until the last minute. Inevitably the project manager worked through the night to meet the delivery deadline &amp;#8212; a proven technique for bug creation. &lt;span /&gt;What&amp;#8217;s worse, noone on the team really questioned this mode of operation.
+&lt;/p&gt;
+&lt;span id="continue-reading"/&gt;
+
+
+&lt;h3&gt;Why?&lt;/h3&gt;
+&lt;p&gt;Because the final system was a document. Because the source files (the sections of this document, that is) were edited using Microsoft Word. Because the team &amp;#8212; a combination of sales people, business managers and technical experts &amp;#8212; knew no better way of working &lt;sup&gt;&lt;a href="http://wordaligned.org/articles/collaborative-documentation-tools.html#footnote1"&gt;[1]&lt;/a&gt;&lt;/sup&gt;.
+&lt;/p&gt;
+&lt;p&gt;The sad truth is, I don&amp;#8217;t know of any documentation system which could have coped with the requirements of this project. Version control isn&amp;#8217;t the problem. Subversion (for example) is more than up to the job of managing the source files, by which I mean not that it allows secure, networked access to the files, backups, revision control and so on &amp;#8212; that&amp;#8217;s a given; but rather that it comes with user-friendly clients such as &lt;a href="http://tortoisesvn.tigris.org/"&gt;TortoiseSVN&lt;/a&gt;. You don&amp;#8217;t need to be a programmer to use TortoiseSVN.
+&lt;/p&gt;
+
+&lt;h3&gt;LaTeX and DocBook&lt;/h3&gt;
+&lt;p&gt;No, the problem is with the documentation systems themselves. You &lt;em&gt;do&lt;/em&gt; need to be a programmer to work with a system based on &lt;a href="http://www.latex-project.org/"&gt;LaTeX&lt;/a&gt; or on &lt;a href="http://docbook.org"&gt;DocBook&lt;/a&gt; &amp;#8212; or at least to give up Microsoft Word in favour of such a system. Yet the benefits, if you can make the move, &lt;a href="http://wordaligned.org/articles/softdoc.html"&gt;are substantial&lt;/a&gt;: you can assemble documents from separate sections, you can view differences between versions, more than one person can work on the same section at the same time, you can generate various output formats from a single set of sources, branching and merging become possible, as do more sophisticated text transformations, and searching multiple documents becomes a snip.
+&lt;/p&gt;
+
+&lt;h3&gt;Google documents&lt;/h3&gt;
+&lt;p&gt;I recently tried out the Google documents word processor, which I&amp;#8217;d rather assumed I&amp;#8217;d like. It &lt;em&gt;has&lt;/em&gt; got many things right &amp;#8212; document access, for example. You control who can view the document, who can edit the document, and shared access is as simple as an internet connection. Integration with the email client was equally sweet, assuming you use &lt;a href="http://mail.google.com"&gt;gmail&lt;/a&gt; that is. Document versioning and differencing is also in place. Unfortunately I&amp;#8217;d say there&amp;#8217;s still some way to go with the basic document editing, which I found sluggish and clunky.
+&lt;/p&gt;
+&lt;p&gt;I wouldn&amp;#8217;t recommend it, at least not yet, but, like the team I described, I don&amp;#8217;t really know of anything better. Collaborative, networked documentation tools are the way forwards, I suggest; and I think these tools could usefully steal many ideas from successful software development tools. They&amp;#8217;re just not there yet.
+&lt;/p&gt;
+&lt;p&gt;&lt;hr /&gt;
+   &lt;a id="footnote1"&gt;[1]&lt;/a&gt;
+&lt;/p&gt;
+&lt;p&gt;I&amp;#8217;ve experienced worse. At one place I worked software development activities were organised into separate projects. Each project had its own documentation folder on a networked drive; beneath this folder a number of standard subfolders contained design, planning, specification documents and so on. Documents within a project were indexed using a spreadsheet in the top-level folder. A master spreadsheet indexed all the spreadsheets. Each project had a project number. Each document in each project had a document number. There were spreadsheets containing the numbers. Documents included version numbers in their filenames: &lt;code&gt;N237571_tasklist_V37.doc&lt;/code&gt;. To edit a document you had to copy it to its new file name then edit its properties to set the internal version number equal to the internal one, then fill out the document history form. To revert a document, someone had to dig through the backups. Everyone had write access to everything. Concurrent modifications were outlawed. I shudder at the memory.
+&lt;/p&gt;</description>
+<dc:date>2007-08-10</dc:date>
+<guid>http://wordaligned.org/articles/collaborative-documentation-tools.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/collaborative-documentation-tools.html</link>
+<category>Web Applications</category>
+</item>
+
+<item>
+<title>Robot wars</title>
+<description>&lt;p&gt;I recently &lt;a href="http://wordaligned.org/articles/turing-tests-and-train-trackers.html"&gt;described&lt;/a&gt; an encounter with a robot which set me thinking about the Turing Test. These days it&amp;#8217;s not just people who need to distinguish between people and computers. Computers have to too.
+&lt;/p&gt;
+&lt;p&gt;I&amp;#8217;m thinking about all those web forms designed to foil spam-bots: sum these numbers, answer this question, type the letters hidden in this image. The intelligence behind these forms is entirely mechanical, and the odd thing is that most of the tests are the kind of things that robots are capable of doing well; whereas, being colour-blind, it usually takes me a few goes to pass the hidden-text tests. I guess this first line of defence is simply a way to make a site less attractive to spam-bots, in the hopes they&amp;#8217;ll buzz off and annoy another computer.
+&lt;/p&gt;
+&lt;p&gt;It turns out that this spin on the Turing Test is known as a &lt;a href="http://en.wikipedia.org/wiki/Captcha"&gt;CAPTCHA&lt;/a&gt; &amp;#8212; a &lt;em&gt;C&lt;/em&gt;ompletely &lt;em&gt;A&lt;/em&gt;utomated &lt;em&gt;P&lt;/em&gt;ublic &lt;em&gt;T&lt;/em&gt;uring test to tell &lt;em&gt;C&lt;/em&gt;omputers and &lt;em&gt;H&lt;/em&gt;umans &lt;em&gt;A&lt;/em&gt;part. I discovered this in a roundabout way, when I chanced upon an &lt;a href="http://blogoscoped.com/archive/2007-07-05-n38.html"&gt;anti-captcha&lt;/a&gt;. Being human I instantly recognised this as a funny joke. &lt;a href="http://blogoscoped.com/forum/101776.html"&gt;Hah!&lt;/a&gt;
+&lt;/p&gt;</description>
+<dc:date>2007-07-06</dc:date>
+<guid>http://wordaligned.org/articles/robot-wars.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/robot-wars.html</link>
+<category>Web Applications</category>
+</item>
+
+<item>
+<title>Source open, problem closed</title>
+<description>&lt;p&gt;I &lt;a href="http://wordaligned.org/articles/trac-not-just-a-pretty-interface.html"&gt;wrote&lt;/a&gt; a while back about &lt;a href="http://trac.edgewall.org"&gt;trac&lt;/a&gt;. I continued to be impressed by it. Although it was fiddly to install, I notice that this should be improved by the next &lt;a href="http://trac.edgewall.org/wiki/TracDev/ReleaseNotes/0.11"&gt;point release&lt;/a&gt;, which will be packaged in a &lt;a href="http://peak.telecommunity.com/DevCenter/PythonEggs"&gt;python egg&lt;/a&gt;. And although the version we&amp;#8217;re using is only 0.10.2, it&amp;#8217;s proven itself remarkably solid. In fact we haven&amp;#8217;t encountered any bugs. Or at least we hadn&amp;#8217;t until today, when someone discovered that attempting to attach a small file to a wiki page resulted in an application error.
+&lt;/p&gt;
+&lt;span id="continue-reading"/&gt;
+
+&lt;p&gt;Up until today we&amp;#8217;d been attaching pictures which had always worked just fine. Attempting to upload a small text file resulted in the web browser showing a big red error page filled with the following stack trace.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;Traceback (most recent call last):
+  File "/usr/local/lib/python2.5/site-packages/trac/web/main.py", line 387, in dispatch_request
+    dispatcher.dispatch(req)
+  File "/usr/local/lib/python2.5/site-packages/trac/web/main.py", line 238, in dispatch
+    resp = chosen_handler.process_request(req)
+  File "/usr/local/lib/python2.5/site-packages/trac/attachment.py", line 361, in process_request
+    self._do_save(req, attachment)
+  File "/usr/local/lib/python2.5/site-packages/trac/attachment.py", line 449, in _do_save
+    size = upload.file.len
+AttributeError: 'cStringIO.StringO' object has no attribute 'len'
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;&lt;a href="http://trac.edgewall.org"&gt;Trac&lt;/a&gt; is a popular piece of software, and I had to believe someone else would have run into this bug. Sure enough, googling [&lt;code&gt;AttributeError: 'cStringIO.StringO' object has no attribute 'len'&lt;/code&gt;][Q] led me straight to &lt;a href="http://trac.edgewall.org/ticket/4311"&gt;trac ticket #4311&lt;/a&gt;, and the happy news that this particular problem had been fixed. If you look at the ticket, you&amp;#8217;ll notice that it cross-references the actual &lt;a href="http://trac.edgewall.org/changeset/4459"&gt;repository diff&lt;/a&gt; of the changes which fixed the problem &amp;#8212; a simple three line change to a single file in this case, and a nice demonstration of how &lt;a href="http://trac.edgewall.org"&gt;trac&lt;/a&gt; integrates source control, defect tracking and a wiki.
+&lt;/p&gt;
+&lt;p&gt;Since I didn&amp;#8217;t want to upgrade our trac installation just yet I applied the patch directly to &lt;code&gt;/usr/local/lib/python2.5/site-packages/trac/attachment.py&lt;/code&gt; (the file identified in the traceback), and all was well.
+&lt;/p&gt;
+&lt;p&gt;This is of course an every day story from the world of open source software. If you stop and think about it, though, there are several layers of openness.
+&lt;/p&gt;
+&lt;ol&gt;
+ &lt;li&gt;&lt;p&gt;The error message was open and obvious. I didn&amp;#8217;t have to search through a server log. Application developers are usually taught hide tracebacks from end users &amp;#8212; they&amp;#8217;re deemed too frightening.  In this case, though, I didn&amp;#8217;t even have to leave my web browser to diagnose and find a fix to the problem.
+&lt;/p&gt;
+
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;p&gt;Trac opens up its own defect database for public access. As we&amp;#8217;ve seen, this provides a great example of trac in action. &lt;span /&gt;Many closed source projects would regard it as a sign of weakness to publish this kind of information, though I do think (perhaps due to the influence of the open source movement) this attitude is changing.
+&lt;/p&gt;
+
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;p&gt;The source files behind the application were open. All I had to do was tweak one of them using a text editor. No rebuild required.
+&lt;/p&gt;
+
+ &lt;/li&gt;
+&lt;/ol&gt;</description>
+<dc:date>2007-06-27</dc:date>
+<guid>http://wordaligned.org/articles/source-open-problem-closed.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/source-open-problem-closed.html</link>
+<category>Web Applications</category>
+</item>
+
+<item>
+<title>Google Reader</title>
+<description>&lt;p&gt;My google homepage disappeared yesterday. I don&amp;#8217;t know why, but wonder
+   if an &lt;a href="http://wordaligned.org/articles/a-tale-of-two-upgrades.html"&gt;upgrade&lt;/a&gt; was botched since it&amp;#8217;s back again today as if
+   nothing ever happened. During the downtime I investigated &lt;a href="http://www.google.com/reader"&gt;google
+reader&lt;/a&gt;. I like it: just as
+   &lt;a href="http://mail.google.com/mail/"&gt;gmail&lt;/a&gt; re-invents the email client, so
+   google reader re-invents the news reader as a way of finding and
+   organising feeds. So now I&amp;#8217;ve replaced a number of feeds on my google
+   homepage with a single google reader gadget.
+&lt;/p&gt;</description>
+<dc:date>2007-04-27</dc:date>
+<guid>http://wordaligned.org/articles/google-reader.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/google-reader.html</link>
+<category>Web Applications</category>
+</item>
+
+<item>
+<title>A tale of two upgrades</title>
+<description>&lt;p&gt;This week I upgraded my &lt;a href="http://www.google.com/ig"&gt;google personal homepage&lt;/a&gt; and I upgraded
+   some software on my PC &amp;#8212; and the two processes couldn&amp;#8217;t have been
+   more different. This post describes my experience. It goes on to
+   discuss the two different models of supplying and upgrading software
+   from both a user&amp;#8217;s and a software provider&amp;#8217;s perspective.
+&lt;/p&gt;
+&lt;span id="continue-reading"/&gt;
+
+
+&lt;h3&gt;Google homepage upgrade&lt;/h3&gt;
+&lt;p&gt;The &lt;a href="http://www.google.com/ig"&gt;google homepage&lt;/a&gt; upgrade was painless. It just happened when I
+   visited the site. Actually it upgraded me and I&amp;#8217;m probably being
+   upgraded all the time, it&amp;#8217;s just that I don&amp;#8217;t usually notice: this
+   time, they&amp;#8217;d introduced another folding widget
+   &lt;img src="http://www.google.co.uk/ig/images/zippy_minus_sm.gif" alt="Close widget"/&gt;
+   &lt;img src="http://www.google.co.uk/ig/images/zippy_plus_sm.gif" alt="Open widget"/&gt;,
+   allowing me to preview a syndicated article
+   without having to leave the page.
+&lt;/p&gt;
+&lt;p&gt;Incidentally, I don&amp;#8217;t even know what version of google homepage I&amp;#8217;m
+   using.  And I don&amp;#8217;t really care. If it&amp;#8217;s like most google software,
+   it&amp;#8217;s probably labelled as &amp;#8220;beta&amp;#8221; &amp;#8212; despite being rock solid.
+   Whatever version it is, I don&amp;#8217;t have any choice in the matter. I get
+   what they give me.
+&lt;/p&gt;
+
+&lt;h3&gt;PC software upgrade&lt;/h3&gt;
+&lt;p&gt;The PC software upgrade was less straightforward. As soon as I&amp;#8217;d
+   booted up my PC, a host of upgrade agents started distracting me
+   &amp;#8212; it wasn&amp;#8217;t really how I wanted to start my working day, but I&amp;#8217;ve
+   learned that if you try and click away these agents, they&amp;#8217;ll only come
+   back and trouble you later at a similarly inconvenient time. The only
+   way to silence them is to obey. Here&amp;#8217;s what the first friendly
+   instruction dialog advised:
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;This update is for MacBook computers with Intel processors only.
+&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Note: Print or write down these instructions before you begin the update.&lt;/strong&gt;
+&lt;/p&gt;
+&lt;p&gt;To update the firmware on your Intel-based MacBook:
+&lt;/p&gt;
+&lt;ol&gt;
+ &lt;li&gt;&lt;p&gt;Quit all other open applications.
+&lt;/p&gt;
+
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;p&gt;Click Shut Down in the MacBook EFI Firmware Update window and wait for your computer to shut down.
+&lt;/p&gt;
+
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;p&gt;Press and hold the power button on your MacBook until the power indicator light flashes repeatedly to begin the update.
+&lt;/p&gt;
+
+ &lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;   A status bar indicates the progress of the update.
+      &lt;strong&gt;Important: Do not interrupt the update.&lt;/strong&gt;
+      Your computer restarts automatically when the update is completed and opens the MacBook EFI Firmware Update.
+&lt;/p&gt;
+&lt;ol&gt;
+ &lt;li&gt;
+     Click OK, if the firmware is now up-to-date.
+ &lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;If these instructions appear on your screen again, the firmware update
+   was not successful. Repeat steps 2, 3 and 4.
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;These are simple enough instructions, but they certainly didn&amp;#8217;t make
+   me feel comfortable. They carry a strong hint that something might go
+   wrong:
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;There&amp;#8217;s only one thing for it. You&amp;#8217;ll need to send your computer
+   into a coma then prod it until it revives. It&amp;#8217;s risky but it&amp;#8217;s the
+   only way.
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;Consider the poor user who doesn&amp;#8217;t know what processor they&amp;#8217;re
+   running, or what a processor is, or what firmware means?  The
+   instructions didn&amp;#8217;t pop up in a document with a print button, so even
+   obeying the first note about printing them out needed thought &amp;#8212;
+   fortunately I had access to another PC so I just emailled them to
+   myself.
+&lt;/p&gt;
+&lt;p&gt;Once I&amp;#8217;d upgraded the firmware &amp;#8212; phew!, it worked &amp;#8212; I dealt with the
+   other software upgrades. They too required me to restart my PC. They
+   weren&amp;#8217;t for software I use much.
+&lt;/p&gt;
+&lt;p&gt;If it looks like I&amp;#8217;m quickly taking back everything
+   &lt;a href="http://wordaligned.org/articles/happy-mac.html"&gt;I said about Macs&lt;/a&gt;
+   a couple of weeks back, I&amp;#8217;m not. Upgrade agents on a Windows PC
+   are even more annoying; but what&amp;#8217;s far worse is protecting yourself
+   against unwanted software &amp;#8220;upgrades&amp;#8221; (viruses, spyware, etc.). And the
+   variety of different package management systems on various Linux
+   distributions indicates that they too haven&amp;#8217;t solved the problem,
+   though at least the user typically pulls the upgrade rather than have
+   the computer push it at them.
+&lt;/p&gt;
+
+&lt;h4&gt;Conclusions: User&amp;#8217;s Perspective&lt;/h4&gt;
+&lt;p&gt;It&amp;#8217;s a little glib to suggest that providing software as a service,
+   rather than as a desktop application, solves the upgrade problem.  For
+   a start, not all software is suited to being run remotely &amp;#8212; though as
+   bandwidths increase and browser capabilities improve, more and more
+   will fall into this category.
+&lt;/p&gt;
+&lt;p&gt;From a user&amp;#8217;s point of view, as I&amp;#8217;ve already pointed out, using a
+   remotely hosted software service may seem like a loss of control: What&amp;#8217;s to
+   stop google reading my emails?  What guarantees they won&amp;#8217;t
+   carelessly delete my calendar appointments?  Will they suddenly
+   revoke a service I&amp;#8217;ve come depend on? Or will they simply auto-upgrade
+   me to a version I don&amp;#8217;t like?
+&lt;/p&gt;
+&lt;p&gt;&lt;span /&gt;When we think more carefully, though, we realise these fears are
+   misplaced and often apply equally to desktop software. A poor quality
+   desktop application can shred your data, and you&amp;#8217;re also vulnerable to
+   hardware failures, viruses and burglars. I&amp;#8217;m willing to bet google&amp;#8217;s
+   backup regime is more rigorous than most domestic ones. Regarding
+   upgrades: you often get trapped in an upgrade dependency cycle on a PC
+   &amp;#8212; this package depends on that package, which requires the latest
+   version of another package, and you suddenly find you&amp;#8217;re running
+   bleeding edge software when all you wanted was a bugfix to something
+   which basically worked. And in an age when most computers are
+   permanently hooked to the internet, even the privacy argument weakens.
+&lt;/p&gt;
+
+&lt;h4&gt;Conclusions: Provider&amp;#8217;s Perspective&lt;/h4&gt;
+&lt;p&gt;Things are tough for the software provider too. If you decide to host
+   your software as a web-based service, there are &lt;a href="http://www.paulgraham.com/road.html"&gt;advantages&lt;/a&gt;:
+&lt;/p&gt;
+&lt;ul&gt;
+ &lt;li&gt;
+     you retain full control over the version of software you deploy (and which, therefore, your users use)
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     you&amp;#8217;re directly connected to your customers; you can monitor use patterns and improve your application accordingly
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     you don&amp;#8217;t need to port to a platform you don&amp;#8217;t like
+ &lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;With these advantages come responsibilities. You control your users&amp;#8217;
+   data, and it&amp;#8217;s your responsibility to make sure it&amp;#8217;s secure and that
+   their privacy is protected. You&amp;#8217;d better be capable of hosting the
+   service, 24 hours a day, 7 days a week, 52 weeks a year; and you&amp;#8217;ll
+   need to be capable of scaling up if necessary &amp;#8212; you can&amp;#8217;t increase
+   your user-base by printing more CDs.
+&lt;/p&gt;
+&lt;p&gt;If, instead, you decide to deliver a desktop application, you need to
+   worry about which platforms you&amp;#8217;ll support. Saying you support
+   Windows, for example, isn&amp;#8217;t really good enough &amp;#8212; you need to consider
+   the various permutations of versions and service packs, and how you&amp;#8217;ll
+   test them, and how long you&amp;#8217;ll go on supporting them. And you have to
+   think about how customers can upgrade between versions of your
+   software &amp;#8212; a problem which I&amp;#8217;ll discuss in another post.
+&lt;/p&gt;</description>
+<dc:date>2007-01-27</dc:date>
+<guid>http://wordaligned.org/articles/a-tale-of-two-upgrades.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/a-tale-of-two-upgrades.html</link>
+<category>Web Applications</category>
+</item>
+
+<item>
+<title>fold left, right</title>
+<description>&lt;p&gt;A couple of pleasant ways for functional programmers to click to oblivion:
+   1. &lt;a href="http://foldl.com"&gt;http://foldl.com&lt;/a&gt;
+   2. &lt;a href="http://foldr.com"&gt;http://foldr.com&lt;/a&gt;
+&lt;/p&gt;</description>
+<dc:date>2007-01-06</dc:date>
+<guid>http://wordaligned.org/articles/fold-left-right.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/fold-left-right.html</link>
+<category>Web Applications</category>
+</item>
+
+<item>
+<title>Trac &#8212; not just a pretty interface</title>
+<description>&lt;p&gt;I&amp;#8217;ve been using &lt;a href="http://trac.edgewall.org"&gt;trac&lt;/a&gt; for a project at work recently, and it really
+   does seem to be every bit as good as it looks.
+&lt;/p&gt;
+&lt;span id="continue-reading"/&gt;
+
+
+&lt;h3&gt;Tools you can trust&lt;/h3&gt;
+&lt;p&gt;I&amp;#8217;ve noted before how important it is to like the tools you use &lt;a href="http://wordaligned.org/articles/google-mail-holiday-auto-responder.html"&gt;every day&lt;/a&gt;.
+   Until now, most project management tools left me cold: the
+   bug-trackers that provide clunky and restrictive front-ends to a
+   database, the meeting schedulers that only run on Windows XP, the
+   &lt;span /&gt;project planning tools that are so expensive only higher management
+   can afford them, and so sophisticated noone can get them to do what
+   they want.
+&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://trac.edgewall.org"&gt;Trac&lt;/a&gt;, though, is different. As you can see, the trac project team
+   eat their own dog food &amp;#8212; the trac home page &lt;em&gt;is&lt;/em&gt; a trac project &amp;#8212; which
+   as always is a good sign.
+&lt;/p&gt;
+&lt;p&gt;Trac is a pleasure to use.
+&lt;/p&gt;
+
+&lt;h3&gt;Killer Features&lt;/h3&gt;
+&lt;p&gt;&lt;a href="http://trac.edgewall.org"&gt;Trac&lt;/a&gt; grabbed my attention because it looks so good, and I suppose that
+   remains one of its killer features.
+&lt;/p&gt;
+&lt;p&gt;Actually using it, though, what I really like is the way the tools
+   integrate with the &lt;a href="http://subversion.tigris.org"&gt;version control system&lt;/a&gt;. Want to &lt;a href="http://trac.edgewall.org/wiki/TracLinks"&gt;link&lt;/a&gt; from a wiki
+   page to a repository URL? No problem. Want to &lt;a href="http://trac.edgewall.org/wiki/TracLinks"&gt;link&lt;/a&gt; to a changeset
+   associated with a repository revision? Easy peasy. Want a page which
+   displays the difference between any two repository revisions? Yep, it
+   can do that too.
+&lt;/p&gt;
+&lt;p&gt;Browse the &lt;a href="http://trac.edgewall.org/timeline"&gt;trac project&amp;#8217;s own timeline&lt;/a&gt;
+   to see some of these features in action.
+&lt;/p&gt;
+
+&lt;h3&gt;Downsides&lt;/h3&gt;
+&lt;p&gt;There are downsides.
+&lt;/p&gt;
+&lt;ol&gt;
+ &lt;li&gt;
+     &lt;a href="http://trac.edgewall.org"&gt;trac&lt;/a&gt; was fiddly to install. I needed to get hold of
+&lt;a href="http://www.swig.org"&gt;SWIG&lt;/a&gt;, then build the python/subversion
+bindings, then choose a database, then install the relevant python
+database bindings, then clearsilver, then &amp;#8230; well, you get the
+picture.
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     trac is only at version &lt;a href="http://www.edgewall.org/blog/news/trac_0_10_2.html"&gt;0.10.2&lt;/a&gt;.
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     trac tries to do everything. It&amp;#8217;s the source browser which thinks
+     it&amp;#8217;s a wiki which thinks it&amp;#8217;s a bug-tracker which thinks it&amp;#8217;s a project
+     planner.
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     the only version control system trac works with is &lt;a href="http://subversion.tigris.org"&gt;Subversion&lt;/a&gt;.
+ &lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;To answer these points in turn.
+&lt;/p&gt;
+&lt;ol&gt;
+ &lt;li&gt;
+     Yes, that is a concern. The lack of a one-click installer may put
+     off some users. Trac does not stand alone: it builds on proven
+     technologies &amp;#8212; &lt;a href="http://python.org"&gt;Python&lt;/a&gt;, relational databases, web servers.
+Besides, you probably &lt;em&gt;can&lt;/em&gt; just grab a trac package for certain Linux
+distributions.
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     I haven&amp;#8217;t seen any problems (yet). As a product, it feels stable and well-tuned.
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     You don&amp;#8217;t need to use all of trac&amp;#8217;s features. As a Subversion
+     repository browser alone it pays its way. As a repository browser combined
+     with a wiki, it&amp;#8217;s peerless.
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     You can make this an upside by upgrading to &lt;a href="http://subversion.tigris.org"&gt;Subversion&lt;/a&gt;!
+ &lt;/li&gt;
+&lt;/ol&gt;</description>
+<dc:date>2006-12-20</dc:date>
+<guid>http://wordaligned.org/articles/trac-not-just-a-pretty-interface.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/trac-not-just-a-pretty-interface.html</link>
+<category>Web Applications</category>
+</item>
+
+<item>
+<title>1, 6, 21, 107, &#8230; ?</title>
+<description>&lt;p&gt;Apparently, this is the &lt;a href="http://www.research.att.com/~njas/sequences/A060843"&gt;busy beaver
+sequence&lt;/a&gt;,
+   described in the fabulous &lt;a href="http://www.research.att.com/~njas/sequences/Seis.html"&gt;On-Line Encyclopedia of Integer
+Sequences&lt;/a&gt; as:
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;The maximal number of steps that an n-state &lt;a href="http://en.wikipedia.org/wiki/Turing_machine"&gt;Turing machine&lt;/a&gt; can make
+   on an initially blank tape before eventually halting.
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;You can even
+   &lt;a href="http://www.research.att.com/~njas/sequences/play?want=A060843&amp;amp;auto=y"&gt;&lt;em&gt;listen&lt;/em&gt;&lt;/a&gt;
+   to this sequence if you&amp;#8217;re prepared to allow pop-ups and plugins.
+&lt;/p&gt;</description>
+<dc:date>2006-12-17</dc:date>
+<guid>http://wordaligned.org/articles/1-6-21-107.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/1-6-21-107.html</link>
+<category>Web Applications</category>
+</item>
+
+<item>
+<title>Synchronising Workspaces</title>
+<description>&lt;p&gt;Here&amp;#8217;s an interesting &lt;a href="http://www.martinfowler.com/bliki/MultipleDesktops.html"&gt;note&lt;/a&gt; from &lt;a href="http://www.martinfowler.com"&gt;Martin Fowler&lt;/a&gt;, in which he
+   describes his use of version control to keep his workspace
+   synchronised between different machines. It chimes with something I
+   wrote a couple of months back about &lt;a href="http://wordaligned.org/articles/personal-version-control.html"&gt;personal version
+control&lt;/a&gt;. Some of what he says makes me think: 
+&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;In an ideal world, wouldn&amp;#8217;t it be better if his machine were a client, and his workspace on a server?&lt;/em&gt; 
+&lt;/p&gt;
+&lt;p&gt;This idea is nothing new, and some people
+   have heard it so many times before that they no longer believe it. I
+   think it&amp;#8217;s happening right now &amp;#8212; it&amp;#8217;s just more of an evolution than
+   a revolution.
+&lt;/p&gt;</description>
+<dc:date>2006-12-14</dc:date>
+<guid>http://wordaligned.org/articles/synchronising-workspaces.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/synchronising-workspaces.html</link>
+<category>Web Applications</category>
+</item>
+
+<item>
+<title>Permission and Forgiveness</title>
+<description>&lt;p&gt;I needed to check the times for trains from Bristol to London, so
+   I went to &lt;a href="http://thetrainline.com"&gt;http://thetrainline.com&lt;/a&gt; and
+   filled out the &lt;strong&gt;Quick Timetable&lt;/strong&gt; form, entering &lt;strong&gt;bristol temple meads&lt;/strong&gt;
+   and &lt;strong&gt;paddington&lt;/strong&gt; as my departure and destination points.
+&lt;/p&gt;
+&lt;span id="continue-reading"/&gt;
+
+
+&lt;h3&gt;Which Paddington?&lt;/h3&gt;
+&lt;p&gt;As you can see, I stick to lowercase when I&amp;#8217;m in a hurry &amp;#8212; but I
+   did remember to specify which of the Bristol mainline stations I
+   intended to leave from, knowing from previous experience that the
+   Quick Timetable wouldn&amp;#8217;t be smart enough to simultaneously provide
+   answers for both.
+&lt;/p&gt;
+&lt;p&gt;Unfortunately the trainline software couldn&amp;#8217;t figure out which
+   Paddington I wanted to travel to. What&amp;#8217;s worse, it tried to cover up
+   its confusion with a plethora of information and options. Sure, a
+   single click on the LONDON PADDINGTON link was all I needed to do,
+   but that link was buried half-way down the page, after a text entry field and
+   26 alphabetic selection links.
+&lt;/p&gt;
+&lt;img src="http://wordaligned.org/files/thetrainline.png" width="100%" alt="The trainline station finder"/&gt;
+
+&lt;p&gt;As you can see, &lt;a href="http://thetrainline.com"&gt;the trainline&lt;/a&gt; uses uppercase for stations, which isn&amp;#8217;t
+   reader-friendly.
+&lt;/p&gt;
+&lt;p&gt;London Paddington has to be the best known station in the
+   country. It&amp;#8217;s also the only mainline Paddington station. It&amp;#8217;s also in
+   exactly the same place as Paddington Underground. Couldn&amp;#8217;t the
+   Trainline have made a wild guess that when I said Paddington I meant
+   &lt;strong&gt;LONDON PADDINGTON&lt;/strong&gt;?
+&lt;/p&gt;
+&lt;p&gt;By this stage, I was curious to find out what would happen if I asked
+   for train times from Bristol Temple Meads to Paddington Underground. I
+   got a page full of unhelpful apologies, starting with:
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;&lt;strong&gt;We cannot find any services that meet your request.&lt;/strong&gt;
+   Possible reasons and solutions are listed below. You can try and search for another journey by clicking on the back button:
+&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h3&gt;State of the Art&lt;/h3&gt;
+&lt;p&gt;The trainline isn&amp;#8217;t an egregious website. As you can see, I
+   prefer it to &lt;a href="http://www.nationalrail.co.uk/"&gt;National Rail Enquiries&lt;/a&gt;
+   for timetable queries. But that&amp;#8217;s no excuse.  The
+   trainline should have figured out which Paddington I meant without
+   needing my permission to do so and begged my forgiveness if it
+   misinterpreted me.
+&lt;/p&gt;
+&lt;p&gt;In the same way a &lt;a href="http://mail.google.com"&gt;good email client&lt;/a&gt; should go ahead and delete an
+   email when I ask it to, rather than present an irritating confirmation
+   dialogue asking if I really am really sure I really want to really
+   delete it. I end up OK&amp;#8217;ing such a confirmation dialogue
+   on auto-pilot, meaning that the one time it might save me, it
+   doesn&amp;#8217;t. A good email client just deletes the message without
+   further permission and provides a way for me to recover it if
+   necessary.
+&lt;/p&gt;
+&lt;p&gt;It&amp;#8217;s sometimes worth reminding ourselves that computers are here to serve
+   us. &lt;span /&gt;As programmers, perhaps we&amp;#8217;re rather too used to wrestling them into
+   submission &amp;ndash; perhaps we sometimes secretly &lt;em&gt;enjoy&lt;/em&gt; it &amp;ndash; and
+   as a consequence we expect other users to tolerate such impudence.
+&lt;/p&gt;
+&lt;p&gt;Being a programmer, of course I managed to get the train times. I then
+   found myself thinking about a common &lt;a href="http://www.google.com/search?q=Python+EAFP"&gt;Python idiom&lt;/a&gt; for handling tricky
+   inputs gracefully.
+&lt;/p&gt;
+
+&lt;h3&gt;Permission and Forgiveness&lt;/h3&gt;
+&lt;p&gt;Code written in a statically typed language &amp;#8212; even if that language
+   supports exceptions &amp;#8212; often gets swamped by error handling
+   code. There are more ways for things to go wrong than right, and they
+   all need handling.
+&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://python.org"&gt;Python&lt;/a&gt; is a dynamic language. Doesn&amp;#8217;t that mean that there are even
+   more ways to go wrong? After all, the compiler isn&amp;#8217;t going to check
+   that we pass a nice string into the following integer conversion
+   function.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;bad number converter&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;def string_to_int(number_string):
+    from string import digits
+    char_to_digit = dict(zip(digits, range(10)))
+    number = 0
+    for ch in number_string:
+        number *= 10
+        number += char_to_digit[ch]
+    return number
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;This function is woefully under-specified and guaranteed to misfire in
+   the face of poor input, but with a little more thought it can go
+   &lt;em&gt;right&lt;/em&gt; in situations which it wasn&amp;#8217;t originally coded for. Here&amp;#8217;s an
+   improved version:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;better number converter&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;def thing_to_int(thing, default=0):
+    """ Converts the input thing into an integer, returning a
+    default value if the conversion fails.
+
+&amp;gt;&amp;gt;&amp;gt; thing_to_int("10")
+    10
+    &amp;gt;&amp;gt;&amp;gt; assert thing_to_int(1.e12) == 1000000000000
+    &amp;gt;&amp;gt;&amp;gt; thing_to_int("one")
+    0
+    &amp;gt;&amp;gt;&amp;gt; thing_to_int("one", default=-1)
+    -1
+    &amp;gt;&amp;gt;&amp;gt; class forty_two(object):
+    ...     def __int__(self): return 42
+    &amp;gt;&amp;gt;&amp;gt; assert thing_to_int(forty_two()) == 42
+    """
+    try:
+        return int(thing)
+    except:
+        return default
+
+def _test():
+    import doctest
+    doctest.testmod()
+
+if __name__ == "__main__":
+    _test()
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;The function&amp;#8217;s documentation shows just how flexible this simple
+   function is. The idiom used here is to proceed assuming that the
+   function caller has passed a suitable &lt;code&gt;thing&lt;/code&gt; parameter, but to handle
+   any errors which occur.
+&lt;/p&gt;
+&lt;p&gt;Here&amp;#8217;s another example, showing how we can use &lt;code&gt;set&lt;/code&gt; in a version of
+   &lt;a href="http://python.org"&gt;Python&lt;/a&gt; which didn&amp;#8217;t build support for sets into the core
+   language. Note that we don&amp;#8217;t attempt to query version numbers or check
+   which libraries have been installed. We just try and use &lt;code&gt;set&lt;/code&gt; and
+   handle any fall-out.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;Using set in old and new versions of Python&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;try:
+    set
+except NameError:
+    from sets import Set as set
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;This idiom is known as &lt;a href="http://www.google.com/search?q=Python+EAFP"&gt;&amp;#8220;it&amp;#8217;s easier to ask forgiveness than
+permission&amp;#8221;&lt;/a&gt;.
+&lt;/p&gt;</description>
+<dc:date>2006-12-07</dc:date>
+<guid>http://wordaligned.org/articles/permission-and-forgiveness.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/permission-and-forgiveness.html</link>
+<category>Web Applications</category>
+</item>
+
+<item>
+<title>Wiki Markup</title>
+<description>&lt;p&gt;I&amp;#8217;m a big fan of wikis but one irritation is that they all have their
+   own markup syntax. I guess that&amp;#8217;s because the wiki is one of those sweet
+   web applications that every programmer wants to reinvent.
+&lt;/p&gt;
+&lt;p&gt;On a fairly regular basis, and in order of personal preference, I use:
+&lt;/p&gt;
+&lt;ul&gt;
+ &lt;li&gt;
+     &lt;a href="http://daringfireball.net/projects/markdown/"&gt;Markdown&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     &lt;a href="http://boost.org/tools/quickbook"&gt;QuickBook&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     &lt;a href="http://trac.edgewall.org/wiki/TracWiki"&gt;TracWiki&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     &lt;a href="http://www.textism.com/tools/textile/"&gt;Textile&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     &lt;a href="http://www.mediawiki.org/"&gt;MediaWiki&lt;/a&gt;
+ &lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;There&amp;#8217;s some convergence between these mini-languages, but not a whole
+   lot. Ampersands and angle brackets are of course converted into
+   HTML-safe equivalents. Paragraphs and bulleted lists usually work as
+   you&amp;#8217;d expect. The other primary ingredients &amp;#8212; headings, links, images
+   &amp;#8212; vary between implementations.
+&lt;/p&gt;
+&lt;p&gt;This post describes what I think makes a good wiki markup syntax and why
+   I rate &lt;a href="http://daringfireball.net/projects/markdown/"&gt;Markdown&lt;/a&gt; so highly.
+&lt;/p&gt;
+&lt;span id="continue-reading"/&gt;
+
+
+&lt;h3&gt;Bigger != Better&lt;/h3&gt;
+&lt;p&gt;Given the number of wiki variants out there, most users are unlikely
+   to remember even the basics of any single wiki markup
+   syntax.  Ideally, then, the wiki markup rules should be simple &amp;#8212;
+   simple enough to fit on a post-it note (or a post-it note sized
+   block of pixels on a screen) which the user can refer to.
+&lt;/p&gt;
+&lt;p&gt;I wouldn&amp;#8217;t use this criterion to rule out a more complex markup
+   syntax. &lt;a href="http://www.mediawiki.org/"&gt;MediaWiki&lt;/a&gt; is probably about as complex a markup as there
+   is but it still manages to keep the simple things simple.
+&lt;/p&gt;
+&lt;p&gt;All things being equal, though, I prefer a compact set of markup rules.
+&lt;/p&gt;
+
+&lt;h3&gt;Well Documented&lt;/h3&gt;
+&lt;p&gt;It goes without saying that the wiki markup rules should be well
+   documented. How else is an end user to work out what to do?
+&lt;/p&gt;
+&lt;p&gt;I think it&amp;#8217;s also plain that a wiki markup should be self-documented,
+   by which I mean the
+   &lt;a href="http://daringfireball.net/projects/markdown/syntax"&gt;documentation&lt;/a&gt;
+   should be written using
+   &lt;a href="http://daringfireball.net/projects/markdown/syntax.text"&gt;itself&lt;/a&gt;.
+&lt;/p&gt;
+
+&lt;h3&gt;Escape to (X)HTML&lt;/h3&gt;
+&lt;p&gt;Noone expects a wiki syntax to do everything HTML can, so there&amp;#8217;d
+   better be a way of escaping the normal wiki markup rules to include
+   raw HTML in a document.  For example, there have been a number of
+   attempts to provide a wiki syntax for tables, but none works quite as well
+   as an HTML table &amp;#8212; so a wiki should simply provide a way for HTML
+   tables to be introduced into a document.
+&lt;/p&gt;
+&lt;p&gt;There&amp;#8217;s another side to this. Sometimes we simply want to stop normal
+   wiki processing from happening. If the underscore is normally used to
+   emphasize words &lt;em&gt;like this&lt;/em&gt;, then we&amp;#8217;d better be able to escape this
+   behaviour when we want to see the underscores _like this_.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;escaping underscores with Markdown&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;If the underscore is normally used to emphasize
+words _like this_, then we'd better be able to
+escape this behaviour when we want to see
+the underscores \_like this\_.
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+
+&lt;h3&gt;Conformance Tests&lt;/h3&gt;
+&lt;p&gt;A good wiki markup syntax may well have a life outside its native wiki
+   implementation. It could be used in other wikis or blogs. It could become a
+   general purpose HTML templating application.
+&lt;/p&gt;
+&lt;p&gt;If it&amp;#8217;s to have any hope of standing on its own like this, it had
+   better come with a decent set of conformance tests: that is, a set of
+   test inputs and expected outputs.
+&lt;/p&gt;
+&lt;p&gt;The existence of such a suite helps explain why you can find
+   trustworthy &lt;a href="http://daringfireball.net/projects/markdown/"&gt;Markdown&lt;/a&gt; implementations in a variety of popular
+   high-level languages (Perl, PHP, Python, Ruby &amp;#8230;).
+&lt;/p&gt;
+
+&lt;h3&gt;Suck it and See&lt;/h3&gt;
+&lt;p&gt;Most wikis provide a page to be used for experimentation &amp;#8212; it&amp;#8217;s often
+   called something like &amp;#8220;SandBox&amp;#8221;. A superior better wiki markup syntax
+   will also host such a facility online. You can try out Markdown
+   &lt;a href="http://daringfireball.net/projects/markdown/dingus"&gt;here&lt;/a&gt; and
+   Textile &lt;a href="http://www.textism.com/tools/textile/"&gt;here&lt;/a&gt;.
+&lt;/p&gt;
+
+&lt;h3&gt;And the Winner is &amp;#8230;&lt;/h3&gt;
+&lt;p&gt;No suprises here: I said at the outset that &lt;a href="http://daringfireball.net/projects/markdown/"&gt;Markdown&lt;/a&gt; is my favourite. It
+   more than meets all the criteria mentioned above which already puts
+   it one step ahead of most alternatives. It also wins points for:
+&lt;/p&gt;
+&lt;ol&gt;
+ &lt;li&gt;&lt;p&gt;Explaining its design goals so clearly:
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;Readability, however, is emphasized above all else. A
+   Markdown-formatted document should be publishable as-is, as plain
+   text, without looking like it&amp;#8217;s been marked up with tags or formatting
+   instructions.
+&lt;/p&gt;
+&lt;/blockquote&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;p&gt;Working so well with an &amp;#8220;aware&amp;#8221; text editor. I write the content for
+      my &lt;a href="http://www.wordaligned.org"&gt;web site&lt;/a&gt; in Markdown using
+      &lt;a href="http://www.gnu.org/software/emacs/"&gt;emacs&lt;/a&gt;, and the emacs text mode
+      does the right thing when I&amp;#8217;m writing lists, blockquotes etc.
+&lt;/p&gt;
+
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;p&gt;Providing superior support for
+      &lt;a href="http://daringfireball.net/projects/markdown/syntax#link"&gt;links&lt;/a&gt;.
+&lt;/p&gt;
+
+ &lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;a href="http://boost.org/tools/quickbook"&gt;Quickbook&lt;/a&gt; deserves a special mention too, since it generates not HTML
+   but &lt;a href="http://docbook.org"&gt;DocBook XML&lt;/a&gt;, and hence can be used as a starting point for both
+   &lt;a href="http://wordaligned.org/docs/softdoc_overload/index.html"&gt;online and printed&lt;/a&gt;
+   versions of a document.
+&lt;/p&gt;</description>
+<dc:date>2006-12-03</dc:date>
+<guid>http://wordaligned.org/articles/wiki-markup.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/wiki-markup.html</link>
+<category>Web Applications</category>
+</item>
+
+<item>
+<title>Spam, Typo, Subversion Logs</title>
+<description>&lt;p&gt;This &lt;a href="http://blog.wordaligned.org"&gt;blog&lt;/a&gt; got hit by some spam promoting online gambling sites,
+   even though I&amp;#8217;d cranked up most of the built in anti-spam settings. I
+   went across to the &lt;a href="http://www.typosphere.org"&gt;Typo&lt;/a&gt; website looking for advice and discovered:
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;The Typo Trac is currently offline because of a high level of
+   spam. It shall return as soon as we&amp;#8217;ve got some more protection
+   added to it.
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;Unfunnily enough, I experimented with an open &lt;a href="http://trac.edgewall.org/"&gt;Trac&lt;/a&gt; project a while
+   back and it too received spam contributions cunningly hidden
+   where a regular reader wouldn&amp;#8217;t notice.
+&lt;/p&gt;
+&lt;span id="continue-reading"/&gt;
+
+
+&lt;h4&gt;Examining the Typo Subversion Logs&lt;/h4&gt;
+&lt;p&gt;Fortunately the &lt;a href="http://www.typosphere.org"&gt;Typo&lt;/a&gt; Subversion server remains up and running. I
+   took a look at the log files to see if there were any spam-related
+   improvements since I&amp;#8217;d originally installed Typo and the latest release
+   (4.0.3 at the time of writing). There were a few hits.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;$ svn log -r1133:1231 svn://typosphere.org/typo | grep spam
+Add spam setting for Akismet key.  I still need to write the Akismet glue code, but it won't work without a key.
+Big spam filtering upgrade.
+Comments (and trackbacks) that fail the spam check are marked as unpublished
+registering of spam/ham classification with akismet). JustPresumedHam
+of articles whose classification you have confirmed as well as a simple spam/ham
+Use published_at for comment spam checks.  Closes #1089
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+
+&lt;h4&gt;A Closer Examination&lt;/h4&gt;
+&lt;p&gt;This superficial inspection suggests that, out of 99 changes, 4 relate
+   to spam &amp;#8212; suggesting that the &lt;a href="http://www.typosphere.org"&gt;Typo&lt;/a&gt; developers spent less than 5%
+   of their effort making anti-spam changes in the period concerned.
+&lt;/p&gt;
+&lt;p&gt;A more useful statistic would be the number of files which were
+   modified for anti-spam purposes. It&amp;#8217;s rather harder to extract this
+   number using simple shell programs such as &lt;code&gt;grep&lt;/code&gt; so I wrote a
+   &lt;a href="http://python.org"&gt;Python&lt;/a&gt; program to analyse the the &lt;a href="http://svnbook.red-bean.com/en/1.2/svn.ref.svn.c.log.html"&gt;svn log&lt;/a&gt; output. I used the
+   &lt;code&gt;--xml&lt;/code&gt; option to the &lt;a href="http://svnbook.red-bean.com/en/1.2/svn.ref.svn.c.log.html"&gt;svn log&lt;/a&gt; command to provide me with more
+   structured output, and the Python &lt;a href="http://www.python.org/doc/current/lib/module-xml.dom.minidom.html"&gt;minidom&lt;/a&gt; XML module proved more than
+   up to the task of parsing this output.
+&lt;/p&gt;
+&lt;p&gt;Here&amp;#8217;s what this program told me.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;$ svn log -r1133:1231 svn://typosphere.org/typo --xml --verbose | \
+  process_svn_log.py spam akismet
+Found /spam|akismet/i in 9/99 changes affecting 72/270 files.
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Note that I included &lt;a href="http://akismet.com/"&gt;Akismet&lt;/a&gt; in my pattern match. As I understand
+   it, &lt;a href="http://akismet.com/"&gt;Akismet&lt;/a&gt; is a service specifically designed to protect blogs
+   against spam.
+&lt;/p&gt;
+&lt;p&gt;I could dig even deeper and find out how many lines of code were
+   changed, but I don&amp;#8217;t think it&amp;#8217;s worth it. This is a pretty blunt tool,
+   but it does tell us that some smart programmers are having to spend
+   almost as much time fighting dumb spammers as they are writing more
+   useful code.
+&lt;/p&gt;
+
+&lt;h4&gt;The svn log processor&lt;/h4&gt;
+&lt;p&gt;For the record, here&amp;#8217;s my program. It&amp;#8217;s best suited to the job it
+   actually did but it&amp;#8217;s simple enough that I&amp;#8217;ll be able to adapt it for
+   use elsewhere.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;process_svn_log.py&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;""" This program filters 'svn log --xml --verbose' output
+    for log entries which match patterns.
+
+This output has the form:
+&amp;lt;?xml version="1.0"?&amp;gt;
+&amp;lt;log&amp;gt;
+&amp;lt;logentry
+   revision="1133"&amp;gt;
+&amp;lt;author&amp;gt;scott&amp;lt;/author&amp;gt;
+&amp;lt;date&amp;gt;2006-07-13T17:26:26.186291Z&amp;lt;/date&amp;gt;
+&amp;lt;paths&amp;gt;
+&amp;lt;path
+   action="M"&amp;gt;/trunk/app/views/admin/feedback/list.rhtml&amp;lt;/path&amp;gt;
+&amp;lt;/paths&amp;gt;
+&amp;lt;msg&amp;gt;Make search+pagination work right&amp;lt;/msg&amp;gt;
+&amp;lt;/logentry&amp;gt;
+&amp;lt;/log&amp;gt;
+"""
+
+def usage(program):
+    print """\
+Usage: %s PATTERN ...
+Searches the output from 'svn log --xml --verbose' for log entries whose
+message matches the supplied PATTERN(s) and yields summary statistics.
+Example:
+svn log -r1133:1231 svn://typosphere.org/typo --xml --verbose | %s spam""" % (
+    program, program)
+
+def elements(node, tagname):
+    " Return named child elements of a DOM node. "
+    return node.getElementsByTagName(tagname)
+
+def count_paths(logentries):
+    " Count repository path changes logged. "
+    return sum(1
+               for logentry in logentries
+               for paths in elements(logentry, "paths")
+               for path in elements(paths, "path"))
+
+def log_msg_matches(logentry, matcher):
+    " Return true if the logentry message matches, false otherwise. "
+    msgs = elements(logentry, "msg")
+    assert len(msgs) == 1, "Require a single log message per log entry."
+    return matcher(msgs[0].childNodes[0].data) is not None
+
+def process(log, patterns):
+    " Process the input svn log, looking for messages matching the input patterns. "
+    import re
+    pattern = "|".join(patterns)
+    matcher = re.compile(pattern, re.IGNORECASE).search
+    entries = elements(log, "logentry")
+    matches = [entry for entry in entries
+               if log_msg_matches(entry, matcher)]
+    paths = count_paths(entries)
+    matching_paths = count_paths(matches)
+
+print "Found /%s/i in %d/%d changes affecting %d/%d files." % (
+        pattern, len(matches), len(entries), matching_paths, paths)
+
+def main(argv):
+    if len(argv) == 1:
+        usage(argv[0])
+    else:
+        from xml.dom.minidom import parse
+        process(parse(sys.stdin), argv[1:])
+
+if __name__ == "__main__":
+    import sys
+    main(sys.argv)
+
+&lt;/pre&gt;
+
+&lt;/div&gt;</description>
+<dc:date>2006-11-27</dc:date>
+<guid>http://wordaligned.org/articles/spam-typo-subversion-logs.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/spam-typo-subversion-logs.html</link>
+<category>Web Applications</category>
+</item>
+
+<item>
+<title>Lenient Browsers and Wobbly Tables</title>
+<description>&lt;p&gt;&lt;a href="http://www.w3.org/Style/CSS/"&gt;Cascading Style Sheets&lt;/a&gt; are one of those technologies that the
+   web gets right; but actually getting a style-sheet right isn&amp;#8217;t quite
+   so easy.
+&lt;/p&gt;
+&lt;span id="continue-reading"/&gt;
+
+
+&lt;h3&gt;Tinkering with Style Sheets&lt;/h3&gt;
+&lt;p&gt;It&amp;#8217;s all too easy to tinker with a style sheet:
+&lt;/p&gt;
+&lt;ul&gt;
+ &lt;li&gt;
+     Install your browser&amp;#8217;s &lt;a href="http://chrispederick.com/work/webdeveloper/"&gt;Web Developer Extension&lt;/a&gt;.
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     Load up the page you want to re-style into your browser.
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     Hit &lt;em&gt;Ctrl+Shift+E&lt;/em&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     Edit away.
+ &lt;/li&gt;
+&lt;/ul&gt;
+&lt;img src="http://chrispederick.com/images/work/webdeveloper/screenshots/toolbar.png" alt="Web developer toolbar"/&gt;
+
+&lt;p&gt;Your browser updates directly as you make the changes, nudging a
+   margin here, tweaking a font there. When you like what you see, save
+   a copy of the style sheet and install it.
+&lt;/p&gt;
+&lt;p&gt;There are a couple of problems with this WYSIWYG approach to hacking a
+   style sheet.
+&lt;/p&gt;
+
+&lt;h4&gt;Lenient Browsers&lt;/h4&gt;
+&lt;p&gt;Not all browsers interpret styling information in the same way. So
+   what you see in &lt;a href="http://www.firefox.com/"&gt;Firefox&lt;/a&gt; may not be what you get in
+   &lt;a href="http://www.apple.com/safari/"&gt;Safari&lt;/a&gt;. One defence against this is to
+   make sure your CSS is &lt;a href="http://jigsaw.w3.org/css-validator/"&gt;valid&lt;/a&gt;. Web browsers are
+   designed to do the best they can when subjected to &amp;#8220;garbage in&amp;#8221; but
+   they&amp;#8217;ll stand a better chance when given conformant content.
+&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://jigsaw.w3.org/css-validator/check/referer"&gt;
+   &lt;img style="border:0;width:88px;height:31px" src="http://jigsaw.w3.org/css-validator/images/vcss" alt="Check the CSS for this page!" /&gt;&lt;/a&gt;
+&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://validator.w3.org/check?uri=referer"&gt;&lt;img src="http://www.w3.org/Icons/valid-xhtml10" alt="Valid XHTML 1.0 Strict" height="31" width="88" /&gt;&lt;/a&gt;&lt;/p&gt;
+
+
+&lt;h4&gt;Wobbly Tables&lt;/h4&gt;
+&lt;p&gt;&lt;span /&gt;Every time I hack a style sheet in this way it seems like trying to
+   balance a wobbly table. You saw a little
+   off one of the legs. It still doesn&amp;#8217;t balance. So you saw a little off
+   another leg. It &lt;em&gt;still&lt;/em&gt; doesn&amp;#8217;t balance. Things aren&amp;#8217;t going as
+   planned but you&amp;#8217;re not going to give up now. A little more sawing &amp;#8230;
+&lt;/p&gt;
+&lt;p&gt;You end up with a low table. And it still wobbles.
+&lt;/p&gt;
+&lt;p&gt;The analogy isn&amp;#8217;t perfect &amp;#8212; you tend to add things to style sheets
+   rather than saw things off them &amp;#8212; but this only compounds the problem.
+&lt;/p&gt;
+
+&lt;h3&gt;Why fuss about style?&lt;/h3&gt;
+&lt;p&gt;Whilst I have a sneaking admiration for
+   &lt;a href="http://www.research.att.com/~bs/bs_faq.html#looks"&gt;web sites&lt;/a&gt; which
+   eschew style in order to concentrate on content, I&amp;#8217;d rather visit
+   &lt;a href="http://artima.com"&gt;sites&lt;/a&gt; which score highly in both areas.
+&lt;/p&gt;
+&lt;p&gt;I appreciate that style has a shorter shelf-life than content: what
+   looks good today seems faded tomorrow and will be positively dated by
+   next year. Perhaps the best thing about CSS, though, is that it
+   cleanly separates &lt;a href="http://wordaligned.org/softdoc_overload/softdoc_overload/sidebar__presentation_and_structure.html"&gt;presentation from
+content&lt;/a&gt;,
+   meaning that we can change our style sheet next year if we want.
+&lt;/p&gt;
+
+&lt;h3&gt;I am not a Web Designer. But &amp;#8230;&lt;/h3&gt;
+&lt;p&gt;I can&amp;#8217;t claim any great expertise in this area. I&amp;#8217;ve never written a
+   style sheet from scratch, only adapted ones which I liked. Pretty much
+   everything I know about &lt;a href="http://www.w3.org/Style/CSS/"&gt;CSS&lt;/a&gt; comes from examining style sheets
+   which work well. That said, it seems to me that there are some general
+   software design principles which apply equally to style sheets.
+&lt;/p&gt;
+&lt;ol&gt;
+ &lt;li&gt;&lt;p&gt;&lt;a href="http://wiki.hsr.ch/SimpleCode/wiki.cgi"&gt;Simplicity&lt;/a&gt;. Minimise the
+   number of fonts; reduce the colour palette; aim for clean lines. A simple
+   style is likely to look good for longer.
+&lt;/p&gt;
+
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;p&gt;Consistency. &lt;a href="http://www.w3.org/Style/CSS/"&gt;CSS&lt;/a&gt; allows you to over-ride styles at every level &amp;#8212;
+   I think that&amp;#8217;s what the &amp;#8220;cascade&amp;#8221; is. Usually, though, a consistent
+   style should be preferred.
+&lt;/p&gt;
+
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;p&gt;Prototype. A WYSIWYG editor is very tempting for something as
+   visual as a web page but it suffers from the drawbacks I&amp;#8217;ve already
+   mentioned. Why not prototype using something as quick and direct as
+   pencil and paper?
+&lt;/p&gt;
+
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;p&gt;Test. It&amp;#8217;s possible to automate the &lt;a href="http://jigsaw.w3.org/css-validator/"&gt;validation&lt;/a&gt; of
+   your web site. It&amp;#8217;s possible to spider your web site and play back a
+   sample of pages in the browsers you want to support. So do it!
+&lt;/p&gt;
+
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;p&gt;Modularity. Keep logically separate parts of the style sheet
+   separate. The designer of
+   &lt;a href="http://quotedprintable.com/pages/scribbish"&gt;Scribbish&lt;/a&gt; (which is the
+   theme I&amp;#8217;m using for this &lt;a href="http://blog.wordaligned.org"&gt;blog&lt;/a&gt;) clearly
+   knew what he was doing when he created separate style-sheets for page
+   &lt;a href="http://blog.wordaligned.org/stylesheets/theme/layout.css"&gt;layout&lt;/a&gt;,
+   &lt;a href="http://blog.wordaligned.org/stylesheets/theme/content.css"&gt;content&lt;/a&gt;,
+   and &lt;a href="http://blog.wordaligned.org/stylesheets/theme/syntax.css"&gt;syntax-highlighting&lt;/a&gt;.
+&lt;/p&gt;
+
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;p&gt;Use &lt;a href="http://subversion.tigris.org"&gt;Version Control&lt;/a&gt;. When you
+   realise you&amp;#8217;ve made your table more wobbly, wind it back to a previous
+   revision.
+&lt;/p&gt;
+
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;p&gt;Consult an expert. I am not an expert on web design. Maintaining a
+   personal web site is one thing, but if I had to design a new site from
+   scratch, I&amp;#8217;d look for expert help.
+&lt;/p&gt;
+
+ &lt;/li&gt;
+&lt;/ol&gt;</description>
+<dc:date>2006-11-14</dc:date>
+<guid>http://wordaligned.org/articles/lenient-browsers-and-wobbly-tables.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/lenient-browsers-and-wobbly-tables.html</link>
+<category>Web Applications</category>
+</item>
+
+<item>
+<title>My First Typo Sidebar</title>
+<description>&lt;p&gt;I recently developed my very own plugin for this &lt;a href="http://blog.wordaligned.org"&gt;blog&lt;/a&gt;. To cut a
+   short story even shorter, I wrote a &lt;a href="http://www.ruby-lang.org"&gt;Ruby&lt;/a&gt; class and an HTML
+   template, and I was done.
+&lt;/p&gt;
+&lt;span id="continue-reading"/&gt;
+
+
+&lt;h3&gt;The Plugin&lt;/h3&gt;
+&lt;p&gt;Whilst wandering around the &lt;a href="http://www.google.co.uk/ig/directory?hl=en"&gt;Google gadgets&lt;/a&gt;
+   pages, I&amp;#8217;d spotted &lt;a href="http://abowman.com"&gt;Adam Bowman&amp;#8217;s&lt;/a&gt; animated &lt;a href="http://abowman.com/google-modules/tree-frog/"&gt;Treefrog&lt;/a&gt;.
+   It appealed. I wanted one on my &lt;a href="http://blog.wordaligned.org"&gt;blog&lt;/a&gt;.
+&lt;/p&gt;
+&lt;p&gt;What did I have to do? The content required nothing complicated,
+   nothing dynamic: just a static chunk of HTML. How difficult could it be?
+&lt;/p&gt;
+
+&lt;h3&gt;Read the code, Not the manual&lt;/h3&gt;
+&lt;p&gt;I&amp;#8217;ve fiddled round with Typo
+   &lt;a href="http://wordaligned.org/articles/my-test-first-ruby-program.html"&gt;before&lt;/a&gt;
+   and found reading the code to be the best way to figure out
+   what to do. In this case, I needed to look at an existing sidebar
+   plugin. I guessed the best model for my new plugin would be the
+   &amp;#8220;Static&amp;#8221; sidebar component which I use to list a collection
+   of links to favourite web sites.
+&lt;/p&gt;
+&lt;p&gt;I soon found the controller for this plugin in the
+   &lt;code&gt;components/plugins/sidebars/&lt;/code&gt; subdirectory of my &lt;a href="http://www.typosphere.org"&gt;Typo&lt;/a&gt;
+   installation. It&amp;#8217;s a simple &lt;a href="http://www.ruby-lang.org"&gt;Ruby&lt;/a&gt; class derived from
+   &lt;code&gt;Sidebars::ComponentPlugin&lt;/code&gt;:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;components/plugins/sidebars/static_controller.rb&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;class Plugins::Sidebars::StaticController &amp;lt; Sidebars::ComponentPlugin
+  description "Static content, like links to other sites, advertisements, or blog meta-infomation"
+
+DEFAULT_TEXT = %q{
+&amp;lt;ul&amp;gt;
+  &amp;lt;li&amp;gt;&amp;lt;a href="http://www.typosphere.org" title="Typo"&amp;gt;Typo&amp;lt;/a&amp;gt;&amp;lt;/li&amp;gt;
+  ....
+&amp;lt;/ul&amp;gt;
+}
+
+setting :title, 'Links'
+  setting :body, DEFAULT_TEXT, :input_type =&amp;gt; :text_area
+
+end
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;I also spotted a &lt;code&gt;components/plugins/sidebars/static&lt;/code&gt; subdirectory,
+   and in this subdirectory was a two-line HTML template.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;components/plugins/sidebars/static/content.html&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;lt;h3&amp;gt;&amp;lt;%= @sb_config['title'] %&amp;gt;&amp;lt;/h3&amp;gt;
+&amp;lt;%= @sb_config['body'] %&amp;gt;
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+
+&lt;h3&gt;My Plugin&lt;/h3&gt;
+&lt;p&gt;My plugin was even more simple than the static one. I created a class:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;components/plugins/sidebars/treefrog_controller.rb&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;class Plugins::Sidebars::TreefrogController &amp;lt; Sidebars::ComponentPlugin
+  description 'Treefrog'
+  setting :title, 'Treefrog'
+end
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;and an HTML template:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;components/plugins/sidebars/treefrog/content.rhtml&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;lt;h3&amp;gt;&amp;lt;%= @sb_config['title'] %&amp;gt;&amp;lt;/h3&amp;gt;
+&amp;lt;object
+type="application/x-shockwave-flash"
+data="files/treefrog.swf"
+width="150" height="200"&amp;gt;
+&amp;lt;param name="movie" value="files/treefrog.swf" /&amp;gt;
+&amp;lt;/object&amp;gt;
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;and I was done. As &lt;a href="http://wordaligned.org/articles/my-test-first-ruby-program.html"&gt;before&lt;/a&gt;, I ran a local &lt;a href="http://www.typosphere.org"&gt;Typo&lt;/a&gt; session to check my
+   plugin worked, then I copied the files over to my
+   live site. Job done.
+&lt;/p&gt;
+
+&lt;h3&gt;So What?&lt;/h3&gt;
+&lt;p&gt;So what&amp;#8217;s so amazing about this? Absolutely nothing.  This is hardly
+   rocket science.
+&lt;/p&gt;
+&lt;p&gt;Notice, though, that:
+&lt;/p&gt;
+&lt;ol&gt;
+ &lt;li&gt;&lt;p&gt;I didn&amp;#8217;t have to restart my blog server
+&lt;/p&gt;
+
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;p&gt;I didn&amp;#8217;t have to change &lt;em&gt;any&lt;/em&gt; existing part of my &lt;a href="http://www.typosphere.org"&gt;blog
+   application&lt;/a&gt; &amp;#8212; the changes were purely additive.
+&lt;/p&gt;
+
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;p&gt;I didn&amp;#8217;t reconfigure anything. I didn&amp;#8217;t have to register my plugin. I
+      didn&amp;#8217;t have to tell my class where to find the HTML template. I didn&amp;#8217;t
+      have to write or generate loads of XML.
+&lt;/p&gt;
+
+ &lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;No, this isn&amp;#8217;t amazing. So why do so many other application
+   development frameworks get it so very wrong?
+&lt;/p&gt;</description>
+<dc:date>2006-11-12</dc:date>
+<guid>http://wordaligned.org/articles/my-first-typo-sidebar.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/my-first-typo-sidebar.html</link>
+<category>Web Applications</category>
+</item>
+
+<item>
+<title>The Etch-A-Sketch User Interface</title>
+<description>&lt;div class="toc"&gt;
+&lt;h2&gt;Contents&lt;/h2&gt;
+&lt;ul&gt;
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/etch-a-sketch-and-user-interfaces.html#tocthe-joke" name="toc0" id="toc0"&gt;The Joke&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/etch-a-sketch-and-user-interfaces.html#tocmy-own-additions" name="toc1" id="toc1"&gt;My Own Additions&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/etch-a-sketch-and-user-interfaces.html#tocnegative-answers" name="toc2" id="toc2"&gt;Negative Answers&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/etch-a-sketch-and-user-interfaces.html#toca-more-searching-question" name="toc3" id="toc3"&gt;A More Searching Question&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/etch-a-sketch-and-user-interfaces.html#tocthe-real-joke" name="toc4" id="toc4"&gt;The Real Joke&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/etch-a-sketch-and-user-interfaces.html#tocthere-may-be-hope" name="toc5" id="toc5"&gt;There May be Hope&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/etch-a-sketch-and-user-interfaces.html#tocetchasketch-einstein" name="toc6" id="toc6"&gt;Etch-A-Sketch Einstein&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/etch-a-sketch-and-user-interfaces.html#tocparting-shot" name="toc7" id="toc7"&gt;Parting Shot&lt;/a&gt;
+ &lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;&lt;p&gt;My nephew Samuel turned 6 today. We bought him an &lt;a href="http://www.etch-a-sketch.com/"&gt;Etch-A-Sketch&lt;/a&gt;. It
+   reminded me of one of those old jokes which used to go around the web,
+   the one about &lt;a href="http://winn.com/bs/etchasketch.html"&gt;Etch-A-Sketch technical support&lt;/a&gt;.
+&lt;/p&gt;
+&lt;span id="continue-reading"/&gt;
+
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/etch-a-sketch-and-user-interfaces.html#toc0" name="tocthe-joke" id="tocthe-joke"&gt;The Joke&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Here&amp;#8217;s my condensed version of the &lt;a href="http://www.google.co.uk/search?hl=en&amp;amp;q=etch-a-sketch+technical+support"&gt;joke&lt;/a&gt;.
+&lt;/p&gt;
+&lt;p&gt;Here are the Frequently Asked Questions for &lt;a href="http://www.etch-a-sketch.com/"&gt;Etch-A-Sketch&lt;/a&gt; Technical Support:
+&lt;/p&gt;
+&lt;ul&gt;
+ &lt;li&gt;
+     &lt;strong&gt;Q&lt;/strong&gt;: How do I create a New Document on my Etch-A-Sketch?
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     &lt;strong&gt;A&lt;/strong&gt;: Pick it up and shake it.
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     &lt;strong&gt;Q&lt;/strong&gt;: How do I delete a Document on my Etch-A-Sketch?
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     &lt;strong&gt;A&lt;/strong&gt;: Pick it up and shake it.
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     &lt;strong&gt;Q&lt;/strong&gt;: What&amp;#8217;s the shortcut for Undo?
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     &lt;strong&gt;A&lt;/strong&gt;: Pick it up and shake it.
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     &lt;strong&gt;Q&lt;/strong&gt;: How do I turn my Etch-A-Sketch off?
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     &lt;strong&gt;A&lt;/strong&gt;: Pick it up and shake it.
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     &lt;strong&gt;Q&lt;/strong&gt;: My Etch-A-Sketch has all of these funny little lines all over the screen.
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     &lt;strong&gt;A&lt;/strong&gt;: Pick it up and shake it
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     &lt;strong&gt;Q&lt;/strong&gt;: How do I save my Etch-A-Sketch Document?
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     &lt;strong&gt;A&lt;/strong&gt;: Don&amp;#8217;t shake it.
+ &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h4&gt;&lt;a href="http://wordaligned.org/articles/etch-a-sketch-and-user-interfaces.html#toc1" name="tocmy-own-additions" id="tocmy-own-additions"&gt;My Own Additions&lt;/a&gt;&lt;/h4&gt;
+&lt;p&gt;Here are some additions of my own:
+&lt;/p&gt;
+&lt;ul&gt;
+ &lt;li&gt;
+     &lt;strong&gt;Q&lt;/strong&gt;: How do I find a Document on my Etch-A-Sketch?
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     &lt;strong&gt;A&lt;/strong&gt;: Pick it up.
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     &lt;strong&gt;Q&lt;/strong&gt;: How do I edit a Document on my Etch-A-Sketch?
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     &lt;strong&gt;A&lt;/strong&gt;: Turn the knobs to move the pen. Shake to undo your changes.
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     &lt;strong&gt;Q&lt;/strong&gt;: How can a friend view a Document on my Etch-A-Sketch?
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     &lt;strong&gt;A&lt;/strong&gt;: Pass your friend the Etch-A-Sketch.
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     &lt;strong&gt;Q&lt;/strong&gt;: How can my friend and I work on the same Document?
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     &lt;strong&gt;A&lt;/strong&gt;: The preferred method is to take it in turns. Alternatively,
+  you &lt;em&gt;could&lt;/em&gt; each operate one of the knobs.
+ &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h4&gt;&lt;a href="http://wordaligned.org/articles/etch-a-sketch-and-user-interfaces.html#toc2" name="tocnegative-answers" id="tocnegative-answers"&gt;Negative Answers&lt;/a&gt;&lt;/h4&gt;
+&lt;p&gt;Sometimes the answers are, simply, no:
+&lt;/p&gt;
+&lt;ul&gt;
+ &lt;li&gt;
+     &lt;strong&gt;Q&lt;/strong&gt;: Can I draw a dotted line with my Etch-A-Sketch?
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     &lt;strong&gt;A&lt;/strong&gt;: No.
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     &lt;strong&gt;Q&lt;/strong&gt;: Can I change the pen colour?
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     &lt;strong&gt;A&lt;/strong&gt;: No.
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     &lt;strong&gt;Q&lt;/strong&gt;: Can open more than one Document at once?
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     &lt;strong&gt;A&lt;/strong&gt;: No.
+ &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h4&gt;&lt;a href="http://wordaligned.org/articles/etch-a-sketch-and-user-interfaces.html#toc3" name="toca-more-searching-question" id="toca-more-searching-question"&gt;A More Searching Question&lt;/a&gt;&lt;/h4&gt;
+&lt;p&gt;Sometimes the joke is on us:
+&lt;/p&gt;
+&lt;ul&gt;
+ &lt;li&gt;
+     &lt;strong&gt;Q&lt;/strong&gt;: Why isn&amp;#8217;t the &lt;a href="http://en.wikipedia.org/wiki/Microsoft_Word"&gt;word processor&lt;/a&gt; on my PC as easy to use as Etch-A-Sketch?
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     &lt;strong&gt;A&lt;/strong&gt;: You need to purchase an upgrade to your &lt;a href="http://en.wikipedia.org/wiki/Microsoft_Word"&gt;word processor&lt;/a&gt;.
+ &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/etch-a-sketch-and-user-interfaces.html#toc4" name="tocthe-real-joke" id="tocthe-real-joke"&gt;The Real Joke&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;The joke, I suppose, is in comparing an &lt;a href="http://www.etch-a-sketch.com/"&gt;Etch-A-Sketch&lt;/a&gt; &amp;#8212; a simple
+   child&amp;#8217;s toy &amp;#8212; with something as sophisticated as a fully-featured
+   grown up &lt;a href="http://en.wikipedia.org/wiki/Microsoft_Word"&gt;desktop word processor&lt;/a&gt;. &lt;span /&gt;The real joke is that we
+   continue to tolerate applications with bloated user interfaces,
+   feature-creep, and enforced-upgrades. Worse than that, we actually
+   encourage these applications by shelling out for them, year after
+   year.
+&lt;/p&gt;
+&lt;p&gt;As a consequence, many desktop applications are now stuffed with so
+   many controls, widgets and toolbars that you can&amp;#8217;t see what you&amp;#8217;re
+   doing. And all you wanted to do was write someone a one page
+   letter. Adding insult to injury, your &lt;a href="http://en.wikipedia.org/wiki/Microsoft_Word"&gt;word processor&lt;/a&gt; even
+   gets in your way of doing that:
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;It looks as though you&amp;#8217;re writing a letter. Allow me to interrupt
+   and reformat it.
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;Does anyone else hate being bullied by a paper-clip?
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/etch-a-sketch-and-user-interfaces.html#toc5" name="tocthere-may-be-hope" id="tocthere-may-be-hope"&gt;There May be Hope&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;A new generation of applications is appearing: applications which are
+   clean to look at and simple to use. I&amp;#8217;m sure the simplicity derives
+   in part from the constraints imposed by having to work within a web
+   browser (within multiple versions of multiple browsers, even), and
+   in part from the fact that these are applications whose features have
+   had less time to creep. But I also like to think that some very bright
+   people have actually started to realise how to best to design
+   interfaces and interactions. It&amp;#8217;s not about bewildering or dazzling us;
+   rather, it&amp;#8217;s about staying out of our way.
+&lt;/p&gt;
+&lt;p&gt;I&amp;#8217;m talking about applications like &lt;a href="http://www.google.com"&gt;Google&lt;/a&gt;,
+   whose classic search page is brilliantly simple. Or
+   &lt;a href="http://www.gmail.com"&gt;GMail&lt;/a&gt;, which quietly revolutionises what an
+   email client should look like &amp;#8212; and gets it right. &lt;a href="http://maps.google.com"&gt;Google
+Maps&lt;/a&gt; is another favourite.
+&lt;/p&gt;
+&lt;p&gt;With a web-based application back-ups become someone else&amp;#8217;s
+   problem. Upgrading between versions also becomes someone else&amp;#8217;s
+   problem &amp;#8212; you may not even notice many upgrades. You&amp;#8217;re always using
+   the latest version and your friends are too.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/etch-a-sketch-and-user-interfaces.html#toc6" name="tocetchasketch-einstein" id="tocetchasketch-einstein"&gt;Etch-A-Sketch Einstein&lt;/a&gt;&lt;/h3&gt;
+&lt;img src="http://members.aol.com/laguna555/images/einstein.jpg"
+     width="50%" title="Einstein Etch-A-Sketch picture"
+     alt="Einstein Etch-A-Sketch picture"/&gt;
+
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/etch-a-sketch-and-user-interfaces.html#toc7" name="tocparting-shot" id="tocparting-shot"&gt;Parting Shot&lt;/a&gt;&lt;/h3&gt;
+&lt;ul&gt;
+ &lt;li&gt;
+     &lt;strong&gt;Q&lt;/strong&gt;: Why isn&amp;#8217;t my word processor as easy to use as Etch-A-Sketch?
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     &lt;strong&gt;A&lt;/strong&gt;: Maybe one day it will be &amp;#8230;
+ &lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Happy birthday Samuel!
+&lt;/p&gt;</description>
+<dc:date>2006-11-07</dc:date>
+<guid>http://wordaligned.org/articles/etch-a-sketch-and-user-interfaces.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/etch-a-sketch-and-user-interfaces.html</link>
+<category>Web Applications</category>
+</item>
+
+<item>
+<title>When computer applications reside on the web</title>
+<description>&lt;p&gt;In an &lt;a href="http://observer.guardian.co.uk/business/story/0,,1934018,00.html"&gt;article&lt;/a&gt; about Steve Wozniak published in yesterday&amp;#8217;s
+   &lt;a href="http://observer.guardian.co.uk/"&gt;Observer newspaper&lt;/a&gt; it says:
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;But that doesn&amp;#8217;t stop him criticising the OS X operating system and
+   looking forward to the day when computer applications reside on the
+   web and consumers are released from the regular upgrade tyranny.
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;I&amp;#8217;m not sure what the criticism of &lt;a href="http://www.apple.com/macosx/"&gt;OS
+X&lt;/a&gt; is about (as a recent convert to
+   Apple computers for development work, it seems rather good), but I
+   certainly agree with the rest of the sentence.
+&lt;/p&gt;
+&lt;p&gt;The predicted move towards server-based applications is nothing new, of
+   course. Some of my friends argue that people have been going on about
+   this move for such a long time that if it hasn&amp;#8217;t happened yet &amp;#8212; which
+   it hasn&amp;#8217;t, really &amp;#8212; then it isn&amp;#8217;t going to happen. I would counter
+   that it is happening already; it&amp;#8217;s just more of an evolution than a
+   revolution, but, with the various dependencies (reliable broadband
+   internet connections, compliant web-browsers, attractive web applications)
+   falling into place, it&amp;#8217;s unstoppable.
+&lt;/p&gt;
+&lt;p&gt;Here are some web-based applications I use:
+&lt;/p&gt;
+&lt;ul&gt;
+ &lt;li&gt;
+     &lt;a href="http://mail.google.com"&gt;email&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     &lt;a href="http://calendar.google.com"&gt;calendar&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     &lt;a href="http://gmail.com"&gt;address book&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     &lt;a href="http://www.strongspace.com"&gt;secure backup&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     &lt;a href="http://subversion.tigris.org"&gt;version control system&lt;/a&gt;
+ &lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;There are probably more which I don&amp;#8217;t even realise I&amp;#8217;m using.
+   I really wouldn&amp;#8217;t want to manage any of these locally ever again.
+&lt;/p&gt;</description>
+<dc:date>2006-10-30</dc:date>
+<guid>http://wordaligned.org/articles/the-day-when-computer-applications-reside-on-the-web.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/the-day-when-computer-applications-reside-on-the-web.html</link>
+<category>Web Applications</category>
+</item>
+
+</channel>
+</rss>

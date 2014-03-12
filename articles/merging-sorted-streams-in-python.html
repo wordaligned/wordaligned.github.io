@@ -1,0 +1,281 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<link rel="icon" href="/images/favicon.png" type="image/png"/>
+<link href="/styles/application.css" media="all" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="/scripts/prettify.js"></script>
+<script type="text/javascript" src="/scripts/lang-lisp.js"></script>
+<script type="text/javascript" src="http://www.haloscan.com/load/wordaligned"></script>
+
+<title>Merging sorted streams in Python</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="author" content="Thomas Guest" />
+<meta name="description" content="Did you know that Python's for loops can have an else clause? Here's how it can be used in a stream-merging function. A Word Aligned article posted 2008-10-01, tagged Python, Streams." />
+<meta name="keywords" content="Python, Streams" />
+<link rel="alternate" type="application/rss+xml" title="Feed" href="http://feeds.wordaligned.org/wordaligned" />
+</head>
+
+<body onload="prettyPrint()">
+<div id="container">
+  <div id="header">
+<h1><span><a accesskey="h" href="/">Word Aligned</a></span></h1>
+<h2>space sensitive programming</h2>
+<a class="button" href="http://feeds.wordaligned.org/wordaligned" title="Subscribe to Word Aligned"><img style="float: right;" src="/images/feed.png" alt="Feed Logo" height="28" width="28"/></a>
+</div>
+
+  <div id="page">
+    <div id="content">
+      <div class="atomentry" id="merging-sorted-streams-in-python.html">
+<h2 class="title"><a href="/articles/merging-sorted-streams-in-python.html">Merging sorted streams in Python</a></h2>
+<p class="meta"><abbr class="published" title="2008-10-01">2008-10-01</abbr> &bull; <a href="/tag/python" rel="tag">Python</a>, <a href="/tag/streams" rel="tag">Streams</a> &bull; <a href="/articles/merging-sorted-streams-in-python.html#disqus_thread">Comments</a></p>
+<h3>Problem</h3>
+<div class="amazon"><a href="http://www.amazon.com/gp/product/0596007973?ie=UTF8&amp;tag=wordalig-20&amp;linkCode=as2&amp;camp=1789&amp;creative=9325&amp;creativeASIN=0596007973"><img src="/images/books/python-cookbook.jpg" alt="Python Cookbook cover"/></a></div>
+
+<p>In a post on his <a href="http://drj11.wordpress.com/2008/09/25/i-learn-python/">Code Monk blog</a> David Jones offers up some Python tidbits he&#8217;s only recently discovered and invites readers to share similar discoveries. I&#8217;d like to respond here by talking about <a href="http://www.ubookcase.com/book/Oreilly/Python.Cookbook.2nd.edition/0596007973/pythoncook2-chp-19-sect-14.html">a recipe</a> from the Python Cookbook.
+</p>
+<blockquote>
+<h3>Problem</h3>
+<p>You have several sorted sequences (iterables) and need to iterate on the overall sorted sequence that results from &#8220;merging&#8221; these sequences.
+</p>
+</blockquote><p>For example, we could merge multiples of 2, 3 and 5.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">&gt;&gt;&gt; from itertools import count, imap, islice
+&gt;&gt;&gt; m2, m3, m5 = [imap(n.__mul__, count(1)) for n in (2, 3, 5)]
+&gt;&gt;&gt; m235 = merge(m2, m3, m5)
+&gt;&gt;&gt; list(islice(m235, 10))
+[2, 3, 4, 5, 6, 6, 8, 9, 10, 10]
+
+</pre>
+
+</div>
+
+<p>Here, 6 appears twice in the merged stream since it&#8217;s a multiple of 2 and also of 3, and similarly 10 makes a double appearance.
+</p>
+<p>This example merges three infinite streams. If we were sure all our inputs were finite, we might well simply chain them together and sort the whole thing.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">&gt;&gt;&gt; from itertools import chain
+&gt;&gt;&gt; def merge(*seqs):
+&gt;&gt;&gt;     return sorted(chain(*seqs))
+
+</pre>
+
+</div>
+
+<p>An algorithm which deals with a (potential) mix of finite and infinite sequences is a little more interesting. We might consider an approach which repeatedly peeks at the head element of each sequence, finds the smallest of these, then pops and yields it. The <a href="http://www.ubookcase.com/book/Oreilly/Python.Cookbook.2nd.edition/0596007973/pythoncook2-chp-19-sect-14.html">recipe</a> in the Cookbook improves on this idea.
+</p>
+<span id="continue-reading"/>
+
+
+<h3>Solution</h3>
+<p>The ingenious <a href="http://www.ubookcase.com/book/Oreilly/Python.Cookbook.2nd.edition/0596007973/pythoncook2-chp-19-sect-14.html">merge implementation</a> shown below is credited to S&eacute;bastien Keim, Raymond Hettinger and Danny Yoo (the same Raymond Hettinger who appears on <a href="http://drj11.wordpress.com/2008/09/25/i-learn-python/">Code Monk</a> to point out that zip can unzip).
+</p>
+<p>The algorithm uses a priority queue as a staging area. This priority queue is initialised to hold a collection of pairs comprising the head value from each input stream and the tail of that stream. We then pop the first element from this queue, yielding its value, and queue the next (head, tail) pair from the stream it came from. At all times the priority queue contains a (head, tail) pair from each input stream.
+</p>
+<p>This all works sweetly when the inputs are all infinite. The complication occurs when a finite sequence reaches its end.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">import heapq
+
+def merge(*subsequences):
+    # prepare a priority queue whose items are pairs of the form
+    # (current-value, iterator), one each per (non-empty) subsequence
+    heap = [  ]
+    for subseq in subsequences:
+        iterator = iter(subseq)
+        for current_value in iterator:
+            # subseq is not empty, therefore add this subseq's pair
+            # (current-value, iterator) to the list
+            heap.append((current_value, iterator))
+            break
+    # make the priority queue into a heap
+    heapq.heapify(heap)
+    while heap:
+        # get and yield lowest current value (and corresponding iterator)
+        current_value, iterator = heap[0]
+        yield current_value
+        for current_value in iterator:
+            # subseq is not finished, therefore add this subseq's pair
+            # (current-value, iterator) back into the priority queue
+            heapq.heapreplace(heap, (current_value, iterator))
+            break
+        else:
+            # subseq has been exhausted, therefore remove it from the queue
+            heapq.heappop(heap)
+
+</pre>
+
+</div>
+
+<p>I had to look twice at this code despite the copious comments. There&#8217;s nothing unusual about the two outer loops, a <code>for</code> loop and a <code>while</code> loop. The first sets up the priority queue, visiting each input to do so; the second actually generates the output results while items remain in this queue.
+</p>
+<p>It&#8217;s the inner <code>for</code> loops which are less standard: execution of the body of each will <code>break</code> as soon as a single item has been processed, except when the body is never executed because the iterable is empty, which, in the first case means that iterable needn&#8217;t be queued, and in the second case means the <code>for</code>&#8217;s <code>else</code> clause executes, dequeuing the iterable. These are for loops which actually do something at most once.
+</p>
+<p>You did remember that for loops, in Python, have an <a href="http://docs.python.org/tutorial/controlflow.html#break-and-continue-statements-and-else-clauses-on-loops">else clause</a>, right?
+</p>
+<p>I confess that if I ever knew that, I&#8217;d certainly forgotten it! The else clause executes if the loop is not broken out of, whether or not the iterable is empty<a id="fn1link" href="#fn1"><sup>[1]</sup></a>. There&#8217;s nothing very else-y about it! I&#8217;d be interested to learn of any other C-family languages with a similar construct?
+</p>
+<p>I&#8217;m a fan of the Python Cookbook because it teaches Python idioms by example. Here&#8217;s how it explains this one.
+</p>
+<blockquote><p>Note the idiom that we use to advance an iterator by one step, dealing with the possibility that the iterator is exhausted:</p>
+<pre>for current_value in iterator:
+    # if we get here the iterator was not empty, current_value was
+    # its first value, and the iterator has been advanced one step
+    ...use pair (current_value, iterator)...
+    # we break at once as we only wanted the first item of iterator
+    break
+else:
+    # if we get here the break did not execute, so the iterator
+    # was empty (exhausted)
+    # deal with the case of iterator being exhausted...
+</pre></blockquote>
+
+<p>I have to admit the code still looks odd to me but it&#8217;s just about the perfect construct for this particular use case, eliminating any mention of <code>iterator.next()</code> and <code>StopIteration</code>.
+</p>
+
+<h3>Batteries Included</h3>
+<p><a href="http://wiki.tcl.tk/2352"><img src="http://www.python.org/pics/batteries-included.jpg" alt="Batteries included"/></a>
+</p>
+<p>Python 2.6 includes merge as standard in the <a href="http://docs.python.org/library/heapq.html#heapq.merge">heapq module</a>. Here&#8217;s the <a href="http://svn.python.org/view/python/tags/r26/Lib/heapq.py?rev=66716&amp;view=markup">implementation</a>. You&#8217;ll notice it doesn&#8217;t use the for-break-else idiom, hence the explicit exception catching. It also packs triples rather than pairs into the staging queue, presumably to guarantee a stable merge of the inputs.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">def merge(*iterables):
+    '''Merge multiple sorted inputs into a single sorted output.
+    
+    Similar to sorted(itertools.chain(*iterables)) but returns a generator,
+    does not pull the data into memory all at once, and assumes that each of
+    the input streams is already sorted (smallest to largest).
+    
+    &gt;&gt;&gt; list(merge([1,3,5,7], [0,2,4,8], [5,10,15,20], [], [25]))
+    [0, 1, 2, 3, 4, 5, 5, 7, 8, 10, 15, 20, 25]
+    
+    '''
+    _heappop, _heapreplace, _StopIteration = heappop, heapreplace, StopIteration
+    
+    h = []
+    h_append = h.append
+    for itnum, it in enumerate(map(iter, iterables)):
+        try:
+            next = it.next
+            h_append([next(), itnum, next])
+        except _StopIteration:
+            pass
+    heapify(h)
+    
+    while 1:
+        try:
+            while 1:
+                v, itnum, next = s = h[0]   # raises IndexError when h is empty
+                yield v
+                s[0] = next()               # raises StopIteration when exhausted
+                _heapreplace(h, s)          # restore heap condition
+        except _StopIteration:
+            _heappop(h)                     # remove empty iterator
+        except IndexError:
+            return
+
+</pre>
+
+</div>
+
+
+<h3>What else?</h3>
+<p>Personally I&#8217;ve only really used <code>else</code> alongside <code>if</code><a id="fn2link" href="#fn2"><sup>[2]</sup></a>. As shown here, it also pairs up with <code>for</code> and <code>while</code>. It also also appears (optionally) towards the end of a <a href="http://docs.python.org/ref/try.html">try statement</a>. From <a href="http://docs.python.org/tutorial/errors.html#handling-exceptions">the documentation</a>: 
+</p>
+<blockquote><p>The <strong>try &#8230; except</strong> statement has an optional <i>else clause</i>, which, when present, must follow all except clauses. It is useful for code that must be executed if the try clause does not raise an exception. For example:</p>
+<pre>    for arg in sys.argv[1:]:
+        try:
+            f = open(arg, 'r')
+        except IOError:
+            print 'cannot open', arg
+        else:
+            print arg, 'has', len(f.readlines()), 'lines'
+            f.close()
+</pre><p> The use of the <strong>else</strong> clause is better than adding additional code to the <strong>try</strong> clause because it avoids accidentally catching an exception that wasn&#8217;t raised by the code being protected by the <strong>try &#8230; except</strong> statement.</p></blockquote>
+
+<hr />
+
+<p><a id="fn1" href="#fn1link">[1]</a> Coincidentally, the <code>for ... else</code> construct gets a <a href="http://blog.cdleary.com/2008/10/idiomatic-python-refactoring-for-else-in-contains-operator/">mention</a> today in Christopher Leary&#8217;s VaporWarning blog.
+</p>
+<blockquote><p>The for-else statement looks a little strange when you first encounter it, but I&#8217;ve come to love it.
+</p>
+</blockquote><p>More breaking news &#8230; <a href="http://docs.python.org/whatsnew/2.6.html">Python 2.6</a> officially released about 4 hours after I posted this article. I&#8217;ve tweaked a couple of links accordingly, and will tweak a couple more once the 2.6 documentation appears directly under <a href="http://docs.python.org">http://docs.python.org</a>.
+</p>
+<p><a id="fn2" href="#fn2link">[2]</a> If and else appear together in traditional <a href="http://docs.python.org/ref/if.html#tok-if_stmt">if statements</a> and the newer <a href="http://docs.python.org/ref/Booleans.html">conditional expressions</a>. The latter render one of the Cookbook <a href="http://www.ubookcase.com/book/Oreilly/Python.Cookbook.2nd.edition/0596007973/pythoncook2-chp-18-sect-9.html">recipes</a> obsolete.
+</p>
+</div>
+
+<div class="comments"><hr/><div id="disqus_thread"></div><script type="text/javascript" src="http://disqus.com/forums/wordaligned/embed.js"></script></div>
+      
+<div id="comments"><script type="text/javascript">
+//<![CDATA[
+(function() {
+    var links = document.getElementsByTagName('a');
+    var query = '?';
+    for(var i = 0; i < links.length; i++) {
+        if(links[i].href.indexOf('#disqus_thread') >= 0) {
+            query += 'url' + i + '=' + encodeURIComponent(links[i].href) + '&amp;';
+        }
+    }
+    document.write('<script type="text/javascript" src="http://disqus.com/forums/wordaligned/get_num_replies.js' + query + '"></' + 'script>');
+})();
+//]]>
+</script></div>
+
+    </div>
+    <div id="sidebar">
+      
+<div class="sidebar-node">
+<h3>Tagged</h3>
+<ul id="categories"><li><a href="/tag/python" rel="tag">Python</a></li>
+<li><a href="/tag/streams" rel="tag">Streams</a></li></ul>
+
+</div>
+
+<div class="sidebar-node">
+<h3>Chain</h3>
+<ul>
+<li><a accesskey="n" href="/articles/removing-duplicates-using-itertoolsgroupby.html" title="Next article">&laquo; Removing duplicates using itertools.groupby</a></li>
+<li><a accesskey="p" href="/articles/launching-missiles-and-other-unhappy-accidents.html" title="Previous article">&raquo; Launching missiles and other unhappy accidents</a></li>
+</ul>
+
+
+</div>
+
+<div class="sidebar-node">
+<h3>Feeds</h3>
+
+<ul>
+<li><a href="http://feeds.wordaligned.org/wordaligned"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Articles</a></li>
+<li><a href="http://feeds.wordaligned.org/wordaligned/comments"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Comments</a></li>
+</ul>
+
+
+</div>
+
+    </div>
+  </div>
+  <div id="footer">
+<hr />
+<p><a href="http://tag.wordaligned.org">Thomas Guest</a></p>
+</div>
+
+</div>
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-3373724-1']);
+  _gaq.push(['_trackPageview']);
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ga);
+  })();
+</script>
+</body>
+
+</html>

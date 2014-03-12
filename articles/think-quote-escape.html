@@ -1,0 +1,119 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<link rel="icon" href="/images/favicon.png" type="image/png"/>
+<link href="/styles/application.css" media="all" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="/scripts/prettify.js"></script>
+<script type="text/javascript" src="/scripts/lang-lisp.js"></script>
+<title>Think, quote, escape</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="author" content="Thomas Guest" />
+<meta name="description" content="A Word Aligned article posted 2010-03-30, tagged Self, Build." />
+<meta name="keywords" content="Self, Build" />
+<link rel="alternate" type="application/rss+xml" title="Feed" href="http://feeds.wordaligned.org/wordaligned" />
+</head>
+
+<body onload="prettyPrint()">
+<div id="container">
+  <div id="header">
+<h1><span><a accesskey="h" href="/">Word Aligned</a></span></h1>
+<h2>whatsoever I do, it&#8217;s got to be funky</h2>
+<a class="button" href="http://feeds.wordaligned.org/wordaligned" title="Subscribe to Word Aligned"><img style="float: right;" src="/images/feed.png" alt="Feed Logo" height="28" width="28"/></a>
+</div>
+
+  <div id="page">
+    <div id="content">
+      <div class="atomentry" id="think-quote-escape.html">
+<h2 class="title"><a href="/articles/think-quote-escape.html">Think, quote, escape</a></h2>
+<p class="meta"><abbr class="published" title="2010-03-30">2010-03-30</abbr> &bull; <a href="/tag/self" rel="tag">Self</a>, <a href="/tag/build" rel="tag">Build</a> &bull; <a href="/articles/think-quote-escape.html#disqus_thread">Comments</a></p>
+<p>Evidently Jamie had got in before me. Somehow he&#8217;d unpacked the new 2U server and balanced it on the side of his desk. He looked hassled. I didn&#8217;t ask. The server&#8217;s fans whirred noisily. On Jamie&#8217;s second monitor I could see the familiar chatter of Linux installing itself. I stepped over the cardboard and polystyrene, sat, woke my machine.
+</p>
+<p>Moments later I heard the install disk eject. Jamie typed something, cursed. The disk clattered into the bin. The room grew quiet as the server shut down.
+</p>
+<p>We were a small, new team. Nonetheless, we&#8217;d put something substantial together. It built on a Java framework and ran on Linux. We&#8217;d tweaked the framework, meaning we had to build it from source before building our own stuff, so a clean build took almost half an hour. Just over half an hour later, Jamie had burned a new install disk. He placed it in the server&#8217;s DVD drive. The fans roared up again. Ten minutes later, more cursing, another disk in the bin.
+</p>
+<p>I walked across. Jamie was glaring at some code. A Perl list? His cursor was poised over an item in this list, a single-quoted string, inside which was a sed command, whose arguments themselves needed quoting, which was evidently meant to edit the contents of a double-quoted string in some configuration file. Think: quote and escape. I could see there were <em>four</em> DVDs in the bin. Jamie must have been in for some time. No wonder he looked hassled.
+</p>
+<p>So, what&#8217;s up?
+</p>
+<p>A trade show in the States. The salesman was out there. A bare machine had already been delivered and he needed the software, so Jamie had to cut a DVD which would directly install the operating system together with our application. Please don&#8217;t expect a salesman to download an ISO image and set up enough of a network to boot from it. A courier was booked for midday to collect the DVD. That&#8217;s what&#8217;s up. So leave me alone and let me get on with it.
+</p>
+<p>He didn&#8217;t actually say that last bit. It&#8217;s true, though, he was the Linux expert. I stubbornly watched as he changed some double quotes for single ones, added a couple more backslashes, checked in the file, kicked off another build.
+</p>
+<p>Back at my desk, I reviewed the version control change logs. Evidently Jamie was working on a post-install script which took the form of a list of actions which would be evaluated and executed in Perl. Looking at the file diffs, the sticking point seemed to be a sed command to edit the X display settings. Embedding sed within Perl was proving tricky.
+</p>
+<p>Jamie&#8217;s edit-build-burn-install-check cycle seemed crazy to me. Why not recreate the broken post-install step as a standalone operation? Soon enough I&#8217;d found a way to reproduce the problem. After reading documentation and experimenting I figured out how to nest and escape the various strings. I admit, it took me longer than I expected. By this time Jamie solved the problem by trial and error anyway &#8212; and as proof he had an install disk which he knew worked. He may well have spent less time actually concentrating on the issue than I had; the build-burn-install phases of his process all ran as background activities.
+</p>
+<p>In the event we needed to revise the software anyway. So the salesman had to download a new build at the last minute. Jamie stayed late the next day to talk him through the installation.
+</p>
+</div>
+
+<div class="comments"><hr/><div id="disqus_thread"></div><script type="text/javascript" src="http://disqus.com/forums/wordaligned/embed.js"></script></div>
+      
+<div id="comments"><script type="text/javascript">
+//<![CDATA[
+(function() {
+    var links = document.getElementsByTagName('a');
+    var query = '?';
+    for(var i = 0; i < links.length; i++) {
+        if(links[i].href.indexOf('#disqus_thread') >= 0) {
+            query += 'url' + i + '=' + encodeURIComponent(links[i].href) + '&amp;';
+        }
+    }
+    document.write('<script type="text/javascript" src="http://disqus.com/forums/wordaligned/get_num_replies.js' + query + '"></' + 'script>');
+})();
+//]]>
+</script></div>
+
+    </div>
+    <div id="sidebar">
+      
+<div class="sidebar-node">
+<h3>Tagged</h3>
+<ul id="categories"><li><a href="/tag/self" rel="tag">Self</a></li>
+<li><a href="/tag/build" rel="tag">Build</a></li></ul>
+
+</div>
+
+<div class="sidebar-node">
+<h3>Chain</h3>
+<ul>
+<li><a accesskey="n" href="/articles/binary-search.html" title="Next article">&laquo; Binary search returns &#8230; ?</a></li>
+<li><a accesskey="p" href="/articles/beware-the-march-of-ides.html" title="Previous article">&raquo; Beware the March of IDEs!</a></li>
+</ul>
+
+
+</div>
+
+<div class="sidebar-node">
+<h3>Feeds</h3>
+
+<ul>
+<li><a href="http://feeds.wordaligned.org/wordaligned"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Articles</a></li>
+<li><a href="http://feeds.wordaligned.org/wordaligned/comments"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Comments</a></li>
+</ul>
+
+
+</div>
+
+    </div>
+  </div>
+  <div id="footer">
+<hr />
+<p><a href="http://tag.wordaligned.org">Thomas Guest</a></p>
+</div>
+
+</div>
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-3373724-1']);
+  _gaq.push(['_trackPageview']);
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ga);
+  })();
+</script>
+</body>
+
+</html>

@@ -1,0 +1,199 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<link rel="icon" href="/images/favicon.png" type="image/png"/>
+<link href="/styles/application.css" media="all" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="/scripts/prettify.js"></script>
+<script type="text/javascript" src="/scripts/lang-lisp.js"></script>
+<title>Angle brackets hurt my eyes</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="author" content="Thomas Guest" />
+<meta name="description" content="A Word Aligned article posted 2013-05-01, tagged Lisp, Syntax." />
+<meta name="keywords" content="Lisp, Syntax" />
+<link rel="alternate" type="application/rss+xml" title="Feed" href="http://feeds.wordaligned.org/wordaligned" />
+</head>
+
+<body onload="prettyPrint()">
+<div id="container">
+  <div id="header">
+<h1><span><a accesskey="h" href="/">Word Aligned</a></span></h1>
+<h2>tales from the code face</h2>
+<a class="button" href="http://feeds.wordaligned.org/wordaligned" title="Subscribe to Word Aligned"><img style="float: right;" src="/images/feed.png" alt="Feed Logo" height="28" width="28"/></a>
+</div>
+
+  <div id="page">
+    <div id="content">
+      <div class="atomentry" id="angle-brackets-hurt-my-eyes.html">
+<h2 class="title"><a href="/articles/angle-brackets-hurt-my-eyes.html">Angle brackets hurt my eyes</a></h2>
+<p class="meta"><abbr class="published" title="2013-05-01">2013-05-01</abbr> &bull; <a href="/tag/lisp" rel="tag">Lisp</a>, <a href="/tag/syntax" rel="tag">Syntax</a> &bull; <a href="/articles/angle-brackets-hurt-my-eyes.html#disqus_thread">Comments</a></p>
+<blockquote><p>&#8220;All these angle brackets, they&#8217;re hurting my eyes.&#8221;
+</p>
+</blockquote><p>I&#8217;m quoting a colleague who sits next to me and I sympathise. Perhaps a section from a build file was causing him pain?
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">&lt;target name="all" description="Build product."&gt;
+  &lt;mkdir dir="build" if="${not directory::exists('build')}" /&gt;
+   ....
+&lt;/target&gt;
+
+</pre>
+
+</div>
+
+<p>Or maybe it was some XSL to generate XML by applying XML to XML?
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">&lt;xsl:if test="$index-make or @index!='false'"&gt;
+  &lt;xsl:if test="//index"&gt;
+    &lt;fo:block text-align-last="justify" space-before="5pt"&gt;
+      &lt;fo:basic-link internal-destination="index-page"&gt;
+        &lt;xsl:choose&gt;
+          &lt;xsl:when test="(/doc/@lang = 'ja') or (/doc/@lang = '')&lt;/xsl:when&gt;
+          &lt;xsl:otherwise&gt;INDEX&lt;/xsl:otherwise&gt;
+        &lt;/xsl:choose&gt;
+      &lt;/fo:basic-link&gt;
+      &lt;fo:page-number-citation ref-id="index-page"/&gt;
+    &lt;/fo:block&gt;
+  &lt;/xsl:if&gt;
+&lt;/xsl:if&gt;
+
+</pre>
+
+</div>
+
+<p>Or perhaps he was wrestling with a C++ compile error.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">print.cpp: In function 'void print(const
+std::map&lt;std::basic_string&lt;char, std::char_traits&lt;char&gt;,
+std::allocator&lt;char&gt; &gt;, int, std::less&lt;std::basic_string&lt;char,
+std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt; &gt;,
+std::allocator&lt;std::pair&lt;const std::basic_string&lt;char,
+std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt;, int&gt; &gt; &gt;&amp;)':
+print.cpp:7: error: no match for 'operator&lt;&lt;' in 'std::cout &lt;&lt;
+details' /usr/include/c++/4.2.1/ostream:112: note: candidates are:
+std::basic_ostream&lt;_CharT, _Traits&gt;&amp; std::basic_ostream&lt;_CharT,
+_Traits&gt;::operator&lt;&lt;(std::basic_ostream&lt;_CharT, _Traits&gt;&amp;
+(*)(std::basic_ostream&lt;_CharT, _Traits&gt;&amp;)) [with _CharT = char,
+_Traits = std::char_traits&lt;char&gt;]
+
+</pre>
+
+</div>
+
+<p>What makes angle brackets so vexatious. Could it be their sharp corners?
+</p>
+<p>Lisp is as elegant as XML is prickly, yet it too is famous for brackets, <a href="http://en.wikipedia.org/wiki/S-expression">albeit round ones</a> &#8212; and lots of them.
+</p>
+<blockquote class="twitter-tweet"><p>It&#8217;s not that Clojure/Lisp has a lot of parentheses. Its just that we removed everything else.</p>&mdash; Alex Miller (@puredanger) <a href="https://twitter.com/puredanger/status/313507982623268865">March 18, 2013</a></blockquote>
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+Imagine a parallel universe with angle-bracket Lisp. I wonder if the language would have proved so enduring?
+
+
+
+<div class="typocode"><div class="codetitle">Not so pretty now?</div>
+
+<pre class="prettyprint">&lt;define &lt;euler-transform s&gt;
+  &lt;let &lt;&lt;s0 &lt;stream-ref s 0&gt;&gt;
+        &lt;s1 &lt;stream-ref s 1&gt;&gt;    
+        &lt;s2 &lt;stream-ref s 2&gt;&gt;&gt;
+    &lt;cons-stream &lt;- s2 &lt;/ &lt;square &lt;- s2 s1&gt;&gt;
+                          &lt;+ s0 &lt;* -2 s1&gt; s2&gt;&gt;&gt;
+                 &lt;euler-transform &lt;stream-cdr s&gt;&gt;&gt;&gt;&gt;
+
+</pre>
+
+</div>
+
+
+
+Looking more closely at the first code snippet, the section from a build file, we can see the problem isn&#8217;t so much the angle brackets as all the others.
+
+
+
+<div class="typocode">
+
+<pre class="prettyprint">&lt;mkdir dir="build" if="${not directory::exists('build')}" /&gt;
+
+</pre>
+
+</div>
+
+
+
+The braces and parentheses may be embedded in a double quoted string but that only makes things worse. The nested levels hurt my eyes and, if you can bear to look at the code long enough, you&#8217;ll realise there&#8217;s a simpler message trying to get out: <tt>mkdir -p build</tt>.
+</div>
+
+<div class="comments"><hr/><div id="disqus_thread"></div><script type="text/javascript" src="http://disqus.com/forums/wordaligned/embed.js"></script></div>
+      
+<div id="comments"><script type="text/javascript">
+//<![CDATA[
+(function() {
+    var links = document.getElementsByTagName('a');
+    var query = '?';
+    for(var i = 0; i < links.length; i++) {
+        if(links[i].href.indexOf('#disqus_thread') >= 0) {
+            query += 'url' + i + '=' + encodeURIComponent(links[i].href) + '&amp;';
+        }
+    }
+    document.write('<script type="text/javascript" src="http://disqus.com/forums/wordaligned/get_num_replies.js' + query + '"></' + 'script>');
+})();
+//]]>
+</script></div>
+
+    </div>
+    <div id="sidebar">
+      
+<div class="sidebar-node">
+<h3>Tagged</h3>
+<ul id="categories"><li><a href="/tag/lisp" rel="tag">Lisp</a></li>
+<li><a href="/tag/syntax" rel="tag">Syntax</a></li></ul>
+
+</div>
+
+<div class="sidebar-node">
+<h3>Chain</h3>
+<ul>
+<li><a accesskey="n" href="/articles/clown-flee-jump.html" title="Next article">&laquo; Clown, Flee, Jump</a></li>
+<li><a accesskey="p" href="/articles/solutions.html" title="Previous article">&raquo; &#8220;Solutions&#8221;</a></li>
+</ul>
+
+
+</div>
+
+<div class="sidebar-node">
+<h3>Feeds</h3>
+
+<ul>
+<li><a href="http://feeds.wordaligned.org/wordaligned"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Articles</a></li>
+<li><a href="http://feeds.wordaligned.org/wordaligned/comments"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Comments</a></li>
+</ul>
+
+
+</div>
+
+    </div>
+  </div>
+  <div id="footer">
+<hr />
+<p><a href="http://tag.wordaligned.org">Thomas Guest</a></p>
+</div>
+
+</div>
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-3373724-1']);
+  _gaq.push(['_trackPageview']);
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ga);
+  })();
+</script>
+</body>
+
+</html>

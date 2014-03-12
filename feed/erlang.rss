@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" >
+<channel>
+<title>Word Aligned</title>
+<link>http://wordaligned.org</link>
+<description>tales from the code face</description>
+<dc:creator>tag@wordaligned.org</dc:creator>
+<language>en-gb</language>
+<item>
+<title>Fun with Erlang, ACCU 2008</title>
+<description>&lt;p&gt;I&amp;#8217;ve just got back from a &lt;a href="http://accu.org/index.php/conferences/accu_conference_2008/accu2008_sessions#Fun%20with%20Erlang"&gt;one day course on Erlang&lt;/a&gt; given by its inventor, Joe Armstrong, at day 0 of the &lt;a href="http://accu.org/index.php/conferences/accu_conference_2008"&gt;ACCU 2008 conference&lt;/a&gt;. Actually, he crammed as much as he could from a three day course into a single day. I&amp;#8217;m not too disappointed we didn&amp;#8217;t reach the stated aim of the course, of developing and running a networked application and changing it on the fly: I&amp;#8217;m happy enough to have written some &lt;a href="http://erlang.org"&gt;Erlang&lt;/a&gt; code and been exposed to some new ideas.
+&lt;/p&gt;
+&lt;div class="amazon"&gt;&lt;a href="http://www.amazon.com/gp/product/193435600X?ie=UTF8&amp;amp;tag=wordalig-20&amp;amp;linkCode=as2&amp;amp;camp=1789&amp;amp;creative=9325&amp;amp;creativeASIN=193435600X"&gt;&lt;img src="http://wordaligned.org/images/programming-erlang.jpg" alt="Programming Erlang"/&gt;&lt;/a&gt;&lt;/div&gt;
+
+&lt;p&gt;Armstrong is affable and enthusiastic and not afraid to voice his opinions. He&amp;#8217;s a good teacher. I do recommend his book, &lt;a href="http://www.amazon.com/gp/product/193435600X?ie=UTF8&amp;amp;amp;tag=wordalig-20&amp;amp;amp;linkCode=as2&amp;amp;amp;camp=1789&amp;amp;amp;creative=9325&amp;amp;amp;creativeASIN=193435600X"&gt;&amp;#8220;Programming Erlang: Software for a Concurrent World&amp;#8221;&lt;/a&gt;, but found the tone a bit matey in places. In person he&amp;#8217;s much more direct and engaging.
+&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://erlang.org"&gt;Erlang&lt;/a&gt; is a functional programming language which builds in support for multiple processes &amp;#8212; these are &lt;em&gt;not&lt;/em&gt; operating system processes; and in some ways, Erlang &lt;em&gt;is&lt;/em&gt; the operating system. You define functions and other rules and controls using pattern matching. When patterns are used to dispatch message responses in a &lt;code&gt;receive&lt;/code&gt; statement, the code reads well, and functions can be defined using patterns in an elegant and concise way &amp;#8212; no if-this-then-that-else-other.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;-module(accum).
+-export([evens_and_odds/1]).
+-import(lists, [reverse/1]).
+
+evens_and_odds(L) -&amp;gt; evens_and_odds(L,[], []).
+
+evens_and_odds([H|T], E, O) when H rem 2 =:= 0 -&amp;gt; evens_and_odds(T, [H|E], O);
+evens_and_odds([H|T], E, O) -&amp;gt;  evens_and_odds(T, E, [H|O]);
+evens_and_odds([], E, O)    -&amp;gt;  {E, O}.
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;(I know this example should be coded using &lt;code&gt;lists:partition&lt;/code&gt;, it&amp;#8217;s just here to show the pattern syntax.)
+&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://www.sics.se/~joe/images/mc.jpg" title="Joe Armstrong and the big thumper"&gt;&lt;img src="http://www.sics.se/~joe/images/joe_mc.jpg" alt="Joe Armstrong and the big thumper" style="float:right;"/&gt;&lt;/a&gt;
+&lt;/p&gt;
+&lt;p&gt;Erlang is no academic pure functional language, though. It originated at &lt;a href="http://www.ericsson.com"&gt;Ericsson&lt;/a&gt; over 20 years ago and has been used to develop &lt;em&gt;extremely&lt;/em&gt; reliable distributed concurrent systems. Hence the current interest: Erlang can take advantage of multiple processor cores on multiple machines, which is why it&amp;#8217;s been adopted by up and coming projects like &lt;a href="http://couchdb.org"&gt;CouchDB&lt;/a&gt;. Given its proprietary origins, I think we&amp;#8217;re lucky to find the language available under an open source license. (Armstrong has some stories to tell about that!) On the other hand, Armstrong admitted that some of the documentation was weak &amp;#8212; at Ericsson you could always  ask one of the Erlang developers if you didn&amp;#8217;t understand something. Personally, I&amp;#8217;d be wary of the OTP platform, a full-featured distributed application framework built on top of Erlang.
+&lt;/p&gt;
+&lt;p&gt;Processes communicate by messages and by generating exceptions. You can link processes together. This doesn&amp;#8217;t mean designing a distributed system is easy, but I&amp;#8217;d say it gives us an appropriate language for such systems. Or as Armstrong puts it:
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;&amp;#8220;You cannot describe concurrent systems in sequential languages.&amp;#8221;
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;hr /&gt;
+
+&lt;p&gt;By the way, I&amp;#8217;ll be back at the conference on Thursday, to hear what &lt;a href="http://wordaligned.org/articles/programming-nirvana-plan-b.html"&gt;Simon Peyton Jones has to say about functional programming and Haskell&lt;/a&gt;. See some of you then.
+&lt;/p&gt;</description>
+<dc:date>2008-04-01</dc:date>
+<guid>http://wordaligned.org/articles/fun-with-erlang-accu-2008.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/fun-with-erlang-accu-2008.html</link>
+<category>Erlang</category>
+</item>
+
+<item>
+<title>Erlang Erlang</title>
+<description>&lt;h3&gt;Programming Erlang&lt;/h3&gt;
+&lt;p&gt;&amp;#8230; so I order a single copy of &lt;a href="http://www.pragprog.com/titles/jaerlang"&gt;&amp;#8220;Programming Erlang&amp;#8221;&lt;/a&gt; from amazon
+&lt;/p&gt;
+
+&lt;h3&gt;Multiple Dispatch&lt;/h3&gt;
+&lt;p&gt;but they send two which is
+&lt;/p&gt;
+&lt;p&gt;&lt;img src="http://ecx.images-amazon.com/images/I/41jS8XjGcML._AA240_.jpg" alt="Programming Erlang 1"/&gt;
+   &lt;img src="http://ecx.images-amazon.com/images/I/41jS8XjGcML._AA240_.jpg" alt="Programming Erlang 2"/&gt;
+&lt;/p&gt;
+
+&lt;h3&gt;Distributed Systems&lt;/h3&gt;
+&lt;p&gt;ok because now I have one for home and one for work
+&lt;/p&gt;
+
+&lt;h3&gt;Fault Tolerance&lt;/h3&gt;
+&lt;p&gt;but double checking the invoice I see the book packing robot in the warehouse made no mistake and I in fact carelessly ordered not one but two copies
+&lt;/p&gt;
+
+&lt;h3&gt;Parallel Processing&lt;/h3&gt;
+&lt;p&gt;and then I recall being distracted at the point of sale since I&amp;#8217;m after the erlang book but amazon offers me a better deal if I pair it with some other book which I do but maybe forget to remove the original then while coasting towards the checkout I&amp;#8217;m answering an email or an instant message or something and fail to spot my mistake
+&lt;/p&gt;
+
+&lt;h3&gt;Error Handling&lt;/h3&gt;
+&lt;p&gt;so now I return the duplicate and will do one thing at a time next time &amp;#8230;
+&lt;/p&gt;</description>
+<dc:date>2008-01-15</dc:date>
+<guid>http://wordaligned.org/articles/erlang-erlang.html</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/erlang-erlang.html</link>
+<category>Erlang</category>
+</item>
+
+</channel>
+</rss>

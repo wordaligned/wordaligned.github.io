@@ -1,0 +1,153 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<link rel="icon" href="/images/favicon.png" type="image/png"/>
+<link href="/styles/application.css" media="all" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="/scripts/prettify.js"></script>
+<script type="text/javascript" src="/scripts/lang-lisp.js"></script>
+<script type="text/javascript" src="http://www.haloscan.com/load/wordaligned"></script>
+
+<title>Python keyword workaround</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="author" content="Thomas Guest" />
+<meta name="description" content="A Word Aligned article posted 2007-03-23, tagged Python." />
+<meta name="keywords" content="Python" />
+<link rel="alternate" type="application/rss+xml" title="Feed" href="http://feeds.wordaligned.org/wordaligned" />
+</head>
+
+<body onload="prettyPrint()">
+<div id="container">
+  <div id="header">
+<h1><span><a accesskey="h" href="/">Word Aligned</a></span></h1>
+<h2>space sensitive programming</h2>
+<a class="button" href="http://feeds.wordaligned.org/wordaligned" title="Subscribe to Word Aligned"><img style="float: right;" src="/images/feed.png" alt="Feed Logo" height="28" width="28"/></a>
+</div>
+
+  <div id="page">
+    <div id="content">
+      <div class="atomentry" id="python-keyword-workaround">
+<h2 class="title"><a href="/articles/python-keyword-workaround">Python keyword workaround</a></h2>
+<p class="meta"><abbr class="published" title="2007-03-23">2007-03-23</abbr> &bull; <a href="/tag/python" rel="tag">Python</a> &bull; <a href="/articles/python-keyword-workaround#disqus_thread">Comments</a></p>
+<p>I was writing a simple tool and wanted to pass it <code>from</code>
+   and <code>to</code> parameters. As usual, I used the <a href="http://docs.python.org/lib/module-optparse.html">optparse</a> module to extract
+   these parameters from the command line.
+</p>
+<div class="typocode"><div class="codetitle">Spot the syntax error</div>
+
+<pre class="prettyprint">def do_something(from_here, to_here):
+    ....
+
+from optparse import OptionParser
+parser = OptionParser()
+parser.add_option("--from")
+parser.add_option("--to")
+
+opts, files = parser.parse_args()
+do_something(opts.from, opts.to)
+
+</pre>
+
+</div>
+
+<p>This code won&#8217;t work because <code>from</code> is a keyword (it&#8217;s used to qualify module imports).
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">    do_something(opts.from, opts.to)
+                         ^
+SyntaxError: invalid syntax
+
+</pre>
+
+</div>
+
+<p>One pragmatic way round this would be to change the command line parameters.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">parser.add_option("--start")
+parser.add_option("--finish")
+
+</pre>
+
+</div>
+
+<p>I didn&#8217;t want to do that, so here&#8217;s another.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">do_something(getattr(opts, "from"), opts.to)
+
+</pre>
+
+</div>
+</div>
+
+<div class="comments"><hr/><div id="disqus_thread"></div><script type="text/javascript" src="http://disqus.com/forums/wordaligned/embed.js"></script></div>
+      
+<div id="comments"><script type="text/javascript">
+//<![CDATA[
+(function() {
+    var links = document.getElementsByTagName('a');
+    var query = '?';
+    for(var i = 0; i < links.length; i++) {
+        if(links[i].href.indexOf('#disqus_thread') >= 0) {
+            query += 'url' + i + '=' + encodeURIComponent(links[i].href) + '&amp;';
+        }
+    }
+    document.write('<script type="text/javascript" src="http://disqus.com/forums/wordaligned/get_num_replies.js' + query + '"></' + 'script>');
+})();
+//]]>
+</script></div>
+
+    </div>
+    <div id="sidebar">
+      
+<div class="sidebar-node">
+<h3>Tagged</h3>
+<ul id="categories"><li><a href="/tag/python" rel="tag">Python</a></li></ul>
+
+</div>
+
+<div class="sidebar-node">
+<h3>Chain</h3>
+<ul>
+<li><a accesskey="n" href="/articles/high-altitude-programming" title="Next article">&laquo; High altitude programming</a></li>
+<li><a accesskey="p" href="/articles/charming-python" title="Previous article">&raquo; Charming Python</a></li>
+</ul>
+
+
+</div>
+
+<div class="sidebar-node">
+<h3>Feeds</h3>
+
+<ul>
+<li><a href="http://feeds.wordaligned.org/wordaligned"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Articles</a></li>
+<li><a href="http://feeds.wordaligned.org/wordaligned/comments"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Comments</a></li>
+</ul>
+
+
+</div>
+
+    </div>
+  </div>
+  <div id="footer">
+<hr />
+<p><a href="http://tag.wordaligned.org">Thomas Guest</a></p>
+</div>
+
+</div>
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-3373724-1']);
+  _gaq.push(['_trackPageview']);
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ga);
+  })();
+</script>
+</body>
+
+</html>

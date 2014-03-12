@@ -1,0 +1,166 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<link rel="icon" href="/images/favicon.png" type="image/png"/>
+<link href="/styles/application.css" media="all" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="/scripts/prettify.js"></script>
+<script type="text/javascript" src="/scripts/lang-lisp.js"></script>
+<script type="text/javascript" src="http://www.haloscan.com/load/wordaligned"></script>
+
+<title>From Hash Key to Haskell</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="author" content="Thomas Guest" />
+<meta name="description" content="A note on keys, characters, smileys, digraphs and Haskell. A Word Aligned article posted 2008-01-19, tagged Apple, Haskell, Python, C++, Characters." />
+<meta name="keywords" content="Apple, Haskell, Python, C++, Characters" />
+<link rel="alternate" type="application/rss+xml" title="Feed" href="http://feeds.wordaligned.org/wordaligned" />
+</head>
+
+<body onload="prettyPrint()">
+<div id="container">
+  <div id="header">
+<h1><span><a accesskey="h" href="/">Word Aligned</a></span></h1>
+<h2>space sensitive programming</h2>
+<a class="button" href="http://feeds.wordaligned.org/wordaligned" title="Subscribe to Word Aligned"><img style="float: right;" src="/images/feed.png" alt="Feed Logo" height="28" width="28"/></a>
+</div>
+
+  <div id="page">
+    <div id="content">
+      <div class="atomentry" id="from-hash-key-to-haskell.html">
+<h2 class="title"><a href="/articles/from-hash-key-to-haskell.html">From Hash Key to Haskell</a></h2>
+<p class="meta"><abbr class="published" title="2008-01-19">2008-01-19</abbr> &bull; <a href="/tag/apple" rel="tag">Apple</a>, <a href="/tag/haskell" rel="tag">Haskell</a>, <a href="/tag/python" rel="tag">Python</a>, <a href="/tag/c++" rel="tag">C++</a>, <a href="/tag/characters" rel="tag">Characters</a> &bull; <a href="/articles/from-hash-key-to-haskell.html#disqus_thread">Comments</a></p>
+<h3>Mac Hash</h3>
+<p>How annoying, there&#8217;s no hash key on the Mac UK keyboard!
+</p>
+<p>SHIFT+3 gets you the UK pound sign, &pound; (I&#8217;d prefer the Euro, &euro;), and once you&#8217;ve found that you&#8217;re in the right vicinity &#8212; as if by magic, ALT+3 produces the #.
+</p>
+<p>Unfortunately this same key combination doesn&#8217;t work on the Windows XP virtual machine I run under <a href="http://www.parallels.com/en/products/desktop/">Parallels</a>. I&#8217;ve done enough configuring to get the Mac keyboard working tolerably with this virtualised XP, but whenever I need to enter a # I&#8217;m reduced to cutting and pasting.
+</p>
+
+<h3>Trigraph Confusion</h3>
+<p>C and C++ programmers could avoid the # by using trigraphs, an obscure language feature which allows you to write <code>??=</code> instead. Yes, there are other trigraphs. Courtesy of Wikipedia, here&#8217;s an <a href="http://en.wikipedia.org/wiki/C_trigraph#Example">example program</a> which uses them all.
+</p>
+<blockquote><pre>
+??=include &lt;stdio.h&gt;
+
+int main(void)
+??&lt;
+    char n??(5??);
+    n??(4??) = '0' - (??-0 ??' 1 ??! 2);
+    printf("%c??/n", n??(4??));
+    return 0;
+??&gt;
+</pre></blockquote>
+
+<p>Impressively unreadable!
+</p>
+
+<h3>What you see is not what you type</h3>
+<p>An important difference between a typewriter and a text editor is the software between keypress and screen update &#8212; the software I&#8217;ve failed to fully configure on my virtual XP machine. So why not exploit this indirection?
+</p>
+<p>Developers of mobile phones have grown ingenious at adapting a numeric keypad to generate text almost as ably as a QWERTY one. (Which do serious texters prefer, I wonder, an <a href="http://www.apple.com/iphone/">iphone</a> or a numeric keypad?) And my <a href="http://www.adiumx.com/">instant messenger client</a> is cute enough to display smiley punctuation sequences as emoticon graphics.
+</p>
+
+<h3>Python smiley</h3>
+<p>On which point, <span id="excerpt0"/>has anyone else noticed the square-jawed smiley you get when you chop the last element from a Python list? This one&#8217;s wearing a cap.
+</p>
+<pre style="font-size: 150%">q[:-1]</pre>
+
+
+<h3>Readable Haskell</h3>
+<p><a href="http://www.haskell.org">Haskell</a> is one of my <a href="http://www.codinghorror.com/blog/archives/000916.html" title="Jeff Attwood cautions against the magpie mentality.">shiny new things</a> for 2008. I&#8217;ve scratched at it before and one of the things which put me off is the number of digraphs in the code. They don&#8217;t look right. I&#8217;m talking about the arrows in particular:
+</p>
+<pre style="font-size: 150%">-&gt;  &lt;-  =&gt;</pre>
+
+<p>Of course I&#8217;m used to the logical digraphs <code>&amp;&amp;</code>, <code>||</code> and the comparison operators, <code>==</code>, <code>&lt;=</code> etc. These don&#8217;t look out of place in the C family of languages, but Haskell&#8217;s roots seem closer to mathematics and logic; it <em>craves</em> proper mathematical and logical symbols.
+</p>
+<img style="float:right;" src="http://haskell.org/haskellwiki_logo_small.png" alt="Haskell Logo"/>
+
+<p>The symbol Haskell uses for anonymous functions is a single backslash, <code>\</code>. This should of course be a lambda, &#x03BB;. It&#8217;s ironic that this character is the star of the <a href="http://www.haskell.org">Haskell homepage</a> but can&#8217;t be found in Haskell source code.
+</p>
+<p>It shouldn&#8217;t be too hard to view and edit Haskell code using more appropriate characters even if you actually input them as usual. Oh look, <a href="http://www.iro.umontreal.ca/~monnier/elisp/#haskell-mode">Emacs does it already</a>!
+</p>
+<p>Set <code>(setq haskell-font-lock-symbols 'unicode)</code> and your Haskell code will look something like the sample shown in the upper screen below (I&#8217;ve split the editor window and shown a plain-text view of the same content in the lower screen).
+</p>
+<img src="/files/haskell-emacs-screen.png" alt="Emacs Haskell mode screen grab"/>
+
+<p>Much better!
+</p>
+</div>
+
+<div class="comments"><hr/><div id="disqus_thread"></div><script type="text/javascript" src="http://disqus.com/forums/wordaligned/embed.js"></script></div>
+      
+<div id="comments"><script type="text/javascript">
+//<![CDATA[
+(function() {
+    var links = document.getElementsByTagName('a');
+    var query = '?';
+    for(var i = 0; i < links.length; i++) {
+        if(links[i].href.indexOf('#disqus_thread') >= 0) {
+            query += 'url' + i + '=' + encodeURIComponent(links[i].href) + '&amp;';
+        }
+    }
+    document.write('<script type="text/javascript" src="http://disqus.com/forums/wordaligned/get_num_replies.js' + query + '"></' + 'script>');
+})();
+//]]>
+</script></div>
+
+    </div>
+    <div id="sidebar">
+      <div class="sidebar-node">
+<h3>Excerpt</h3>
+<p><a href="#excerpt0">Has anyone else noticed the square-jawed smiley you get when you chop the last element from a Python list?</a></p>
+
+</div>
+
+<div class="sidebar-node">
+<h3>Tagged</h3>
+<ul id="categories"><li><a href="/tag/apple" rel="tag">Apple</a></li>
+<li><a href="/tag/haskell" rel="tag">Haskell</a></li>
+<li><a href="/tag/python" rel="tag">Python</a></li>
+<li><a href="/tag/c++" rel="tag">C++</a></li>
+<li><a href="/tag/characters" rel="tag">Characters</a></li></ul>
+
+</div>
+
+<div class="sidebar-node">
+<h3>Chain</h3>
+<ul>
+<li><a accesskey="n" href="/articles/attack-of-the-alien-asterisks.html" title="Next article">&laquo; Attack of the Alien Asterisks</a></li>
+<li><a accesskey="p" href="/articles/erlang-erlang.html" title="Previous article">&raquo; Erlang Erlang</a></li>
+</ul>
+
+
+</div>
+
+<div class="sidebar-node">
+<h3>Feeds</h3>
+
+<ul>
+<li><a href="http://feeds.wordaligned.org/wordaligned"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Articles</a></li>
+<li><a href="http://feeds.wordaligned.org/wordaligned/comments"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Comments</a></li>
+</ul>
+
+
+</div>
+
+    </div>
+  </div>
+  <div id="footer">
+<hr />
+<p><a href="http://tag.wordaligned.org">Thomas Guest</a></p>
+</div>
+
+</div>
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-3373724-1']);
+  _gaq.push(['_trackPageview']);
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ga);
+  })();
+</script>
+</body>
+
+</html>

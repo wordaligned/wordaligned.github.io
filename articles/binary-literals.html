@@ -1,0 +1,200 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<link rel="icon" href="/images/favicon.png" type="image/png"/>
+<link href="/styles/application.css" media="all" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="/scripts/prettify.js"></script>
+<script type="text/javascript" src="/scripts/lang-lisp.js"></script>
+<script type="text/javascript" src="http://www.haloscan.com/load/wordaligned"></script>
+
+<title>Binary Literals</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="author" content="Thomas Guest" />
+<meta name="description" content="A Word Aligned article posted 2006-08-06, tagged C++, Ruby." />
+<meta name="keywords" content="C++, Ruby" />
+<link rel="alternate" type="application/rss+xml" title="Feed" href="http://feeds.wordaligned.org/wordaligned" />
+</head>
+
+<body onload="prettyPrint()">
+<div id="container">
+  <div id="header">
+<h1><span><a accesskey="h" href="/">Word Aligned</a></span></h1>
+<h2>sweating the small stuff</h2>
+<a class="button" href="http://feeds.wordaligned.org/wordaligned" title="Subscribe to Word Aligned"><img style="float: right;" src="/images/feed.png" alt="Feed Logo" height="28" width="28"/></a>
+</div>
+
+  <div id="page">
+    <div id="content">
+      <div class="atomentry" id="binary-literals.html">
+<h2 class="title"><a href="/articles/binary-literals.html">Binary Literals</a></h2>
+<p class="meta"><abbr class="published" title="2006-08-06">2006-08-06</abbr> &bull; <a href="/tag/c++" rel="tag">C++</a>, <a href="/tag/ruby" rel="tag">Ruby</a> &bull; <a href="/articles/binary-literals.html#disqus_thread">Comments</a></p>
+<p>When I <a href="/articles/my-test-first-ruby-program.html" title="my (test) first Ruby program">examined Ruby&#8217;s syntax</a> for integral literals I found the usual
+   suspects &#8212; decimal, octal, and hexadecimal numbers. There were also a couple
+   of pleasant surprises.
+</p>
+<span id="continue-reading"/>
+
+
+<h4>Binary Literals</h4>
+<p><span id="excerpt0"/>Ruby supports binary literals. It&#8217;s always been mystery to me why
+   other languages don&#8217;t support these &ndash; you always need them when you
+   need to pack and unpack binary data. Many of us old C/C++ hackers
+   probably use hexadecimal numbers for this purpose, to the extent that
+   we probably <em>know</em> the binary values of the first sixteen hex numbers
+   &#8212; but they still don&#8217;t <a href="/articles/readable-code.html" title="Readable code">read</a> well. For example, here, in
+   different languages, are bitmasks to get at bits 2 to 5 (inclusive) of
+   a number. I&#8217;m counting the least significant bit as bit 0 here.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">mask = 0b111100    # Ruby, binary literal
+mask = 0x3C        # Python, hexadecimal numeric literal
+unsigned long const mask
+     = 0x3C;       // C++, hexadecimal numeric literal
+
+</pre>
+
+</div>
+
+<p>It&#8217;s clear that the Ruby literal is easiest to interpret as a bit mask.
+</p>
+<p>In C++ &#8212; and other C-family languages &#8212; we could equally try
+   and express our intent of extracting bits 2, 3, 4, 5 more directly:
+</p>
+<div class="typocode">
+
+<pre class="prettyprint"> unsigned long const mask
+     = ~(~0u &lt;&lt; 6 - 2) &lt;&lt; 2;
+
+</pre>
+
+</div>
+
+<p>With a bit of squinting, we read this as: &#8220;set bits in the half open range
+   from bits 2 to 6&#8221;.
+</p>
+<p>Note in passing that the subtraction operator, <code>-</code>, binds more tightly
+   than the left shift operator, <code>&lt;&lt;</code>, <a href="/articles/brackets_off.html" title="Brackets off!">despite what you might expect</a>,
+   so we are in fact left shifting <code>~0u</code> by <code>4</code>.
+</p>
+<p>In C++ we might even consider working around the lack of binary
+   literals using a <a href="http://www.sgi.com/tech/stl/bitset.html">bitset</a>.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">unsigned long const mask
+    = std::bitset&lt;6&gt;(std::string("111100")).to_ulong();
+
+</pre>
+
+</div>
+
+<p>This is, however, non-idiomatic and inefficient, and really just exposes the
+   language&#8217;s lack of binary literals.
+</p>
+
+<h4>Underscore as Separators</h4>
+<p>Binary literals soon get tricky to read. Runs of 1&#8217;s and 0&#8217;s can be
+   hard on the eye.  How readable, for example, would our <a href="http://www.ruby-lang.org" title="Ruby home">Ruby</a>
+   literal be if we wanted to mask out bits 9, 10, 11?
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">mask = 0b111000000000
+
+</pre>
+
+</div>
+
+<p>Fortunately, <a href="http://www.ruby-lang.org" title="Ruby home">Ruby</a> allows us to place underscores in numeric
+   literals, which, gives us an equivalent number:
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">mask = 0b1110_0000_0000
+
+</pre>
+
+</div>
+
+<p>Here, I&#8217;ve inserted the underscores every <code>4</code> bits &#8212; that is, at the
+   boundaries of nibbles. Nice one <a href="http://www.ruby-lang.org" title="Ruby home">Ruby</a>!
+</p>
+</div>
+
+<div class="comments"><hr/><div id="disqus_thread"></div><script type="text/javascript" src="http://disqus.com/forums/wordaligned/embed.js"></script></div>
+      
+<div id="comments"><script type="text/javascript">
+//<![CDATA[
+(function() {
+    var links = document.getElementsByTagName('a');
+    var query = '?';
+    for(var i = 0; i < links.length; i++) {
+        if(links[i].href.indexOf('#disqus_thread') >= 0) {
+            query += 'url' + i + '=' + encodeURIComponent(links[i].href) + '&amp;';
+        }
+    }
+    document.write('<script type="text/javascript" src="http://disqus.com/forums/wordaligned/get_num_replies.js' + query + '"></' + 'script>');
+})();
+//]]>
+</script></div>
+
+    </div>
+    <div id="sidebar">
+      <div class="sidebar-node">
+<h3>Excerpt</h3>
+<p><a href="#excerpt0">Ruby supports binary literals. It's always been mystery to me why
+other languages don't support these &ndash; you always need them when you
+need to pack and unpack binary data.</a></p>
+
+</div>
+
+<div class="sidebar-node">
+<h3>Tagged</h3>
+<ul id="categories"><li><a href="/tag/c++" rel="tag">C++</a></li>
+<li><a href="/tag/ruby" rel="tag">Ruby</a></li></ul>
+
+</div>
+
+<div class="sidebar-node">
+<h3>Chain</h3>
+<ul>
+<li><a accesskey="n" href="/articles/creating-a-temporary-subversion-repository.html" title="Next article">&laquo; Creating a Temporary Subversion Repository</a></li>
+<li><a accesskey="p" href="/articles/readable-code.html" title="Previous article">&raquo; Readable Code</a></li>
+</ul>
+
+
+</div>
+
+<div class="sidebar-node">
+<h3>Feeds</h3>
+
+<ul>
+<li><a href="http://feeds.wordaligned.org/wordaligned"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Articles</a></li>
+<li><a href="http://feeds.wordaligned.org/wordaligned/comments"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Comments</a></li>
+</ul>
+
+
+</div>
+
+    </div>
+  </div>
+  <div id="footer">
+<hr />
+<p><a href="http://tag.wordaligned.org">Thomas Guest</a></p>
+</div>
+
+</div>
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-3373724-1']);
+  _gaq.push(['_trackPageview']);
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ga);
+  })();
+</script>
+</body>
+
+</html>

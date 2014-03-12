@@ -1,0 +1,297 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<link rel="icon" href="/images/favicon.png" type="image/png"/>
+<link href="/styles/application.css" media="all" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="/scripts/prettify.js"></script>
+<script type="text/javascript" src="/scripts/lang-lisp.js"></script>
+<title>Python on Ice</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="author" content="Thomas Guest" />
+<meta name="description" content="A review of the Python 2, Python 3 language fork. Python 3 has met with some resistance. A moratorium on further changes to the language is being imposed, to smooth the transition. A Word Aligned article posted 2009-10-28, tagged Python." />
+<meta name="keywords" content="Python" />
+<link rel="alternate" type="application/rss+xml" title="Feed" href="http://feeds.wordaligned.org/wordaligned" />
+</head>
+
+<body onload="prettyPrint()">
+<div id="container">
+  <div id="header">
+<h1><span><a accesskey="h" href="/">Word Aligned</a></span></h1>
+<h2>space sensitive programming</h2>
+<a class="button" href="http://feeds.wordaligned.org/wordaligned" title="Subscribe to Word Aligned"><img style="float: right;" src="/images/feed.png" alt="Feed Logo" height="28" width="28"/></a>
+</div>
+
+  <div id="page">
+    <div id="content">
+      <div class="atomentry" id="antipep">
+<h2 class="title"><a href="/articles/antipep">Python on Ice</a></h2>
+<p class="meta"><abbr class="published" title="2009-10-28">2009-10-28</abbr> &bull; <a href="/tag/python" rel="tag">Python</a> &bull; <a href="/articles/antipep#disqus_thread">Comments</a></p>
+<div class="toc">
+<h2>Contents</h2>
+<ul>
+ <li><a href="#tocpython" name="toc0" id="toc0">Python?</a>
+ </li>
+
+ <li><a href="#toctwisted-81-on-python-25" name="toc1" id="toc1">Twisted 8.1 on Python 2.5</a>
+ </li>
+
+ <li><a href="#tocpython-3-on-word-aligned" name="toc2" id="toc2">Python 3 on Word Aligned</a>
+ </li>
+
+ <li><a href="#tocpython-3-absent-from-europython" name="toc3" id="toc3">Python 3 absent from Europython</a>
+ </li>
+
+ <li><a href="#tocpython-3-literature" name="toc4" id="toc4">Python 3 Literature</a>
+ </li>
+
+ <li><a href="#tocthe-cost-of-python-3" name="toc5" id="toc5">The Cost of Python 3</a>
+ </li>
+
+ <li><a href="#tocevolution-of-python" name="toc6" id="toc6">Evolution of Python</a>
+ </li>
+
+ <li><a href="#tocaccepting-python-3" name="toc7" id="toc7">Accepting Python 3</a>
+ </li>
+</ul>
+</div><blockquote><p>A moratorium on Python changes is probably a good thing&#8212;the last edition of my book nearly made my head explode. &#8212; <a href="http://twitter.com/dabeaz/status/5055586588">@dabeaz</a>
+</p>
+</blockquote>
+<h3><a href="#toc0" name="tocpython" id="tocpython">Python?</a></h3>
+<p>&#8220;Python?&#8221;
+</p>
+<p>&#8220;Yes, Python. It&#8217;s a <a href="/articles/pitching-python-in-three-syllables.html">high-level</a> language, we used it for the prototype. We can use it for parts of the system where performance isn&#8217;t critical. Connecting components together. The web server.&#8221;
+</p>
+<p>&#8220;But what will we do when Python changes? It&#8217;s a developing language, right? How can we maintain our system.&#8221;
+</p>
+<p>Not an issue, I explained. Python takes backwards compatibility very seriously. Besides, we choose which version of Python to deploy with, we choose when we migrate &#8212; maybe never. Look, you can <a href="http://python.org/download/releases">download the source</a> for every version of Python ever released. All you need is a <a href="http://www.python.org/dev/peps/pep-0007" title="A C89 compiler, in fact. (PEP 7, Style Guide for C Code)">C compiler</a>. C is the porting layer, if you like, and C isn&#8217;t going anywhere in a hurry.
+</p>
+<p>In all honesty, I expected more maintenance issues with the C++ parts of our product, where the language may not have changed in a decade but <a href="/articles/code-rot.html">compilers are only just catching up</a> with it; and in fact I didn&#8217;t have to argue for long to persuade senior management, not on this issue at least. They&#8217;d already seen how quickly I could get things up and running using Python. Even though the company had more experience with C, C++, Java, and even .Net, I convinced them Python had a role on the server-based system we were developing.
+</p>
+<p>Nonetheless, I didn&#8217;t think it the right time to mention Python 3. Why confuse things?
+</p>
+<span id="continue-reading"/>
+
+
+<h3><a href="#toc1" name="toctwisted-81-on-python-25" id="toctwisted-81-on-python-25">Twisted 8.1 on Python 2.5</a></h3>
+<p>I won&#8217;t go into detail about the product. Data flowed through it, redirected dynamically using tees and filters, and robots were attached to the resulting streams to monitor them. A web UI presented controls and a view of the system. We used C and C++ for managing the bulk of the flow. The robots we coded in both Python and C++. We connected and coordinated everything using <a href="http://twistedmatrix.com" title="Twisted is an event-driven networking engine written in Python">Twisted</a>, a Python networking engine. Our initial deployment used Python 2.5 and Twisted 8.1. We&#8217;ve since upgraded to Python 2.6 and Twisted 8.2.
+</p>
+
+<h3><a href="#toc2" name="tocpython-3-on-word-aligned" id="tocpython-3-on-word-aligned">Python 3 on Word Aligned</a></h3>
+<p>At work there was no question of using Python 3 even though it became available when we started development. Twisted hadn&#8217;t been released against Python 3 (<a href="http://stackoverflow.com/questions/172306/how-are-you-planning-on-handling-the-migration-to-python-3/214601#214601">it still hasn&#8217;t</a>) and even if it had been, we wouldn&#8217;t have trusted it immediately. Here at <a href="/">Word Aligned</a>, though, I switched to Python 3 pretty much as soon as it was officially released. Since the start of 2009, <a href="/articles/perl-6-python-3.html#tocword-aligned-and-python-30">any Python code published on this site has been written in Python 3</a>.
+</p>
+<p>Since then I&#8217;ve come to question my decision. I want people to visit my site and I want them to stay long enough to read any code here. Python is perfect because it&#8217;s readable and accessible. Anyone who&#8217;s ever written a program, whatever the  language, can understand Python. But many times I&#8217;ve felt the need to explain my Python 3 code, not to Java, C#, C++ and C users, not even to Perl and Ruby users, but to Python users!
+</p>
+<blockquote><p>Note that in Python 3 &#8230; whereas in Python 2 &#8230; available in Python 3.1 only &#8230; you&#8217;d need to write &#8230; from __future__ import print_function
+</p>
+</blockquote><p>I wouldn&#8217;t have felt the need to say any of this if I&#8217;d stuck with Python 2.
+</p>
+
+<h3><a href="#toc3" name="tocpython-3-absent-from-europython" id="tocpython-3-absent-from-europython">Python 3 absent from Europython</a></h3>
+<p><a href="http://www.flickr.com/photos/thomasguest/4036266347/" title="Europython 2009 bag code by Thomas Guest, on Flickr"><img src="http://farm3.static.flickr.com/2700/4036266347_9862579d68.jpg" width="500" height="208" alt="Code on the Europython 2009 bag" /></a>
+</p>
+<p>At Europython 2009 I was struck by the absence of Python 3 from the agenda. None of <a href="http://www.europython.eu/talks/timetable/" title="Europython 2009 timetable">the sessions</a> covered Python 3, used Python 3, or even mentioned Python 3 (unless you count David Jones&#8217; talk on <a href="http://www.europython.eu/talks/talk_abstracts/index.html#talk74">Loving Old Versions of Python</a>). The only Python 3 code I saw appeared on the conference bag; a lightly obfuscated script which printed out the conference destination. Note that <code>print</code> is being used in a way which works with both 2.x and 3.x &#8212; that is, with parentheses and taking a single parameter. Very few systems resolve <code>/usr/bin/env python</code> as Python 3, though<a id="fn1link" href="#fn1"><sup>[1]</sup></a>, which is lucky since even this simple function raises an exception under Python 3 (and transforming the code using <code><a href="http://docs.python.org/library/2to3.html">2to3</a></code> makes it worse).
+</p>
+<p>This Python 3 silence was at last broken during the question and answer session which followed the final keynote on the final day of the conference. An audibly nervous member of the audience asks <a href="http://www.python.org/psf">Python Software Foundation</a> supremo <a href="http://holdenweb.com">Steve Holden</a> a question:
+</p>
+<blockquote><p>Audience member: A source of confusion is the Python 2 Python 3 thing. How are you going about getting people to move from Python 2 to Python 3?
+</p>
+<p>Steve Holden: I&#8217;m not trying to get people to move to Python 3. [Audience applauds].
+</p>
+</blockquote><p>Steve Holden went on to round out this answer, saying that 2.6 is the recommended production version of Python. Anyone who took Python 3.0 into production, he said, would have been &#8220;kicked in the teeth by the fact that the IO subsystem performed execrably slowly, it was really dreadful&#8221; &#8212; a fact the 3.0 release notes failed to mention, but which has been <a href="http://docs.python.org/3.1/whatsnew/3.1.html#optimizations">fixed in Python 3.1</a>. For teaching purposes, or for greenfield development which doesn&#8217;t need to reuse other people&#8217;s code, by all means try Python 3, he said. Python 3 is the future of Python. There&#8217;s a migration strategy in place.
+</p>
+<p>And what about the overhead on the core Python development team, who now have two versions to maintain? Well, Steve Holden said, there are tools to automate patching and merging, but yes, there&#8217;s an overhead.
+</p>
+<p>(To hear the question and full response, there&#8217;s <a href="http://blip.tv/file/2351630" title="The Python Software Foundation and Us, Steve Holden, Europython 2009">a video at blip.tv</a>. Fast forward to 52 minutes and 40 seconds.)
+</p>
+
+<h3><a href="#toc4" name="tocpython-3-literature" id="tocpython-3-literature">Python 3 Literature</a></h3>
+<div class="amazon"><a href="http://www.amazon.com/Python-Essential-Reference-Developers-Library/dp/0672329786"><img src="/images/books/python-essential-reference4.png" alt="Python Essential Reference, 4th edition"/></a></div>
+<div class="amazon"><a href="http://www.amazon.com/gp/product/1430224150?ie=UTF8&amp;tag=diveintomark-20"><img height="222px" src="http://ecx.images-amazon.com/images/I/51N9HK%2B7WGL._SL300_.jpg" alt="Dive into Python 3 cover"/></a></div>
+
+<p>How have book authors reacted to Python 3? Mark Pilgrim has dived in with  aplomb. His introductory book, <a href="http://www.diveintopython3.org">Dive into Python 3</a>, uses Python 3 as Python 3 was intended. For example, you won&#8217;t find <a href="http://docs.python.org/py3k/library/stdtypes.html#old-string-formatting-operations">% characters</a> used in string formatting; {up to date <a href="http://www.python.org/dev/peps/pep-3101/" title="PEP 3101, Advanced String Formatting">braces</a> are used exclusively}. It&#8217;s an engaging, painstakingly-written book, and (bonus!) the online version is an object lesson in how to craft HTML.
+</p>
+<p>David Beazley attacks the problem in a different way, but then his subject is different. His comprehensive <a href="http://www.amazon.com/Python-Essential-Reference-Developers-Library/dp/0672329786">Python Essential Reference</a> aims to cover the core language and its standard library in its entirety: think of it as the reference any serious Python programmer <a href="http://www.dabeaz.com/blog/2009/08/essential-misconceptions.html">would like to have within reach</a>. David Beazley&#8217;s approach is to concentrate on the common subset of Python 2 and 3, omitting features of 2 which aren&#8217;t in 3 and avoiding features of 3 which haven&#8217;t been backported to 2. His book succeeds but it does raise some awkward questions. Will Pythonistas find themselves maintaining parallel code-bases, and end up twisting their code until it fits into the intersection of two flavours of the language?
+</p>
+<img src="http://chart.apis.google.com/chart?cht=v&amp;chco=ffdd66,33ccff&amp;chs=450x330&amp;chd=t:100,90,100,70,100,70,70&amp;chdl=Python+2|Python+3&amp;chf=bg,s,EFEFEF&amp;chdlp=l&amp;chtt=Safe+Programming+Zone|Python+2+%e2%88%a9+Python+3&amp;chts=333333,24" alt="Safe Python Programming zone"/>
+
+<p>Or will they simply avoid Python 3?
+</p>
+<p>David Beazley eventually covers new Python 3 features in an appendix, by which time the strain has started to show:
+</p>
+<blockquote><p>Finally, even though Python 3.0 is described as the latest and greatest, it suffers from numerous performance and behavioral problems [&#8230;] in the opinion of this author, Python 3.0 is really only suitable for experimental use by seasoned Python veterans.
+</p>
+</blockquote>
+<h3><a href="#toc5" name="tocthe-cost-of-python-3" id="tocthe-cost-of-python-3">The Cost of Python 3</a></h3>
+<p>David Beazley may have ended up feeling like a Python 3 beta tester, but, as discussed at the start of this article, most Python users have a free choice. We can live a little longer with Python 2 <a href="http://wiki.python.org/moin/PythonWarts">warts</a> in exchange for a proven platform and an excellent set of supporting libraries. We can try and write to a language subset. We can use Python 2 and import much of the future. Or we can dive into Python 3.
+</p>
+<p>The people who must find the language fork tough are the Python suppliers. Our choice, as consumers, means work for them: we&#8217;ve mentioned the core Python team, who must surely spend more time patching and testing; think of Python library writers (such as the wizards behind Twisted).
+</p>
+<p>There&#8217;s another important class of supplier: the people working on alternative Python implementations, the ones which work on <a href="http://www.jython.org">Java</a>, or <a href="http://www.codeplex.com/IronPython">.Net</a>, the ones which have no global interpreter lock, the ones which can run deeply recursive functions. Pythonistas are understandably excited about <a href="http://code.google.com/p/unladen-swallow/">Unladen Swallow</a>, a development branch of CPython 2.6. Just look at the project <a href="http://code.google.com/p/unladen-swallow/wiki/ProjectPlan">goals</a>!
+</p>
+<blockquote><p>We want to make Python faster, but we also want to make it easy for large, well-established applications to switch to Unladen Swallow.
+</p>
+<ol>
+ <li>
+     Produce a version of Python at least 5x faster than CPython.
+ </li>
+
+ <li>
+     Python application performance should be stable.
+ </li>
+
+ <li>
+     Maintain source-level compatibility with CPython applications.
+ </li>
+
+ <li>
+     Maintain source-level compatibility with CPython extension modules.
+ </li>
+
+ <li>
+     We do not want to maintain a Python implementation forever; we view our work as a branch, not a fork. 
+ </li>
+</ol>
+</blockquote><p>In summary, if Unladen Swallow touches down safely, it will become CPython, and anyone using CPython will benefit from a high-level language capable of performing at native speeds.
+</p>
+<p>I&#8217;d like to highlight the final goal, the one about maintaining, branching and forking. Unladen Swallow is a branch taken from CPython 2.6<a id="fn2link" href="#fn2"><sup>[2]</sup></a>. If it succeeds, much hard and unglamorous work will be needed to merge it to the latest CPython 2, and patch it across to CPython 3. Python implementers must pay a high price, in terms of increased workload, for the Python 2, Python 3 fork.
+</p>
+<p>Could Python have evolved in a more linear way, by deprecating then removing features, while adding in new ones? I guess not, a mature language wouldn&#8217;t dare break backwards compatibility. 
+</p>
+<p>Would it?
+</p>
+
+<h3><a href="#toc6" name="tocevolution-of-python" id="tocevolution-of-python">Evolution of Python</a></h3>
+<p>My employers were right to characterise Python as a developing language. On the subject of incremental change, I wanted to highlight again the <a href="http://wordaligned.org/articles/python-counters.html">evolution of the multiset in Python</a>, from Python 1.4, released in 2001, through to Python 3.1, just 4 months old.
+</p>
+<div class="typocode"><div class="codetitle">Evolution of the Multiset in Python</div>
+
+<pre class="prettyprint">def multiset_14(xs):
+    multiset = {}
+    for x in xs:
+        if multiset.has_key(x):
+            multiset[x] = multiset[x] + 1
+        else:
+            multiset[x] = 1
+    return multiset
+
+def multiset_15(xs):
+    multiset = {}        
+    for x in xs:
+        multiset[x] = multiset.get(x, 0) + 1
+    return multiset
+
+import collections
+
+def multiset_25(xs):
+    multiset = collections.defaultdict(int)
+    for x in xs:
+        multiset[x] += 1
+    return multiset
+
+def multiset_31(xs):
+    return collections.Counter(xs)
+
+</pre>
+
+</div>
+
+<p>Lovely!
+</p>
+<p><span style="font-size:8px"><code>multiset_14()</code> won&#8217;t work in Python 3, and <code>multiset_31()</code> won&#8217;t work in Python 2 (not yet, anyway).</span>
+</p>
+
+<h3><a href="#toc7" name="tocaccepting-python-3" id="tocaccepting-python-3">Accepting Python 3</a></h3>
+<blockquote><p>The main goal of the Python development community at this point should be to get widespread acceptance of Python 3000. &#8212; Guido van Rossum, <a href="http://mail.python.org/pipermail/python-ideas/2009-October/006305.html">2009-10-21</a>
+</p>
+</blockquote><p>Unlike Steve Holden, Guido van Rossum <strong>is</strong> trying to get people to move to Python 3, or at least to accept it. <a href="http://mail.python.org/pipermail/python-ideas/2009-October/006305.html">Here&#8217;s how</a>:
+</p>
+<blockquote><p>I propose a moratorium on language changes. This would be a period of several years during which no changes to Python&#8217;s grammar or language semantics will be accepted. The reason is that frequent changes to the language cause pain for implementers of alternate implementations (Jython, IronPython, PyPy, and others probably already in the wings) at little or no benefit to the average user (who won&#8217;t see the changes for years to come and might not be in a position to upgrade to the latest version for years after).
+</p>
+</blockquote><p>Wow!
+</p>
+<p>I&#8217;m not close enough to Python development to know exactly what&#8217;s involved here, but a scan of the <a href="http://mail.python.org/pipermail/python-ideas/2009-October/thread.html#6305">email thread</a> suggests this proposal has been widely accepted. I think it&#8217;s clear from the rest of this article that I sympathise with the motivation behind it. Yet I can&#8217;t help feeling uneasy about putting Python on ice. Yes, there have been changes to the language grammar over the past fifteen years. I wouldn&#8217;t say they&#8217;ve been frequent, and there aren&#8217;t many I&#8217;d want to do without, even if I only get to use them (in production) a year or two after they&#8217;ve been released. Yes, these changes cause pain to implementers<a id="fn3link" href="#fn3"><sup>[3]</sup></a>, but that&#8217;s not the whole story. Who said implementing a language would be easy? Perhaps much of the pain comes from implementing the changes twice, once for 2 and once for 3.
+</p>
+<p>Soon there&#8217;ll be a <a href="http://www.python.org/dev/peps" title="Python Enhancement Proposals">PEP</a> stating more formally what exactly a moratorium on language changes will mean. That is,
+</p>
+<p>A <strong>P</strong>ython <strong>E</strong>nhancement <strong>P</strong>roposal which <strong>P</strong>roposes: Stop <strong>E</strong>nhancing <strong>P</strong>ython!
+</p>
+<hr />
+
+<p><a id="fn1" href="#fn1link">[1]</a> I wonder if anyone can guess why this code fails, just by looking at it? As a hint, highlight the rest of this paragraph. <span style="color:white">Some Python 2 codecs are byte rather than text oriented, and Python 3 prohibits this kind of confusion.</span>
+</p>
+<p><a id="fn2" href="#fn2link">[2]</a> More details of the Unladen Swallow branch approach. 
+</p>
+<blockquote><p>In order to achieve our combination of performance and compatibility goals, we opt to modify CPython, rather than start our own implementation from scratch. In particular, we opt to start working on CPython 2.6.1: Python 2.6 nestles nicely between 2.4/2.5 (which most interesting applications are using) and 3.x (which is the eventual future). Starting from a CPython release allows us to avoid reimplementing a wealth of built-in functions, objects and standard library modules, and allows us to reuse the existing, well-used CPython C extension API. Starting from a 2.x CPython release allows us to more easily migrate existing applications; if we were to start with 3.x, and ask large application maintainers to first port their application, we feel this would be a non-starter for our intended audience. 
+</p>
+</blockquote><p><a id="fn3" href="#fn3link">[3]</a>: C++ compiler writers, gear up for C++0x!
+</p>
+</div>
+
+<div class="comments"><hr/><div id="disqus_thread"></div><script type="text/javascript" src="http://disqus.com/forums/wordaligned/embed.js"></script></div>
+      
+<div id="comments"><script type="text/javascript">
+//<![CDATA[
+(function() {
+    var links = document.getElementsByTagName('a');
+    var query = '?';
+    for(var i = 0; i < links.length; i++) {
+        if(links[i].href.indexOf('#disqus_thread') >= 0) {
+            query += 'url' + i + '=' + encodeURIComponent(links[i].href) + '&amp;';
+        }
+    }
+    document.write('<script type="text/javascript" src="http://disqus.com/forums/wordaligned/get_num_replies.js' + query + '"></' + 'script>');
+})();
+//]]>
+</script></div>
+
+    </div>
+    <div id="sidebar">
+      
+<div class="sidebar-node">
+<h3>Tagged</h3>
+<ul id="categories"><li><a href="/tag/python" rel="tag">Python</a></li></ul>
+
+</div>
+
+<div class="sidebar-node">
+<h3>Chain</h3>
+<ul>
+<li><a accesskey="n" href="/articles/next-permutation" title="Next article">&laquo; Next permutation: When C++ gets it right</a></li>
+<li><a accesskey="p" href="/articles/steady-on-subversion.html" title="Previous article">&raquo; Steady on Subversion</a></li>
+</ul>
+
+
+</div>
+
+<div class="sidebar-node">
+<h3>Feeds</h3>
+
+<ul>
+<li><a href="http://feeds.wordaligned.org/wordaligned"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Articles</a></li>
+<li><a href="http://feeds.wordaligned.org/wordaligned/comments"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Comments</a></li>
+</ul>
+
+
+</div>
+
+    </div>
+  </div>
+  <div id="footer">
+<hr />
+<p><a href="http://tag.wordaligned.org">Thomas Guest</a></p>
+</div>
+
+</div>
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-3373724-1']);
+  _gaq.push(['_trackPageview']);
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ga);
+  })();
+</script>
+</body>
+
+</html>

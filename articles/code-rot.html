@@ -1,0 +1,378 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<link rel="icon" href="/images/favicon.png" type="image/png"/>
+<link href="/styles/application.css" media="all" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="/scripts/prettify.js"></script>
+<script type="text/javascript" src="/scripts/lang-lisp.js"></script>
+<title>Code Rot</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="author" content="Thomas Guest" />
+<meta name="description" content="What happens when we stop tending to our code? It decays. This article investigates why. A Word Aligned article posted 2009-09-03, tagged C++, Build." />
+<meta name="keywords" content="C++, Build" />
+<link rel="alternate" type="application/rss+xml" title="Feed" href="http://feeds.wordaligned.org/wordaligned" />
+</head>
+
+<body onload="prettyPrint()">
+<div id="container">
+  <div id="header">
+<h1><span><a accesskey="h" href="/">Word Aligned</a></span></h1>
+<h2>sweating the small stuff</h2>
+<a class="button" href="http://feeds.wordaligned.org/wordaligned" title="Subscribe to Word Aligned"><img style="float: right;" src="/images/feed.png" alt="Feed Logo" height="28" width="28"/></a>
+</div>
+
+  <div id="page">
+    <div id="content">
+      <div class="atomentry" id="code-rot.html">
+<h2 class="title"><a href="/articles/code-rot.html">Code Rot</a></h2>
+<p class="meta"><abbr class="published" title="2009-09-03">2009-09-03</abbr> &bull; <a href="/tag/c++" rel="tag">C++</a>, <a href="/tag/build" rel="tag">Build</a> &bull; <a href="/articles/code-rot.html#disqus_thread">Comments</a></p>
+<div class="toc">
+<h2>Contents</h2>
+<ul>
+ <li><a href="#tocdvbcodec-fail" name="toc0" id="toc0">Dvbcodec Fail</a>
+ </li>
+
+ <li><a href="#toccode-rot" name="toc1" id="toc1">Code Rot</a>
+ </li>
+
+ <li><a href="#tocstandard-c" name="toc2" id="toc2">Standard C++</a>
+ </li>
+
+ <li><a href="#tocsupport-rot" name="toc3" id="toc3">Support Rot</a>
+ </li>
+
+ <li><a href="#tochow-did-this-ever-compile" name="toc4" id="toc4">How did this ever compile?</a>
+ </li>
+
+ <li><a href="#tocboost-advances" name="toc5" id="toc5">Boost advances</a>
+ </li>
+
+ <li><a href="#tocchanging-behaviour" name="toc6" id="toc6">Changing behaviour</a>
+ </li>
+
+ <li><a href="#toccode-inaction" name="toc7" id="toc7">Code inaction</a>
+ </li>
+
+ <li><a href="#tocrotten-artefacts" name="toc8" id="toc8">Rotten artefacts</a>
+ </li>
+
+ <li><a href="#tocstopping-the-rot" name="toc9" id="toc9">Stopping the rot</a>
+ </li>
+
+ <li><a href="#tocthanks" name="toc10" id="toc10">Thanks</a>
+ </li>
+</ul>
+</div><blockquote><p>Those of us who have to tiptoe around non-standard or ancient compilers will know that template template parameters are off limits. 
+</p>
+<p>&#8212; <a href="http://www.oxyware.com/CheckedInt.pdf" title="CheckedInt: A policy-based range-checked integer, Hubert Matthews">Hubert Matthews (PDF)</a>
+</p>
+</blockquote>
+<h3><a href="#toc0" name="tocdvbcodec-fail" id="tocdvbcodec-fail">Dvbcodec Fail</a></h3>
+<p>Long ago, way back in 2004, I wrote an <a href="http://wordaligned.org/docs/dvbcodec/index.html">article</a> for <a href="http://accu.org/index.php/journals/241" title="A Mini-project to decode a Mini-Language, Thomas Guest">Overload</a> describing how to use the <a href="http://www.boost.org/doc/libs/1_39_0/libs/spirit/index.html" title="Boost Spirit C++ parser framework">Boost Spirit</a> parser framework to generate C++ code which could convert structured binary data to text. I went on to republish this article on my own website, where I also included a source distribution.
+</p>
+<p>Much has changed since then. The C++ language may not have, but compiler and platform support for it has improved considerably. Boost survives &#8212; indeed, many of its libraries will feed into the next version of C++. Overload thrives, adapting to an age when printed magazines about programming are all but extinct. My old website proved less durable: I&#8217;ve changed domain name and shuffled things around more than once. But you can still find the article online if you look hard enough, and recently someone did indeed find it. He, let&#8217;s call him Rick, downloaded the source code archive, <a href="http://wordaligned.org/docs/dvbcodec/dvbcodec-1.0.zip" title="Rotten dvbcodec source distribution">dvbcodec-1.0.zip</a>, extracted it, scanned the README, typed:
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">$ make
+
+</pre>
+
+</div>
+
+<p>&#8230; and discovered the code didn&#8217;t even build.
+</p>
+<p>At this point many of us would assume (correctly) the code had not been maintained. We&#8217;d delete it and write off the few minutes it took to evaluate it. Rick decided instead to contact me and let me know my code was broken. He even offered a fix for one problem.
+</p>
+
+<h3><a href="#toc1" name="toccode-rot" id="toccode-rot">Code Rot</a></h3>
+<p>Sad to say, I wasn&#8217;t entirely surprised. I no longer use this code. Unused code stops working. It decays.
+</p>
+<p>I&#8217;m not talking about a compiled executable, which the compiler has tied to a particular platform, and which therefore progressively degrades as the platform advances. (I&#8217;ve heard stories about device drivers for which the source code has long been lost, and which require ever more elaborate emulation shims to keep them alive.) I&#8217;m talking about source code. And the decay isn&#8217;t usually literal, though I suppose you might have a source listing on a mouldy printout, or an unreadable floppy disk.
+</p>
+<p>No, the code itself is usually a pristine copy of the original. Publishers often attach checksums to source distributions so readers can verify their download is correct. I hadn&#8217;t taken this precaution with my <code>dvbcodec-1.0.zip</code> but I&#8217;m certain the version Rick downloaded was exactly the same as the one I created 5 years ago. Yet in that time it had stopped working. Why?
+</p>
+<span id="continue-reading"/>
+
+
+<h3><a href="#toc2" name="tocstandard-c" id="tocstandard-c">Standard C++</a></h3>
+<p>As already mentioned, this was C++ code. C++ is backed by an ISO standard, ratified in 1998, with corrigenda published in 2003. You might expect C++ code to improve with age, compiling and running more quickly, less likely to run out of resources.
+</p>
+<p>Not so. My favourite counter-example comes from a nice paper <a href="http://www.oxyware.com/CheckedInt.pdf" title="CheckedInt: A policy-based range-checked integer, Hubert Matthews">&#8220;CheckedInt: A policy-based range-checked integer&#8221; (PDF)</a> published by Hubert Matthews in 2004 which discusses how to use C++ templates to implement a range-checked integer. The paper includes a source code listing together with some notes to help readers forced to &#8220;tiptoe around non-standard or ancient compilers&#8221; (think: MSVC6). Yet when I experimented with this code in 2005 I found myself tripped up by a strict and up-to-date compiler.
+</p>
+<pre>
+$ g++ -Wall -c checked_int.cpp
+checked_int.cpp: In constructor `CheckedInt&lt;low, high, ValueChecker&gt;::CheckedInt(int)':
+checked_int.cpp:45: error: there are no arguments to `RangeCheck' that
+depend on a template parameter, so a declaration of `RangeCheck' must
+be available
+checked_int.cpp:45: error: (if you use `-fpermissive', G++ will accept
+your code, but allowing the use of an undeclared name is deprecated)
+</pre>
+
+<p>I emailed Hubert Matthews using the address included at the top of his paper. He swiftly and kindly put me straight on how to fix the problem.
+</p>
+<p>What&#8217;s interesting here is that this code is pure C++, just over a page of it. It has no dependencies on third party libraries. Hubert Matthews is a C++ expert and he acknowledges the help of two more experts, <a href="http://erdani.org" title="Author of Modern C++ and coauthor of C++ Coding Standards">Andrei Alexandrescu</a> and <a href="http://curbralan.com" title="Programming guru">Kevlin Henney</a>, in his paper. Yet the code fails to build using both ancient and modern compilers. In its published form it has the briefest of shelf-lives.
+</p>
+
+<h3><a href="#toc3" name="tocsupport-rot" id="tocsupport-rot">Support Rot</a></h3>
+<p>Code alone is of limited use. What really matters for its ongoing health is that someone cares about it &#8212; someone exercises, maintains and supports it. Hubert Matthews included an email address in his paper and I was able to contact him using that address.
+</p>
+<p>How well would my code shape up on this front? Putting myself in Rick&#8217;s position, I unzipped the source distribution I&#8217;d archived 5 years ago. I was pleased to find a README which, at the very top, provides a URL for updates, <a href="http://homepage.ntlworld.com/thomas.guest">http://homepage.ntlworld.com/thomas.guest</a>. I was less pleased to find this URL gave me a <strong>404 Not Found</strong> error. Similarly, when I tried emailling the project maintainer mentioned in the README, I got a <strong>550 Invalid recipient</strong> error: the attempted delivery to <a href="mailto:thomas.guest@ntlworld.com">thomas.guest@ntlworld.com</a> had failed permanently.
+</p>
+<p><a href="http://homepage.ntlworld.com/thomas.guest"><img src="/images/ntlworld-404.png" alt="NTL World 404" width="520px" height="400px"/></a>
+</p>
+<p><a href="http://www.w3.org/Provider/Style/URI" title="Tim Berners-Lee's classic advice on creating stable links">Cool URIs don&#8217;t change</a> but my old NTL homepage was anything but cool; it came for free with a dial-up connection I&#8217;ve happily since abandoned. Looking back, maybe I should have found a more stable location for my code. If I&#8217;d set up (e.g.) a Sourceforge project then my <code>dvbcodec</code> project might still be alive and supported, possibly even by a new maintainer.
+</p>
+
+<h3><a href="#toc4" name="tochow-did-this-ever-compile" id="tochow-did-this-ever-compile">How did this ever compile?</a></h3>
+<p>Wise hindsights wouldn&#8217;t resurrect my code. If I wanted to continue I&#8217;d have to go it alone. Here&#8217;s what the README had to say about platform requirements.
+</p>
+<blockquote><p>   REQUIREMENTS and PLATFORMS
+</p>
+<p>   To build the dvbcodec you will need Version 1.31.0 of Boost, or later.
+</p>
+<p>   You will also need a good C++ compiler. The dvbcodec has been built and
+      tested on the Windows operating system using: GCC 3.3.1, MSVC 7.1
+</p>
+</blockquote><p>A &#8220;good C++ compiler&#8221;, eh? As we&#8217;ve already seen, GCC 3.3.1 may be good but my platform has GCC 4.0.1 installed, which is better. If my records can be believed, this <code>upperCase()</code> function compiled cleanly using both GCC 3.3.1 and MSVC 7.1.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">std::string
+upperCase(std::string const &amp; lower)
+{
+    std::string upper = lower;
+    
+    for (std::string&lt;char&gt;::iterator cc = upper.begin();
+         cc != upper.end(); ++cc)
+    {
+        * cc = std::toupper(* cc);
+    }
+    
+    return upper;
+}
+
+</pre>
+
+</div>
+
+<p>Huh? <code>Std::string</code> is a typedef for <code>std::basic_string&lt;char&gt;</code> and there&#8217;s no such thing as a <code>std::basic_string&lt;char&gt;&lt;char&gt;::iterator</code>, which is what GCC 4.0.1 says:
+</p>
+<pre>
+stringutils.cpp:58: error: 'std::string' is not a template
+</pre>
+
+<p>The simple fix is to write <code>std::string::iterator</code> instead of <code>std::string&lt;char&gt;::iterator</code>. A better fix, suggested by Rick, is to use <code>std::transform()</code>. I wonder why I missed this first time round?
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">std::string
+upperCase(std::string const &amp; lower)
+{
+    std::string upper = lower;
+    std::transform(upper.begin(), upper.end(), upper.begin(), ::toupper);
+    return upper;
+}
+
+</pre>
+
+</div>
+
+
+<h3><a href="#toc5" name="tocboost-advances" id="tocboost-advances">Boost advances</a></h3>
+<p>GCC has become stricter about what it accepts even though the formal specification of what it should do (the C++ standard) has stayed put. The Boost C++ libraries have more freedom to evolve, and the next round of build problems I encountered relate to Boost.Spirit&#8217;s evolution. Whilst it would be possible to require dvbcodec users to build against Boost 1.31 (which can still be downloaded from the <a href="http://www.boost.org">Boost website</a>) it wouldn&#8217;t be reasonable. So I updated my machine (using Macports) to make sure I had an up to date version of Boost, 1.38 at the time of writing.
+</p>
+<pre>
+$ sudo port upgrade boost
+</pre>
+
+<p>Boost&#8217;s various dependencies triggered an upgrade of boost-jam, gperf, libiconv, ncursesw, ncurses, gettext, zlib, bzip2, and this single command took over an hour to complete.
+</p>
+<p>I discovered that Boost.Spirit, the C++ parser framework on which <code>dvbcodec</code> is based, has gone through an overhaul. According to the change log the flavour of Spirit used by <code>dvbcodec</code> is now known respectfully as Spirit Classic. A clever use of namespaces and include path forwarding meant my &#8220;classic&#8221; client code would at least compile, at the expense of some deprecation warnings.
+</p>
+<pre>
+Computing dependencies for decodeout.cpp...
+Compiling decodeout.cpp...
+In file included from codectypedefs.hpp:11,
+                 from decodecontext.hpp:10,
+                 from decodeout.cpp:8:
+/opt/local/include/boost/spirit/tree/ast.hpp:18:4: warning: #warning "This header is deprecated. Please use: boost/spirit/include/classic_ast.hpp"
+In file included from codectypedefs.hpp:12,
+                 from decodecontext.hpp:10,
+                 from decodeout.cpp:8:
+</pre>
+
+<p>To suppress these warnings I included the preferred header. I then had to change namespace directives from <code>boost::spirit</code> to <code>boost::spirit::classic</code>. I fleetingly considered porting my code to Spirit V2, but decided against it: for even after this first round of changes, I still had a build problem.
+</p>
+
+<h3><a href="#toc6" name="tocchanging-behaviour" id="tocchanging-behaviour">Changing behaviour</a></h3>
+<p>Actually, this was a second level build problem. The <code>dvbcodec</code> build has multiple phases:
+</p>
+<ol>
+ <li>
+     it builds a program to generate code. This generator can parse binary format syntax descriptions and emit C++ code which will convert data formatted according to these descriptions
+ </li>
+
+ <li>
+     it runs this generator with the available syntax descriptions as inputs
+ </li>
+
+ <li>
+     it compiles the emitted C++ code into a final <code>dvbcodec</code> executable
+ </li>
+</ol>
+<img src="/images/dvbcodec-build.png" alt="Dvbcodec build process"/>
+
+<p>I ran into a problem during the second phase of this process. The dvbcodec generator no longer parsed all of the supplied syntax descriptions. Specifically, I was seeing this conditional test raise an exception when trying to parse section format syntax descriptions.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">    if (!parse(section_format,
+               section_grammar,
+               space_p).full)
+    {
+        throw SectionFormatParseException(section_format);
+    }
+
+</pre>
+
+</div>
+
+<p>Here, <code>parse</code> is <code>boost::spirit::classic::parse</code>, which parses something &#8212; the section format syntax description, passed as a string in this case &#8212; according to the supplied grammar. The third parameter, <code>boost::spirit::classic::space_p</code>, is a skip parser which tells <code>parse</code> to skip whitespace between tokens. <code>Parse</code> returns a <code>parse_info</code> struct whose <code>full</code> field is a boolean which will be set to <code>true</code> if the input section format has been fully consumed.
+</p>
+<p>I soon figured out that the parse call was failing to fully consume binary syntax descriptions with trailing spaces, such as the the one shown below.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">" program_association_section() {"
+"    table_id                   8"
+"    section_syntax_indicator   1"
+"    '0'                        1"
+....
+"    CRC_32                    32"
+" }                              "
+
+</pre>
+
+</div>
+
+<p>If I stripped the trailing whitespace after the closing brace before calling <code>parse()</code> all would be fine. I wasn&#8217;t fine about this fix though. The Spirit documentation is very good but it had been a while since I&#8217;d read it and, as already mentioned, my code used the &#8220;classic&#8221; version of Spirit, in danger of becoming the &#8220;legacy&#8221; then &#8220;deprecated&#8221; and eventually the &#8220;dead&#8221; version. Re-reading the documentation it wasn&#8217;t clear to me exactly what the correct behaviour of <code>parse()</code> should be in this case. Should it fully consume trailing space? Had my program ever worked?
+</p>
+<p>I went back in time, downloading and building against Boost 1.31, and satisfied myself that my code used to work, though maybe it worked due to a bug in the old version of Spirit. Stripping trailing spaces before parsing allowed my code to work with Spirit past and present, so I curtailed my investigation and made the fix.
+</p>
+<p>(Interestingly, Boost 1.31 found a way to warn me I was using a compiler it didn&#8217;t know about.
+</p>
+<pre>
+boost_1_31_0/boost/config/compiler/gcc.hpp:92:7: warning: 
+#warning "Unknown compiler version - please run the configure tests and report the results"
+</pre>
+
+<p>I ignored this warning.)
+</p>
+
+<h3><a href="#toc7" name="toccode-inaction" id="toccode-inaction">Code inaction</a></h3>
+<p>Apologies for the lengthy explanation in the previous section. The point is, few software projects stand alone, and changes in any dependencies, <strong>including bug fixes</strong>, can have knock on effects. In this instance, I consider myself lucky; <code>dvbcodec</code>&#8217;s unusual three phase build enabled me to catch a runtime error before generating the final product. Of course, to actually catch that error, I needed to at least try building my code.
+</p>
+<p>More simply: if you don&#8217;t use your code, it rots.
+</p>
+
+<h3><a href="#toc8" name="tocrotten-artefacts" id="tocrotten-artefacts">Rotten artefacts</a></h3>
+<p>It wasn&#8217;t just the code which had gone off. My source distribution included documentation &#8212; the plain text version of the article I&#8217;d written for Overload &#8212; and the Makefile had a build target to generate an HTML version of this documentation. This target depended on <a href="http://www.boost.org/doc/tools/quickbook/index.html" title="Quickbook, a Boost documentation tool">Quickbook</a>, another Boost tool. Quickbook generates Docbook XML from plain text source, and Docbook is a good starting point for HTML, PDF and other standard output formats.
+</p>
+<p>This is quite a sophisticated toolchain. It&#8217;s also one I no longer use. Most of what I write goes straight to the web and I don&#8217;t need such a fiddly process just to produce HTML. So I decided to freshen up dead links, leave the original documentation as a record, and simply cut the documentation target from the Makefile.
+</p>
+
+<h3><a href="#toc9" name="tocstopping-the-rot" id="tocstopping-the-rot">Stopping the rot</a></h3>
+<p>As we&#8217;ve seen, software, like other soft organic things, breaks down over time. How can we stop the rot?
+</p>
+<p>Freezing software to a particular executable built against a fixed set of dependencies to run on a single platform is one way &#8212; and maybe some of us still have an aging Windows 95 machine, kept alive purely to run some such frozen program.
+</p>
+<p>A better solution is to actively tend the software and ensure it stays in shape. Exercise it regularly on a build server. Record test results. Fix faults as and when they appear. Review the architecture. Upgrade the platform and dependencies. Prune unused features, splice in new ones. This is the path taken by the Boost project, though certainly the growth far outpaces any pruning (the Boost 1.39 download is 5 times bigger than its 1.31 ancestor). Boost takes forwards and backwards compatibility seriously, hence the ongoing support for Spirit classic and the compiler version certification headers. Maintaining compatibility can be at odds with simplicity.
+</p>
+<p>There is another way too. Although the <code>dvbcodec</code> project has collapsed into disrepair the idea behind it certainly hasn&#8217;t. I&#8217;ve taken this same idea &#8212; of parsing formal syntax descriptions to generate code which handles binary formatted data &#8212; and enhanced it to work more flexibly and with a wider range of inputs. Whenever I come across a new binary data structure, I paste its syntax into a text file, regenerate the code, and I can work with this structure. Unfortunately I can&#8217;t show you any code (it&#8217;s proprietary) but I hope I&#8217;ve shown you the idea. Effectively, <span id="excerpt0"/>the old C++ code has been left to rot but the idea within it remains green, recoded in Python. Maybe I should find a way to humanely destroy the C++ and all links to it, but for now I&#8217;ll let it degrade, an illustration of its time.
+</p>
+<blockquote><p>Is it possible that software is not like anything else, that it is meant to be discarded: that the whole point is to see it as a soap bubble? &#8212; <a href="http://www.cs.yale.edu/quotes.html">Alan J. Perlis</a>
+</p>
+</blockquote>
+<h3><a href="#toc10" name="tocthanks" id="tocthanks">Thanks</a></h3>
+<p>I would like to thank to Rick Engelbrecht for reporting and helping to fix the bugs discussed in this article.
+</p>
+<p>This article first appeared in Overload 92, and I would like to thank the team at Overload for their expert help.
+</p>
+</div>
+
+<div class="comments"><hr/><div id="disqus_thread"></div><script type="text/javascript" src="http://disqus.com/forums/wordaligned/embed.js"></script></div>
+      
+<div id="comments"><script type="text/javascript">
+//<![CDATA[
+(function() {
+    var links = document.getElementsByTagName('a');
+    var query = '?';
+    for(var i = 0; i < links.length; i++) {
+        if(links[i].href.indexOf('#disqus_thread') >= 0) {
+            query += 'url' + i + '=' + encodeURIComponent(links[i].href) + '&amp;';
+        }
+    }
+    document.write('<script type="text/javascript" src="http://disqus.com/forums/wordaligned/get_num_replies.js' + query + '"></' + 'script>');
+})();
+//]]>
+</script></div>
+
+    </div>
+    <div id="sidebar">
+      <div class="sidebar-node">
+<h3>Excerpt</h3>
+<p><a href="#excerpt0">The old C++ code has been left to rot but the idea within it remains green, recoded in Python</a></p>
+
+</div>
+
+<div class="sidebar-node">
+<h3>Tagged</h3>
+<ul id="categories"><li><a href="/tag/c++" rel="tag">C++</a></li>
+<li><a href="/tag/build" rel="tag">Build</a></li></ul>
+
+</div>
+
+<div class="sidebar-node">
+<h3>Chain</h3>
+<ul>
+<li><a accesskey="n" href="/articles/favicon.html" title="Next article">&laquo; Favicon</a></li>
+<li><a accesskey="p" href="/articles/a-useful-octal-escape-sequence.html" title="Previous article">&raquo; A useful octal escape sequence</a></li>
+</ul>
+
+
+</div>
+
+<div class="sidebar-node">
+<h3>Feeds</h3>
+
+<ul>
+<li><a href="http://feeds.wordaligned.org/wordaligned"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Articles</a></li>
+<li><a href="http://feeds.wordaligned.org/wordaligned/comments"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Comments</a></li>
+</ul>
+
+
+</div>
+
+    </div>
+  </div>
+  <div id="footer">
+<hr />
+<p><a href="http://tag.wordaligned.org">Thomas Guest</a></p>
+</div>
+
+</div>
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-3373724-1']);
+  _gaq.push(['_trackPageview']);
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ga);
+  })();
+</script>
+</body>
+
+</html>
