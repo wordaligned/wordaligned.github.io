@@ -25,9 +25,9 @@
 
   <div id="page">
     <div id="content">
-      <div class="atomentry" id="shell-script-sets.html">
-<h2 class="title"><a href="/articles/shell-script-sets.html">He Sells Shell Scripts to Intersect Sets</a></h2>
-<p class="meta"><abbr class="published" title="2007-08-18">2007-08-18</abbr> &bull; <a href="/tag/c++" rel="tag">C++</a>, <a href="/tag/accu" rel="tag">ACCU</a>, <a href="/tag/shell" rel="tag">Shell</a>, <a href="/tag/streams" rel="tag">Streams</a> &bull; <a href="/articles/shell-script-sets.html#disqus_thread">Comments</a></p>
+      <div class="atomentry" id="shell-script-sets">
+<h2 class="title"><a href="/articles/shell-script-sets">He Sells Shell Scripts to Intersect Sets</a></h2>
+<p class="meta"><abbr class="published" title="2007-08-18">2007-08-18</abbr> &bull; <a href="/tag/c++" rel="tag">C++</a>, <a href="/tag/accu" rel="tag">ACCU</a>, <a href="/tag/shell" rel="tag">Shell</a>, <a href="/tag/streams" rel="tag">Streams</a> &bull; <a href="/articles/shell-script-sets#disqus_thread">Comments</a></p>
 <div class="toc">
 <h2>Contents</h2>
 <ul>
@@ -405,6 +405,133 @@ $ sort -t. +0n -1n +1n -2n +2n -3n +3n IP
 </p>
 </div>
 
+<h5><a name="feedback">Feedback</a></h5>
+<div id="feedback_div">
+<ol id="feedback" class="feedback">
+
+<li class="feedbackitem" id="feedback-1406">
+<div class="author">   
+<cite><a href="http://drj11.wordpress.com/">David Jones</a></cite>
+2007-09-18
+</div>
+<div class="content">
+<p>I think this is a really good article on the spirit of shell programming.</p>
+
+<p>Intersection is «comm -12 a b», subtraction is «comm -23 a b», symmetric difference is (almost) «comm -2 a b».</p>
+
+<p>«| sort | uniq | sort -nr» is one of my favourites.  sort in popularity order.</p>
+
+</div>
+</li>
+
+
+<li class="feedbackitem" id="feedback-1407">
+<div class="author">   
+<cite><a href="http://wordaligned.org">Thomas Guest</a></cite>
+2007-09-18
+</div>
+<div class="content">
+<blockquote>
+    <p>I think this is a really good article on the spirit of shell programming.</p>
+</blockquote>
+
+<p>Thanks David, much appreciated.</p>
+
+<blockquote>
+    <p>Intersection is «comm -12 a b» ...</p>
+</blockquote>
+
+<p>I wish I'd discovered <code>comm</code> before I wrote the article! It's much neater than the combination of <code>grep</code> and <code>cut</code>. One of the problems I have with the shell tools, though, is that it takes time to discover them. Thus <code>man comm</code> points me to related functions <code>sort</code>, <code>diff</code>, <code>cmp</code> etc, but (e.g.) <code>man sort</code> doesn't have anything to say about <code>comm</code>.</p>
+
+</div>
+</li>
+
+
+<li class="feedbackitem" id="feedback-1409">
+<div class="author">   
+<cite><a href="http://drj11.wordpress.com/">David Jones</a></cite>
+2007-09-20
+</div>
+<div class="content">
+<p>Totally agree about time to discover shell tools (and the traditionally bad organisation of the man pages).  In the good old days a Unix system was simple enough that you could just «ls /usr/bin» and go through each one to see what it did.  That's not so feasible any more.</p>
+
+<p>There's a certain learning value to seeing how to build up the tools from other parts though.</p>
+
+</div>
+</li>
+
+
+<li class="feedbackitem" id="feedback-1410">
+<div class="author">   
+<cite><a href="http://wordaligned.org">Thomas Guest</a></cite>
+2007-09-20
+</div>
+<div class="content">
+<p>I've realised the other thing about the <code>uniq</code>, <code>grep</code>, <code>tr</code>, <code>cut</code> pipeline is that it's a bit more flexible -- so you can easily tweak the recipe to (e.g.) intersect N sets. Unlike most of the shell tools, <code>comm</code> has a very limited role (but thanks again for pointing it out).</p>
+
+</div>
+</li>
+
+
+<li class="feedbackitem" id="feedback-1411">
+<div class="author">   
+<cite>Don</cite>
+2007-09-24
+</div>
+<div class="content">
+<p>Here is how i did it with cat, sort, and uniq:</p>
+
+<p>(shell script)</p>
+
+take 2 input files and output 2 files: unique.txt and duplicate.txt
+
+<p>if [ $# -ne 2 ]; then 
+    echo 1>&amp;2 Usage: $0 file1 file2
+    exit 127 
+fi</p>
+
+<p>cat $1 $2>tmp.tmp
+sort tmp.tmp>sort.tmp
+uniq -u sort.tmp unique.txt
+uniq -d sort.tmp duplicate.txt
+rm *.tmp 2>/dev/null
+wc *.txt
+exit 0</p>
+
+</div>
+</li>
+
+
+<li class="feedbackitem" id="feedback-1414">
+<div class="author">   
+<cite><a href="http://wordaligned.org">Thomas Guest</a></cite>
+2007-09-26
+</div>
+<div class="content">
+<pre>
+if [ $# -ne 2 ]
+then 
+    echo 1>&2 Usage: $0 file1 file2
+    exit 127 
+fi
+
+cat $1 $2 > tmp.tmp
+sort tmp.tmp > sort.tmp
+uniq -u sort.tmp > unique.txt 
+uniq -d sort.tmp > duplicate.txt
+rm *.tmp 2>/dev/null
+wc *.txt
+exit 0
+</pre>
+
+<p>Don, I've tried to reformat your comment -- I think linebreaks got mangled. It assumes each input file contains no duplicates, right? I think <code>rm *.tmp</code> is a little risky! </p>
+
+</div>
+</li>
+
+</ol>
+</div>
+
 <div class="comments"><hr/><div id="disqus_thread"></div><script type="text/javascript" src="http://disqus.com/forums/wordaligned/embed.js"></script></div>
       
 <div id="comments"><script type="text/javascript">
@@ -444,8 +571,8 @@ $ sort -t. +0n -1n +1n -2n +2n -3n +3n IP
 <div class="sidebar-node">
 <h3>Chain</h3>
 <ul>
-<li><a accesskey="n" href="/articles/shameful-names.html" title="Next article">&laquo; Shameful Names</a></li>
-<li><a accesskey="p" href="/articles/collaborative-documentation-tools.html" title="Previous article">&raquo; Collaborative documentation tools</a></li>
+<li><a accesskey="n" href="/articles/shameful-names" title="Next article">&laquo; Shameful Names</a></li>
+<li><a accesskey="p" href="/articles/collaborative-documentation-tools" title="Previous article">&raquo; Collaborative documentation tools</a></li>
 </ul>
 
 

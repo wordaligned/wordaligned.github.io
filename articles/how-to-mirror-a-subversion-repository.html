@@ -25,9 +25,9 @@
 
   <div id="page">
     <div id="content">
-      <div class="atomentry" id="how-to-mirror-a-subversion-repository.html">
-<h2 class="title"><a href="/articles/how-to-mirror-a-subversion-repository.html">How to Mirror a Subversion Repository</a></h2>
-<p class="meta"><abbr class="published" title="2006-08-12">2006-08-12</abbr> &bull; <a href="/tag/subversion" rel="tag">Subversion</a> &bull; <a href="/articles/how-to-mirror-a-subversion-repository.html#disqus_thread">Comments</a></p>
+      <div class="atomentry" id="how-to-mirror-a-subversion-repository">
+<h2 class="title"><a href="/articles/how-to-mirror-a-subversion-repository">How to Mirror a Subversion Repository</a></h2>
+<p class="meta"><abbr class="published" title="2006-08-12">2006-08-12</abbr> &bull; <a href="/tag/subversion" rel="tag">Subversion</a> &bull; <a href="/articles/how-to-mirror-a-subversion-repository#disqus_thread">Comments</a></p>
 <div class="toc">
 <h2>Contents</h2>
 <ul>
@@ -227,6 +227,172 @@ tar c PATH_TO_REPOS &gt; /dev/tcp/DOTTED.IP.OF.MIRROR/2345
 </ul>
 </div>
 
+<h5><a name="feedback">Feedback</a></h5>
+<div id="feedback_div">
+<ol id="feedback" class="feedback">
+
+<li class="feedbackitem" id="feedback-112">
+<div class="author">   
+<cite>msherman@responsys.com</cite>
+2006-11-01
+</div>
+<div class="content">
+Nice job on this, it was exactly what I was looking for.
+
+</div>
+</li>
+
+
+<li class="feedbackitem" id="feedback-113">
+<div class="author">   
+<cite><a href="http://wordaligned.org">Thomas Guest</a></cite>
+2006-11-02
+</div>
+<div class="content">
+Thanks for the feedback. I wonder, though, if some of the advice in this post has grown out of date. Subversion 1.4 adds a new tool "svnsync" which is designed to help mirror Subversion repositories. (Unfortunately I can't report directly on this tool since I haven't had a chance to try it.) Everything in this post remains true, though, and if you're on 1.3 or earlier, these are your options.
+
+<a href="http://subversion.tigris.org/svn_1.4_releasenotes.html" rel="nofollow">http://subversion.tigris.org/svn_1.4_releasenotes.html</a>
+
+</div>
+</li>
+
+
+<li class="feedbackitem" id="feedback-169">
+<div class="author">   
+<cite>Ajo Paul</cite>
+2006-12-07
+</div>
+<div class="content">
+<p>Hi,</p>
+
+<p>May be this question is already answered. But I was still unsure. I have setup a local svn mirror which syncs to the svn server installed elsewhere. Right now the setup is readonly and one way. Is there a way by which I can commit changes to the mirror and then this change is reflected in the master repo?</p>
+
+<p>-Ajo </p>
+
+</div>
+</li>
+
+
+<li class="feedbackitem" id="feedback-173">
+<div class="author">   
+<cite><a href="http://wordaligned.org">Thomas Guest</a></cite>
+2006-12-08
+</div>
+<div class="content">
+<p>Um. Sorry, I don't know the answer to this one. I'd suggest asking the question on the subversion users mailing list:</p>
+
+<p><a href="http://subversion.tigris.org/servlets/ProjectMailingListList" rel="nofollow">http://subversion.tigris.org/servlets/ProjectMailingListList</a></p>
+
+</div>
+</li>
+
+
+<li class="feedbackitem" id="feedback-190">
+<div class="author">   
+<cite>Ajo Paul</cite>
+2006-12-20
+</div>
+<div class="content">
+<p>Hi, have found a workaround for a two way mirror(Which is the only posiiblity with svn rite now apart from svk). have to commit to the master repo after doing a repo switch using svn switch --relocate and switch back to local mirror for updates and chekouts.</p>
+
+<p>have blogged it on <a href="http://ajopaul.wordpress.com" rel="nofollow">http://ajopaul.wordpress.com</a></p>
+
+<p>-Ajo</p>
+
+</div>
+</li>
+
+
+<li class="feedbackitem" id="feedback-283">
+<div class="author">   
+<cite>jeff</cite>
+2007-03-08
+</div>
+<div class="content">
+<p>I'm trying to replicate a repository using </p>
+
+<p>svnadmin hotcopy  </p>
+
+<p>Is it oK once I created the  to compress it, tar, gzip, and do some kind of remote copy to another system, scp, rcp, ftp ?</p>
+
+<p>Uncompress it and bring up the  repository?</p>
+
+<p>jeff</p>
+
+</div>
+</li>
+
+
+<li class="feedbackitem" id="feedback-284">
+<div class="author">   
+<cite><a href="http://wordaligned.org">Thomas Guest</a></cite>
+2007-03-08
+</div>
+<div class="content">
+<p>Jeff, you can get a definitive answer either by reading the documentation or from the subversion users mailing list. </p>
+
+<p>I've never had any trouble, and I don't think you will, so long as you take the usual precautions (e.g. don't use text mode for ftp transfer). I'd also be careful with file permissions and I'd advise running a sanity check on your replicated repository.</p>
+
+</div>
+</li>
+
+
+<li class="feedbackitem" id="feedback-310">
+<div class="author">   
+<cite>Skeeve</cite>
+2007-03-27
+</div>
+<div class="content">
+<p>My aim is to mirror a branch (frozen) of a repository in one VPN into another repository in an other VPN.</p>
+
+<p>My idea was to check it out from the original and committing to the other.</p>
+
+<p>As I'm really new to SVN and I haven't read the whole book yet, maybe someone here can give me a hint whether or not this is possible and if so, where to read.</p>
+
+<p>Many tia...</p>
+
+</div>
+</li>
+
+
+<li class="feedbackitem" id="feedback-312">
+<div class="author">   
+<cite><a href="http://wordaligned.org">Thomas Guest</a></cite>
+2007-03-28
+</div>
+<div class="content">
+<p>Skeeve, I don't think checking out and committing is the way to go. I'd look into <a href="http://svnbook.red-bean.com/en/1.2/svn-book.html#svn.reposadmin.maint.tk.svndumpfilter" rel="nofollow">svndumpfilter</a>. If your original repository is a large one, you might like to create something smaller to experiment on. As ever, try the subversion users mailing list if you need more help. </p>
+
+</div>
+</li>
+
+
+<li class="feedbackitem" id="feedback-963">
+<div class="author">   
+<cite>rick jones</cite>
+2007-05-16
+</div>
+<div class="content">
+<p>Is there any chance of a single-step svnadmin way to mirror a repos on one machine to another, or is the only way to go dumping and tranferring via other means?</p>
+
+</div>
+</li>
+
+
+<li class="feedbackitem" id="feedback-965">
+<div class="author">   
+<cite><a href="http://wordaligned.org">Thomas Guest</a></cite>
+2007-05-16
+</div>
+<div class="content">
+<p>Rick, the svn administrative tools are file-system based, and will work happily across (e.g) NFS mounts. You just have to be a little careful with user and group ids. If it's a small repository, <code>svnadmin hotcopy</code> gets the job done quickly. For incremental maintenance of a mirror on a second machine, I'd look into <code>svnsync</code> -- which looks to be like <code>rsync</code> for Subversion repositories.</p>
+
+</div>
+</li>
+
+</ol>
+</div>
+
 <div class="comments"><hr/><div id="disqus_thread"></div><script type="text/javascript" src="http://disqus.com/forums/wordaligned/embed.js"></script></div>
       
 <div id="comments"><script type="text/javascript">
@@ -264,8 +430,8 @@ overheads.</a></p>
 <div class="sidebar-node">
 <h3>Chain</h3>
 <ul>
-<li><a accesskey="n" href="/articles/are-list-comprehensions-the-wrong-way-round.html" title="Next article">&laquo; Are List Comprehensions the Wrong Way Round?</a></li>
-<li><a accesskey="p" href="/articles/message-to-self-whats-this.html" title="Previous article">&raquo; Message to Self. What&#8217;s this?</a></li>
+<li><a accesskey="n" href="/articles/are-list-comprehensions-the-wrong-way-round" title="Next article">&laquo; Are List Comprehensions the Wrong Way Round?</a></li>
+<li><a accesskey="p" href="/articles/message-to-self-whats-this" title="Previous article">&raquo; Message to Self. What&#8217;s this?</a></li>
 </ul>
 
 

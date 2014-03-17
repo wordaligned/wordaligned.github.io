@@ -25,9 +25,9 @@
 
   <div id="page">
     <div id="content">
-      <div class="atomentry" id="casualties-in-the-great-computer-shootout.html">
-<h2 class="title"><a href="/articles/casualties-in-the-great-computer-shootout.html">Casualties in the great computer shootout</a></h2>
-<p class="meta"><abbr class="published" title="2007-02-01">2007-02-01</abbr> &bull; <a href="/tag/c++" rel="tag">C++</a>, <a href="/tag/python" rel="tag">Python</a> &bull; <a href="/articles/casualties-in-the-great-computer-shootout.html#disqus_thread">Comments</a></p>
+      <div class="atomentry" id="casualties-in-the-great-computer-shootout">
+<h2 class="title"><a href="/articles/casualties-in-the-great-computer-shootout">Casualties in the great computer shootout</a></h2>
+<p class="meta"><abbr class="published" title="2007-02-01">2007-02-01</abbr> &bull; <a href="/tag/c++" rel="tag">C++</a>, <a href="/tag/python" rel="tag">Python</a> &bull; <a href="/articles/casualties-in-the-great-computer-shootout#disqus_thread">Comments</a></p>
 <div class="toc">
 <h2>Contents</h2>
 <ul>
@@ -417,6 +417,177 @@ ValueError: invalid literal for int() with base 10: '-98.1\n'
 </p>
 </div>
 
+<h5><a name="feedback">Feedback</a></h5>
+<div id="feedback_div">
+<ol id="feedback" class="feedback">
+
+<li class="feedbackitem" id="feedback-247">
+<div class="author">   
+<cite>Isaac Gouy</cite>
+2007-02-05
+</div>
+<div class="content">
+<p><em>"What do you need to do to run it? How accurate is it? How robust? How extensible?"</em></p>
+
+<ul>
+<li>And the worst thing about 100m track races is that they tell us nothing about how well the competitors can swim? :-)</li>
+</ul>
+
+<p>-<em>"It’s hard to see why the author hasn’t included the extra few characters needed to make it compile cleanly ... It looks like a performance hack ..."</em></p>
+
+<ul>
+<li>Instead of complaining about programs, as though they were writ in stone - contribute a better program.</li>
+</ul>
+
+<p><em>"... on the 6Kb input file ..."</em></p>
+
+<ul>
+<li>The example input file is 6KB, with N=21,000 the test input file is ~124MB</li>
+</ul>
+
+<p><em>"I’ve come to regard static typing as a way of strapping code more tightly to the machine ... Python provides a higher-level model of integers."</em></p>
+
+<ul>
+<li><p>And statically type checked languages like Haskell also provide arbitrary-precision tagged-integers - that functionality isn't restricted to dynamically type checked languages.</p></li>
+<li><p>And <em>"the program will run as usual and will politely offer a vaguely convincing but wrong result"</em> is really about the C and its brethren - Ada and Oberon-2 and ... would all show an error on overflow, even C# provides overflow checks.</p></li>
+</ul>
+
+</div>
+</li>
+
+
+<li class="feedbackitem" id="feedback-248">
+<div class="author">   
+<cite><a href="http://wordaligned.org">Thomas Guest</a></cite>
+2007-02-06
+</div>
+<div class="content">
+<p>Isaac, thanks for the feedback.</p>
+
+<blockquote>
+    <p>"And the worst thing about 100m track races is that they tell us nothing about how well the competitors can swim? :-)"</p>
+</blockquote>
+
+<p>Fair point, but I'm not sure how well the analogy works. Of course the shootout is all about efficiency, but the sample programs I compare are idiomatic solutions to the problem of accumulating integers, and I'm interested in their other dimensions. In fact, the shootout refuses non-idiomatic solutions, otherwise we'd probably see performance hacks like loop-unrolling and embedded assembler instructions -- and of course the Python would simply call out to C (which would use loop-unrolling and embedded assembler ... ).</p>
+
+<blockquote>
+    <p>"Instead of complaining about programs, as though they were writ in stone - contribute a better program."</p>
+</blockquote>
+
+<p>Good point. I should. And thanks for the correction on file sizes -- I'd missed that. Things make a little more sense now :-)</p>
+
+<p>Re- Haskell. I know little about Haskell, but I have hopes that functional languages are going to move further into the mainstream with the increase of multi-core chips. Accumulating a huge collection of integers is a task well-suited to divide and conquer: spawn tasks to accumulate portions of the collection, then sum their individual results. What I really don't want to see is programmers hand-coding threads to do this: it leads to horrendous code and hideous defects. I'd like the language to quietly and correctly tune the code for me.</p>
+
+</div>
+</li>
+
+
+<li class="feedbackitem" id="feedback-249">
+<div class="author">   
+<cite>Isaac Gouy</cite>
+2007-02-06
+</div>
+<div class="content">
+<blockquote>
+    <p>idiomatic solutions to the problem of accumulating integers</p>
+</blockquote>
+
+<p>That's very much a matter of perspective - there's always a lot of criticism that the programs are <strong>not</strong> idiomatic.</p>
+
+<blockquote>
+    <p>interested in their other dimensions ... </p>
+</blockquote>
+
+<p>I look forward to seeing your cross-language measurements on those other dimensions :-)</p>
+
+<blockquote>
+    <p>Python would simply call out to C</p>
+</blockquote>
+
+<p>At which we might wonder how much Python (Ruby, Smalltalk, Lisp, Lua, ... ) goodness we'd given up.</p>
+
+<blockquote>
+    <p>functional languages ... move further into the mainstream</p>
+</blockquote>
+
+<p>Note that programs written in 2 pure functional programming languages (Haskell, Clean) are shown <a href="http://shootout.alioth.debian.org/gp4/benchmark.php?test=sumcol&amp;lang=all" rel="nofollow">faster than the C program you listed</a>.</p>
+
+</div>
+</li>
+
+
+<li class="feedbackitem" id="feedback-250">
+<div class="author">   
+<cite><a href="http://wordaligned.org">Thomas Guest</a></cite>
+2007-02-07
+</div>
+<div class="content">
+<blockquote>
+    <p>I look forward to seeing your cross-language measurements on those other dimensions :-)</p>
+</blockquote>
+
+<p>It's true, not everything is as easy to measure as speed (and we all know how hard it is to get meaningful speed measurements); and it's also true that automatically generated metrics are valuable. </p>
+
+<p>My favourite such metric would be: <em>"how many tests does it pass?"</em> The <a href="http://shootout.alioth.debian.org" rel="nofollow">shootout</a> already has this covered. I think the shootout also has some interesting things to tell us about: <em>"how do I run it?"</em> and: <em>"what happens when the computer doesn't like it (e.g. what do the compile errors look like)?"</em>. These details are incidental to the shootout, and harder to quantify.</p>
+
+<p>Similarly, it's hard to objectively measure: <em>"how readable is it?"</em> For example, I'm used to (e.g.) Java programmers claiming that  a long list of imports, keywords, type declarations and getters and setters make a program easier to read. I disagree! For me, the lines-of-code metric would be more closely correlated to readability. Again, the shootout sort-of covers this.</p>
+
+<blockquote>
+    <p>Note that programs written in 2 pure functional programming languages (Haskell, Clean) are shown faster than the C program you listed.</p>
+</blockquote>
+
+<p>Interesting indeed. The <a href="http://shootout.alioth.debian.org/gp4/benchmark.php?test=sumcol&amp;lang=ghc&amp;id=2]" rel="nofollow">speedy Haskell</a> variant looks very clunky compared to the <a href="http://shootout.alioth.debian.org/gp4/benchmark.php?test=sumcol&amp;lang=ghc&amp;id=3" rel="nofollow">slower</a> and the <a href="http://shootout.alioth.debian.org/gp4/benchmark.php?test=sumcol&amp;lang=ghc&amp;id=4" rel="nofollow">slowest</a> ones -- but I'm no Haskell expert. I see the winning <a href="http://shootout.alioth.debian.org/gp4/benchmark.php?test=sumcol&amp;lang=clean" rel="nofollow">Clean</a> entry is your own. Congratulations! </p>
+
+</div>
+</li>
+
+
+<li class="feedbackitem" id="feedback-252">
+<div class="author">   
+<cite>Isaac Gouy</cite>
+2007-02-07
+</div>
+<div class="content">
+<blockquote>
+    <p>hard to objectively measure: <em>"how readable is it?"</em></p>
+</blockquote>
+
+<p>Because we haven't yet said what we mean by "readable". We might imagine "readable" could be measured by asking many many programmers questions about the program, and measuring their response time and accuracy.</p>
+
+<blockquote>
+    <p>Java programmers ... imports, keywords, type declarations and ... make a program easier to read. I disagree!</p>
+</blockquote>
+
+<p>My opinion is that both those responses are too simplistic - it depends. It depends how big the program is, it depends how complex the program is, it depends on the skill and experience of the readers (and writers), it depends what browse/explore tools are available in the programming environment ...</p>
+
+<blockquote>
+    <p>I see the winning Clean entry is your own</p>
+</blockquote>
+
+<p>And see how naive the implementation is - a simple recursive function that takes a handle and sum as arguments, and loops until no more ints are read - in this case, congratulations to the language implementors.</p>
+
+</div>
+</li>
+
+
+<li class="feedbackitem" id="feedback-255">
+<div class="author">   
+<cite><a href="http://wordaligned.org">Thomas Guest</a></cite>
+2007-02-08
+</div>
+<div class="content">
+<blockquote>
+    <p>... we haven't yet said what we mean by "readable". We might imagine "readable" could be measured by asking many many programmers questions about the program, and measuring their response time and accuracy.</p>
+</blockquote>
+
+<p>Another reason why it's hard to measure readability: it depends on who's doing the reading.</p>
+
+</div>
+</li>
+
+</ol>
+</div>
+
 <div class="comments"><hr/><div id="disqus_thread"></div><script type="text/javascript" src="http://disqus.com/forums/wordaligned/embed.js"></script></div>
       
 <div id="comments"><script type="text/javascript">
@@ -453,8 +624,8 @@ the most accurate.</a></p>
 <div class="sidebar-node">
 <h3>Chain</h3>
 <ul>
-<li><a accesskey="n" href="/articles/code-completion-for-dynamic-languages.html" title="Next article">&laquo; Code completion for dynamic languages</a></li>
-<li><a accesskey="p" href="/articles/a-tale-of-two-upgrades.html" title="Previous article">&raquo; A tale of two upgrades</a></li>
+<li><a accesskey="n" href="/articles/code-completion-for-dynamic-languages" title="Next article">&laquo; Code completion for dynamic languages</a></li>
+<li><a accesskey="p" href="/articles/a-tale-of-two-upgrades" title="Previous article">&raquo; A tale of two upgrades</a></li>
 </ul>
 
 

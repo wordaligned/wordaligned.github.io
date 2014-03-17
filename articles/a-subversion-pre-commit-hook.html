@@ -25,9 +25,9 @@
 
   <div id="page">
     <div id="content">
-      <div class="atomentry" id="a-subversion-pre-commit-hook.html">
-<h2 class="title"><a href="/articles/a-subversion-pre-commit-hook.html">A Subversion Pre-Commit Hook</a></h2>
-<p class="meta"><abbr class="published" title="2006-08-09">2006-08-09</abbr> &bull; <a href="/tag/subversion" rel="tag">Subversion</a>, <a href="/tag/python" rel="tag">Python</a>, <a href="/tag/c++" rel="tag">C++</a>, <a href="/tag/shell" rel="tag">Shell</a> &bull; <a href="/articles/a-subversion-pre-commit-hook.html#disqus_thread">Comments</a></p>
+      <div class="atomentry" id="a-subversion-pre-commit-hook">
+<h2 class="title"><a href="/articles/a-subversion-pre-commit-hook">A Subversion Pre-Commit Hook</a></h2>
+<p class="meta"><abbr class="published" title="2006-08-09">2006-08-09</abbr> &bull; <a href="/tag/subversion" rel="tag">Subversion</a>, <a href="/tag/python" rel="tag">Python</a>, <a href="/tag/c++" rel="tag">C++</a>, <a href="/tag/shell" rel="tag">Shell</a> &bull; <a href="/articles/a-subversion-pre-commit-hook#disqus_thread">Comments</a></p>
 <p>Subversion&#8217;s <a href="http://svnbook.red-bean.com/en/1.2/svn.reposadmin.create.html#svn.reposadmin.create.hooks">hook scripts</a> provide a powerful and
    flexible way to associate actions with repository events. For example,
    the <a href="http://svnbook.red-bean.com/en/1.2/svn.reposadmin.create.html#svn.reposadmin.create.hooks">pre-commit</a> hook allows you to check &#8212; and possibly abort &#8212; a
@@ -253,6 +253,152 @@ if __name__ == "__main__":
 </div>
 </div>
 
+<h5><a name="feedback">Feedback</a></h5>
+<div id="feedback_div">
+<ol id="feedback" class="feedback">
+
+<li class="feedbackitem" id="feedback-51">
+<div class="author">   
+<cite>Luisma</cite>
+2006-08-22
+</div>
+<div class="content">
+In which languages can you write a hook?
+
+thank you very much for the tutorial!
+
+</div>
+</li>
+
+
+<li class="feedbackitem" id="feedback-58">
+<div class="author">   
+<cite><a href="http://wordaligned.org">Thomas Guest</a></cite>
+2006-08-28
+</div>
+<div class="content">
+You can write the hook in whatever language you choose. Subversion will execute it provided 1) it is executable and 2) it has the name "pre-commit". If you use a scripting language (e.g. Python, Perl, Bash) then make sure the shebang line will locate the relevant executable.
+
+</div>
+</li>
+
+
+<li class="feedbackitem" id="feedback-176">
+<div class="author">   
+<cite>Mounty</cite>
+2006-12-13
+</div>
+<div class="content">
+<p>If writing hooks on a windows system your actual hook file, e.g "pre-commit" has to be either a .exe or a .bat</p>
+
+<p>I personally write most of my scripts in Perl and call them from the corresponding .bat file, remembering to pass the arguments to the script.</p>
+
+<p>BEWARE: When Subversion calls the .bat file it does so with no environmental variables set, you will therefore have to manually set PATH= so that you do not receive "XYZ is not recognised as an internal or external command" errors.</p>
+
+</div>
+</li>
+
+
+<li class="feedbackitem" id="feedback-208">
+<div class="author">   
+<cite>Tony Morris</cite>
+2007-01-05
+</div>
+<div class="content">
+<p>I write them in Haskell</p>
+
+</div>
+</li>
+
+
+<li class="feedbackitem" id="feedback-209">
+<div class="author">   
+<cite>Tony Morris</cite>
+2007-01-05
+</div>
+<div class="content">
+<p>I write them in Haskell</p>
+
+</div>
+</li>
+
+
+<li class="feedbackitem" id="feedback-215">
+<div class="author">   
+<cite><a href="http://wordaligned.org">Thomas Guest</a></cite>
+2007-01-06
+</div>
+<div class="content">
+<p>Thanks for the tips Mounty. I have set up a Subversion server on Windows before and it worked just fine, but I admit I'm more comfortable using a Unix-based server.</p>
+
+</div>
+</li>
+
+
+<li class="feedbackitem" id="feedback-216">
+<div class="author">   
+<cite><a href="http://wordaligned.org">Thomas Guest</a></cite>
+2007-01-06
+</div>
+<div class="content">
+<p>Cheers Tony. I've not used Haskell myself. I'm experimenting with <a href="http://wiki.wordaligned.org/sicp" rel="nofollow">Scheme</a> in my spare time, and often adopt a functional style of programming in other languages.</p>
+
+</div>
+</li>
+
+
+<li class="feedbackitem" id="feedback-309">
+<div class="author">   
+<cite>Matt Stine</cite>
+2007-03-26
+</div>
+<div class="content">
+<p>I just wanted to thank you - I've been trying to setup SVN commit hooks and nowhere did I find that your hook filenames should be "pre-commit" w/o an extension. Your example helped me to get my hooks working!</p>
+
+</div>
+</li>
+
+
+<li class="feedbackitem" id="feedback-512">
+<div class="author">   
+<cite>bernd</cite>
+2007-05-04
+</div>
+<div class="content">
+<p>nice article, thank you for this!</p>
+
+</div>
+</li>
+
+
+<li class="feedbackitem" id="feedback-939">
+<div class="author">   
+<cite><a href="http://www.toolssalon.com/">decl</a></cite>
+2007-05-16
+</div>
+<div class="content">
+<p>BEWARE: When Subversion calls the .bat file it does so with no environmental variables set, you will therefore have to manually set PATH= so that you do not receive "XYZ is not recognised as an internal or external command" errors.</p>
+
+<p>:(((</p>
+
+</div>
+</li>
+
+
+<li class="feedbackitem" id="feedback-1334">
+<div class="author">   
+<cite><a href="http://www.camikon.com/">Mick</a></cite>
+2007-05-22
+</div>
+<div class="content">
+<p>nice article, thank you for this!</p>
+
+</div>
+</li>
+
+</ol>
+</div>
+
 <div class="comments"><hr/><div id="disqus_thread"></div><script type="text/javascript" src="http://disqus.com/forums/wordaligned/embed.js"></script></div>
       
 <div id="comments"><script type="text/javascript">
@@ -294,8 +440,8 @@ to prohibit.</a></p>
 <div class="sidebar-node">
 <h3>Chain</h3>
 <ul>
-<li><a accesskey="n" href="/articles/octal-literals.html" title="Next article">&laquo; Octal Literals</a></li>
-<li><a accesskey="p" href="/articles/creating-a-temporary-subversion-repository.html" title="Previous article">&raquo; Creating a Temporary Subversion Repository</a></li>
+<li><a accesskey="n" href="/articles/octal-literals" title="Next article">&laquo; Octal Literals</a></li>
+<li><a accesskey="p" href="/articles/creating-a-temporary-subversion-repository" title="Previous article">&raquo; Creating a Temporary Subversion Repository</a></li>
 </ul>
 
 

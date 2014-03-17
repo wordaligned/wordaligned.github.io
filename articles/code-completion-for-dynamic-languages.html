@@ -25,9 +25,9 @@
 
   <div id="page">
     <div id="content">
-      <div class="atomentry" id="code-completion-for-dynamic-languages.html">
-<h2 class="title"><a href="/articles/code-completion-for-dynamic-languages.html">Code completion for dynamic languages</a></h2>
-<p class="meta"><abbr class="published" title="2007-02-02">2007-02-02</abbr> &bull; <a href="/tag/python" rel="tag">Python</a>, <a href="/tag/ruby" rel="tag">Ruby</a>, <a href="/tag/emacs" rel="tag">Emacs</a>, <a href="/tag/dynamic-languages" rel="tag">Dynamic Languages</a> &bull; <a href="/articles/code-completion-for-dynamic-languages.html#disqus_thread">Comments</a></p>
+      <div class="atomentry" id="code-completion-for-dynamic-languages">
+<h2 class="title"><a href="/articles/code-completion-for-dynamic-languages">Code completion for dynamic languages</a></h2>
+<p class="meta"><abbr class="published" title="2007-02-02">2007-02-02</abbr> &bull; <a href="/tag/python" rel="tag">Python</a>, <a href="/tag/ruby" rel="tag">Ruby</a>, <a href="/tag/emacs" rel="tag">Emacs</a>, <a href="/tag/dynamic-languages" rel="tag">Dynamic Languages</a> &bull; <a href="/articles/code-completion-for-dynamic-languages#disqus_thread">Comments</a></p>
 <p>Here&#8217;s an interesting <a href="http://www.regdeveloper.co.uk/2007/02/01/making_sense_ruby/">article</a> in which Huw Collingbourne describes
    his frustration with trying to program a smart code completion system
    for Visual Studio. The problem being, the code in question is
@@ -119,6 +119,186 @@
 </p>
 </div>
 
+<h5><a name="feedback">Feedback</a></h5>
+<div id="feedback_div">
+<ol id="feedback" class="feedback">
+
+<li class="feedbackitem" id="feedback-238">
+<div class="author">   
+<cite><a href="http://homepage.mac.com/keithray/blog/index.html">Keith Ray</a></cite>
+2007-02-02
+</div>
+<div class="content">
+<p>re - </p>
+
+<ol>
+<li>Pull up a full-screen window</li>
+<li>Split the window vertically</li>
+<li>Use one side for the code you’re working on</li>
+<li>Use the other side to run an interpreted Python session</li>
+</ol>
+
+<p>I was just thinking this morning that doing that on a projector would be a great way show off test-driven development in Python (or even Java).</p>
+
+</div>
+</li>
+
+
+<li class="feedbackitem" id="feedback-246">
+<div class="author">   
+<cite><a href="http://wordaligned.org">Thomas Guest</a></cite>
+2007-02-04
+</div>
+<div class="content">
+<p>Hi Keith. Doing <em>any</em> programming in front of an audience is brave, and makes very for convincing demonstration. </p>
+
+<p>I've been lucky enough to attend the <a href="http://accu.org/index.php/conferences" rel="nofollow">ACCU conference</a> a few times and admire the speakers who have the ability to program live. <a href="http://www.gotw.ca/" rel="nofollow">Herb Sutter</a> excels at it.</p>
+
+</div>
+</li>
+
+
+<li class="feedbackitem" id="feedback-360">
+<div class="author">   
+<cite>rubikitch</cite>
+2007-04-11
+</div>
+<div class="content">
+rct-complete in `rcodetools' package does editor-independent accurate completion.
+Instead of analyzing Ruby code, rct-complete actually executes the code to get candidates.
+
+</div>
+</li>
+
+
+<li class="feedbackitem" id="feedback-362">
+<div class="author">   
+<cite><a href="http://wordaligned.org">Thomas Guest</a></cite>
+2007-04-12
+</div>
+<div class="content">
+<p>rubikitch, thanks for the note -- that's exactly the kind of intelligent code completion technique I was talking about. </p>
+
+</div>
+</li>
+
+
+<li class="feedbackitem" id="feedback-395">
+<div class="author">   
+<cite>vais</cite>
+2007-04-17
+</div>
+<div class="content">
+<p>rubikitch, am I missing something, or is this an extremely dangerous way to do completion? I have been struggling with this thought for a while, could you please explain your reasoning as to how it is ok to run arbitrary code to provide completion candidates. Side effects, anybody? </p>
+
+<p>For example, copy and paste any sample code from <a href="http://www.webrick.org" rel="nofollow">www.webrick.org</a>, and then invoke completion in your editor of choice. What happens? Well, at a minimum you get an http server running on port 2000, and, I suppose depending on the editor in question, it hangs as the ruby code blocks. I have not tried this with things like File.delete, but even if you blacklist certain things, you can never be 100% sure that there are no negative side effects from executing the code you happen to be editing. </p>
+
+<p>So, the question is whether 100% accurate completion is worth the price of uncertainty about the consequences of code execution. I have never been more looking forward to being proved wrong as on this one.</p>
+
+</div>
+</li>
+
+
+<li class="feedbackitem" id="feedback-397">
+<div class="author">   
+<cite><a href="http://wordaligned.org">Thomas Guest</a></cite>
+2007-04-17
+</div>
+<div class="content">
+<p>vais, I haven't actually used <a href="http://www.google.com/search?q=rct-complete" rel="nofollow">rct-complete</a> myself, and I haven't found any definitive documentation online, but I think the programmer is fully in charge of what gets executed and when. Determining code-complete options can be done using an object's reflection interfaces; then you can select the method and decide if you want to run the code.</p>
+
+<p>Developing any code is "dangerous", but narrowing the gap between writing and executing code reduces the risk.</p>
+
+</div>
+</li>
+
+
+<li class="feedbackitem" id="feedback-420">
+<div class="author">   
+<cite>vais</cite>
+2007-04-19
+</div>
+<div class="content">
+<p>Thomas, I could not agree with you more on the points you make in this post regarding your Emacs setup for working with Python -- my workflow in Ruby is almost identical. </p>
+
+<p>"...to do it properly, you do have to hook into the interpreter and its powers of reflection..." could not be more dead on. </p>
+
+<p>However, you should at least try rct-complete before jumping to the conclusion that it does the right thing, somehow, magically. That is just plain ole wishfull thinking. And, yes, I could not find any documentation either (that would explain the principles behind its operation). I guess the author did not want to kill the magic...</p>
+
+<p>Of course Ruby code must be executed in order to obtain code-complete options, and that is exacly what the tool does. Here, try this:</p>
+
+<ol>
+<li>create a file named test.txt</li>
+<li>create a file named test.rb, and type the following:
+File.rename('test.txt', 'oops.txt')</li>
+<li>Hit enter, and type this: 
+Dir.</li>
+<li>because my editor is set up to call rct-complete when a period is pressed, completion happens, and I get a list of everything the Dir class can do, great!</li>
+</ol>
+
+<p>Now, look into the directory where your test.txt and test.rb are. What do you see? oops.txt and test.rb.</p>
+
+<p>I am all for narrowing the gap between writing and executing code, but if this example does not scare you, nothing will. That is just not the way to do it. </p>
+
+<p>Once again, I wish it had some magic and just did the right thing, but a simple test points to the contrary. If only rubikitch would make some of his reasoning behind rct-complete publicly available, but alas...</p>
+
+</div>
+</li>
+
+
+<li class="feedbackitem" id="feedback-421">
+<div class="author">   
+<cite><a href="http://wordaligned.org">Thomas Guest</a></cite>
+2007-04-19
+</div>
+<div class="content">
+<p>vais, you're quite right, I can't really comment on rct-complete because I haven't used it; and although I'm interested in Ruby, I hardly ever program in it, so I won't be able to provide any more informed comments. Thanks too for the use case. I take your point. I am confused though: are you saying you use rct-complete, even though it's so dangerous, or when you say "my editor" do you mean "the editor"?</p>
+
+</div>
+</li>
+
+
+<li class="feedbackitem" id="feedback-432">
+<div class="author">   
+<cite>vais</cite>
+2007-04-19
+</div>
+<div class="content">
+<p>Thomas, I <em>would love</em> to be able to use rct-complete, so when I found it, I got really excited. Of course the next step is to try it, and, it surely did all the things it was supposed to do - what a joy!</p>
+
+<p>The trouble started when I discovered that if there are any syntax errors in the code, or even a mis-typed method name, autocompletion stopped working for the entire file until those things were removed. So, I started digging... and the rest is documented above.</p>
+
+<p>So, to answer your question, I am not speaking in the abstract, and by "my editor" I really do mean my editor. BTW my editor for many years has been SciTE (<a href="http://www.scintilla.org/SciTE.html" rel="nofollow">http://www.scintilla.org/SciTE.html</a>) - a Lua-scriptable tiny wonder (which by the way was orginally created as just a demo of the Scintilla component which in turn was created because the author wanted a better editing component for working with Python code)</p>
+
+<p>Mitchell made it even more perfect(tm) with his scite-tools project you can see here: <a href="http://caladbolg.net/scite.php" rel="nofollow">http://caladbolg.net/scite.php</a>, and scite-tools comes with rct-complete baked right in. Fortunately disabling it is just commenting out a line of Lua, which is what I unfortunatelly had to do as a result of my findings. I must add that scite-tools is MUCH more than that, and anybody who uses SciTE owes it to themselves to check it out. This is the best example I have seen of tapping into the power of Lua under the hood of this editor to do amazing things.</p>
+
+</div>
+</li>
+
+
+<li class="feedbackitem" id="feedback-485">
+<div class="author">   
+<cite>rubikitch</cite>
+2007-04-28
+</div>
+<div class="content">
+I just implemented Test-Driven Completion (TDC) in rcodetools.
+TDC means that completion in a method, current implementation cannot do, uses a unit test.
+Test scripts are self-enclosed and expected to be executed, so side-effects are not problem.
+
+If you want to use the development version, try
+  darcs get <a href="http://eigenclass.org/repos/rcodetools/head" rel="nofollow">http://eigenclass.org/repos/rcodetools/head</a> rcodetools
+After `darcs get' the repository,
+  darcs pull
+updates your local repository.
+
+
+</div>
+</li>
+
+</ol>
+</div>
+
 <div class="comments"><hr/><div id="disqus_thread"></div><script type="text/javascript" src="http://disqus.com/forums/wordaligned/embed.js"></script></div>
       
 <div id="comments"><script type="text/javascript">
@@ -158,8 +338,8 @@ dynamic languages help keep it that way.</a></p>
 <div class="sidebar-node">
 <h3>Chain</h3>
 <ul>
-<li><a accesskey="n" href="/articles/bin2hex-py.html" title="Next article">&laquo; bin2hex.py</a></li>
-<li><a accesskey="p" href="/articles/casualties-in-the-great-computer-shootout.html" title="Previous article">&raquo; Casualties in the great computer shootout</a></li>
+<li><a accesskey="n" href="/articles/bin2hex-py" title="Next article">&laquo; bin2hex.py</a></li>
+<li><a accesskey="p" href="/articles/casualties-in-the-great-computer-shootout" title="Previous article">&raquo; Casualties in the great computer shootout</a></li>
 </ul>
 
 

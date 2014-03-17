@@ -25,9 +25,9 @@
 
   <div id="page">
     <div id="content">
-      <div class="atomentry" id="keyword-substitution-just-say-no.html">
-<h2 class="title"><a href="/articles/keyword-substitution-just-say-no.html">Keyword Substitution - Just say No!</a></h2>
-<p class="meta"><abbr class="published" title="2006-08-02">2006-08-02</abbr> &bull; <a href="/tag/subversion" rel="tag">Subversion</a>, <a href="/tag/cvs" rel="tag">CVS</a>, <a href="/tag/cvs2svn" rel="tag">cvs2svn</a> &bull; <a href="/articles/keyword-substitution-just-say-no.html#disqus_thread">Comments</a></p>
+      <div class="atomentry" id="keyword-substitution-just-say-no">
+<h2 class="title"><a href="/articles/keyword-substitution-just-say-no">Keyword Substitution - Just say No!</a></h2>
+<p class="meta"><abbr class="published" title="2006-08-02">2006-08-02</abbr> &bull; <a href="/tag/subversion" rel="tag">Subversion</a>, <a href="/tag/cvs" rel="tag">CVS</a>, <a href="/tag/cvs2svn" rel="tag">cvs2svn</a> &bull; <a href="/articles/keyword-substitution-just-say-no#disqus_thread">Comments</a></p>
 <p><a href="http://subversion.tigris.org">Subversion</a> supports keyword substitution &#8212; and has to, really, since it
    claims to be &#8220;a compelling replacement for <a href="http://www.nongnu.org/cvs/">CVS</a>&#8221;.
 </p>
@@ -91,6 +91,109 @@
 </ol>
 </div>
 
+<h5><a name="feedback">Feedback</a></h5>
+<div id="feedback_div">
+<ol id="feedback" class="feedback">
+
+<li class="feedbackitem" id="feedback-152">
+<div class="author">   
+<cite>Ben Collins-Sussman</cite>
+2006-11-24
+</div>
+<div class="content">
+I agree that keywords are a bad idea most of the time, but your last two points aren't actually true, with respect to how subversion works.
+
+Keyword substitution doesn't modify the file on checkin, it modifies only the working file upon checkout.  In other words, the file stored in the repository is 'contracted' (no keywords), something like $Id:$.   Only when you checkout the file to a working copy, does the *working* verson of the file expand to $Id: blah blah$.
+
+When you run 'svn diff', the working file is contracted and compared against the contracted text-base;  the same contraction happens when you 'svn commit'.   So it turns out that you don't see spurious diffs either in the commit diffs or when comparing two trees against each other.
+
+I still hate keywords.  :-)
+
+</div>
+</li>
+
+
+<li class="feedbackitem" id="feedback-153">
+<div class="author">   
+<cite><a href="http://wordaligned.org">Thomas Guest</a></cite>
+2006-11-24
+</div>
+<div class="content">
+<p>
+Thanks for the correction Ben. For point 2), I guess I should have said that the modification -- and hence the rebuild -- happens when you (or others) update their working copies.
+</p>
+<p>
+Point 3) does hold if you're using the basic Unix diff and patch tools rather than svn diff and svn merge. So the message is: prefer to use svn diff and svn merge!
+</p>
+
+</div>
+</li>
+
+
+<li class="feedbackitem" id="feedback-256">
+<div class="author">   
+<cite><a href="http://www.daveonscm.com">David P Thomas</a></cite>
+2007-02-10
+</div>
+<div class="content">
+<p>In general I agree... but I have come across some legitimate usage models for keyword expansion (if ever they could exist ;)</p>
+
+<p>This is an actual case from a development shop with ~1,000 developers.   They develop core software that is delivered to customers as source.  Every so often, they release a new version of the source code to the same customers.   The customers then take these "vendor drops" and customize them internally.  Of course, they use their own VCS tool to manage their changes.  Over time, the customers will hack/slash/handmerge multiple vendor releases into a "working copy."  Not ideal and not recommended but the fact remains... the original vendor deals with frequent support calls and is unable to get an answer to "what version are you using?"</p>
+
+<p>Their solution is to embed keyword substituted variables into each source code file... so regardless of the source-jumble that results on a customer site, the customer can reference $Id$, $Log$, $Author$, etc and the vendor can use that to trace back to the original version of code.</p>
+
+<p>I don't like using the built-in VCS mechanism for keyword expansion per your aforementioned reasons.  Rather, I prefer to do a post-release, pre-deployment keyword filter on source code being packaged.  This can optionally be version controlled locally as well, but no need to have the keywords embedded in the code from the beginning.</p>
+
+</div>
+</li>
+
+
+<li class="feedbackitem" id="feedback-267">
+<div class="author">   
+<cite><a href="http://wordaligned.org">Thomas Guest</a></cite>
+2007-02-14
+</div>
+<div class="content">
+<p>David -- thanks for the note. What you describe is on a scale way beyond my experience. <a href="http://blog.wordaligned.org/articles/2007/02/13/release-then-test" rel="nofollow">Here</a> are some more thoughts spawned by your comment.</p>
+
+</div>
+</li>
+
+
+<li class="feedbackitem" id="feedback-271">
+<div class="author">   
+<cite>Joel Smith</cite>
+2007-02-27
+</div>
+<div class="content">
+<p>Although you make some valid points against keyword substitution, there are occasions when it is extremely useful. We use SVN for controlling changes to config files for the servers we maintain. Using the Id field allows us to track the changes that have been made on the files and the versions/admin who made the changes.</p>
+
+<p>We could use RCS, on each server, but use SVN for a more centralised approach to manage the ~100 servers.</p>
+
+<p>Most of the files we are using are config text files or simple shell scripts. We could manually add the history log, but using SVN and the keyword substitution gets around this, and allows us to see at once on a server which version we are dealing with, even if there is no direct SVN access.</p>
+
+</div>
+</li>
+
+
+<li class="feedbackitem" id="feedback-274">
+<div class="author">   
+<cite><a href="http://wordaligned.org">Thomas Guest</a></cite>
+2007-02-28
+</div>
+<div class="content">
+<p>Thanks for the feedback Joel -- though I'm not quite sure I understand it! Are you saying that your servers are all running independently, and that each runs its own flavour of software? How many SVN repositories do you have and where are they located?</p>
+
+<p>If you need to know who changed what when, then the Id field is only the tip of the iceberg of information available in the version control system (admittedly, the tip is often the interesting bit), so surely what you really need is SVN access?</p>
+
+<p>In any case, I take your point: keyword substitution is helping you out.</p>
+
+</div>
+</li>
+
+</ol>
+</div>
+
 <div class="comments"><hr/><div id="disqus_thread"></div><script type="text/javascript" src="http://disqus.com/forums/wordaligned/embed.js"></script></div>
       
 <div id="comments"><script type="text/javascript">
@@ -128,8 +231,8 @@ Surely this is the behaviour we really want from a version control system?</a></
 <div class="sidebar-node">
 <h3>Chain</h3>
 <ul>
-<li><a accesskey="n" href="/articles/readable-code.html" title="Next article">&laquo; Readable Code</a></li>
-<li><a accesskey="p" href="/articles/map-filter-accumulate-lambda.html" title="Previous article">&raquo; map, filter, accumulate, lambda</a></li>
+<li><a accesskey="n" href="/articles/readable-code" title="Next article">&laquo; Readable Code</a></li>
+<li><a accesskey="p" href="/articles/map-filter-accumulate-lambda" title="Previous article">&raquo; map, filter, accumulate, lambda</a></li>
 </ul>
 
 
