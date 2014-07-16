@@ -1,0 +1,187 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<link rel="icon" href="/images/favicon.png" type="image/png"/>
+<link href="/styles/application.css" media="all" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="/scripts/prettify.js"></script>
+<script type="text/javascript" src="/scripts/lang-lisp.js"></script>
+<title>Group When</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="author" content="Thomas Guest" />
+<meta name="description" content="A Word Aligned article posted 2014-07-16, tagged Python, Haskell, Streams." />
+<meta name="keywords" content="Python, Haskell, Streams" />
+<link rel="alternate" type="application/rss+xml" title="Feed" href="http://feeds.wordaligned.org/wordaligned" />
+</head>
+
+<body onload="prettyPrint()">
+<div id="container">
+  <div id="header">
+<h1><span><a accesskey="h" href="/">Word Aligned</a></span></h1>
+<h2>space sensitive programming</h2>
+<a class="button" href="http://feeds.wordaligned.org/wordaligned" title="Subscribe to Word Aligned"><img style="float: right;" src="/images/feed.png" alt="Feed Logo" height="28" width="28"/></a>
+</div>
+
+  <div id="page">
+    <div id="content">
+      <div class="atomentry" id="group-when">
+<h2 class="title"><a href="/articles/group-when">Group When</a></h2>
+<p class="meta"><abbr class="published" title="2014-07-16">2014-07-16</abbr> &bull; <a href="/tag/python" rel="tag">Python</a>, <a href="/tag/haskell" rel="tag">Haskell</a>, <a href="/tag/streams" rel="tag">Streams</a> &bull; <a href="/articles/group-when#disqus_thread">Comments</a></p>
+<p>Phil Nash&#8217;s recent tweet intrigued me.
+</p>
+<div><blockquote class="twitter-tweet" lang="en"><p>Functional people: I often (in F#) need to process a seq into a smaller list or seq &ndash; where items from the input are grouped in some way&hellip;</p>&mdash; Phil Nash (@phil_nash) <a href="https://twitter.com/phil_nash/statuses/489167611641724928">July 15, 2014</a></blockquote><blockquote class="twitter-tweet" lang="en"><p>&hellip; the need to group may not be known until after the first item in the group.&#10;I struggle to find a nicely functional way to do this. Ideas?</p>&mdash; Phil Nash (@phil_nash) <a href="https://twitter.com/phil_nash/statuses/489167962931482626">July 15, 2014</a></blockquote><script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script></div>
+
+<p>He later clarified what he was after &#8212; and had now found &#8212; linking to a <a href="http://fssnip.net/6A">solution</a> posted a couple of years ago by <a href="http://tomasp.net">Tomas Petricek</a>. The function <code>groupWhen</code> splits a sequence into groups, starting a new group whenever the predicate holds.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint"> module Seq =
+   /// Iterates over elements of the input sequence and groups adjacent elements.
+   /// A new group is started when the specified predicate holds about the element
+   /// of the sequence (and at the beginning of the iteration).
+   ///
+   /// For example: 
+   ///    Seq.groupWhen isOdd [3;3;2;4;1;2] = seq [[3]; [3; 2; 4]; [1; 2]]
+   let groupWhen f (input:seq&lt;_&gt;) = seq {
+     use en = input.GetEnumerator()
+     let running = ref true
+     
+     // Generate a group starting with the current element. Stops generating
+     // when it founds element such that 'f en.Current' is 'true'
+     let rec group() = 
+       [ yield en.Current
+         if en.MoveNext() then
+           if not (f en.Current) then yield! group() 
+         else running := false ]
+     
+     if en.MoveNext() then
+       // While there are still elements, start a new group
+       while running.Value do
+         yield group() |&gt; Seq.ofList }
+
+</pre>
+
+</div>
+
+<p>Here&#8217;s a nice Haskell version coded up by <a href="https://twitter.com/sdarlington">@sdarlington</a>.
+</p>
+<script src="https://gist.github.com/sdarlington/be76048bff124694769d.js"></script>
+
+<p>Maybe <a href="https://docs.python.org/3/library/itertools.html#itertools.takewhile">takewhile</a> and <a href="https://docs.python.org/3/library/itertools.html#itertools.dropwhile">dropwhile</a> could power a Python solution, but my first choice would be <a href="https://docs.python.org/3/library/itertools.html#itertools.groupby">itertools.groupby</a>. A suitable key function could just count the number of times the predicate holds.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">class count_p:
+    ''' Return a value which increments every time the predicate holds, starting from 0.
+    '''
+    def __init__(self, pred):
+        self._n = 0
+        self._pred = pred
+    
+    def __call__(self, v):
+        self._n += self._pred(v)
+        return self._n
+
+def group_when(pred, xs):
+    return (gp for _, gp in groupby(xs, count_p(pred)))
+
+</pre>
+
+</div>
+
+<p>Here, <code>group_when</code> accepts an iterable and returns an iterable sequence of iterable groups. Clients choose how to consume the results.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">&gt;&gt;&gt; def odd(v): return v % 2
+&gt;&gt;&gt; xs = group_when(odd, [3, 3, 2, 4, 1, 2])
+&gt;&gt;&gt; print([list(g) for g in xs])
+[[3], [3, 2, 4], [1, 2]]
+
+</pre>
+
+</div>
+
+<p>Note that <code>count_p</code> does something very like <a href="acc">itertools.accumulate</a>. Here&#8217;s another version of <code>group_when</code> which takes advantage of this.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">def group_when(pred, xs):
+    xs, ys = tee(xs)
+    accu = accumulate(map(pred, ys))
+    return (gp for _, gp in groupby(xs, lambda _: next(accu)))
+
+</pre>
+
+</div>
+</div>
+
+<div class="comments"><hr/><div id="disqus_thread"></div><script type="text/javascript" src="http://disqus.com/forums/wordaligned/embed.js"></script></div>
+      
+<div id="comments"><script type="text/javascript">
+//<![CDATA[
+(function() {
+    var links = document.getElementsByTagName('a');
+    var query = '?';
+    for(var i = 0; i < links.length; i++) {
+        if(links[i].href.indexOf('#disqus_thread') >= 0) {
+            query += 'url' + i + '=' + encodeURIComponent(links[i].href) + '&amp;';
+        }
+    }
+    document.write('<script type="text/javascript" src="http://disqus.com/forums/wordaligned/get_num_replies.js' + query + '"></' + 'script>');
+})();
+//]]>
+</script></div>
+
+    </div>
+    <div id="sidebar">
+      
+<div class="sidebar-node">
+<h3>Tagged</h3>
+<ul id="categories"><li><a href="/tag/python" rel="tag">Python</a></li>
+<li><a href="/tag/haskell" rel="tag">Haskell</a></li>
+<li><a href="/tag/streams" rel="tag">Streams</a></li></ul>
+
+</div>
+
+<div class="sidebar-node">
+<h3>Chain</h3>
+<ul>
+
+<li><a accesskey="p" href="/articles/word-aligned-hosted-by-github" title="Previous article">&raquo; Word Aligned, hosted by Github</a></li>
+</ul>
+
+
+</div>
+
+<div class="sidebar-node">
+<h3>Feeds</h3>
+
+<ul>
+<li><a href="http://feeds.wordaligned.org/wordaligned"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Articles</a></li>
+<li><a href="http://feeds.wordaligned.org/wordaligned/comments"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Comments</a></li>
+</ul>
+
+
+</div>
+
+    </div>
+  </div>
+  <div id="footer">
+<hr />
+<p><a href="http://tag.wordaligned.org">Thomas Guest</a></p>
+</div>
+
+</div>
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-3373724-1']);
+  _gaq.push(['_trackPageview']);
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ga);
+  })();
+</script>
+</body>
+
+</html>

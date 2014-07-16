@@ -7,6 +7,104 @@
 <dc:creator>tag@wordaligned.org</dc:creator>
 <language>en-gb</language>
 <item>
+<title>Group When</title>
+<description>&lt;p&gt;Phil Nash&amp;#8217;s recent tweet intrigued me.
+&lt;/p&gt;
+&lt;div&gt;&lt;blockquote class="twitter-tweet" lang="en"&gt;&lt;p&gt;Functional people: I often (in F#) need to process a seq into a smaller list or seq &amp;ndash; where items from the input are grouped in some way&amp;hellip;&lt;/p&gt;&amp;mdash; Phil Nash (@phil_nash) &lt;a href="https://twitter.com/phil_nash/statuses/489167611641724928"&gt;July 15, 2014&lt;/a&gt;&lt;/blockquote&gt;&lt;blockquote class="twitter-tweet" lang="en"&gt;&lt;p&gt;&amp;hellip; the need to group may not be known until after the first item in the group.&amp;#10;I struggle to find a nicely functional way to do this. Ideas?&lt;/p&gt;&amp;mdash; Phil Nash (@phil_nash) &lt;a href="https://twitter.com/phil_nash/statuses/489167962931482626"&gt;July 15, 2014&lt;/a&gt;&lt;/blockquote&gt;&lt;script async src="http://wordaligned.org//platform.twitter.com/widgets.js" charset="utf-8"&gt;&lt;/script&gt;&lt;/div&gt;
+
+&lt;p&gt;He later clarified what he was after &amp;#8212; and had now found &amp;#8212; linking to a &lt;a href="http://fssnip.net/6A"&gt;solution&lt;/a&gt; posted a couple of years ago by &lt;a href="http://tomasp.net"&gt;Tomas Petricek&lt;/a&gt;. The function &lt;code&gt;groupWhen&lt;/code&gt; splits a sequence into groups, starting a new group whenever the predicate holds.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt; module Seq =
+   /// Iterates over elements of the input sequence and groups adjacent elements.
+   /// A new group is started when the specified predicate holds about the element
+   /// of the sequence (and at the beginning of the iteration).
+   ///
+   /// For example: 
+   ///    Seq.groupWhen isOdd [3;3;2;4;1;2] = seq [[3]; [3; 2; 4]; [1; 2]]
+   let groupWhen f (input:seq&amp;lt;_&amp;gt;) = seq {
+     use en = input.GetEnumerator()
+     let running = ref true
+     
+     // Generate a group starting with the current element. Stops generating
+     // when it founds element such that 'f en.Current' is 'true'
+     let rec group() = 
+       [ yield en.Current
+         if en.MoveNext() then
+           if not (f en.Current) then yield! group() 
+         else running := false ]
+     
+     if en.MoveNext() then
+       // While there are still elements, start a new group
+       while running.Value do
+         yield group() |&amp;gt; Seq.ofList }
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Here&amp;#8217;s a nice Haskell version coded up by &lt;a href="https://twitter.com/sdarlington"&gt;@sdarlington&lt;/a&gt;.
+&lt;/p&gt;
+&lt;script src="https://gist.github.com/sdarlington/be76048bff124694769d.js"&gt;&lt;/script&gt;
+
+&lt;p&gt;Maybe &lt;a href="https://docs.python.org/3/library/itertools.html#itertools.takewhile"&gt;takewhile&lt;/a&gt; and &lt;a href="https://docs.python.org/3/library/itertools.html#itertools.dropwhile"&gt;dropwhile&lt;/a&gt; could power a Python solution, but my first choice would be &lt;a href="https://docs.python.org/3/library/itertools.html#itertools.groupby"&gt;itertools.groupby&lt;/a&gt;. A suitable key function could just count the number of times the predicate holds.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;class count_p:
+    ''' Return a value which increments every time the predicate holds, starting from 0.
+    '''
+    def __init__(self, pred):
+        self._n = 0
+        self._pred = pred
+    
+    def __call__(self, v):
+        self._n += self._pred(v)
+        return self._n
+
+def group_when(pred, xs):
+    return (gp for _, gp in groupby(xs, count_p(pred)))
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Here, &lt;code&gt;group_when&lt;/code&gt; accepts an iterable and returns an iterable sequence of iterable groups. Clients choose how to consume the results.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; def odd(v): return v % 2
+&amp;gt;&amp;gt;&amp;gt; xs = group_when(odd, [3, 3, 2, 4, 1, 2])
+&amp;gt;&amp;gt;&amp;gt; print([list(g) for g in xs])
+[[3], [3, 2, 4], [1, 2]]
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Note that &lt;code&gt;count_p&lt;/code&gt; does something very like &lt;a href="acc"&gt;itertools.accumulate&lt;/a&gt;. Here&amp;#8217;s another version of &lt;code&gt;group_when&lt;/code&gt; which takes advantage of this.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;def group_when(pred, xs):
+    xs, ys = tee(xs)
+    accu = accumulate(map(pred, ys))
+    return (gp for _, gp in groupby(xs, lambda _: next(accu)))
+
+&lt;/pre&gt;
+
+&lt;/div&gt;</description>
+<dc:date>2014-07-16</dc:date>
+<guid>http://wordaligned.org/articles/group-when</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/group-when</link>
+<category>Python</category>
+<category>Haskell</category>
+<category>Streams</category>
+</item>
+
+<item>
 <title>Word Aligned, hosted by Github</title>
 <description>&lt;p&gt;To anyone who subscribes to this site&amp;#8217;s &lt;a href="http://feeds.wordaligned.org/wordaligned"&gt;feed&lt;/a&gt;, my apologies if your reader recently got filled with items you&amp;#8217;d already seen. I can explain.
 &lt;/p&gt;
@@ -1142,105 +1240,6 @@ node * remove_if(node * head, remove_fn rm)
 <link>http://wordaligned.org/articles/life-goes-on</link>
 <category>Algorithms</category>
 <category>Graphics</category>
-</item>
-
-<item>
-<title>Life on Canvas</title>
-<description>&lt;p&gt;I was lucky enough to be taught maths by &lt;a href="http://www.math.princeton.edu/directory/john-conway" title="John Conway, now at Princeton University"&gt;John Horton Conway&lt;/a&gt;, if only for an hour a week for a single term. He was lucky enough to be teaching number theory: a subject packed with treasures picked from the full history of mathematics.
-&lt;/p&gt;
-&lt;p&gt;I remember him as animated and unkempt. He bustled into that first lecture with a carrier bag and started pulling out groceries one by one. How many items were in the bag, he wondered? Could he count them all &amp;#8212; it was a &lt;em&gt;very&lt;/em&gt; large bag &amp;#8212; and what exactly did &lt;a href="http://mathworld.wolfram.com/Aleph-0.html" title="The 'small' infinite set of integers"&gt;infinity&lt;/a&gt; mean? Later I would see him pacing along Kings Parade dragging a shopping tolley, lost in thought.
-&lt;/p&gt;
-&lt;p&gt;Number theory may be as old as mathematics but it remains very much alive. Some 40 years ago Professor Conway discovered a primitive and novel mathematical life form: the Game of Life. 
-&lt;/p&gt;
-&lt;p&gt;The rules are simple. A colony of cells inhabits a two dimensional grid. At any one time each cell is either alive or dead, and as time advances the fate of a cell is determined entirely by its immediate 8 neighbours:
-&lt;/p&gt;
-&lt;ul&gt;
- &lt;li&gt;
-     reproduction: a dead cell with exactly 3 live neighbours becomes alive
- &lt;/li&gt;
-
- &lt;li&gt;
-     survival: a live cell with 2 or 3 live neighbours lives on
- &lt;/li&gt;
-
- &lt;li&gt;
-     overcrowding or loneliness: in all other cases the cell dies or stays dead
- &lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;In code, we might represent the colony as a two dimensional array filled with &lt;code&gt;1&lt;/code&gt;&amp;#8217;s and &lt;code&gt;0&lt;/code&gt;&amp;#8217;s for live and dead cells and code up the rules like this:
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
-
-&lt;pre class="prettyprint"&gt;// Determine the fate of cell i, j in the next generation.
-// Return 1 for "lives", 0 for "dies"
-function fate(cells, i, j) {
-    var neighbours = [[-1,-1],[-1,0],[-1,1],
-                      [0,-1],        [0,1],
-                      [1,-1], [1,0], [1,1]];
-        live_neighbours = 0;
-    neighbours.forEach(function(n) { 
-        live_neighbours += cells[i + n[0]][j + n[1]];
-    });
-    return (live_neighbours == 3 || 
-            cells[i][j] == 1 &amp;amp;&amp;amp; live_neighbours == 2) ? 1 : 0;
-}
-
-&lt;/pre&gt;
-
-&lt;/div&gt;
-
-&lt;p&gt;It turns out these simple rules generate an astonishing ecosystem. Simple patterns flourish, evolving into complex patterns which, many generations later may decay into stable forms and repeating patterns, or, occasionally, become extinct. 
-&lt;/p&gt;
-&lt;p&gt;Can a finite pattern grow indefinitely? Conway originally conjectured no, this was impossible, offering $50 to the first person who could prove or disprove the his conjecture before the end of 1970. In November of that year a team from MIT led by Bill Gosper claimed the prize, disproving the conjecture with a glider gun pattern which spits out a new spaceship every 30 generations.
-&lt;/p&gt;
-&lt;img src=http://upload.wikimedia.org/wikipedia/commons/e/e5/Gospers_glider_gun.gif alt="Gosper's glider gun, Wikimedia commons" style="border:1px solid black;"&gt;
-
-&lt;span id="continue-reading"/&gt;
-
-&lt;p&gt;A 2 dimensional array can naturally be represented on the most basic computer screen &amp;#8212; think raster graphics, pixels &amp;#8212; and the parallel emergence and development of the personal computer helps explain life&amp;#8217;s continuing appeal&lt;a id="fn1link" href="http://wordaligned.org/articles/life-on-canvas#fn1"&gt;&lt;sup&gt;[1]&lt;/sup&gt;&lt;/a&gt;. The game of life has become the &lt;a href="http://programmer.97things.oreilly.com/wiki/index.php/Learn_to_Say_%22Hello%2C_World%22" title="Laern to say Hello, world"&gt;hello world&lt;/a&gt; of graphics frameworks. In 2012 we can use the HTML5 canvas, a 2 dimensional surface for drawing on.
-&lt;/p&gt;
-&lt;p&gt;&lt;canvas id="lifecanvas" width="480" height="320" style="border:1px solid black;"&gt;Unfortunately your client does not support the &lt;a href="http://www.w3.org/TR/html5/the-canvas-element.html#the-canvas-element"&gt;HTML5 canvas element&lt;/a&gt;. If you are using a feed reader, try visiting the &lt;a href="http://wordaligned.org/articles/life-on-canvas.html"&gt;original page&lt;/a&gt;.&lt;/canvas&gt;
-   &lt;div&gt;
-   &lt;button type="button" id="random" title="Random pattern" style="vertical-align:top;width:50px;height:50px;"&gt;&lt;img src="http://wordaligned.org/images/glyphicons_322_playing_dices.png" /&gt;&lt;/button&gt;
-   &lt;button type="button" id="clear" title="Clear screen" style="vertical-align:top;width:50px;height:50px;"&gt;&lt;img src="http://wordaligned.org/images/glyphicons_192_circle_remove.png" /&gt;&lt;/button&gt;
-   &lt;button type="button" id="toggle" title="Play/Pause" style="vertical-align:top;width:50px;height:50px;"&gt;&lt;img src="http://wordaligned.org/images/glyphicons_174_pause.png" /&gt;&lt;/button&gt;
-   &lt;button type="button" id="step" title="Single step" style="vertical-align:top;width:50px;height:50px;"&gt;&lt;img src="http://wordaligned.org/images/glyphicons_178_step_forward.png" /&gt;&lt;/button&gt;
-   &lt;button type="button" id="info" title="Help" style="vertical-align:top;width:50px;height:50px;"&gt;&lt;img src="http://wordaligned.org/images/glyphicons_195_circle_info.png" /&gt;&lt;/button&gt;
-   &lt;/div&gt;
-   &lt;script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"&gt;&lt;/script&gt;
-   &lt;script type="text/javascript" src="http://wordaligned.org/scripts/simple-life.js"&gt;&lt;/script&gt;
-&lt;/p&gt;
-&lt;p&gt;After a little experimentation you&amp;#8217;re sure to uncover life&amp;#8217;s three main domains: still lives, which remain unchanged; oscillators, which repeat; and spaceships, which move across the board. Then there are methuselahs, puffers, guns &amp;#8230;
-&lt;/p&gt;
-&lt;p&gt;Here&amp;#8217;s a pulsar, an oscillator with period 3.
-&lt;/p&gt;
-&lt;img src="http://wordaligned.org/images/pulsar.gif" alt="Pulsar"/&gt;
-
-&lt;p&gt;And here&amp;#8217;s a glider, classed as a diagonal spaceship, &lt;a href="http://www.catb.org/hacker-emblem/" title="When you put the glider emblem on your web page, or wear it on clothing, or display it in some other way, you are visibly associating yourself with the hacker culture"&gt;a pattern chosen&lt;/a&gt; by Eric S Raymond as a hackers&amp;#8217; emblem.
-&lt;/p&gt;
-&lt;img src="http://wordaligned.org/images/glider.gif" alt="Glider, an orthogonal spaceship"/&gt;
-
-&lt;p&gt;Here&amp;#8217;s another 5 cell pattern &amp;#8212; the R-pentomino. Clear the canvas, pick out an R-pentomino cluster of cells with the mouse, click play, and watch what evolves!
-&lt;/p&gt;
-&lt;img src="http://wordaligned.org/images/Rpentomino.png" alt="Rpentomino"/&gt;
-
-&lt;p&gt;&lt;a href="http://www.conwaylife.com/wiki/Turtle" title="An orthogonal c/3 spaceship"&gt;Turtle&lt;/a&gt;, &lt;a href="http://www.conwaylife.com/wiki/Garden_of_Eden" title="A pattern that has no parents and thus can only occur in generation 0"&gt;garden&lt;/a&gt;, &lt;a href="http://www.conwaylife.com/wiki/Unicycle" title="Unicycle is a period 6 oscillator made up of four copies of unix"&gt;unicycle&lt;/a&gt;: animal, vegetable, mineral. The kingdom of life is inclusive and extensive, a delight for naturalists and taxonomists alike. It&amp;#8217;s seduced logophiles and lexicographers too: reading through Stephen A. Silver&amp;#8217;s comprehensive &lt;a href="http://www.argentum.freeserve.co.uk/lex.htm" title="A lexicon of terms relating to John Horton Conway's Game of Life, by Stephen Silver"&gt;Life Lexicon&lt;/a&gt;, I learned that an anteater consumes ants, a &lt;a href="http://www.argentum.freeserve.co.uk/lex_c.htm#caterpillar"&gt;caterpillar&lt;/a&gt; works by laying tracks at its front end, a baker&amp;#8217;s dozen is a loaf &lt;a href="http://www.argentum.freeserve.co.uk/lex_h.htm#hassler"&gt;hassled&lt;/a&gt; by two blocks and two caterers, and an &lt;a href="http://www.argentum.freeserve.co.uk/lex_a.htm#ak47reaction"&gt;AK47&lt;/a&gt; reaction occurs when a honey farm predecessor, catalysed by an eater and a block, reappears at another location 47 generations later, having produced a glider and a traffic light. I could go on&amp;#8230;
-&lt;/p&gt;
-&lt;hr /&gt;
-
-&lt;p&gt;&lt;a id="fn1" href="http://wordaligned.org/articles/life-on-canvas#fn1link"&gt;[1]&lt;/a&gt;: I&amp;#8217;m glossing over details here. The true game of life is played out on an infinite grid, and patterns such as &lt;a href="http://en.wikipedia.org/wiki/Gun_(cellular_automaton)"&gt;Gosper&amp;#8217;s glider gun&lt;/a&gt; show that it really does have to be infinite. Computers have trouble with such an unconstrained requirement, and a computer animation might try and adapt the screen as the pattern grows, or limit the region of interest. Another approach is to wrap the canvas, left to right, top to bottom, so the game of life is played out on what&amp;#8217;s topologically a toriodal surface. That&amp;#8217;s what the canvas shown here does.
-&lt;/p&gt;
-&lt;p style="text-align:center"&gt;&amp;sect;&lt;/p&gt;
-
-&lt;p&gt;The icons used on this page were downloaded from &lt;a href="http://glyphicons.com"&gt;http://glyphicons.com&lt;/a&gt; and are licensed under the &lt;a href=http://creativecommons.org/licenses/by/3.0/deed.en&gt;CC BY 3.0&lt;/a&gt; terms. The animated gifs were placed in the public domain by their authors.
-&lt;/p&gt;</description>
-<dc:date>2012-06-27</dc:date>
-<guid>http://wordaligned.org/articles/life-on-canvas</guid>
-<author>tag@wordaligned.org (Thomas Guest)</author>
-<link>http://wordaligned.org/articles/life-on-canvas</link>
-<category>Algorithms</category>
-<category>Graphics</category>
-<category>Self</category>
 </item>
 
 </channel>

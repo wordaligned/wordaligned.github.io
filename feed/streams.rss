@@ -7,6 +7,102 @@
 <dc:creator>tag@wordaligned.org</dc:creator>
 <language>en-gb</language>
 <item>
+<title>Group When</title>
+<description>&lt;p&gt;Phil Nash&amp;#8217;s recent tweet intrigued me.
+&lt;/p&gt;
+&lt;div&gt;&lt;blockquote class="twitter-tweet" lang="en"&gt;&lt;p&gt;Functional people: I often (in F#) need to process a seq into a smaller list or seq &amp;ndash; where items from the input are grouped in some way&amp;hellip;&lt;/p&gt;&amp;mdash; Phil Nash (@phil_nash) &lt;a href="https://twitter.com/phil_nash/statuses/489167611641724928"&gt;July 15, 2014&lt;/a&gt;&lt;/blockquote&gt;&lt;blockquote class="twitter-tweet" lang="en"&gt;&lt;p&gt;&amp;hellip; the need to group may not be known until after the first item in the group.&amp;#10;I struggle to find a nicely functional way to do this. Ideas?&lt;/p&gt;&amp;mdash; Phil Nash (@phil_nash) &lt;a href="https://twitter.com/phil_nash/statuses/489167962931482626"&gt;July 15, 2014&lt;/a&gt;&lt;/blockquote&gt;&lt;script async src="http://wordaligned.org//platform.twitter.com/widgets.js" charset="utf-8"&gt;&lt;/script&gt;&lt;/div&gt;
+
+&lt;p&gt;He later clarified what he was after &amp;#8212; and had now found &amp;#8212; linking to a &lt;a href="http://fssnip.net/6A"&gt;solution&lt;/a&gt; posted a couple of years ago by &lt;a href="http://tomasp.net"&gt;Tomas Petricek&lt;/a&gt;. The function &lt;code&gt;groupWhen&lt;/code&gt; splits a sequence into groups, starting a new group whenever the predicate holds.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt; module Seq =
+   /// Iterates over elements of the input sequence and groups adjacent elements.
+   /// A new group is started when the specified predicate holds about the element
+   /// of the sequence (and at the beginning of the iteration).
+   ///
+   /// For example: 
+   ///    Seq.groupWhen isOdd [3;3;2;4;1;2] = seq [[3]; [3; 2; 4]; [1; 2]]
+   let groupWhen f (input:seq&amp;lt;_&amp;gt;) = seq {
+     use en = input.GetEnumerator()
+     let running = ref true
+     
+     // Generate a group starting with the current element. Stops generating
+     // when it founds element such that 'f en.Current' is 'true'
+     let rec group() = 
+       [ yield en.Current
+         if en.MoveNext() then
+           if not (f en.Current) then yield! group() 
+         else running := false ]
+     
+     if en.MoveNext() then
+       // While there are still elements, start a new group
+       while running.Value do
+         yield group() |&amp;gt; Seq.ofList }
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Here&amp;#8217;s a nice Haskell version coded up by &lt;a href="https://twitter.com/sdarlington"&gt;@sdarlington&lt;/a&gt;.
+&lt;/p&gt;
+&lt;script src="https://gist.github.com/sdarlington/be76048bff124694769d.js"&gt;&lt;/script&gt;
+
+&lt;p&gt;Maybe &lt;a href="https://docs.python.org/3/library/itertools.html#itertools.takewhile"&gt;takewhile&lt;/a&gt; and &lt;a href="https://docs.python.org/3/library/itertools.html#itertools.dropwhile"&gt;dropwhile&lt;/a&gt; could power a Python solution, but my first choice would be &lt;a href="https://docs.python.org/3/library/itertools.html#itertools.groupby"&gt;itertools.groupby&lt;/a&gt;. A suitable key function could just count the number of times the predicate holds.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;class count_p:
+    ''' Return a value which increments every time the predicate holds, starting from 0.
+    '''
+    def __init__(self, pred):
+        self._n = 0
+        self._pred = pred
+    
+    def __call__(self, v):
+        self._n += self._pred(v)
+        return self._n
+
+def group_when(pred, xs):
+    return (gp for _, gp in groupby(xs, count_p(pred)))
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Here, &lt;code&gt;group_when&lt;/code&gt; accepts an iterable and returns an iterable sequence of iterable groups. Clients choose how to consume the results.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; def odd(v): return v % 2
+&amp;gt;&amp;gt;&amp;gt; xs = group_when(odd, [3, 3, 2, 4, 1, 2])
+&amp;gt;&amp;gt;&amp;gt; print([list(g) for g in xs])
+[[3], [3, 2, 4], [1, 2]]
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Note that &lt;code&gt;count_p&lt;/code&gt; does something very like &lt;a href="acc"&gt;itertools.accumulate&lt;/a&gt;. Here&amp;#8217;s another version of &lt;code&gt;group_when&lt;/code&gt; which takes advantage of this.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;def group_when(pred, xs):
+    xs, ys = tee(xs)
+    accu = accumulate(map(pred, ys))
+    return (gp for _, gp in groupby(xs, lambda _: next(accu)))
+
+&lt;/pre&gt;
+
+&lt;/div&gt;</description>
+<dc:date>2014-07-16</dc:date>
+<guid>http://wordaligned.org/articles/group-when</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/group-when</link>
+<category>Streams</category>
+</item>
+
+<item>
 <title>Run-length encoding in Python</title>
 <description>&lt;p&gt;Recently I discussed &lt;a href="http://wordaligned.org/articles/deflate-runlength-encoding-but-better.html" title="DEFLATE: run-length encoding, but better"&gt;run-length encoding and DEFLATE&lt;/a&gt; compression. I never actually showed a Python implementation of a run-length encoder, so here&amp;#8217;s one now.
 &lt;/p&gt;

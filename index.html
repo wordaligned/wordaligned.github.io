@@ -11,7 +11,7 @@
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
 <meta name="author" content="Thomas Guest" />
 <meta name="description" content="A collection of articles on software development written by Thomas Guest." />
-<meta name="keywords" content="CLRS, Regex, Missiles, Cycling, apple, Pictures, Self, Editors, Emacs, Torvalds, ImageMagick, IDE, Decorators, Shell, PIL, Lcs, Turing, Ruby on Rails, Puzzles, Europython, iphone, Characters, Fractals, Crabs, DocBook, Dynamic Languages, lighttpd, Bugs, CVS, Reviews, Steganography, Algorithms, Perec, Content, Markdown, Two Wheels, Conferences, Syntax, Unix, Arc, Accu, Web-applications, Chess, Web Applications, Java, Esr, Recursion, Charts, Perl, Subversion, Recommended, Teamwork, Build, ACCU, Knuth, Android, Erlang, Boost, php, OCR, nm, Python, cvs2svn, self, SICP, Lisp, Books, Graphics, Disqus, Ruby, openid, C, Zlib, Trac, Windows, Documentation, C++, Go, Streams, Bristol, Tesseract, Drawing, Accidents, Google, Apple, Etc, Functional Programming, Pi, Haskell, Design, Virtualization, Spolsky, Curl, Scheme" />
+<meta name="keywords" content="CLRS, Regex, Missiles, Cycling, apple, Pictures, Self, Editors, Emacs, Torvalds, ImageMagick, IDE, Decorators, Shell, PIL, Lcs, Turing, Ruby on Rails, Puzzles, Europython, iphone, Characters, Fractals, Crabs, DocBook, Dynamic Languages, lighttpd, Bugs, CVS, Reviews, Steganography, Algorithms, Perec, Content, Markdown, Two Wheels, Conferences, Syntax, Unix, Arc, Go, Web-applications, Chess, Web Applications, Java, Esr, Recursion, Charts, Perl, Subversion, Recommended, Teamwork, Build, ACCU, Knuth, Android, Erlang, Boost, php, OCR, nm, Python, cvs2svn, self, SICP, Lisp, Books, Graphics, Disqus, Ruby, openid, C, Zlib, Trac, Windows, Documentation, C++, Accu, Streams, Bristol, Tesseract, Drawing, Accidents, Google, Apple, Etc, Functional Programming, Pi, Haskell, Design, Virtualization, Spolsky, Curl, Scheme" />
 <link rel="alternate" type="application/rss+xml" title="Feed" href="http://feeds.wordaligned.org/wordaligned" />
 </head>
 
@@ -25,7 +25,101 @@
 
   <div id="page">
     <div id="content">
-      <div class="atomentry" id="word-aligned-hosted-by-github">
+      <div class="atomentry" id="group-when">
+<h2 class="title"><a href="/articles/group-when">Group When</a></h2>
+<p class="meta"><abbr class="published" title="2014-07-16">2014-07-16</abbr> &bull; <a href="/tag/python" rel="tag">Python</a>, <a href="/tag/haskell" rel="tag">Haskell</a>, <a href="/tag/streams" rel="tag">Streams</a> &bull; <a href="/articles/group-when#disqus_thread">Comments</a></p>
+<p>Phil Nash&#8217;s recent tweet intrigued me.
+</p>
+<div><blockquote class="twitter-tweet" lang="en"><p>Functional people: I often (in F#) need to process a seq into a smaller list or seq &ndash; where items from the input are grouped in some way&hellip;</p>&mdash; Phil Nash (@phil_nash) <a href="https://twitter.com/phil_nash/statuses/489167611641724928">July 15, 2014</a></blockquote><blockquote class="twitter-tweet" lang="en"><p>&hellip; the need to group may not be known until after the first item in the group.&#10;I struggle to find a nicely functional way to do this. Ideas?</p>&mdash; Phil Nash (@phil_nash) <a href="https://twitter.com/phil_nash/statuses/489167962931482626">July 15, 2014</a></blockquote><script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script></div>
+
+<p>He later clarified what he was after &#8212; and had now found &#8212; linking to a <a href="http://fssnip.net/6A">solution</a> posted a couple of years ago by <a href="http://tomasp.net">Tomas Petricek</a>. The function <code>groupWhen</code> splits a sequence into groups, starting a new group whenever the predicate holds.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint"> module Seq =
+   /// Iterates over elements of the input sequence and groups adjacent elements.
+   /// A new group is started when the specified predicate holds about the element
+   /// of the sequence (and at the beginning of the iteration).
+   ///
+   /// For example: 
+   ///    Seq.groupWhen isOdd [3;3;2;4;1;2] = seq [[3]; [3; 2; 4]; [1; 2]]
+   let groupWhen f (input:seq&lt;_&gt;) = seq {
+     use en = input.GetEnumerator()
+     let running = ref true
+     
+     // Generate a group starting with the current element. Stops generating
+     // when it founds element such that 'f en.Current' is 'true'
+     let rec group() = 
+       [ yield en.Current
+         if en.MoveNext() then
+           if not (f en.Current) then yield! group() 
+         else running := false ]
+     
+     if en.MoveNext() then
+       // While there are still elements, start a new group
+       while running.Value do
+         yield group() |&gt; Seq.ofList }
+
+</pre>
+
+</div>
+
+<p>Here&#8217;s a nice Haskell version coded up by <a href="https://twitter.com/sdarlington">@sdarlington</a>.
+</p>
+<script src="https://gist.github.com/sdarlington/be76048bff124694769d.js"></script>
+
+<p>Maybe <a href="https://docs.python.org/3/library/itertools.html#itertools.takewhile">takewhile</a> and <a href="https://docs.python.org/3/library/itertools.html#itertools.dropwhile">dropwhile</a> could power a Python solution, but my first choice would be <a href="https://docs.python.org/3/library/itertools.html#itertools.groupby">itertools.groupby</a>. A suitable key function could just count the number of times the predicate holds.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">class count_p:
+    ''' Return a value which increments every time the predicate holds, starting from 0.
+    '''
+    def __init__(self, pred):
+        self._n = 0
+        self._pred = pred
+    
+    def __call__(self, v):
+        self._n += self._pred(v)
+        return self._n
+
+def group_when(pred, xs):
+    return (gp for _, gp in groupby(xs, count_p(pred)))
+
+</pre>
+
+</div>
+
+<p>Here, <code>group_when</code> accepts an iterable and returns an iterable sequence of iterable groups. Clients choose how to consume the results.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">&gt;&gt;&gt; def odd(v): return v % 2
+&gt;&gt;&gt; xs = group_when(odd, [3, 3, 2, 4, 1, 2])
+&gt;&gt;&gt; print([list(g) for g in xs])
+[[3], [3, 2, 4], [1, 2]]
+
+</pre>
+
+</div>
+
+<p>Note that <code>count_p</code> does something very like <a href="acc">itertools.accumulate</a>. Here&#8217;s another version of <code>group_when</code> which takes advantage of this.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">def group_when(pred, xs):
+    xs, ys = tee(xs)
+    accu = accumulate(map(pred, ys))
+    return (gp for _, gp in groupby(xs, lambda _: next(accu)))
+
+</pre>
+
+</div>
+
+</div>
+
+
+<div class="atomentry" id="word-aligned-hosted-by-github">
 <h2 class="title"><a href="/articles/word-aligned-hosted-by-github">Word Aligned, hosted by Github</a></h2>
 <p class="meta"><abbr class="published" title="2014-03-13">2014-03-13</abbr> &bull; <a href="/tag/self" rel="tag">self</a> &bull; <a href="/articles/word-aligned-hosted-by-github#disqus_thread">Comments</a></p>
 <p>To anyone who subscribes to this site&#8217;s <a href="http://feeds.wordaligned.org/wordaligned">feed</a>, my apologies if your reader recently got filled with items you&#8217;d already seen. I can explain.
@@ -571,31 +665,6 @@ function animate() {
 </div>
 
 
-<div class="atomentry" id="c++-concurrency-in-action">
-<h2 class="title"><a href="/articles/c++-concurrency-in-action">C++ Concurrency in Action</a></h2>
-<p class="meta"><abbr class="published" title="2013-01-21">2013-01-21</abbr> &bull; <a href="/tag/c++" rel="tag">C++</a>, <a href="/tag/reviews" rel="tag">Reviews</a> &bull; <a href="/articles/c++-concurrency-in-action#disqus_thread">Comments</a></p>
-<p><span style="text-align:center;font-size:72px;color:gold;">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
-</p>
-<p><a href="http://www.amazon.co.uk/C-Concurrency-Action-Practical-Multithreading/dp/1933988770" title="C++ Concurrency in Action, on Amazon">C++ Concurrency in Action</a> is an excellent book. You should buy it if you want to use the support for concurrency added by the new C++ standard, C++11; and if you&#8217;re using C++11 you&#8217;ll deepen your understanding of the various language enhancements and how they work together.
-</p>
-<div class="amazon"><a href="http://www.amazon.co.uk/C-Concurrency-Action-Practical-Multithreading/dp/1933988770"><img src="http://www.justsoftwaresolutions.co.uk/images/ccia.jpg" alt="C++ Concurrency in Action cover"></a></div>
-
-<p>Who&#8217;s the author? What makes him qualified to write this book?
-</p>
-<blockquote><p><a href="http://www.justsoftwaresolutions.co.uk/" title="Anthony Willams' website">Anthony Williams</a> is a UK-based developer and consultant with many years experience in C++. He has been an active member of the BSI C++ Standards Panel since 2001, and is author or coauthor of many of the C++ Standards Committee papers that led up to the inclusion of the thread library in the new C++ Standard, known as C++11 or C++0x. He has been the maintainer of the Boost Thread library since 2006, and is the developer of the <a href="http://www.stdthread.co.uk/" title="just::thread, a C++ Standard Thread Library implementation">just::thread</a> implementation of the C++11 thread library from Just Software Solutions Ltd. Anthony lives in the far west of Cornwall, England. &#8212; <a href="http://www.manning.com/williams/" title="Williams' author page on Manning website">About the Author, Manning website</a>
-</p>
-</blockquote><p>It&#8217;s clear the experience of writing papers for the standards committee has paid off. The book is well organised and clearly written. Accurate and thorough, it&#8217;s also a pleasure to read. The examples are practical, and range from launching threads through to lock-free message queues. The largest case study &#8212; a message passing framework and an ATM application built on this framework &#8212; shows the expert use of modern C++ to write elegant and compact code.
-</p>
-<p>The clarity of the text is matched by the book&#8217;s clean and functional design. It looks good. I bought the dead-tree version which gave me free access to the ebook and I&#8217;ve made use of both formats.
-</p>
-<p>I&#8217;m new to C++11 and compilers are still catching up with the standard. This book is steeped in C++11. Reading through it, I came to realise that a close look at the standard thread library helps explain the evolution of the language as a whole: so <strong>that&#8217;s</strong> why variadic templates are needed, and move semantics work <strong>there</strong>, and &#8212; <strong>I get it!</strong> &#8212; lambda functions fit nicely with condition variables.
-</p>
-<p>Recommended++
-</p>
-
-</div>
-
-
 <div class="extended">
 <p><a href="/articles/">Visit the Word Aligned archives...</a></p>
 </div>
@@ -639,7 +708,7 @@ function animate() {
 
 <div class="sidebar-node">
 <h3>Top Tags</h3>
-<ul id="categories"><li><a href="/tag/python" rel="tag">Python</a> <em>(107)</em></li>
+<ul id="categories"><li><a href="/tag/python" rel="tag">Python</a> <em>(108)</em></li>
 <li><a href="/tag/c++" rel="tag">C++</a> <em>(66)</em></li>
 <li><a href="/tag/self" rel="tag">Self</a> <em>(53)</em></li>
 <li><a href="/tag/puzzles" rel="tag">Puzzles</a> <em>(30)</em></li>
@@ -671,7 +740,7 @@ function animate() {
 <div class="sidebar-node">
 <h3>Chain</h3>
 <ul>
-<li><a accesskey="p" href="/articles/word-aligned-hosted-by-github" title="First article">&raquo; Word Aligned, hosted by Github</a></li>
+<li><a accesskey="p" href="/articles/group-when" title="First article">&raquo; Group When</a></li>
 
 </ul>
 
