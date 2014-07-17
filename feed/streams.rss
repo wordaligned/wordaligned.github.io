@@ -12,7 +12,7 @@
 &lt;/p&gt;
 &lt;div&gt;&lt;blockquote class="twitter-tweet" lang="en"&gt;&lt;p&gt;Functional people: I often (in F#) need to process a seq into a smaller list or seq &amp;ndash; where items from the input are grouped in some way&amp;hellip;&lt;/p&gt;&amp;mdash; Phil Nash (@phil_nash) &lt;a href="https://twitter.com/phil_nash/statuses/489167611641724928"&gt;July 15, 2014&lt;/a&gt;&lt;/blockquote&gt;&lt;blockquote class="twitter-tweet" lang="en"&gt;&lt;p&gt;&amp;hellip; the need to group may not be known until after the first item in the group.&amp;#10;I struggle to find a nicely functional way to do this. Ideas?&lt;/p&gt;&amp;mdash; Phil Nash (@phil_nash) &lt;a href="https://twitter.com/phil_nash/statuses/489167962931482626"&gt;July 15, 2014&lt;/a&gt;&lt;/blockquote&gt;&lt;script async src="http://wordaligned.org//platform.twitter.com/widgets.js" charset="utf-8"&gt;&lt;/script&gt;&lt;/div&gt;
 
-&lt;p&gt;He later clarified what he was after &amp;#8212; and had now found &amp;#8212; linking to a &lt;a href="http://fssnip.net/6A"&gt;solution&lt;/a&gt; posted a couple of years ago by &lt;a href="http://tomasp.net"&gt;Tomas Petricek&lt;/a&gt;. The function &lt;code&gt;groupWhen&lt;/code&gt; splits a sequence into groups, starting a new group whenever the predicate holds.
+&lt;p&gt;He later clarified what he was after &amp;#8212; and had now found &amp;#8212; linking to a &lt;a href="http://fssnip.net/6A"&gt;solution&lt;/a&gt; posted a couple of years ago by &lt;a href="http://tomasp.net"&gt;Tomas Petricek&lt;/a&gt;. The function &lt;code&gt;groupWhen&lt;/code&gt; splits a sequence into groups, starting a new group whenever the predicate returns true.
 &lt;/p&gt;
 &lt;div class="typocode"&gt;
 
@@ -48,12 +48,12 @@
 &lt;/p&gt;
 &lt;script src="https://gist.github.com/sdarlington/be76048bff124694769d.js"&gt;&lt;/script&gt;
 
-&lt;p&gt;Maybe &lt;a href="https://docs.python.org/3/library/itertools.html#itertools.takewhile"&gt;takewhile&lt;/a&gt; and &lt;a href="https://docs.python.org/3/library/itertools.html#itertools.dropwhile"&gt;dropwhile&lt;/a&gt; could power a Python solution, but my first choice would be &lt;a href="https://docs.python.org/3/library/itertools.html#itertools.groupby"&gt;itertools.groupby&lt;/a&gt;. A suitable key function could just count the number of times the predicate holds.
+&lt;p&gt;Maybe &lt;a href="https://docs.python.org/3/library/itertools.html#itertools.takewhile"&gt;takewhile&lt;/a&gt; and &lt;a href="https://docs.python.org/3/library/itertools.html#itertools.dropwhile"&gt;dropwhile&lt;/a&gt; could power a Python solution, but my first choice would be &lt;a href="https://docs.python.org/3/library/itertools.html#itertools.groupby"&gt;itertools.groupby&lt;/a&gt;. &lt;code&gt;Groupby&lt;/code&gt; chops a sequence into subsequences, where the elements of each subsequence have the same key value. A suitable key function, in this case, must change its return value every time the sequence yields an element for which the predicate holds. It could toggle between a pair of values, for example. Or it could just count the number of times the predicate holds.
 &lt;/p&gt;
 &lt;div class="typocode"&gt;
 
 &lt;pre class="prettyprint"&gt;class count_p:
-    ''' Return a value which increments every time the predicate holds, starting from 0.
+    ''' Return a value which increments every time the predicate holds.
     '''
     def __init__(self, pred):
         self._n = 0
@@ -91,6 +91,32 @@ def group_when(pred, xs):
     xs, ys = tee(xs)
     accu = accumulate(map(pred, ys))
     return (gp for _, gp in groupby(xs, lambda _: next(accu)))
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p style="text-align:center"&gt;&amp;sect;&lt;/p&gt;
+
+&lt;p&gt;After a short break, here&amp;#8217;s a third version of &lt;code&gt;group_when&lt;/code&gt;. This is the first time I&amp;#8217;ve found a use for &lt;code&gt;takewhile&lt;/code&gt; and &lt;code&gt;dropwhile&lt;/code&gt;. Beware: as the teed streams &lt;code&gt;xs&lt;/code&gt; and &lt;code&gt;ys&lt;/code&gt; diverge, the amount of backing storage required will grow &amp;#8230; only for the stored values to then be dropped!
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;from itertools import *
+ 
+def group_when(p, xs):
+    def notp(x): return not p(x)
+    xs = iter(xs)
+    while True:
+        x = next(xs)
+        xs, ys = tee(xs)
+        yield chain([x], takewhile(notp, xs))
+        xs = dropwhile(notp, ys)
+ 
+def odd(x):
+    return x % 2
+ 
+[list(g) for g in group_when(odd, [3, 3, 2, 4, 1, 2])] # [[3], [3, 2, 4], [1, 2]]
 
 &lt;/pre&gt;
 
