@@ -1,0 +1,196 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<link rel="icon" href="/images/favicon.png" type="image/png"/>
+<link href="/styles/application.css" media="all" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="/scripts/prettify.js"></script>
+<script type="text/javascript" src="/scripts/lang-lisp.js"></script>
+<title>Python averages</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="author" content="Thomas Guest" />
+<meta name="description" content="A Word Aligned article posted 2014-12-03, tagged Python." />
+<meta name="keywords" content="Python" />
+<link rel="alternate" type="application/rss+xml" title="Feed" href="http://feeds.wordaligned.org/wordaligned" />
+</head>
+
+<body onload="prettyPrint()">
+<div id="container">
+  <div id="header">
+<h1><span><a accesskey="h" href="/">Word Aligned</a></span></h1>
+<h2>space sensitive programming</h2>
+<a class="button" href="http://feeds.wordaligned.org/wordaligned" title="Subscribe to Word Aligned"><img style="float: right;" src="/images/feed.png" alt="Feed Logo" height="28" width="28"/></a>
+</div>
+
+  <div id="page">
+    <div id="content">
+      <div class="atomentry" id="python-averages">
+<h2 class="title"><a href="/articles/python-averages">Python averages</a></h2>
+<p class="meta"><abbr class="published" title="2014-12-03">2014-12-03</abbr> &bull; <a href="/tag/python" rel="tag">Python</a> &bull; <a href="/articles/python-averages#disqus_thread">Comments</a></p>
+<p>You&#8217;ve been running some tests, each of which returns a 3-tuple of numerical results &#8212; <code>(real, user, sys)</code> times, maybe &#8212; and you&#8217;d like to combine these into a single 3-tuple, the average result.
+</p>
+<p>Easy!
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">def average(times):
+    N = float(len(results))
+    return (sum(t[0] for t in times)/N,
+            sum(t[1] for t in times)/N,
+            sum(t[2] for t in times)/N)
+
+</pre>
+
+</div>
+
+<p>If you want a more generic solution, one which works when the tuples might have any number of elements, you could do this:
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">def average(xs):
+    N = float(len(xs))
+    R = len(xs[0])
+    return tuple(sum(x[i] for x in xs)/N for i in range(R))
+
+</pre>
+
+</div>
+
+<p>or this:
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">def average(xs):
+    N = float(len(xs))
+    return tuple(sum(col)/N for col in zip(*xs))
+
+</pre>
+
+</div>
+
+<p>The second generic variant uses <a href="https://docs.python.org/3/library/functions.html#zip">zip</a> to transpose its inputs. 
+</p>
+<p>Now suppose we have keyed collections of results which we want to average:
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">&gt;&gt;&gt; times = [{'real': 34.4, 'user': 26.2, 'sys': 7.3},
+             {'real': 28.7, 'user': 21.5, 'sys': 6.4},
+             {'real': 29.3, 'user': 22.0, 'sys': 6.9}]
+
+</pre>
+
+</div>
+
+<p>If, as in the example above, each result has the same set of keys, the average result could be calculated like this:
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">&gt;&gt;&gt; N = float(len(times))
+&gt;&gt;&gt; { k : sum(t[k] for t in times)/N for k in times[0] }
+{'real': 30.8, 'sys': 6.9, 'user': 23.2}
+
+</pre>
+
+</div>
+
+<p>What if the inputs don&#8217;t have the same keys? Consider the contents of four fridges.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">&gt;&gt;&gt; fridges = [
+    { 'egg': 5, 'milk': 1.700, 'sausage': 6 },
+    { 'beer': 6, 'milk': 0.568, 'egg': 1 },
+    { 'egg': 3, 'sausage': 4, 'milk': 0.125, 'lettuce': 1 },
+    { 'carrot': 4 }]
+
+</pre>
+
+</div>
+
+<p>A <a href="https://docs.python.org/3/library/collections.html#collections.Counter">Counter</a> can collect and calculate the average fridge contents. 
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">&gt;&gt;&gt; from collections import Counter
+&gt;&gt;&gt; total = sum(map(Counter, fridges), Counter())
+&gt;&gt;&gt; N = float(len(fridges))
+&gt;&gt;&gt; { k: v/N for k, v in total.items() }
+{'sausage': 2.5, 'lettuce': 0.25, 'beer': 1.5, 'carrot': 1.0, 
+ 'egg': 2.25, 'milk': 0.59825}
+
+</pre>
+
+</div>
+
+<p>Note that although <code>Counter</code>s were primarily designed to work with positive integers to represent counts, there&#8217;s nothing stopping us from using floating point numbers (amount of milk in our example) in the values field.
+</p>
+</div>
+
+<div class="comments"><hr/><div id="disqus_thread"></div><script type="text/javascript" src="http://disqus.com/forums/wordaligned/embed.js"></script></div>
+      
+<div id="comments"><script type="text/javascript">
+//<![CDATA[
+(function() {
+    var links = document.getElementsByTagName('a');
+    var query = '?';
+    for(var i = 0; i < links.length; i++) {
+        if(links[i].href.indexOf('#disqus_thread') >= 0) {
+            query += 'url' + i + '=' + encodeURIComponent(links[i].href) + '&amp;';
+        }
+    }
+    document.write('<script type="text/javascript" src="http://disqus.com/forums/wordaligned/get_num_replies.js' + query + '"></' + 'script>');
+})();
+//]]>
+</script></div>
+
+    </div>
+    <div id="sidebar">
+      
+<div class="sidebar-node">
+<h3>Tagged</h3>
+<ul id="categories"><li><a href="/tag/python" rel="tag">Python</a></li></ul>
+
+</div>
+
+<div class="sidebar-node">
+<h3>Chain</h3>
+<ul>
+
+<li><a accesskey="p" href="/articles/group-when" title="Previous article">&raquo; Group When</a></li>
+</ul>
+
+
+</div>
+
+<div class="sidebar-node">
+<h3>Feeds</h3>
+
+<ul>
+<li><a href="http://feeds.wordaligned.org/wordaligned"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Articles</a></li>
+<li><a href="http://feeds.wordaligned.org/wordaligned/comments"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Comments</a></li>
+</ul>
+
+
+</div>
+
+    </div>
+  </div>
+  <div id="footer">
+<hr />
+<p><a href="http://tag.wordaligned.org">Thomas Guest</a></p>
+</div>
+
+</div>
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-3373724-1']);
+  _gaq.push(['_trackPageview']);
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ga);
+  })();
+</script>
+</body>
+
+</html>

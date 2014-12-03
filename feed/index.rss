@@ -7,6 +7,113 @@
 <dc:creator>tag@wordaligned.org</dc:creator>
 <language>en-gb</language>
 <item>
+<title>Python averages</title>
+<description>&lt;p&gt;You&amp;#8217;ve been running some tests, each of which returns a 3-tuple of numerical results &amp;#8212; &lt;code&gt;(real, user, sys)&lt;/code&gt; times, maybe &amp;#8212; and you&amp;#8217;d like to combine these into a single 3-tuple, the average result.
+&lt;/p&gt;
+&lt;p&gt;Easy!
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;def average(times):
+    N = float(len(results))
+    return (sum(t[0] for t in times)/N,
+            sum(t[1] for t in times)/N,
+            sum(t[2] for t in times)/N)
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;If you want a more generic solution, one which works when the tuples might have any number of elements, you could do this:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;def average(xs):
+    N = float(len(xs))
+    R = len(xs[0])
+    return tuple(sum(x[i] for x in xs)/N for i in range(R))
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;or this:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;def average(xs):
+    N = float(len(xs))
+    return tuple(sum(col)/N for col in zip(*xs))
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;The second generic variant uses &lt;a href="https://docs.python.org/3/library/functions.html#zip"&gt;zip&lt;/a&gt; to transpose its inputs. 
+&lt;/p&gt;
+&lt;p&gt;Now suppose we have keyed collections of results which we want to average:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; times = [{'real': 34.4, 'user': 26.2, 'sys': 7.3},
+             {'real': 28.7, 'user': 21.5, 'sys': 6.4},
+             {'real': 29.3, 'user': 22.0, 'sys': 6.9}]
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;If, as in the example above, each result has the same set of keys, the average result could be calculated like this:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; N = float(len(times))
+&amp;gt;&amp;gt;&amp;gt; { k : sum(t[k] for t in times)/N for k in times[0] }
+{'real': 30.8, 'sys': 6.9, 'user': 23.2}
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;What if the inputs don&amp;#8217;t have the same keys? Consider the contents of four fridges.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; fridges = [
+    { 'egg': 5, 'milk': 1.700, 'sausage': 6 },
+    { 'beer': 6, 'milk': 0.568, 'egg': 1 },
+    { 'egg': 3, 'sausage': 4, 'milk': 0.125, 'lettuce': 1 },
+    { 'carrot': 4 }]
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;A &lt;a href="https://docs.python.org/3/library/collections.html#collections.Counter"&gt;Counter&lt;/a&gt; can collect and calculate the average fridge contents. 
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; from collections import Counter
+&amp;gt;&amp;gt;&amp;gt; total = sum(map(Counter, fridges), Counter())
+&amp;gt;&amp;gt;&amp;gt; N = float(len(fridges))
+&amp;gt;&amp;gt;&amp;gt; { k: v/N for k, v in total.items() }
+{'sausage': 2.5, 'lettuce': 0.25, 'beer': 1.5, 'carrot': 1.0, 
+ 'egg': 2.25, 'milk': 0.59825}
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Note that although &lt;code&gt;Counter&lt;/code&gt;s were primarily designed to work with positive integers to represent counts, there&amp;#8217;s nothing stopping us from using floating point numbers (amount of milk in our example) in the values field.
+&lt;/p&gt;</description>
+<dc:date>2014-12-03</dc:date>
+<guid>http://wordaligned.org/articles/python-averages</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/python-averages</link>
+<category>Python</category>
+</item>
+
+<item>
 <title>Group When</title>
 <description>&lt;p&gt;Phil Nash&amp;#8217;s recent tweet intrigued me.
 &lt;/p&gt;
@@ -1243,29 +1350,6 @@ node * remove_if(node * head, remove_fn rm)
 <link>http://wordaligned.org/articles/accu-bristol-and-bath</link>
 <category>ACCU</category>
 <category>Self</category>
-</item>
-
-<item>
-<title>Life goes on</title>
-<description>&lt;p&gt;&lt;a href="http://www.flickr.com/photos/anachrocomputer/6951474448/" title="Testing the Wincor-Nixdorf Customer Display by anachrocomputer, on Flickr"&gt;&lt;img src="http://farm6.staticflickr.com/5340/6951474448_f83069b7cf.jpg" width="500" height="333" alt="Testing the Wincor-Nixdorf Customer Display"&gt;&lt;/a&gt;
-&lt;/p&gt;
-&lt;p&gt;In my &lt;a href="http://wordaligned.org/articles/life-on-canvas.html" title="Game of life"&gt;previous post&lt;/a&gt; I described John Conway&amp;#8217;s Game of Life as a &lt;a href="http://programmer.97things.oreilly.com/wiki/index.php/Learn_to_say_Hello_World" title="Learn to say 'Hello, World'"&gt;hello world&lt;/a&gt; for computer graphics. Actually, it goes beyond that. Hello world is a complete program, a proof the toolchain works, but it&amp;#8217;s not a particularly interesting program. An implementation of the game of life does more than demonstrate you can put pixels on screens: the evolution of those pixel colonies turns out to be a subject &lt;a href="http://pentadecathlon.com/lifeNews/2010/02/prime_numbers.html" title="A Life pattern to calculate prime numbers"&gt;worth studying&lt;/a&gt; in itself.
-&lt;/p&gt;
-&lt;p&gt;That said, I&amp;#8217;m primarily interested in Life as an exercise in learning new things. I&amp;#8217;ve continued to develop my &lt;a href="http://diveintohtml5.info/canvas.html" title="Mark Pilgrim dives into HTML5's canvas element"&gt;canvas&lt;/a&gt; implementation, adding some &lt;a href="http://jqueryui.com" title="The official jQuery user interface library"&gt;jQuery UI&lt;/a&gt; effects. The code is on &lt;a href="https://github.com/wordaligned/game-of-life.git" title="Wordaligned's game-of-life repository on Github"&gt;Github&lt;/a&gt; &amp;#8212; yes, it&amp;#8217;s high time I learned about that too &amp;#8212; though note there are dependencies on jQuery, jQuery UI, Imagemagick, and on pattern files downloaded from &lt;a href="http://www.conwaylife.com/wiki/Main_Page"&gt;conwaylife.com&lt;/a&gt;.
-&lt;/p&gt;
-&lt;p&gt;A working version can be found at &lt;a href="http://wordaligned.org/life.html" title="Life on Canvas"&gt;wordaligned.org/life&lt;/a&gt;. Click the graphic below to give it a go. Your web client does support HTML5 Canvas, right?
-&lt;/p&gt;
-&lt;div style="border:1px solid #333"&gt;&lt;a href="http://wordaligned.org/life" title="Play the game of life"&gt;&lt;img src="http://wordaligned.org/images/life-on-canvas.png" alt="Play the game of life"/&gt;&lt;/a&gt;&lt;/div&gt;
-
-&lt;p&gt;&lt;hr /&gt;
-   Thanks, &lt;a href="http://www.flickr.com/photos/anachrocomputer" title="anachrocomputer's photostream"&gt;anachrocomputer&lt;/a&gt;, for the delightful hello world photo
-&lt;/p&gt;</description>
-<dc:date>2012-06-29</dc:date>
-<guid>http://wordaligned.org/articles/life-goes-on</guid>
-<author>tag@wordaligned.org (Thomas Guest)</author>
-<link>http://wordaligned.org/articles/life-goes-on</link>
-<category>Algorithms</category>
-<category>Graphics</category>
 </item>
 
 </channel>

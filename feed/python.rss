@@ -7,6 +7,113 @@
 <dc:creator>tag@wordaligned.org</dc:creator>
 <language>en-gb</language>
 <item>
+<title>Python averages</title>
+<description>&lt;p&gt;You&amp;#8217;ve been running some tests, each of which returns a 3-tuple of numerical results &amp;#8212; &lt;code&gt;(real, user, sys)&lt;/code&gt; times, maybe &amp;#8212; and you&amp;#8217;d like to combine these into a single 3-tuple, the average result.
+&lt;/p&gt;
+&lt;p&gt;Easy!
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;def average(times):
+    N = float(len(results))
+    return (sum(t[0] for t in times)/N,
+            sum(t[1] for t in times)/N,
+            sum(t[2] for t in times)/N)
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;If you want a more generic solution, one which works when the tuples might have any number of elements, you could do this:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;def average(xs):
+    N = float(len(xs))
+    R = len(xs[0])
+    return tuple(sum(x[i] for x in xs)/N for i in range(R))
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;or this:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;def average(xs):
+    N = float(len(xs))
+    return tuple(sum(col)/N for col in zip(*xs))
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;The second generic variant uses &lt;a href="https://docs.python.org/3/library/functions.html#zip"&gt;zip&lt;/a&gt; to transpose its inputs. 
+&lt;/p&gt;
+&lt;p&gt;Now suppose we have keyed collections of results which we want to average:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; times = [{'real': 34.4, 'user': 26.2, 'sys': 7.3},
+             {'real': 28.7, 'user': 21.5, 'sys': 6.4},
+             {'real': 29.3, 'user': 22.0, 'sys': 6.9}]
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;If, as in the example above, each result has the same set of keys, the average result could be calculated like this:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; N = float(len(times))
+&amp;gt;&amp;gt;&amp;gt; { k : sum(t[k] for t in times)/N for k in times[0] }
+{'real': 30.8, 'sys': 6.9, 'user': 23.2}
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;What if the inputs don&amp;#8217;t have the same keys? Consider the contents of four fridges.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; fridges = [
+    { 'egg': 5, 'milk': 1.700, 'sausage': 6 },
+    { 'beer': 6, 'milk': 0.568, 'egg': 1 },
+    { 'egg': 3, 'sausage': 4, 'milk': 0.125, 'lettuce': 1 },
+    { 'carrot': 4 }]
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;A &lt;a href="https://docs.python.org/3/library/collections.html#collections.Counter"&gt;Counter&lt;/a&gt; can collect and calculate the average fridge contents. 
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; from collections import Counter
+&amp;gt;&amp;gt;&amp;gt; total = sum(map(Counter, fridges), Counter())
+&amp;gt;&amp;gt;&amp;gt; N = float(len(fridges))
+&amp;gt;&amp;gt;&amp;gt; { k: v/N for k, v in total.items() }
+{'sausage': 2.5, 'lettuce': 0.25, 'beer': 1.5, 'carrot': 1.0, 
+ 'egg': 2.25, 'milk': 0.59825}
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Note that although &lt;code&gt;Counter&lt;/code&gt;s were primarily designed to work with positive integers to represent counts, there&amp;#8217;s nothing stopping us from using floating point numbers (amount of milk in our example) in the values field.
+&lt;/p&gt;</description>
+<dc:date>2014-12-03</dc:date>
+<guid>http://wordaligned.org/articles/python-averages</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/python-averages</link>
+<category>Python</category>
+</item>
+
+<item>
 <title>Group When</title>
 <description>&lt;p&gt;Phil Nash&amp;#8217;s recent tweet intrigued me.
 &lt;/p&gt;
@@ -4415,72 +4522,6 @@ compress.filetype  = ("text/plain", "text/html", "text/css")
 <guid>http://wordaligned.org/articles/deflate-runlength-encoding-but-better</guid>
 <author>tag@wordaligned.org (Thomas Guest)</author>
 <link>http://wordaligned.org/articles/deflate-runlength-encoding-but-better</link>
-<category>Python</category>
-</item>
-
-<item>
-<title>Review: Expert Python Programming</title>
-<description>&lt;p&gt;&lt;a href="http://www.packtpub.com/expert-python-programming/book"&gt;&lt;img height="262px" src="http://wordaligned.org/images/books/expert-python-programming.jpg" alt="Expert Python Programming cover"/&gt;&lt;/a&gt;
-   &lt;a href="http://ziade.org"&gt;&lt;img height="262px" src="http://tarekziade.files.wordpress.com/2008/09/tarekgotchi.png" alt="Tarek Ziad&amp;eacute;"/&gt;&lt;/a&gt;
-&lt;/p&gt;
-&lt;p&gt;If you follow &lt;a href="http://planet.python.org"&gt;Python blogs&lt;/a&gt; you&amp;#8217;ll have seen &lt;a href="http://www.google.com/search?q=expert+python+programming+review" title="Packt sent review copies to all these people"&gt;more than one review&lt;/a&gt; of Tarek Ziad&amp;eacute;&amp;#8217;s book, &lt;a href="http://www.packtpub.com/expert-python-programming/book"&gt;Expert Python Programming&lt;/a&gt;. As a result of these reviews I&amp;#8217;d decided that, although the book looked interesting, I wouldn&amp;#8217;t be investing in a copy for myself; but when the &lt;a href="http://www.packtpub.com"&gt;publishers&lt;/a&gt; contacted me directly with the offer of a free review copy, I accepted.
-&lt;/p&gt;
-&lt;span id="continue-reading"/&gt;
-
-&lt;p&gt;You may wonder: Why the need for a book on &lt;strong&gt;expert&lt;/strong&gt; Python programming? Doesn&amp;#8217;t Python value simplicity and transparency above all else? (Language lawyers and &lt;a href="http://en.wikipedia.org/wiki/Perl#Perl_golf"&gt;golfers&lt;/a&gt;, look elsewhere!) Why any &lt;strong&gt;book&lt;/strong&gt; on Python, when the online documentation is so well put together?
-&lt;/p&gt;
-&lt;p&gt;Yes, that&amp;#8217;s what I thought too, but the fact is, Python has steadily expanded over a series of point releases. The standard &lt;a href="http://docs.python.org/tutorial"&gt;tutorial&lt;/a&gt; omits important new(-ish) features such as decorators and properties, and its treatment of generators and special methods is light. Although the language reference covers these topics, it&amp;#8217;s no user guide.
-&lt;/p&gt;
-&lt;p&gt;&lt;a href="http://www.packtpub.com/expert-python-programming/book"&gt;Expert Python Programming&lt;/a&gt; starts well, picking up where the Python &lt;a href="http://docs.python.org/tutorial"&gt;tutorial&lt;/a&gt; leaves off. It soon becomes evident Tarek Ziad&amp;eacute; is indeed an expert Python programmer. He walks through some nice real-world examples. He presents guidelines and advanced idioms few Pythonistas would dispute. He points to tools, modules and articles hosted on and away from &lt;a href="http://python.org"&gt;python.org&lt;/a&gt; with accuracy.
-&lt;/p&gt;
-&lt;p&gt;Unfortunately the details let the book down. Graphics are poor quality. Some screen shots are barely readable. Here&amp;#8217;s a broken code sample &amp;#8212; it&amp;#8217;s not the only one.
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
-
-&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; def sum(sequence):   # better !
-...     total = 0
-...     for arg in args:
-...         total += arg
-...     return total
-
-&lt;/pre&gt;
-
-&lt;/div&gt;
-
-&lt;p&gt;(While I&amp;#8217;m nit-picking, I wish books didn&amp;#8217;t resort to comments for call-out text, and I&amp;#8217;d prefer an example which doesn&amp;#8217;t shadow a built-in function).
-&lt;/p&gt;
-&lt;p&gt;I&amp;#8217;m less bothered by the &lt;a href="http://atomisator.ziade.org/query?component=Expert+Python+Programming+Book&amp;amp;order=priority&amp;amp;report=9&amp;amp;owner=tarek&amp;amp;col=id&amp;amp;col=summary&amp;amp;col=status&amp;amp;col=type&amp;amp;col=priority&amp;amp;col=milestone"&gt;grammatical errors and typos&lt;/a&gt;. Tarek Ziad&amp;eacute; writes clearly and engagingly. The book is easy to read. That said, I won&amp;#8217;t let him get away with this pronouncement on Test-Driven Development (TDD).
-&lt;/p&gt;
-&lt;blockquote&gt;&lt;p&gt;[TDD] is widely used in the Python community, and probably more so in communities that work with statically typed languages. This may be due to the fact that developers think that most tests are done by the compiler, which checks many things when it produces a binary.
-&lt;/p&gt;
-&lt;/blockquote&gt;&lt;ol&gt;
- &lt;li&gt;
-     I&amp;#8217;m sure he means &amp;#8220;more so &lt;strong&gt;than&lt;/strong&gt; in communities &amp;#8230;&amp;#8221;. 
- &lt;/li&gt;
-
- &lt;li&gt;
-     The negative spin may well irritate some readers unnecessarily. 
- &lt;/li&gt;
-
- &lt;li&gt;
-     Which is a shame, since I agree with the point he&amp;#8217;s trying to make, that &lt;a href="http://mindview.net/WebLog/log-0025" title="Bruce Eckel's essay on testing and static typing"&gt;strong testing beats static typing&lt;/a&gt;.
- &lt;/li&gt;
-&lt;/ol&gt;
-&lt;p&gt;Further in, the book covers more general software engineering discipline, with chapters on packaging and distribution, version control, project tracking, documentation, optimisation etc. As ever, Tarek Ziad&amp;eacute; provides some welcome pointers to Python best practices, but I see little point in (e.g.) supplying sample &lt;a href="http://trac.edgewall.org/"&gt;Trac&lt;/a&gt; configuration file listings &amp;#8212; it would be better to direct readers to up to date online documentation.
-&lt;/p&gt;
-&lt;p&gt;Once you get beyond the core language, Python becomes a sizable topic. It must have been hard to decide what belongs in a book for expert Python programmers, and what to leave out. I do think there should have been more about Python 3.0. I would also suggest coverage of embedding and extending &amp;#8212; of interfacing with other languages.
-&lt;/p&gt;
-&lt;p&gt;In summary, then, I enjoyed &lt;a href="http://www.packtpub.com/expert-python-programming/book"&gt;Expert Python Programming&lt;/a&gt; and learned a few things from it. I don&amp;#8217;t think I&amp;#8217;ll return to it often, but it has provided some useful pointers. With careful editing and design it could have been much better.
-&lt;/p&gt;
-&lt;hr /&gt;
-
-&lt;p&gt;At a slight tangent, but still on the topic of expert Python programming, I recommend David M. Beazley&amp;#8217;s  &lt;a href="http://dabeaz.com/coroutines/" title="A Curious Course on Coroutines and Concurrency"&gt;&amp;#8220;A Curious Course on Coroutines and Concurrency&amp;#8221;&lt;/a&gt;, originally presented at PyCon&amp;#8217;09. It sort-of follows on from his equally good &lt;a href="http://www.dabeaz.com/generators/"&gt;&amp;#8220;Generator Tricks for Systems Programmers&amp;#8221;&lt;/a&gt; PyCon&amp;#8217;08 presentation but this time he&amp;#8217;s pushing rather than pulling.
-&lt;/p&gt;
-&lt;blockquote&gt;&lt;p&gt;&lt;a href="http://www.dabeaz.com" title="Is David working on Tubes?"&gt;&lt;img src="http://www.dabeaz.com/images/Davetubes.jpg" alt="David Beazley"/&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;Dave working on his latest project &amp;#8212; &amp;#8220;you know, it&amp;#8217;s a series of tubes.&amp;#8221;&lt;/p&gt;&lt;/blockquote&gt;</description>
-<dc:date>2009-04-16</dc:date>
-<guid>http://wordaligned.org/articles/review-expert-python-programming</guid>
-<author>tag@wordaligned.org (Thomas Guest)</author>
-<link>http://wordaligned.org/articles/review-expert-python-programming</link>
 <category>Python</category>
 </item>
 

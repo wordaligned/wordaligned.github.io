@@ -25,7 +25,112 @@
 
   <div id="page">
     <div id="content">
-      <div class="atomentry" id="group-when">
+      <div class="atomentry" id="python-averages">
+<h2 class="title"><a href="/articles/python-averages">Python averages</a></h2>
+<p class="meta"><abbr class="published" title="2014-12-03">2014-12-03</abbr> &bull; <a href="/tag/python" rel="tag">Python</a> &bull; <a href="/articles/python-averages#disqus_thread">Comments</a></p>
+<p>You&#8217;ve been running some tests, each of which returns a 3-tuple of numerical results &#8212; <code>(real, user, sys)</code> times, maybe &#8212; and you&#8217;d like to combine these into a single 3-tuple, the average result.
+</p>
+<p>Easy!
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">def average(times):
+    N = float(len(results))
+    return (sum(t[0] for t in times)/N,
+            sum(t[1] for t in times)/N,
+            sum(t[2] for t in times)/N)
+
+</pre>
+
+</div>
+
+<p>If you want a more generic solution, one which works when the tuples might have any number of elements, you could do this:
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">def average(xs):
+    N = float(len(xs))
+    R = len(xs[0])
+    return tuple(sum(x[i] for x in xs)/N for i in range(R))
+
+</pre>
+
+</div>
+
+<p>or this:
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">def average(xs):
+    N = float(len(xs))
+    return tuple(sum(col)/N for col in zip(*xs))
+
+</pre>
+
+</div>
+
+<p>The second generic variant uses <a href="https://docs.python.org/3/library/functions.html#zip">zip</a> to transpose its inputs. 
+</p>
+<p>Now suppose we have keyed collections of results which we want to average:
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">&gt;&gt;&gt; times = [{'real': 34.4, 'user': 26.2, 'sys': 7.3},
+             {'real': 28.7, 'user': 21.5, 'sys': 6.4},
+             {'real': 29.3, 'user': 22.0, 'sys': 6.9}]
+
+</pre>
+
+</div>
+
+<p>If, as in the example above, each result has the same set of keys, the average result could be calculated like this:
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">&gt;&gt;&gt; N = float(len(times))
+&gt;&gt;&gt; { k : sum(t[k] for t in times)/N for k in times[0] }
+{'real': 30.8, 'sys': 6.9, 'user': 23.2}
+
+</pre>
+
+</div>
+
+<p>What if the inputs don&#8217;t have the same keys? Consider the contents of four fridges.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">&gt;&gt;&gt; fridges = [
+    { 'egg': 5, 'milk': 1.700, 'sausage': 6 },
+    { 'beer': 6, 'milk': 0.568, 'egg': 1 },
+    { 'egg': 3, 'sausage': 4, 'milk': 0.125, 'lettuce': 1 },
+    { 'carrot': 4 }]
+
+</pre>
+
+</div>
+
+<p>A <a href="https://docs.python.org/3/library/collections.html#collections.Counter">Counter</a> can collect and calculate the average fridge contents. 
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">&gt;&gt;&gt; from collections import Counter
+&gt;&gt;&gt; total = sum(map(Counter, fridges), Counter())
+&gt;&gt;&gt; N = float(len(fridges))
+&gt;&gt;&gt; { k: v/N for k, v in total.items() }
+{'sausage': 2.5, 'lettuce': 0.25, 'beer': 1.5, 'carrot': 1.0, 
+ 'egg': 2.25, 'milk': 0.59825}
+
+</pre>
+
+</div>
+
+<p>Note that although <code>Counter</code>s were primarily designed to work with positive integers to represent counts, there&#8217;s nothing stopping us from using floating point numbers (amount of milk in our example) in the values field.
+</p>
+
+</div>
+
+
+<div class="atomentry" id="group-when">
 <h2 class="title"><a href="/articles/group-when">Group When</a></h2>
 <p class="meta"><abbr class="published" title="2014-07-16">2014-07-16</abbr> &bull; <a href="/tag/python" rel="tag">Python</a>, <a href="/tag/haskell" rel="tag">Haskell</a>, <a href="/tag/streams" rel="tag">Streams</a> &bull; <a href="/articles/group-when#disqus_thread">Comments</a></p>
 <p>Phil Nash&#8217;s recent tweet intrigued me.
@@ -655,42 +760,6 @@ function animate() {
 </div>
 
 
-<div class="atomentry" id="folded-files-and-rainbow-code">
-<h2 class="title"><a href="/articles/folded-files-and-rainbow-code">Folded files and rainbow code</a></h2>
-<p class="meta"><abbr class="published" title="2013-01-23">2013-01-23</abbr> &bull; <a href="/tag/editors" rel="tag">Editors</a>, <a href="/tag/syntax" rel="tag">Syntax</a> &bull; <a href="/articles/folded-files-and-rainbow-code#disqus_thread">Comments</a></p>
-<p>In one of my first programming jobs I worked at a software house which grew its own tools. We had a home made version control system, build system, test harness and programming language. We even had our own editor!
-</p>
-<p>The language was C, lightly extended to support the primitive types of our particular problem domain. The editor was more esoteric. You drove it using the numeric keypad and it modeled source code as nested blocks:
-</p>
-<ul><li>files contained blocks of:</li>
-<ul><li>includes</li>
-<li>documentation</li>
-<li>data</li>
-<li>functions</li></ul>
-<li>functions contained groups of:</li>
-<ul><li>parameters:</li>
-<ul><li>in parameters</li>
-<li>out parameters</li></ul>
-<li>initialisation blocks</li>
-<li>assertions</li>
-<li>code blocks</li>
-<li>loops</li>
-<li>machine dependent sections</li>
-<li>returns</li></ul></ul>
-
-<p>The editor facilitated navigation of this nested structure, with keypresses to <a href="http://en.wikipedia.org/wiki/Code_folding">fold and unfold</a>.
-</p>
-<p>You don&#8217;t need to write your own editor to get the benefits of code folding: most editors support it to some degree. With this particular editor, however, folding reached its apotheosis. You could crimp and tuck and pleat, nesting layer upon layer within a single source file.
-</p>
-<p><a href="http://www.flickr.com/photos/cobbphoto/4534419314/" title="Origami Dragon by g cobb, on Flickr"><img src="http://farm5.staticflickr.com/4001/4534419314_705521d064.jpg" width="500" height="334" alt="Origami Dragon"></a>
-</p>
-<div class="extended">
-<p><a href="/articles/folded-files-and-rainbow-code#continue-reading">Continue reading...</a></p>
-</div>
-
-</div>
-
-
 <div class="extended">
 <p><a href="/articles/">Visit the Word Aligned archives...</a></p>
 </div>
@@ -734,7 +803,7 @@ function animate() {
 
 <div class="sidebar-node">
 <h3>Top Tags</h3>
-<ul id="categories"><li><a href="/tag/python" rel="tag">Python</a> <em>(108)</em></li>
+<ul id="categories"><li><a href="/tag/python" rel="tag">Python</a> <em>(109)</em></li>
 <li><a href="/tag/c++" rel="tag">C++</a> <em>(66)</em></li>
 <li><a href="/tag/self" rel="tag">Self</a> <em>(53)</em></li>
 <li><a href="/tag/puzzles" rel="tag">Puzzles</a> <em>(30)</em></li>
@@ -766,7 +835,7 @@ function animate() {
 <div class="sidebar-node">
 <h3>Chain</h3>
 <ul>
-<li><a accesskey="p" href="/articles/group-when" title="First article">&raquo; Group When</a></li>
+<li><a accesskey="p" href="/articles/python-averages" title="First article">&raquo; Python averages</a></li>
 
 </ul>
 
