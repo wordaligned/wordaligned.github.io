@@ -25,7 +25,88 @@
 
   <div id="page">
     <div id="content">
-      <div class="atomentry" id="python-averages">
+      <div class="atomentry" id="why-zip-when-you-can-map">
+<h2 class="title"><a href="/articles/why-zip-when-you-can-map">Why zip when you can map?</a></h2>
+<p class="meta"><abbr class="published" title="2014-12-16">2014-12-16</abbr> &bull; <a href="/tag/python" rel="tag">Python</a> &bull; <a href="/articles/why-zip-when-you-can-map#disqus_thread">Comments</a></p>
+<p><a href="http://en.wikipedia.org/wiki/Zipper"><img src="/images/zip.jpg" title="Why zip?" alt="Why zip?"/></a>
+   <a href="http://www.strava.com/activities/158661061"><img src="/images/dundry-thunder.jpg" alt="when you can map?" title="when you can map!"/></a>
+</p>
+<p>You&#8217;ve got a couple of parallel lists you&#8217;d like to combine and output, a line for each pair. Here&#8217;s one way to do it: use <code>zip</code> to do the combining.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">&gt;&gt;&gt; times = [42.12, 42.28, 42.34, 42.40, 42.45]
+&gt;&gt;&gt; names = ['Hickman', 'Guest', 'Burns', 'Williams']
+&gt;&gt;&gt; fmt = '{:20} {:.2f}'.format
+&gt;&gt;&gt; print('\n'.join(fmt(n, t) for n, t in zip(names, times))
+Hickman              42.12
+Guest                42.28
+Burns                42.34
+Williams             42.40
+
+</pre>
+
+</div>
+
+<p>Slightly more succinctly:
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">&gt;&gt;&gt; print('\n'.join(fmt(*nt) for nt in zip(names, times))
+...
+
+</pre>
+
+</div>
+
+<p>If you look at the generator expression passed into <code>str.join</code>, you can see we&#8217;re just mapping <code>fmt</code> to the zipped <code>names</code> and <code>times</code> lists.
+</p>
+<p>Well, sort of.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">&gt;&gt;&gt; print('\n'.join(map(fmt, zip(names, times))))
+print('\n'.join(map(fmt, zip(names, times))))
+Traceback (most recent call last):
+...
+IndexError: tuple index out of range
+
+</pre>
+
+</div>
+
+<p>To fix this, we <strong>could</strong> use <code>itertools.starmap</code> which effectively unpacks the zipped pairs.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">&gt;&gt;&gt; from itertools import starmap
+&gt;&gt;&gt; print('\n'.join(starmap(fmt, zip(names, times))))
+Hickman              42.12
+Guest                42.28
+Burns                42.34
+Williams             42.40
+
+</pre>
+
+</div>
+
+<p>This latest version looks clean enough but there&#8217;s something odd about zipping two lists together only to unpack the resulting 2-tuples for consumption by the format function.
+</p>
+<p>Don&#8217;t forget, <code>map</code> happily accepts more than one sequence! There&#8217;s no need to <code>zip</code> after all.
+</p>
+<div class="typocode"><div class="codetitle">Don&#8217;t zip, map!</div>
+
+<pre class="prettyprint">&gt;&gt;&gt; print('\n'.join(map(fmt, names, times))
+...
+
+</pre>
+
+</div>
+
+</div>
+
+
+<div class="atomentry" id="python-averages">
 <h2 class="title"><a href="/articles/python-averages">Find the average of a collection of tuples or dicts using Python</a></h2>
 <p class="meta"><abbr class="published" title="2014-12-03">2014-12-03</abbr> &bull; <a href="/tag/python" rel="tag">Python</a> &bull; <a href="/articles/python-averages#disqus_thread">Comments</a></p>
 <p>You&#8217;ve been running some tests, each of which returns a 3-tuple of numerical results &#8212; <code>(real, user, sys)</code> times, maybe &#8212; and you&#8217;d like to combine these into a single 3-tuple, the average result.
@@ -734,32 +815,6 @@ function animate() {
 </div>
 
 
-<div class="atomentry" id="singly-linked-lists-in-c++">
-<h2 class="title"><a href="/articles/singly-linked-lists-in-c++">Singly Linked Lists in C++</a></h2>
-<p class="meta"><abbr class="published" title="2013-02-07">2013-02-07</abbr> &bull; <a href="/tag/c" rel="tag">C</a>, <a href="/tag/c++" rel="tag">C++</a>, <a href="/tag/algorithms" rel="tag">Algorithms</a> &bull; <a href="/articles/singly-linked-lists-in-c++#disqus_thread">Comments</a></p>
-<p>In a <a href="/articles/two-star-programming.html">recent post</a> I wrote about removing items from a singly linked list. I presented a couple of alternative implementations, and in the comments section readers suggested yet more versions.
-</p>
-<p>My implementations were written in C: the post was inspired by something <a href="http://meta.slashdot.org/story/12/10/11/0030249/linus-torvalds-answers-your-questions">Linus Torvalds had said</a> about low-level programming skills, and I&#8217;m guessing he meant C programming skills. The fact is, C programmers are condemned to reimplement these basic functions on this basic structure because the C standard library has nothing to say about singly linked lists. Until recently the C++ standard library was similarly silent on the subject, only offering a doubly linked list.
-</p>
-
-<h3>C++ introduces &#8230; the linked list!</h3>
-<p>That&#8217;s all changed now with the introduction of <code>std::forward_list</code>. The <a href="http://en.cppreference.com/w/cpp/container/forward_list">class interface</a> doesn&#8217;t mention links or pointers but a quick glance through its contents makes it clear that if you imagine the container to be a templated version of a classic singly-linked list, you won&#8217;t go far wrong.
-</p>
-<p>This gives <code>forward_list</code> some members you won&#8217;t find elsewhere in the <code>std::</code> namespace. For example, <code>std::forward_list::before_begin()</code>, which returns an iterator just before the beginning of the list &#8212; much as the more familiar <code>end()</code> is just past the end.
-</p>
-<p>Why is <code>before_begin()</code> necessary? You can&#8217;t dereference it and you can&#8217;t reverse through a forward list till you get to it. Well, since forward list iterators can only go forwards, instead of the familiar sequence <code>insert()</code>, <code>erase()</code> and <code>emplace()</code> methods we have <code>insert_after()</code>, <code>erase_after()</code> and <code>emplace_after()</code>, not to mention <code>splice_after()</code>. The before-the-beginning iterator allows you to use these operations to modify the node at the head of the list.
-</p>
-<p><strong>Quick question</strong>: what&#8217;s the complexity of <code>std::list::size()</code>?
-</p>
-<p><strong>Trick question</strong>: and how about <code>std::forward_list::size()</code>?
-</p>
-<div class="extended">
-<p><a href="/articles/singly-linked-lists-in-c++#continue-reading">Continue reading...</a></p>
-</div>
-
-</div>
-
-
 <div class="extended">
 <p><a href="/articles/">Visit the Word Aligned archives...</a></p>
 </div>
@@ -803,7 +858,7 @@ function animate() {
 
 <div class="sidebar-node">
 <h3>Top Tags</h3>
-<ul id="categories"><li><a href="/tag/python" rel="tag">Python</a> <em>(109)</em></li>
+<ul id="categories"><li><a href="/tag/python" rel="tag">Python</a> <em>(110)</em></li>
 <li><a href="/tag/c++" rel="tag">C++</a> <em>(66)</em></li>
 <li><a href="/tag/self" rel="tag">Self</a> <em>(53)</em></li>
 <li><a href="/tag/puzzles" rel="tag">Puzzles</a> <em>(30)</em></li>
@@ -835,7 +890,7 @@ function animate() {
 <div class="sidebar-node">
 <h3>Chain</h3>
 <ul>
-<li><a accesskey="p" href="/articles/python-averages" title="First article">&raquo; Find the average of a collection of tuples or dicts using Python</a></li>
+<li><a accesskey="p" href="/articles/why-zip-when-you-can-map" title="First article">&raquo; Why zip when you can map?</a></li>
 
 </ul>
 

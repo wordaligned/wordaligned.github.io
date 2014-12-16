@@ -7,6 +7,89 @@
 <dc:creator>tag@wordaligned.org</dc:creator>
 <language>en-gb</language>
 <item>
+<title>Why zip when you can map?</title>
+<description>&lt;p&gt;&lt;a href="http://en.wikipedia.org/wiki/Zipper"&gt;&lt;img src="http://wordaligned.org/images/zip.jpg" title="Why zip?" alt="Why zip?"/&gt;&lt;/a&gt;
+   &lt;a href="http://www.strava.com/activities/158661061"&gt;&lt;img src="http://wordaligned.org/images/dundry-thunder.jpg" alt="when you can map?" title="when you can map!"/&gt;&lt;/a&gt;
+&lt;/p&gt;
+&lt;p&gt;You&amp;#8217;ve got a couple of parallel lists you&amp;#8217;d like to combine and output, a line for each pair. Here&amp;#8217;s one way to do it: use &lt;code&gt;zip&lt;/code&gt; to do the combining.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; times = [42.12, 42.28, 42.34, 42.40, 42.45]
+&amp;gt;&amp;gt;&amp;gt; names = ['Hickman', 'Guest', 'Burns', 'Williams']
+&amp;gt;&amp;gt;&amp;gt; fmt = '{:20} {:.2f}'.format
+&amp;gt;&amp;gt;&amp;gt; print('\n'.join(fmt(n, t) for n, t in zip(names, times))
+Hickman              42.12
+Guest                42.28
+Burns                42.34
+Williams             42.40
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Slightly more succinctly:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; print('\n'.join(fmt(*nt) for nt in zip(names, times))
+...
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;If you look at the generator expression passed into &lt;code&gt;str.join&lt;/code&gt;, you can see we&amp;#8217;re just mapping &lt;code&gt;fmt&lt;/code&gt; to the zipped &lt;code&gt;names&lt;/code&gt; and &lt;code&gt;times&lt;/code&gt; lists.
+&lt;/p&gt;
+&lt;p&gt;Well, sort of.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; print('\n'.join(map(fmt, zip(names, times))))
+print('\n'.join(map(fmt, zip(names, times))))
+Traceback (most recent call last):
+...
+IndexError: tuple index out of range
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;To fix this, we &lt;strong&gt;could&lt;/strong&gt; use &lt;code&gt;itertools.starmap&lt;/code&gt; which effectively unpacks the zipped pairs.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; from itertools import starmap
+&amp;gt;&amp;gt;&amp;gt; print('\n'.join(starmap(fmt, zip(names, times))))
+Hickman              42.12
+Guest                42.28
+Burns                42.34
+Williams             42.40
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;This latest version looks clean enough but there&amp;#8217;s something odd about zipping two lists together only to unpack the resulting 2-tuples for consumption by the format function.
+&lt;/p&gt;
+&lt;p&gt;Don&amp;#8217;t forget, &lt;code&gt;map&lt;/code&gt; happily accepts more than one sequence! There&amp;#8217;s no need to &lt;code&gt;zip&lt;/code&gt; after all.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;Don&amp;#8217;t zip, map!&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; print('\n'.join(map(fmt, names, times))
+...
+
+&lt;/pre&gt;
+
+&lt;/div&gt;</description>
+<dc:date>2014-12-16</dc:date>
+<guid>http://wordaligned.org/articles/why-zip-when-you-can-map</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/why-zip-when-you-can-map</link>
+<category>Python</category>
+</item>
+
+<item>
 <title>Find the average of a collection of tuples or dicts using Python</title>
 <description>&lt;p&gt;You&amp;#8217;ve been running some tests, each of which returns a 3-tuple of numerical results &amp;#8212; &lt;code&gt;(real, user, sys)&lt;/code&gt; times, maybe &amp;#8212; and you&amp;#8217;d like to combine these into a single 3-tuple, the average result.
 &lt;/p&gt;
@@ -4194,334 +4277,6 @@ Run(count=10, value=2)
 <guid>http://wordaligned.org/articles/runlength-encoding-in-python</guid>
 <author>tag@wordaligned.org (Thomas Guest)</author>
 <link>http://wordaligned.org/articles/runlength-encoding-in-python</link>
-<category>Python</category>
-</item>
-
-<item>
-<title>DEFLATE: run-length encoding, but better</title>
-<description>&lt;h3&gt;Run-length encoding&lt;/h3&gt;
-&lt;p&gt;&lt;a href="http://en.wikipedia.org/wiki/Run-length_encoding"&gt;Run-length encoding&lt;/a&gt; is a simple compression scheme in which runs of equal values are represented by the value and a repeat count. For example, a supermarket cashier might process this line of shopping
-&lt;/p&gt;
-&lt;img src="http://wordaligned.org/images/fruit-line.png" alt="Fruit salad"/&gt;
-
-&lt;p&gt;as
-&lt;/p&gt;
-&lt;ul&gt;
- &lt;li&gt;
-     4 bananas
- &lt;/li&gt;
-
- &lt;li&gt;
-     3 apples
- &lt;/li&gt;
-
- &lt;li&gt;
-     2 bananas
- &lt;/li&gt;
-
- &lt;li&gt;
-     1 pineapple
- &lt;/li&gt;
-
- &lt;li&gt;
-     3 apples
- &lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;Unix packs in its very own run length encoder, &lt;code&gt;uniq -c&lt;/code&gt;. It works just fine &amp;#8212; so long as the values you want to encode are newline separated byte strings, that is.
-&lt;/p&gt;
-&lt;p&gt;Let&amp;#8217;s use a sequence of coin tosses as an example stream. &lt;code&gt;$RANDOM&lt;/code&gt; generates random numbers. We use the least significant bit of these numbers as an index into an array containing the values &lt;code&gt;heads&lt;/code&gt;, &lt;code&gt;tails&lt;/code&gt;.
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
-
-&lt;pre class="prettyprint"&gt;$ HT=(heads tails)
-$ toss() { echo ${HT[$RANDOM&amp;amp;1]}; }
-$ toss; toss; toss
-heads
-tails
-tails
-$ tosses() { while [ 1 ]; do toss; done; }
-$ tosses | head
-tails
-tails
-tails
-heads
-tails
-heads
-heads
-heads
-tails
-tails
-
-&lt;/pre&gt;
-
-&lt;/div&gt;
-
-&lt;p&gt;&lt;img src="http://wordaligned.org/images/tails.jpg" alt="tails"/&gt;
-   &lt;img src="http://wordaligned.org/images/tails.jpg" alt="tails"/&gt;
-   &lt;img src="http://wordaligned.org/images/tails.jpg" alt="tails"/&gt;
-   &lt;img src="http://wordaligned.org/images/heads.jpg" alt="heads"/&gt;
-   &lt;img src="http://wordaligned.org/images/tails.jpg" alt="tails"/&gt;
-   &lt;img src="http://wordaligned.org/images/heads.jpg" alt="heads"/&gt;
-   &lt;img src="http://wordaligned.org/images/heads.jpg" alt="heads"/&gt;
-   &lt;img src="http://wordaligned.org/images/heads.jpg" alt="heads"/&gt;
-   &lt;img src="http://wordaligned.org/images/tails.jpg" alt="tails"/&gt;
-   &lt;img src="http://wordaligned.org/images/tails.jpg" alt="tails"/&gt;
-&lt;/p&gt;
-&lt;span id="continue-reading"/&gt;
-
-&lt;p&gt;Passing a fresh sample from this same stream through our run-length encoder we get:
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
-
-&lt;pre class="prettyprint"&gt;$ tosses | uniq -c | head
-   2 heads
-   1 tails
-   1 heads
-   1 tails
-   1 heads
-   6 tails
-   3 heads
-   1 tails
-   4 heads
-   1 tails
-
-&lt;/pre&gt;
-
-&lt;/div&gt;
-
-&lt;p&gt;An &lt;code&gt;awk&lt;/code&gt; script can be used as a run-length decoder. (There must be a neater way, using &lt;code&gt;sed&lt;/code&gt; maybe?)
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
-
-&lt;pre class="prettyprint"&gt;$ runlendec() { awk '{ while ($1--) print $2 }'; }
-$ tosses | head | tee orig.log | uniq -c | runlendec | tee encdec.log
-heads
-tails
-heads
-tails
-heads
-heads
-tails
-tails
-heads
-heads
-$ diff orig.log encdec.log
-
-&lt;/pre&gt;
-
-&lt;/div&gt;
-
-&lt;p&gt;Here, we toss a coin 10 times teeing the original sequence to a file. The next two links in the pipeline compress and decompress the sequence, teeing the results to another file. Finally, as a sanity check, we confirm the round trip results are the same.
-&lt;/p&gt;
-
-&lt;h3&gt;Run-length encoding in Python&lt;/h3&gt;
-&lt;p&gt;This Unix run-length codec is fun, but of limited practical use. One good feature, though, is the way it operates on streams of data (including infinite streams), leaving clients free to decide how best to slice and buffer these streams.
-&lt;/p&gt;
-&lt;p&gt;Python has a fine library of high-level &lt;a href="http://docs.python.org/library/itertools.html"&gt;stream transformation tools&lt;/a&gt; from which we can build a generic and flexible run-length codec in just a few lines. Since I want to progress from run-length coding to something more advanced, I&amp;#8217;ll leave discussing how to implement this codec for now, but if you&amp;#8217;d like to write your own version, here&amp;#8217;s a description suitable for &lt;a href="http://docs.python.org/library/doctest#simple-usage-checking-examples-in-a-text-file"&gt;doctesting&lt;/a&gt;.
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
-
-&lt;pre class="prettyprint"&gt;Import the run-length codec functions and compress a short string.
-&amp;gt;&amp;gt;&amp;gt; from runlength import compress, decompress
-&amp;gt;&amp;gt;&amp;gt; comp = compress('AABBBACC')
-
-The returned compressor is a stream (an iterable).
-&amp;gt;&amp;gt;&amp;gt; next(comp)
-(2, 'A')
-
-Pull the rest of the stream into memory.
-&amp;gt;&amp;gt;&amp;gt; rest = list(comp)
-&amp;gt;&amp;gt;&amp;gt; rest
-[(3, 'B'), (1, 'A'), (2, 'C')]
-
-Simple decompress example.
-&amp;gt;&amp;gt;&amp;gt; concat = ''.join
-&amp;gt;&amp;gt;&amp;gt; concat(decompress(rest))
-'BBBACC'
-
-Compress, decompress also work with infinite streams, like the 
-a2b3 stream, which repeatedly cycles two pairs. 
-&amp;gt;&amp;gt;&amp;gt; from itertools import cycle, islice
-&amp;gt;&amp;gt;&amp;gt; a2b3 = cycle([(2, 'a'), (3, 'b')])
-&amp;gt;&amp;gt;&amp;gt; dec = decompress(a2b3)
-
-Pull 8 values from the decompressed stream.
-&amp;gt;&amp;gt;&amp;gt; concat(islice(dec, 8))
-'aabbbaab'
-
-Now compress the decompressed stream, and explore a few items.
-&amp;gt;&amp;gt;&amp;gt; comp = compress(dec)
-&amp;gt;&amp;gt;&amp;gt; next(comp)
-(2, 'b')
-&amp;gt;&amp;gt;&amp;gt; list(islice(comp, 2))
-[(2, 'a'), (3, 'b')]
-
-&lt;/pre&gt;
-
-&lt;/div&gt;
-
-
-&lt;h3&gt;DEFLATE&lt;/h3&gt;
-&lt;img style="border: 2px solid #ccc;" src="http://wordaligned.org/images/chessboard-monochrome.png" alt="Chessboard"/&gt;
-
-&lt;p&gt;The Wikipedia page on &lt;a href="http://en.wikipedia.org/wiki/Run-length_encoding"&gt;run-length encoding&lt;/a&gt; identifies monochrome images as good candidates for run-length compression. The white and black pixels typically group into long runs. Indeed, any simple image using a limited palette should reduce well using this compression scheme.
-&lt;/p&gt;
-&lt;p&gt;The chessboard above is 256&amp;times;256 pixels, each square being 32&amp;times;32 pixels. We &lt;em&gt;could&lt;/em&gt; run-length encode this 64K pixel image as 256&amp;times;8 = 2K runs of 32 pixels, a decent saving. (Actually, we should do slightly better, noting that there are runs of length 64 at the chessboard rank boundaries, but  you get the idea.)
-&lt;/p&gt;
-&lt;pre&gt;
-(32,W)(32,B)(32,W)(32,B)(32,W)(32,B)(32,W)(32,B),
-(32,W)(32,B)(32,W)(32,B)(32,W)(32,B)(32,W)(32,B),
-....
-(32,B)(32,W)(32,B)(32,W)(32,B)(32,W)(32,B)(32,W)
-&lt;/pre&gt;
-
-&lt;p&gt;Like a paletted image, a block of text &amp;#8212; the web page you&amp;#8217;re reading now, for example &amp;#8212; employs a limited alphabet. Although the characters in this text don&amp;#8217;t usually group into long runs there&amp;#8217;s plenty of repetition, especially in the raw HTML: all the occurrences of &lt;code&gt;&amp;lt;div&amp;gt;&lt;/code&gt;, &lt;code&gt;&amp;lt;span&amp;gt;&lt;/code&gt; and &lt;code&gt;class&lt;/code&gt; used for CSS styling, for example. The &lt;a href="http://en.wikipedia.org/wiki/DEFLATE"&gt;DEFLATE&lt;/a&gt; compression algorithm uses a clever twist on run-length encoding to remove this redundancy:
-&lt;/p&gt;
-&lt;blockquote&gt;&lt;p&gt;The compressed data consists of a series of elements of two types: literal bytes (of strings that have not been detected as duplicated within the previous 32K input bytes), and pointers to duplicated strings, where a pointer is represented as a pair &amp;lt;length, backward distance&amp;gt;. (&lt;a href="http://tools.ietf.org/html/rfc1951"&gt;RFC-1951&lt;/a&gt;)
-&lt;/p&gt;
-&lt;/blockquote&gt;&lt;p&gt;(In addition, a multiple-level dynamic Huffman encoding scheme reduces the space needed for the strings, distances and lengths themselves.)
-&lt;/p&gt;
-&lt;p&gt;There&amp;#8217;s more to these pointer elements than first appears: the length can exceed the backward distance. Thus the sequence:
-&lt;/p&gt;
-&lt;pre&gt;
-heads
-heads
-heads
-heads
-heads
-&lt;/pre&gt;
-
-&lt;p&gt;can be deflated as the literal type &lt;code&gt;heads\n&lt;/code&gt; followed by the pointer type &lt;code&gt;&amp;lt;24, 6&amp;gt;&lt;/code&gt;. 
-&lt;/p&gt;
-&lt;p&gt;If you&amp;#8217;ve spotted the potential for recursion, good! The inflating stream can reference itself, which can reference itself, which can &amp;#8230; &lt;a href="http://steike.com/code/useless/zip-file-quine/" title="Best ever Quine!"&gt;Confusing?&lt;/a&gt;
-&lt;/p&gt;
-
-&lt;h3&gt;Zipping pixels&lt;/h3&gt;
-&lt;p&gt;&lt;a href="http://www.libpng.org/pub/png/" title="Check out the graphics on the PNG home page!"&gt;PNG&lt;/a&gt; images use DEFLATE compression (as implemented by &lt;a href="http://www.zlib.net"&gt;zlib&lt;/a&gt;) to save on pixel storage space. Here&amp;#8217;s a binary view of the raw data in the chessboard graphic shown above, all &lt;strong&gt;137 bytes&lt;/strong&gt; of it. The 64K pixels themselves compress into a 88 byte IDAT chunk, of which the final 8 bytes are a checksum and (I think?) some padding. Maybe the image could be &lt;a href="http://drj11.wordpress.com/2009/02/20/i-crush-optipng/"&gt;squeezed harder&lt;/a&gt;, but I&amp;#8217;m impressed!
-&lt;/p&gt;
-&lt;pre&gt;
-8950 4e47 0d0a 1a0a 0000 000d 4948 4452  .&lt;b&gt;PNG&lt;/b&gt;........&lt;b&gt;IHDR&lt;/b&gt;
-0000 0100 0000 0100 0100 0000 0074 0995  .............t..
-cb00 0000 5049 4441 5468 81ed ceb1 0d00  ....P&lt;b&gt;IDAT&lt;/b&gt;h......
-200c 0341 f65f 1a58 803a 2f74 6e52 e424   ..A._.X.:/tnR.$
-7bed 9b75 f3ba cf07 0000 df83 ca0e 0000  {..u............
-7a60 ba1f 0080 2ea8 ec00 00a0 07a6 fb01  z`..............
-00e8 82ca 0e00 007a 60ba 1f00 802e a8ec  .......z`.......
-0000 2007 0e8a 69f0 e2b9 9471 c700 0000  .. ...i....q....
-0049 454e 44ae 4260 82                   .&lt;b&gt;IEND&lt;/b&gt;.B`.
-&lt;/pre&gt;
-
-&lt;p&gt;Here&amp;#8217;s a trace of how zlib inflates the compressed pixels in this &lt;a href="http://www.libpng.org/pub/png/spec/1.2/PNG-Chunks.html"&gt;IDAT chunk&lt;/a&gt;. (Source code available via anonymous SVN at &lt;a href="http://wordaligned.org/svn/etc/zlib_trace"&gt;http://wordaligned.org/svn/etc/zlib_trace&lt;/a&gt;.)
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
-
-&lt;pre class="prettyprint"&gt;inflate: allocated
-inflate: reset
-inflate:   zlib header ok
-inflate:     dynamic codes block (last)
-inflate:       table sizes ok
-inflate:       code lengths ok
-inflate:       codes ok
-inflate:         literal 0x00
-inflate:         literal 0xff
-inflate:         length 3
-inflate:         distance 1
-inflate:         literal 0x00
-inflate:         length 3
-inflate:         distance 1
-inflate:         length 24
-inflate:         distance 8
-inflate:         length 25
-inflate:         distance 25
-inflate:         length 258
-inflate:         distance 33
-....
-
-&lt;/pre&gt;
-
-&lt;/div&gt;
-
-&lt;p&gt;I&amp;#8217;ve attempted to show the first few stages of the genesis of the uncompressed stream in the picture below. The way the stream recursively inflates itself is quite beautiful.
-&lt;/p&gt;
-&lt;img style="border: 2px solid #ccc;" src="http://wordaligned.org/images/inflate.png" alt="Inflating pixels"/&gt;
-
-&lt;ol&gt;
- &lt;li&gt;
-     put 00
- &lt;/li&gt;
-
- &lt;li&gt;
-     put ff
- &lt;/li&gt;
-
- &lt;li&gt;
-     go back 1 (to ff), put 3
- &lt;/li&gt;
-
- &lt;li&gt;
-     put 00
- &lt;/li&gt;
-
- &lt;li&gt;
-     go back 1 (to 00), put 3
- &lt;/li&gt;
-
- &lt;li&gt;
-     go back 8 (to 00 00 00 00 ff ff ff ff)
- &lt;/li&gt;
-
- &lt;li&gt;
-     put 24
- &lt;/li&gt;
-&lt;/ol&gt;
-&lt;p&gt;Two elements later, and the repeat length has grown to 258. In fact, the entire chessboard is generated from just 3 literal and 43 pointer elements.
-&lt;/p&gt;
-&lt;p&gt;(Not all graphics have such a regular pattern, of course, so we can&amp;#8217;t always achieve such dramatic compression.)
-&lt;/p&gt;
-
-&lt;h3&gt;Deflated HTML&lt;/h3&gt;
-&lt;p&gt;Web servers can and do save on band-width by transferring &lt;a href="http://www.gzip.org/"&gt;gzip&lt;/a&gt; compressed HTML to gzip capable clients. (Gzip is a simple wrapper around DEFLATE.) Any PNG images transferred will also have their pixels DEFLATE compressed.
-&lt;/p&gt;
-&lt;pre&gt;
-$ curl http://wordaligned.org --head --compress
-HTTP/1.1 200 OK
-Date: Sun, 17 May 2009 17:41:53 GMT
-Server: lighttpd | Word Aligned
-Content-Type: text/html; charset=UTF-8
-....
-Vary: Accept-Encoding
-&lt;b&gt;Content-Encoding: gzip&lt;/b&gt;
-Content-Length: 20
-&lt;/pre&gt;
-
-&lt;p&gt;The Word Aligned &lt;a href="http://wordaligned.org/"&gt;front page&lt;/a&gt; contains about 75Kb of HTML, which gzips to just 16Kb &amp;#8212; a decent saving. Relevant lines from the &lt;a href="http://redmine.lighttpd.net/projects/lighttpd/wiki/Docs:ModCompress"&gt;lighttpd configuration file&lt;/a&gt; read:
-&lt;/p&gt;
-&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;lighttpd mod_compress&lt;/div&gt;
-
-&lt;pre class="prettyprint"&gt;server.modules = (
-    ....
-    "mod_compress"
-)
-compress.cache-dir = basedir + "lighttpd/cache/compress/"
-compress.filetype  = ("text/plain", "text/html", "text/css")
-
-&lt;/pre&gt;
-
-&lt;/div&gt;
-
-&lt;p&gt;I uphold Gzip (built on zlib, which implements DEFLATE) as a hero of the web. As we&amp;#8217;ve seen, it implements a powerful and elegant algorithm, but perhaps the best thing about it is that it&amp;#8217;s free to use, a freedom worth fighting for. Check out this battle report from the &lt;a href="http://www.gzip.org/#faq"&gt;FAQ&lt;/a&gt;.
-&lt;/p&gt;
-&lt;blockquote&gt;
-&lt;h3&gt;What about patents?&lt;/h3&gt;
-&lt;p&gt;&lt;em&gt;gzip&lt;/em&gt; was developed as a replacement for compress because of the UNISYS and IBM &lt;a href="http://www.faqs.org/faqs/compression-faq/part1/section-6.html"&gt;patents&lt;/a&gt; covering the &lt;a href="http://www.faqs.org/faqs/compression-faq/part2/section-1.html"&gt;LZW&lt;/a&gt; algorithm used by compress.
-&lt;/p&gt;
-&lt;p&gt;I have probably spent more time studying data compression patents than actually implementing data compression algorithms. I maintain a list of several hundred patents on lossless data compression algorithms, and I made sure that &lt;em&gt;gzip&lt;/em&gt; isn&amp;#8217;t covered by any of them. In particular, the &lt;code&gt;--fast&lt;/code&gt; option of gzip is not as fast it could, precisely to avoid a patented technique.  &amp;#8212; Jean-Loup Gailly, &lt;a href="http://www.gzip.org/#faq11"&gt;Gzip FAQ&lt;/a&gt;
-&lt;/p&gt;
-&lt;/blockquote&gt;</description>
-<dc:date>2009-05-21</dc:date>
-<guid>http://wordaligned.org/articles/deflate-runlength-encoding-but-better</guid>
-<author>tag@wordaligned.org (Thomas Guest)</author>
-<link>http://wordaligned.org/articles/deflate-runlength-encoding-but-better</link>
 <category>Python</category>
 </item>
 
