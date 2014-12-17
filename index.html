@@ -38,7 +38,7 @@
 <pre class="prettyprint">&gt;&gt;&gt; times = [42.12, 42.28, 42.34, 42.40, 42.45]
 &gt;&gt;&gt; names = ['Hickman', 'Guest', 'Burns', 'Williams']
 &gt;&gt;&gt; fmt = '{:20} {:.2f}'.format
-&gt;&gt;&gt; print('\n'.join(fmt(n, t) for n, t in zip(names, times))
+&gt;&gt;&gt; print('\n'.join(fmt(n, t) for n, t in zip(names, times)))
 Hickman              42.12
 Guest                42.28
 Burns                42.34
@@ -52,7 +52,7 @@ Williams             42.40
 </p>
 <div class="typocode">
 
-<pre class="prettyprint">&gt;&gt;&gt; print('\n'.join(fmt(*nt) for nt in zip(names, times))
+<pre class="prettyprint">&gt;&gt;&gt; print('\n'.join(fmt(*nt) for nt in zip(names, times)))
 ...
 
 </pre>
@@ -66,7 +66,6 @@ Williams             42.40
 <div class="typocode">
 
 <pre class="prettyprint">&gt;&gt;&gt; print('\n'.join(map(fmt, zip(names, times))))
-print('\n'.join(map(fmt, zip(names, times))))
 Traceback (most recent call last):
 ...
 IndexError: tuple index out of range
@@ -96,7 +95,7 @@ Williams             42.40
 </p>
 <div class="typocode"><div class="codetitle">Don&#8217;t zip, map!</div>
 
-<pre class="prettyprint">&gt;&gt;&gt; print('\n'.join(map(fmt, names, times))
+<pre class="prettyprint">&gt;&gt;&gt; print('\n'.join(map(fmt, names, times)))
 ...
 
 </pre>
