@@ -18,7 +18,7 @@
 &lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; times = [42.12, 42.28, 42.34, 42.40, 42.45]
 &amp;gt;&amp;gt;&amp;gt; names = ['Hickman', 'Guest', 'Burns', 'Williams']
 &amp;gt;&amp;gt;&amp;gt; fmt = '{:20} {:.2f}'.format
-&amp;gt;&amp;gt;&amp;gt; print('\n'.join(fmt(n, t) for n, t in zip(names, times))
+&amp;gt;&amp;gt;&amp;gt; print('\n'.join(fmt(n, t) for n, t in zip(names, times)))
 Hickman              42.12
 Guest                42.28
 Burns                42.34
@@ -32,7 +32,7 @@ Williams             42.40
 &lt;/p&gt;
 &lt;div class="typocode"&gt;
 
-&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; print('\n'.join(fmt(*nt) for nt in zip(names, times))
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; print('\n'.join(fmt(*nt) for nt in zip(names, times)))
 ...
 
 &lt;/pre&gt;
@@ -46,7 +46,6 @@ Williams             42.40
 &lt;div class="typocode"&gt;
 
 &lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; print('\n'.join(map(fmt, zip(names, times))))
-print('\n'.join(map(fmt, zip(names, times))))
 Traceback (most recent call last):
 ...
 IndexError: tuple index out of range
@@ -76,7 +75,7 @@ Williams             42.40
 &lt;/p&gt;
 &lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;Don&amp;#8217;t zip, map!&lt;/div&gt;
 
-&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; print('\n'.join(map(fmt, names, times))
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; print('\n'.join(map(fmt, names, times)))
 ...
 
 &lt;/pre&gt;
