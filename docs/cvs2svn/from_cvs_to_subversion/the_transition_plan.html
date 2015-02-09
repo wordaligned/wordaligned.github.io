@@ -1,0 +1,73 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>The Transition Plan</title>
+<link rel="stylesheet" href="../../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.67.0">
+<link rel="start" href="../index.html" title="From CVS to Subversion">
+<link rel="up" href="../index.html" title="From CVS to Subversion">
+<link rel="prev" href="more_evaluation.html" title="More Evaluation">
+<link rel="next" href="what_we_failed_to_do.html" title="What We Failed to Do">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><td valign="top"></td></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="more_evaluation.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="what_we_failed_to_do.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+<div class="section" lang="en">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="from_cvs_to_subversion.the_transition_plan"></a>The Transition Plan</h2></div></div></div>
+<p>
+There never seems to be a good time to change tools. There will always
+be releases to make, builds to test, critical patches to issue, and
+it's understandably hard to justify even the smallest amount of
+downtime in such real, customer-facing activity. Indeed, when there's
+lots of this real work to be done it's equally hard to dedicate the
+time to take proper care when executing such a tool change.</p>
+<p>
+On the other hand, by taking such an argument to the extreme, software
+developers end up stuck using Visual Studio 6.0 and grumbling
+(unfairly) about Microsoft's poor support for C++.</p>
+<p>
+We were, then, keen to proceed. Our transition plan was simple. The
+timescale was short but manageable&#8212;and we knew that if we missed
+the slot, we wouldn't get another chance for a while.</p>
+<p>
+As part of the evaluation, we'd created some backup scripts to mirror
+a <a href="http://subversion.tigris.org/" target="_top">Subversion</a> repository to our backup machine. Next, we set up a
+migration script to:</p>
+<div class="itemizedlist"><ul type="disc">
+<li>
+disable scheduled jobs which might get in the way
+</li>
+<li>
+take down the <a href="http://www.nongnu.org/cvs/" target="_top">CVS</a> server
+</li>
+<li>
+copy the <a href="http://www.nongnu.org/cvs/" target="_top">CVS</a> repository
+</li>
+<li>
+import this copy using <a href="http://cvs2svn.tigris.org/" target="_top">cvs2svn</a>
+</li>
+<li>
+log any problems occurring in any of these steps.
+</li>
+</ul></div>
+<p>
+So, to initiate the transition, all we had to do was schedule the
+migration script to run overnight. In the morning, if the log files
+were clean, we could kick off the <a href="http://subversion.tigris.org/" target="_top">Subversion</a> backups, point the
+<a href="http://subversion.tigris.org/" target="_top">Subversion</a> server at the newly imported repository and start it up,
+restart the <a href="http://www.nongnu.org/cvs/" target="_top">CVS</a> server in readonly mode, and we'd be done.</p>
+</div>
+<table width="100%"><tr>
+<td align="left"></td>
+<td align="right"><small>Copyright &copy; 2006 Thomas Guest</small></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="more_evaluation.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="what_we_failed_to_do.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

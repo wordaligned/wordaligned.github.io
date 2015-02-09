@@ -1,0 +1,144 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Chickens, Eggs, Python, Tests</title>
+<link rel="stylesheet" href="../../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.67.0">
+<link rel="start" href="../index.html" title="Chickens, Eggs, Python, Tests">
+<link rel="up" href="../index.html" title="Chickens, Eggs, Python, Tests">
+<link rel="prev" href="the_unittest_module.html" title="The Unittest Module">
+<link rel="next" href="a_test_driven_enhancement_to_cpp2html.html" title="A Test-Driven Enhancement to cpp2html">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><td valign="top"></td></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="the_unittest_module.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="a_test_driven_enhancement_to_cpp2html.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+<div class="section" lang="en">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="chickens__eggs__python__tests.chickens__eggs__python__tests"></a>Chickens, Eggs, Python, Tests</h2></div></div></div>
+<p>
+So, we have some code. We'd like to change it to create decent unit tests. 
+We'd also like some unit tests before we change it. Stalemate?</p>
+<p>
+Not quite! To break the deadlock we can capture output from the function
+as it stands and use this as a basis for some preliminary unit tests.</p>
+<p>
+Let's create a file <code class="code"><span class="identifier">test_cpp2html</span><span class="special">.</span><span class="identifier">py</span></code> and write our first test
+case:</p>
+<pre class="programlisting">
+<code class="literal">
+<span class="keyword">import</span><span class="identifier"> src2html</span><span class="keyword">
+import</span><span class="identifier"> unittest</span><span class="keyword">
+
+class</span><span class="identifier"> TestCpp2Html</span><span class="special">(</span><span class="identifier">unittest</span><span class="special">.</span><span class="identifier">TestCase</span><span class="special">):</span><span class="keyword">
+    
+    def</span><span class="identifier"> testDefaultMarkup</span><span class="special">(</span><span class="identifier">self</span><span class="special">):</span><span class="identifier">
+        src</span><span class="special"> =</span><span class="string"> 'cutlery = fork + knife; // do we need spoons?'</span><span class="identifier">
+        htm</span><span class="special"> =</span><span class="identifier"> src2html</span><span class="special">.</span><span class="identifier">cpp2html</span><span class="special">(</span><span class="identifier">src</span><span class="special">)</span><span class="identifier">
+        self</span><span class="special">.</span><span class="identifier">assertEqual</span><span class="special">(</span><span class="identifier">
+            htm</span><span class="special">,</span><span class="string">
+            '&lt;pre&gt;cutlery = fork + knife; &lt;font color="red"&gt;&lt;i&gt;'</span><span class="string">
+            '// do we need spoons?&lt;/i&gt;&lt;/font&gt;&lt;/pre&gt;'</span><span class="special">
+            )</span><span class="keyword">
+
+
+
+if</span><span class="identifier"> __name__</span><span class="special"> ==</span><span class="string"> '__main__'</span><span class="special">:</span><span class="identifier">
+    unittest</span><span class="special">.</span><span class="identifier">main</span><span class="special">()</span></code>
+</pre>
+<p>
+Running the test from the command line gives:</p>
+<pre class="programlisting"><code class="literal">&gt; <a href="http://www.python.org" target="_top">Python</a> test_cpp2html.py
+.
+----------------------------------------------------------------------
+Ran 1 test in 0.280s
+
+</code></pre>
+<p>
+Before we examine what the unit test framework is doing I should confess where
+I got the expected value of <code class="code"><span class="identifier">htm</span></code> from &#8211; not by reverse
+engineering the innards of <code class="code"><span class="identifier">cpp2html</span></code> but by capturing its
+actual output. One way to do this would be break the test by making the
+assertion fail (e.g.) <code class="code"><span class="identifier">self</span><span class="special">.</span><span class="identifier">assertEqual</span><span class="special">(</span><span class="identifier">htm</span><span class="special">,</span><span class="string"> '?'</span><span class="special">)</span></code>.</p>
+<p>
+Running this broken version of the test gives:</p>
+<pre class="programlisting"><code class="literal">&gt; python test_cpp2html.py
+F
+<code class="literal">==</code><code class="literal">==</code><code class="literal">==</code><code class="literal">==</code><code class="literal">==</code><code class="literal">==</code><code class="literal">==</code><code class="literal">==</code><code class="literal">==</code><code class="literal">==</code><code class="literal">==</code><code class="literal">==</code><code class="literal">==</code><code class="literal">==</code><code class="literal">==</code><code class="literal">==</code><code class="literal">==</code>==
+FAIL: testDefaultMarkup (<span class="underline">_main</span>_.TestCpp2Html)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "test_cpp2html.py", line 9, in testDefaultMarkup
+    self.assertEqual(
+  File "C:_<span class="underline">python</span>_23\lib\unittest.py", line 302, in failUnlessEqual
+    raise self.failureException, \
+AssertionError: '&lt;pre&gt;cutlery = fork + knife; &lt;font color<code class="literal">"red"&gt;&lt;i&gt;// do we need spoons?&lt;/i&gt;&lt;/font&gt;&lt;/pre&gt;' !</code> '?'
+
+----------------------------------------------------------------------
+Ran 1 test in 0.280s
+
+FAILED (failures=1)
+</code></pre>
+<a name="chickens__eggs__python__tests.comments_on_unittest_in_action"></a><h1>
+<a name="id4750003"></a>Comments on Unittest in Action</h1>
+<p>
+Let's look a little more closely at our test and its output:</p>
+<div class="itemizedlist"><ul type="disc"><li>
+We created our unit test by deriving a class, <code class="code"><span class="identifier">TestCpp2Html</span></code>,
+      from <code class="code"><span class="identifier">unittest</span><span class="special">.</span><span class="identifier">TestCase</span></code>. Any member function within this
+      class whose name begins with "test" is identified by the test runner.
+      So, <code class="code"><span class="identifier">testDefaultMarkup</span></code> will be executed when
+      <code class="code"><span class="identifier">unittest</span><span class="special">.</span><span class="identifier">main</span><span class="special">()</span></code> gets called.
+</li></ul></div>
+<div class="informaltable"><table class="table" width="74%">
+<colgroup><col></colgroup>
+<tbody><tr><td class="blurb">
+<span class="inlinemediaobject"><img src="../../images/info.png"></span> A C/C++ programmer may find it hard to imagine how such a test
+          framework could actually be implemented. C/C++ does not provide the
+          capability to dynamically query a function's name, nor even to
+          identify the module which defines it. This is where <a href="http://www.python.org" target="_top">Python</a>'s powers
+          of introspection come into play. We'll be looking more closely at
+          these when we use the <code class="code"><span class="identifier">doctest</span></code> module.</td></tr></tbody>
+</table></div>
+<div class="itemizedlist"><ul type="disc">
+<li>
+<code class="code"><span class="identifier">testDefaultMarkup</span></code> uses a base class method
+      <code class="code"><span class="identifier">unittest</span><span class="special">.</span><span class="identifier">TestCase</span><span class="special">.</span><span class="identifier">assertEqual</span></code> to check that the value
+      returned by a function matches an expected value. This method is used
+      instead of <a href="http://www.python.org" target="_top">Python</a>'s standard <code class="code"><span class="keyword">assert</span></code> so that the test runner
+      can accumulate all test results and produce a report. The output on
+      failure is also more informative.
+</li>
+<li>
+Notice how quiet the output of a successful test is and how noisy a
+      failure is. Good! (Of course, <code class="code"><span class="identifier">unittest</span></code> provides mechanisms
+      for tuning verbosity to the level required.)
+</li>
+<li>
+I have intentionally omitted docstrings from the test case class and its
+      methods. Notice that the failing test identified itself:<br><br><code class="literal">FAIL: testDefaultMarkup (<span class="underline">_main</span>_.TestCpp2Html)</code><br><br>
+
+      Had the method contained a docstring this would have been printed
+      instead. In the case of a failing test the method name is more useful
+      than a docstring. This also explains why <a href="http://www.python.org" target="_top">Python</a> test case methods often
+      end up with lengthy names.
+</li>
+<li>
+The test code has been placed in a separate file to the module it tests,
+  rather than being included in the module itself. Refer to 
+  the <a href="http://www.python.org" target="_top">Python</a><code class="code"><span class="identifier">unittest</span></code> documentation for some good reasons as to why.
+</li>
+</ul></div>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><small>Copyright &copy; 2004 Thomas Guest</small></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="the_unittest_module.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="a_test_driven_enhancement_to_cpp2html.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

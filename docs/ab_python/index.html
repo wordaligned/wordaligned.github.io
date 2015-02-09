@@ -1,0 +1,155 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>From A to B with Python</title>
+<link rel="stylesheet" href="../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.67.0">
+<link rel="start" href="index.html" title="From A to B with Python">
+<link rel="next" href="from_a_to_b_with_python/first_pass.html" title="First Pass">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><td valign="top"></td></table>
+<hr>
+<div class="spirit-nav"><a accesskey="n" href="from_a_to_b_with_python/first_pass.html"><img src="../images/next.png" alt="Next"></a></div>
+<div class="article" lang="en">
+<div class="titlepage">
+<div>
+<div><h2 class="title">
+<a name="from_a_to_b_with_python"></a>From A to B with Python</h2></div>
+<div><div class="author"><h3 class="author">
+<span class="firstname">Thomas</span> <span class="surname">Guest</span>
+</h3></div></div>
+<div><p class="copyright">Copyright &copy; 2004 Thomas Guest</p></div>
+</div>
+<hr>
+</div>
+<div class="toc">
+<p><b>Table of Contents</b></p>
+<dl>
+<dt><span class="section"><a href="index.html#from_a_to_b_with_python.getting_started">Getting Started</a></span></dt>
+<dt><span class="section"><a href="from_a_to_b_with_python/first_pass.html">First Pass</a></span></dt>
+<dt><span class="section"><a href="from_a_to_b_with_python/second_pass.html">Second Pass</a></span></dt>
+<dt><span class="section"><a href="from_a_to_b_with_python/conclusion.html">Conclusion</a></span></dt>
+<dt><span class="section"><a href="from_a_to_b_with_python/credits.html">Credits</a></span></dt>
+<dt><span class="section"><a href="from_a_to_b_with_python/the_final_script.html">The Final Script</a></span></dt>
+</dl>
+</div>
+<div class="section" lang="en">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="from_a_to_b_with_python.getting_started"></a>Getting Started</h2></div></div></div>
+<a name="getting_started.introduction"></a><h1>
+<a name="id4748708"></a>Introduction</h1>
+<p>
+Files form the raw ingredients of a software sytem &#8211; source files, build
+files, configuration files, resource files, scripts and so on. These files
+are typically organised into directories.</p>
+<p>
+As the system develops, this directory structure must develop with it: maybe
+an extra level of hierarchy needs adding to accommodate a new revision of an
+operating system; maybe third party libraries need gathering into a single
+place; maybe we are porting to a platform which imposes some restriction on
+file names; or maybe the name originally chosen for a directory has simply
+become misleading.</p>
+<p>
+This article describes the development of a simple <span class="underline">Python</span> script to facilitate
+relocating a source tree. It is as much &#8211; if not more &#8211; about getting
+started with <span class="underline">Python</span> as it is about solving the particular problem used as an
+example.</p>
+<a name="getting_started.statement_of_the_problem"></a><h1>
+<a name="id4748762"></a>Statement of the Problem</h1>
+<p>
+Let's suppose that we have a directory structure we wish to modify. This
+existing structure has been reviewed and the decision has been taken to re-map
+source directories as follows:</p>
+<div class="informaltable">
+<h4>
+<a name="id4748778"></a><span class="table-title">Remapping Directories</span>
+</h4>
+<table class="table">
+<colgroup>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>From A</th>
+<th>To B</th>
+</tr></thead>
+<tbody>
+<tr>
+<td><code class="literal">png</code></td>
+<td><code class="literal">graphics/thirdparty/png</code></td>
+</tr>
+<tr>
+<td><code class="literal">jpeg</code></td>
+<td><code class="literal">graphics/thirdparty/jpeg</code></td>
+</tr>
+<tr>
+<td><code class="literal">bitmap</code></td>
+<td><code class="literal">graphics/common/bitmap</code></td>
+</tr>
+<tr>
+<td><code class="literal">UserIF</code></td>
+<td><code class="literal">ui</code></td>
+</tr>
+<tr>
+<td><code class="literal">UserIF/Wgts</code></td>
+<td><code class="literal">ui/widgets</code></td>
+</tr>
+<tr>
+<td><code class="literal">os</code></td>
+<td><code class="literal">platform/os</code></td>
+</tr>
+<tr>
+<td><code class="literal">os/hpux</code></td>
+<td><code class="literal">platform/os/hpux10</code></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>
+By <span class="emphasis"><em>re-mapped</em></span>, I mean that the directory and its contents should be
+recursively moved to the new location.  So, for example:</p>
+<div class="blockquote"><blockquote class="blockquote"><p>
+    <code class="literal">UserIF/Wgts/buttons/switchbutton.cpp</code><br>
+
+    is relocated to:<br>
+
+    <code class="literal">ui/widgets/buttons/switchbutton.cpp</code>
+</p></blockquote></div>
+<p>
+Although it's straightforward create a new top-level directory and copy
+existing directories to their new locations, the problem we then face is that
+our source files will no longer build because the files they include have
+moved. In fact, some of the build files themselves need adjusting, since they
+too reference moving targets.</p>
+<a name="getting_started.an_outline_solution"></a><h1>
+<a name="id4748907"></a>An Outline Solution</h1>
+<p>
+In outline, our script will implement a two-pass algorithm:</p>
+<div class="orderedlist"><ol type="1">
+<li>
+Traverse all files in the current source tree, working out where they
+    will move to. The output of this pass is a container which maps existing
+    files to their new locations.
+</li>
+<li>
+For each file found in the first pass, perform the actual relocation,
+    updating any internal references to file paths.
+</li>
+</ol></div>
+<p>
+The actual processing for a file in the second pass depends on the type of the
+file. We can simply copy a bitmap, for example, to its new home, but when
+relocating a C/C++ source file we'll need to be more careful. This is why I've
+chosen a two-pass solution: when updating internal file references, I prefer
+look-up to recalculation.</p>
+</div>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><small></small></td>
+</tr></table>
+<hr>
+<div class="spirit-nav"><a accesskey="n" href="from_a_to_b_with_python/first_pass.html"><img src="../images/next.png" alt="Next"></a></div>
+</body>
+</html>

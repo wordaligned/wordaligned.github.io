@@ -1,0 +1,101 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>More Examples</title>
+<link rel="stylesheet" href="../../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.67.0">
+<link rel="start" href="../index.html" title="Brackets Off!">
+<link rel="up" href="../index.html" title="Brackets Off!">
+<link rel="prev" href="../index.html" title="Brackets Off!">
+<link rel="next" href="coding_standards_and_guidelines.html" title="Coding Standards and Guidelines">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><td valign="top"></td></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="../index.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="coding_standards_and_guidelines.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+<div class="section" lang="en">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="brackets_off_.more_examples"></a>More Examples</h2></div></div></div>
+<a name="examples"></a><p>
+</p>
+<div class="orderedlist"><ol type="1">
+<li><code class="code"><span class="identifier">x</span><span class="special"> =</span><span class="number"> 8</span><span class="special"> -</span><span class="number"> 4</span><span class="special"> -</span><span class="number"> 2</span></code></li>
+<li><code class="code"><span class="identifier">r</span><span class="special"> =</span><span class="identifier"> h</span><span class="special"> &lt;&lt;</span><span class="number"> 4</span><span class="special"> +</span><span class="number"> 1</span></code></li>
+<li><code class="code"><span class="identifier">str</span><span class="special"> +=</span><span class="special"> ((</span><span class="identifier">errors</span><span class="special"> ==</span><span class="number"> 0</span><span class="special">)</span><span class="special"> ?</span><span class="string"> "succeeded"</span><span class="special"> :</span><span class="string"> "failed"</span><span class="special">)</span></code></li>
+<li><code class="code"><span class="special">*</span><span class="identifier">utf</span><span class="special">++</span><span class="special"> =</span><span class="number"> 0x80</span><span class="special"> |</span><span class="identifier"> ucs</span><span class="special"> &gt;&gt;</span><span class="number"> 6</span><span class="special"> &amp;</span><span class="number"> 0x6f</span></code></li>
+</ol></div>
+<p>
+Our original <a href="../index.html#example0">example</a> contains three operators:
+assignment, addition and multiplication. These operators &#8211; indeed all
+operators &#8211; follow a strict precedence which defines the order of evaluation.
+Since multiplication has higher precedence than addition, which in turn has
+higher precedence than assigment, the expression is equivalent to:</p>
+<pre class="programlisting">
+<code class="literal">
+<span class="identifier">v</span><span class="special"> =</span><span class="special"> (</span><span class="identifier">u</span><span class="special"> +</span><span class="special"> (</span><span class="identifier">a</span><span class="special"> *</span><span class="identifier"> t</span><span class="special">))</span>
+</code>
+</pre>
+<p>
+This means the compiler can be trusted with the expression as first presented.
+No parentheses are required. Good, the language does what we expect.</p>
+<p>
+In <a href="more_examples.html#examples">Example 1</a>, subtraction binds
+more tightly (i.e. has higher precedence than) assignment, so the subtractions
+are performed first. Since all the arithmetic operators associate left to
+right, the expression is equivalent to:</p>
+<pre class="programlisting">
+<code class="literal">
+<span class="identifier">x</span><span class="special"> =</span><span class="special"> ((</span><span class="number">8</span><span class="special"> -</span><span class="number"> 4</span><span class="special">)</span><span class="special"> -</span><span class="number"> 2</span><span class="special">)</span>
+</code>
+</pre>
+<p>
+In <a href="more_examples.html#examples">Example 2</a> arithmetic operators bind more
+tightly than shift operators, so the expression is equivalent to:</p>
+<pre class="programlisting">
+<code class="literal">
+<span class="identifier">r</span><span class="special"> =</span><span class="special"> (</span><span class="identifier">h</span><span class="special"> &lt;&lt;</span><span class="special"> (</span><span class="number">4</span><span class="special"> +</span><span class="number"> 1</span><span class="special">))</span>
+</code>
+</pre>
+<p>
+Why did the programmer not write <code class="code"><span class="identifier">r</span><span class="special"> =</span><span class="identifier"> h</span><span class="special"> &lt;&lt;</span><span class="number"> 5</span></code> ? Probably because she really meant:</p>
+<pre class="programlisting">
+<code class="literal">
+<span class="identifier">r</span><span class="special"> =</span><span class="special"> (</span><span class="identifier">h</span><span class="special"> &lt;&lt;</span><span class="number"> 4</span><span class="special">)</span><span class="special"> +</span><span class="number"> 1</span>
+</code>
+</pre>
+<p>
+but bit shifting (like, say, finding the address of something, or subscripting
+an array) somehow seems closer to the machine and feels as if it ought to be
+of higher precedence than addition, so the crucial parentheses were missed.
+(This example is lifted straight from <a href="refs.html#refs.koenig"><span class="emphasis"><em>C Traps and Pitfalls</em></span></a>,
+from the section headed: <span class="emphasis"><em>Operators do not always have the precedence you want</em></span>.)</p>
+<p>
+In <a href="more_examples.html#examples">Example 3</a> the parentheses are unneccessary,
+since the comparison operators bind more tightly than the conditional
+operator, which in turn binds more tightly than the assignment operators. Do
+the parentheses help you understand the meaning of this expression? Would you
+have left them out &#8211; and if so, would one of your team-mates have complained?</p>
+<p>
+How should the fourth example be parenthesised, to make its meaning clear? It
+is equivalent to:</p>
+<pre class="programlisting">
+<code class="literal">
+<span class="special">(*(</span><span class="identifier">utf</span><span class="special">++))</span><span class="special"> =</span><span class="special"> (</span><span class="number">0x80</span><span class="special"> |</span><span class="special"> ((</span><span class="identifier">ucs</span><span class="special"> &gt;&gt;</span><span class="number"> 6</span><span class="special">)</span><span class="special"> &amp;</span><span class="number"> 0x6f</span><span class="special">))</span>
+</code>
+</pre>
+<p>
+which shows how complicated an expression looks when parentheses are added
+indiscriminately.</p>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><small>Copyright &copy; 2004 Thomas Guest</small></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="../index.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="coding_standards_and_guidelines.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

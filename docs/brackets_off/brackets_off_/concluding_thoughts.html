@@ -1,0 +1,79 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Concluding Thoughts</title>
+<link rel="stylesheet" href="../../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.67.0">
+<link rel="start" href="../index.html" title="Brackets Off!">
+<link rel="up" href="../index.html" title="Brackets Off!">
+<link rel="prev" href="coding_standards_and_guidelines.html" title="Coding Standards and Guidelines">
+<link rel="next" href="refs.html" title=" References">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><td valign="top"></td></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="coding_standards_and_guidelines.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="refs.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+<div class="section" lang="en">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="brackets_off_.concluding_thoughts"></a>Concluding Thoughts</h2></div></div></div>
+<p>
+Any effort put into becoming familiar with precedence tables is likely to pay
+off across a range of languages. For example, although C++ introduces several
+new operators over C, there are no surprises. The precedence rules remain in
+force even if the operators have been overloaded (but that's the subject of
+another article). Java operator precedence is almost a subset of C's.
+Similarly, scripting languages are generally compatible with C, even where C's
+precedence rules are slightly <a href="concluding_thoughts.html#c_precedence">screwy</a>. So, while
+<a href="http://www.perl.org" target="_top">Perl</a> introduces lower precedence versions of the
+logical operators <code class="code"><span class="keyword">not</span></code>, <code class="code"><span class="keyword">and</span></code>, and <code class="code"><span class="keyword">or</span></code>, it ensures that <code class="code"><span class="keyword">not</span></code> binds more
+tightly than <code class="code"><span class="keyword">and</span></code> which in turn binds more tightly than <code class="code"><span class="keyword">or</span></code>. Interestingly,
+in <a href="http://www.python.org" target="_top">Python</a>, where whitespace is syntactically
+significant, parentheses can be used not just to indicate order of evaluation,
+but also to wrap lengthy expressions over several lines.</p>
+<a name="c_precedence"></a><div class="informaltable"><table class="table" width="74%">
+<colgroup><col></colgroup>
+<tbody><tr><td class="blurb">
+<span class="inlinemediaobject"><img src="../../images/info.png"></span>  According to <a href="refs.html#refs.koenig">Koenig</a>, some of C's
+peculiarities can be blamed on its heritage:<br>
+
+
+ "The precedence of the C logical
+operators comes about for historical reasons. B, the predecessor of C, had
+logical operators that corresponded roughly to C's <code class="code"><span class="special">&amp;</span></code> and <code class="code"><span class="special">|</span></code> operators. Although
+they were defined to act on bits, the compiler would treat them as <code class="code"><span class="special">&amp;&amp;</span></code> and <code class="code"><span class="special">||</span></code>
+if they were in a conditional context. When the two usages were split apart in
+C, it was deemed too dangerous to change the precedence much."</td></tr></tbody>
+</table></div>
+<p>
+The more experienced I become as programmer, the fewer parentheses I use.
+Coming from a mathematical background, it was several months into my first job
+before I dared use the conditional operator &#8211; and when I finally did start
+using it, I parenthesised all the sub-expressions for safety. Later on in my
+career, when I first found myself working with the bitwise operators, again, I
+enclosed sub-expressions with brackets. As my confidence has increased, the
+brackets have peeled away.</p>
+<p>
+This, though, is simply evolution. Familiarity with the languages you use
+makes it easier to read expressions without the unnecessary noise of
+parentheses. Evolving in this way, however, leaves a programmer vulnerable
+when working on code written by a more experienced team-mate, unless the
+experienced programmer writes to a lowest common denominator.</p>
+<p>
+Surely it would be better for everyone to program to a highest common
+denominator. The operator precedence tables are a fundamental part of the
+language. The rules for using them are simple. Although there are many
+precedence levels, the operators do group logically. Update your Coding
+Standards. Prohibit unnecessary parentheses. Brackets off!</p>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><small>Copyright &copy; 2004 Thomas Guest</small></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="coding_standards_and_guidelines.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="refs.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

@@ -1,0 +1,71 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Connecting up to Word Doctor Output</title>
+<link rel="stylesheet" href="../../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.67.0">
+<link rel="start" href="../index.html" title="Soft Documentation">
+<link rel="up" href="../index.html" title="Soft Documentation">
+<link rel="prev" href="the_existing_documentation_toolchain.html" title="The Existing Documentation Toolchain">
+<link rel="next" href="other_problems.html" title="Other Problems">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><td valign="top"></td></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="the_existing_documentation_toolchain.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="other_problems.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+<div class="section" lang="en">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="soft_documentation.connecting_up_to_word_doctor_output"></a>Connecting up to Word Doctor Output</h2></div></div></div>
+<p>
+The real downside of Word Doctor was when it came to trying to connect the
+Product to the Word Doctor web pages. This job fell to me. It was a
+multi-layered integration task:</p>
+<div class="itemizedlist"><ul type="disc">
+<li>
+on a team level I would work with the technical author
+  to ensure the documentation content was correct, and contained the required
+  Help topics.
+</li>
+<li>
+on the Product side, the web-based user interface would call for help using
+  a text identifier. The Help subsystem would use the identifier to look up an
+  HTML location&#8212;a page and an anchor within that page&#8212;and it could then
+  pop up a new window viewing this location.
+</li>
+<li>
+on the documentation side, I would have to configure Word Doctor to ensure
+  its HTML output included the right locations.
+</li>
+</ul></div>
+<p>
+Unfortunately, there were problems with each of these layers.</p>
+<p>
+Personally, I got on well with the technical author, but the documentation
+tools made it extremely hard for us to work on the same file. We had to take
+it in turns or work with copies. I couldn't even fix a typo directly.</p>
+<p>
+The Word Doctor output was a frame-based collection of static HTML pages. Now,
+externally referencing a particular location in such a set of pages is
+tricky&#8212;due to the limitations of frames&#8212;so the Product's help sub-system
+had to dynamically generate a framed front page displaying the appropriate
+left and right pane each time it was called. Not too difficult, but more
+complex than strictly necessary.</p>
+<p>
+Both pages and anchors were a moving target in the Word Doctor output. Every
+time you added a new section to the document you broke most of the help
+references. Thus we found ourselves in a situation where the technical author
+wanted the Product to stabilise in order to document it and I needed the
+documentation to stabilise in order to link to it.</p>
+</div>
+<table width="100%"><tr>
+<td align="left"></td>
+<td align="right"><small>Copyright &copy; 2006 Thomas Guest</small></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="the_existing_documentation_toolchain.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="other_problems.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

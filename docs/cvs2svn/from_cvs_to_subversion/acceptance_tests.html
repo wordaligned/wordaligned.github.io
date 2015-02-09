@@ -1,0 +1,59 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Acceptance Tests</title>
+<link rel="stylesheet" href="../../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.67.0">
+<link rel="start" href="../index.html" title="From CVS to Subversion">
+<link rel="up" href="../index.html" title="From CVS to Subversion">
+<link rel="prev" href="the_problem.html" title="The Problem">
+<link rel="next" href="recovery.html" title="Recovery">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><td valign="top"></td></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="the_problem.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="recovery.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+<div class="section" lang="en">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="from_cvs_to_subversion.acceptance_tests"></a>Acceptance Tests</h2></div></div></div>
+<p>
+What makes this mistake so chastening is the fact that a basic
+acceptance test of the new repository would have been both simple and
+scriptable:</p>
+<pre class="programlisting"><code class="literal">#!/bin/sh
+cvs co <a href="http://www.nongnu.org/cvs/" target="_top">CVS</a>ARCHIVE  fromcvs           # Checkout from <a href="http://www.nongnu.org/cvs/" target="_top">CVS</a>, on the trunk
+svn co SVNREPOS/trunk fromsvn          # Checkout from SVN, on the trunk
+diff -q -r fromcvs fromsvn &gt; all_diffs # Spot the difference
+</code></pre>
+<p>
+If the all<span class="underline">diffs file is empty, the _CVS</span> and <a href="http://subversion.tigris.org/" target="_top">Subversion</a> checkouts are
+byte-for-byte compatible.</p>
+<p>
+Unfortunately the all_diffs file wasn't empty. Remember those
+keyword expansions? <a href="http://subversion.tigris.org/" target="_top">Subversion</a> is clever enough to replace <a href="http://www.nongnu.org/cvs/" target="_top">CVS</a> version
+numbers with its own revision numbers and as a result the files
+differ when checked out. Keyword expansion really is a bad idea!
+Similarly, a number of text files were different because <a href="http://subversion.tigris.org/" target="_top">Subversion</a>
+had tidied up inconsistent line endings.</p>
+<p>
+So, there were plenty of false hits as well as a list
+of files we needed to run <code class="code"><span class="identifier">cvsadmin</span><span class="special"> -</span><span class="identifier">kb</span></code> on.</p>
+<p>
+Incidentally, we could have chosen to clean up the files during import
+by passing some more parameters to <a href="http://cvs2svn.tigris.org/" target="_top">cvs2svn</a>: a suitable combination of
+<code class="code"><span class="special">--</span><span class="identifier">mime</span><span class="special">-</span><span class="identifier">types</span><span class="special">=</span><span class="identifier">FILE</span></code>, <code class="code"><span class="special">--</span><span class="identifier">eol</span><span class="special">-</span><span class="identifier">from</span><span class="special">-</span><span class="identifier">mime</span><span class="special">-</span><span class="identifier">type</span></code> and <code class="code"><span class="special">--</span><span class="identifier">no</span><span class="special">-</span><span class="keyword">default</span><span class="special">-</span><span class="identifier">eol</span></code> options
+would have done the job. We decided, though, that the proper solution
+was to fix the root cause of the problem.</p>
+</div>
+<table width="100%"><tr>
+<td align="left"></td>
+<td align="right"><small>Copyright &copy; 2006 Thomas Guest</small></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="the_problem.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="recovery.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

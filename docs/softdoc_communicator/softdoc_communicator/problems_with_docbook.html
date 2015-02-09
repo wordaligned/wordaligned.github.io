@@ -1,0 +1,128 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Problems with DocBook</title>
+<link rel="stylesheet" href="../../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.67.0">
+<link rel="start" href="../index.html" title="Soft Documentation">
+<link rel="up" href="../index.html" title="Soft Documentation">
+<link rel="prev" href="the_technical_author_departs.html" title="The Technical Author Departs">
+<link rel="next" href="docbook_in_action.html" title="DocBook in Action">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><td valign="top"></td></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="the_technical_author_departs.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="docbook_in_action.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+<div class="section" lang="en">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="softdoc_communicator.problems_with_docbook"></a>Problems with DocBook</h2></div></div></div>
+<div class="toc"><dl>
+<dt><span class="section"><a href="problems_with_docbook.html#softdoc_communicator.portability">Portability</a></span></dt>
+<dt><span class="section"><a href="problems_with_docbook.html#softdoc_communicator.volatility">Volatility</a></span></dt>
+<dt><span class="section"><a href="problems_with_docbook.html#softdoc_communicator.verbosity">Verbosity</a></span></dt>
+<dt><span class="section"><a href="problems_with_docbook.html#softdoc_communicator.control">Control</a></span></dt>
+</dl></div>
+<p>
+Most things went rather suprisingly well, but I did encounter a small
+number of hitches.</p>
+<div class="section" lang="en">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="softdoc_communicator.portability"></a>Portability</h3></div></div></div>
+<p>
+My first unpleasant surprise with the <a href="http://docbook.org" target="_top">DocBook</a> toolchain came when I
+tried to generate the printable PDF output on a Windows XP
+machine. Rather naively, perhaps, I'd assumed that since all the
+tools were Java based I'd be able to run them on any platform with a
+JVM. Not so.</p>
+<p>
+The first time I tried a Windows build, I got a two page traceback
+triggered by an exception raised in one of the graphics processing
+libraries. Fortunately, I was able to work around the problem by
+swapping the graphics library for an alternative version, apparently
+with no adverse effects.</p>
+<p>
+The incident did shake my confidence, though. It may well be true that
+open source tools give you the ultimate level of control, but you
+don't usually want to exercise it! At this stage I had only tried
+building small documents with a few images. I remained fearful that
+similar problems might recur when the manual grew larger and more
+laden with screenshots.</p>
+</div>
+<div class="section" lang="en">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="softdoc_communicator.volatility"></a>Volatility</h3></div></div></div>
+<p>
+We all know that healthy software tools are in active development, but
+this does have a downside. Some problems actually arose from the
+progression of the tools I was using. For example, I started out with
+the version of the <a href="http://docbook.org" target="_top">DocBook</a> XSL stylesheets I scavenged from my
+reference open source documentation build (version 1.65.1).</p>
+<p>
+These were more than good enough for my needs, but much of the <a href="http://docbook.org" target="_top">DocBook</a>
+documentation I was using referred to more recent distributions. In
+this case, switching to the most recent stable distribution of the XSL
+stylesheets resulted in improvements all round. Apache FOP is less
+mature though: the last stable version (as of December 2005) is
+0.20.5&#8212;hardly a version number to inspire confidence&#8212;and the
+latest release, 0.90 alpha 1, represents a break from the past. I
+anticipate problems if and when I migrate to a modern version of FOP,
+though again, I also hope for improvements.</p>
+</div>
+<div class="section" lang="en">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="softdoc_communicator.verbosity"></a>Verbosity</h3></div></div></div>
+<p>
+XML is verbose and <a href="http://docbook.org" target="_top">DocBook</a> XML is no exception. As an illustration, here
+is a section of a <a href="http://docbook.org" target="_top">DocBook</a> document:</p>
+<pre class="programlisting"><code class="literal">&lt;para&gt;
+ We needed just two output formats:
+ &lt;/para&gt;
+ &lt;itemizedlist&gt;
+ &lt;listitem&gt;
+ hard copy, printed and bound
+ &lt;/listitem&gt;
+ &lt;listitem&gt;
+ linked online web pages.
+ &lt;/listitem&gt;
+ &lt;/itemizedlist&gt;
+</code></pre>
+<p>
+XML claims to be human readable, and on one level, it is. On another
+level, though, the clunky angle brackets and obtrusive tags make the
+actual text content in the master document hard to read: the syntax
+obscures the semantics.</p>
+</div>
+<div class="section" lang="en">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="softdoc_communicator.control"></a>Control</h3></div></div></div>
+<p>
+The <a href="http://docbook.org" target="_top">DocBook</a> toolchain gave us superb control over some aspects of the
+documentation task. In other areas the controls existed but were
+tricky to locate and operate.</p>
+<p>
+For example, controlling the chunking of the HTML output was
+straightforward and could all be done using build time
+parameters&#8212;with no modifications needed to the document
+source. Similarly, controlling file and anchor names in the generated
+HTML was easy, which meant the integration between the Product and the
+online version of the manual was both stable and clean.</p>
+<p>
+Some of the printed output options don't seem so simple, especially
+for someone without a background in printing. In particular, I still
+haven't got to grips with fine control of page-breaking logic, and
+have to hope noone minds too much about tables which split awkwardly
+over pages.</p>
+</div>
+</div>
+<table width="100%"><tr>
+<td align="left"></td>
+<td align="right"><small>Copyright &copy; 2006 Thomas Guest</small></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="the_technical_author_departs.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="docbook_in_action.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

@@ -1,0 +1,260 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Second Pass</title>
+<link rel="stylesheet" href="../../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.67.0">
+<link rel="start" href="../index.html" title="From A to B with Python">
+<link rel="up" href="../index.html" title="From A to B with Python">
+<link rel="prev" href="first_pass.html" title="First Pass">
+<link rel="next" href="conclusion.html" title="Conclusion">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><td valign="top"></td></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="first_pass.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="conclusion.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+<div class="section" lang="en">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="from_a_to_b_with_python.second_pass"></a>Second Pass</h2></div></div></div>
+<a name="second_pass.main_loop"></a><h1>
+<a name="id4750987"></a>Main Loop</h1>
+<p>
+Recall that our <a href="../index.html#getting_started.statement_of_the_problem">second pass</a>
+takes each file found during the first pass and relocates it, updating any 
+internal references to file paths.</p>
+<p>
+The main loop for the second pass is:</p>
+<pre class="programlisting">
+<code class="literal">
+<span class="comment"># Create the new root directory for relocated files
+</span><span class="identifier">new_root</span><span class="special"> =</span><span class="string"> '../relocate'</span><span class="identifier">
+os</span><span class="special">.</span><span class="identifier">makedirs</span><span class="special">(</span><span class="identifier">new_root</span><span class="special">)</span><span class="comment">
+   
+# Now actually perform the relocation
+</span><span class="keyword">for</span><span class="identifier"> srcdst</span><span class="keyword"> in</span><span class="identifier"> files_map</span><span class="special">.</span><span class="identifier">items</span><span class="special">():</span><span class="identifier">
+    relocate</span><span class="special">(</span><span class="identifier">file</span><span class="special">,</span><span class="identifier"> new_root</span><span class="special">,</span><span class="identifier"> files_map</span><span class="special">)</span></code>
+</pre>
+<p>
+The function <code class="code"><span class="identifier">os</span><span class="special">.</span><span class="identifier">makedirs</span></code> recursively creates a directory path. It throws an
+exception if the directory path already exists.  We will not catch this
+exception since we want to ensure the files are being relocated to a
+clean directory.</p>
+<a name="second_pass.relocating_by_copying"></a><h1>
+<a name="id4751164"></a>Relocating by Copying</h1>
+<pre class="programlisting">
+<code class="literal">
+<span class="keyword">import</span><span class="identifier"> shutil</span><span class="keyword">
+
+def</span><span class="identifier"> relocate</span><span class="special">(</span><span class="identifier">srcdst</span><span class="special">,</span><span class="identifier"> dst_root</span><span class="special">,</span><span class="identifier"> files_map</span><span class="special">):</span><span class="string">
+    """Relocate a file, correcting internal file references."""</span><span class="identifier">
+   dst_file</span><span class="special"> =</span><span class="identifier"> os</span><span class="special">.</span><span class="identifier">path</span><span class="special">.</span><span class="identifier">join</span><span class="special">(</span><span class="identifier">dst_root</span><span class="special">,</span><span class="identifier"> srcdst</span><span class="special">[</span><span class="number">1</span><span class="special">])</span><span class="identifier">
+   dst_dir</span><span class="special"> =</span><span class="identifier"> os</span><span class="special">.</span><span class="identifier">path</span><span class="special">.</span><span class="identifier">dirname</span><span class="special">(</span><span class="identifier">dst_file</span><span class="special">)</span><span class="keyword">
+   if</span><span class="keyword"> not</span><span class="identifier"> os</span><span class="special">.</span><span class="identifier">path</span><span class="special">.</span><span class="identifier">isdir</span><span class="special">(</span><span class="identifier">dst_dir</span><span class="special">):</span><span class="identifier">
+       os</span><span class="special">.</span><span class="identifier">makedirs</span><span class="special">(</span><span class="identifier">dst_dir</span><span class="special">)</span><span class="keyword">
+   if</span><span class="identifier"> isSourceFile</span><span class="special">(</span><span class="identifier">dst_file</span><span class="special">):</span><span class="identifier">
+       relocateSource</span><span class="special">(</span><span class="identifier">srcdst</span><span class="special">,</span><span class="identifier"> dst_file</span><span class="special">,</span><span class="identifier"> files_map</span><span class="special">)</span><span class="keyword">
+   else</span><span class="special">:</span><span class="identifier">
+       shutil</span><span class="special">.</span><span class="identifier">copyfile</span><span class="special">(</span><span class="identifier">srcdst</span><span class="special">[</span><span class="number">0</span><span class="special">],</span><span class="identifier"> dst_file</span><span class="special">)</span></code>
+</pre>
+<p>
+There aren't many new features to comment on here. The first parameter to the
+function, <code class="code"><span class="identifier">srcdst</span></code>, is a <code class="code"><span class="special">(</span><span class="identifier">key</span><span class="special">,</span><span class="identifier"> value</span><span class="special">)</span></code> item from the
+<code class="code"><span class="identifier">files_map</span></code> dictionary, so <code class="code"><span class="identifier">srcdst</span><span class="special">[</span><span class="number">0</span><span class="special">]</span></code> is the path to the original file,
+and <code class="code"><span class="identifier">srcdst</span><span class="special">[</span><span class="number">1</span><span class="special">]</span></code> is the path to the relocated file, relative to the new root
+directory.</p>
+<p>
+We create the destination directory unless it already exists. Then, if our
+file is a source file, we call <code class="code"><span class="identifier">relocateSource</span><span class="special">()</span></code>; otherwise, we
+simply copy the file across.</p>
+<p>
+I admit this isn't the most object-oriented of functions. The meaning of the
+literal 0 and 1 isn't transparent, and switching on type often
+indicates unfamiliarity with polymorphism.  It isn't <a href="http://www.python.org" target="_top">Python</a> that's to
+blame here, nor a lack of familiarity with polymorphism: rather a reluctance
+on my part to add such sophistication to a simple script.</p>
+<a name="second_pass.identifying_source_files"></a><h2>
+<a name="id4751894"></a>Identifying Source Files</h2>
+<pre class="programlisting">
+<code class="literal">
+<span class="keyword">import</span><span class="identifier"> re</span><span class="keyword">
+
+def</span><span class="identifier"> isSourceFile</span><span class="special">(</span><span class="identifier">file</span><span class="special">):</span><span class="string">
+    """Return True if the input file is a C/C++ source file."""</span><span class="identifier"> 
+    src_re</span><span class="special"> =</span><span class="identifier"> re</span><span class="special">.</span><span class="identifier">compile</span><span class="special">(</span><span class="identifier">r</span><span class="string">'\.(c|h)(pp)?$'</span><span class="special">,</span><span class="identifier">
+                        re</span><span class="special">.</span><span class="identifier">IGNORECASE</span><span class="special">)</span><span class="keyword">
+    return</span><span class="identifier"> src_re</span><span class="special">.</span><span class="identifier">search</span><span class="special">(</span><span class="identifier">file</span><span class="special">)</span><span class="keyword"> is</span><span class="keyword"> not</span><span class="keyword"> None</span></code>
+</pre>
+<p>
+We identify source files using a regular expression pattern: <code class="code"><span class="identifier">r</span><span class="string">'\.(c|h)(pp)?$'</span></code>. 
+Here, the <code class="code"><span class="identifier">r</span></code> stands for raw string, which means that backslashes are not
+handled in any special way by <a href="http://www.python.org" target="_top">Python</a> &#8211; the string literal is passed directly
+on to the regular expression module.</p>
+<p>
+Regular expression patterns in <a href="http://www.python.org" target="_top">Python</a> are as powerful, concise and downright
+confusing to the uninitiated as they are elswhere.  I would say that
+subsequent use of regular expression matches is a little more friendly.</p>
+<p>
+In this case, the regex reads:</p>
+<div class="blockquote"><blockquote class="blockquote"><p><span class="emphasis"><em>match a '.' followed by either a 'c' or an 'h'
+followed by one or no 'pp's, followed by the end of the string</em></span></p></blockquote></div>
+<p>
+The <code class="code"><span class="identifier">re</span><span class="special">.</span><span class="identifier">IGNORECASE</span></code> flag tells the regex compiler to ignore case.</p>
+<p>
+So, we expect:</p>
+<pre class="programlisting">
+<code class="literal">
+<span class="keyword">assert</span><span class="special">(</span><span class="identifier">isSourceFile</span><span class="special">(</span><span class="string">'a.cpp'</span><span class="special">))</span><span class="keyword">
+assert</span><span class="special">(</span><span class="identifier">isSourceFile</span><span class="special">(</span><span class="string">'a.C'</span><span class="special">))</span><span class="keyword">
+assert</span><span class="special">(</span><span class="keyword">not</span><span class="identifier"> isSourceFile</span><span class="special">(</span><span class="string">'a.cc'</span><span class="special">))</span><span class="keyword">
+assert</span><span class="special">(</span><span class="keyword">not</span><span class="identifier"> isSourceFile</span><span class="special">(</span><span class="string">'a.cppp'</span><span class="special">))</span><span class="keyword">
+assert</span><span class="special">(</span><span class="identifier">isSourceFile</span><span class="special">(</span><span class="string">'a.cc.h'</span><span class="special">))</span></code>
+</pre>
+<p>
+This time, the assertions hold.</p>
+<a name="second_pass.relocating_source_files"></a><h1>
+<a name="id4752290"></a>Relocating Source Files</h1>
+<a name="second_pass.relocatesource"></a><h2>
+<a name="id4752298"></a>relocateSource</h2>
+<pre class="programlisting">
+<code class="literal">
+<span class="keyword">def</span><span class="identifier"> relocateSource</span><span class="special">(</span><span class="identifier">srcdst</span><span class="special">,</span><span class="identifier"> dstfile</span><span class="special">,</span><span class="identifier"> files_map</span><span class="special">):</span><span class="string">
+    """Relocate a source file, correcting included file paths to included."""</span><span class="identifier">
+    fin</span><span class="special">  =</span><span class="identifier"> file</span><span class="special">(</span><span class="identifier">srcdst</span><span class="special">[</span><span class="number">0</span><span class="special">],</span><span class="string"> 'r'</span><span class="special">)</span><span class="identifier">
+    fout</span><span class="special"> =</span><span class="identifier"> file</span><span class="special">(</span><span class="identifier">dstfile</span><span class="special">,</span><span class="string"> 'w'</span><span class="special">)</span><span class="keyword">
+    for</span><span class="identifier"> line</span><span class="keyword"> in</span><span class="identifier"> fin</span><span class="identifier">
+        fout</span><span class="special">.</span><span class="identifier">write</span><span class="special">(</span><span class="identifier">
+            processSourceLine</span><span class="special">(</span><span class="identifier">line</span><span class="special">,</span><span class="identifier">
+                              srcdst</span><span class="special">,</span><span class="identifier">
+                              files_map</span><span class="special">)</span><span class="special">
+            )</span><span class="identifier">
+   fin</span><span class="special">.</span><span class="identifier">close</span><span class="special">()</span><span class="identifier">
+   fout</span><span class="special">.</span><span class="identifier">close</span><span class="special">()</span></code>
+</pre>
+<p>
+The function <code class="code"><span class="identifier">relocateSource</span><span class="special">()</span></code> simply reads the input file line by line. Each
+line is converted and written to the output file.</p>
+<a name="second_pass.processing_a_line_of_a_source_file"></a><h2>
+<a name="id4752576"></a>Processing a Line of a Source File</h2>
+<pre class="programlisting">
+<code class="literal">
+<span class="keyword">def</span><span class="identifier"> processSourceLine</span><span class="special">(</span><span class="identifier">line</span><span class="special">,</span><span class="identifier"> srcdst</span><span class="special">,</span><span class="identifier"> files_map</span><span class="special">):</span><span class="string">
+    """Process a line from a source file, correcting included file paths."""</span><span class="identifier">
+    
+    include_re</span><span class="special"> =</span><span class="identifier"> re</span><span class="special">.</span><span class="identifier">compile</span><span class="special">(</span><span class="identifier">
+        r</span><span class="string">'^\s*#\s*include\s*"'</span><span class="identifier">
+        r</span><span class="string">'(?P&lt;inc_file&gt;\S+)'</span><span class="string">
+        '"'</span><span class="special">)</span><span class="identifier">
+        
+    match</span><span class="special"> =</span><span class="identifier"> include_re</span><span class="special">.</span><span class="identifier">match</span><span class="special">(</span><span class="identifier">line</span><span class="special">)</span><span class="keyword">
+    
+    if</span><span class="identifier"> match</span><span class="special">:</span><span class="identifier">
+        mapped_inc_file</span><span class="special"> =</span><span class="identifier"> mapIncludeFile</span><span class="special">(</span><span class="identifier">
+            match</span><span class="special">.</span><span class="identifier">group</span><span class="special">(</span><span class="string">'inc_file'</span><span class="special">),</span><span class="identifier">
+            srcdst</span><span class="special">,</span><span class="identifier">
+            files_map</span><span class="special">
+            )</span><span class="identifier">
+        line</span><span class="special"> =</span><span class="identifier"> line</span><span class="special">[:</span><span class="identifier">match</span><span class="special">.</span><span class="identifier">start</span><span class="special">(</span><span class="string">'inc_file'</span><span class="special">)]</span><span class="special"> +</span><span class="special"> \</span><span class="identifier">
+               mapped_inc_file</span><span class="special"> +</span><span class="special"> \</span><span class="identifier">
+               line</span><span class="special">[</span><span class="identifier">match</span><span class="special">.</span><span class="identifier">end</span><span class="special">(</span><span class="string">'inc_file'</span><span class="special">):]</span><span class="keyword">
+    
+    return</span><span class="identifier"> line</span></code>
+</pre>
+<p>
+The function <code class="code"><span class="identifier">processSourceLine</span></code> has a rather more complicated regex at its
+core.  Essentially we want to spot lines similar to: <code class="code"><span class="preprocessor">#include</span><span class="string"> "UserIF/Wgts/Menu.hpp"</span></code>    
+and extract the double-quoted file path. The complication is that there may be any
+amount of whitespace at several points on the line &#8211; hence the appearances of
+<code class="code"><span class="special">\</span><span class="identifier">s</span><span class="special">*</span></code>, which reads <span class="emphasis"><em>zero or more whitespace characters</em></span>.</p>
+<p>
+The three raw strings which comprise the regex will be concatenated before
+the regex is compiled in the same way that adjacent string literals in
+C/C++ get joined together in an early phase of compilation. I have split the
+string in this way to emphasise its meaning.</p>
+<p>
+The bizarre <code class="code"><span class="special">(</span>#<span class="identifier">P</span><span class="special">&lt;</span><span class="identifier">inc_file</span><span class="special">&gt;\</span><span class="identifier">S</span><span class="special">+)</span></code> syntax creates a named group:
+essentially, it allows us to identify the sub-group of a match object using
+the group name <code class="code"><span class="identifier">inc_file</span></code>.</p>
+<p>
+So, the function looks for lines of the form: <code class="code"><span class="preprocessor">#include</span><span class="string"> "inc_file"</span></code>
+then calls <code class="code"><span class="identifier">mapIncludeFile</span><span class="special">(</span><span class="identifier">inc_file</span><span class="special">...)</span></code> to find what should now be included,
+and returns: <code class="code"><span class="preprocessor">#include</span><span class="string"> "mapped_inc_file"</span></code>.</p>
+<p>
+Incidentally, I am assuming here that the angle brackets are reserved for
+inclusion of standard library files &#8211; or at least not the files we are
+moving.  That is, we don't try and alter lines such as: <code class="code"><span class="preprocessor">#include</span><span class="special"> &lt;</span><span class="identifier">vector</span><span class="special">&gt;</span></code>.</p>
+<a name="second_pass.mapping_include_files"></a><h2>
+<a name="id4753112"></a>Mapping Include Files</h2>
+<pre class="programlisting">
+<code class="literal">
+<span class="keyword">import</span><span class="identifier"> sys</span><span class="keyword">
+
+def</span><span class="identifier"> mapIncludeFile</span><span class="special">(</span><span class="identifier">inc</span><span class="special">,</span><span class="identifier"> srcdst</span><span class="special">,</span><span class="identifier"> files_map</span><span class="special">):</span><span class="string">
+    """Determine the remapped include file path."""</span><span class="comment">
+    
+    # First, obtain a path to the include file relative to
+    # the original source root
+</span><span class="keyword">    if</span><span class="identifier"> os</span><span class="special">.</span><span class="identifier">path</span><span class="special">.</span><span class="identifier">dirname</span><span class="special">(</span><span class="identifier">inc</span><span class="special">):</span><span class="keyword">
+        pass</span><span class="comment"> # Assumption 1) - "inc" is our relative path
+</span><span class="keyword">    else</span><span class="special">:</span><span class="comment">
+        # Assumption 2) The file must be located in the same
+        # directory as the source file which includes it.
+</span><span class="identifier">        inc</span><span class="special"> =</span><span class="identifier"> os</span><span class="special">.</span><span class="identifier">path</span><span class="special">.</span><span class="identifier">join</span><span class="special">(</span><span class="identifier">
+            os</span><span class="special">.</span><span class="identifier">path</span><span class="special">.</span><span class="identifier">dirname</span><span class="special">(</span><span class="identifier">srcdst</span><span class="special">[</span><span class="number">0</span><span class="special">]),</span><span class="identifier"> inc</span><span class="special">)</span><span class="comment">
+            
+    # Look up the new home for the file
+</span><span class="keyword">    try</span><span class="special">:</span><span class="identifier">
+        mapped_inc</span><span class="special"> =</span><span class="identifier"> files_map</span><span class="special">[</span><span class="identifier">inc</span><span class="special">]</span><span class="keyword">
+        if</span><span class="special"> (</span><span class="identifier">os</span><span class="special">.</span><span class="identifier">path</span><span class="special">.</span><span class="identifier">dirname</span><span class="special">(</span><span class="identifier">mapped_inc</span><span class="special">)</span><span class="special"> ==</span><span class="identifier">
+            os</span><span class="special">.</span><span class="identifier">path</span><span class="special">.</span><span class="identifier">dirname</span><span class="special">(</span><span class="identifier">srcdst</span><span class="special">[</span><span class="number">1</span><span class="special">])):</span><span class="identifier">
+            mapped_inc</span><span class="special"> =</span><span class="identifier"> os</span><span class="special">.</span><span class="identifier">path</span><span class="special">.</span><span class="identifier">basename</span><span class="special">(</span><span class="identifier">mapped_inc</span><span class="special">)</span><span class="keyword">
+    except</span><span class="identifier"> KeyError</span><span class="special">:</span><span class="keyword">
+        print</span><span class="string"> 'Failed to locate [%s] (included by [%s]) '</span><span class="special"> \</span><span class="string">
+              'relative to source root.'</span><span class="special"> %</span><span class="special"> (</span><span class="identifier">
+              include</span><span class="special">,</span><span class="identifier"> srcdst</span><span class="special">[</span><span class="number">0</span><span class="special">])</span><span class="identifier">
+        sys</span><span class="special">.</span><span class="identifier">exit</span><span class="special">(</span><span class="number">1</span><span class="special">)</span><span class="keyword">
+        
+    return</span><span class="identifier"> mapped_inc</span></code>
+</pre>
+<p>
+The function <code class="code"><span class="identifier">mapIncludeFile</span><span class="special">()</span></code> is actually quite simple, though only because
+of an assumption I have made about the way include paths are used in this
+source tree. The assumption is:</p>
+<div class="informaltable"><table class="table" width="74%">
+<colgroup><col></colgroup>
+<tbody><tr><td class="blurb">
+All <code class="code"><span class="preprocessor">#include</span></code> directives give a path name relative to the root of the source
+tree, except when the included file is present in the same directory as the
+source file &#8211; in which case the file can be included directly by its
+basename. Furthermore, there are no source files at the top-level of the
+source tree (there are only directories at this level).</td></tr></tbody>
+</table></div>
+<p>
+For source trees with more complex include paths, and correspondingly
+more subtle <code class="code"><span class="preprocessor">#include</span></code> directives, this function will need fairly heavy-weight
+adaptation. (Alternatively, run another script to simplify your include
+paths first.)</p>
+<p>
+If this assumption holds, we can easily determine the original path to the
+included files, then use our <code class="code"><span class="identifier">files_map</span></code> dictionary to look up the new path. If
+the assumption doesn't hold, then the dictionary look up will fail, raising a
+<code class="code"><span class="identifier">KeyError</span></code> exception.  The exception is caught, a diagnostic printed, then
+the script exits with status 1.</p>
+<p>
+We could test whether <code class="code"><span class="identifier">mapped_inc</span></code> is a key in our dictionary before
+attempting to use it; and if it were absent, we could simply print an error
+and continue. However, we choose to view such an absence as exceptional since
+it undermines the assumptions made by the script.  We do not wish to risk
+moving thousands of files without being sure of what we're doing.</p>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><small>Copyright &copy; 2004 Thomas Guest</small></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="first_pass.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="conclusion.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

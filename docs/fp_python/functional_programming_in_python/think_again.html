@@ -1,0 +1,89 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Think Again</title>
+<link rel="stylesheet" href="../../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.67.0">
+<link rel="start" href="../index.html" title="Functional Programming in Python">
+<link rel="up" href="../index.html" title="Functional Programming in Python">
+<link rel="prev" href="program_listing.html" title="Program Listing">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><td valign="top"></td></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="program_listing.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a>
+</div>
+<div class="section" lang="en">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="functional_programming_in_python.think_again"></a>Think Again</h2></div></div></div>
+<p>
+My thinking has changed since I first wrote this article: although I believe it
+remains a valid presentation of <a href="http://www.python.org" target="_top">Python</a>'s functional programming
+capabilities, I cannot whole-heartedly recommend the final script as a solution to the
+original problem &#8211; namely, of syntax highlighting C++ and Python source code.</p>
+<p>
+The script makes the classic mistake of confusing document <span class="emphasis"><em>structure</em></span> with
+document <span class="emphasis"><em>presentation</em></span>. That is, it simply embeds the markup tags directly:
+despite the fact that we identified keywords, comments etc, this structural information
+has been lost by the time the HTML is output. It would have been better to 
+separate structure from presentation using cascading style sheets. (See, for
+example, the <a href="../../boostbook.css" target="_top">style sheet</a> used for this article.)</p>
+<p>
+The second mistake is that it re-invents a tool which probably already exists
+somewhere out there. In fact there are several such tools which are more
+powerful, more flexible, freely available and suitably licensed.</p>
+<p>
+The third mistake is that, although the script is fine at processing blocks of
+source code, it doesn't scale very well to processing articles which embed
+such blocks, which is what I really wanted to do: for that job, regexes meet
+their match, and a parser is required.</p>
+<p>
+A superior documentation toolchain might:</p>
+<div class="orderedlist"><ol type="1">
+<li>
+Be a freely available open source solution &#8211; allowing me to modify it if
+required
+</li>
+<li>
+Accept as input a simple text format
+</li>
+<li>
+Parse this input, converting it into a standard and open format for
+structured technical documentation &#8211; such as <a href="http://www.docbook.org" target="_top">DocBook</a>.
+</li>
+<li>
+Which would then allow me to convert from <a href="http://www.docbook.org" target="_top">DocBook</a>
+into any number of formats (HTML, PDF, RTF etc) by applying the right 
+XSL stylesheets
+</li>
+</ol></div>
+<p>
+Whilst researching <a href="../../dvbcodec/index.html" target="_top">another article</a> I chanced upon
+just such a tool. <span class="bold"><strong>QuickBook</strong></span> is a <a href="http://spirit.sourceforge.net" target="_top">Spirit</a> application and can now be 
+found in the <code class="literal">boost/tools</code> subdirectory of the 
+<a href="http://www.boost.org" target="_top">Boost</a> CVS <a href="http://sourceforge.net/cvs/?group_id=7586" target="_top">repository</a>. It allows you
+to generate <a href="http://www.boost.org/doc/html/boostbook.html" target="_top">BoostBook</a>
+documentation from a WikiWiki style plain text source
+file.</p>
+<div class="informaltable"><table class="table" width="74%">
+<colgroup><col></colgroup>
+<tbody><tr><td class="blurb">
+<span class="inlinemediaobject"><img src="../../images/info.png"></span> Here is the plain text source for this article: <a href="../fp_python.qbk" target="_top">fp_python.qbk</a>
+</td></tr></tbody>
+</table></div>
+<p>
+<span class="bold"><strong>QuickBook</strong></span> is distributed as source code under the 
+<a href="http://www.boost.org" target="_top">Boost</a> software license. I helped adapt
+<span class="bold"><strong>Quickbook</strong></span> to recognise Python source code.</p>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><small>Copyright &copy; 2004 Thomas Guest</small></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="program_listing.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a>
+</div>
+</body>
+</html>

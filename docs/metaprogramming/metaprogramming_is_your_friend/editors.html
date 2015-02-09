@@ -1,0 +1,126 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title> Editors and Editing</title>
+<link rel="stylesheet" href="../../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.67.0">
+<link rel="start" href="../index.html" title="Metaprogramming is Your Friend">
+<link rel="up" href="../index.html" title="Metaprogramming is Your Friend">
+<link rel="prev" href="../index.html" title="Metaprogramming is Your Friend">
+<link rel="next" href="compilation.html" title="Compilation">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><td valign="top"></td></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="../index.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="compilation.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+<div class="section" lang="en">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="metaprogramming_is_your_friend.editors"></a> Editors and Editing</h2></div></div></div>
+<a name="editors.editor_metaprogramming"></a><h1>
+<a name="id4748871"></a>Editor Metaprogramming</h1>
+<p>
+I've already spoken about programming <a href="http://www.gnu.org/software/emacs/" target="_top">Emacs</a> to create C++ files in a
+standard format. We can compare this technique to a couple of common
+alternatives:</p>
+<div class="orderedlist"><ol type="1">
+<li>
+create an empty file then type in the standard header etc.
+</li>
+<li>
+copy an existing file which does something similar to what we want,
+      then adapt as required.
+</li>
+</ol></div>
+<p>
+The first option is tough on the fingers and few of us would fail to introduce
+a typo or two. The second is better but all too often is executed without due
+care &#8211; maybe because a programmer prefers to concentrate on what he wants
+to add rather than on what he ought to remove &#8211; and all too often leads to a
+new file which is already slightly broken: perhaps a comment remains
+which only applies to the original file, perhaps there's an incorrect
+date stamp.</p>
+<p>
+The elisp solution is an improvement. It addresses the concerns described
+above and can be tailored to fit our needs most exactly. All decent editors
+have a macro language, so the technique is portable.</p>
+<p>
+Of course, there is a downside. You have to be comfortable customising your
+editor. (Or you have to know someone who can do it for you.)</p>
+<a name="editors.batch_editing"></a><h1>
+<a name="id4748936"></a>Batch Editing</h1>
+<p>
+By <span class="emphasis"><em>batch editing</em></span> I mean the process of creating a program to edit a
+collection of source files without user intervention. This is closely related
+to <a href="editors.html#editors.editor_metaprogramming">editor metaprogramming</a> &#8211; indeed, 
+I often execute simple batch edits without leaving my editor (though the 
+editor itself may shell-out instructions to tools such as <code class="literal">find</code> and <code class="literal">sed</code>).</p>
+<p>
+Very early on in my career (we're talking early 80's) I worked with a
+programmer who preferred to edit source files in batch mode. His desk did not
+have a computer terminal on it. Instead, he would study printouts, perhaps
+marking them up in pencil, perhaps using a rubber to undo these edits, before
+finally writing &#8211; by hand &#8211; an editor batch file to apply his changes. He
+then visited a computer terminal to enter and execute this batch file.</p>
+<p>
+Even then, this was an old-fashioned way of working, yet he was clear about its
+advantages:</p>
+<div class="itemizedlist"><ul type="disc">
+<li>
+<span class="bold"><strong>Recordable:</strong></span> the batch file provides a perfect record of what it has done.
+</li>
+<li>
+<span class="bold"><strong>Reversable:</strong></span> its effects can therefore be undone, if necessary.
+</li>
+<li>
+<span class="bold"><strong>Reflective:</strong></span> by working in this reflective, careful way, he was less
+      likely to introduce errors. When system rebuilds can only be run
+      overnight, this becomes paramount.
+</li>
+</ul></div>
+<p>
+These days, builds are quicker and batch editing is more immediate. With a few
+regular expressions and a script you can alter every file in the system in
+less time than it takes to check your email. As an example, in 
+<a href="../../ab_python/index.html" target="_top">another article</a>
+I describe the development of a simple <a href="http://www.python.org" target="_top">Python</a> script to relocate
+source files into a new directory structure, taking care to adjust internal
+references to <code class="literal">#included</code> files.</p>
+<p>
+The benefits of using a script to perform this sort of operation are a
+superset of those listed above. In addition, a scripted solution beats hand
+hacking since it is:</p>
+<div class="itemizedlist"><ul type="disc">
+<li>
+<span class="bold"><strong>Reliable:</strong></span> the script can be shown to work by unit tests and by system
+      tests on small data sets. Then it can be left to do its job.
+</li>
+<li>
+<span class="bold"><strong>Efficient:</strong></span> editing dozens &#8211; perhaps hundreds &#8211; of files by hand is
+      error prone and tedious. A script can process Megabytes of source code in
+      minutes.
+</li>
+</ul></div>
+<p>
+Again, there is a downside. You have to invest time in writing the script,
+which may well require a larger investment in learning a new language. Many of
+us would regard proficiency in other languages as an upside but it may be
+difficult to make that initial investment under the usual project pressures.</p>
+<p>
+So, once again, it may end up being a team-mate who ends writes the script
+for you. Indeed, many software organisations have a dedicated <span class="emphasis"><em>Tools Group</em></span>
+which specialises in writing and customising tools for internal use during the
+development of core products. Perhaps this team could equally well be
+named a <span class="emphasis"><em>Metaprogramming Group</em></span>?</p>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><small>Copyright &copy; 2005 Thomas Guest</small></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="../index.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="compilation.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

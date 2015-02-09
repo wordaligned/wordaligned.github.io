@@ -1,0 +1,115 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title> How to Comment-Out Code</title>
+<link rel="stylesheet" href="../../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.67.0">
+<link rel="start" href="../index.html" title="Code in Comments">
+<link rel="up" href="../index.html" title="Code in Comments">
+<link rel="prev" href="../index.html" title="Code in Comments">
+<link rel="next" href="more_examples.html" title="More Examples">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><td valign="top"></td></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="../index.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="more_examples.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+<div class="section" lang="en">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="code_in_comments.howto"></a> How to Comment-Out Code</h2></div></div></div>
+<p>
+Usually it's as simple as using your editor to select a region then
+instructing it to comment out that region.</p>
+<p>
+If using C-style comments &#8211; by which I mean comments delimited by <code class="code"><span class="special">/*</span></code> and <code class="code"><span class="special">*/</span></code>
+&#8211; then bear in mind they do not nest, so you may run into problems with real
+comments in the code you want to comment out, or even with commenting-out code
+which has already been commented-out.</p>
+<p>
+I came to C++ from a C background, and remember attending a training course at
+which the presenter pointed out how easy it was to comment out C++ comments
+using C comments:</p>
+<pre class="programlisting">
+<code class="literal">
+<span class="comment">/*
+for (Surfaces::iterator sf = surfaces.begin();
+     sf != surfaces.end(); 
+     ++sf) {
+     // std::cout &lt;&lt; "Drawing: " &lt;&lt; *sf &lt;&lt; "\n";
+     sf-&gt;draw();
+}
+*/</span>
+</code>
+</pre>
+<p>
+Oh dear!</p>
+<p>
+If your editor's syntax highlighting makes it obvious that the whole loop is
+commented out, great. Would it still be obvious if, for example, you were
+viewing the source file on a remote computer via a telnet session? Or if you
+were code-reviewing a printed version of the file? Or if you had hit
+a commented-out line while searching? Or even if you were at a customer site and
+didn't have access to your favourite editor?</p>
+<p>
+The more useful thing to say about C++ comments is that they run from where
+they start until the end of the line, and therefore do not suffer from this
+nesting problem. So a C++ comment can be commented out by a C++ comment!</p>
+<pre class="programlisting">
+<code class="literal">
+<span class="comment">// for (Surfaces::iterator sf = surfaces.begin();
+//     sf != surfaces.end(); 
+//    ++sf) {
+//    // std::cout &lt;&lt; "Drawing: " &lt;&lt; *sf &lt;&lt; "\n";
+//    sf-&gt;draw();
+// }
+</span></code>
+</pre>
+<p>
+If using C-style comments, then the following style makes it clear which lines
+are part of the comment:</p>
+<pre class="programlisting">
+<code class="literal">
+<span class="comment">/* for (Surfaces::iterator sf = surfaces.begin();
+ *     sf != surfaces.end(); 
+ *    ++sf) {
+ *    // std::cout &lt;&lt; "Drawing: " &lt;&lt; *sf &lt;&lt; "\n";
+ *    sf-&gt;draw();
+ * }
+ */</span>
+</code>
+</pre>
+<p>
+If your editor does not allow you to easily comment out a lengthy region of
+code in this way then either use a better editor or read the rest of this
+article and consdier whether commenting out the code is really what's required.</p>
+<p>
+A more heavy duty way to stop a block of code from executing is to instruct
+the preprocessor to skip past it.</p>
+<pre class="programlisting">
+<code class="literal">
+<span class="preprocessor">#if</span><span class="number"> 0</span><span class="keyword">
+    for</span><span class="special"> (</span><span class="identifier">Surfaces</span><span class="special">::</span><span class="identifier">iterator</span><span class="identifier"> sf</span><span class="special"> =</span><span class="identifier"> surfaces</span><span class="special">.</span><span class="identifier">begin</span><span class="special">();</span><span class="identifier">
+         sf</span><span class="special"> !=</span><span class="identifier"> surfaces</span><span class="special">.</span><span class="identifier">end</span><span class="special">();</span><span class="special"> 
+         ++</span><span class="identifier">sf</span><span class="special">)</span><span class="special"> {</span><span class="comment">
+         // std::cout &lt;&lt; "Drawing: " &lt;&lt; *sf &lt;&lt; "\n";
+</span><span class="identifier">         sf</span><span class="special">-&gt;</span><span class="identifier">draw</span><span class="special">();</span><span class="special">
+    }</span><span class="preprocessor">
+#endif</span>
+</code>
+</pre>
+<p>
+If this technique is used, the preprocessed-out code blends perfectly with the
+executable code. Even syntax-highlighting does not expose the fact that the
+code will not be executed.</p>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><small>Copyright &copy; 2004 Thomas Guest</small></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="../index.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="more_examples.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

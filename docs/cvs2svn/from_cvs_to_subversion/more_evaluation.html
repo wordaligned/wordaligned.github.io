@@ -1,0 +1,69 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>More Evaluation</title>
+<link rel="stylesheet" href="../../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.67.0">
+<link rel="start" href="../index.html" title="From CVS to Subversion">
+<link rel="up" href="../index.html" title="From CVS to Subversion">
+<link rel="prev" href="importing_a_copy_of_the_cvs_repository.html" title="Importing a Copy of the CVS Repository">
+<link rel="next" href="the_transition_plan.html" title="The Transition Plan">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><td valign="top"></td></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="importing_a_copy_of_the_cvs_repository.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="the_transition_plan.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+<div class="section" lang="en">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="from_cvs_to_subversion.more_evaluation"></a>More Evaluation</h2></div></div></div>
+<p>
+To our surprise and disappointment, the speed of clean checkouts (by
+"clean" I mean checking out the entire codebase into a new directory,
+rather than simply updating an existing working copy) was
+underwhelming. <a href="http://www.nongnu.org/cvs/" target="_top">CVS</a> sets a hard act to follow here since one of its
+strengths is its speed, but I simply couldn't imagine <a href="http://subversion.tigris.org/" target="_top">Subversion</a>
+claiming to be a compelling replacement for <a href="http://www.nongnu.org/cvs/" target="_top">CVS</a> unless it was equally
+fast. In fact, head-to-head, on the same platform, our tests showed
+<a href="http://www.nongnu.org/cvs/" target="_top">CVS</a> to be measurably quicker for clean checkouts.</p>
+<p>
+What the trials did indicate was that disk access rather than network
+bandwidth was the main source of pain. Every time it checks out a
+file, <a href="http://subversion.tigris.org/" target="_top">Subversion</a> replicates the base version of that file and its
+properties <sup>[<a name="id4753897" href="#ftn.id4753897">1</a>]</sup> into a hidden .svn directory, so for every 100 files you
+checkout, at least 500 files will be created on disk.</p>
+<p>
+This replication is quite deliberate and is based on the principle
+that disk-space is cheaper than network bandwidth. <a href="http://subversion.tigris.org/" target="_top">Subversion</a> makes
+full use of the cached file copies in your working area&#8212;so, for
+example, common operations such as viewing your modifications to a
+file, or reverting these modifications, do not require any interaction
+with the server.</p>
+<p>
+What we found, then, on the performance side, was that the routine
+management of a working copy was much quicker. Clean checkouts took
+time, yes, but use of the <code class="literal">svn update</code> command keeps these to a
+minimum. In fact, the only user who frequently performed clean
+checkouts was our overnight automatic build.</p>
+<p>
+Everything else went very well. Clearly, the authors of <a href="http://subversion.tigris.org/" target="_top">Subversion</a> had
+done a great job in fixing the problems with <a href="http://www.nongnu.org/cvs/" target="_top">CVS</a>, and they'd done so
+-- at least from a user's perspective&#8212;by simplifying it.</p>
+<div class="footnotes">
+<br><hr width="100" align="left">
+<div class="footnote"><p><sup>[<a name="ftn.id4753897" href="#id4753897">1</a>] </sup>"Properties" is the <a href="http://subversion.tigris.org/" target="_top">Subversion</a> term for
+metadata associated with a file&#8212;such as whether it's executable,
+for example.</p></div>
+</div>
+</div>
+<table width="100%"><tr>
+<td align="left"></td>
+<td align="right"><small>Copyright &copy; 2006 Thomas Guest</small></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="importing_a_copy_of_the_cvs_repository.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="the_transition_plan.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

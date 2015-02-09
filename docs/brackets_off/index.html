@@ -1,0 +1,87 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Brackets Off!</title>
+<link rel="stylesheet" href="../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.67.0">
+<link rel="start" href="index.html" title="Brackets Off!">
+<link rel="next" href="brackets_off_/more_examples.html" title="More Examples">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><td valign="top"></td></table>
+<hr>
+<div class="spirit-nav"><a accesskey="n" href="brackets_off_/more_examples.html"><img src="../images/next.png" alt="Next"></a></div>
+<div class="article" lang="en">
+<div class="titlepage">
+<div>
+<div><h2 class="title">
+<a name="brackets_off_"></a>Brackets Off!</h2></div>
+<div><div class="author"><h3 class="author">
+<span class="firstname">Thomas</span> <span class="surname">Guest</span>
+</h3></div></div>
+<div><p class="copyright">Copyright &copy; 2004 Thomas Guest</p></div>
+</div>
+<hr>
+</div>
+<div class="toc">
+<p><b>Table of Contents</b></p>
+<dl>
+<dt><span class="section"><a href="index.html#brackets_off_.introduction">Introduction</a></span></dt>
+<dt><span class="section"><a href="brackets_off_/more_examples.html">More Examples</a></span></dt>
+<dt><span class="section"><a href="brackets_off_/coding_standards_and_guidelines.html">Coding Standards and Guidelines</a></span></dt>
+<dt><span class="section"><a href="brackets_off_/concluding_thoughts.html">Concluding Thoughts</a></span></dt>
+<dt><span class="section"><a href="brackets_off_/refs.html"> References</a></span></dt>
+</dl>
+</div>
+<div class="section" lang="en">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="brackets_off_.introduction"></a>Introduction</h2></div></div></div>
+<a name="example0"></a><p>
+
+The mathematical formula:</p>
+<pre class="programlisting">
+<code class="literal">
+<span class="identifier">v</span><span class="special"> =</span><span class="identifier"> u</span><span class="special"> +</span><span class="identifier"> at</span>
+</code>
+</pre>
+<p>
+calculates the speed, <code class="code"><span class="identifier">v</span></code>, of an object, with initial speed <code class="code"><span class="identifier">u</span></code> and constant
+acceleration <code class="code"><span class="identifier">a</span></code>, after time <code class="code"><span class="identifier">t</span></code>. Placing the <code class="code"><span class="identifier">a</span></code> next to the <code class="code"><span class="identifier">t</span></code> is a convenient
+shorthand for <span class="emphasis"><em>multiply <code class="code"><span class="identifier">a</span></code> by <code class="code"><span class="identifier">t</span></code></em></span>, which also makes it apparent that the
+multiplication must be done before the addition.</p>
+<p>
+When the same formula is written in C, the multiplication operator needs
+explicit representation:</p>
+<pre class="programlisting">
+<code class="literal">
+<span class="identifier">v</span><span class="special"> =</span><span class="identifier"> u</span><span class="special"> +</span><span class="identifier"> a</span><span class="special"> *</span><span class="identifier"> t</span>
+</code>
+</pre>
+<p>
+The layout of this expression no longer makes it clear that the multiplication
+should be done before the addition, so a programmer might choose to
+parenthesise:</p>
+<pre class="programlisting">
+<code class="literal">
+<span class="identifier">v</span><span class="special"> =</span><span class="identifier"> u</span><span class="special"> +</span><span class="special"> (</span><span class="identifier">a</span><span class="special"> *</span><span class="identifier"> t</span><span class="special">)</span>
+</code>
+</pre>
+<p>
+Are these parentheses required to guarantee correct evaluation of <code class="code"><span class="identifier">v</span></code>? If not,
+should they be included anyway, to help convey the meaning of the expression?
+How can coding standards help with such choices?</p>
+<p>
+This article aims to answer these questions. It first presents some examples
+of the operator precedence and associativity rules in action, then offers some
+guidelines on when to parenthesise expressions, and finally argues that these
+guidelines should be replaced by a single rule.</p>
+</div>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><small></small></td>
+</tr></table>
+<hr>
+<div class="spirit-nav"><a accesskey="n" href="brackets_off_/more_examples.html"><img src="../images/next.png" alt="Next"></a></div>
+</body>
+</html>

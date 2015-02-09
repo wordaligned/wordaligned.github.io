@@ -1,0 +1,426 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Use Cases And Alternatives</title>
+<link rel="stylesheet" href="../../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.67.0">
+<link rel="start" href="../index.html" title="The Case Against TODO">
+<link rel="up" href="../index.html" title="The Case Against TODO">
+<link rel="prev" href="ask_the_code.html" title="Ask The Code">
+<link rel="next" href="test_frameworks.html" title="Test Frameworks">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><td valign="top"></td></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="ask_the_code.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="test_frameworks.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+<div class="section" lang="en">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="todo.use_cases_and_alternatives"></a>Use Cases And Alternatives</h2></div></div></div>
+<div class="toc"><dl>
+<dt><span class="section"><a href="use_cases_and_alternatives.html#todo.place_holders">Place Holders</a></span></dt>
+<dt><span class="section"><a href="use_cases_and_alternatives.html#todo.generated_code">Generated Code</a></span></dt>
+<dt><span class="section"><a href="use_cases_and_alternatives.html#todo.work_in_progress">Work-in-progress</a></span></dt>
+<dt><span class="section"><a href="use_cases_and_alternatives.html#todo.notes_to_self">Notes to Self</a></span></dt>
+<dt><span class="section"><a href="use_cases_and_alternatives.html#todo.latent_defects">Latent Defects</a></span></dt>
+<dt><span class="section"><a href="use_cases_and_alternatives.html#todo.grand_designs">Grand Designs</a></span></dt>
+<dt><span class="section"><a href="use_cases_and_alternatives.html#todo.future_optimisations">Future Optimisations</a></span></dt>
+<dt><span class="section"><a href="use_cases_and_alternatives.html#todo.the_hideous_hack">The Hideous Hack</a></span></dt>
+</dl></div>
+<div class="section" lang="en">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="todo.place_holders"></a>Place Holders</h3></div></div></div>
+<p>
+In another <a href="http://wordaligned.org/metaprogramming/index.html" target="_top">article</a>, I describe my use of an Emacs <code class="code"><span class="identifier">elisp</span></code> program to generate a
+skeleton C++ file, which&#8212;amongst other things&#8212;inserts
+placeholders for <code class="code"><span class="identifier">Doxygen</span></code> comments.</p>
+<p>
+These placeholders had <code class="code"><span class="identifier">TODO</span></code>s in them for me to fill in. Or at least they
+used to! I have now decided I would rather leave a class undocumented than 
+have it ever look like this:</p>
+<pre class="programlisting">
+<code class="literal">
+<span class="comment">/**
+ * TODO write a description of MyNewClass.
+ */</span><span class="keyword">
+class</span><span class="identifier"> MyNewClass</span><span class="special"> {</span><span class="special">
+    ....</span><span class="special">
+};</span>
+</code>
+</pre>
+<p>
+The <code class="code"><span class="identifier">TODO</span></code> in the example above serves no useful purpose&#8212;I'm well aware the
+new class needs describing, <code class="code"><span class="identifier">Doxygen</span></code> will warn me should I forget&#8212;and as
+a consequence my <code class="code"><span class="identifier">elisp</span></code> now generates smaller but better-formed skeleton
+files. This reflects more accurately the way I aspire to work: no
+broken code.</p>
+<p>
+While we're on the subject, note that editor macros make it all too easy to
+create unfinished or extravagent comments. A block of asterisks is a poor way
+to fill a source file:</p>
+<pre class="programlisting">
+<code class="literal">
+<span class="comment">/* * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *                                                     *
+ *           M Y   N E W    C L A S S                  *
+ *                                                     *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * */</span>
+</code>
+</pre>
+</div>
+<div class="section" lang="en">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="todo.generated_code"></a>Generated Code</h3></div></div></div>
+<p>
+My <code class="code"><span class="identifier">elisp</span></code> metaprogram is of course a code-generator. When I realised it was
+producing broken output I stepped in and fixed it. With third-party code
+generators we may not be so lucky.</p>
+<p>
+Consider a GUI builder which allows us to design our user interface and map
+buttons events to actions. The output of this builder is some auto-generated
+code with placeholders:</p>
+<pre class="programlisting">
+<code class="literal">
+<span class="keyword">void</span><span class="identifier"> MyDialog</span><span class="special">::</span><span class="identifier">OnButtonClick</span><span class="special">(</span><span class="identifier">Button</span><span class="identifier"> button</span><span class="special">)</span><span class="special"> {</span><span class="comment">
+    // TODO. Insert button action code here.
+</span><span class="special">}</span>
+</code>
+</pre>
+<p>
+Clearly there's a potential problem if the auto-generation is repeated. Will
+any callbacks we implement be replaced with <code class="code"><span class="identifier">TODO</span></code>'s?</p>
+<p>
+There's not much we can do about this&#8212;unless we are GUI builder writers, in
+which case we might consider better ways to separate the generated code from
+the application-specific implementation. (See [Reference Brown] for a more
+detailed discussion of this issue.)</p>
+<p>
+Perhaps this is why many seasoned GUI developers drop the framework early on,
+preferring the control they get from hand-crafted code?</p>
+</div>
+<div class="section" lang="en">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="todo.work_in_progress"></a>Work-in-progress</h3></div></div></div>
+<p>
+Suppose a programmer creates a new class, <code class="code"><span class="identifier">NewClass</span></code>, whose interface offers
+clients, amongst other things, a pair of serialization functions:</p>
+<pre class="programlisting">
+<code class="literal">
+<span class="identifier">NewClass</span><span class="special"> {</span><span class="special">
+    ....</span><span class="keyword">
+public</span><span class="special">:</span><span class="comment"> // Serialization 
+</span><span class="keyword">    void</span><span class="identifier"> put</span><span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">ostream</span><span class="special"> &amp;</span><span class="identifier"> put_to</span><span class="special">)</span><span class="keyword"> const</span><span class="special">;</span><span class="keyword">
+    void</span><span class="identifier"> get</span><span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">istream</span><span class="special"> &amp;</span><span class="identifier"> get_from</span><span class="special">);</span><span class="special">
+    ....</span><span class="special">
+};</span>
+</code>
+</pre>
+<p>
+The output function is quickly coded up. The input function turns out to be
+rather trickier. Now, the programmer sensibly wishes to put her
+work-in-progress into the source management system as soon as possible. She
+checks in an empty implementation:</p>
+<pre class="programlisting">
+<code class="literal">
+<span class="keyword">void</span><span class="identifier"> NewClass</span><span class="special">::</span><span class="identifier">get</span><span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">istream</span><span class="special"> &amp;</span><span class="identifier"> get_from</span><span class="special">)</span><span class="special"> {</span><span class="comment">
+    // TODO
+</span><span class="special">}</span>
+</code>
+</pre>
+<p>
+Here, we understand the <code class="code"><span class="identifier">TODO</span></code> to mean that, although the code compiles, the
+implementation is incomplete. Client code shouldn't try to <code class="code"><span class="identifier">get</span></code> instances of
+this new class just yet.</p>
+<p>
+The trouble is, as far as client code is concerned&#8212;at both compile and run
+time&#8212;the comment has no effect. It's not hard to imagine a scenario where
+we accidentally end up reading in a <code class="code"><span class="identifier">NewClass</span></code>, leading to some unwanted
+effect downstream, possibly in an apparently unrelated piece of code.</p>
+<p>
+Any time spent tracking down such a problem has been wasted. The moment the
+<code class="code"><span class="identifier">TODO</span></code> was written, we were aware of its exact location and cause.</p>
+<p>
+A better technique is to call a function:</p>
+<pre class="programlisting">
+<code class="literal">
+<span class="keyword">void</span><span class="identifier"> NewClass</span><span class="special">::</span><span class="identifier">get</span><span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">istream</span><span class="special"> &amp;</span><span class="identifier"> from</span><span class="special">)</span><span class="keyword"> const</span><span class="special"> {</span><span class="identifier">
+    NotYetImplemented</span><span class="special">();</span><span class="special">
+}</span>
+</code>
+</pre>
+<p>
+Here, <code class="code"><span class="identifier">NotYetImplemented</span><span class="special">()</span></code> might fire an assertion, raise an exception, or
+log an error message. At the very simplest, we could put a rough
+and ready macro into service:</p>
+<pre class="programlisting">
+<code class="literal">
+<span class="preprocessor">#define</span><span class="identifier"> NotYetImplemented</span><span class="special">()</span><span class="identifier"> assert</span><span class="special">(!</span><span class="string">"Not yet implemented!"</span><span class="special">)</span>
+</code>
+</pre>
+<p>
+As usual, the move from comment to code improves things. Now the system offers
+more useful diagnostics in the event of an unimplemented function being
+called: but it won't save us from trouble if this event happens once the
+software has been shipped. We are still reliant on someone
+remembering to finish what got started. Here, test-driven development
+techniques are invaluable. They are so important they merit fuller discussion
+later in this article.</p>
+</div>
+<div class="section" lang="en">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="todo.notes_to_self"></a>Notes to Self</h3></div></div></div>
+<p>
+Consider the following struct:</p>
+<pre class="programlisting">
+<code class="literal">
+<span class="keyword">struct</span><span class="identifier"> FileSize</span><span class="special"> {</span><span class="comment"> // TODO 64 bit
+</span><span class="keyword">    unsigned</span><span class="keyword"> long</span><span class="identifier"> ms_4_bytes</span><span class="special">;</span><span class="keyword">
+    unsigned</span><span class="keyword"> long</span><span class="identifier"> ls_4_bytes</span><span class="special">;</span><span class="special">  
+};</span>
+</code>
+</pre>
+<p>
+I classify this <code class="code"><span class="identifier">TODO</span></code> as a note-to-self since it may not be obvious to anyone
+but the programmer who wrote the comment exactly what should be done to
+the code on a 64 bit platform. If we <code class="code"><span class="identifier">grep</span></code> around surrounding source
+files, we'll probably find a few similar comments and get a better idea of
+what's required.</p>
+<p>
+Sometimes it's even more clear that we're dealing with a note-to-self.</p>
+<pre class="programlisting">
+<code class="literal">
+<span class="keyword">struct</span><span class="identifier"> FileSize</span><span class="special"> {</span><span class="comment"> // TODO 64 bit. TAG
+</span><span class="special">    ....</span><span class="special">
+};</span>
+</code>
+</pre>
+<p>
+Here, the author uses his initials to stake a claim on the <code class="code"><span class="keyword">struct</span></code>. He
+seems to be saying, "I know what needs doing, and I'll probably be the one who
+does it". Ideally, of course, when we undertake a 64 bit port, he will still
+be around to tie up these loose ends; even if he isn't, he has left us some
+useful pointers.</p>
+<p>
+This isn't a bad use of <code class="code"><span class="identifier">TODO</span></code>. It's certainly preferable to the programmer
+keeping the <code class="code"><span class="identifier">TODO</span></code> list in his head, or even in his log book. The information is
+where it needs to be, often down to individual lines of code. My only quibble
+is with the note-to-self attitude. When we check in code, we release it
+to a wider audience; we are publishing our work. These notes-to-self should
+really be notes-to-everyone.</p>
+<p>
+In an ideal world, then, there will be a little more documentation explaining
+the porting task in more detail. Pair-programming, peer review and open source
+development can help us maintain a disciplined approach.</p>
+</div>
+<div class="section" lang="en">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="todo.latent_defects"></a>Latent Defects</h3></div></div></div>
+<p>
+Suppose we're digging around some legacy code and we discover the following
+bizarre integer literal in an assignment:</p>
+<pre class="programlisting">
+<code class="literal">
+<span class="identifier">flags</span><span class="special"> &amp;=</span><span class="number"> 0xFFFFFFF7</span><span class="special">;</span>
+</code>
+</pre>
+<p>
+What to do? Evidently bit three of the <code class="code"><span class="keyword">unsigned</span><span class="keyword"> int</span><span class="identifier"> flags</span></code> variable is
+being cleared, but so are bits thirty-two and above. Is this the intended
+behaviour?</p>
+<p>
+Now, the code in question is regarded as sound. It works. Target
+platforms have always had thirty-two bit <code class="code"><span class="keyword">int</span></code>s, and will continue to do so for
+the forseeable future.</p>
+<p>
+We could make a note in the code and move on:</p>
+<pre class="programlisting">
+<code class="literal">
+<span class="identifier">flags</span><span class="special"> &amp;=</span><span class="number"> 0xFFFFFFF7</span><span class="special">;</span><span class="comment"> // FIXME this assumes 32 bit ints
+</span></code>
+</pre>
+<p>
+If we're feeling less confident, the note might read:</p>
+<pre class="programlisting">
+<code class="literal">
+<span class="identifier">flags</span><span class="special"> &amp;=</span><span class="number"> 0xFFFFFFF7</span><span class="special">;</span><span class="comment"> // TODO doesn't this assume 32 bit ints !?
+</span></code>
+</pre>
+<p>
+Or, if we're feeling more confident, we make the fix directly:</p>
+<pre class="programlisting">
+<code class="literal">
+<span class="identifier">flags</span><span class="special"> &amp;=</span><span class="special"> ~(</span><span class="number">1U</span><span class="special"> &lt;&lt;</span><span class="number"> 3</span><span class="special">);</span>
+</code>
+</pre>
+<div class="sidebar">
+<p class="title"><b>Legacy code</b></p>
+I haven't defined what I mean by legacy code here&#8212;but the risk
+associated with change is surely a defining characteristic. In his book
+<span class="emphasis"><em>Working Effectively with Legacy Code</em></span>, Michael Feathers
+chooses a specific and objective definition: legacy code is code
+which has no unit tests. He goes on to offer some sound advice on how to
+work with such code: that is, how to put it under test. Once the tests are
+in place, the risks associated with change reduce.</div>
+<p>
+Personally, I dislike adding comments as shown above. Yes, it's better than
+ignoring the problem, but only marginally. By adding a comment we're ducking
+the issue. On the other hand it's also risky to modify legacy code even when
+we think we're fixing it. Who knows what
+compensating code there might be elsewhere in the system?</p>
+<p>
+A more responsible reaction is to dig a little deeper and find exactly how
+pervasive the problem is. The assumption that <code class="code"><span class="keyword">int</span></code>s occupy thirty-two bits
+may cut across many lines in many files&#8212;and yet, as stated earlier, this
+assumption may actually be reasonable, at least for the forseeable future. Not
+all code needs to be portable.</p>
+<p>
+Even if we are prepared to continue with this assumption about target
+platforms, the important thing is not to throw away our insight. With barely
+any extra effort we can replace the <code class="code"><span class="identifier">TODO</span></code> with a 
+<a href="http://boost.org/doc/html/boost_staticassert.html" target="_top">compile-time assertion</a>:</p>
+<pre class="programlisting">
+<code class="literal">
+<span class="identifier">BOOST_STATIC_ASSERT</span><span class="special">(</span><span class="keyword">sizeof</span><span class="special">(</span><span class="keyword">int</span><span class="special">)</span><span class="special"> *</span><span class="identifier"> CHAR_BIT</span><span class="special"> ==</span><span class="number"> 32</span><span class="special">);</span>
+</code>
+</pre>
+<p>
+With this assertion in place, the code won't even compile if we try and port to
+a platform which doesn't meet this assumption.</p>
+<p>
+On the other hand, if digging deeper reveals more latent defects, and if
+we already have reason to believe the legacy code is in poor shape, then more
+radical action may be needed (see Sidebar, Legacy Code).</p>
+</div>
+<div class="section" lang="en">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="todo.grand_designs"></a>Grand Designs</h3></div></div></div>
+<p>
+At the other end of the scale are the <code class="code"><span class="identifier">TODO</span></code>s which claim a glorious
+future for a sound&#8212;if straightforward&#8212;block of code.</p>
+<pre class="programlisting">
+<code class="literal">
+<span class="comment">// TODO use an adaptive search algorithm:
+// 1) keep a log of past commands
+// 2) when the system is idle, review this log to predict the next command
+// 3) pre-fetch the results of the predicted command.
+// This should make the UI more responsive.
+</span></code>
+</pre>
+<p>
+Let's hope this ingenious scheme isn't attempted until careful analysis shows
+that it really is necessary and calibrated test runs prove that it really can
+improve response times.</p>
+<p>
+Until then, this particular <code class="code"><span class="identifier">TODO</span></code> is simply an incitement to over-engineering.</p>
+</div>
+<div class="section" lang="en">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="todo.future_optimisations"></a>Future Optimisations</h3></div></div></div>
+<p>
+Closely related to Grand Designs are those points in a code-base where a
+progammer uses <code class="code"><span class="identifier">TODO</span></code> to indicate where a sub-optimal solution has been used.
+Maybe a hand-crafted container might offer client code quicker lookups
+than the one which was picked, for convenience, from the C++ Standard
+Library.</p>
+<pre class="programlisting">
+<code class="literal">
+<span class="keyword">typedef</span><span class="identifier"> std</span><span class="special">::</span><span class="identifier">map</span><span class="special">&lt;</span><span class="identifier">person</span><span class="special">,</span><span class="identifier"> phone_number</span><span class="special">&gt;</span><span class="identifier"> phone_book</span><span class="special">;</span><span class="comment"> 
+// TODO replace with a hash map for efficiency
+</span></code>
+</pre>
+<p>
+This <code class="code"><span class="identifier">TODO</span></code> looks reasonable enough, but again I think it may lead us astray.
+Why should we consider making this replacement? Why should the suggestion be
+repeated every time we look at this code?</p>
+<p>
+If we do find our code runs too slowly we need to measure first. The
+hand-rolled hash map might make no perceptible difference; but simplifying the
+arithmetic in that innocent looking loop the profiler warned us about might
+realise a 50% speed-up with far less effort.</p>
+</div>
+<div class="section" lang="en">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="todo.the_hideous_hack"></a>The Hideous Hack</h3></div></div></div>
+<div class="sidebar">
+<p class="title"><b>Broken Windows</b></p>
+In <span class="emphasis"><em>The Pragmatic Programmer: From Journeyman to Master</em></span>
+Andrew Hunt and Dave Thomas advise us not to live with broken
+windows:<br>
+
+"One broken window, left unrepaired for any substantial length of time,
+instills in the inhabitants of the building a sense of abandonment&#8212;a
+sense that the powers that be don't care about the building. So another
+window gets broken. People start littering. Graffiti appears. Serious
+structural damage begins. In a relatively short space of time, the
+building becomes damaged beyond the owner's desire to fix it, and the
+sense of abandonment becomes reality."
+<br><br>
+
+Hunt and Thomas suggest the same is true of software: when we
+discover something is broken, we must repair it promptly. Deferring the
+repair work with a <code class="code"><span class="identifier">TODO</span></code> or a <code class="code"><span class="identifier">FIXME</span></code> risks making things worse. The next
+programmer to visit the code is unlikely to make the fix, but he may well
+be encouraged to adopt <code class="code"><span class="identifier">TODO</span></code> to defer the treatment of similar problems
+elsewhere.</div>
+<p>
+Consider the following scenario. Testing reveals that a peculiar --
+but reproducible&#8212;combination of events can lead to deadlock. A
+SHOWSTOPPER defect is raised and assigned to some unfortunate
+programmer. The programmer must delay her current task to
+investigate. After a couple of frustrating days of poring over log
+files she narrows the problem down. It looks very like a race
+condition in a particular function.</p>
+<p>
+To test her suspicions, she injects a ten millisecond delay into one of the
+calling threads. The defect goes away!</p>
+<p>
+Armed with this evidence, she consults the programmers involved. The original
+author of the function has nothing helpful to say&#8212;clearly it's the client
+code (which does the synchronisation) which is at fault. Equally unhelpfully,
+the authors of the client code suggest the proper solution is to move
+responsibility for synchronisation into the function itself.</p>
+<p>
+All this blame-storming is holding up development. The project manager
+makes the call: check in the ten millisecond delay, change the defect
+to LOW priority, get on with new features.</p>
+<p>
+I don't think it will come as a surprise to find out that the code still reads
+as follows:</p>
+<pre class="programlisting">
+<code class="literal">
+<span class="identifier">Sleep</span><span class="special">(</span><span class="number">10</span><span class="special">);</span><span class="comment"> // HACK. Workaround a race condition.
+           // See DEFECT 5678 for details.
+</span></code>
+</pre>
+<p>
+Nor should it surprise us to learn that the defect hasn't really gone away,
+it has just gone under cover. The software still deadlocks. Less often, less
+reproducibly, but just as disastrously.</p>
+<p>
+This article is about the use of <code class="code"><span class="identifier">TODO</span></code>, not dysfunctional development teams.
+A proper solution will involve the organisation as much as the code-base, and
+will have to remain beyond the scope of this article.</p>
+<p>
+Clearly, though, something very wrong has happened. I'm not claiming that
+<code class="code"><span class="identifier">TODO</span></code>&#8212;or, in this case, its unsavoury relative, <code class="code"><span class="identifier">HACK</span></code>&#8212;is to blame.
+What I do suggest is that this use of <code class="code"><span class="identifier">HACK</span></code> opens the door (breaks the window
+perhaps?) to similar abuse in future. When we introduce such
+code into our system we sanction the approach it takes, inviting more of the
+same.</p>
+<p>
+Sure enough, as features continue to be added, we find more and more
+Sleep()s, HACKs and TODOs attempting to disguise a broken threading
+model.</p>
+</div>
+</div>
+<table width="100%"><tr>
+<td align="left"></td>
+<td align="right"><small>Copyright &copy; 2004-2006 Thomas Guest</small></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="ask_the_code.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="test_frameworks.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

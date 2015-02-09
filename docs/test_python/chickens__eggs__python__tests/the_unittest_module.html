@@ -1,0 +1,132 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>The Unittest Module</title>
+<link rel="stylesheet" href="../../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.67.0">
+<link rel="start" href="../index.html" title="Chickens, Eggs, Python, Tests">
+<link rel="up" href="../index.html" title="Chickens, Eggs, Python, Tests">
+<link rel="prev" href="../index.html" title="Chickens, Eggs, Python, Tests">
+<link rel="next" href="chickens__eggs__python__tests.html" title="Chickens, Eggs, Python, Tests">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><td valign="top"></td></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="../index.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="chickens__eggs__python__tests.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+<div class="section" lang="en">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="chickens__eggs__python__tests.the_unittest_module"></a>The Unittest Module</h2></div></div></div>
+<p>
+As already mentioned, the <code class="code"><span class="identifier">unittest</span></code> module is <a href="http://www.python.org" target="_top">Python</a>'s standard unit
+testing module. According to the <a href="http://www.python.org" target="_top">Python</a> documentation this testing
+framework:</p>
+<div class="blockquote"><blockquote class="blockquote"><p><span class="emphasis"><em>... is a <a href="http://www.python.org" target="_top">Python</a> language version of JUnit, by Kent Beck and Erich Gamma.
+       JUnit is, in turn, a Java version of Kent's Smalltalk testing
+       framework.</em></span></p></blockquote></div>
+<p>
+So, we can expect a lightweight test framework which will complement an
+iterative style of development, where tests are written alongside (in advance
+of, preferably) new functionality, and where continual testing catches
+regressions early.</p>
+<p>
+I do not intend to detail the capabilities of <code class="code"><span class="identifier">unittest</span></code> here since the
+official documentation does the job far better. There's quite a lot to it, but
+&#8211; in keeping with the <a href="http://www.python.org" target="_top">Python</a> 
+<a href="refs.html#refs.python_design_principles">design principles</a> &#8211; it's about as simple as 
+it can be. Before proceeding to use the
+module for ourselves, though, let's pause to note that <a href="http://www.python.org" target="_top">Python</a> itself ships
+with a comprehensive suite of unit tests; and there's no better way to see
+<code class="code"><span class="identifier">unittest</span></code> in action than to run these tests. You'll find them in the
+<code class="code"><span class="identifier">Lib</span><span class="special">/</span><span class="identifier">test</span></code> subdirectory of your <a href="http://www.python.org" target="_top">Python</a> installation. Refer to the README
+file for details.</p>
+<a name="the_unittest_module.creating_unit_tests_for_cpp2html"></a><h1>
+<a name="id4748918"></a>Creating Unit Tests for Cpp2html</h1>
+<p>
+Recall the outline form of our C++ markup function:</p>
+<pre class="programlisting">
+<code class="literal">
+<span class="keyword">def</span><span class="identifier"> cpp2html</span><span class="special">(</span><span class="identifier">cpp_src</span><span class="special">):</span><span class="string">
+    """Return C++ source code marked up using html."""</span><span class="special">
+    
+    ....</span><span class="identifier"> 
+    
+    markup_rules</span><span class="special"> =</span><span class="special"> (</span><span class="special">
+        (</span><span class="identifier">comment_pattern</span><span class="special">,</span><span class="keyword">
+         lambda</span><span class="identifier"> s</span><span class="special">:</span><span class="identifier"> colour</span><span class="special">(</span><span class="identifier">italics</span><span class="special">(</span><span class="identifier">s</span><span class="special">),</span><span class="string"> 'red'</span><span class="special">)),</span><span class="special">
+        (</span><span class="identifier">builtin_pattern</span><span class="special">,</span><span class="keyword">
+         lambda</span><span class="identifier"> s</span><span class="special">:</span><span class="identifier"> colour</span><span class="special">(</span><span class="identifier">s</span><span class="special">,</span><span class="string"> 'blue'</span><span class="special">)),</span><span class="special">
+        (</span><span class="identifier">keyword_pattern</span><span class="special">,</span><span class="keyword">
+         lambda</span><span class="identifier"> s</span><span class="special">:</span><span class="identifier"> colour</span><span class="special">(</span><span class="identifier">bold</span><span class="special">(</span><span class="identifier">s</span><span class="special">),</span><span class="string"> 'blue'</span><span class="special">)),</span><span class="special">
+        (</span><span class="identifier">string_pattern</span><span class="special">,</span><span class="keyword">
+         lambda</span><span class="identifier"> s</span><span class="special">:</span><span class="identifier"> colour</span><span class="special">(</span><span class="identifier">s</span><span class="special">,</span><span class="string"> 'green'</span><span class="special">))</span><span class="special">
+        )</span><span class="comment">
+        
+    # Create a regex group for each pattern in the markup rules,
+    # and combine these groups into a single pattern.
+</span><span class="identifier">    cpp_pattern</span><span class="special"> =</span><span class="identifier"> orPatterns</span><span class="special">(</span><span class="special">
+        [</span><span class="string">'(%s)'</span><span class="special"> %</span><span class="identifier"> p</span><span class="keyword"> for</span><span class="identifier"> p</span><span class="special">,</span><span class="identifier"> f</span><span class="keyword"> in</span><span class="identifier"> markup_rules</span><span class="special">]</span><span class="special">
+        )</span><span class="identifier">
+
+    cpp_re</span><span class="special"> =</span><span class="identifier"> re</span><span class="special">.</span><span class="identifier">compile</span><span class="special">(</span><span class="identifier">
+        cpp_pattern</span><span class="special">,</span><span class="identifier">
+        re</span><span class="special">.</span><span class="identifier">DOTALL</span><span class="special"> |</span><span class="identifier">
+        re</span><span class="special">.</span><span class="identifier">MULTILINE</span><span class="comment"> # C-style comments can span multiple lines
+</span><span class="special">        )</span><span class="identifier">
+    
+    cpp_src</span><span class="special"> =</span><span class="identifier"> cookForHtml</span><span class="special">(</span><span class="identifier">cpp_src</span><span class="special">)</span><span class="identifier">
+    
+    cpp_src</span><span class="special"> =</span><span class="identifier"> cpp_re</span><span class="special">.</span><span class="identifier">sub</span><span class="special">(</span><span class="keyword">
+        lambda</span><span class="identifier"> m</span><span class="special">:</span><span class="identifier"> markup</span><span class="special">(</span><span class="identifier">m</span><span class="special">,</span><span class="identifier"> markup_rules</span><span class="special">),</span><span class="identifier">
+        cpp_src</span><span class="special">)</span><span class="keyword">
+
+    return</span><span class="identifier"> preformat</span><span class="special">(</span><span class="identifier">cpp_src</span><span class="special">)</span></code>
+</pre>
+<p>
+Here, the function accepts C++ source data as an input string. It creates
+regex patterns to match various tokens of interest in the source data. Then it
+sets up a tuple, <code class="code"><span class="identifier">markup_rules</span></code>, pairing these patterns to markup
+functions. Regex substitution is then used to markup these tokens.</p>
+<p>
+The function, as it stands, is not amenable to testing. The function
+documentation doesn't describe in detail how the source code will be marked-up
+so it's hard to write a test without peering into the implementation. For
+similar reasons the function is not as useful as it could be for prospective
+clients: anyone using the function has to put up with the in-built and
+undocumented markup scheme &#8211; in other words, you get what you're given.</p>
+<p>
+The obvious solution to these problems is to allow clients (and a test routine
+is just another client) to pass in their own markup functions. For those
+who're happy to go with the house style, we should at least document it.</p>
+<p>
+Once we admit this first round of work needs doing it's tempting to seek other
+improvements. For example, the algorithm presented is clearly a general
+purpose regex based text processor which has been primed with some C++ data
+and html markup functions &#8211; should the code not be re-cast to express this
+separation? While such suggestions appeal, we resist them for now for
+several good reasons:</p>
+<div class="itemizedlist"><ul type="disc">
+<li>
+Refactoring is best done one step at a time.
+</li>
+<li>
+Refactoring is best done with regression tests in place; our current goal
+     is to produce regression tests; to rework the code substantially before
+     setting up these tests would be a risky diversion.
+</li>
+<li>
+There's no immediate need for the general purpose solution.
+</li>
+</ul></div>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><small>Copyright &copy; 2004 Thomas Guest</small></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="../index.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="chickens__eggs__python__tests.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

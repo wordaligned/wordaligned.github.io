@@ -1,0 +1,212 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title> Part Three - Refactor</title>
+<link rel="stylesheet" href="../../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.67.0">
+<link rel="start" href="../index.html" title="A Mini-Project to Decode a Mini-Language">
+<link rel="up" href="../index.html" title="A Mini-Project to Decode a Mini-Language">
+<link rel="prev" href="part_two.html" title=" Part Two - Implementation">
+<link rel="next" href="downloads.html" title="Downloads">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><td valign="top"></td></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="part_two.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="downloads.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+<div class="section" lang="en">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="a_mini_project_to_decode_a_mini_language.part_three"></a> Part Three - Refactor</h2></div></div></div>
+<a name="part_three.introduction"></a><h2>
+<a name="id4756216"></a>Introduction</h2>
+<p>
+Of course I <span class="emphasis"><em>did</em></span> have a go at re-implementing the codec using the third 
+<a href="part_two.html#implementation_strategies">implementation strategy</a>:</p>
+<div class="informaltable"><table class="table" width="74%">
+<colgroup><col></colgroup>
+<tbody><tr><td class="blurb">
+Devise a code generator which, given a section format, will generate a
+program to encode/decode that particular format.</td></tr></tbody>
+</table></div>
+<p>
+In fact, my solution using the code generator approach reads in a
+<span class="emphasis"><em>list</em></span> of <a href="../sectionformat.cpp" target="_top">section formats</a> <span class="emphasis"><em>at build time</em></span>.
+These formats are then parsed &#8211; <span class="emphasis"><em>still at build time</em></span> &#8211; and
+semantic actions associated with the parser create a
+<a href="../sectiondecode.cpp" target="_top">generated C++ file</a>. This generated file then gets built 
+into the actual DVB codec.</p>
+<a name="part_three.advantages_of_the_code_generator_approach"></a><h2>
+<a name="id4756303"></a>Advantages of the Code Generator Approach</h2>
+<p>
+The main advantages are:</p>
+<a name="catch_errors_at_build_time"></a><a name="split_up_context"></a><div class="orderedlist"><ol type="1">
+<li>
+ Problems which used to be caught at run time
+can now be caught at build time. For example, we can check that our section
+formats are syntactically valid at build time.
+</li>
+<li>
+Since the section format parsing has been done
+at build time, the <code class="code"><span class="identifier">dvbcodec</span></code> itself runs more efficiently. Without any
+deliberate attempt to optimise we have achieved a five-fold speed up &#8211; and I
+would also guess a much reduced memory requirement (I haven't measured
+this).
+</li>
+<li>
+ The refactor caused me to split up a 
+<a href="refs.html#refs.kelly">Context</a> class, which was taking on more responsibility than it should have.
+As a result, the <a href="../decodecontext.hpp" target="_top">class</a> which maintains context during
+decoding (things like position in the input data, a container mapping field names to 
+field values etc) has been separated from the <a href="../decodeout.hpp" target="_top">class</a> which 
+produces the formatted output. This is a better partitioned and more flexible solution:
+for example, you could generate <a href="http://www.xml.org" target="_top">XML</a> structured output
+simply by providing a variant implementation of this 
+<a href="../decodeout.hpp" target="_top">decode output class</a>.
+</li>
+</ol></div>
+<p>
+A common advantage of code generators &#8211; of reducing the amount of code to be
+written and maintained &#8211; was, in this case, absent. In fact, there is
+very slightly <span class="emphasis"><em>more</em></span> code in the generated <code class="code"><span class="identifier">dvbcodec</span></code>.</p>
+<a name="part_three.disadvantages_of_the_code_generator_approach"></a><h2>
+<a name="id4756415"></a>Disadvantages of the Code Generator Approach</h2>
+<p>
+The generated code approach has some very real disadvantages:</p>
+<div class="orderedlist"><ol type="1">
+<li>
+The codec worked just fine as it was: any refactor is risky, even
+with <a href="downloads.html#downloads.test_suite">unit tests</a> in place.
+</li>
+<li>
+The generator approach puts more strain on the build system. Of course, we
+generally prefer to work harder at build time if it gives us more 
+<a href="part_three.html#catch_errors_at_build_time">confidence</a> about what will happen at run 
+time &#8211; but this is still an important consideration. Some integrated development 
+environments don't accomodate custom builds well.
+</li>
+<li>
+Writing code to write code is a form of metaprogramming with the various
+associated metaproblems: what might once have been achieved directly now
+requires thinking on a different level. This is particularly tricky when &#8211; as
+in this case &#8211; C++ is being used to write C++.
+</li>
+</ol></div>
+<p>
+To illustrate this third point, compare the following <span class="emphasis"><em>direct</em></span> lines of C++,
+used to produce formatted output:</p>
+<pre class="programlisting">
+<code class="literal">
+<span class="identifier">std</span><span class="special">::</span><span class="identifier">string</span><span class="keyword"> const</span><span class="identifier"> value</span><span class="special"> =</span><span class="identifier">
+    context</span><span class="special">.</span><span class="identifier">readFieldValue</span><span class="special">(</span><span class="identifier">field_name</span><span class="special">,</span><span class="identifier">
+                           decodeUnsignedLong</span><span class="special">(</span><span class="identifier">bitwidth</span><span class="special">));</span><span class="identifier">
+
+context</span><span class="special">.</span><span class="identifier">decodeOut</span><span class="special">()</span><span class="special">
+    &lt;&lt;</span><span class="identifier"> context</span><span class="special">.</span><span class="identifier">indent</span><span class="special">()</span><span class="special">
+    &lt;&lt;</span><span class="identifier"> field_name</span><span class="special"> &lt;&lt;</span><span class="string"> " "</span><span class="special">
+    &lt;&lt;</span><span class="identifier"> bitwidth</span><span class="special">
+    &lt;&lt;</span><span class="string"> " = 0x"</span><span class="special"> &lt;&lt;</span><span class="identifier"> value</span><span class="special"> &lt;&lt;</span><span class="string"> "\n"</span><span class="special">;</span>
+</code>
+</pre>
+<p>
+with the lines used to <span class="emphasis"><em>generate</em></span> code which has the equivalent functionality:</p>
+<pre class="programlisting">
+<code class="literal">
+<span class="identifier">cpp_</span><span class="special">
+    &lt;&lt;</span><span class="identifier"> indent</span><span class="special">()</span><span class="special">
+    &lt;&lt;</span><span class="string"> "context.decodeOut() &lt;&lt; context.indent() &lt;&lt; "</span><span class="special">
+    &lt;&lt;</span><span class="identifier"> quote</span><span class="special">(</span><span class="identifier">field_name</span><span class="special">
+            +</span><span class="string"> " "</span><span class="special">
+            +</span><span class="identifier"> bitwidth</span><span class="special"> 
+            +</span><span class="string"> " = 0x"</span><span class="special">)</span><span class="special">
+    &lt;&lt;</span><span class="string"> " &lt;&lt; context.readFieldValue("</span><span class="special">
+    &lt;&lt;</span><span class="identifier"> quote</span><span class="special">(</span><span class="identifier">field_name</span><span class="special">)</span><span class="special"> +</span><span class="string"> ", "</span><span class="special">
+    &lt;&lt;</span><span class="identifier"> decodeUnsignedLong</span><span class="special">(</span><span class="identifier">bitwidth</span><span class="special">)</span><span class="special"> &lt;&lt;</span><span class="string"> ") &lt;&lt; \"\\n\";\n"</span><span class="special">;</span>
+</code>
+</pre>
+<p>
+Now you know why I had to
+<a href="part_three.html#split_up_context">separate decode context from decode output</a>
+for the generated version. You'll also realise why it's more common
+to use a language like <a href="http://www.python.org" target="_top">Python</a> &#8211; with its handy support for 
+triple quoted strings, raw strings and so on &#8211; to generate C++.</p>
+<p>
+One common disadvantage &#8211; that the generated code isn't very nice to
+look at &#8211; was, in this case, absent. I was genuinely surprised and
+delighted by the clarity of the generated <a href="../sectiondecode.cpp" target="_top">section
+decoder</a>. The extract below compares nicely with the 
+<a href="part_two.html#program_association_section">PAT section syntax</a>.</p>
+<pre class="programlisting">
+<code class="literal">
+<span class="comment">// GENERATED FILE. DO NOT EDIT.
+// Generated by: dvbcodecgenerator 
+// On: Nov 25 2004
+/**
+ * Copyright (c) 2004, Thomas Guest. All rights reserved.
+ * @file
+ * @brief Generated section decoders.
+ */    
+
+/**
+ * @brief Generated program_association_section decoder
+ */</span><span class="keyword">
+void</span><span class="identifier">
+decode_program_association_section</span><span class="special">(</span><span class="identifier">DecodeOut</span><span class="special"> &amp;</span><span class="identifier"> out</span><span class="special">)</span><span class="special">
+{</span><span class="identifier">
+    out</span><span class="special">.</span><span class="identifier">putSectionName</span><span class="special">(</span><span class="string">"program_association_section()"</span><span class="special">);</span><span class="special">
+    {</span><span class="identifier">
+        out</span><span class="special">.</span><span class="identifier">enterBlock</span><span class="special">();</span><span class="identifier">
+        out</span><span class="special">.</span><span class="identifier">putField</span><span class="special">(</span><span class="string">"table_id"</span><span class="special">,</span><span class="number"> 8</span><span class="special">);</span><span class="identifier">
+        out</span><span class="special">.</span><span class="identifier">putField</span><span class="special">(</span><span class="string">"section_syntax_indicator"</span><span class="special">,</span><span class="number"> 1</span><span class="special">);</span><span class="identifier">
+        out</span><span class="special">.</span><span class="identifier">putField</span><span class="special">(</span><span class="string">"'0'"</span><span class="special">,</span><span class="number"> 1</span><span class="special">);</span><span class="identifier">
+        out</span><span class="special">.</span><span class="identifier">putField</span><span class="special">(</span><span class="string">"reserved"</span><span class="special">,</span><span class="number"> 2</span><span class="special">);</span><span class="identifier">
+        out</span><span class="special">.</span><span class="identifier">putField</span><span class="special">(</span><span class="string">"section_length"</span><span class="special">,</span><span class="number"> 12</span><span class="special">);</span><span class="identifier">
+        out</span><span class="special">.</span><span class="identifier">putField</span><span class="special">(</span><span class="string">"transport_stream_id"</span><span class="special">,</span><span class="number"> 16</span><span class="special">);</span><span class="identifier">
+        out</span><span class="special">.</span><span class="identifier">putField</span><span class="special">(</span><span class="string">"reserved"</span><span class="special">,</span><span class="number"> 2</span><span class="special">);</span><span class="identifier">
+        out</span><span class="special">.</span><span class="identifier">putField</span><span class="special">(</span><span class="string">"version_number"</span><span class="special">,</span><span class="number"> 5</span><span class="special">);</span><span class="identifier">
+        out</span><span class="special">.</span><span class="identifier">putField</span><span class="special">(</span><span class="string">"current_next_indicator"</span><span class="special">,</span><span class="number"> 1</span><span class="special">);</span><span class="identifier">
+        out</span><span class="special">.</span><span class="identifier">putField</span><span class="special">(</span><span class="string">"section_number"</span><span class="special">,</span><span class="number"> 8</span><span class="special">);</span><span class="identifier">
+        out</span><span class="special">.</span><span class="identifier">putField</span><span class="special">(</span><span class="string">"last_section_number"</span><span class="special">,</span><span class="number"> 8</span><span class="special">);</span><span class="identifier">
+        out</span><span class="special">.</span><span class="identifier">putLoopControl</span><span class="special">(</span><span class="string">"for (i=0; i&lt;N; i++)"</span><span class="special">);</span><span class="identifier">
+        out</span><span class="special">.</span><span class="identifier">enterBlock</span><span class="special">();</span><span class="keyword">
+        while</span><span class="special">(!</span><span class="identifier">out</span><span class="special">.</span><span class="identifier">testLoopExit</span><span class="special">())</span><span class="special">
+        {</span><span class="identifier">
+            out</span><span class="special">.</span><span class="identifier">putField</span><span class="special">(</span><span class="string">"program_number"</span><span class="special">,</span><span class="number"> 16</span><span class="special">);</span><span class="identifier">
+            out</span><span class="special">.</span><span class="identifier">putField</span><span class="special">(</span><span class="string">"reserved"</span><span class="special">,</span><span class="number"> 3</span><span class="special">);</span><span class="keyword">
+            if</span><span class="special"> (</span><span class="identifier">out</span><span class="special">.</span><span class="identifier">putIf</span><span class="special">(</span><span class="string">"program_number"</span><span class="special">,</span><span class="string"> "=="</span><span class="special">,</span><span class="char"> '0'</span><span class="special">))</span><span class="special">
+            {</span><span class="identifier">
+                out</span><span class="special">.</span><span class="identifier">enterBlock</span><span class="special">();</span><span class="identifier">
+                out</span><span class="special">.</span><span class="identifier">putField</span><span class="special">(</span><span class="string">"network_PID"</span><span class="special">,</span><span class="number"> 13</span><span class="special">);</span><span class="identifier">
+                out</span><span class="special">.</span><span class="identifier">leaveBlock</span><span class="special">();</span><span class="special">
+            }</span><span class="keyword">
+            else</span><span class="keyword"> if</span><span class="special"> (</span><span class="identifier">out</span><span class="special">.</span><span class="identifier">putElse</span><span class="special">())</span><span class="special">
+            {</span><span class="identifier">
+                out</span><span class="special">.</span><span class="identifier">enterBlock</span><span class="special">();</span><span class="identifier">
+                out</span><span class="special">.</span><span class="identifier">putField</span><span class="special">(</span><span class="string">"program_map_PID"</span><span class="special">,</span><span class="number"> 13</span><span class="special">);</span><span class="identifier">
+                out</span><span class="special">.</span><span class="identifier">leaveBlock</span><span class="special">();</span><span class="special">
+            }</span><span class="special">
+        }</span><span class="identifier">
+        out</span><span class="special">.</span><span class="identifier">putField</span><span class="special">(</span><span class="string">"CRC_32"</span><span class="special">,</span><span class="number"> 32</span><span class="special">);</span><span class="identifier">
+        out</span><span class="special">.</span><span class="identifier">leaveBlock</span><span class="special">();</span><span class="special">
+    }</span><span class="special">
+}</span>
+</code>
+</pre>
+<a name="part_three.on_balance"></a><h2>
+<a name="id4757860"></a>On Balance</h2>
+<p>
+On balance, I prefer the version of <code class="code"><span class="identifier">dvbcodec</span></code> based on the generated section
+decoder. The big win is that more errors can be 
+<a href="part_three.html#catch_errors_at_build_time">caught at build time</a>. Either way, it was
+educational and interesting to explore both options.</p>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><small>Copyright &copy; 2004 Thomas Guest</small></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="part_two.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="downloads.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

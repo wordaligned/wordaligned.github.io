@@ -1,0 +1,78 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Code in Comments</title>
+<link rel="stylesheet" href="../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.67.0">
+<link rel="start" href="index.html" title="Code in Comments">
+<link rel="next" href="code_in_comments/howto.html" title=" How to Comment-Out Code">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><td valign="top"></td></table>
+<hr>
+<div class="spirit-nav"><a accesskey="n" href="code_in_comments/howto.html"><img src="../images/next.png" alt="Next"></a></div>
+<div class="article" lang="en">
+<div class="titlepage">
+<div>
+<div><h2 class="title">
+<a name="code_in_comments"></a>Code in Comments</h2></div>
+<div><div class="author"><h3 class="author">
+<span class="firstname">Thomas</span> <span class="surname">Guest</span>
+</h3></div></div>
+<div><p class="copyright">Copyright &copy; 2004 Thomas Guest</p></div>
+</div>
+<hr>
+</div>
+<div class="toc">
+<p><b>Table of Contents</b></p>
+<dl>
+<dt><span class="section"><a href="index.html#code_in_comments.introduction">Introduction</a></span></dt>
+<dt><span class="section"><a href="code_in_comments/howto.html"> How to Comment-Out Code</a></span></dt>
+<dt><span class="section"><a href="code_in_comments/more_examples.html">More Examples</a></span></dt>
+<dt><span class="section"><a href="code_in_comments/why_comment_out_code_.html">Why Comment-Out code?</a></span></dt>
+<dt><span class="section"><a href="code_in_comments/_why_commenting_out_code_is_a_bad_idea.html"> Why Commenting Out Code is a Bad Idea</a></span></dt>
+<dt><span class="section"><a href="code_in_comments/what_to_do_instead.html">What to do Instead</a></span></dt>
+<dt><span class="section"><a href="code_in_comments/conclusions.html">Conclusions</a></span></dt>
+</dl>
+</div>
+<div class="section" lang="en">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="code_in_comments.introduction"></a>Introduction</h2></div></div></div>
+<p>
+We have all seen comments in source files which look more like executable code
+than documentation.</p>
+<p>
+The first line in the body of the <code class="code"><span class="keyword">for</span></code> loop below is such a comment: you might
+expect to be able to remove the leading slashes and have code which compiles
+and runs but functions slightly differently.</p>
+<p>
+What did the author of this comment intend?</p>
+<pre class="programlisting">
+<code class="literal">
+<span class="keyword">for</span><span class="special"> (</span><span class="identifier">Surfaces</span><span class="special">::</span><span class="identifier">iterator</span><span class="identifier"> sf</span><span class="special"> =</span><span class="identifier"> surfaces</span><span class="special">.</span><span class="identifier">begin</span><span class="special">();</span><span class="identifier">
+     sf</span><span class="special"> !=</span><span class="identifier"> surfaces</span><span class="special">.</span><span class="identifier">end</span><span class="special">();</span><span class="special"> 
+     ++</span><span class="identifier">sf</span><span class="special">)</span><span class="special"> {</span><span class="comment">
+     // std::cout &lt;&lt; "Drawing: " &lt;&lt; *sf &lt;&lt; "\n";
+</span><span class="identifier">     sf</span><span class="special">-&gt;</span><span class="identifier">draw</span><span class="special">();</span><span class="special">
+}</span>
+</code>
+</pre>
+<p>
+OK, I'm being disingenuous. I'm aware that the comment isn't really a comment,
+it's commented-out code. And, like any tolerant and capable programmer, by
+examining the surrounding context I can guess why this code has been commented
+out.</p>
+<p>
+This article examines how to comment-out code, then describes various problems
+which lead to code being commented out, before finally arguing that there's
+often a better solution to these problems.</p>
+</div>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><small></small></td>
+</tr></table>
+<hr>
+<div class="spirit-nav"><a accesskey="n" href="code_in_comments/howto.html"><img src="../images/next.png" alt="Next"></a></div>
+</body>
+</html>

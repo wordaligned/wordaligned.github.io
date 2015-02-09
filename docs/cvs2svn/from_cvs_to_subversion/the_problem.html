@@ -1,0 +1,121 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>The Problem</title>
+<link rel="stylesheet" href="../../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.67.0">
+<link rel="start" href="../index.html" title="From CVS to Subversion">
+<link rel="up" href="../index.html" title="From CVS to Subversion">
+<link rel="prev" href="what_we_failed_to_do.html" title="What We Failed to Do">
+<link rel="next" href="scheduled_backups.html" title="Scheduled Backups">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><td valign="top"></td></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="what_we_failed_to_do.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="scheduled_backups.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+<div class="section" lang="en">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="from_cvs_to_subversion.the_problem"></a>The Problem</h2></div></div></div>
+<div class="toc"><dl>
+<dt><span class="section"><a href="the_problem.html#from_cvs_to_subversion.binary_files">Binary Files</a></span></dt>
+<dt><span class="section"><a href="the_problem.html#from_cvs_to_subversion.acceptance_tests">Acceptance Tests</a></span></dt>
+<dt><span class="section"><a href="the_problem.html#from_cvs_to_subversion.recovery">Recovery</a></span></dt>
+</dl></div>
+<div class="section" lang="en">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="from_cvs_to_subversion.binary_files"></a>Binary Files</h3></div></div></div>
+<p>
+The problem we had was with binary files which had (wrongly) been
+checked into <a href="http://www.nongnu.org/cvs/" target="_top">CVS</a> as text files. On import, by default, <a href="http://cvs2svn.tigris.org/" target="_top">cvs2svn</a> does a
+couple of things to text files which can seriously damage binary
+files:</p>
+<div class="orderedlist"><ol type="1">
+<li>
+keyword-expansion is enabled <sup>[<a name="id4754439" href="#ftn.id4754439">3</a>]</sup>&#8212;meaning that
+  byte sequences which match patterns such as "$Id: $" get changed
+  when you check the file out.
+</li>
+<li>
+the end-of-line style property is set to <code class="literal">native</code>, meaning again that 
+  the binary file you check out may not be the one you checked
+  in, since <a href="http://subversion.tigris.org/" target="_top">Subversion</a> makes sure end-of-line sequences are the ones
+  preferred by your client platform.
+</li>
+</ol></div>
+<p>
+We'd messed up but fortunately we'd messed up in an immediately
+obvious way: a number of binaries were broken, to the point that they
+wouldn't even execute.</p>
+<p>
+This is one of those mistakes you only make once (until you make it
+the next time and kick yourself even harder, that is). I guess we were
+lulled into a false sense of security: everything seemed to be working
+so smoothly ... <a href="http://subversion.tigris.org/" target="_top">Subversion</a> is better than <a href="http://www.nongnu.org/cvs/" target="_top">CVS</a> at handling binary files
+... everything had been working fine with <a href="http://www.nongnu.org/cvs/" target="_top">CVS</a>, so our <a href="http://www.nongnu.org/cvs/" target="_top">CVS</a> repository
+must be fine ... <a href="http://cvs2svn.tigris.org/" target="_top">cvs2svn</a> would spot any problems.</p>
+<p>
+Of course, our <a href="http://www.nongnu.org/cvs/" target="_top">CVS</a> repository wasn't fine. We'd got away with binary
+files marked as text for the simple reason that most of these files
+had been used on Linux only.</p>
+</div>
+<div class="section" lang="en">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="from_cvs_to_subversion.acceptance_tests"></a>Acceptance Tests</h3></div></div></div>
+<p>
+What makes this mistake so chastening is the fact that a basic
+acceptance test of the new repository would have been both simple and
+scriptable:</p>
+<pre class="programlisting"><code class="literal">#!/bin/sh
+cvs co CVSARCHIVE  fromcvs             # Checkout from CVS, on the trunk
+svn co SVNREPOS/trunk fromsvn          # Checkout from SVN, on the trunk
+diff -q -r fromcvs fromsvn &gt; all_diffs # Spot the difference
+</code></pre>
+<p>
+If the <code class="literal">all_diffs</code> file is empty, the CVS and Subversion checkouts are
+byte-for-byte compatible.</p>
+<p>
+Unfortunately the <code class="literal">all_diffs</code> file wasn't empty. Remember those
+keyword expansions? <a href="http://subversion.tigris.org/" target="_top">Subversion</a> is clever enough to replace <a href="http://www.nongnu.org/cvs/" target="_top">CVS</a> version
+numbers with its own revision numbers and as a result the files
+differ when checked out. Keyword expansion really is a 
+<a href="http://blog.wordaligned.org/articles/2006/08/02/keyword-substitution-just-say-no" target="_top">bad idea</a>!
+Similarly, a number of text files were different because <a href="http://subversion.tigris.org/" target="_top">Subversion</a>
+had tidied up inconsistent line endings.</p>
+<p>
+So, there were plenty of false hits as well as a list
+of files we needed to run <code class="literal">cvsadmin -kb</code> on.</p>
+<p>
+Incidentally, we could have chosen to clean up the files during import
+by passing some more parameters to <a href="http://cvs2svn.tigris.org/" target="_top">cvs2svn</a>: a suitable combination of
+<code class="literal">--mime-types=FILE</code>, <code class="literal">--eol-from-mime-type</code> and <code class="literal">--no-default-eol</code> options
+would have done the job. We decided, though, that the proper solution
+was to fix the root cause of the problem.</p>
+</div>
+<div class="section" lang="en">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="from_cvs_to_subversion.recovery"></a>Recovery</h3></div></div></div>
+<p>
+So, we had to delay by a day to reinstate <a href="http://www.nongnu.org/cvs/" target="_top">CVS</a>, run the text-to-binary
+corrections, re-run the migration, perform acceptance tests. This
+time we were more cautious and we also tested builds made from
+the clean <a href="http://subversion.tigris.org/" target="_top">Subversion</a> checkout.</p>
+</div>
+<div class="footnotes">
+<br><hr width="100" align="left">
+<div class="footnote"><p><sup>[<a name="ftn.id4754439" href="#id4754439">3</a>] </sup>Strictly speaking, <a href="http://cvs2svn.tigris.org/" target="_top">cvs2svn</a>
+  sets <code class="literal">svn:keywords</code> on <a href="http://www.nongnu.org/cvs/" target="_top">CVS</a> files to <code class="literal">author id date</code> if the mode of
+  the RCS file in question is either <code class="literal">kv</code>, <code class="literal">kvl</code> or not <code class="literal">kb</code>.</p></div>
+</div>
+</div>
+<table width="100%"><tr>
+<td align="left"></td>
+<td align="right"><small>Copyright &copy; 2006 Thomas Guest</small></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="what_we_failed_to_do.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="scheduled_backups.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

@@ -1,0 +1,112 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>What We Failed to Do</title>
+<link rel="stylesheet" href="../../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.67.0">
+<link rel="start" href="../index.html" title="From CVS to Subversion">
+<link rel="up" href="../index.html" title="From CVS to Subversion">
+<link rel="prev" href="the_transition_plan.html" title="The Transition Plan">
+<link rel="next" href="the_problem.html" title="The Problem">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><td valign="top"></td></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="the_transition_plan.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="the_problem.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+<div class="section" lang="en">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="from_cvs_to_subversion.what_we_failed_to_do"></a>What We Failed to Do</h2></div></div></div>
+<p>
+A number of items on the evaluation and transition plan never
+happened. We didn't create any local training materials&#8212;it didn't
+seem necessary, given the high quality of <a href="http://subversion.tigris.org/" target="_top">Subversion</a>'s built in
+documentation, and the fact that we all knew <a href="http://www.nongnu.org/cvs/" target="_top">CVS</a> (see Sidebar:
+Subversion for CVS users). We ordered printed
+copies of "Version Control with Subversion" and "Pragmatic Version
+Control Using Subversion", set up an FAQ page on the Wiki that did
+little more than collect together a few links to offsite URLs, and
+left it at that.</p>
+<div class="sidebar">
+<p class="title"><b>Subversion for CVS users</b></p>
+If you're familiar with <a href="http://www.nongnu.org/cvs/" target="_top">CVS</a> then <a href="http://subversion.tigris.org/" target="_top">Subversion</a> will also seem familiar.
+This is hardly surprising since <a href="http://subversion.tigris.org/" target="_top">Subversion</a>'s stated aim is to be a
+compelling replacement for <a href="http://www.nongnu.org/cvs/" target="_top">CVS</a>. So, the terminology is almost
+identical: you "check out" files from a "repository", you edit them,
+you "diff" files to see what you&#8212;and others&#8212;have changed, and
+you "check in" your changes. You "update" your working copy to merge
+in changes made by other team members. You can "log" what changes have
+been made. You can "branch" a project by copying it from the "trunk"
+into a new place in the repository; similarly you can "tag" a fixed
+version of a project by copying it into a new place in the
+repository. You can "merge" changes made on the branch back to the
+trunk, and vice versa.<br>
+
+If you use the command line client, <code class="literal">svn</code>, the command line arguments
+are often identical to the ones used with the <code class="literal">cvs</code> client (svn
+commit, svn checkout, svn status, svn annotate svn diff, svn log,
+etc.).<br>
+
+The areas where <a href="http://www.nongnu.org/cvs/" target="_top">CVS</a> and <a href="http://subversion.tigris.org/" target="_top">Subversion</a> differ are generally where
+<a href="http://subversion.tigris.org/" target="_top">Subversion</a> fixes a <a href="http://www.nongnu.org/cvs/" target="_top">CVS</a> deficiency or where <a href="http://subversion.tigris.org/" target="_top">Subversion</a> actually manages
+to simplify things. For example, as already mentioned, <a href="http://subversion.tigris.org/" target="_top">Subversion</a>
+fixes a well-known <a href="http://www.nongnu.org/cvs/" target="_top">CVS</a> deficiency by allowing you to move files and
+directories; and <a href="http://subversion.tigris.org/" target="_top">Subversion</a>'s transactional model means that a version
+number (a revision number, in <a href="http://subversion.tigris.org/" target="_top">Subversion</a> terminology) is an
+incrementing integer applied to the repository as a whole, which is
+easier to work with than the dot-separated version numbers which apply
+to each <a href="http://www.nongnu.org/cvs/" target="_top">CVS</a> controlled file.<br>
+
+More information for <a href="http://www.nongnu.org/cvs/" target="_top">CVS</a> users migrating to <a href="http://subversion.tigris.org/" target="_top">Subversion</a> can be found
+<a href="http://svnbook.red-bean.com/en/1.2/svn.forcvs.html" target="_top">here</a>.
+</div>
+<p>
+Despite encouragement, no-one had bothered to use the trial repository
+as a sandbox for experimenting with <a href="http://subversion.tigris.org/" target="_top">Subversion</a> (apart from the
+individual actually running the trial). So, the evaluation of the
+product's usability and basic functionality was down to just one
+person. Again, this turned out not to be a problem&#8212;and we weren't
+really being lax when you consider how many open source projects have
+switched, or are switching, to <a href="http://subversion.tigris.org/" target="_top">Subversion</a>. We just <span class="underline">knew</span> <a href="http://subversion.tigris.org/" target="_top">Subversion</a>
+worked.</p>
+<p>
+We quite deliberately didn't plan any reorganisation or pruning of the
+<a href="http://www.nongnu.org/cvs/" target="_top">CVS</a> repository before importing it: <a href="http://subversion.tigris.org/" target="_top">Subversion</a> would allow us to make
+such changes in a better controlled way, once we got to the other
+side. For similar reasons, we didn't change keyword expansion
+properties on import. Again, <a href="http://subversion.tigris.org/" target="_top">Subversion</a> allows you to manage such
+properties better than <a href="http://www.nongnu.org/cvs/" target="_top">CVS</a> does, and now was not the time to start
+arguing whether or not we really thought keyword expansion was a good
+idea <sup>[<a name="id4754328" href="#ftn.id4754328">2</a>]</sup>.</p>
+<p>
+We didn't fix any of our build scripts in advance. As part of the
+evaluation we'd grepped the source for all such scripts and it
+turned out you could count the number of scripted calls to <code class="literal">cvs</code> on
+the fingers of one hand. We were confident we could fix these pretty
+much as soon as our <a href="http://subversion.tigris.org/" target="_top">Subversion</a> server went live.</p>
+<p>
+We didn't even bother evaluating any advanced <a href="http://subversion.tigris.org/" target="_top">Subversion</a> clients. I
+used the command line almost exclusively for experimentation: others
+were happy to defer setting up <a href="http://tortoisesvn.tigris.org/" target="_top">TortoiseSVN</a>, <a href="http://subclipse.tigris.org/" target="_top">Subclipse</a>, <a href="http://svn.collab.net/repos/svn/trunk/contrib/client-side/psvn/psvn.el" target="_top">psvn</a>, etc., until
+they actually had to.</p>
+<p>
+The one crucial item we neglected from our plan was to perform
+acceptance tests on the freshly imported repository.  Fortunately we
+discovered the problem with our carelessness almost immediately and
+were able to recover swiftly.</p>
+<div class="footnotes">
+<br><hr width="100" align="left">
+<div class="footnote"><p><sup>[<a name="ftn.id4754328" href="#id4754328">2</a>] </sup>It's a <a href="http://blog.wordaligned.org/articles/2006/08/02/keyword-substitution-just-say-no" target="_top">bad</a> idea!</p></div>
+</div>
+</div>
+<table width="100%"><tr>
+<td align="left"></td>
+<td align="right"><small>Copyright &copy; 2006 Thomas Guest</small></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="the_transition_plan.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="the_problem.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

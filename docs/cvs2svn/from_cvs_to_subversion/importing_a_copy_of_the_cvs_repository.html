@@ -1,0 +1,92 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Importing a Copy of the CVS Repository</title>
+<link rel="stylesheet" href="../../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.67.0">
+<link rel="start" href="../index.html" title="From CVS to Subversion">
+<link rel="up" href="../index.html" title="From CVS to Subversion">
+<link rel="prev" href="setting_up_the_trial_server.html" title="Setting up the Trial Server">
+<link rel="next" href="more_evaluation.html" title="More Evaluation">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><td valign="top"></td></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="setting_up_the_trial_server.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="more_evaluation.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+<div class="section" lang="en">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="from_cvs_to_subversion.importing_a_copy_of_the_cvs_repository"></a>Importing a Copy of the CVS Repository</h2></div></div></div>
+<div class="toc"><dl>
+<dt><span class="section"><a href="importing_a_copy_of_the_cvs_repository.html#from_cvs_to_subversion.cvs2svn">Cvs2svn</a></span></dt>
+<dt><span class="section"><a href="importing_a_copy_of_the_cvs_repository.html#from_cvs_to_subversion.choice_of_database_layer">Choice of Database Layer</a></span></dt>
+</dl></div>
+<div class="section" lang="en">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="from_cvs_to_subversion.cvs2svn"></a>Cvs2svn</h3></div></div></div>
+<p>
+Creating the trial repository was a little more time consuming. To
+perform realistic tests we needed something like a full import of our 
+<a href="http://www.nongnu.org/cvs/" target="_top">CVS</a> repository.</p>
+<p>
+<a href="http://subversion.tigris.org/" target="_top">Subversion</a> provides a Python program, <a href="http://cvs2svn.tigris.org/" target="_top">cvs2svn</a>, to perform this
+import. One thing you really shouldn't do is try to import a live <a href="http://www.nongnu.org/cvs/" target="_top">CVS</a>
+repository, which is of course a moving target. One thing we equally
+didn't want to do was take down the <a href="http://www.nongnu.org/cvs/" target="_top">CVS</a> server for any period of
+time. Fortunately, we kept a mirror of the live repository; by taking
+a copy of this mirror (when it wasn't being mirrored!), we gave ourselves
+something to import.</p>
+<p>
+The documentation for <a href="http://cvs2svn.tigris.org/" target="_top">cvs2svn</a> is rather thin. In fact, at the time of
+writing this article, there's not a huge amount over and above what
+the command line tells you:</p>
+<pre class="programlisting"><code class="literal">cvs2svn --help
+</code></pre>
+<p>
+Fortunately, the program works.  Most of the options aren't even
+required if you're happy to go with the default repository layout,
+default database backend, default keyword expansion mode, default
+end-of-line style and so on. And, if <a href="http://cvs2svn.tigris.org/" target="_top">cvs2svn</a> does hit problems&#8212;
+which will almost certainly be caused by "Garbage In"&#8212;it exits
+smartly and tells you what to do next.</p>
+<p>
+In our case, we had to clear up a little tag ambiguity, and then we were
+off. The import took about four hours&#8212;this is for a <a href="http://www.nongnu.org/cvs/" target="_top">CVS</a> repository
+consisting of about 64000 files, a few hundred tags and branches, and
+occupying around 12Gb on disk.</p>
+</div>
+<div class="section" lang="en">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="from_cvs_to_subversion.choice_of_database_layer"></a>Choice of Database Layer</h3></div></div></div>
+<p>
+At revision 1.3, <a href="http://subversion.tigris.org/" target="_top">Subversion</a> provides a couple of database backends:</p>
+<div class="itemizedlist"><ul type="disc">
+<li>
+a Berkeley DB database
+</li>
+<li>
+FSFS, where data is stored in ordinary flat files, using a custom format.
+</li>
+</ul></div>
+<p>
+The pros and cons of the two choices are discussed in the
+<a href="http://svnbook.red-bean.com/en/1.2/svn.reposadmin.html#svn.reposadmin.basics.backends" target="_top">Subversion book</a>.</p>
+<p>
+Although the FSFS backend is less mature it looked more suitable in
+every other respect. The <a href="http://subversion.tigris.org/" target="_top">Subversion</a> repository create tool, <code class="literal">svnadmin
+create</code>, treats FSFS as the default database backend&#8212;and so does
+<code class="literal">cvs2svn</code>. We decided to go with this default and have had no
+complaints.</p>
+</div>
+</div>
+<table width="100%"><tr>
+<td align="left"></td>
+<td align="right"><small>Copyright &copy; 2006 Thomas Guest</small></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="setting_up_the_trial_server.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="more_evaluation.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

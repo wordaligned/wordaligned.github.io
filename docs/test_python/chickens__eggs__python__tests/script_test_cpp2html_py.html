@@ -1,0 +1,192 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Script test_cpp2html.py</title>
+<link rel="stylesheet" href="../../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.67.0">
+<link rel="start" href="../index.html" title="Chickens, Eggs, Python, Tests">
+<link rel="up" href="../index.html" title="Chickens, Eggs, Python, Tests">
+<link rel="prev" href="refs.html" title=" References">
+<link rel="next" href="script_htmlmarkup_py.html" title="Script htmlmarkup.py">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><td valign="top"></td></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="refs.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="script_htmlmarkup_py.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+<div class="section" lang="en">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="chickens__eggs__python__tests.script_test_cpp2html_py"></a>Script test_cpp2html.py</h2></div></div></div>
+<pre class="programlisting">
+<code class="literal">
+<span class="keyword">import</span><span class="identifier"> unittest</span><span class="keyword">
+from</span><span class="identifier"> cpp2html</span><span class="keyword"> import</span><span class="special"> *</span><span class="keyword">
+from</span><span class="identifier"> htmlmarkup</span><span class="keyword"> import</span><span class="identifier"> preformat</span><span class="keyword">
+
+
+class</span><span class="identifier"> TestCppMarkup</span><span class="special">(</span><span class="identifier">unittest</span><span class="special">.</span><span class="identifier">TestCase</span><span class="special">):</span><span class="keyword">
+
+    def</span><span class="identifier"> testDefaultMarkup</span><span class="special">(</span><span class="identifier">self</span><span class="special">):</span><span class="identifier">
+        src</span><span class="special"> =</span><span class="string"> 'cutlery = knife + fork; // do we need spoons?'</span><span class="identifier">
+        htm</span><span class="special"> =</span><span class="string"> '&lt;pre&gt;cutlery = knife + fork; &lt;font color="red"&gt;&lt;i&gt;// do we need spoons?&lt;/i&gt;&lt;/font&gt;&lt;/pre&gt;'</span><span class="identifier">
+        self</span><span class="special">.</span><span class="identifier">assertEqual</span><span class="special">(</span><span class="identifier">cpp2html</span><span class="special">(</span><span class="identifier">src</span><span class="special">),</span><span class="identifier"> htm</span><span class="special">)</span><span class="keyword">
+    
+    def</span><span class="identifier"> testDefaultStringMarkup</span><span class="special">(</span><span class="identifier">self</span><span class="special">):</span><span class="identifier">
+        src</span><span class="special"> =</span><span class="identifier"> r</span><span class="string">'what_he_said = "He said \"Hi!\""'</span><span class="identifier">
+        htm</span><span class="special"> =</span><span class="identifier"> preformat</span><span class="special">(</span><span class="identifier">r</span><span class="string">'what_he_said = '</span><span class="special"> +</span><span class="identifier">
+                  htm_green</span><span class="special">(</span><span class="identifier">r</span><span class="string">'"He said \"Hi!\""'</span><span class="special">))</span><span class="identifier">
+        self</span><span class="special">.</span><span class="identifier">assertEqual</span><span class="special">(</span><span class="identifier">cpp2html</span><span class="special">(</span><span class="identifier">src</span><span class="special">),</span><span class="identifier"> htm</span><span class="special">)</span><span class="keyword">
+
+    
+    def</span><span class="identifier"> testCustomStringMarkup</span><span class="special">(</span><span class="identifier">self</span><span class="special">):</span><span class="keyword">
+        from</span><span class="identifier"> string</span><span class="keyword"> import</span><span class="identifier"> swapcase</span><span class="keyword"> as</span><span class="identifier"> sc</span><span class="identifier">
+        src</span><span class="special"> =</span><span class="identifier"> r</span><span class="string">'what_he_said = "He said \"Hi!\""'</span><span class="identifier">
+        htm</span><span class="special"> =</span><span class="identifier"> preformat</span><span class="special">(</span><span class="identifier">r</span><span class="string">'what_he_said = "hE SAID \"hI!\""'</span><span class="special">)</span><span class="identifier">
+        self</span><span class="special">.</span><span class="identifier">assertEqual</span><span class="special">(</span><span class="identifier">cpp2html</span><span class="special">(</span><span class="identifier">src</span><span class="special">,</span><span class="identifier"> markup_string</span><span class="special">=</span><span class="identifier">sc</span><span class="special">),</span><span class="identifier"> htm</span><span class="special">)</span><span class="keyword">
+
+
+    def</span><span class="identifier"> testDefaultCCommentMarkup</span><span class="special">(</span><span class="identifier">self</span><span class="special">):</span><span class="identifier">
+        src</span><span class="special"> =</span><span class="string"> '''
+        x = 1; /* This comment // ??
+                * is on two lines */'''</span><span class="identifier">
+        htm</span><span class="special"> =</span><span class="identifier"> preformat</span><span class="special">(</span><span class="string">'''
+        x = 1; '''</span><span class="special"> +</span><span class="identifier">
+        htm_italics_red</span><span class="special">(</span><span class="string">
+            '''/* This comment // ??
+                * is on two lines */'''</span><span class="special">)</span><span class="special">
+            )</span><span class="identifier">
+        self</span><span class="special">.</span><span class="identifier">assertEqual</span><span class="special">(</span><span class="identifier">cpp2html</span><span class="special">(</span><span class="identifier">src</span><span class="special">),</span><span class="identifier"> htm</span><span class="special">)</span><span class="keyword">
+
+
+    def</span><span class="identifier"> testCustomCCommentMarkup</span><span class="special">(</span><span class="identifier">self</span><span class="special">):</span><span class="keyword">
+        from</span><span class="identifier"> string</span><span class="keyword"> import</span><span class="identifier"> upper</span><span class="keyword"> as</span><span class="identifier"> uc</span><span class="identifier">
+        src</span><span class="special"> =</span><span class="string"> '''
+        x = 1; /* This comment // ??
+                * is on two lines */'''</span><span class="identifier">
+        htm</span><span class="special"> =</span><span class="identifier"> preformat</span><span class="special">(</span><span class="string">'''
+        x = 1; /* THIS COMMENT // ??
+                * IS ON TWO LINES */'''</span><span class="special">)</span><span class="identifier">
+
+        self</span><span class="special">.</span><span class="identifier">assertEqual</span><span class="special">(</span><span class="identifier">cpp2html</span><span class="special">(</span><span class="identifier">src</span><span class="special">,</span><span class="identifier"> markup_comment</span><span class="special">=</span><span class="identifier">uc</span><span class="special">),</span><span class="identifier"> htm</span><span class="special">)</span><span class="keyword">
+
+        
+    def</span><span class="identifier"> testDefaultCppCommentMarkup</span><span class="special">(</span><span class="identifier">self</span><span class="special">):</span><span class="identifier">
+        src</span><span class="special"> =</span><span class="string"> "y += 2; // /* !? */ ERROR?"</span><span class="identifier">
+        htm</span><span class="special"> =</span><span class="identifier"> preformat</span><span class="special">(</span><span class="string">"y += 2; "</span><span class="special"> +</span><span class="identifier">
+                  htm_italics_red</span><span class="special">(</span><span class="string">"// /* !? */ ERROR?"</span><span class="special">))</span><span class="identifier">
+        self</span><span class="special">.</span><span class="identifier">assertEqual</span><span class="special">(</span><span class="identifier">cpp2html</span><span class="special">(</span><span class="identifier">src</span><span class="special">),</span><span class="identifier"> htm</span><span class="special">)</span><span class="keyword">
+            
+        
+    def</span><span class="identifier"> testCustomCppCommentMarkup</span><span class="special">(</span><span class="identifier">self</span><span class="special">):</span><span class="keyword">
+        from</span><span class="identifier"> string</span><span class="keyword"> import</span><span class="identifier"> lower</span><span class="keyword"> as</span><span class="identifier"> lc</span><span class="identifier">
+        src</span><span class="special"> =</span><span class="string"> "y += 2; // /* !? */ ERROR?"</span><span class="identifier">
+        htm</span><span class="special"> =</span><span class="identifier"> preformat</span><span class="special">(</span><span class="string">"y += 2; // /* !? */ error?"</span><span class="special">)</span><span class="identifier">
+        self</span><span class="special">.</span><span class="identifier">assertEqual</span><span class="special">(</span><span class="identifier">cpp2html</span><span class="special">(</span><span class="identifier">src</span><span class="special">,</span><span class="identifier"> markup_comment</span><span class="special">=</span><span class="identifier">lc</span><span class="special">),</span><span class="identifier"> htm</span><span class="special">)</span><span class="keyword">
+
+
+    def</span><span class="identifier"> testDefaultKeywordAndBuiltInMarkup</span><span class="special">(</span><span class="identifier">self</span><span class="special">):</span><span class="identifier">
+        kw</span><span class="special"> =</span><span class="identifier"> htm_bold_blue</span><span class="identifier">
+        bt</span><span class="special"> =</span><span class="identifier"> htm_blue</span><span class="identifier">
+        src</span><span class="special"> =</span><span class="string"> 'char const * version() { return v_str; }'</span><span class="identifier">
+        htm</span><span class="special"> =</span><span class="identifier"> preformat</span><span class="special">(</span><span class="string">
+            '%s %s * version() { %s v_str; }'</span><span class="special"> %</span><span class="special">
+            (</span><span class="identifier">bt</span><span class="special">(</span><span class="string">'char'</span><span class="special">),</span><span class="identifier"> kw</span><span class="special">(</span><span class="string">'const'</span><span class="special">),</span><span class="identifier"> kw</span><span class="special">(</span><span class="string">'return'</span><span class="special">))</span><span class="special">
+            )</span><span class="identifier">
+        self</span><span class="special">.</span><span class="identifier">assertEqual</span><span class="special">(</span><span class="identifier">cpp2html</span><span class="special">(</span><span class="identifier">src</span><span class="special">),</span><span class="identifier"> htm</span><span class="special">)</span><span class="keyword">
+                        
+        
+    def</span><span class="identifier"> testCustomKeywordAndBuiltInMarkup</span><span class="special">(</span><span class="identifier">self</span><span class="special">):</span><span class="identifier">
+        kw</span><span class="special"> =</span><span class="identifier"> htm_bold_blue</span><span class="identifier">
+        bt</span><span class="special"> =</span><span class="identifier"> htm_blue</span><span class="identifier">
+        src</span><span class="special"> =</span><span class="string"> 'char const * version() { return v_str; }'</span><span class="comment">
+        # Use the keyword markup for builtins &amp; vice-versa.
+</span><span class="identifier">        htm</span><span class="special"> =</span><span class="identifier"> preformat</span><span class="special">(</span><span class="string">
+            '%s %s * version() { %s v_str; }'</span><span class="special"> %</span><span class="special">
+            (</span><span class="identifier">kw</span><span class="special">(</span><span class="string">'char'</span><span class="special">),</span><span class="identifier"> bt</span><span class="special">(</span><span class="string">'const'</span><span class="special">),</span><span class="identifier"> bt</span><span class="special">(</span><span class="string">'return'</span><span class="special">))</span><span class="special">
+            )</span><span class="identifier">
+        self</span><span class="special">.</span><span class="identifier">assertEqual</span><span class="special">(</span><span class="identifier">
+            cpp2html</span><span class="special">(</span><span class="identifier">src</span><span class="special">,</span><span class="identifier"> markup_keyword</span><span class="special">=</span><span class="identifier">bt</span><span class="special">,</span><span class="identifier"> markup_builtin</span><span class="special">=</span><span class="identifier">kw</span><span class="special">),</span><span class="identifier"> htm</span><span class="special">)</span><span class="keyword">
+                        
+        
+    def</span><span class="identifier"> testHtmlCookery</span><span class="special">(</span><span class="identifier">self</span><span class="special">):</span><span class="identifier">
+        src</span><span class="special"> =</span><span class="string"> '*utf++ = 0x80 | ucs &gt;&gt; 6 &amp; 0x6f'</span><span class="identifier">
+        htm</span><span class="special"> =</span><span class="identifier"> preformat</span><span class="special">(</span><span class="string">'*utf++ = 0x80 | ucs &amp;gt;&amp;gt; 6 &amp;amp; 0x6f'</span><span class="special">)</span><span class="identifier">
+        self</span><span class="special">.</span><span class="identifier">assertEqual</span><span class="special">(</span><span class="identifier">cpp2html</span><span class="special">(</span><span class="identifier">src</span><span class="special">),</span><span class="identifier"> htm</span><span class="special">)</span><span class="keyword">
+        
+        
+    def</span><span class="identifier"> testNoMarkup</span><span class="special">(</span><span class="identifier">self</span><span class="special">):</span><span class="identifier">
+        src</span><span class="special"> =</span><span class="string"> 'cutlery = knife + fork; // do we need spoons?'</span><span class="identifier">
+        htm</span><span class="special"> =</span><span class="identifier"> preformat</span><span class="special">(</span><span class="identifier">src</span><span class="special">)</span><span class="identifier">
+        self</span><span class="special">.</span><span class="identifier">assertEqual</span><span class="special">(</span><span class="identifier">cpp2html</span><span class="special">(</span><span class="identifier">src</span><span class="special">,</span><span class="keyword"> None</span><span class="special">,</span><span class="keyword"> None</span><span class="special">,</span><span class="keyword"> None</span><span class="special">,</span><span class="keyword"> None</span><span class="special">),</span><span class="identifier"> htm</span><span class="special">)</span><span class="keyword">
+
+
+    def</span><span class="identifier"> testNosuchMarkup</span><span class="special">(</span><span class="identifier">self</span><span class="special">):</span><span class="identifier">
+        src</span><span class="special"> =</span><span class="string"> '#define X 1'</span><span class="identifier">
+        self</span><span class="special">.</span><span class="identifier">assertRaises</span><span class="special">(</span><span class="identifier">TypeError</span><span class="special">,</span><span class="identifier"> cpp2html</span><span class="special">,</span><span class="identifier"> src</span><span class="special">,</span><span class="identifier">
+                          markup_preprocessor</span><span class="special">=</span><span class="identifier">htm_blue</span><span class="special">)</span><span class="keyword">
+
+
+    def</span><span class="identifier"> testBadCodeMarkup</span><span class="special">(</span><span class="identifier">self</span><span class="special">):</span><span class="identifier">
+        src</span><span class="special"> =</span><span class="string"> 'for ( x = "bad; ) ?? /* garbage'</span><span class="keyword">
+        try</span><span class="special">:</span><span class="identifier">
+            htm</span><span class="special"> =</span><span class="identifier"> cpp2html</span><span class="special">(</span><span class="identifier">src</span><span class="special">)</span><span class="keyword">
+        except</span><span class="special">:</span><span class="identifier">
+            self</span><span class="special">.</span><span class="identifier">fail</span><span class="special">(</span><span class="string">'Exception raised marking up [%s]'</span><span class="special"> %</span><span class="identifier"> src</span><span class="special">)</span><span class="keyword">
+
+        
+    def</span><span class="identifier"> testGenericFunctionMarkup</span><span class="special">(</span><span class="identifier">self</span><span class="special">):</span><span class="comment">
+        # GCD example borrowed (with thanks) from
+        # Greg Colvin's keynote at ACCU 2003 conference.
+</span><span class="identifier">        src</span><span class="special"> =</span><span class="string"> '''
+// Generic greatest common divisor algorithm.
+template&lt;typename T&gt;
+T gcd(T m, T n) {
+    while( m &gt; 0 ) {
+        if( n &gt; m )
+            swap(m,n);
+        m = m - n
+    }
+    return n;
+}
+'''</span><span class="identifier">
+        kw</span><span class="special"> =</span><span class="identifier"> htm_bold_blue</span><span class="identifier">
+        cmt</span><span class="special"> =</span><span class="identifier"> htm_italics_red</span><span class="identifier">
+        
+        htm</span><span class="special"> =</span><span class="identifier"> preformat</span><span class="special">(</span><span class="string">'''
+%(comment)s
+%(kw1)s&amp;lt;%(kw2)s T&amp;gt;
+T gcd(T m, T n) {
+    %(kw3)s( m &amp;gt; 0 ) {
+        %(kw4)s( n &amp;gt; m )
+            swap(m,n);
+        m = m - n
+    }
+    %(kw5)s n;
+}
+'''</span><span class="special"> %</span><span class="special">   {</span><span class="string">
+            'comment'</span><span class="special"> :</span><span class="identifier"> cmt</span><span class="special">(</span><span class="string">'// Generic greatest common divisor algorithm.'</span><span class="special">),</span><span class="string">
+            'kw1'</span><span class="special"> :</span><span class="identifier"> kw</span><span class="special">(</span><span class="string">'template'</span><span class="special">),</span><span class="string">
+            'kw2'</span><span class="special"> :</span><span class="identifier"> kw</span><span class="special">(</span><span class="string">'typename'</span><span class="special">),</span><span class="string">
+            'kw3'</span><span class="special"> :</span><span class="identifier"> kw</span><span class="special">(</span><span class="string">'while'</span><span class="special">),</span><span class="string">
+            'kw4'</span><span class="special"> :</span><span class="identifier"> kw</span><span class="special">(</span><span class="string">'if'</span><span class="special">),</span><span class="string">
+            'kw5'</span><span class="special"> :</span><span class="identifier"> kw</span><span class="special">(</span><span class="string">'return'</span><span class="special">)</span><span class="special">
+        })</span><span class="identifier">
+        
+        self</span><span class="special">.</span><span class="identifier">assertEqual</span><span class="special">(</span><span class="identifier">cpp2html</span><span class="special">(</span><span class="identifier">src</span><span class="special">),</span><span class="identifier"> htm</span><span class="special">)</span><span class="keyword">
+        
+
+if</span><span class="identifier"> __name__</span><span class="special"> ==</span><span class="string"> '__main__'</span><span class="special">:</span><span class="identifier">
+    unittest</span><span class="special">.</span><span class="identifier">main</span><span class="special">()</span></code>
+</pre>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><small>Copyright &copy; 2004 Thomas Guest</small></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="refs.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="script_htmlmarkup_py.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

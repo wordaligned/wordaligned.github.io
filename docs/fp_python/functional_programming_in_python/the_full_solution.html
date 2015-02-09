@@ -1,0 +1,102 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>The Full Solution</title>
+<link rel="stylesheet" href="../../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.67.0">
+<link rel="start" href="../index.html" title="Functional Programming in Python">
+<link rel="up" href="../index.html" title="Functional Programming in Python">
+<link rel="prev" href="lambda_functions.html" title="Lambda Functions">
+<link rel="next" href="closing_thoughts.html" title="Closing Thoughts">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><td valign="top"></td></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="lambda_functions.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="closing_thoughts.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+<div class="section" lang="en">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="functional_programming_in_python.the_full_solution"></a>The Full Solution</h2></div></div></div>
+<a name="the_full_solution.the_final_script"></a><h1>
+<a name="id4751177"></a>The Final Script</h1>
+<p>
+The final script appears at the end of this article. Most of its interesting
+points have already been discussed. Note, though:</p>
+<div class="itemizedlist"><ul type="disc">
+<li>
+The lambda function used for pattern substitution, which binds its second
+     argument to our markup rules enabling us to pass our markup rules into
+     the markup function; this works around the fact that a function passed
+     into <code class="code"><span class="identifier">re</span><span class="special">.</span><span class="identifier">sub</span></code> must only accept a single match object argument.
+</li>
+<li>
+The use of the built in <code class="code"><span class="identifier">filter</span></code> function, applied to the groups
+     present in our match object. This function accepts a predicate function
+     and a list, and returns a filtered list containing only those elements
+     for which the predicate is true. If the predicate is <code class="code"><span class="keyword">None</span></code>, the
+     returned list has its zero or empty elements removed.
+</li>
+<li>
+The string literal match pattern, which introduces a negative look behind
+     assertion, <code class="code"><span class="string">'(?&lt;!\\)'</span></code>. The pattern itself
+     <code class="code"><span class="string">".*?(?&lt;!\\)"</span></code> will match an opening double quote followed
+     by a non-greedy sequence of any characters followed by a closing double
+     quote, provided that the closing double quote is not preceded by a
+     backslash &#8211; is not escaped in C terminology. This is necessary in case
+     we encounter a string literal of the form:<br><code class="code"><span class="identifier">char</span><span class="identifier"> const</span><span class="special"> *</span><span class="identifier"> what_he_said</span><span class="special"> =</span><span class="string"> "He said \"Hi!\""</span><span class="special">;</span></code>
+</li>
+<li>
+The <code class="code"><span class="identifier">cookForHtml</span></code> function. The term <span class="emphasis"><em>cook</em></span>, in this context, comes from
+     <a href="closing_thoughts.html#refs">Friedl</a>. <a href="http://www.python.org" target="_top">Python</a>'s <code class="code"><span class="identifier">cgi</span></code> module supplies the required functionality.
+</li>
+</ul></div>
+<a name="the_full_solution.marking_up__ulink_url__http___www_python_org__python__ulink__code"></a><h1>
+<a name="id4751352"></a>Marking up <a href="http://www.python.org" target="_top">Python</a> Code</h1>
+<p>
+I think it's clear that this script could be extended to handle other
+highlighting schemes or source data of other types. It's just a matter of
+defining the markup rules and patterns.</p>
+<p>
+The thought of creating a pattern to match <a href="http://www.python.org" target="_top">Python</a>'s various flavours of string
+literal is rather daunting. Fortunately, the language itself provides a
+<code class="code"><span class="identifier">tokenize</span></code> module which does the job more easily and more accurately.
+The final script also provides a <a href="http://www.python.org" target="_top">Python</a> to html conversion function
+<code class="code"><span class="identifier">python2html</span></code> based on the <code class="code"><span class="identifier">generate_tokens</span></code> function exported
+by this module.</p>
+<p>
+This function embeds a sub-function, <code class="code"><span class="identifier">popLine</span><span class="special">()</span></code>, which is used as the
+callable object required as a parameter to <code class="code"><span class="identifier">generate_tokens</span></code>. This
+function can directly access the list of lines in the enclosing function's
+scope. An alternative would have been to create a functor object initialised
+with a reference to (or a copy of) the required list. In this case, I prefer
+to keep related code as close together as possible, and choose the
+sub-function.</p>
+<a name="the_full_solution.weaknesses_and_limitations"></a><h1>
+<a name="id4751454"></a>Weaknesses and Limitations</h1>
+<p>
+The script, although powerful, is far from perfect. It bundles data sets
+together with a number of unrelated utility functions to get the job done.
+Properly, it should be partitioned into modules: perhaps one for the C++ data
+tuples, one for the pattern creation utilities, one for the general purpose
+html markup utilities and one for our main functions. This partitioning is not
+hard to achieve, but will have to remain a subject for a future article.</p>
+<p>
+To provide a more flexible markup tool, the functions <code class="code"><span class="identifier">python2html</span></code> and
+<code class="code"><span class="identifier">cpp2html</span></code> should provide a mechanism for clients to supply their own
+markup rules. The obvious solution here would be to allow these rules to be
+supplied as optional function parameters.</p>
+<p>
+Finally, despite <a href="http://www.python.org" target="_top">Python</a>'s support for unit testing, this script contains no
+unit tests.</p>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><small>Copyright &copy; 2004 Thomas Guest</small></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="lambda_functions.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="closing_thoughts.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

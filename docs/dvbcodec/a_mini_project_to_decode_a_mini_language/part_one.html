@@ -1,0 +1,552 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title> Part One - Design and Test</title>
+<link rel="stylesheet" href="../../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.67.0">
+<link rel="start" href="../index.html" title="A Mini-Project to Decode a Mini-Language">
+<link rel="up" href="../index.html" title="A Mini-Project to Decode a Mini-Language">
+<link rel="prev" href="../index.html" title="A Mini-Project to Decode a Mini-Language">
+<link rel="next" href="part_two.html" title=" Part Two - Implementation">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><td valign="top"></td></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="../index.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="part_two.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+<div class="section" lang="en">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="a_mini_project_to_decode_a_mini_language.part_one"></a> Part One - Design and Test</h2></div></div></div>
+<a name="part_one.motivation"></a><h2>
+<a name="id4748761"></a>Motivation</h2>
+<p>
+The motivation for this article comes from <span class="emphasis"><em>The Art of UNIX Programming</em></span> by
+<a href="refs.html#refs.raymond">Eric S. Raymond</a>. This is one of the most inspiring books I've read on
+how to write software: although firmly rooted in the traditions of the <span class="emphasis"><em>UNIX</em></span>
+operating system, the culture and philosophy it describes applies far more
+widely. It has reinforced my belief that software development can indeed be an
+art.</p>
+<p>
+Having read this book, wanted to put some of its ideas into
+practice. So I set myself a mini-project.</p>
+<a name="part_one.an_idea_for_a_mini_project"></a><h2>
+<a name="id4748801"></a>An Idea for a Mini-Project</h2>
+<p>
+As a starting point, I'd like to summarise two of <a href="refs.html#refs.raymond">Raymond's</a> 
+most important lessons.</p>
+<div class="itemizedlist"><ul type="disc">
+<li>
+Data structures, not algorithms, are central to programming.
+</li>
+<li>
+Prefer text file formats: they're human-readable and extensible. If you must
+use a binary format then invest in a tool which converts from this format to a
+textual one and back again. This will facilitate working with your data.
+</li>
+</ul></div>
+<p>
+I work in a domain where the need for compression requires the use of binary
+file formats: namely digital television (DTV). Digital video is typically
+<a href="http://www.chiariglione.org/mpeg/standards/mpeg-2/mpeg-2.htm" target="_top">MPEG-2</a> encoded. This is a highly compressed encoding designed to squeeze as
+much content as possible into a limited bandwidth. <a href="http://www.chiariglione.org/mpeg/standards/mpeg-2/mpeg-2.htm" target="_top">MPEG-2</a> encoding also allows
+video and audio content to be combined with metadata: for example, a
+television programme might be accompanied by a text description of itself and
+of what's showing next.</p>
+<div class="informaltable"><table class="table" width="74%">
+<colgroup><col></colgroup>
+<tbody><tr><td class="blurb">
+<span class="inlinemediaobject"><img src="../../images/info.png"></span> The proper term for these particular items of metadata is Event
+Information, present and following. Since this article is not primarily about
+digital television I shall avoid such jargon as far as possible.</td></tr></tbody>
+</table></div>
+<p>
+To get to grips with this metadata a conversion tool is required. The specific
+task I set myself, then, was to write a tool to convert <a href="http://www.chiariglione.org/mpeg/standards/mpeg-2/mpeg-2.htm" target="_top">MPEG-2</a> metadata from
+binary to text, and, if required, to reverse the process. Such an encode/decode
+tool is commonly referred to as a <span class="emphasis"><em>codec</em></span>.</p>
+<p>
+My project, then, was to implement a digital television codec.</p>
+<a name="part_one.the_mpeg_2_bit_stream_syntax__an_example_of_a_minilanguage"></a><h2>
+<a name="id4748929"></a>The MPEG-2 Bit Stream Syntax: An Example of a Minilanguage</h2>
+<p>
+The metadata format is specified using the <a href="http://www.chiariglione.org/mpeg/standards/mpeg-2/mpeg-2.htm" target="_top">MPEG-2</a> bit stream syntax which
+is defined in <a href="refs.html#refs.iso_iec_13818_1">ISO/IEC 13818-1</a>. Data items are
+described by name and length in bits using a C-like procedural syntax. An
+example makes this clear:</p>
+<pre class="programlisting"><code class="literal">program_map_section() {            
+       table_id                        8 
+       section_syntax_indicator        1 
+       '0'                             1 
+       reserved                        2 
+       section_length                 12 
+       program_number                 16 
+       reserved                        2  
+       version_number                  5 
+       current_next_indicator          1  
+       section_number                  8 
+       last_section_number             8 
+       reserved                        3  
+       PCR_PID                        13 
+       reserved                        4  
+       program_info_length            12 
+       for (i=0; i&lt;N; i++) {             
+           descriptor()                  
+       }                                 
+       for (i=0;i&lt;N1;i++) {              
+           stream_type                 8 
+           reserved                    3  
+           elementary_PID             13 
+           reserved                    4  
+           ES_info_length             12 
+           for (i=0; i&lt;N2; i++) {        
+               descriptor()              
+           }                             
+       }                                 
+       CRC_32                         32
+   }                                     
+</code></pre>
+<p>
+What we have here is the bit stream syntax for a section of the <code class="code"><span class="identifier">Program</span><span class="identifier"> Map</span><span class="identifier">
+Table</span></code>. The first 8 bits give the table id (which happens to be 2, for this
+particular table); the single bit which follows provides the section syntax
+indicator; the next bit is always set to zero; the next two bits are reserved
+(and should each be set to one); and so on, until we get to the 32 bit CRC.</p>
+<div class="informaltable"><table class="table" width="74%">
+<colgroup><col></colgroup>
+<tbody><tr><td class="blurb">
+<span class="inlinemediaobject"><img src="../../images/info.png"></span> I assume the <span class="emphasis"><em>reserved</em></span> parts of the section are included to provide
+room for a degree of future extensibility. But not much room. This is one of
+the reasons why <a href="refs.html#refs.raymond">Raymond</a> advocates text file formats: <span class="emphasis"><em>if you need a larger
+value in a text format, just write it.</em></span>
+</td></tr></tbody>
+</table></div>
+<p>
+To provide a little context: the <code class="code"><span class="identifier">Program</span><span class="identifier"> Map</span><span class="identifier"> Table</span><span class="special"> (</span><span class="identifier">PMT</span><span class="special">)</span></code> supplies basic
+information about the digital television services present in an <a href="http://www.chiariglione.org/mpeg/standards/mpeg-2/mpeg-2.htm" target="_top">MPEG-2</a>
+transport stream. A section of this table &#8211; as shown above &#8211; defines the
+elementary streams which comprise a single television service. For example,
+the <code class="code"><span class="identifier">PMT</span></code> for the BBC1 digital television service consists of a video stream,
+an audio stream, a subtitle stream and some data streams. Of course, 
+<a href="refs.html#refs.iso_iec_13818_1">ISO/IEC 13818-1</a> defines the format of many other tables and
+sections, and related specifications &#8211; such as <a href="refs.html#refs.etsi_en_300_468">EN 300468</a>
+define many more.</p>
+<p>
+This textual specification of a binary format is an example of what
+<a href="refs.html#refs.raymond">Raymond</a> terms a mini-language. In fact we have a Turing-complete
+mini-language: that is, it allows for loops and conditionals. The particular
+example shown here does not include any conditionals, though we do have nested
+loops. Note also the referenced <code class="code"><span class="identifier">descriptor</span><span class="special">()</span></code> items. To fully parse the
+<code class="code"><span class="identifier">program_map_section</span><span class="special">()</span></code> we'll need the <code class="code"><span class="identifier">descriptor</span><span class="special">()</span></code>
+format specified too:</p>
+<pre class="programlisting"><code class="literal">descriptor() {              
+       descriptor_tag         8
+       descriptor_length      8
+       for (i=0; i&lt;N; i++) {   
+            private_data_byte 8
+       }                       
+   }                           
+</code></pre>
+<a name="part_one.complications"></a><h2>
+<a name="id4749196"></a>Complications</h2>
+<p>
+The syntax is easy to read, particularly to anyone familiar with C. However,
+if we look more closely at the for-loop in the <code class="code"><span class="identifier">descriptor</span></code>, although it's
+apparent that <code class="code"><span class="identifier">i</span></code> must be an integral loop counter, it's less clear where <code class="code"><span class="identifier">N</span></code>
+is defined. Similarly, in the <code class="code"><span class="identifier">program_map_section</span></code>, how do we find the
+values of <code class="code"><span class="identifier">N1</span></code> and <code class="code"><span class="identifier">N2</span></code>?</p>
+<p>
+<a href="refs.html#refs.iso_iec_13818_1">ISO/IEC 13818-1</a> answers these questions. In the <code class="code"><span class="identifier">descriptor</span></code>, the
+<code class="code"><span class="identifier">descriptor_length</span></code> data element encodes an unsigned integer which tells us
+how many bytes of data are to follow: so <code class="code"><span class="identifier">N</span></code> is simply the value obtained by
+decoding <code class="code"><span class="identifier">descriptor_length</span></code>. The <code class="code"><span class="identifier">program_map_section</span></code> is not quite so simple. <code class="code"><span class="identifier">N</span></code> is easy
+enough &#8211; it's as many variable-length descriptors as it takes to fill the
+total length specified by <code class="code"><span class="identifier">program_info_length</span></code>. <code class="code"><span class="identifier">N2</span></code> is similarly the
+number of descriptors to fill the length specified by the most recent
+occurrence of <code class="code"><span class="identifier">ES_info_length</span></code>. For <code class="code"><span class="identifier">N1</span></code>, however, we have to keep decoding
+elementary streams until the following is true:</p>
+<pre class="programlisting"><code class="literal">Sum of elementary stream lengths (in bytes)
+     ==  section_length - 
+         - (2 + 5 + 1 + 8 + 8 
+            + 3 + 13 + 4 + 12) / 8
+         - program_info_length
+         - 32 / 8
+</code></pre>
+<p>
+We have to divide by 8 since field widths of values within the PMT section are
+given in bits &#8211; but length fields give values in bytes.</p>
+<p>
+Despite these complications, the encoding is well-designed: we can parse these
+binary data structures sequentially without needing to look ahead; and we can skip
+over any bits we're not interested in.</p>
+<p>
+In fact, the more closely we inspect our examples, the more we notice. This
+is good. Recall that data structures, not algorithms, are central to
+programming. Already we're getting stuck into the data.</p>
+<p>
+While we're in this positive frame of mind, let's review the full range of
+control structures required by the <a href="refs.html#refs.iso_iec_13818_1">ISO/IEC 13818-1</a>
+bitstream syntax:</p>
+<a name="part_one.iso_iec_13818_1_control_structures"></a><h2>
+<a name="id4749390"></a>ISO/IEC 13818-1 Control Structures</h2>
+<pre class="programlisting"><code class="literal"><span class="bold"><strong>while</strong></span> (condition) { 
+        data_element
+        ...
+    }   
+
+    <span class="bold"><strong>do</strong></span> {
+        data_element
+        ... 
+    }
+    <span class="bold"><strong>while</strong></span> (condition)
+
+
+    <span class="bold"><strong>if</strong></span> (condition) {
+        data_element
+        ...
+    }
+    <span class="bold"><strong>else</strong></span> {
+        data_element
+        ...
+    }
+    
+    <span class="bold"><strong>for</strong></span> (i=0;i&lt;n;i++) {
+        data_element
+        ...
+    }
+</code></pre>
+<p>
+So, we've got pretty much C's control structures, excepting <code class="code"><span class="keyword">switch</span></code>,
+<code class="code"><span class="keyword">break</span></code>, <code class="code"><span class="keyword">return</span></code> and <code class="code"><span class="keyword">continue</span></code>.</p>
+<p>
+This is starting to look alarming. How complex can a <code class="code"><span class="identifier">condition</span></code> be? How shall
+we handle three different looping constructs? Our mini-project has become rather
+bigger than we imagined.</p>
+<a name="part_one.back_to_the_data"></a><h2>
+<a name="id4749490"></a>Back to the Data</h2>
+<p>
+The thing to do at this point is to shelve these concerns and get back to
+specifics. So, I got hold of some PMT section data and parsed it by hand. I
+used two types of data:</p>
+<div class="itemizedlist"><ul type="disc">
+<li>
+PMT sections pulled out of recorded digital TV broadcasts
+</li>
+<li>
+a simple PMT section synthesised by hand.
+</li>
+</ul></div>
+<p>
+I shall spare you the details. Note though that in parsing by hand we're
+already starting work on our text output format. For example, given the binary
+contents of a synthesised descriptor:</p>
+<pre class="programlisting"><code class="literal">0a 04 0a 0b 0a 0b</code></pre>
+<p>
+and recalling the descriptor syntax:</p>
+<pre class="programlisting"><code class="literal">descriptor() {              
+        descriptor_tag         8
+        descriptor_length      8
+        for (i=0; i&lt;N; i++) {   
+             private_data_byte 8
+        }                       
+    }                           </code></pre>
+<p>
+a suitable output might be:</p>
+<pre class="programlisting"><code class="literal">descriptor() {              
+        descriptor_tag         8 = 0x0a
+        descriptor_length      8 = 0x04
+        for (i=0; i&lt;N; i++) {   
+             private_data_byte 8 = 0x0a
+             private_data_byte 8 = 0x0b
+             private_data_byte 8 = 0x0a
+             private_data_byte 8 = 0x0b
+        }                       
+    }
+</code></pre>
+<p>
+I have deliberately chosen an output format which closely resembles the syntax
+definition. The loop has been unrolled, but I have retained the loop control
+to indicate the structure and origin of the data. I have chosen a hexadecimal
+representation for the data values &#8211; always a good choice for binary data &#8211;
+and explicitly indicate the numeric base used by prefixing these values with the
+string <code class="code"><span class="number">0</span><span class="identifier">x</span></code>. Finally, I have retained the bit widths for convenience: this
+will mean that when converting from text to binary, there will be no need to
+refer back to the descriptor syntax.</p>
+<p>
+Referrring back to our motivating reference, we see we have instinctively
+followed one of <a href="refs.html#refs.raymond">Raymond</a>'s recommendations:</p>
+<div class="blockquote"><blockquote class="blockquote"><p><span class="emphasis"><em>When filtering, never throw away information you don't need to.</em></span></p></blockquote></div>
+<p>
+Here, the term <span class="emphasis"><em>filter</em></span> is used in its <span class="emphasis"><em>Unix</em></span> sense, and applies well to a
+codec; and the reasoning is that any discarded information can never be used
+in any program further down the <span class="emphasis"><em>Unix</em></span> pipeline. In our example, we can see
+that the output includes all the information carried by both the descriptor
+syntax definition and by the example descriptor.</p>
+<a name="part_one.handling_failures"></a><h2>
+<a name="id4749631"></a>Handling Failures</h2>
+<p>
+Suppose our descriptor was too short:</p>
+<pre class="programlisting"><code class="literal">0a 04 0a 0b 0a
+</code></pre>
+<p>
+What should our codec make of such data?</p>
+<p>
+Maybe something like this:</p>
+<pre class="programlisting"><code class="literal">descriptor() {              
+       descriptor_tag         8 = 0x0a
+       descriptor_length      8 = 0x04
+       for (i=0; i&lt;N; i++) {   
+            private_data_byte 8 = 0x0a
+            private_data_byte 8 = 0x0b
+            private_data_byte 8 = 0x0a 
+   <span class="bold"><strong>&gt;&gt;&gt; ERROR: end of data reached. descriptor() incomplete.</strong></span>
+</code></pre>
+<p>
+It's perhaps premature to tie down how errors should be handled, other than to
+say that they should draw attention to themselves, that they shouldn't crash
+the codec, and that they should provide useful diagnostics.  But it certainly
+isn't premature to include some malformed data in our test set.</p>
+<p>
+Another point <a href="refs.html#refs.raymond">Raymond</a> makes about data conversion tools is that they should
+be generous in what they accept (as input) but rigorous in what they emit (as
+output). In our case, this means that a user might change the layout of a text
+version of a <code class="code"><span class="identifier">descriptor</span></code> to read like this:</p>
+<pre class="programlisting"><code class="literal">descriptor() 
+    {   
+        descriptor_tag 8 = 0xA
+        descriptor_length 8 = 0x4
+        for (i = 0; i &lt; N; i++) 
+        {    
+             private_data_byte 8 = 0xA
+             private_data_byte 8 = 0xB
+             private_data_byte 8 = 0xA
+             private_data_byte 8 = 0xB
+        }                       
+    }                           
+</code></pre>
+<p>
+and still expect the codec to convert this to binary as:</p>
+<pre class="programlisting"><code class="literal">0a 04 0a 0b 0a 0b
+</code></pre>
+<p>
+One of the great benefits of having a codec is that we can generate binary
+data from an easy-to-edit textual form: it would be a severe limitation if
+the encoding process was over-sensitive about whitespace, layout, or the
+capitalisation of hexadecimal numbers.</p>
+<a name="part_one.reducing_project_scope"></a><h2>
+<a name="id4749727"></a>Reducing Project Scope</h2>
+<p>
+Whilst tinkering around with my test data set, I've also been paging through
+the <a href="http://www.chiariglione.org/mpeg/standards/mpeg-2/mpeg-2.htm" target="_top">MPEG-2</a> bitstream syntax. The bad news is that the expressions which appear
+in conditionals may be quite complex, making use of all the usual C
+arithmetic, bitwise, logical and relational operators as well as a few
+domain-specific additions.</p>
+<p>
+The good news is that we can make good progress if we restrict our
+scope as follows:</p>
+<div class="itemizedlist"><ul type="disc">
+<li>
+restrict the control structures to <code class="code"><span class="keyword">for</span><span class="special">()</span><span class="special"> {...}</span></code> and 
+      <code class="code"><span class="keyword">if</span><span class="special"> (</span><span class="identifier">condition</span><span class="special">)</span><span class="special"> {...}</span><span class="keyword"> else</span><span class="special"> {...}</span></code>
+</li>
+<li>
+restrict conditions to the form <code class="code"><span class="identifier">field</span><span class="special"> ==</span><span class="identifier"> value</span></code>
+</li>
+</ul></div>
+<p>
+These restrictions will not make a lot of sense to end users. In end user
+terms, we can aim for a first release of our codec which will only support
+sections from the following four tables:</p>
+<div class="itemizedlist"><ul type="disc">
+<li>
+Program Association Table (PAT)
+</li>
+<li>
+Conditional Access Table (CAT)
+</li>
+<li>
+Network Information Table (NIT)
+</li>
+<li>
+Program Map Table (PMT)
+</li>
+</ul></div>
+<p>
+This reduced scope may seem rather limiting. Note however that these
+four tables &#8211; collectively termed the <span class="emphasis"><em>Program Specific Information
+(PSI) Tables</em></span> &#8211; <span class="emphasis"><em>contain the necessary and sufficient information to
+demultiplex and present programs</em></span> (<a href="refs.html#refs.iso_iec_13818_1">ISO
+13818-1</a>). Note further that our syntactic restrictions will not stop
+us from extending our codec to handle the complete set of <a href="http://www.dvb.org" target="_top">DVB</a>
+<a href="refs.html#refs.etsi_en_300_468">Service Information (SI) tables</a>, which
+contain just about all of the metadata used in European digital
+broadcasts.  Note finally that we remain faithful to our aims:
+<a href="refs.html#refs.raymond">Raymond</a> emphasises the need to release early and often, so that
+users can drive (and implement, even, in an open source world) future
+developments. By reducing scope, we allow for this early feedback. We
+must take care, though, to follow another Unix maxim, and keep our
+design extensible.</p>
+<a name="part_one.a_prototype_descriptor_decoder"></a><h2>
+<a name="id4749918"></a>A Prototype Descriptor Decoder</h2>
+<pre class="programlisting">
+<code class="literal">
+<span class="comment">/**
+ * @brief Decode a descriptor.
+ * @param begin The start of the descriptor data
+ * @param end One past the end of the descriptor data
+ * @param out Output stream for the decoded data
+ */</span><span class="keyword">
+bool</span><span class="identifier"> 
+decodeDescriptor</span><span class="special">(</span><span class="identifier">desc_iter</span><span class="identifier"> begin</span><span class="special">,</span><span class="identifier"> desc_iter</span><span class="identifier"> end</span><span class="special">,</span><span class="identifier"> std</span><span class="special">::</span><span class="identifier">ostream</span><span class="special"> &amp;</span><span class="identifier"> out</span><span class="special">)</span><span class="special">
+{</span><span class="identifier">
+    out</span><span class="special"> &lt;&lt;</span><span class="string"> "descriptor() {\n"</span><span class="special">;</span><span class="keyword">
+
+    if</span><span class="special"> (</span><span class="identifier">begin</span><span class="special"> !=</span><span class="identifier"> end</span><span class="special">)</span><span class="special"> {</span><span class="identifier">
+        out</span><span class="special"> &lt;&lt;</span><span class="string"> "    descriptor_tag 8 = "</span><span class="special">
+            &lt;&lt;</span><span class="special"> *</span><span class="identifier">begin</span><span class="special">++</span><span class="special"> &lt;&lt;</span><span class="string"> "\n"</span><span class="special">;</span><span class="special">
+    }</span><span class="comment">
+   
+    // We don't know yet how much data we need to decode.
+    // Use a special non-zero value to indicate this.
+</span><span class="keyword">    unsigned</span><span class="keyword"> int</span><span class="identifier"> to_decode</span><span class="special"> =</span><span class="number"> 0xff</span><span class="special">;</span><span class="keyword">
+   
+    if</span><span class="special"> (</span><span class="identifier">begin</span><span class="special"> !=</span><span class="identifier"> end</span><span class="special">)</span><span class="special"> {</span><span class="identifier">
+        to_decode</span><span class="special"> =</span><span class="special"> *</span><span class="identifier">begin</span><span class="special">++;</span><span class="identifier">
+        
+        out</span><span class="special"> &lt;&lt;</span><span class="string"> "    descriptor_length 8 = "</span><span class="special">
+            &lt;&lt;</span><span class="identifier"> to_decode</span><span class="special"> &lt;&lt;</span><span class="string"> "\n"</span><span class="special">;</span><span class="identifier">
+            
+        out</span><span class="special"> &lt;&lt;</span><span class="string"> "    for(i=0; i&lt;N; i++) {\n"</span><span class="special">;</span><span class="keyword">
+       
+        while</span><span class="special"> (</span><span class="identifier">begin</span><span class="special"> !=</span><span class="identifier"> end</span><span class="special"> &amp;&amp;</span><span class="identifier"> to_decode</span><span class="special"> !=</span><span class="number"> 0</span><span class="special">)</span><span class="special"> {</span><span class="identifier">
+            out</span><span class="special"> &lt;&lt;</span><span class="string"> "        "</span><span class="special">
+                &lt;&lt;</span><span class="string"> "private_data_byte 8 = "</span><span class="special">
+                &lt;&lt;</span><span class="special"> *</span><span class="identifier">begin</span><span class="special">++</span><span class="special"> &lt;&lt;</span><span class="string"> "\n"</span><span class="special">;</span><span class="special">
+            --</span><span class="identifier">to_decode</span><span class="special">;</span><span class="special">
+        }</span><span class="identifier">
+        out</span><span class="special"> &lt;&lt;</span><span class="string"> "    }\n"</span><span class="special">;</span><span class="special"> 
+    }</span><span class="keyword">
+   
+    if</span><span class="special"> (</span><span class="identifier">begin</span><span class="special"> !=</span><span class="identifier"> end</span><span class="special">)</span><span class="special"> {</span><span class="identifier">
+        out</span><span class="special"> &lt;&lt;</span><span class="string"> "ERROR: descriptor() too long.\n"</span><span class="special">;</span><span class="special">
+    }</span><span class="keyword"> else</span><span class="keyword"> if</span><span class="special"> (</span><span class="identifier">to_decode</span><span class="special"> !=</span><span class="number"> 0</span><span class="special">)</span><span class="special"> {</span><span class="identifier">
+        out</span><span class="special"> &lt;&lt;</span><span class="string"> "ERROR: end of data reached. "</span><span class="special">
+            &lt;&lt;</span><span class="string"> "descriptor() incomplete.\n"</span><span class="special">;</span><span class="special">
+    }</span><span class="keyword"> else</span><span class="special"> {</span><span class="identifier">
+        out</span><span class="special"> &lt;&lt;</span><span class="string"> "}\n"</span><span class="special">;</span><span class="special"> 
+    }</span><span class="keyword">
+
+    return</span><span class="identifier"> begin</span><span class="special"> ==</span><span class="identifier"> end</span><span class="special"> &amp;&amp;</span><span class="identifier"> to_decode</span><span class="special"> ==</span><span class="number"> 0</span><span class="special">;</span><span class="special">
+}</span>
+</code>
+</pre>
+<p>
+The function above is a direct first attempt at writing a descriptor decoder.
+Whilst there may be some mileage in this approach, some weaknesses are
+apparent:</p>
+<div class="itemizedlist"><ul type="disc">
+<li>
+The indentation is fixed. This won't do if we are decoding a descriptor
+     in the broader context of a PMT section, when it can appear at two different
+     levels.
+</li>
+<li>
+The error handling is clumsy.
+</li>
+<li>
+Data &#8211; in this case, the descriptor's syntax &#8211; has become muddled with
+     control flow.
+</li>
+</ul></div>
+<p>
+Now is not the time to deal with these weaknesses. We shall simply note that
+the first is simple to fix and the second can easily be improved on. It's the
+third weakness which, in the longer term, will lead to code which is harder to
+understand, maintain and extend. On the other hand, this function demonstrably
+works on our test data set, which is encouraging; and it's not hard to see how
+the approach taken could be extended to decode PAT, CAT, NIT and PMT sections
+&#8211; which is all we've decided to do.</p>
+<a name="part_one.design_alternatives"></a><h2>
+<a name="id4750899"></a>Design Alternatives</h2>
+<p>
+We are now in a good position to consider the design of our codec. Three
+alternatives spring to mind:</p>
+<div class="itemizedlist"><ul type="disc">
+<li>
+Implement a descriptor-codec, a pmt-codec, and so on as required. Here,
+      each mini-codec understands its own designated part of the syntax.
+      Then the dtv-codec simply farms out work as appropriate.  This extends the
+      direct approach described above.
+</li>
+<li>
+Implement a general dtv-codec which understands the full bitstream
+      syntax and can use it to parse an arbitrary section format. All that
+      then remains is to prime this codec with the required section
+      formats.
+</li>
+<li>
+Devise a code generator which, given a section format, will generate a
+      program to code/decode that particular format.
+</li>
+</ul></div>
+<p>
+All three alternatives are good, and all seem in line with our motivating
+aims. The third, in particular, exemplifies <a href="refs.html#refs.raymond">Raymond</a>'s:</p>
+<div class="blockquote"><blockquote class="blockquote"><p><span class="emphasis"><em>Rule of Generation:<br>
+
+Avoid hand-hacking; write programs to write programs when you can.</em></span></p></blockquote></div>
+<p>
+In chosing which route to take, we should remember the <a href="refs.html#refs.xp">XP</a>
+mantra: <span class="emphasis"><em>Do the simplest thing possible</em></span>; which, in UNIX-speak, becomes the
+more prosaic: <span class="emphasis"><em>Keep it Simple, Stupid!</em></span></p>
+<a name="part_one.more_details"></a><h2>
+<a name="id4750978"></a>More Details</h2>
+<p>
+For those who want to implement their own codec, you can find a link
+zip archive <a href="downloads.html#downloads.test_suite">here</a>. This archive contains:</p>
+<div class="itemizedlist"><ul type="disc">
+<li>
+binary PAT, CAT, NIT and PMT sections
+</li>
+<li>
+synthesised text sections
+</li>
+<li>
+alternative text versions
+</li>
+<li>
+malformed binary sections 
+</li>
+<li>
+the relevant section syntax definitions
+</li>
+<li>
+table_id values
+</li>
+<li>
+a README
+</li>
+</ul></div>
+<p>
+For those who'd prefer to see my attempt; proceed to 
+<a href="part_two.html#part_two.introduction">part two</a> of this article.</p>
+<a name="part_one.conclusions"></a><h2>
+<a name="id4751036"></a>Conclusions</h2>
+<p>
+Progress has been made, and without the need to compromise our artistic
+aims.  Even before we've completed the project, we've started to receive the
+main benefit: of understanding our data.</p>
+<p>
+The second part of this article is where we compromise, get our hands
+dirty, bite off more than we can chew &#8211; that is, we write some code.</p>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><small>Copyright &copy; 2004 Thomas Guest</small></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="../index.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="part_two.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

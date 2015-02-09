@@ -1,0 +1,247 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Problems with the Existing Documentation Tools</title>
+<link rel="stylesheet" href="../../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.67.0">
+<link rel="start" href="../index.html" title="Soft Documentation">
+<link rel="up" href="../index.html" title="Soft Documentation">
+<link rel="prev" href="../index.html" title="Soft Documentation">
+<link rel="next" href="regaining_control.html" title="Regaining Control">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><td valign="top"></td></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="../index.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="regaining_control.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+<div class="section" lang="en">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="softdoc_communicator.problems_with_the_existing_documentation_tools"></a>Problems with the Existing Documentation Tools</h2></div></div></div>
+<div class="toc"><dl>
+<dt><span class="section"><a href="problems_with_the_existing_documentation_tools.html#softdoc_communicator.the_existing_toolchain">The Existing Toolchain</a></span></dt>
+<dt><span class="section"><a href="problems_with_the_existing_documentation_tools.html#softdoc_communicator.connecting_up_to_word_doctor_output">Connecting up to Word Doctor Output</a></span></dt>
+<dt><span class="section"><a href="problems_with_the_existing_documentation_tools.html#softdoc_communicator.other_problems">Other Problems</a></span></dt>
+<dt><span class="section"><a href="problems_with_the_existing_documentation_tools.html#softdoc_communicator.resistance_to_change">Resistance to Change</a></span></dt>
+</dl></div>
+<div class="section" lang="en">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="softdoc_communicator.the_existing_toolchain"></a>The Existing Toolchain</h3></div></div></div>
+<p>
+The existing toolchain was, as already mentioned, based on a Microsoft
+Word master document. Producing hard copy was as simple as CTRL+P,
+followed by a dialog about printer settings and some manual labour
+involving a ring binder. It's fair to say that the printed output
+looked pretty much exactly as previewed: the author had good control
+over pagination, positioning of images, fonts, colours and so on.</p>
+<p>
+The linked online pages took more effort. We'd got a license for a
+tool which I'll call Word Doctor (not its real name&#8212;I'm using an
+alias because I'm going to moan about it). Generating the linked web
+pages using Word Doctor involved the following steps:</p>
+<div class="orderedlist"><ol type="1">
+<li>
+Create a new Project.
+</li>
+<li>
+Point it at the Microsoft Word Master.
+</li>
+<li>
+Select some project options from the Word Doctor GUI.
+</li>
+<li>
+Click the build button.
+</li>
+<li>
+Make a cup of tea while the pages generate.
+</li>
+</ol></div>
+<p>
+All fairly easy&#8212;in theory. In practice, there were some other steps
+which the Word Doctor user manual neglected to mention:</p>
+<div class="orderedlist"><ol type="1">
+<li>
+Exit Microsoft Word. Word Doctor has trouble accessing the
+  document otherwise.
+</li>
+<li>
+Restart your PC. For some reason a resource got terminally locked up.
+</li>
+<li>
+Rewrite the Microsoft Word master using the Word Doctor document
+  template.
+</li>
+<li>
+Don't forget to exit Microsoft Word!
+</li>
+<li>
+Create a new project etc.
+</li>
+<li>
+Click the build button.
+</li>
+<li>
+Click away a few warnings about saving TEMPLATE.DOT and OLE
+  something or other.
+</li>
+<li>
+Read the Word Doctor workarounds Wiki page on the intranet.
+</li>
+<li>
+Click the build button again.
+</li>
+<li>
+Go for lunch. Documentation builds took around half an hour.
+</li>
+</ol></div>
+<p>
+I am not exaggerating. The engineering manager admitted that he
+estimated it took at least two days of struggling to convert a
+Microsoft Word master into the online form. And nor do I blame Word
+Doctor. I don't think Microsoft Word is designed to interoperate with
+other thirdparty tools. Instead, it tries to do everything itself:
+from revision control, through styling, to HTML output. It uses an
+opaque binary file format to deter anyone from trying to develop tools
+to work with it.</p>
+<p>
+The final irritation was with the Word Doctor output. The HTML was
+packed with Internet Explorer specific Javascript, and looked poor in
+any other browser.</p>
+</div>
+<div class="section" lang="en">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="softdoc_communicator.connecting_up_to_word_doctor_output"></a>Connecting up to Word Doctor Output</h3></div></div></div>
+<p>
+The real downside of Word Doctor was when it came to trying to connect
+the Product to the Word Doctor web pages. This job fell to me. It was
+a multi-layered integration task:</p>
+<div class="itemizedlist"><ul type="disc">
+<li>
+on a team level I would work with the technical author to ensure the
+  documentation content was accurate and complete.
+</li>
+<li>
+on the Product side, the web-based user interface would call for
+  help using a text identifier. The Help subsystem would use the
+  identifier to look up an HTML location&#8212;a page and an anchor within
+  that page&#8212;and it could then pop up a new window viewing this
+  location.
+</li>
+<li>
+on the documentation side, I would have to configure Word Doctor to
+  ensure its HTML output included the right locations.
+</li>
+</ul></div>
+<p>
+Unfortunately, there were problems with each of these layers.</p>
+<p>
+Personally, I got on well with the technical author, but the
+documentation tools made it extremely hard for us to work on the same
+file. We had to take it in turns or work with copies. I couldn't even
+fix a typo directly.</p>
+<p>
+The Word Doctor output was a frame-based collection of static HTML
+pages. Now, externally referencing a particular location in such a set
+of pages is tricky&#8212;due to the limitations of frames&#8212;so the
+Product's help sub-system had to dynamically generate a framed front
+page displaying the appropriate left and right pane each time it was
+called. Not too difficult, but more complex than strictly necessary.</p>
+<p>
+Both pages and anchors were a moving target in the Word Doctor
+output. Every time you added a new section to the document you risked
+breaking the help references. Thus we found ourselves in a situation
+where the technical author wanted the Product to stabilise in order to
+document it and I needed the documentation to stabilise so that the
+Product could link to it.</p>
+</div>
+<div class="section" lang="en">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="softdoc_communicator.other_problems"></a>Other Problems</h3></div></div></div>
+<p>
+Microsoft Word uses a proprietary binary format. This ties you into
+their product to a degree&#8212;effectively, you're relying on Microsoft
+to look after your data because you simply cannot work with this data
+without their tool. Of course, the risk of Microsoft collapsing during
+the lifetime of your document may be one you can live with, but you
+are also vulnerable to them ceasing to support the version of Word you
+prefer, or charging an unreasonable amoount for an upgrade. It also
+means:</p>
+<div class="itemizedlist"><ul type="disc">
+<li>
+it's extremely hard for more than one person to work on a document
+  at a time since changes to binary files cannot be merged together
+  easily.
+</li>
+<li>
+revision control becomes more expensive and less useful (how do you
+  view the differences between two versions of the manual?)
+</li>
+<li>
+it is very difficult to automate anything. As a trivial example,
+  Word Doctor had no batch interface&#8212;it required human input at
+  every stage. Now consider trying to rebadge the manual, perhaps for
+  redistribution of the Product by some partner company. With a decent
+  documentation toolchain this should be as simple as the build 
+  <code class="code"><span class="identifier">prepare</span></code> target copying the correct logo graphic into place and
+  applying a simple transformation to some text strings.
+</li>
+</ul></div>
+</div>
+<div class="section" lang="en">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="softdoc_communicator.resistance_to_change"></a>Resistance to Change</h3></div></div></div>
+<p>
+Despite all of these limitations and irritations it was hard to convince
+anyone a change was necessary or even desirable. The reasons were as much
+organisational as technical.</p>
+<div class="itemizedlist"><ul type="disc">
+<li>
+The existing tools had been used to produce acceptable end user
+  documentation in the past for other products shipped by the company.
+</li>
+<li>
+Already, considerable effort had been put into the Word master for
+  the new Product (even if much of it would have to be scrapped due to
+  the inevitable changes as the Product developed).
+</li>
+<li>
+Setting up a smarter toolchain would need engineering input, and,
+  once the tools were in place, would the technical author be able to
+  use them productively?
+</li>
+</ul></div>
+<p>
+I could (and did) argue against all of these points:</p>
+<div class="itemizedlist"><ul type="disc">
+<li>
+Existing documentation was stand-alone: it did not have to integrate
+  with what it documented.
+</li>
+<li>
+Using the existing tools to connect the Product with
+  its documentation looked like being a continual sink of effort.
+</li>
+<li>
+I had every confidence that the technical author could quickly
+  master a new documentation tool, and that such a tool would save us
+  all time even in the short term.
+</li>
+</ul></div>
+<p>
+As I saw it, we risked treating documentation as an add-on&#8212;a
+nice-to-have&#8212;rather than as an integral part of the Product, and I
+believe this is wrong. Decent documentation is one of the first things
+I look for when I evaluate a piece of software. Quite simply, I didn't
+want to deliver a Product with poor documentation.</p>
+</div>
+</div>
+<table width="100%"><tr>
+<td align="left"></td>
+<td align="right"><small>Copyright &copy; 2006 Thomas Guest</small></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="../index.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="regaining_control.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

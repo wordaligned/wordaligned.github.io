@@ -1,0 +1,93 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>A DocBook Toolchain</title>
+<link rel="stylesheet" href="../../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.67.0">
+<link rel="start" href="../index.html" title="Soft Documentation">
+<link rel="up" href="../index.html" title="Soft Documentation">
+<link rel="prev" href="regaining_control.html" title="Regaining Control">
+<link rel="next" href="presentation_and_structure.html" title="Presentation and Structure">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><td valign="top"></td></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="regaining_control.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="presentation_and_structure.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+<div class="section" lang="en">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="soft_documentation.a_docbook_toolchain"></a>A DocBook Toolchain</h2></div></div></div>
+<p>
+I should outline here the basics of the toolchain I had evaluated. It was
+based on <a href="http://docbook.org" target="_top">DocBook</a>. A two sentence introduction to <a href="http://docbook.org" target="_top">DocBook</a>
+can be found on the front page of the 
+<a href="http://docbook.sourceforge.net/" target="_top">SourceForge <a href="http://docbook.org" target="_top">DocBook</a> Project</a>. 
+I reproduce it here in full:</p>
+<div class="blockquote"><blockquote class="blockquote"><p><a href="http://docbook.org" target="_top">DocBook</a> is an XML vocabulary that lets you create documents in a
+presentation-neutral form that captures the logical structure of your
+content. Using free tools along with the <a href="http://docbook.org" target="_top">DocBook</a> XSL stylesheets, you
+can publish your content as HTML pages and PDF files, and in many
+other formats.</p></blockquote></div>
+<p>
+I would also like to highlight a couple of points from the preface to
+Bob Stayton's 
+<a href="http://www.sagehill.net/docbookxsl/index.html" target="_top"><span class="emphasis"><em><a href="http://docbook.org" target="_top">DocBook</a> XSL: The Complete Guide</em></span></a>&#8212;a
+reference which anyone actually using <a href="http://docbook.org" target="_top">DocBook</a> is sure to have
+bookmarked:</p>
+<div class="blockquote"><blockquote class="blockquote"><p>A major advantage of <a href="http://docbook.org" target="_top">DocBook</a> is the availability of <a href="http://docbook.org" target="_top">DocBook</a> tools
+from many sources, not just from a single vendor of a proprietary file
+format.  You can mix and match components for editing, typesetting,
+version control, and HTML conversion.<br>
+ ...  <br>
+The other major advantage
+of <a href="http://docbook.org" target="_top">DocBook</a> is the set of free stylesheets that are available for
+it... These stylesheets enable anyone to publish their <a href="http://docbook.org" target="_top">DocBook</a> content
+in print and HTML. An active community of users and contributors keeps
+up the development of the stylesheets and answers questions.</p></blockquote></div>
+<p>
+So, the master document is written in XML conforming to the <a href="http://docbook.org" target="_top">DocBook</a> DTD. This
+master provides the structure and content of our document. Transforming the
+master into different output formats starts with the <a href="http://docbook.org" target="_top">DocBook</a> XSL stylesheets.
+Various aspects of the transformation can be controlled by setting parameters
+to be applied during this transformation (do we want a datestamp to appear in
+the page footer?, should a list of Figures be included in the contents?), or
+even by writing custom XSL templates (for the front page, perhaps).</p>
+<p>
+Depending on the exact output format there may still be work for us to do.
+For HTML pages, the XSL transformation produces nicely structured HTML, but we
+probably want to adjust the CSS style sheet and perhaps provide our own
+admonition and navigation graphics. For Windows HTML Help, the <a href="http://docbook.org" target="_top">DocBook</a> XSL
+stylesheets again produce a special form of HTML which we must then run
+through an HTML Help compiler.</p>
+<p>
+PDF output is rather more fiddly: The <a href="http://docbook.org" target="_top">DocBook</a> XSL stylesheets yield XSL
+formatting objects (FO) from the <a href="http://docbook.org" target="_top">DocBook</a> XML master. A further stage of
+processing is then required to convert these formatting objects into PDF. I
+used the <a href="http://xmlgraphics.apache.org/fop/" target="_top">Apache Formatting Objects Processor (FOP)</a>,
+which in turn depends on other third-party libraries for
+image processing and so on.</p>
+<p>
+As we can see, there are choices to be made at all stages: which
+XSL transform software do we use, which imaging libraries; do we go for a
+stable release of Apache FOP or the development rewrite? Do we spend money on
+a <a href="http://docbook.org" target="_top">DocBook</a> XML editor? Since we have full source access for everything in the
+chain we might also choose to customise the tools if they aren't working for
+us.</p>
+<p>
+These choices were, to start with, a distraction. I was happy to go with the
+selection made by the <a href="http://www.hibernate.org" target="_top">Hibernate</a> team unless there was a good reason not to. I
+wanted the most direct route to generating decent documentation. I kept
+reminding myself that content was more important than style (even though the
+styling tools were more fun to play with).</p>
+</div>
+<table width="100%"><tr>
+<td align="left"></td>
+<td align="right"><small>Copyright &copy; 2006 Thomas Guest</small></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="regaining_control.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="presentation_and_structure.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

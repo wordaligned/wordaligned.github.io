@@ -1,0 +1,58 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Scheduled Backups</title>
+<link rel="stylesheet" href="../../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.67.0">
+<link rel="start" href="../index.html" title="From CVS to Subversion">
+<link rel="up" href="../index.html" title="From CVS to Subversion">
+<link rel="prev" href="the_problem.html" title="The Problem">
+<link rel="next" href="how_much_should_you_import_.html" title="How Much Should You Import?">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><td valign="top"></td></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="the_problem.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="how_much_should_you_import_.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+<div class="section" lang="en">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="from_cvs_to_subversion.scheduled_backups"></a>Scheduled Backups</h2></div></div></div>
+<p>
+I won't go into detail here about the differences between <a href="http://www.nongnu.org/cvs/" target="_top">CVS</a> and
+<a href="http://subversion.tigris.org/" target="_top">Subversion</a>. There's plenty of solid documentation already available.
+One thing worth mentioning is the strategy we adopted for
+<a href="http://subversion.tigris.org/" target="_top">Subversion</a> backups. Previously, our <a href="http://www.nongnu.org/cvs/" target="_top">CVS</a> repository had been mirrored
+to a backup machine using an <code class="literal">rsync</code> job scheduled to
+run every couple of hours. Tape backups of this mirror were
+kept offsite.</p>
+<p>
+I had some reservations about this strategy, particularly since
+(thanks to our hyperactive and insomniac automatic build user) the <a href="http://www.nongnu.org/cvs/" target="_top">CVS</a>
+archive was rarely quiet.  Simply treating the <a href="http://www.nongnu.org/cvs/" target="_top">CVS</a> archive as a bunch
+of files&#8212;which is what <code class="literal">rsync</code> does&#8212;seemed risky. Would the
+mirror be in good shape if <code class="literal">rsync</code> ran in parallel with a check-in?</p>
+<p>
+<a href="http://subversion.tigris.org/" target="_top">Subversion</a> provides the ability to make a hot backup of a live
+repository using the <code class="literal">svnadmin hotcopy</code> command. So, something as
+simple as:</p>
+<pre class="programlisting"><code class="literal">svnadmin hotcopy /path/to/live/repository /path/to/mirror/repository
+</code></pre>
+<p>
+creates a full mirror of the live repository&#8212;if you're prepared to
+wait a while, that is.</p>
+<p>
+Once this mirror has been created, it can be maintained by merging in
+incremental changes using <code class="literal">svnadmin dump --incremental</code> to dump the
+changes and <code class="literal">svnadmin load</code> to load them into the repository mirror.</p>
+</div>
+<table width="100%"><tr>
+<td align="left"></td>
+<td align="right"><small>Copyright &copy; 2006 Thomas Guest</small></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="the_problem.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="how_much_should_you_import_.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

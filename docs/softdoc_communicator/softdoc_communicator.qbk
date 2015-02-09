@@ -1,0 +1,767 @@
+[article Soft Documentation
+    [id softdoc_communicator]
+    [authors [Guest, Thomas]]
+    [copyright 2006 Thomas Guest]
+]
+
+[def Hibernate [@http://www.hibernate.org Hibernate]]
+[def DocBook [@http://docbook.org DocBook]]
+[def __boost__ [@http://boost.org/ Boost]]
+[def BoostBook [@http://boost.org/tools/boostbook BoostBook]]
+[def QuickBook [@http://boost.org/tools/quickbook QuickBook]]
+[def --- '''&#x2014;''']
+
+[section Writing a User Manual]
+
+[section Introduction]
+
+I am a member of a small team of software developers working on a
+novel software product (I'll call it "the Product" from now
+on). Recently I spent some time working on the user manual for this
+Product.
+
+The existing version of the manual was based on a Microsoft Word
+master document. From this master the various required output formats
+were generated in a semi-automated fashion.
+
+Microsoft Word is a popular and powerful tool. It does have its
+drawbacks though, especially for technical documentation, and these
+drawbacks were only amplified by the other tools involved in producing
+the final deliverables. We'll look more closely at these drawbacks
+later. I summarise them here by saying the proprietrary tools and file
+formats led to a loss of control.
+
+Setting up tools to produce technical documentation in multiple
+formats is a difficult problem, but it's also a problem which has been
+solved many times over. Plenty of open source projects provide model
+solutions. My increasing frustration with the Microsoft Word based
+documentation toolchain led me to explore one of these alternatives.
+
+This article records the outcome of my exploration. It tells how, in
+the end, we did regain control over the manual, but at a price.
+
+[endsect]
+
+[section Requirements]
+
+The requirements for the manual were clear enough. It had to fit the
+corporate style---dictating, in this case, font families, colour
+schemes and various other presentational aspects. There would be
+pictures. There would be screen shots. There would be cross
+references.  Naturally, the contents should provide clear and complete
+details on how to use the Product.
+
+We needed just two output formats:
+
+* hard copy, printed and bound
+* linked online web pages.
+
+Of course, these two versions of the document would have to agree with
+each other. And the Product itself, a server-based piece of software
+with a web browser interface, should integrate with the online
+documentation in a context-sensitive manner: clicking the Help icon
+next to an item in the UI should pop up the manual opened at the
+correct location.
+
+Finally, there was the slightly strange requirement that the
+documentation should be substantial [footnote This, to me, is a
+suspect requirement, or at least one we should keep in check,
+otherwise we run the risk of producing documentation whose sections
+are cut-and-paste adaptations of similar sections.]. Somehow, it
+seemed unreasonable to ask customers to hand over lots of money for
+nothing more than CD's worth of software; bundling in a weighty manual
+made the final deliverables more tangible.
+
+
+[endsect]
+
+[endsect]
+
+[section Problems with the Existing Documentation Tools] 
+
+[section The Existing Toolchain]
+
+The existing toolchain was, as already mentioned, based on a Microsoft
+Word master document. Producing hard copy was as simple as CTRL+P,
+followed by a dialog about printer settings and some manual labour
+involving a ring binder. It's fair to say that the printed output
+looked pretty much exactly as previewed: the author had good control
+over pagination, positioning of images, fonts, colours and so on.
+
+The linked online pages took more effort. We'd got a license for a
+tool which I'll call Word Doctor (not its real name---I'm using an
+alias because I'm going to moan about it). Generating the linked web
+pages using Word Doctor involved the following steps:
+
+# Create a new Project.
+
+# Point it at the Microsoft Word Master.
+
+# Select some project options from the Word Doctor GUI.
+
+# Click the build button.
+
+# Make a cup of tea while the pages generate.
+
+All fairly easy---in theory. In practice, there were some other steps
+which the Word Doctor user manual neglected to mention:
+
+# Exit Microsoft Word. Word Doctor has trouble accessing the
+  document otherwise.
+
+# Restart your PC. For some reason a resource got terminally locked up.
+
+# Rewrite the Microsoft Word master using the Word Doctor document
+  template.
+
+# Don't forget to exit Microsoft Word!
+
+# Create a new project etc.
+
+# Click the build button.
+ 
+# Click away a few warnings about saving TEMPLATE.DOT and OLE
+  something or other.
+
+# Read the Word Doctor workarounds Wiki page on the intranet.
+
+# Click the build button again.
+
+# Go for lunch. Documentation builds took around half an hour.
+
+I am not exaggerating. The engineering manager admitted that he
+estimated it took at least two days of struggling to convert a
+Microsoft Word master into the online form. And nor do I blame Word
+Doctor. I don't think Microsoft Word is designed to interoperate with
+other thirdparty tools. Instead, it tries to do everything itself:
+from revision control, through styling, to HTML output. It uses an
+opaque binary file format to deter anyone from trying to develop tools
+to work with it.
+
+The final irritation was with the Word Doctor output. The HTML was
+packed with Internet Explorer specific Javascript, and looked poor in
+any other browser.
+
+[endsect]
+
+[section Connecting up to Word Doctor Output]
+
+The real downside of Word Doctor was when it came to trying to connect
+the Product to the Word Doctor web pages. This job fell to me. It was
+a multi-layered integration task:
+
+* on a team level I would work with the technical author to ensure the
+  documentation content was accurate and complete.
+
+* on the Product side, the web-based user interface would call for
+  help using a text identifier. The Help subsystem would use the
+  identifier to look up an HTML location---a page and an anchor within
+  that page---and it could then pop up a new window viewing this
+  location.
+
+* on the documentation side, I would have to configure Word Doctor to
+  ensure its HTML output included the right locations.
+
+Unfortunately, there were problems with each of these layers.
+
+Personally, I got on well with the technical author, but the
+documentation tools made it extremely hard for us to work on the same
+file. We had to take it in turns or work with copies. I couldn't even
+fix a typo directly.
+
+The Word Doctor output was a frame-based collection of static HTML
+pages. Now, externally referencing a particular location in such a set
+of pages is tricky---due to the limitations of frames---so the
+Product's help sub-system had to dynamically generate a framed front
+page displaying the appropriate left and right pane each time it was
+called. Not too difficult, but more complex than strictly necessary.
+
+Both pages and anchors were a moving target in the Word Doctor
+output. Every time you added a new section to the document you risked
+breaking the help references. Thus we found ourselves in a situation
+where the technical author wanted the Product to stabilise in order to
+document it and I needed the documentation to stabilise so that the
+Product could link to it.
+
+[endsect]
+
+[section Other Problems]
+
+Microsoft Word uses a proprietary binary format. This ties you into
+their product to a degree---effectively, you're relying on Microsoft
+to look after your data because you simply cannot work with this data
+without their tool. Of course, the risk of Microsoft collapsing during
+the lifetime of your document may be one you can live with, but you
+are also vulnerable to them ceasing to support the version of Word you
+prefer, or charging an unreasonable amoount for an upgrade. It also
+means:
+
+* it's extremely hard for more than one person to work on a document
+  at a time since changes to binary files cannot be merged together
+  easily.
+
+* revision control becomes more expensive and less useful (how do you
+  view the differences between two versions of the manual?)
+
+* it is very difficult to automate anything. As a trivial example,
+  Word Doctor had no batch interface---it required human input at
+  every stage. Now consider trying to rebadge the manual, perhaps for
+  redistribution of the Product by some partner company. With a decent
+  documentation toolchain this should be as simple as the build 
+  `prepare` target copying the correct logo graphic into place and
+  applying a simple transformation to some text strings.
+
+[endsect]
+
+[section Resistance to Change]
+
+Despite all of these limitations and irritations it was hard to convince
+anyone a change was necessary or even desirable. The reasons were as much
+organisational as technical.
+
+* The existing tools had been used to produce acceptable end user
+  documentation in the past for other products shipped by the company.
+
+* Already, considerable effort had been put into the Word master for
+  the new Product (even if much of it would have to be scrapped due to
+  the inevitable changes as the Product developed).
+
+* Setting up a smarter toolchain would need engineering input, and,
+  once the tools were in place, would the technical author be able to
+  use them productively?
+
+I could (and did) argue against all of these points:
+
+* Existing documentation was stand-alone: it did not have to integrate
+  with what it documented. 
+
+* Using the existing tools to connect the Product with
+  its documentation looked like being a continual sink of effort.
+
+* I had every confidence that the technical author could quickly
+  master a new documentation tool, and that such a tool would save us
+  all time even in the short term.
+
+As I saw it, we risked treating documentation as an add-on---a
+nice-to-have---rather than as an integral part of the Product, and I
+believe this is wrong. Decent documentation is one of the first things
+I look for when I evaluate a piece of software. Quite simply, I didn't
+want to deliver a Product with poor documentation.
+
+[endsect]
+
+[endsect]
+
+[section Regaining Control]
+
+My frustration with the existing documentation tools set me thinking
+about alternatives. I looked first to the open source world, where
+there's no shortage of excellent documentation and where the authors
+are happy to show how they generated it.
+
+I experimented by downloading and attempting to build some open source
+documentation. Once I had this basic step working, I continued to
+experiment. Could I change fonts, include images, replicate the house
+style? How easy were the tools to use with our own content?
+
+After a Friday afternoon's experimentation I had something worth
+showing to the engineering manager: an end-to-end solution which, from
+a DocBook XML master, generated a skeleton PDF and HTML user manual in
+something approaching the house style.
+
+I suggested to the engineering manager that we should switch the
+usermanual to be based on the tools I had just demonstrated. I said
+I'd be happy set up the toolchain. He agreed with me that technically,
+this seemed the way forwards. However, it wasn't easy for him to give
+me the go ahead for the reasons already discussed.
+
+I confess I had my own doubts too. All I knew at this stage was that
+DocBook could do the job and that I would happily tinker with it to
+get it working for us. I didn't know if we could be productive using
+it. At least we understood the limitations of the current tools.
+
+We both recognised that the single most important thing was
+content. Full and accurate documentation supplied as a plain README
+would be of more practical use to our customers than something
+beautifully formatted and structured but misleadingly inaccurate.
+
+In the end we deferred making a final decision on what to do with the
+manual.  The results of my experiment did seem worth recording, so I
+spent a day or so tidying up and checking in the code so we could
+return to it, if required.
+
+[endsect]
+
+[section A DocBook Toolchain]
+
+I should outline here the basics of the toolchain I had evaluated. It
+was based on DocBook. A two sentence introduction to DocBook can be
+found on the front page of the [@http://docbook.sourceforge.net/
+SourceForge DocBook Project].  I reproduce it here in full:
+
+[:DocBook is an XML vocabulary that lets you create documents in a
+presentation-neutral form that captures the logical structure of your
+content. Using free tools along with the DocBook XSL stylesheets, you
+can publish your content as HTML pages and PDF files, and in many
+other formats.]
+
+I would also like to highlight a couple of points from the preface to
+Bob Stayton's [@http://www.sagehill.net/docbookxsl/index.html
+['DocBook XSL: The Complete Guide]]---a reference which anyone
+actually using DocBook is sure to have bookmarked:
+
+[:A major advantage of DocBook is the availability of DocBook tools
+from many sources, not just from a single vendor of a proprietary file
+format.  You can mix and match components for editing, typesetting,
+version control, and HTML conversion.\n ...  \nThe other major
+advantage of DocBook is the set of free stylesheets that are available
+for it... These stylesheets enable anyone to publish their DocBook
+content in print and HTML. An active community of users and
+contributors keeps up the development of the stylesheets and answers
+questions.]
+
+So, the master document is written in XML conforming to the DocBook
+DTD. This master provides the structure and content of our
+document. Transforming the master into different output formats starts
+with the DocBook XSL stylesheets.  Various aspects of the
+transformation can be controlled by setting parameters to be applied
+during this transformation (do we want a datestamp to appear in the
+page footer?, should a list of Figures be included in the contents?),
+or even by writing custom XSL templates (for the front page, perhaps).
+
+Depending on the exact output format there may still be work for us to
+do.  For HTML pages, the XSL transformation produces nicely structured
+HTML, but we probably want to adjust the CSS style sheet and perhaps
+provide our own admonition and navigation graphics. For Windows HTML
+Help, the DocBook XSL stylesheets again produce a special form of HTML
+which we must then run through an HTML Help compiler.
+
+PDF output is rather more fiddly: The DocBook XSL stylesheets yield
+XSL formatting objects (FO) from the DocBook XML master. A further
+stage of processing is then required to convert these formatting
+objects into PDF. I used the [@http://xmlgraphics.apache.org/fop/
+Apache Formatting Objects Processor (FOP)], which in turn depends on
+other third-party libraries for image processing and so on.
+
+As we can see, there are choices to be made at all stages: which XSL
+transform software do we use, which imaging libraries; do we go for a
+stable release of Apache FOP or the development rewrite? Do we spend
+money on a DocBook XML editor? Since we have full source access for
+everything in the chain we might also choose to customise the tools if
+they aren't working for us.
+
+These choices were, to start with, a distraction.  I wanted the most
+direct route to generating decent documentation. I kept reminding
+myself that content was more important than style (even though the
+styling tools were more fun to play with).
+
+[endsect]
+
+[section Sidebar: Version Control]
+
+Software must adapt to survive. Features are added, bugs squashed;
+maybe the UI gets a makeover, maybe configuration files are replaced
+by a database. Customers do not usually get exposed to this state of
+flux. Typically, they are shipped stable and tested versions of a
+Product---though they may also expect to receive patches against these
+versions, fixing critical bugs for example.
+
+Software developers depend on their version control system to manage
+both the formal, released versions, the patches, and the ongoing
+development version, and to maintain the connections between these
+versions. Computers are good at isolating the differences between
+versions of a source file and at copying these differences between the
+different branches of a code-base. Thus, a programmer can (for
+example) fix a bug once, and the version control system can then be
+used to safely apply the fix wherever it's needed.
+
+In a large code base, the version control system can be configured to
+allow a team of programmers to work on the same set of files---and
+even on the same file.  The version control system can make sense of
+concurrent modifications, and merge them accurately; and in the rare
+situations it can't, it fails safely.
+
+These considerations apply equally to the user manual, whose
+versions must map to versions of the software. By choosing suitable
+documentation formats and adopting version control, authors can
+realise the same benefits.
+
+In fact, the leading open source version control system, Subversion
+[Reference: Subversion], explains the concept of branching a project
+using the particular example of a document -- a handbook, in this
+case. See:
+http://svnbook.red-bean.com/en/1.1/ch04.html#svn-ch-4-sect-1 for
+more information.  Note also that the Subversion documentation is
+written in DocBook.
+
+[endsect]
+
+[section The Technical Author Departs]
+
+We continued on, then, deferring work on the documentation until at
+least we had frozen the user interface. Then the technical author
+left. She'd landed a full-time editing position on a magazine.
+
+Again, I volunteered to work on the documentation. By now the
+engineering manager had succeeded in selling the idea of switching
+documentation tools to higher management.
+
+Version 1.0 was due to be released in two weeks. We had four choices:
+
+# Ship with the existing documentation---which was dangerously out of
+  date.
+
+# Stub out the documentation entirely, so at least users wouldn't be
+  misled by it.
+
+# Revise the Microsoft Word document, use Word Doctor to generate HTML,
+  reconnect the HTML to the Product.
+
+# Rewrite the manual using DocBook.
+
+We ruled out the first choice even though it required the least
+effort. The second seemed like an admission of defeat---could we
+seriously consider releasing a formal version of the Product without
+documentation? Noone present had any enthusiasm for the third choice.
+
+So, finally, with less than a fortnight until code-freeze, I got
+assigned the task of finishing the documentation using the tools of my
+choosing.
+
+
+[endsect]
+
+[section Problems with DocBook]
+
+Most things went rather suprisingly well, but I did encounter a small
+number of hitches.
+
+[section Portability] 
+
+My first unpleasant surprise with the DocBook toolchain came when I
+tried to generate the printable PDF output on a Windows XP
+machine. Rather naively, perhaps, I'd assumed that since all the
+tools were Java based I'd be able to run them on any platform with a
+JVM. Not so.
+
+The first time I tried a Windows build, I got a two page traceback
+triggered by an exception raised in one of the graphics processing
+libraries. Fortunately, I was able to work around the problem by
+swapping the graphics library for an alternative version, apparently
+with no adverse effects.
+
+The incident did shake my confidence, though. It may well be true that
+open source tools give you the ultimate level of control, but you
+don't usually want to exercise it! At this stage I had only tried
+building small documents with a few images. I remained fearful that
+similar problems might recur when the manual grew larger and more
+laden with screenshots.
+
+[endsect]
+
+[section Volatility]
+
+We all know that healthy software tools are in active development, but
+this does have a downside. Some problems actually arose from the
+progression of the tools I was using. For example, I started out with
+the version of the DocBook XSL stylesheets I scavenged from my
+reference open source documentation build (version 1.65.1). 
+
+These were more than good enough for my needs, but much of the DocBook
+documentation I was using referred to more recent distributions. In
+this case, switching to the most recent stable distribution of the XSL
+stylesheets resulted in improvements all round. Apache FOP is less
+mature though: the last stable version (as of December 2005) is
+0.20.5---hardly a version number to inspire confidence---and the
+latest release, 0.90 alpha 1, represents a break from the past. I
+anticipate problems if and when I migrate to a modern version of FOP,
+though again, I also hope for improvements.
+
+[endsect]
+
+[section Verbosity]
+
+XML is verbose and DocBook XML is no exception. As an illustration, here
+is a section of a DocBook document:
+
+[pre
+ <para>
+ We needed just two output formats:
+ </para>
+ <itemizedlist>
+ <listitem>
+ hard copy, printed and bound
+ </listitem>
+ <listitem>
+ linked online web pages.
+ </listitem>
+ </itemizedlist>
+]
+
+XML claims to be human readable, and on one level, it is. On another
+level, though, the clunky angle brackets and obtrusive tags make the
+actual text content in the master document hard to read: the syntax
+obscures the semantics.
+
+
+[endsect]
+
+[section Control]
+
+The DocBook toolchain gave us superb control over some aspects of the
+documentation task. In other areas the controls existed but were
+tricky to locate and operate.
+
+For example, controlling the chunking of the HTML output was
+straightforward and could all be done using build time
+parameters---with no modifications needed to the document
+source. Similarly, controlling file and anchor names in the generated
+HTML was easy, which meant the integration between the Product and the
+online version of the manual was both stable and clean.
+
+Some of the printed output options don't seem so simple, especially
+for someone without a background in printing. In particular, I still
+haven't got to grips with fine control of page-breaking logic, and
+have to hope noone minds too much about tables which split awkwardly
+over pages.
+
+[endsect]
+
+[endsect]
+
+[section DocBook in Action]
+
+[section The Rush to Completion]
+
+In the end, though, all went better than we could have hoped.
+
+I soon had the documentation build integrated with the Product
+build. Now the distributable ISO CD image had the right version of the
+User Manual automatically included.
+
+I wrote a simple program to check the integration between the Product
+and the User Manual. This program checked that the various page/anchor
+targets which the Product used to launch the pop up Help window were
+valid. This script too became part of the build. It provided a
+rudimentary safety net as I rolled in more and more content.
+
+Next, I cannibalised the good bits of the existing manual. We knew
+what problems we had seen in the field: some could be fixed using
+better examples in the Help text; I fixed these next.
+
+Within a couple of days the new manual had all the good content from
+the old manual and none of the misleading or inaccurate content; it
+included some new sections and was fully linked to the Product. It
+was, though, very light on screen shots.
+
+[endsect]
+
+[section Screen Captures]
+
+In an ideal world we could programatically:
+
+* launch the Product;
+* load some data; 
+* pose the user interface for a number of screen shots;
+* capture these screen shots for inclusion in the documentation.
+
+Then this program too could become part of the build and, in theory,
+the screen shots would never fall out of step with the Product.
+
+Already we had some tools in place to automate data loading and to
+exercise the user interface. We still have no solution for
+automatically capturing and cropping the images, so we rely on
+human intervention. So far, this hasn't been a huge issue.
+
+[endsect]
+
+[section QuickBook]
+
+I had a workaround for the verbosity issue. I used QuickBook, one of
+the __boost__ tools. QuickBook is a lightweight C++ program which
+generates DocBook XML from a WikiWiki style source document.
+
+Using QuickBook, we can write our previous example as:
+
+[pre
+ We needed just two output formats:
+
+ * hard copy, printed and bound
+ * linked online web pages.
+]
+
+QuickBook documents are easy to read and easy to write. QuickBook does
+fall a long way short of the full expressive richness of DocBook but
+if all you need are sections, cross-references, tables, lists,
+embedded images and so on, then it's ideal.
+
+[endsect]
+
+[section Build Times]
+
+It wasn't going to be hard to beat Word Doctor on build
+times. Currently, it takes about a minute to generate the full user
+manual, in both PDF and HTML formats, from source. A simple dependency
+check means this build is only triggered when required. The real gain
+here is not so much that the build is quick, but that it is automatic:
+not a single button needs clicking.
+
+[endsect]
+
+[endsect]
+
+[section Soft Documentation]
+
+As a software user I expect software to just work---especially
+software with a GUI. It should be obvious what to do without needing
+to read the manual; and preferably without even waiting for tooltips
+to float into view. By designing a GUI which operates within a web
+browser we already have a headstart here: the user interface is driven
+like any other web interface---there's no need to document how
+hyperlinks work or what the browser's address bar does.
+
+What's more, the [@http://agilemanifesto.org/
+Manifesto for Agile Software Development] explicitly
+prefers: "Working software over comprehensive documentation".
+
+These considerations don't mean that the manual is redundant or
+unwanted, though. There are times when we don't want to clutter the
+core user interface with reference details. There remain occasions
+when hardcopy is invaluable.
+
+What's more, when you try and design an intuitive user interface, you
+realise that the distinction between software and documentation is
+somewhat artificial: it's not so much that the boundaries blur as
+that, from a user's point of view, they aren't really there. Suppose,
+for example, that a form requires an email address to be entered. If
+the user enters an invalid address the form is redrawn with the
+erroneous input highlighted and a terse message displayed: ['Please
+enter a valid email address]; there will also be a clickable Help icon
+directing confused users to the right page of the user manual. Which
+of these elements of the user interface are software and which are
+documentation?
+
+Now suppose we are delivering a library designed to be linked into a
+larger program. The documentation is primarily the header files which
+define the interface to this library. We must invest considerable
+effort making sure these header files define a coherent and
+comprehensible interface: maybe we deliver the library with some
+example client code and makefiles; maybe we provide a test harness;
+maybe we generate hyperlinked documentation directly from the source
+files; and maybe we supply the library implementation as source
+code. Now which is software and which is documentation?
+
+When we write software, we remember 
+[link refs.abelson_and_sussman Abelson and Sussman's] advice:
+
+[:Programs should be written for people to read, and only incidentally
+for machines to execute.]
+     
+In other words, software is documentation. Software should also be
+soft---soft enough to adapt to changing requirements. We must be sure
+to keep our documentation soft too.
+
+[endsect]
+
+
+[section Conclusions]
+
+The real benefits of the new documentation toolchain are becoming more and
+more apparent.
+
+As a simple example, a single text file defines the Product's four
+part version number. The build system processes this file to make sure
+the correct version number appears where it's needed: in the user
+interface, in the CD install script---and, of course, in the
+documentation.
+
+Another example. If we get a support call which we think could have
+been avoided had the documentation been better, then we fix the
+documentation directly. Anyone with access to the version control
+system and a text editor can make the fix. The full printed and online
+documentation will be regenerated when they next do a build, and will
+automatically be included in the next release.
+
+And a final example. The Product I work on checks file-based digital
+video: it can spot unpleasant compression artifacts, unwanted black
+frames, audio glitches and so on. The range and depth of these checks
+is perhaps the area which changes most frequently: when we add support
+for a new video standard, for example. The architecture we have in
+place means that these low level enhancements disrupt the higher
+levels of the software only minimally: in fact, the user interface for
+this part of the Product is dynamically generated from a formal
+description of which checks are supported. Adding a check at this
+level is a simple matter of extending this formal description. We also
+need to document the check: perhaps a reference to the video standard
+and a precise definition of the metrics used. With an intelligent
+documentation toolchain the documentation can live alongside the
+formal description and build time checks confirm the help text links
+up properly.
+
+From an engineering point of view, documentation is properly
+integrated into the Product. I finish with another quotation from
+[@http://www.sagehill.net/docbookxsl/index.html Stayton]:
+
+[:Setting up a DocBook system will take some time and effort. But the
+payoff will be an efficient, flexible, and inexpensive publishing system
+that can grow with your needs.]
+
+[endsect]
+
+[section:refs References]
+
+[h3 Abelson and Sussman]
+
+['Structure and Interpretation of Computer Progams],
+Harold Abelson, Gerald Jay Sussman with Julie Sussman,
+MIT Press, 1984; ISBN 0-262-01077-1
+
+[h3 Apache FOP]
+
+[@http://xmlgraphics.apache.org/fop/]
+
+[h3 Agile Manifesto]
+
+Manifesto for Agile Software Development\n
+[@http://agilemanifesto.org/]
+
+[h3 Boost]
+
+[@http://www.boost.org/]
+
+[h3 BoostBook]
+
+[@http://www.boost.org/tools/boostbook/]
+
+[h3 Boost QuickBook]
+
+[@http://www.boost.org/tools/quickbook/]
+
+[h3 DocBook]
+
+[@http://docbook.org]
+
+[h3 Microsoft Word]
+
+[@http://office.microsoft.com/]
+
+[h3 Stayton]
+
+['DocBook XSL: The Complete Guide],
+[@http://www.sagehill.net/docbookxsl/index.html]
+
+[h3 The DocBook Project]
+
+[@http://docbook.sourceforge.net/]
+
+[endsect]
+
+[section Credits]
+
+My thanks to the editorial teams at both Overload and Communicator
+for their help with this article.
+
+[endsect]
+
+
+

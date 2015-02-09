@@ -1,0 +1,91 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Conclusion</title>
+<link rel="stylesheet" href="../../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.67.0">
+<link rel="start" href="../index.html" title="From A to B with Python">
+<link rel="up" href="../index.html" title="From A to B with Python">
+<link rel="prev" href="second_pass.html" title="Second Pass">
+<link rel="next" href="credits.html" title="Credits">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><td valign="top"></td></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="second_pass.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="credits.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+<div class="section" lang="en">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="from_a_to_b_with_python.conclusion"></a>Conclusion</h2></div></div></div>
+<a name="conclusion.finishing_touches"></a><h1>
+<a name="id4753778"></a>Finishing Touches</h1>
+<p>
+The final script appears at the end of this article.</p>
+<p>
+The Windows problem I mentioned earlier is caused by the platform specific
+directory path separator. Unix uses forward slashes, Windows backslashes.
+My chosen solution is to work with <span class="emphasis"><em>normalised</em></span> paths internally until we
+actually write out the include files, when we make sure forward slashes
+are used as separators.</p>
+<p>
+As a gesture towards user-friendliness I have added an indication of progress
+and an output log. However, this script remains very much for software
+developers who understand what it's doing. I have chosen <code class="code"><span class="identifier">sys</span><span class="special">.</span><span class="identifier">stdout</span><span class="special">.</span><span class="identifier">write</span></code> in
+preference to the <code class="code"><span class="keyword">print</span></code> statement used during the script's development,
+since it gives greater control over output format.</p>
+<p>
+I have not done anything special with Makefiles, project files, Jamfiles &#8211;
+or whatever else you use with your build system. There will be an order of
+magnitude fewer of these to deal with (unless you have a very strange build
+system), but the same techniques can be applied.</p>
+<p>
+The script as it stands has several weaknesses. It is, of course, suited to
+doing a very specific job: solving the exact problem laid out at the start of
+this article, right down to the specified directory mapping.  Whilst
+it would be overkill to provide a GUI allowing users to enter this mapping,
+this input data could usefully be separated from the body of the script.
+Similarly, as already mentioned, the script makes some big assumptions about
+way include paths are used in this particular system.  Finally, there are no
+unit tests &#8211; the only testing has been a rather ad hoc probing of functions
+during the script's development.</p>
+<a name="conclusion.on_scripted_solutions"></a><h1>
+<a name="id4753877"></a>On Scripted Solutions</h1>
+<p>
+This sort of bulk re-arrangement of files is well suited to a scripted
+solution for reasons of:</p>
+<div class="itemizedlist"><ul type="disc">
+<li>
+<span class="bold"><strong>Reliability.</strong></span> The script can be shown to work by unit tests and by
+system tests on small data sets. Then it can be left to do its job.
+</li>
+<li>
+<span class="bold"><strong>Efficiency.</strong></span> Editing dozens &#8211; perhaps hundreds &#8211; of files by
+hand is error prone and tedious. What's worse, unless some moratorium
+on check-ins has been imposed during the restructure, the new
+structure may be out of date before it is ready. A script can process
+Megabytes of source in minutes. Alternatively, it will happy to run at
+night after even the most nocturnal of programmers has logged out.
+</li>
+<li>
+<span class="bold"><strong>Recordability.</strong></span> The script becomes part of the source tree (perhaps in the 
+<code class="literal">tools/scripts directory</code>, in which place it can record accurately 
+and repeatably the tasks it performs.
+</li>
+<li>
+<span class="bold"><strong>Reusability.</strong></span> A well-written script can be amended and enhanced to
+solve future source re-organisations. And even if it can't be re-used,
+a knowledge of scripting can.
+</li>
+</ul></div>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><small>Copyright &copy; 2004 Thomas Guest</small></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="second_pass.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="credits.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

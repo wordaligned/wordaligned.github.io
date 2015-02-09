@@ -1,0 +1,62 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Lazy Builder Source Code and Corrections</title>
+<link rel="stylesheet" href="../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.67.0">
+<link rel="start" href="index.html" title="Lazy Builder Source Code and Corrections">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><td valign="top"></td></table>
+<hr>
+<div class="spirit-nav"></div>
+<div class="article" lang="en">
+<div class="titlepage">
+<div>
+<div><h2 class="title">
+<a name="lazy_builder_source_code_and_corrections"></a>Lazy Builder Source Code and Corrections</h2></div>
+<div><div class="author"><h3 class="author">
+<span class="firstname">Thomas</span> <span class="surname">Guest</span>
+</h3></div></div>
+</div>
+<hr>
+</div>
+<a name=".source_distribution"></a><h2>
+<a name="id4750966"></a>Source distribution</h2>
+<p>
+Here is the <a href="lazy_builder_src.zip" target="_top">source code</a> accompanying the article
+<a href="http://www.artima.com/cppsource/lazy_builder.html" target="_top">The Lazy Builder's Complexity Lesson</a>.</p>
+<a name=".correction"></a><h2>
+<a name="id4749524"></a>Correction</h2>
+<p>
+In an email from <a href="http://cvogt.org/" target="_top">Christopher Vogt</a> I got some
+interesting feedback on this article. It turns out that my analysis of
+the complexity of the first (and worst) brute force algorithm wasn't
+quite correct. I wanted it to be O(N * N), but in fact in the worst
+case it suffers O(N * N * log N) performance.</p>
+<p>
+This worst case occurs when both the job and the toolback contain N
+instances of a single widget. The "used" set will also grow to size N,
+and repeatedly searching through this set is what causes the
+additional log(N) factor.</p>
+<p>
+Consider what happens when we examine the Jth widget in the job. By this stage
+the used set is of size (J-1), and we search this set J times, before inserting
+(an iterator to) the Jth widget in the toolbox (the first widget we haven't used).</p>
+<p>
+Thus the complexity is the sum 1 log 1 + ... J log J + ... N log N, which turns out
+to be O(N * N * log N).</p>
+<p>
+I'd like to thank Christopher again for his help, and for supplying the following
+proof.</p>
+<p>
+<span class="inlinemediaobject"><img src="proof.gif" alt="proof"></span></p>
+</div>
+<table width="100%"><tr>
+<td align="left"></td>
+<td align="right"><small></small></td>
+</tr></table>
+<hr>
+<div class="spirit-nav"></div>
+</body>
+</html>

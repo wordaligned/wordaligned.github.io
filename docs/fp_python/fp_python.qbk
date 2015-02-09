@@ -1,0 +1,628 @@
+[article Functional Programming in Python
+    [authors [Guest, Thomas]]
+    [copyright 2004 Thomas Guest]
+    [source-mode python]
+]
+
+
+
+[def __python__    [@http://www.python.org Python]]
+[def __info__      [$../images/info.png]]
+[def -- '''&#x2013;''']
+[def __boost__     [@http://www.boost.org Boost]]
+[def __spirit__    [@http://spirit.sourceforge.net Spirit]]
+
+[section Introduction]
+
+In a [@../ab_python/index.html previous article] I described the development
+of a simple __python__ script to relocate source files, demonstrating how
+Python's built in objects and modules can make light work of such tasks. The
+final script bore a superficial resemblence to a C program: the code was
+structured into blocks, with a main routine calling subroutines to get the job
+done; objects were scoped; and control flow was handled by familiar constructs
+-- loops, if statements and return statements.
+
+__python__ also allows the creation of more C++ like scripts, complete with
+classes, polymorphism, exceptions introspection etc. In this
+article, however, I want to show how __python__ copes cleanly in a situation 
+where C++ struggles, namely functional programming.
+
+This article, then, builds on the [@../ab_python/index.html previous article]
+by introducing some of Python's functional programming capabilities by means
+of example. It also shows some more advanced uses of Python's regular
+expression module.
+
+[endsect]
+
+[section The Problem]
+
+Let's suppose we want to convert some articles from plain text format into web
+pages. Since these articles are about programming, they embed fragments of
+C/C++ source code, and since the presentation of source code matters, we want
+these fragments to have their syntax highlighted according to the following
+rules:
+
+[table Highlighting Scheme
+
+[[Lexical Element]         [Displayed As]]
+[[builtin types]           [blue]]
+[[keywords]                [[*bold], blue]]
+[[comments]                [['italics], red]]
+[[string literals]         [green]]
+]
+
+I should confess at this point -- as will soon become obvious -- that I'm an
+html novice, and am aiming for the very simplest of markup to achieve the
+scheme presented above: this article is about __python__, not web page
+development. Nonetheless, the finished script could be adapted to produce
+output suitable for more sophisticated web pages.
+
+[endsect]
+
+
+[section Towards a Solution]
+
+[h1 A Pattern Matching Algorithm]
+
+Full lexical analysis of C/C++ is beyond the scope of this script. Even hooking in
+to some third-party parser would be overkill. Fortunately, we can get the job
+done using a simple pattern matching algorithm.
+
+In outline this algorithm:
+
+* creates a pattern to match regions of interest in the code,
+
+* processes the code, marking up these matches.
+     
+To get us started, the following script picks out some C++ keywords associated
+with control flow and emphasises them using bold text:
+
+    import re
+    html_data = re.sub(r'(if|else|for|do|while)',
+                       r'<b>\1</b>',
+                       src_data)                   
+
+
+Notice here the `\1`, which backreferences the first (and in this case,
+only) group matched by the input pattern. The `r` before the string
+literal often appears in Python regular expressions. It stands for ['raw string] 
+and ensures that backslashes are not handled in any special way by
+Python -- the string literals are passed directly on to the regular expression
+module.
+
+
+[h1 Patching up the Problems]
+
+The simple script above is broken.  The C++ fragment:
+
+    cutlery = fork + knife; // do we need spoons?
+    
+would be marked up:
+
+[pre
+    '''cutlery = <b>for</b>k + kn<b>if</b>e; // <b>do</b> we need spoons?'''
+]
+
+There are three unwanted substitutions! Clearly, we should only match keywords
+which are complete words, and keywords cease to be keywords when they're in a
+comment. Both problems can be fixed by using a more complex pattern:
+
+    def markup(match):
+        """Return an html-marked-up version of the input match object"""
+        html = ''
+        if (match.group(1)):
+            html = bold(match.group(1))
+        elif (match.group(2)):
+            html = italics(match.group(2))
+        return html
+    
+    cpp_re = re.compile(r'(\bif\b|\belse\b|\bfor\b|\bdo\b|\bwhile\b)'
+                        r'|'
+                        r'(//.*?$|/\*.*?\*/)',
+                        re.DOTALL |
+                        re.MULTILINE)
+                      
+    html_data = cpp_re.sub(markup, src_data)
+
+                   
+Some notes on the regex pattern:
+
+* `'\b'` matches (the empty string at) the beginning or end of a word,
+   
+* the flag parameter to `re.compile`, `re.DOTALL |
+     re.MULTILINE`, enables us to match C-style multi-line comments (refer
+     to the __python__ documentation for details,
+   
+* asterisks -- such as the ones which appear in C-style comments -- are
+     regex special characters, so they need to be escaped for a literal
+     match,
+   
+* `'.*?'` is a non-greedy match of any character. Non-greedy means
+     that the regex parser doesn't consume all the text it can to match a part
+     of a pattern before backtracking to match the next part of the pattern.
+     So, for example, `'//.*?$'` matches from the start of a C++
+     style-comment up to the next end-of-line character, but `'//.*$'`
+     would match from this start point up to the final end-of-line in the
+     data.
+    
+And some notes our more advanced use of the re module:
+
+* parentheses have been used to capture matching text into groups,
+   
+* the first argument to `re.sub` is now a function which accepts
+     a `MatchObject`. This function applies markup according to the group which
+     has been matched.
+
+Finally, it's probably worth saying something about the triple-quoted string
+literal which appears as the first line of the function. This is the
+function's documentation string, or `docstring`. These strings are, by
+convention, triple-quoted, since they often span more than one line. Refer to
+the __python__ documentation, and in particular ['PEP: 257 Docstring
+Conventions], for details.
+
+[endsect]
+   
+
+[section List Comprehensions]
+
+I'm not entirely happy with the revised script. I don't like the
+repetition of the regex special character, `\b`, and I don't like the
+way the C++ keywords have been obscured by the presence of these characters.
+This situation is only going to get worse when we extend the pattern to
+include all the other C++ keywords.
+
+We could build the pattern up using an explicit loop and the built in join
+function.
+
+    keywords = ('if', 'else', 'for', 'do', 'while')
+    
+    kw_patterns = []
+    for kw in keywords:
+        kw_patterns.append(r'\b%s\b' % kw)
+    
+    kw_pattern = '|'.join(kw_patterns)
+
+
+Alternatively, we can use a list comprehension instead of the loop:
+
+    keywords = ('if', 'else', 'for', 'do', 'while')
+    
+    kw_pattern = '|'.join([r'\b%s\b' % kw 
+                           for kw in keywords])
+
+
+
+This second alternative is the __python__ idiom for building lists from sequences.
+
+There are downsides to using this idiom. What if a C/C++ programmer tries to
+understand/modify this script? What if I don't use __python__ for a while (day
+to day, I use C++) -- will I remember what the syntax means? (Think of all
+those ultra-succinct [@http://www.perl.org Perl] programs, which default
+pretty much everything to apparently conjure their results from thin air.)
+
+In this case, the idiom is well worth adopting. List comprehensions are too
+useful to be ignored.
+
+[endsect]
+
+[section Lambda Functions]
+
+There's another thing I'm not happy about: the separation of the patterns
+being matched and the markup applied to the matches.  Recalling our
+original statement of the problem:
+
+[table Highlighting Scheme
+[[Lexical Element]         [Displayed As]]
+[[builtin types]           [blue]]
+[[keywords]                [[*bold], blue]]
+[[comments]                [['italics], red]]
+[[string literals]         [green]]
+]
+
+I'd like the script to somehow embody this mapping.
+
+The table suggests using a dictionary to map from lexical elements to
+markup functions. Rather than use a dictionary, we'll choose a sequence of
+2-tuples. This is because the elements of a dictionary are not ordered
+(perhaps dictionary was not the best term for __python__ to adopt for such a
+collection!) and we want to control the order in which pattern matches are
+tested. For example, `double` will appear as both a builtin type and as
+a keyword, and we can indicate we want it to match as a builtin by placing
+builtins before keywords in our markup rules.
+ 
+So, we want something like:
+
+    def italics(str): 
+        return '<i>' + str + '</i>'
+        
+    def bold(str): 
+        return '<b>' + str + '</b>'
+    
+    def colour(str, col):
+        return ('<font color="' + col + '">'
+                + str + '</font>')
+        
+    def boldBlue(str):
+        return bold(colour(str, 'blue'))
+                     
+    # ... similarly define blue, italicsRed etc ...
+       
+    markup_rules = (
+        (builtin_pattern, blue),
+        (kw_pattern, boldBlue),
+        (comment_pattern, italicsRed),
+        (string_pattern, green)
+    )
+
+
+
+Here, the html markup helper functions `italics`,
+`colour`, `bold`, are good general purpose utility
+functions. The markup utilities -- `blue`, `boldBlue`,
+`italicsRed`, `green` -- do not merit existence as named
+functions: they are simply the result of composing our utilities and binding
+arguments to values. This is where __python__'s lambda functions can help:
+
+    markup_rules = (
+        
+        (comment_pattern,
+         lambda s: colour(italics(s), 'red'))
+         ,
+        (builtin_pattern,
+         lambda s: colour(s, 'blue'))
+         ,
+        (keyword_pattern,
+         lambda s: colour(bold(s), 'blue'))
+         ,
+        (string_pattern,
+         lambda s: colour(s, 'green'))
+    )
+
+
+A lambda function is an anonymous function. Nonetheless, these anonymous
+functions can be passed around as parameters -- we'll be passing them into our
+regex text substitution function, for example, and we'll use another lambda
+function to do this.
+
+[endsect]
+
+[section The Full Solution]
+
+[h1 The Final Script]
+
+The final script appears at the end of this article. Most of its interesting
+points have already been discussed. Note, though:
+
+* The lambda function used for pattern substitution, which binds its second
+     argument to our markup rules enabling us to pass our markup rules into
+     the markup function; this works around the fact that a function passed
+     into `re.sub` must only accept a single match object argument.
+     
+* The use of the built in `filter` function, applied to the groups
+     present in our match object. This function accepts a predicate function
+     and a list, and returns a filtered list containing only those elements
+     for which the predicate is true. If the predicate is `None`, the
+     returned list has its zero or empty elements removed.
+     
+* The string literal match pattern, which introduces a negative look behind
+     assertion, `'(?<!\\)'`. The pattern itself
+     `".*?(?<!\\)"` will match an opening double quote followed
+     by a non-greedy sequence of any characters followed by a closing double
+     quote, provided that the closing double quote is not preceded by a
+     backslash -- is not escaped in C terminology. This is necessary in case
+     we encounter a string literal of the form:\n
+          `char const * what_he_said = "He said \"Hi!\"";`
+   
+* The `cookForHtml` function. The term ['cook], in this context, comes from
+     [link refs Friedl]. __python__'s `cgi` module supplies the required functionality.
+
+
+[h1 Marking up __python__ Code]
+
+I think it's clear that this script could be extended to handle other
+highlighting schemes or source data of other types. It's just a matter of
+defining the markup rules and patterns.
+
+The thought of creating a pattern to match __python__'s various flavours of string
+literal is rather daunting. Fortunately, the language itself provides a
+`tokenize` module which does the job more easily and more accurately.
+The final script also provides a __python__ to html conversion function
+`python2html` based on the `generate_tokens` function exported
+by this module.
+
+This function embeds a sub-function, `popLine()`, which is used as the
+callable object required as a parameter to `generate_tokens`. This
+function can directly access the list of lines in the enclosing function's
+scope. An alternative would have been to create a functor object initialised
+with a reference to (or a copy of) the required list. In this case, I prefer
+to keep related code as close together as possible, and choose the
+sub-function.
+
+
+[h1 Weaknesses and Limitations]
+
+The script, although powerful, is far from perfect. It bundles data sets
+together with a number of unrelated utility functions to get the job done.
+Properly, it should be partitioned into modules: perhaps one for the C++ data
+tuples, one for the pattern creation utilities, one for the general purpose
+html markup utilities and one for our main functions. This partitioning is not
+hard to achieve, but will have to remain a subject for a future article.
+
+To provide a more flexible markup tool, the functions `python2html` and
+`cpp2html` should provide a mechanism for clients to supply their own
+markup rules. The obvious solution here would be to allow these rules to be
+supplied as optional function parameters.
+
+Finally, despite __python__'s support for unit testing, this script contains no
+unit tests.
+
+[endsect]
+
+[section Closing Thoughts]
+
+[h1 Conclusions]
+
+__python__'s support for lambda functions and list comprehensions have allowed us
+to create a deceptively simple script. 
+
+The script by no means demonstrates all of __python__'s functional programming
+capabilities. A good reference book ([link refs Beazley], for example) describes these
+in more depth.
+
+[h1 Credits]
+
+This article first appeared in the [@http://www.accu.org ACCU's] [*Cvu]
+journal, and I would like to thank the editorial team at this journal for 
+their encouragement and feedback.
+
+Thanks again to Dan Tallis for his expert review of an earlier draft of this
+article.
+
+[#refs]
+
+[h1 References]
+
+[table References
+
+[[Who]           [What]]
+
+[[Thomas Guest]  [A __python__ Script to Relocate Source Trees]]
+
+[[Python]        [[@http://www.python.org]]]
+
+[[Friedl]        [['Mastering Regular Expressions], Jeffrey E. F. Freidl. The
+                    definitive reference on regular expressions, though note that it
+                    focuses mainly on [@http://www.perl.org Perl's] regex support.]]
+
+[[Beazley]       [['__python__ Essential Reference], David Beazley. A concise 
+                   overview of the Python programming language, which
+                   complements the official documentation nicely.]]
+]
+                   
+[endsect]
+
+[section Program Listing]
+
+
+    import re
+    
+    # Reference ISO/IEC 14882, "The C++ Standard", Tables 3 & 4.
+    cpp_keywords = (
+        'and', 'and_eq', 'asm', 'auto', 'bitand', 'bitor', 'bool', 'break',
+        'case', 'catch', 'char', 'class', 'compl', 'const', 'const_cast',
+        'continue', 'default', 'delete', 'do', 'double', 'dynamic_cast', 'else',
+        'enum', 'explicit', 'export', 'extern', 'false', 'float', 'for', 'friend',
+        'goto', 'if', 'inline', 'int', 'long', 'mutable', 'namespace', 'new',
+        'not', 'not_eq', 'operator', 'or', 'or_eq', 'private', 'protected',
+        'public', 'register', 'reinterpret_cast', 'return', 'short', 'sizeof',
+        'static', 'static_cast', 'struct', 'switch', 'template', 'this', 'throw',
+        'true', 'try', 'typedef', 'typeid', 'typename', 'union', 'using',
+        'virtual', 'void', 'volatile', 'wchar_t', 'while', 'xor', 'xor_eq'    
+        )
+    
+    
+    cpp_builtins = (
+        'bool', 'signed', 'unsigned', 'char', 'short', 'long', 'float', 'double',
+        'wchar_t'
+        )
+    
+    
+    def preformat(str):
+        """Return a preformatted version of the string."""    
+        return '<pre>' + str + '</pre>'
+    
+    
+    def italics(str):
+        """Return an italicised version of the string."""
+        return '<i>' + str + '</i>'
+    
+    
+    def bold(str):
+        """Return a bold version of the string."""
+        return '<b>' + str + '</b>'
+    
+    
+    def colour(str, colour):
+        """Return a coloured version of the string."""
+        return ('<font color="' + colour + '">'
+                + str +
+                '</font>')
+    
+    
+    def orPatterns(patterns):
+        """Return a pattern which matches any one of the input patterns."""
+        return '|'.join(patterns)
+    
+    
+    def cookForHtml(src):
+        """Return the input data cooked for html."""
+        import cgi
+        return cgi.escape(src)
+    
+    
+    
+    def markup(match, rules):
+        """Markup the text matched by the input match object."""
+        # Sanity check: the rules match the groups
+        hits = filter(None, match.groups())
+        assert(len(hits) == 1)
+        assert(len(match.groups()) == len(rules))
+    
+        ix = match.lastindex # Last and only index, in fact.
+    
+        # Careful! - rules are indexed from 0 but matchObject groups
+        # are indexed from 1.
+        markup_fn = rules[ix - 1][1]
+        return markup_fn(match.group(ix))
+    
+    
+    def cpp2html(cpp_src):
+        """Return C++ source code marked up using html."""
+        comment_pattern = orPatterns([
+            r'//.*?$',   # C++ style comment
+            r'/\*.*?\*/' # C style comment
+            ])
+    
+        builtin_pattern = orPatterns([
+            r'\b%s\b' % bt
+            for bt in cpp_builtins
+            ])
+    
+        keyword_pattern = orPatterns([
+            r'\b%s\b' % kw
+            for kw in cpp_keywords
+            ])
+            
+        string_pattern = r'".*?(?<!\\)"'
+        
+        markup_rules = (
+            (comment_pattern,
+             lambda s: colour(italics(s), 'red')),
+            # Need builtins before keywords -- there's an overlap,
+            # since some keywords are also designated as builtins.
+            (builtin_pattern,
+             lambda s: colour(s, 'blue')),
+            (keyword_pattern,
+             lambda s: colour(bold(s), 'blue')),
+            (string_pattern,
+             lambda s: colour(s, 'green'))
+            )
+    
+        # Create a regex group for each pattern in the markup rules,
+        # and combine these groups into a single pattern.
+        cpp_pattern = orPatterns(
+            ['(%s)' % p for p, f in markup_rules]
+            )
+    
+        cpp_re = re.compile(
+            cpp_pattern,
+            re.DOTALL |
+            re.MULTILINE # C-style comments can span multiple lines
+            )
+        
+        cpp_src = cookForHtml(cpp_src)
+        
+        cpp_src = cpp_re.sub(
+            lambda m: markup(m, markup_rules),
+            cpp_src)
+    
+        return preformat(cpp_src)
+    
+    
+    def python2html(srcdata):
+        """Return __python__ source code marked up using html."""
+        import keyword
+        import token
+        import tokenize
+        
+        lines = srcdata.split('\n')    
+        def popLine():
+            line = ''
+            if len(lines) > 0:
+                line = lines.pop(0) + '\n'
+            return line
+    
+        marked_up = ''
+        row, col = 0, 0 # Location of the end of the previous token
+        
+        for tok in tokenize.generate_tokens(popLine):
+            # The tokenizer skips whitespace. We must put it back.        
+            srow, scol = tok[2]
+            if (srow > row):
+                col = 0
+            if (scol >= col):
+                marked_up += ' ' * (scol - col)
+            
+            tok_name = token.tok_name[tok[0]]
+            str = cookForHtml(tok[1])
+            
+            if (tok_name == 'STRING'):
+                marked_up += colour(str, 'green')
+            elif (tok_name == 'COMMENT'):
+                marked_up += colour(italics(str), 'red')
+            elif (tok_name == 'NAME' and
+                keyword.iskeyword(tok[1])):
+                marked_up += colour(bold(str), 'blue')
+            else:
+                marked_up += str
+                                  
+            row, col = tok[3]
+    
+        return preformat(marked_up)
+        
+[endsect]
+
+[section Think Again]
+
+My thinking has changed since I first wrote this article: although I believe it
+remains a valid presentation of __python__'s functional programming
+capabilities, I cannot whole-heartedly recommend the final script as a solution to the
+original problem -- namely, of syntax highlighting C++ and Python source code.
+
+The script makes the classic mistake of confusing document ['structure] with
+document ['presentation]. That is, it simply embeds the markup tags directly:
+despite the fact that we identified keywords, comments etc, this structural information
+has been lost by the time the HTML is output. It would have been better to 
+separate structure from presentation using cascading style sheets. (See, for
+example, the [@boostbook.css style sheet] used for this article.)  
+
+The second mistake is that it re-invents a tool which probably already exists
+somewhere out there. In fact there are several such tools which are more
+powerful, more flexible, freely available and suitably licensed.
+
+The third mistake is that, although the script is fine at processing blocks of
+source code, it doesn't scale very well to processing articles which embed
+such blocks, which is what I really wanted to do: for that job, regexes meet
+their match, and a parser is required.
+
+A superior documentation toolchain might:
+
+# Be a freely available open source solution -- allowing me to modify it if
+required
+
+# Accept as input a simple text format
+
+# Parse this input, converting it into a standard and open format for
+structured technical documentation -- such as [@http://www.docbook.org
+DocBook].
+
+# Which would then allow me to convert from [@http://www.docbook.org DocBook]
+into any number of formats (HTML, PDF, RTF etc) by applying the right 
+XSL stylesheets
+
+
+Whilst researching [@../dvbcodec/index.html another article] I chanced upon
+just such a tool. [*QuickBook] is a __spirit__ application and can now be 
+found in the =boost/tools= subdirectory of the 
+__boost__ CVS [@http://sourceforge.net/cvs/?group_id=7586 repository]. It allows you
+to generate [@http://www.boost.org/doc/html/boostbook.html BoostBook]
+documentation from a WikiWiki style plain text source
+file. 
+
+[blurb __info__ Here is the plain text source for this article: [@fp_python.qbk]]
+
+[*QuickBook] is distributed as source code under the 
+[@http://www.boost.org Boost] software license. I helped adapt
+[*Quickbook] to recognise Python source code.
+
+[endsect]

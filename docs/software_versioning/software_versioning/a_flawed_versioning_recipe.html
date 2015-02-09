@@ -1,0 +1,68 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>A Flawed Versioning Recipe</title>
+<link rel="stylesheet" href="../../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.67.0">
+<link rel="start" href="../index.html" title="The Trouble with Version Numbers">
+<link rel="up" href="../index.html" title="The Trouble with Version Numbers">
+<link rel="prev" href="../index.html" title="The Trouble with Version Numbers">
+<link rel="next" href="the_problems.html" title="The Problems">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><td valign="top"></td></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="../index.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="the_problems.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+<div class="section" lang="en">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="software_versioning.a_flawed_versioning_recipe"></a>A Flawed Versioning Recipe</h2></div></div></div>
+<p>
+First, let's consider a sensible but flawed recipe for creating a
+versioned software release. To make the discussion easier to follow,
+let's suppose it's version 2.0 we want to release. Let's also suppose
+that a file named VERSION is the sole point of version information
+for the software <sup>[<a name="id4754421" href="#ftn.id4754421">1</a>]</sup>.</p>
+<div class="orderedlist"><ol type="1">
+<li>
+At some suitable point, branch the software to isolate the release
+from noise on the main development trunk. Edit VERSION so its
+contents read <code class="literal">2.0.0 RELEASE BRANCH</code> and check this change in.
+</li>
+<li>
+Create a build from the release branch.
+</li>
+<li>
+Test this build.
+</li>
+<li>
+If the tests pass, edit VERSION so its contents read <code class="literal">2.0</code>, check
+the change in, and go on to the next. If the tests haven't passed, we
+need to fix all the bugs we've found and return to step 1 (or even, in
+extreme circumstances, to step 0).
+</li>
+<li>
+Tag the release branch. Checkout this tagged version of the code and
+create our final release build from it.
+</li>
+</ol></div>
+<div class="footnotes">
+<br><hr width="100" align="left">
+<div class="footnote"><p><sup>[<a name="ftn.id4754421" href="#id4754421">1</a>] </sup>in other words, any part of the system which needs the
+version number must derive it, either at build- or run- time, from this
+single file. This typically includes the user interface, the
+documentation, the licensing system. By enforcing a single point of
+version information, we at least ensure consistency.</p></div>
+</div>
+</div>
+<table width="100%"><tr>
+<td align="left"></td>
+<td align="right"><small>Copyright &copy; 2007 Thomas Guest</small></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="../index.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="the_problems.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

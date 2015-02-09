@@ -1,0 +1,76 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>What to do Instead</title>
+<link rel="stylesheet" href="../../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.67.0">
+<link rel="start" href="../index.html" title="Code in Comments">
+<link rel="up" href="../index.html" title="Code in Comments">
+<link rel="prev" href="_why_commenting_out_code_is_a_bad_idea.html" title=" Why Commenting Out Code is a Bad Idea">
+<link rel="next" href="conclusions.html" title="Conclusions">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><td valign="top"></td></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="_why_commenting_out_code_is_a_bad_idea.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="conclusions.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+<div class="section" lang="en">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="code_in_comments.what_to_do_instead"></a>What to do Instead</h2></div></div></div>
+<p>
+The source management system is the proper home for old versions of source
+code. If, for some reason, it really seems necessary to explicitly note
+that an alternative version of the current code once existed, then
+this can be indicated using indirection.</p>
+<pre class="programlisting">
+<code class="literal">
+<span class="comment">// Previously, surfaces were stored in a vector, not a list.
+// A list is now used to support efficient re-ordering.
+// Refer to version 1.22 of this file for the vector implementation.
+</span></code>
+</pre>
+<p>
+There is a direct parallel with the change history of a document: at times it
+may be very useful to review who changed what, when, or to examine
+side-by-side differences with the previous version of the document, but this is
+achieved by accessing the document's revision history, not by leaving obsolete
+wording lying around in strike-through style.  The up-to-date version of the
+document should be up-to-date.</p>
+<p>
+Ideally, then, the dead code can be cut away. To achieve this ideal requires
+proper use of the source management system. Check-in comments should be of the
+same standard as any other project documentation &#8211; they need to be clear,
+accurate, and must include relevant cross-references (to bug report numbers,
+for example). An iterative approach to check-ins works well: i.e. take the
+code in steps towards its new form, checking in after each step is complete.</p>
+<p>
+We may not be dealing with dead code, though. Perhaps the code represents work
+in progress &#8211; functions which are being written and which do not yet work,
+but which none-the-less belong in the source code repository. In this case,
+the code needs to indicate why it has been commented out, as already
+mentioned. An alternative would be to store the developing code on a branch
+until it matures.</p>
+<p>
+Similarly, if the commented-out code represents the original content of a
+third-party file, then an in-line explanation is required to make this evident
+to anyone inspecting that file. Even in this situation, I would argue the
+original content should be cut and the source control system used to manage
+the differences.</p>
+<p>
+Debug output often gets commented-out because it degrades performance or fills
+up screens. In this case, either the debug code really was a one-off, and
+should be deleted after use, or it should be carefully integrated into the
+trace system (the trace system being the module which provides the facility
+to efficiently filter logged output at run time).</p>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><small>Copyright &copy; 2004 Thomas Guest</small></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="_why_commenting_out_code_is_a_bad_idea.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="conclusions.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

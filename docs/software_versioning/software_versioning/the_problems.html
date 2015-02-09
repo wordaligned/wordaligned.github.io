@@ -1,0 +1,66 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>The Problems</title>
+<link rel="stylesheet" href="../../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.67.0">
+<link rel="start" href="../index.html" title="The Trouble with Version Numbers">
+<link rel="up" href="../index.html" title="The Trouble with Version Numbers">
+<link rel="prev" href="a_flawed_versioning_recipe.html" title="A Flawed Versioning Recipe">
+<link rel="next" href="keyword_expansion.html" title="Keyword Expansion">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><td valign="top"></td></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="a_flawed_versioning_recipe.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="keyword_expansion.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+<div class="section" lang="en">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="software_versioning.the_problems"></a>The Problems</h2></div></div></div>
+<p>
+There are several problems with this procedure.</p>
+<p>
+I haven't explicitly stated how the builds are being created and how
+they're being tested, but reading between the lines suggests that it's
+a little ad hoc. It could well be that one of the developers generates
+the builds from a personal working copy, runs a few sanity checks,
+then throws the code across to the test team for a more thorough
+thrashing.</p>
+<p>
+Such an approach exposes us to an unacceptable level of human
+error. Instead, we need a machine to ensure that our builds are clean
+and reproducible. Before worrying about how we version the software,
+we must ensure we have a build server to automatically generate builds
+for us, and to run as many tests as a machine can on these builds,
+collating and publishing the results. Inevitably, there will still be
+a need for manual testing; but this build server should become the
+single source of builds for the manual testers.</p>
+<p>
+Even when this build server is in place and doing its job, the
+procedure described suffers two major problems.</p>
+<div class="orderedlist"><ol type="1">
+<li>
+There is still too much manual intervention: somebody has to
+remember to edit the VERSION file, and that somebody had better get
+it right. Typically, as release dates close in, the pressure
+increases, and editing fingers become less steady.
+</li>
+<li>
+The final tagged build isn't the build which actually passed all
+the manual tests. We rebuilt it! What's worse, we <span class="emphasis"><em>changed the code</em></span>
+before rebuilding &#8212; we changed the VERSION file, and we checked the code
+out of the repository in a different way.
+</li>
+</ol></div>
+</div>
+<table width="100%"><tr>
+<td align="left"></td>
+<td align="right"><small>Copyright &copy; 2007 Thomas Guest</small></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="a_flawed_versioning_recipe.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="keyword_expansion.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

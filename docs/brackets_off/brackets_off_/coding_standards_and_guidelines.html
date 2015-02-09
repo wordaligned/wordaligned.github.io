@@ -1,0 +1,106 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Coding Standards and Guidelines</title>
+<link rel="stylesheet" href="../../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.67.0">
+<link rel="start" href="../index.html" title="Brackets Off!">
+<link rel="up" href="../index.html" title="Brackets Off!">
+<link rel="prev" href="more_examples.html" title="More Examples">
+<link rel="next" href="concluding_thoughts.html" title="Concluding Thoughts">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><td valign="top"></td></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="more_examples.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="concluding_thoughts.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+<div class="section" lang="en">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="brackets_off_.coding_standards_and_guidelines"></a>Coding Standards and Guidelines</h2></div></div></div>
+<p>
+In general &#8211; at least, in my experience &#8211; coding standards do not provide
+rules on how to parenthesise expressions. I suspect this is for two reasons.</p>
+<p>
+Firstly, because although all programmers use parentheses to clarify the
+meaning of expressions, they may well disagree on what makes an expression
+clear. Clarity seems a matter of taste. While programmers in a team may agree
+(to differ) on whether tabs or spaces are to be used for indentation, their
+coding standard leaves them free to rewrite <a href="more_examples.html#examples">Example 4</a> as:</p>
+<pre class="programlisting">
+<code class="literal">
+<span class="identifier">str</span><span class="special"> +=</span><span class="identifier"> errors</span><span class="special"> ==</span><span class="number"> 0</span><span class="special"> ?</span><span class="string"> "succeeded"</span><span class="special"> :</span><span class="string"> "failed"</span>
+</code>
+</pre>
+<p>
+And secondly, if a coding standard were to rule on how to parenthesise, it
+would be difficult to find a middle ground. This leaves as candidate rules the
+two extremes:</p>
+<div class="orderedlist"><ol type="1">
+<li>
+parenthesise everything
+</li>
+<li>
+never parenthesise
+</li>
+</ol></div>
+<p>
+The first quickly leads to unreadable code, and the second seems overly
+proscriptive.</p>
+<p>
+In the absence of a hard rule, here are some guidelines which I hope are
+non-contentious and which may help us reach a conclusion:</p>
+<div class="itemizedlist"><ul type="disc">
+<li>
+have the operator precedence tables to hand and understand how to interpret
+  expressions using them,
+</li>
+<li>
+understand the logic behind the operator precedence tables, but be aware of
+  the traps and pitfalls,
+</li>
+<li>
+remember, parentheses are not the only way to make order of evaluation
+  clear. For example, <a href="more_examples.html#examples">Example 4</a> could be rewritten:
+</li>
+</ul></div>
+<pre class="programlisting"><code class="literal">*utf++ = 0x80 | 
+              ucs &gt;&gt; 6 &amp; 
+              0x6f
+</code></pre>
+<div class="itemizedlist"><ul type="disc"><li>
+or even:
+</li></ul></div>
+<pre class="programlisting"><code class="literal">*utf = ucs &gt;&gt; 6; 
+*utf &amp;= 0x6f; 
+*utf |= 0x80; 
+++utf;
+</code></pre>
+<div class="itemizedlist"><ul type="disc">
+<li>
+if an expression is hard to understand, break it down into simpler steps, or
+  extract it out as a function with a meaningful name,
+</li>
+<li>
+trust the compiler: it might not implement partial template specialisation
+  correctly, but it will get operator precedence right every time,
+</li>
+<li>
+never use parentheses simply because you aren't sure of how an expression
+     will be evaluated without them: treat doubt as an opportunity to learn,
+</li>
+<li>
+all macro arguments must be parenthesised.
+</li>
+</ul></div>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><small>Copyright &copy; 2004 Thomas Guest</small></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="more_examples.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="concluding_thoughts.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

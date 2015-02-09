@@ -1,0 +1,70 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>List Comprehensions</title>
+<link rel="stylesheet" href="../../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.67.0">
+<link rel="start" href="../index.html" title="Functional Programming in Python">
+<link rel="up" href="../index.html" title="Functional Programming in Python">
+<link rel="prev" href="towards_a_solution.html" title="Towards a Solution">
+<link rel="next" href="lambda_functions.html" title="Lambda Functions">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><td valign="top"></td></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="towards_a_solution.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="lambda_functions.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+<div class="section" lang="en">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="functional_programming_in_python.list_comprehensions"></a>List Comprehensions</h2></div></div></div>
+<p>
+I'm not entirely happy with the revised script. I don't like the
+repetition of the regex special character, <code class="code"><span class="special">\</span><span class="identifier">b</span></code>, and I don't like the
+way the C++ keywords have been obscured by the presence of these characters.
+This situation is only going to get worse when we extend the pattern to
+include all the other C++ keywords.</p>
+<p>
+We could build the pattern up using an explicit loop and the built in join
+function.</p>
+<pre class="programlisting">
+<code class="literal">
+<span class="identifier">keywords</span><span class="special"> =</span><span class="special"> (</span><span class="string">'if'</span><span class="special">,</span><span class="string"> 'else'</span><span class="special">,</span><span class="string"> 'for'</span><span class="special">,</span><span class="string"> 'do'</span><span class="special">,</span><span class="string"> 'while'</span><span class="special">)</span><span class="identifier">
+
+kw_patterns</span><span class="special"> =</span><span class="special"> []</span><span class="keyword">
+for</span><span class="identifier"> kw</span><span class="keyword"> in</span><span class="identifier"> keywords</span><span class="special">:</span><span class="identifier">
+    kw_patterns</span><span class="special">.</span><span class="identifier">append</span><span class="special">(</span><span class="identifier">r</span><span class="string">'\b%s\b'</span><span class="special"> %</span><span class="identifier"> kw</span><span class="special">)</span><span class="identifier">
+
+kw_pattern</span><span class="special"> =</span><span class="string"> '|'</span><span class="special">.</span><span class="identifier">join</span><span class="special">(</span><span class="identifier">kw_patterns</span><span class="special">)</span></code>
+</pre>
+<p>
+Alternatively, we can use a list comprehension instead of the loop:</p>
+<pre class="programlisting">
+<code class="literal">
+<span class="identifier">keywords</span><span class="special"> =</span><span class="special"> (</span><span class="string">'if'</span><span class="special">,</span><span class="string"> 'else'</span><span class="special">,</span><span class="string"> 'for'</span><span class="special">,</span><span class="string"> 'do'</span><span class="special">,</span><span class="string"> 'while'</span><span class="special">)</span><span class="identifier">
+
+kw_pattern</span><span class="special"> =</span><span class="string"> '|'</span><span class="special">.</span><span class="identifier">join</span><span class="special">([</span><span class="identifier">r</span><span class="string">'\b%s\b'</span><span class="special"> %</span><span class="identifier"> kw</span><span class="keyword"> 
+                       for</span><span class="identifier"> kw</span><span class="keyword"> in</span><span class="identifier"> keywords</span><span class="special">])</span></code>
+</pre>
+<p>
+This second alternative is the <a href="http://www.python.org" target="_top">Python</a> idiom for building lists from sequences.</p>
+<p>
+There are downsides to using this idiom. What if a C/C++ programmer tries to
+understand/modify this script? What if I don't use <a href="http://www.python.org" target="_top">Python</a> for a while (day
+to day, I use C++) &#8211; will I remember what the syntax means? (Think of all
+those ultra-succinct <a href="http://www.perl.org" target="_top">Perl</a> programs, which default
+pretty much everything to apparently conjure their results from thin air.)</p>
+<p>
+In this case, the idiom is well worth adopting. List comprehensions are too
+useful to be ignored.</p>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><small>Copyright &copy; 2004 Thomas Guest</small></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="towards_a_solution.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="lambda_functions.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

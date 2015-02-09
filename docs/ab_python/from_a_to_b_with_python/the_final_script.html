@@ -1,0 +1,234 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>The Final Script</title>
+<link rel="stylesheet" href="../../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.67.0">
+<link rel="start" href="../index.html" title="From A to B with Python">
+<link rel="up" href="../index.html" title="From A to B with Python">
+<link rel="prev" href="credits.html" title="Credits">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><td valign="top"></td></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="credits.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a>
+</div>
+<div class="section" lang="en">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="from_a_to_b_with_python.the_final_script"></a>The Final Script</h2></div></div></div>
+<pre class="programlisting">
+<code class="literal">
+<span class="keyword">import</span><span class="identifier"> os</span><span class="keyword">
+import</span><span class="identifier"> re</span><span class="keyword">
+import</span><span class="identifier"> shutil</span><span class="keyword">
+import</span><span class="identifier"> sys</span><span class="keyword">
+
+
+def</span><span class="identifier"> mapDirectory</span><span class="special">(</span><span class="identifier">dirmap</span><span class="special">,</span><span class="identifier"> dname</span><span class="special">):</span><span class="string">
+    """Return the new location of the input directory."""</span><span class="comment">
+    # Successively reduce the directory path until it
+    # matches one of the keys in the directory map.
+</span><span class="identifier">    mapped_dir</span><span class="special"> =</span><span class="identifier"> p</span><span class="special"> =</span><span class="identifier"> dname</span><span class="keyword">
+    while</span><span class="identifier"> p</span><span class="keyword"> and</span><span class="keyword"> not</span><span class="identifier"> p</span><span class="keyword"> in</span><span class="identifier"> dirmap</span><span class="special">:</span><span class="identifier">
+        p</span><span class="special"> =</span><span class="identifier"> os</span><span class="special">.</span><span class="identifier">path</span><span class="special">.</span><span class="identifier">dirname</span><span class="special">(</span><span class="identifier">p</span><span class="special">)</span><span class="keyword">
+       
+    if</span><span class="identifier"> p</span><span class="special">:</span><span class="identifier">
+        mapped_dir</span><span class="special"> =</span><span class="identifier"> os</span><span class="special">.</span><span class="identifier">path</span><span class="special">.</span><span class="identifier">join</span><span class="special">(</span><span class="identifier">dirmap</span><span class="special">[</span><span class="identifier">p</span><span class="special">],</span><span class="identifier"> 
+                                  dname</span><span class="special">[</span><span class="identifier">len</span><span class="special">(</span><span class="identifier">p</span><span class="special">)</span><span class="special"> +</span><span class="number"> 1</span><span class="special">:])</span><span class="keyword">
+   
+    return</span><span class="identifier"> mapped_dir</span><span class="keyword">
+   
+
+def</span><span class="identifier"> mapFiles</span><span class="special">(</span><span class="identifier">logfp</span><span class="special">,</span><span class="identifier"> dirmap</span><span class="special">,</span><span class="identifier"> dname</span><span class="special">,</span><span class="identifier"> files</span><span class="special">):</span><span class="string">
+    """Return a dictionary mapping files in dir to their new locations."""</span><span class="identifier">
+    dname</span><span class="special"> =</span><span class="identifier"> os</span><span class="special">.</span><span class="identifier">path</span><span class="special">.</span><span class="identifier">normpath</span><span class="special">(</span><span class="identifier">dname</span><span class="special">)</span><span class="identifier">
+    new_dir</span><span class="special"> =</span><span class="identifier"> mapDirectory</span><span class="special">(</span><span class="identifier">dirmap</span><span class="special">,</span><span class="identifier"> dname</span><span class="special">)</span><span class="identifier">
+    logfp</span><span class="special">.</span><span class="identifier">write</span><span class="special">(</span><span class="string">"mapDirectory [%s] -&gt; [%s]\n"</span><span class="special"> %</span><span class="special"> (</span><span class="identifier">dname</span><span class="special">,</span><span class="identifier"> new_dir</span><span class="special">))</span><span class="identifier">
+    fm</span><span class="special"> =</span><span class="special"> {}</span><span class="keyword">
+    for</span><span class="identifier"> f</span><span class="keyword"> in</span><span class="identifier"> files</span><span class="special">:</span><span class="identifier">
+        src</span><span class="special"> =</span><span class="identifier"> os</span><span class="special">.</span><span class="identifier">path</span><span class="special">.</span><span class="identifier">join</span><span class="special">(</span><span class="identifier">dname</span><span class="special">,</span><span class="identifier"> f</span><span class="special">)</span><span class="identifier">
+        dst</span><span class="special"> =</span><span class="identifier"> os</span><span class="special">.</span><span class="identifier">path</span><span class="special">.</span><span class="identifier">join</span><span class="special">(</span><span class="identifier">new_dir</span><span class="special">,</span><span class="identifier"> f</span><span class="special">)</span><span class="identifier">
+        logfp</span><span class="special">.</span><span class="identifier">write</span><span class="special">(</span><span class="string">"\t[%s] -&gt; [%s]\n"</span><span class="special"> %</span><span class="special"> (</span><span class="identifier">src</span><span class="special">,</span><span class="identifier"> dst</span><span class="special">))</span><span class="identifier">
+        fm</span><span class="special">[</span><span class="identifier">src</span><span class="special">]</span><span class="special"> =</span><span class="identifier"> dst</span><span class="keyword">
+    return</span><span class="identifier"> fm</span><span class="keyword">
+    
+
+def</span><span class="identifier"> isSourceFile</span><span class="special">(</span><span class="identifier">file</span><span class="special">):</span><span class="string">
+    """Return True if the input file is a C/C++ source file."""</span><span class="identifier"> 
+    src_re</span><span class="special"> =</span><span class="identifier"> re</span><span class="special">.</span><span class="identifier">compile</span><span class="special">(</span><span class="identifier">r</span><span class="string">'\.(c|h)(pp)?$'</span><span class="special">,</span><span class="identifier">
+                         re</span><span class="special">.</span><span class="identifier">IGNORECASE</span><span class="special">)</span><span class="keyword">
+    return</span><span class="identifier"> src_re</span><span class="special">.</span><span class="identifier">search</span><span class="special">(</span><span class="identifier">file</span><span class="special">)</span><span class="keyword"> is</span><span class="keyword"> not</span><span class="keyword"> None</span><span class="keyword">
+
+
+def</span><span class="identifier"> swapSlashes</span><span class="special">(</span><span class="identifier">str</span><span class="special">):</span><span class="string">
+    """Return the imput string with backslashes swapped to forward slashes."""</span><span class="identifier">
+    back_to_fwd_re</span><span class="special"> =</span><span class="identifier"> re</span><span class="special">.</span><span class="identifier">compile</span><span class="special">(</span><span class="identifier">r</span><span class="string">'\\'</span><span class="special">)</span><span class="keyword">
+    return</span><span class="identifier"> back_to_fwd_re</span><span class="special">.</span><span class="identifier">sub</span><span class="special">(</span><span class="string">'/'</span><span class="special">,</span><span class="identifier"> str</span><span class="special">)</span><span class="keyword">
+
+
+def</span><span class="identifier"> mapIncludeFile</span><span class="special">(</span><span class="identifier">logfp</span><span class="special">,</span><span class="identifier"> inc</span><span class="special">,</span><span class="identifier"> srcdst</span><span class="special">,</span><span class="identifier"> files_map</span><span class="special">):</span><span class="string">
+    """Determine the remapped include file path."""</span><span class="comment">
+    # First, obtain a path to the include file relative to
+    # the original source root
+</span><span class="keyword">    if</span><span class="identifier"> os</span><span class="special">.</span><span class="identifier">path</span><span class="special">.</span><span class="identifier">dirname</span><span class="special">(</span><span class="identifier">inc</span><span class="special">):</span><span class="keyword">
+        pass</span><span class="comment"> # Assumption 1) - "inc" is our relative path
+</span><span class="keyword">    else</span><span class="special">:</span><span class="comment">
+        # Assumption 2) The file must be located in the same
+        # directory as the source file which includes it.
+</span><span class="identifier">        inc</span><span class="special"> =</span><span class="identifier"> os</span><span class="special">.</span><span class="identifier">path</span><span class="special">.</span><span class="identifier">join</span><span class="special">(</span><span class="identifier">os</span><span class="special">.</span><span class="identifier">path</span><span class="special">.</span><span class="identifier">dirname</span><span class="special">(</span><span class="identifier">srcdst</span><span class="special">[</span><span class="number">0</span><span class="special">]),</span><span class="identifier"> inc</span><span class="special">)</span><span class="identifier">
+        inc</span><span class="special"> =</span><span class="identifier"> os</span><span class="special">.</span><span class="identifier">path</span><span class="special">.</span><span class="identifier">normpath</span><span class="special">(</span><span class="identifier">inc</span><span class="special">)</span><span class="comment">
+    # Look up the new home for the file
+</span><span class="keyword">    try</span><span class="special">:</span><span class="identifier">
+        mapped_inc</span><span class="special"> =</span><span class="identifier"> files_map</span><span class="special">[</span><span class="identifier">inc</span><span class="special">]</span><span class="keyword">
+    except</span><span class="identifier"> KeyError</span><span class="special">:</span><span class="identifier">
+        err_msg</span><span class="special"> =</span><span class="special"> (</span><span class="string">'\nFatal error: Failed to locate [%s] '</span><span class="string">
+            '(included by [%s]) '</span><span class="string">
+            'relative to source root.'</span><span class="special"> %</span><span class="special"> (</span><span class="identifier">inc</span><span class="special">,</span><span class="identifier"> srcdst</span><span class="special">[</span><span class="number">0</span><span class="special">]))</span><span class="identifier">
+        logfp</span><span class="special">.</span><span class="identifier">write</span><span class="special">(</span><span class="identifier">err_msg</span><span class="special">)</span><span class="identifier">
+        sys</span><span class="special">.</span><span class="identifier">stderr</span><span class="special">.</span><span class="identifier">write</span><span class="special">(</span><span class="identifier">err_msg</span><span class="special">)</span><span class="identifier">
+        sys</span><span class="special">.</span><span class="identifier">exit</span><span class="special">(</span><span class="number">1</span><span class="special">)</span><span class="keyword">
+      
+    if</span><span class="special"> (</span><span class="identifier">os</span><span class="special">.</span><span class="identifier">path</span><span class="special">.</span><span class="identifier">dirname</span><span class="special">(</span><span class="identifier">mapped_inc</span><span class="special">)</span><span class="special"> ==</span><span class="identifier">
+        os</span><span class="special">.</span><span class="identifier">path</span><span class="special">.</span><span class="identifier">dirname</span><span class="special">(</span><span class="identifier">srcdst</span><span class="special">[</span><span class="number">1</span><span class="special">])):</span><span class="identifier">
+        mapped_inc</span><span class="special"> =</span><span class="identifier"> os</span><span class="special">.</span><span class="identifier">path</span><span class="special">.</span><span class="identifier">basename</span><span class="special">(</span><span class="identifier">mapped_inc</span><span class="special">)</span><span class="keyword">   
+    
+    return</span><span class="identifier"> mapped_inc</span><span class="keyword">
+
+
+def</span><span class="identifier"> processSourceLine</span><span class="special">(</span><span class="identifier">logfp</span><span class="special">,</span><span class="identifier"> line</span><span class="special">,</span><span class="identifier"> srcdst</span><span class="special">,</span><span class="identifier"> files_map</span><span class="special">):</span><span class="string">
+    """Process a line from a source file, correcting included file paths."""</span><span class="identifier">
+    include_re</span><span class="special"> =</span><span class="identifier"> re</span><span class="special">.</span><span class="identifier">compile</span><span class="special">(</span><span class="identifier">
+        r</span><span class="string">'^\s*#\s*include\s*"'</span><span class="identifier">
+        r</span><span class="string">'(?P&lt;inc_file&gt;\S+)'</span><span class="string">
+        '"'</span><span class="special">)</span><span class="identifier">
+    match</span><span class="special"> =</span><span class="identifier"> include_re</span><span class="special">.</span><span class="identifier">match</span><span class="special">(</span><span class="identifier">line</span><span class="special">)</span><span class="keyword">
+    if</span><span class="identifier"> match</span><span class="special">:</span><span class="identifier">
+        logfp</span><span class="special">.</span><span class="identifier">write</span><span class="special">(</span><span class="string">'    [%s] -&gt; '</span><span class="special"> %</span><span class="identifier"> line</span><span class="special">.</span><span class="identifier">rstrip</span><span class="special">())</span><span class="identifier">
+        mapped_inc_file</span><span class="special"> =</span><span class="identifier"> mapIncludeFile</span><span class="special">(</span><span class="identifier">
+            logfp</span><span class="special">,</span><span class="identifier">
+            match</span><span class="special">.</span><span class="identifier">group</span><span class="special">(</span><span class="string">'inc_file'</span><span class="special">),</span><span class="identifier">
+            srcdst</span><span class="special">,</span><span class="identifier">
+            files_map</span><span class="special">
+            )</span><span class="identifier">
+        line</span><span class="special"> =</span><span class="identifier"> line</span><span class="special">[:</span><span class="identifier">match</span><span class="special">.</span><span class="identifier">start</span><span class="special">(</span><span class="string">'inc_file'</span><span class="special">)]</span><span class="special"> +</span><span class="special"> \</span><span class="identifier">
+               mapped_inc_file</span><span class="special"> +</span><span class="special"> \</span><span class="identifier">
+               line</span><span class="special">[</span><span class="identifier">match</span><span class="special">.</span><span class="identifier">end</span><span class="special">(</span><span class="string">'inc_file'</span><span class="special">):]</span><span class="identifier">
+        line</span><span class="special"> =</span><span class="identifier"> swapSlashes</span><span class="special">(</span><span class="identifier">line</span><span class="special">)</span><span class="identifier">
+        logfp</span><span class="special">.</span><span class="identifier">write</span><span class="special">(</span><span class="string">'[%s]\n'</span><span class="special"> %</span><span class="identifier"> line</span><span class="special">.</span><span class="identifier">rstrip</span><span class="special">())</span><span class="keyword">
+    
+    return</span><span class="identifier"> line</span><span class="keyword">
+   
+
+def</span><span class="identifier"> relocateSource</span><span class="special">(</span><span class="identifier">logfp</span><span class="special">,</span><span class="identifier"> srcdst</span><span class="special">,</span><span class="identifier"> dstfile</span><span class="special">,</span><span class="identifier"> files_map</span><span class="special">):</span><span class="string">
+    """Relocate a source file, correcting paths to included files."""</span><span class="identifier">
+    infp</span><span class="special">  =</span><span class="identifier"> open</span><span class="special">(</span><span class="identifier">srcdst</span><span class="special">[</span><span class="number">0</span><span class="special">],</span><span class="string"> 'r'</span><span class="special">)</span><span class="identifier">
+    outfp</span><span class="special"> =</span><span class="identifier"> open</span><span class="special">(</span><span class="identifier">dstfile</span><span class="special">,</span><span class="string"> 'w'</span><span class="special">)</span><span class="identifier">
+    logfp</span><span class="special">.</span><span class="identifier">write</span><span class="special">(</span><span class="string">'Relocating source file [%s] -&gt; [%s]\n'</span><span class="special"> %</span><span class="special">
+               (</span><span class="identifier">srcdst</span><span class="special">[</span><span class="number">0</span><span class="special">],</span><span class="identifier"> dstfile</span><span class="special">))</span><span class="keyword">
+    for</span><span class="identifier"> line</span><span class="keyword"> in</span><span class="identifier"> infp</span><span class="special">:</span><span class="identifier">
+        outfp</span><span class="special">.</span><span class="identifier">write</span><span class="special">(</span><span class="identifier">
+            processSourceLine</span><span class="special">(</span><span class="identifier">
+                logfp</span><span class="special">,</span><span class="identifier"> line</span><span class="special">,</span><span class="identifier"> srcdst</span><span class="special">,</span><span class="identifier"> files_map</span><span class="special">)</span><span class="special">
+            )</span><span class="identifier">
+    infp</span><span class="special">.</span><span class="identifier">close</span><span class="special">()</span><span class="identifier">
+    outfp</span><span class="special">.</span><span class="identifier">close</span><span class="special">()</span><span class="keyword">
+
+
+def</span><span class="identifier"> relocate</span><span class="special">(</span><span class="identifier">logfp</span><span class="special">,</span><span class="identifier"> srcdst</span><span class="special">,</span><span class="identifier"> dst_root</span><span class="special">,</span><span class="identifier"> files_map</span><span class="special">):</span><span class="string">
+    """Relocate a file, correcting internal file references."""</span><span class="identifier">
+    dst_file</span><span class="special"> =</span><span class="identifier"> os</span><span class="special">.</span><span class="identifier">path</span><span class="special">.</span><span class="identifier">join</span><span class="special">(</span><span class="identifier">dst_root</span><span class="special">,</span><span class="identifier"> srcdst</span><span class="special">[</span><span class="number">1</span><span class="special">])</span><span class="identifier">
+    dst_dir</span><span class="special"> =</span><span class="identifier"> os</span><span class="special">.</span><span class="identifier">path</span><span class="special">.</span><span class="identifier">dirname</span><span class="special">(</span><span class="identifier">dst_file</span><span class="special">)</span><span class="keyword">
+    if</span><span class="keyword"> not</span><span class="identifier"> os</span><span class="special">.</span><span class="identifier">path</span><span class="special">.</span><span class="identifier">isdir</span><span class="special">(</span><span class="identifier">dst_dir</span><span class="special">):</span><span class="identifier">
+        os</span><span class="special">.</span><span class="identifier">makedirs</span><span class="special">(</span><span class="identifier">dst_dir</span><span class="special">)</span><span class="keyword"> 
+    if</span><span class="identifier"> isSourceFile</span><span class="special">(</span><span class="identifier">dst_file</span><span class="special">):</span><span class="identifier">
+        relocateSource</span><span class="special">(</span><span class="identifier">logfp</span><span class="special">,</span><span class="identifier"> srcdst</span><span class="special">,</span><span class="identifier"> dst_file</span><span class="special">,</span><span class="identifier"> files_map</span><span class="special">)</span><span class="keyword">
+    else</span><span class="special">:</span><span class="identifier">
+        logfp</span><span class="special">.</span><span class="identifier">write</span><span class="special">(</span><span class="string">'Copying [%s] -&gt; [%s]\n'</span><span class="special"> %</span><span class="special">
+                   (</span><span class="identifier">srcdst</span><span class="special">[</span><span class="number">0</span><span class="special">],</span><span class="identifier"> dst_file</span><span class="special">))</span><span class="identifier">
+        shutil</span><span class="special">.</span><span class="identifier">copyfile</span><span class="special">(</span><span class="identifier">srcdst</span><span class="special">[</span><span class="number">0</span><span class="special">],</span><span class="identifier"> dst_file</span><span class="special">)</span><span class="keyword">
+
+
+def</span><span class="identifier"> percent</span><span class="special">(</span><span class="identifier">num</span><span class="special">,</span><span class="identifier"> denom</span><span class="special">):</span><span class="string">
+    """Return num / denom expressed as an integer percentage."""</span><span class="keyword">
+    return</span><span class="identifier"> int</span><span class="special">(</span><span class="identifier">num</span><span class="special"> *</span><span class="number"> 100</span><span class="special"> /</span><span class="identifier"> denom</span><span class="special">)</span><span class="keyword">
+
+
+def</span><span class="identifier"> printSettings</span><span class="special">(</span><span class="identifier">fp</span><span class="special">,</span><span class="identifier"> dmap</span><span class="special">,</span><span class="identifier"> src</span><span class="special">,</span><span class="identifier"> dst</span><span class="special">):</span><span class="string">
+    """Output script settings to the input file."""</span><span class="identifier">
+    fp</span><span class="special">.</span><span class="identifier">write</span><span class="special">(</span><span class="string">'Relocating source tree from [%s] to [%s]\n'</span><span class="special"> %</span><span class="special">
+             (</span><span class="identifier">src</span><span class="special">,</span><span class="identifier"> dst</span><span class="special">))</span><span class="identifier">
+    fp</span><span class="special">.</span><span class="identifier">write</span><span class="special">(</span><span class="string">'Relocating directories:\n'</span><span class="special">)</span><span class="keyword">
+    for</span><span class="identifier"> d</span><span class="keyword"> in</span><span class="identifier"> dirmap</span><span class="special">:</span><span class="identifier">
+        fp</span><span class="special">.</span><span class="identifier">write</span><span class="special">(</span><span class="string">'    [%s] -&gt; [%s]\n'</span><span class="special"> %</span><span class="special">
+                 (</span><span class="identifier">d</span><span class="special">,</span><span class="identifier"> dmap</span><span class="special">[</span><span class="identifier">d</span><span class="special">]))</span><span class="identifier">
+    fp</span><span class="special">.</span><span class="identifier">write</span><span class="special">(</span><span class="string">'\n'</span><span class="special">)</span><span class="comment">
+
+    
+# Main processing starts here...
+# First, set up script data:
+#   - a dictionary mapping existing dirs to their new locations,
+#   - the source and destination roots for the source tree,
+</span><span class="identifier">np</span><span class="special"> =</span><span class="identifier"> os</span><span class="special">.</span><span class="identifier">path</span><span class="special">.</span><span class="identifier">normpath</span><span class="identifier">
+dirmap</span><span class="special"> =</span><span class="special"> {</span><span class="identifier">
+    np</span><span class="special">(</span><span class="string">'png'</span><span class="special">)</span><span class="special">     :</span><span class="identifier"> np</span><span class="special">(</span><span class="string">'graphics/thirdparty/png'</span><span class="special">),</span><span class="identifier">
+    np</span><span class="special">(</span><span class="string">'jpeg'</span><span class="special">)</span><span class="special">    :</span><span class="identifier"> np</span><span class="special">(</span><span class="string">'graphics/thirdparty/jpeg'</span><span class="special">),</span><span class="identifier">
+    np</span><span class="special">(</span><span class="string">'bitmap'</span><span class="special">)</span><span class="special">  :</span><span class="identifier"> np</span><span class="special">(</span><span class="string">'graphics/common/bitmap'</span><span class="special">),</span><span class="identifier">
+    np</span><span class="special">(</span><span class="string">'UserIF'</span><span class="special">)</span><span class="special">  :</span><span class="identifier"> np</span><span class="special">(</span><span class="string">'ui'</span><span class="special">),</span><span class="identifier">
+    np</span><span class="special">(</span><span class="string">'UserIF/Wgts'</span><span class="special">)</span><span class="special"> :</span><span class="identifier"> np</span><span class="special">(</span><span class="string">'ui/widgets'</span><span class="special">),</span><span class="identifier">
+    np</span><span class="special">(</span><span class="string">'os'</span><span class="special">)</span><span class="special">      :</span><span class="identifier"> np</span><span class="special">(</span><span class="string">'platform/os'</span><span class="special">),</span><span class="identifier">
+    np</span><span class="special">(</span><span class="string">'os/hpux'</span><span class="special">)</span><span class="special"> :</span><span class="identifier"> np</span><span class="special">(</span><span class="string">'platform/os/hpux10'</span><span class="special">)</span><span class="special">
+}</span><span class="identifier">
+from_root</span><span class="special"> =</span><span class="string"> '.'</span><span class="identifier">
+to_root</span><span class="special"> =</span><span class="string"> '../relocate'</span><span class="comment">
+
+# Further initialisation.
+</span><span class="identifier">logfp</span><span class="special"> =</span><span class="identifier"> open</span><span class="special">(</span><span class="string">'relocate.log'</span><span class="special">,</span><span class="string"> 'w'</span><span class="special">)</span><span class="identifier">
+printSettings</span><span class="special">(</span><span class="identifier">logfp</span><span class="special">,</span><span class="identifier"> dirmap</span><span class="special">,</span><span class="identifier"> from_root</span><span class="special">,</span><span class="identifier"> to_root</span><span class="special">)</span><span class="identifier">
+printSettings</span><span class="special">(</span><span class="identifier">sys</span><span class="special">.</span><span class="identifier">stdout</span><span class="special">,</span><span class="identifier"> dirmap</span><span class="special">,</span><span class="identifier"> from_root</span><span class="special">,</span><span class="identifier"> to_root</span><span class="special">)</span><span class="comment">
+
+# Initialise a dictionary to map current file path
+# to new file path.
+</span><span class="identifier">files_map</span><span class="special"> =</span><span class="special"> {}</span><span class="comment">
+
+# Fill the dictionary by remapping all files beneath
+# the current working directory.
+</span><span class="identifier">sys</span><span class="special">.</span><span class="identifier">stdout</span><span class="special">.</span><span class="identifier">write</span><span class="special">(</span><span class="string">'Preprocessing files. Please wait.\n'</span><span class="special">)</span><span class="keyword">
+
+for</span><span class="special"> (</span><span class="identifier">subdir</span><span class="special">,</span><span class="identifier"> dirs</span><span class="special">,</span><span class="identifier"> files</span><span class="special">)</span><span class="keyword"> in</span><span class="identifier"> os</span><span class="special">.</span><span class="identifier">walk</span><span class="special">(</span><span class="identifier">from_root</span><span class="special">):</span><span class="identifier">
+    files_map</span><span class="special">.</span><span class="identifier">update</span><span class="special">(</span><span class="identifier">
+        mapFiles</span><span class="special">(</span><span class="identifier">logfp</span><span class="special">,</span><span class="identifier"> dirmap</span><span class="special">,</span><span class="identifier"> subdir</span><span class="special">,</span><span class="identifier"> files</span><span class="special">)</span><span class="special">
+        )</span><span class="comment">
+
+# Create the new root directory for relocated files
+</span><span class="identifier">os</span><span class="special">.</span><span class="identifier">makedirs</span><span class="special">(</span><span class="identifier">to_root</span><span class="special">)</span><span class="comment">
+   
+# Now actually perform the relocation
+</span><span class="identifier">count</span><span class="special"> =</span><span class="identifier"> len</span><span class="special">(</span><span class="identifier">files_map</span><span class="special">)</span><span class="identifier">
+item</span><span class="special"> =</span><span class="number"> 0</span><span class="identifier">
+sys</span><span class="special">.</span><span class="identifier">stdout</span><span class="special">.</span><span class="identifier">write</span><span class="special">(</span><span class="string">'Relocating [%d] files.\n'</span><span class="string">
+                 'Logfile at [%s]\n'</span><span class="string">
+                 'Progress [%02d%%]'</span><span class="special"> %</span><span class="special"> 
+       (</span><span class="identifier">count</span><span class="special">,</span><span class="identifier"> logfp</span><span class="special">.</span><span class="identifier">name</span><span class="special">,</span><span class="identifier"> percent</span><span class="special">(</span><span class="identifier">item</span><span class="special">,</span><span class="identifier"> count</span><span class="special">))</span><span class="special">
+    )</span><span class="keyword">
+   
+for</span><span class="identifier"> srcdst</span><span class="keyword"> in</span><span class="identifier"> files_map</span><span class="special">.</span><span class="identifier">items</span><span class="special">():</span><span class="identifier">
+    item</span><span class="special"> +=</span><span class="number"> 1</span><span class="identifier">
+    sys</span><span class="special">.</span><span class="identifier">stdout</span><span class="special">.</span><span class="identifier">write</span><span class="special">(</span><span class="string">'\b\b\b\b%02d%%]'</span><span class="special"> %</span><span class="identifier"> 
+                     percent</span><span class="special">(</span><span class="identifier">item</span><span class="special">,</span><span class="identifier"> count</span><span class="special">))</span><span class="identifier">
+    relocate</span><span class="special">(</span><span class="identifier">logfp</span><span class="special">,</span><span class="identifier"> srcdst</span><span class="special">,</span><span class="identifier"> to_root</span><span class="special">,</span><span class="identifier"> files_map</span><span class="special">)</span><span class="identifier">
+
+logfp</span><span class="special">.</span><span class="identifier">close</span><span class="special">()</span><span class="identifier">
+sys</span><span class="special">.</span><span class="identifier">stdout</span><span class="special">.</span><span class="identifier">write</span><span class="special">(</span><span class="string">'\nRelocation completed successfully.\n'</span><span class="special">)</span></code>
+</pre>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><small>Copyright &copy; 2004 Thomas Guest</small></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="credits.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a>
+</div>
+</body>
+</html>

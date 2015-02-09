@@ -1,0 +1,144 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Towards a Solution</title>
+<link rel="stylesheet" href="../../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.67.0">
+<link rel="start" href="../index.html" title="Functional Programming in Python">
+<link rel="up" href="../index.html" title="Functional Programming in Python">
+<link rel="prev" href="the_problem.html" title="The Problem">
+<link rel="next" href="list_comprehensions.html" title="List Comprehensions">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><td valign="top"></td></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="the_problem.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="list_comprehensions.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+<div class="section" lang="en">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="functional_programming_in_python.towards_a_solution"></a>Towards a Solution</h2></div></div></div>
+<a name="towards_a_solution.a_pattern_matching_algorithm"></a><h1>
+<a name="id4748885"></a>A Pattern Matching Algorithm</h1>
+<p>
+Full lexical analysis of C/C++ is beyond the scope of this script. Even hooking in
+to some third-party parser would be overkill. Fortunately, we can get the job
+done using a simple pattern matching algorithm.</p>
+<p>
+In outline this algorithm:</p>
+<div class="itemizedlist"><ul type="disc">
+<li>
+creates a pattern to match regions of interest in the code,
+</li>
+<li>
+processes the code, marking up these matches.
+</li>
+</ul></div>
+<p>
+To get us started, the following script picks out some C++ keywords associated
+with control flow and emphasises them using bold text:</p>
+<pre class="programlisting">
+<code class="literal">
+<span class="keyword">import</span><span class="identifier"> re</span><span class="identifier">
+html_data</span><span class="special"> =</span><span class="identifier"> re</span><span class="special">.</span><span class="identifier">sub</span><span class="special">(</span><span class="identifier">r</span><span class="string">'(if|else|for|do|while)'</span><span class="special">,</span><span class="identifier">
+                   r</span><span class="string">'&lt;b&gt;\1&lt;/b&gt;'</span><span class="special">,</span><span class="identifier">
+                   src_data</span><span class="special">)</span></code>
+</pre>
+<p>
+Notice here the <code class="code"><span class="special">\</span><span class="number">1</span></code>, which backreferences the first (and in this case,
+only) group matched by the input pattern. The <code class="code"><span class="identifier">r</span></code> before the string
+literal often appears in Python regular expressions. It stands for <span class="emphasis"><em>raw string</em></span> 
+and ensures that backslashes are not handled in any special way by
+Python &#8211; the string literals are passed directly on to the regular expression
+module.</p>
+<a name="towards_a_solution.patching_up_the_problems"></a><h1>
+<a name="id4749032"></a>Patching up the Problems</h1>
+<p>
+The simple script above is broken.  The C++ fragment:</p>
+<pre class="programlisting">
+<code class="literal">
+<span class="identifier">cutlery</span><span class="special"> =</span><span class="identifier"> fork</span><span class="special"> +</span><span class="identifier"> knife</span><span class="special">;</span><span class="special"> //</span><span class="identifier"> do</span><span class="identifier"> we</span><span class="identifier"> need</span><span class="identifier"> spoons</span>#</code>
+</pre>
+<p>
+would be marked up:</p>
+<pre class="programlisting"><code class="literal">cutlery = <font color="red">&lt;b&gt;for&lt;/b&gt;</font>k + kn<font color="red">&lt;b&gt;if&lt;/b&gt;</font>e; // <font color="red">&lt;b&gt;do&lt;/b&gt;</font> we need spoons?
+</code></pre>
+<p>
+There are three unwanted substitutions! Clearly, we should only match keywords
+which are complete words, and keywords cease to be keywords when they're in a
+comment. Both problems can be fixed by using a more complex pattern:</p>
+<pre class="programlisting">
+<code class="literal">
+<span class="keyword">def</span><span class="identifier"> markup</span><span class="special">(</span><span class="identifier">match</span><span class="special">):</span><span class="string">
+    """Return an html-marked-up version of the input match object"""</span><span class="identifier">
+    html</span><span class="special"> =</span><span class="string"> ''</span><span class="keyword">
+    if</span><span class="special"> (</span><span class="identifier">match</span><span class="special">.</span><span class="identifier">group</span><span class="special">(</span><span class="number">1</span><span class="special">)):</span><span class="identifier">
+        html</span><span class="special"> =</span><span class="identifier"> bold</span><span class="special">(</span><span class="identifier">match</span><span class="special">.</span><span class="identifier">group</span><span class="special">(</span><span class="number">1</span><span class="special">))</span><span class="keyword">
+    elif</span><span class="special"> (</span><span class="identifier">match</span><span class="special">.</span><span class="identifier">group</span><span class="special">(</span><span class="number">2</span><span class="special">)):</span><span class="identifier">
+        html</span><span class="special"> =</span><span class="identifier"> italics</span><span class="special">(</span><span class="identifier">match</span><span class="special">.</span><span class="identifier">group</span><span class="special">(</span><span class="number">2</span><span class="special">))</span><span class="keyword">
+    return</span><span class="identifier"> html</span><span class="identifier">
+
+cpp_re</span><span class="special"> =</span><span class="identifier"> re</span><span class="special">.</span><span class="identifier">compile</span><span class="special">(</span><span class="identifier">r</span><span class="string">'(\bif\b|\belse\b|\bfor\b|\bdo\b|\bwhile\b)'</span><span class="identifier">
+                    r</span><span class="string">'|'</span><span class="identifier">
+                    r</span><span class="string">'(//.*?$|/\*.*?\*/)'</span><span class="special">,</span><span class="identifier">
+                    re</span><span class="special">.</span><span class="identifier">DOTALL</span><span class="special"> |</span><span class="identifier">
+                    re</span><span class="special">.</span><span class="identifier">MULTILINE</span><span class="special">)</span><span class="identifier">
+                  
+html_data</span><span class="special"> =</span><span class="identifier"> cpp_re</span><span class="special">.</span><span class="identifier">sub</span><span class="special">(</span><span class="identifier">markup</span><span class="special">,</span><span class="identifier"> src_data</span><span class="special">)</span></code>
+</pre>
+<p>
+Some notes on the regex pattern:</p>
+<div class="itemizedlist"><ul type="disc">
+<li>
+<code class="code"><span class="string">'\b'</span></code> matches (the empty string at) the beginning or end of a word,
+</li>
+<li>
+the flag parameter to <code class="code"><span class="identifier">re</span><span class="special">.</span><span class="identifier">compile</span></code>, <code class="code"><span class="identifier">re</span><span class="special">.</span><span class="identifier">DOTALL</span><span class="special"> |</span><span class="identifier">
+     re</span><span class="special">.</span><span class="identifier">MULTILINE</span></code>, enables us to match C-style multi-line comments (refer
+     to the <a href="http://www.python.org" target="_top">Python</a> documentation for details,
+</li>
+<li>
+asterisks &#8211; such as the ones which appear in C-style comments &#8211; are
+     regex special characters, so they need to be escaped for a literal
+     match,
+</li>
+<li>
+<code class="code"><span class="string">'.*?'</span></code> is a non-greedy match of any character. Non-greedy means
+     that the regex parser doesn't consume all the text it can to match a part
+     of a pattern before backtracking to match the next part of the pattern.
+     So, for example, <code class="code"><span class="string">'//.*?$'</span></code> matches from the start of a C++
+     style-comment up to the next end-of-line character, but <code class="code"><span class="string">'//.*$'</span></code>
+     would match from this start point up to the final end-of-line in the
+     data.
+</li>
+</ul></div>
+<p>
+And some notes our more advanced use of the re module:</p>
+<div class="itemizedlist"><ul type="disc">
+<li>
+parentheses have been used to capture matching text into groups,
+</li>
+<li>
+the first argument to <code class="code"><span class="identifier">re</span><span class="special">.</span><span class="identifier">sub</span></code> is now a function which accepts
+     a <code class="code"><span class="identifier">MatchObject</span></code>. This function applies markup according to the group which
+     has been matched.
+</li>
+</ul></div>
+<p>
+Finally, it's probably worth saying something about the triple-quoted string
+literal which appears as the first line of the function. This is the
+function's documentation string, or <code class="code"><span class="identifier">docstring</span></code>. These strings are, by
+convention, triple-quoted, since they often span more than one line. Refer to
+the <a href="http://www.python.org" target="_top">Python</a> documentation, and in particular <span class="emphasis"><em>PEP: 257 Docstring
+Conventions</em></span>, for details.</p>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><small>Copyright &copy; 2004 Thomas Guest</small></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="the_problem.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="list_comprehensions.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

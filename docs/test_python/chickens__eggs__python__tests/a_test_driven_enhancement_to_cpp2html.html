@@ -1,0 +1,174 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>A Test-Driven Enhancement to cpp2html</title>
+<link rel="stylesheet" href="../../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.67.0">
+<link rel="start" href="../index.html" title="Chickens, Eggs, Python, Tests">
+<link rel="up" href="../index.html" title="Chickens, Eggs, Python, Tests">
+<link rel="prev" href="chickens__eggs__python__tests.html" title="Chickens, Eggs, Python, Tests">
+<link rel="next" href="the_doctest_module.html" title="The Doctest Module">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><td valign="top"></td></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="chickens__eggs__python__tests.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="the_doctest_module.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+<div class="section" lang="en">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="chickens__eggs__python__tests.a_test_driven_enhancement_to_cpp2html"></a>A Test-Driven Enhancement to cpp2html</h2></div></div></div>
+<p>
+With our test framework in place and all tests passing we're ready to improve
+<code class="code"><span class="identifier">cpp2html</span></code>. We'll start not by touching the function itself but
+by writing a test which should fail:</p>
+<pre class="programlisting">
+<code class="literal">
+<span class="keyword">class</span><span class="identifier"> TestCpp2Html</span><span class="special">(</span><span class="identifier">unittest</span><span class="special">.</span><span class="identifier">TestCase</span><span class="special">):</span><span class="keyword">
+    
+    def</span><span class="identifier"> testDefaultMarkup</span><span class="special">(</span><span class="identifier">self</span><span class="special">):</span><span class="special">
+        ....</span><span class="keyword">
+        
+    def</span><span class="identifier"> testCustomStringMarkup</span><span class="special">(</span><span class="identifier">self</span><span class="special">):</span><span class="keyword">
+        from</span><span class="identifier"> string</span><span class="keyword"> import</span><span class="identifier"> swapcase</span><span class="keyword"> as</span><span class="identifier"> sc</span><span class="identifier">
+        src</span><span class="special"> =</span><span class="identifier"> r</span><span class="string">'what_he_said = "He said \"Hi!\""'</span><span class="identifier">
+        htm</span><span class="special"> =</span><span class="identifier"> preformat</span><span class="special">(</span><span class="identifier">r</span><span class="string">'what_he_said = "hE SAID \"hI!\""'</span><span class="special">)</span><span class="identifier">
+        self</span><span class="special">.</span><span class="identifier">assertEqual</span><span class="special">(</span><span class="identifier">
+            src2html</span><span class="special">.</span><span class="identifier">cpp2html</span><span class="special">(</span><span class="identifier">src</span><span class="special">,</span><span class="identifier"> markup_string</span><span class="special">=</span><span class="identifier">sc</span><span class="special">),</span><span class="identifier"> 
+            htm</span><span class="special">
+            )</span></code>
+</pre>
+<p>
+A couple of observations before running this new test:</p>
+<div class="itemizedlist"><ul type="disc">
+<li>
+Notice how we both restrict the scope of an imported function,
+      <code class="code"><span class="identifier">string</span><span class="special">.</span><span class="identifier">swapcase</span></code>, and create a local alias for it using
+      <code class="code"><span class="keyword">from</span><span class="special"> ...</span><span class="keyword"> as</span></code>.
+</li>
+<li>
+As ever, the <code class="code"><span class="identifier">r</span></code> makes the string literal a raw string, so
+      we don't have to escape the backslashes &#8211; which are of course present
+      to escape the double quotes embedded in the C string literal. <a href="http://www.python.org" target="_top">Python</a>'s
+      sophisticated support for string literals enables us to sidestep the
+      usual quote/escape problems and write more readable code.
+</li>
+<li>
+We are passing a string markup function into <code class="code"><span class="identifier">cpp2html</span></code>, and
+      to do this we are using the keyword-argument syntax. The test is
+      influencing the re-design of <code class="code"><span class="identifier">cpp2html</span></code> &#8211; we've decided that
+      it needs an extra parameter and we've even assigned a name for this
+      parameter.
+</li>
+</ul></div>
+<p>
+Before we get carried away with the redesign we should confirm our new test
+fails. Which it does, spectacularly:</p>
+<pre class="programlisting"><code class="literal">&gt; python test_cpp2html.py
+
+.E
+<code class="literal">==</code><code class="literal">==</code><code class="literal">==</code><code class="literal">==</code><code class="literal">==</code><code class="literal">==</code><code class="literal">==</code><code class="literal">==</code><code class="literal">==</code><code class="literal">==</code><code class="literal">==</code><code class="literal">==</code><code class="literal">==</code><code class="literal">==</code><code class="literal">==</code><code class="literal">==</code><code class="literal">==</code>==
+ERROR: testCustomStringMarkup (<span class="underline">_main</span>_.TestCpp2Html)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "test_cpp2html.py", line 19, in testCustomStringMarkup
+    markup_string=sc)
+TypeError: cpp2html() got an unexpected keyword argument 'markup_string'
+
+----------------------------------------------------------------------
+Ran 2 tests in 0.280s
+
+FAILED (errors=1)
+</code></pre>
+<p>
+So, to get <code class="code"><span class="identifier">testCustomStringMarkup</span></code> to pass, we'll need to extend
+<code class="code"><span class="identifier">cpp2html</span></code>'s parameter list. But then
+<code class="code"><span class="identifier">testDefaultMarkup</span></code> will fail, since it passes a single parameter
+to the function. There's probably a way to resolve this conflict by providing
+a default value for the new <code class="code"><span class="identifier">markup_string</span></code> parameter, but is this
+unnecessarily complex? Looking ever so slightly ahead, will our proposed
+solution scale up when we add the capability to input functions to markup
+keywords, comments and built-ins?</p>
+<p>
+At this point, we're forced to address the key issue at the heart of our
+re-design: What should the interface to <code class="code"><span class="identifier">cpp2html</span></code> be? There are
+several plausible answers here &#8211; ranging from the simple "no change required"
+to the sophisticated "a full C++ tokenizer with callbacks". The point
+is, we're considering the interface from the client's view-point. This is
+clearly a good thing.</p>
+<p>
+The interface I've chosen is as follows:</p>
+<pre class="programlisting">
+<code class="literal">
+<span class="keyword">def</span><span class="identifier"> cpp2html</span><span class="special">(</span><span class="identifier">cpp_src</span><span class="special">,</span><span class="identifier"> 
+             markup_keyword</span><span class="special">=</span><span class="identifier">htm_bold_blue</span><span class="special">,</span><span class="identifier">
+             markup_builtin</span><span class="special">=</span><span class="identifier">htm_blue</span><span class="special">,</span><span class="identifier">
+             markup_comment</span><span class="special">=</span><span class="identifier">htm_italics_red</span><span class="special">,</span><span class="identifier">
+             markup_string</span><span class="special">=</span><span class="identifier">htm_green</span><span class="special">):</span><span class="string">
+    """Return C++ source code marked up using html.
+    
+    markup_keyword --
+    
+        A function which accepts a C++ keyword (passed in as a string) and
+        returns a marked up version of that string. If this parameter is set
+        to "None", no markup is applied, and keywords will not be marked up.
+        If this parameter is not set, default markup is applied.
+                      
+    Similarly for markup_builtin etc.
+    
+    This function also "cooks" the input cpp_src to convert characters "&amp;",
+    "&lt;" and "&gt;" into HTML-safe sequences. Finally, the output will be
+    preformatted for display.
+    """</span><span class="special">
+    ....</span></code>
+</pre>
+<p>
+Although rather complex, this interface retains backwards compatibility whilst
+both allowing user defined markup schemes and properly documenting the default
+scheme.</p>
+<p>
+Note here that the interface has stepped ahead of its unit tests. This is
+fine: at this stage, we haven't implemented the newly-extended functionality
+(in fact, both our tests are failing) and we won't do so yet. First, we
+shall write some more tests against the interface, thereby confirming it
+really is fit for use.</p>
+<a name="a_test_driven_enhancement_to_cpp2html.unit_tests_for_the_new_interface"></a><h1>
+<a name="id4750917"></a>Unit Tests for the New Interface</h1>
+<p>
+The full set of unit tests appear at the end of this article. I do not propose
+to detail their development since the important points have been
+covered already. General guidelines regarding what makes a good test are
+available elsewhere (see <a href="refs.html#refs.myers">Myers</a>, for example).</p>
+<p>
+Note though that we test both use and abuse of the function, as well as
+providing at some tricky cases (such as string literals embedding double
+quotes). Note also our use of the base class method <code class="code"><span class="identifier">assertRaises</span></code>
+to check a <code class="code"><span class="identifier">TypeError</span></code> exception is raised when
+<code class="code"><span class="identifier">cpp2html</span></code> is called with a spurious argument.</p>
+<p>
+The test suite is lengthy &#8211; rather longer, in fact, than the algorithm it
+tests. Let's step back and remember an earlier observation:</p>
+<div class="blockquote"><blockquote class="blockquote"><p><span class="emphasis"><em>... the algorithm presented is clearly a general purpose regex based text
+     processor which has been primed with some C++ data and html markup
+     functions ...</em></span></p></blockquote></div>
+<p>
+Perhaps if we had made this separation then the tests would be simpler: we'd
+need tests for our general (but simple) text processor, tests for our C++
+regex patterns, and tests for our html markup functions, but the sum of these
+component tests might well amount to rather less than the test for their
+combined functionality.</p>
+<p>
+I suspect this is true but I'm not going to investigate futher. Yet. As it
+happens, we're about to use a different mechanism for testing our html markup
+utilities.</p>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><small>Copyright &copy; 2004 Thomas Guest</small></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="chickens__eggs__python__tests.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="the_doctest_module.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

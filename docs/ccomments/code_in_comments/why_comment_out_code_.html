@@ -1,0 +1,113 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Why Comment-Out code?</title>
+<link rel="stylesheet" href="../../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.67.0">
+<link rel="start" href="../index.html" title="Code in Comments">
+<link rel="up" href="../index.html" title="Code in Comments">
+<link rel="prev" href="more_examples.html" title="More Examples">
+<link rel="next" href="_why_commenting_out_code_is_a_bad_idea.html" title=" Why Commenting Out Code is a Bad Idea">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><td valign="top"></td></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="more_examples.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="_why_commenting_out_code_is_a_bad_idea.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+<div class="section" lang="en">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="code_in_comments.why_comment_out_code_"></a>Why Comment-Out code?</h2></div></div></div>
+<p>
+The obvious answer &#8211; to stop it from executing &#8211; begs the further questions:
+Why should the code not execute? Did it ever execute? Will it ever execute?
+There are several possibilities:</p>
+<div class="orderedlist"><ol type="1">
+<li>
+The commented-out code has been superceded by something better, but the
+      author of the new code wants the old code to stick around for a while,
+      perhaps as a reference, perhaps out of historical interest, or perhaps
+      because the new code might not turn out to be better after all.
+</li>
+<li>
+Commenting the code out appears to fix a bug, but noone understands
+      why &#8211; hence the old code is left in comments.
+</li>
+<li>
+The code was commented out during an experiment, maybe an attempt to
+      reproduce a bug, and should never actually have been checked-in in such
+      a state. In other words, a bug has been introduced: in fact the code
+      should still be executed.
+</li>
+<li>
+The source file belongs to a third party library which has required
+      modifications to work in-house. The lines which have been commented out
+      represent the source code in its original form.
+</li>
+<li>
+The commented-out code produces irritatingly verbose debug diagnostics
+      which needed silencing.
+</li>
+<li>
+The commented-out code represents work-in-progess which the author has
+      sensibly checked in to the source repository for safe keeping.
+</li>
+</ol></div>
+<p>
+These are all reasons for turning code into comments, some more reasonable
+than others. Categorising our examples: Example 0) appears to be silenced debug,
+Example 1) work in progress, and Example 2) a hacked-up experiment &#8211; though we
+really cannot be sure. Example 2) might equally well remove the symptoms (if
+not the cause) of a bug and Example 1) might represent a superceded method.</p>
+<p>
+The important point is that unless the author of the commented-out code
+explains what's intended, it is impossible for future readers to accurately
+guess. How, then, should the author explain? With a comment!</p>
+<pre class="programlisting">
+<code class="literal">
+<span class="keyword">for</span><span class="special"> (</span><span class="identifier">Surfaces</span><span class="special">::</span><span class="identifier">iterator</span><span class="identifier"> sf</span><span class="special"> =</span><span class="identifier"> surfaces</span><span class="special">.</span><span class="identifier">begin</span><span class="special">();</span><span class="identifier">
+     sf</span><span class="special"> !=</span><span class="identifier"> surfaces</span><span class="special">.</span><span class="identifier">end</span><span class="special">();</span><span class="special"> 
+     ++</span><span class="identifier">sf</span><span class="special">)</span><span class="special"> {</span><span class="comment">
+     // std::cout &lt;&lt; "Drawing: " &lt;&lt; *sf &lt;&lt; "\n";
+     // Work in progress. Surface stream output not yet implemented.
+     // Tom Guest, 12-Dec-2003.
+</span><span class="identifier">     sf</span><span class="special">-&gt;</span><span class="identifier">draw</span><span class="special">();</span><span class="special">
+}</span>
+</code>
+</pre>
+<p>
+Depending on circumstance, the comment might read:</p>
+<pre class="programlisting">
+<code class="literal">
+<span class="comment">// Do not inflict verbose debug output on everyone.
+// Tom Guest, 12-Dec-2003.
+</span></code>
+</pre>
+<p>
+or even:</p>
+<pre class="programlisting">
+<code class="literal">
+<span class="comment">// Commenting out the above line of code appears to cure the
+// random crashes reported as PR666. I am not yet sure why,
+// but am leaving the code commented out while I investigate.
+// Tom Guest, 12-Dec-2003.
+</span></code>
+</pre>
+<p>
+I have included an explicit name and date in the comment &#8211; redundant data,
+strictly speaking, since they duplicate information held in the source
+management system &#8211; because I do not intend the code to persist in its
+current state. The comment has a sell-by date. Anyone reading it will
+immediately understand what's going on and who to hassle if they don't like
+it.</p>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><small>Copyright &copy; 2004 Thomas Guest</small></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="more_examples.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="_why_commenting_out_code_is_a_bad_idea.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

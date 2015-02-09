@@ -1,0 +1,70 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Test Frameworks</title>
+<link rel="stylesheet" href="../../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.67.0">
+<link rel="start" href="../index.html" title="The Case Against TODO">
+<link rel="up" href="../index.html" title="The Case Against TODO">
+<link rel="prev" href="use_cases_and_alternatives.html" title="Use Cases And Alternatives">
+<link rel="next" href="the_case_against_todo.html" title="The Case Against TODO">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><td valign="top"></td></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="use_cases_and_alternatives.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="the_case_against_todo.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+<div class="section" lang="en">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="todo.test_frameworks"></a>Test Frameworks</h2></div></div></div>
+<p>
+Remember the programmer who checked a stubbed function into the
+source management system?</p>
+<pre class="programlisting">
+<code class="literal">
+<span class="keyword">void</span><span class="identifier"> NewClass</span><span class="special">::</span><span class="identifier">get</span><span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">istream</span><span class="special"> &amp;</span><span class="identifier"> get_from</span><span class="special">)</span><span class="special"> {</span><span class="comment">
+    // TODO
+</span><span class="special">}</span>
+</code>
+</pre>
+<p>
+In a test-first environment, the <code class="code"><span class="identifier">TODO</span></code> is superfluous. The accompanying unit
+tests show exactly what needs doing. In a console window, we see
+something like:</p>
+<pre class="programlisting"><code class="literal">Test    : testNewClassGet
+   testNewClass.cpp(57): Expected "foo" but got "bar"
+   &#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;
+   Ran 13 tests, 12 Passed, 1 Failed.
+</code></pre>
+<p>
+Here, the feedback is swift and accurate, and continues to be so even once
+the class is complete (that is to say, once it passes its tests). Should
+something cause <code class="code"><span class="identifier">NewClass</span></code> to regress, a good set of tests will isolate the
+error even before the offending code gets checked in.</p>
+<p>
+In other words, the <code class="code"><span class="identifier">TODO</span></code> list and the <code class="code"><span class="identifier">FIXME</span></code> list have been replaced by
+test results. We have done the best we can to ensure our <code class="code"><span class="identifier">NewClass</span></code> does
+not end up being yet another <code class="code"><span class="identifier">LegacyClass</span></code>.</p>
+<p>
+Now remember the <code class="code"><span class="identifier">HACK</span></code> which covered up a broken threading model. We will need
+to work much harder to stop the rot advancing any further (in both the
+code-base and the organisation), but again, my main recommendation would be to
+invest in a test framework&#8212;a system test framework in this case.</p>
+<p>
+If we can create a suite of tests which exercise the code to systematically
+expose the threading problems, we may have a chance of understanding them. If
+we can automate these tests and publish results in a user-friendly form --
+bearing in mind that users are not just engineers, but everyone with an
+interest in the code-base&#8212;then we may yet fix them.</p>
+</div>
+<table width="100%"><tr>
+<td align="left"></td>
+<td align="right"><small>Copyright &copy; 2004-2006 Thomas Guest</small></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="use_cases_and_alternatives.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="the_case_against_todo.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

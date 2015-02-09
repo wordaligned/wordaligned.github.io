@@ -1,0 +1,76 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>The Reason for Change</title>
+<link rel="stylesheet" href="../../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.67.0">
+<link rel="start" href="../index.html" title="From CVS to Subversion">
+<link rel="up" href="../index.html" title="From CVS to Subversion">
+<link rel="prev" href="../index.html" title="From CVS to Subversion">
+<link rel="next" href="evaluation.html" title="Evaluation">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><td valign="top"></td></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="../index.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="evaluation.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+<div class="section" lang="en">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="from_cvs_to_subversion.the_reason_for_change"></a>The Reason for Change</h2></div></div></div>
+<div class="sidebar">
+<p class="title"><b>Atomic Commits</b></p>
+Suppose a single logical change to the codebase&#8212;a bugfix perhaps&#8212;
+requires six files to be changed. The programmer makes the change and
+commits the new versions of the files to the <a href="http://www.nongnu.org/cvs/" target="_top">CVS</a> repository. Although
+a single commit command is executed, as far as <a href="http://www.nongnu.org/cvs/" target="_top">CVS</a> is concerned six
+changes have been made, and each individual file moves to its own new
+revision.  If another programmer wishes to patch the bugfix to another
+code branch, all six files will need to be patched&#8212;but it's tricky
+to find this out from <a href="http://www.nongnu.org/cvs/" target="_top">CVS</a>. Information has been lost.
+<a href="http://subversion.tigris.org/" target="_top">Subversion</a> solves this problem with a simplified change model: version
+numbers apply to the repository as a whole, and each change is a
+transaction resulting in a new repository version which logically
+corresponds to a whole new file tree.
+</div>
+<p>
+<a href="http://www.nongnu.org/cvs/" target="_top">CVS</a> is an excellent source control system: fast, powerful and
+flexible. We had no concerns regarding its reliability and some effort
+had been put into integrating it into our automated build, test and
+release system. What's more, everyone in the team knew how to use <a href="http://www.nongnu.org/cvs/" target="_top">CVS</a>
+and how to work around its wrinkles. We all had our favourite
+clients. Why ever would we want to change?</p>
+<p>
+There were a number of reasons:</p>
+<div class="orderedlist"><ol type="1">
+<li>
+The team had grown and so had the codebase. The <a href="http://www.nongnu.org/cvs/" target="_top">CVS</a> server no longer
+  served high volumes of files as quickly as we'd have liked.
+</li>
+<li>
+As the codebase grew, it had become apparent that some files were in
+  the wrong places or had the wrong names. <a href="http://www.nongnu.org/cvs/" target="_top">CVS</a> supports versioning of
+  files but not of file-systems, meaning that we couldn't fix these
+  issues in a controlled way. <a href="http://subversion.tigris.org/" target="_top">Subversion</a> fixes this <a href="http://www.nongnu.org/cvs/" target="_top">CVS</a> limitation.
+</li>
+<li>
+<a href="http://www.nongnu.org/cvs/" target="_top">CVS</a> does not support atomic commits&#8212;another feature
+  built in to <a href="http://subversion.tigris.org/" target="_top">Subversion</a>.
+</li>
+<li>
+<a href="http://subversion.tigris.org/" target="_top">Subversion</a> sets out to be a "compelling replacement for <a href="http://www.nongnu.org/cvs/" target="_top">CVS</a>" and,
+  after a quick skim through the documentation, it looked as though
+  the transition would be painless.
+</li>
+</ol></div>
+</div>
+<table width="100%"><tr>
+<td align="left"></td>
+<td align="right"><small>Copyright &copy; 2006 Thomas Guest</small></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="../index.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="evaluation.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

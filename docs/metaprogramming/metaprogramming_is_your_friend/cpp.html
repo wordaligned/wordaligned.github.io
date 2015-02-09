@@ -1,0 +1,140 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title> Metaprogramming in C++</title>
+<link rel="stylesheet" href="../../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.67.0">
+<link rel="start" href="../index.html" title="Metaprogramming is Your Friend">
+<link rel="up" href="../index.html" title="Metaprogramming is Your Friend">
+<link rel="prev" href="scripting.html" title="Scripting">
+<link rel="next" href="reflection_and_introspection.html" title="Reflection and Introspection">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><td valign="top"></td></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="scripting.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="reflection_and_introspection.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+<div class="section" lang="en">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="metaprogramming_is_your_friend.cpp"></a> Metaprogramming in C++</h2></div></div></div>
+<a name="cpp.template_metaprogramming"></a><h1>
+<a name="id4750507"></a>Template Metaprogramming</h1>
+<p>
+C++ templates, of course, provide the language's support for generic
+programming. These templates can also be used for template metaprogramming.
+In other words, you can write a C++ metaprogram <span class="emphasis"><em>in C++</em></span>.</p>
+<p>
+This is clever, cool, and &#8211; in the right hands &#8211; can even be useful.</p>
+<p>
+I'd be out of my depth even trying to discuss C++ template
+metaprogramming. Fortunately, there's a growing body of 
+<a href="refs.html#refs.abrahams_and_gurtovoy">literature</a> and
+<a href="http://www.boost.org/" target="_top">example libraries</a> covering the subject in some 
+depth.</p>
+<a name="cpp.preprocessor_metaprogramming"></a><h1>
+<a name="id4750554"></a>Preprocessor Metaprogramming</h1>
+<p>
+As mentioned in passing, C++ has a sophisticated templating facility which 
+(amongst other things) makes metaprogramming possible without needing
+to step outside the language.</p>
+<p>
+C++ also inherits the C preprocessor: a rather unsophisticated facility,
+but one which is equally ready for use by metaprogrammers. In fact, careful
+use of this preprocessor can allow you to create generic C algorithms and 
+simulate lambda functions.</p>
+<p>
+For example:</p>
+<p>
+</p>
+<pre class="programlisting">
+<code class="literal">
+<span class="preprocessor">#define</span><span class="identifier"> ALL_ITEMS_IN_LIST</span><span class="special">(</span><span class="identifier">T</span><span class="special">,</span><span class="identifier"> first</span><span class="special">,</span><span class="identifier"> item</span><span class="special">,</span><span class="special"> ...)</span><span class="special"> \</span><span class="keyword">
+do</span><span class="special">  {</span><span class="special">                                     \</span><span class="identifier">
+    T</span><span class="special"> *</span><span class="identifier"> item</span><span class="special"> =</span><span class="identifier"> first</span><span class="special">;</span><span class="special">                     \</span><span class="keyword">
+    while</span><span class="special"> (</span><span class="identifier">item</span><span class="special"> !=</span><span class="identifier"> NULL</span><span class="special">)</span><span class="special"> {</span><span class="special">                \</span><span class="identifier">
+        __VA_ARGS__</span><span class="special">;</span><span class="special">                      \</span><span class="identifier">
+        item</span><span class="special"> =</span><span class="identifier"> item</span><span class="special">-&gt;</span><span class="identifier">next</span><span class="special">;</span><span class="special">                \</span><span class="special">
+    }</span><span class="special">                                     \</span><span class="special">
+}</span><span class="keyword"> while</span><span class="special">(</span><span class="number">0</span><span class="special">)</span><span class="preprocessor">
+
+#define</span><span class="identifier"> ALL_FISH_IN_SEA</span><span class="special">(</span><span class="identifier">first_fish</span><span class="special">,</span><span class="special"> ...)</span><span class="special"> \</span><span class="identifier">
+        ALL_ITEMS_IN_LIST</span><span class="special">(</span><span class="identifier">Fish</span><span class="special">,</span><span class="identifier"> first_fish</span><span class="special">,</span><span class="identifier"> fish</span><span class="special">,</span><span class="identifier"> __VA_ARGS__</span><span class="special">)</span>
+</code>
+</pre>
+<p>
+The first macro, <code class="code"><span class="identifier">ALL_ITEMS_IN_LIST</span></code>, iterates through items in a linked list
+and optionally performs some action on each of them. It requires that list
+nodes are connected by a next pointer called <code class="code"><span class="identifier">next</span></code>. The second macro,
+<code class="code"><span class="identifier">ALL_FISH_IN_SEA</span></code>, specialises the first: the node type is set to <code class="code"><span class="identifier">Fish</span><span class="special"> *</span></code> and
+the list node iterator is called <code class="code"><span class="identifier">fish</span></code> instead of <code class="code"><span class="identifier">item</span></code>.</p>
+<p>
+Here's an example of how we might use it:</p>
+<pre class="programlisting">
+<code class="literal">
+<span class="comment">/**
+ * @brief Find Nemos
+ * @param fishes Linked list of fish
+ * @returns The number of fish in the list called Nemo
+ */</span><span class="keyword"> 
+int</span><span class="identifier"> findNemo</span><span class="special">(</span><span class="identifier">Fish</span><span class="special"> *</span><span class="identifier"> fishes</span><span class="special">)</span><span class="special"> 
+{</span><span class="keyword">
+    int</span><span class="identifier"> count</span><span class="special">;</span><span class="identifier">
+     
+    ALL_FISH_IN_SEA</span><span class="special">(</span><span class="identifier">fishes</span><span class="special">,</span><span class="keyword">
+        if</span><span class="special"> (!</span><span class="identifier">strcmp</span><span class="special">(</span><span class="identifier">fish</span><span class="special">-&gt;</span><span class="identifier">name</span><span class="special">,</span><span class="string"> "Nemo"</span><span class="special">))</span><span class="special"> {</span><span class="identifier">
+            printf</span><span class="special">(</span><span class="string">"Found one!\n"</span><span class="special">);</span><span class="special">
+            ++</span><span class="identifier">count</span><span class="special">;</span><span class="special">
+        }</span><span class="special">
+        );</span><span class="keyword">
+     
+    return</span><span class="identifier"> count</span><span class="special">;</span><span class="special">
+}</span>
+</code>
+</pre>
+<p>
+Note how simple it is to plug a code snippet into our generic looping
+construct. I have used one of C99's variadic macros to do this (these are not
+yet part of standard C++, but some compilers may support them).</p>
+<p>
+I hesitate to recommend using the preprocessor in this way for all 
+<a href="refs.html#refs.sutter">the usual reasons</a>. That said:</p>
+<div class="itemizedlist"><ul type="disc">
+<li>
+This is a technique I have seen used to good effect in production code.
+</li>
+<li>
+Techniques like these are used in highly respected C software &#8211; <a href="http://www.perl.org" target="_top">Perl</a>
+      and <a href="http://www.gzip.org/zlib/" target="_top">Zlib</a>, for example. All C/C++ 
+      programmers should be familiar with it.
+</li>
+<li>
+Although the preprocessor can be dangerous, the way it operates is
+      simple and transparent: use your compiler's -E option (or equivalent) to
+      see exactly what the preprocessor is up to. (I sometimes wish I had an
+      equivalent option for working out how the compiler is handling
+      templated code)
+</li>
+<li>
+Template metaprogramming experts use every preprocessor trick in the
+      book. See, for example, some of Andrei Alexandrescu's 
+      <a href="refs.html#refs.alexandrescu">publications</a>,
+      or the <a href="http://www.boost.org/libs/preprocessor/doc/index.html" target="_top">Boost preprocessor library</a>. (This
+      library's documentation includes an excellent introduction to the
+      preprocessor's limitations, and techniques for working round them.)
+</li>
+</ul></div>
+<p>
+One final point: the <code class="code"><span class="keyword">inline</span></code> keyword (intentionally) does not require the
+compiler to inline code. The preprocessor can do nothing but!</p>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><small>Copyright &copy; 2005 Thomas Guest</small></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="scripting.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="reflection_and_introspection.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

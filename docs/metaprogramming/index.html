@@ -1,0 +1,110 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Metaprogramming is Your Friend</title>
+<link rel="stylesheet" href="../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.67.0">
+<link rel="start" href="index.html" title="Metaprogramming is Your Friend">
+<link rel="next" href="metaprogramming_is_your_friend/editors.html" title=" Editors and Editing">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><td valign="top"></td></table>
+<hr>
+<div class="spirit-nav"><a accesskey="n" href="metaprogramming_is_your_friend/editors.html"><img src="../images/next.png" alt="Next"></a></div>
+<div class="article" lang="en">
+<div class="titlepage">
+<div>
+<div><h2 class="title">
+<a name="metaprogramming_is_your_friend"></a>Metaprogramming is Your Friend</h2></div>
+<div><div class="author"><h3 class="author">
+<span class="firstname">Thomas</span> <span class="surname">Guest</span>
+</h3></div></div>
+<div><p class="copyright">Copyright &copy; 2005 Thomas Guest</p></div>
+</div>
+<hr>
+</div>
+<div class="toc">
+<p><b>Table of Contents</b></p>
+<dl>
+<dt><span class="section"><a href="index.html#metaprogramming_is_your_friend.introduction">Introduction</a></span></dt>
+<dt><span class="section"><a href="metaprogramming_is_your_friend/editors.html"> Editors and Editing</a></span></dt>
+<dt><span class="section"><a href="metaprogramming_is_your_friend/compilation.html">Compilation</a></span></dt>
+<dt><span class="section"><a href="metaprogramming_is_your_friend/scripting.html">Scripting</a></span></dt>
+<dt><span class="section"><a href="metaprogramming_is_your_friend/cpp.html"> Metaprogramming in C++</a></span></dt>
+<dt><span class="section"><a href="metaprogramming_is_your_friend/reflection_and_introspection.html">Reflection and Introspection</a></span></dt>
+<dt><span class="section"><a href="metaprogramming_is_your_friend/domain_specific_extensions.html">Domain Specific Extensions</a></span></dt>
+<dt><span class="section"><a href="metaprogramming_is_your_friend/metaproblems.html">Metaproblems</a></span></dt>
+<dt><span class="section"><a href="metaprogramming_is_your_friend/concluding_thoughts.html">Concluding Thoughts</a></span></dt>
+<dt><span class="section"><a href="metaprogramming_is_your_friend/refs.html"> References</a></span></dt>
+<dt><span class="section"><a href="metaprogramming_is_your_friend/credits.html">Credits</a></span></dt>
+</dl>
+</div>
+<div class="section" lang="en">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="metaprogramming_is_your_friend.introduction"></a>Introduction</h2></div></div></div>
+<a name="introduction.a_program_to_write_a_program"></a><h1>
+<a name="id4748701"></a>A Program to Write a Program</h1>
+<p>
+Whenever I create a new C++ file using <a href="http://www.gnu.org/software/emacs/" target="_top">Emacs</a> a simple elisp script
+executes. This script:</p>
+<div class="itemizedlist"><ul type="disc">
+<li>
+places a standard header at the top of the file,
+</li>
+<li>
+works out what year it is and adjusts the Copyright notice accordingly,
+</li>
+<li>
+generates suitable <code class="code"><span class="preprocessor">#include</span></code> guards (for header files),
+</li>
+<li>
+inserts placeholders for <a href="http://www.doxygen.org/" target="_top">Doxygen</a> comments.
+</li>
+</ul></div>
+<p>
+In short, the script automates some routine housekeeping for me.</p>
+<p>
+On the face of it, nothing extraordinary is going on here. One program (the
+elisp script) helps me write another program (the C++ program which needs the
+new file). This unremarkable elisp script &#8211; a program to write a program &#8211;
+is, then, a metaprogram.</p>
+<p>
+This article investigates some other metaprograms which, perhaps, we don't
+really notice, and some alternative metaprogramming techniques which, perhaps,
+we should be aware of.</p>
+<a name="introduction.what__emphasis_is__emphasis__metaprogramming_"></a><h1>
+<a name="id4748770"></a>What <span class="emphasis"><em>is</em></span> Metaprogramming?</h1>
+<p>
+I like the 
+<a href="http://en.wikipedia.org/wiki/Metaprogramming_%28programming%29" target="_top">definition</a> 
+found in the <a href="metaprogramming_is_your_friend/refs.html#refs.wikipedia">Wikipedia</a>:</p>
+<div class="blockquote"><blockquote class="blockquote"><p><span class="emphasis"><em>"Metaprogramming is the writing of programs that write or manipulate other
+programs (or themselves) as their data or that do part of the work that is
+otherwise done at runtime during compile time."</em></span></p></blockquote></div>
+<p>
+Actually, it's the first half of this definition I like (everything up to and
+including <span class="emphasis"><em>data</em></span>). The second seems rather to weaken the concept by being too
+specific, and in my opinion its presence reflects the current interest in 
+<a href="metaprogramming_is_your_friend/cpp.html#cpp.template_metaprogramming">C++ template-metaprogramming</a> &#8211; but 
+a <a href="metaprogramming_is_your_friend/refs.html#refs.wikipedia">Wikipedia</a> is bound to relect what's in fashion!</p>
+<a name="introduction.why_metaprogram_"></a><h1>
+<a name="id4748831"></a>Why Metaprogram?</h1>
+<p>
+Having established what metaprogramming is the obvious follow-up is <span class="emphasis"><em>"Why?"</em></span>
+Writing programs to manipulate ordinary data is challenging enough for most of
+us, so writing programs to manipulate programs must surely be either crazy or
+too clever by half.</p>
+<p>
+Rather than attempt to provide a theoretical answer to <span class="emphasis"><em>"Why?"</em></span> at this point,
+let's push the question on the stack and discuss some practical
+applications of metaprogramming.</p>
+</div>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><small></small></td>
+</tr></table>
+<hr>
+<div class="spirit-nav"><a accesskey="n" href="metaprogramming_is_your_friend/editors.html"><img src="../images/next.png" alt="Next"></a></div>
+</body>
+</html>

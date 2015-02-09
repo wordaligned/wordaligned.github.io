@@ -1,0 +1,199 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Program Listing</title>
+<link rel="stylesheet" href="../../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.67.0">
+<link rel="start" href="../index.html" title="Functional Programming in Python">
+<link rel="up" href="../index.html" title="Functional Programming in Python">
+<link rel="prev" href="closing_thoughts.html" title="Closing Thoughts">
+<link rel="next" href="think_again.html" title="Think Again">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><td valign="top"></td></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="closing_thoughts.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="think_again.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+<div class="section" lang="en">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="functional_programming_in_python.program_listing"></a>Program Listing</h2></div></div></div>
+<pre class="programlisting">
+<code class="literal">
+<span class="keyword">import</span><span class="identifier"> re</span><span class="comment">
+
+# Reference ISO/IEC 14882, "The C++ Standard", Tables 3 &amp; 4.
+</span><span class="identifier">cpp_keywords</span><span class="special"> =</span><span class="special"> (</span><span class="string">
+    'and'</span><span class="special">,</span><span class="string"> 'and_eq'</span><span class="special">,</span><span class="string"> 'asm'</span><span class="special">,</span><span class="string"> 'auto'</span><span class="special">,</span><span class="string"> 'bitand'</span><span class="special">,</span><span class="string"> 'bitor'</span><span class="special">,</span><span class="string"> 'bool'</span><span class="special">,</span><span class="string"> 'break'</span><span class="special">,</span><span class="string">
+    'case'</span><span class="special">,</span><span class="string"> 'catch'</span><span class="special">,</span><span class="string"> 'char'</span><span class="special">,</span><span class="string"> 'class'</span><span class="special">,</span><span class="string"> 'compl'</span><span class="special">,</span><span class="string"> 'const'</span><span class="special">,</span><span class="string"> 'const_cast'</span><span class="special">,</span><span class="string">
+    'continue'</span><span class="special">,</span><span class="string"> 'default'</span><span class="special">,</span><span class="string"> 'delete'</span><span class="special">,</span><span class="string"> 'do'</span><span class="special">,</span><span class="string"> 'double'</span><span class="special">,</span><span class="string"> 'dynamic_cast'</span><span class="special">,</span><span class="string"> 'else'</span><span class="special">,</span><span class="string">
+    'enum'</span><span class="special">,</span><span class="string"> 'explicit'</span><span class="special">,</span><span class="string"> 'export'</span><span class="special">,</span><span class="string"> 'extern'</span><span class="special">,</span><span class="string"> 'false'</span><span class="special">,</span><span class="string"> 'float'</span><span class="special">,</span><span class="string"> 'for'</span><span class="special">,</span><span class="string"> 'friend'</span><span class="special">,</span><span class="string">
+    'goto'</span><span class="special">,</span><span class="string"> 'if'</span><span class="special">,</span><span class="string"> 'inline'</span><span class="special">,</span><span class="string"> 'int'</span><span class="special">,</span><span class="string"> 'long'</span><span class="special">,</span><span class="string"> 'mutable'</span><span class="special">,</span><span class="string"> 'namespace'</span><span class="special">,</span><span class="string"> 'new'</span><span class="special">,</span><span class="string">
+    'not'</span><span class="special">,</span><span class="string"> 'not_eq'</span><span class="special">,</span><span class="string"> 'operator'</span><span class="special">,</span><span class="string"> 'or'</span><span class="special">,</span><span class="string"> 'or_eq'</span><span class="special">,</span><span class="string"> 'private'</span><span class="special">,</span><span class="string"> 'protected'</span><span class="special">,</span><span class="string">
+    'public'</span><span class="special">,</span><span class="string"> 'register'</span><span class="special">,</span><span class="string"> 'reinterpret_cast'</span><span class="special">,</span><span class="string"> 'return'</span><span class="special">,</span><span class="string"> 'short'</span><span class="special">,</span><span class="string"> 'sizeof'</span><span class="special">,</span><span class="string">
+    'static'</span><span class="special">,</span><span class="string"> 'static_cast'</span><span class="special">,</span><span class="string"> 'struct'</span><span class="special">,</span><span class="string"> 'switch'</span><span class="special">,</span><span class="string"> 'template'</span><span class="special">,</span><span class="string"> 'this'</span><span class="special">,</span><span class="string"> 'throw'</span><span class="special">,</span><span class="string">
+    'true'</span><span class="special">,</span><span class="string"> 'try'</span><span class="special">,</span><span class="string"> 'typedef'</span><span class="special">,</span><span class="string"> 'typeid'</span><span class="special">,</span><span class="string"> 'typename'</span><span class="special">,</span><span class="string"> 'union'</span><span class="special">,</span><span class="string"> 'using'</span><span class="special">,</span><span class="string">
+    'virtual'</span><span class="special">,</span><span class="string"> 'void'</span><span class="special">,</span><span class="string"> 'volatile'</span><span class="special">,</span><span class="string"> 'wchar_t'</span><span class="special">,</span><span class="string"> 'while'</span><span class="special">,</span><span class="string"> 'xor'</span><span class="special">,</span><span class="string"> 'xor_eq'</span><span class="special">    
+    )</span><span class="identifier">
+
+
+cpp_builtins</span><span class="special"> =</span><span class="special"> (</span><span class="string">
+    'bool'</span><span class="special">,</span><span class="string"> 'signed'</span><span class="special">,</span><span class="string"> 'unsigned'</span><span class="special">,</span><span class="string"> 'char'</span><span class="special">,</span><span class="string"> 'short'</span><span class="special">,</span><span class="string"> 'long'</span><span class="special">,</span><span class="string"> 'float'</span><span class="special">,</span><span class="string"> 'double'</span><span class="special">,</span><span class="string">
+    'wchar_t'</span><span class="special">
+    )</span><span class="keyword">
+
+
+def</span><span class="identifier"> preformat</span><span class="special">(</span><span class="identifier">str</span><span class="special">):</span><span class="string">
+    """Return a preformatted version of the string."""</span><span class="keyword">    
+    return</span><span class="string"> '&lt;pre&gt;'</span><span class="special"> +</span><span class="identifier"> str</span><span class="special"> +</span><span class="string"> '&lt;/pre&gt;'</span><span class="keyword">
+
+
+def</span><span class="identifier"> italics</span><span class="special">(</span><span class="identifier">str</span><span class="special">):</span><span class="string">
+    """Return an italicised version of the string."""</span><span class="keyword">
+    return</span><span class="string"> '&lt;i&gt;'</span><span class="special"> +</span><span class="identifier"> str</span><span class="special"> +</span><span class="string"> '&lt;/i&gt;'</span><span class="keyword">
+
+
+def</span><span class="identifier"> bold</span><span class="special">(</span><span class="identifier">str</span><span class="special">):</span><span class="string">
+    """Return a bold version of the string."""</span><span class="keyword">
+    return</span><span class="string"> '&lt;b&gt;'</span><span class="special"> +</span><span class="identifier"> str</span><span class="special"> +</span><span class="string"> '&lt;/b&gt;'</span><span class="keyword">
+
+
+def</span><span class="identifier"> colour</span><span class="special">(</span><span class="identifier">str</span><span class="special">,</span><span class="identifier"> colour</span><span class="special">):</span><span class="string">
+    """Return a coloured version of the string."""</span><span class="keyword">
+    return</span><span class="special"> (</span><span class="string">'&lt;font color="'</span><span class="special"> +</span><span class="identifier"> colour</span><span class="special"> +</span><span class="string"> '"&gt;'</span><span class="special">
+            +</span><span class="identifier"> str</span><span class="special"> +</span><span class="string">
+            '&lt;/font&gt;'</span><span class="special">)</span><span class="keyword">
+
+
+def</span><span class="identifier"> orPatterns</span><span class="special">(</span><span class="identifier">patterns</span><span class="special">):</span><span class="string">
+    """Return a pattern which matches any one of the input patterns."""</span><span class="keyword">
+    return</span><span class="string"> '|'</span><span class="special">.</span><span class="identifier">join</span><span class="special">(</span><span class="identifier">patterns</span><span class="special">)</span><span class="keyword">
+
+
+def</span><span class="identifier"> cookForHtml</span><span class="special">(</span><span class="identifier">src</span><span class="special">):</span><span class="string">
+    """Return the input data cooked for html."""</span><span class="keyword">
+    import</span><span class="identifier"> cgi</span><span class="keyword">
+    return</span><span class="identifier"> cgi</span><span class="special">.</span><span class="identifier">escape</span><span class="special">(</span><span class="identifier">src</span><span class="special">)</span><span class="keyword">
+
+
+
+def</span><span class="identifier"> markup</span><span class="special">(</span><span class="identifier">match</span><span class="special">,</span><span class="identifier"> rules</span><span class="special">):</span><span class="string">
+    """Markup the text matched by the input match object."""</span><span class="comment">
+    # Sanity check: the rules match the groups
+</span><span class="identifier">    hits</span><span class="special"> =</span><span class="identifier"> filter</span><span class="special">(</span><span class="keyword">None</span><span class="special">,</span><span class="identifier"> match</span><span class="special">.</span><span class="identifier">groups</span><span class="special">())</span><span class="keyword">
+    assert</span><span class="special">(</span><span class="identifier">len</span><span class="special">(</span><span class="identifier">hits</span><span class="special">)</span><span class="special"> ==</span><span class="number"> 1</span><span class="special">)</span><span class="keyword">
+    assert</span><span class="special">(</span><span class="identifier">len</span><span class="special">(</span><span class="identifier">match</span><span class="special">.</span><span class="identifier">groups</span><span class="special">())</span><span class="special"> ==</span><span class="identifier"> len</span><span class="special">(</span><span class="identifier">rules</span><span class="special">))</span><span class="identifier">
+
+    ix</span><span class="special"> =</span><span class="identifier"> match</span><span class="special">.</span><span class="identifier">lastindex</span><span class="comment"> # Last and only index, in fact.
+
+    # Careful! - rules are indexed from 0 but matchObject groups
+    # are indexed from 1.
+</span><span class="identifier">    markup_fn</span><span class="special"> =</span><span class="identifier"> rules</span><span class="special">[</span><span class="identifier">ix</span><span class="special"> -</span><span class="number"> 1</span><span class="special">][</span><span class="number">1</span><span class="special">]</span><span class="keyword">
+    return</span><span class="identifier"> markup_fn</span><span class="special">(</span><span class="identifier">match</span><span class="special">.</span><span class="identifier">group</span><span class="special">(</span><span class="identifier">ix</span><span class="special">))</span><span class="keyword">
+
+
+def</span><span class="identifier"> cpp2html</span><span class="special">(</span><span class="identifier">cpp_src</span><span class="special">):</span><span class="string">
+    """Return C++ source code marked up using html."""</span><span class="identifier">
+    comment_pattern</span><span class="special"> =</span><span class="identifier"> orPatterns</span><span class="special">([</span><span class="identifier">
+        r</span><span class="string">'//.*?$'</span><span class="special">,</span><span class="comment">   # C++ style comment
+</span><span class="identifier">        r</span><span class="string">'/\*.*?\*/'</span><span class="comment"> # C style comment
+</span><span class="special">        ])</span><span class="identifier">
+
+    builtin_pattern</span><span class="special"> =</span><span class="identifier"> orPatterns</span><span class="special">([</span><span class="identifier">
+        r</span><span class="string">'\b%s\b'</span><span class="special"> %</span><span class="identifier"> bt</span><span class="keyword">
+        for</span><span class="identifier"> bt</span><span class="keyword"> in</span><span class="identifier"> cpp_builtins</span><span class="special">
+        ])</span><span class="identifier">
+
+    keyword_pattern</span><span class="special"> =</span><span class="identifier"> orPatterns</span><span class="special">([</span><span class="identifier">
+        r</span><span class="string">'\b%s\b'</span><span class="special"> %</span><span class="identifier"> kw</span><span class="keyword">
+        for</span><span class="identifier"> kw</span><span class="keyword"> in</span><span class="identifier"> cpp_keywords</span><span class="special">
+        ])</span><span class="identifier">
+        
+    string_pattern</span><span class="special"> =</span><span class="identifier"> r</span><span class="string">'".*?(?&lt;!\\)"'</span><span class="identifier">
+    
+    markup_rules</span><span class="special"> =</span><span class="special"> (</span><span class="special">
+        (</span><span class="identifier">comment_pattern</span><span class="special">,</span><span class="keyword">
+         lambda</span><span class="identifier"> s</span><span class="special">:</span><span class="identifier"> colour</span><span class="special">(</span><span class="identifier">italics</span><span class="special">(</span><span class="identifier">s</span><span class="special">),</span><span class="string"> 'red'</span><span class="special">)),</span><span class="comment">
+        # Need builtins before keywords -- there's an overlap,
+        # since some keywords are also designated as builtins.
+</span><span class="special">        (</span><span class="identifier">builtin_pattern</span><span class="special">,</span><span class="keyword">
+         lambda</span><span class="identifier"> s</span><span class="special">:</span><span class="identifier"> colour</span><span class="special">(</span><span class="identifier">s</span><span class="special">,</span><span class="string"> 'blue'</span><span class="special">)),</span><span class="special">
+        (</span><span class="identifier">keyword_pattern</span><span class="special">,</span><span class="keyword">
+         lambda</span><span class="identifier"> s</span><span class="special">:</span><span class="identifier"> colour</span><span class="special">(</span><span class="identifier">bold</span><span class="special">(</span><span class="identifier">s</span><span class="special">),</span><span class="string"> 'blue'</span><span class="special">)),</span><span class="special">
+        (</span><span class="identifier">string_pattern</span><span class="special">,</span><span class="keyword">
+         lambda</span><span class="identifier"> s</span><span class="special">:</span><span class="identifier"> colour</span><span class="special">(</span><span class="identifier">s</span><span class="special">,</span><span class="string"> 'green'</span><span class="special">))</span><span class="special">
+        )</span><span class="comment">
+
+    # Create a regex group for each pattern in the markup rules,
+    # and combine these groups into a single pattern.
+</span><span class="identifier">    cpp_pattern</span><span class="special"> =</span><span class="identifier"> orPatterns</span><span class="special">(</span><span class="special">
+        [</span><span class="string">'(%s)'</span><span class="special"> %</span><span class="identifier"> p</span><span class="keyword"> for</span><span class="identifier"> p</span><span class="special">,</span><span class="identifier"> f</span><span class="keyword"> in</span><span class="identifier"> markup_rules</span><span class="special">]</span><span class="special">
+        )</span><span class="identifier">
+
+    cpp_re</span><span class="special"> =</span><span class="identifier"> re</span><span class="special">.</span><span class="identifier">compile</span><span class="special">(</span><span class="identifier">
+        cpp_pattern</span><span class="special">,</span><span class="identifier">
+        re</span><span class="special">.</span><span class="identifier">DOTALL</span><span class="special"> |</span><span class="identifier">
+        re</span><span class="special">.</span><span class="identifier">MULTILINE</span><span class="comment"> # C-style comments can span multiple lines
+</span><span class="special">        )</span><span class="identifier">
+    
+    cpp_src</span><span class="special"> =</span><span class="identifier"> cookForHtml</span><span class="special">(</span><span class="identifier">cpp_src</span><span class="special">)</span><span class="identifier">
+    
+    cpp_src</span><span class="special"> =</span><span class="identifier"> cpp_re</span><span class="special">.</span><span class="identifier">sub</span><span class="special">(</span><span class="keyword">
+        lambda</span><span class="identifier"> m</span><span class="special">:</span><span class="identifier"> markup</span><span class="special">(</span><span class="identifier">m</span><span class="special">,</span><span class="identifier"> markup_rules</span><span class="special">),</span><span class="identifier">
+        cpp_src</span><span class="special">)</span><span class="keyword">
+
+    return</span><span class="identifier"> preformat</span><span class="special">(</span><span class="identifier">cpp_src</span><span class="special">)</span><span class="keyword">
+
+
+def</span><span class="identifier"> python2html</span><span class="special">(</span><span class="identifier">srcdata</span><span class="special">):</span><span class="string">
+    """Return __python__ source code marked up using html."""</span><span class="keyword">
+    import</span><span class="identifier"> keyword</span><span class="keyword">
+    import</span><span class="identifier"> token</span><span class="keyword">
+    import</span><span class="identifier"> tokenize</span><span class="identifier">
+    
+    lines</span><span class="special"> =</span><span class="identifier"> srcdata</span><span class="special">.</span><span class="identifier">split</span><span class="special">(</span><span class="string">'\n'</span><span class="special">)</span><span class="keyword">    
+    def</span><span class="identifier"> popLine</span><span class="special">():</span><span class="identifier">
+        line</span><span class="special"> =</span><span class="string"> ''</span><span class="keyword">
+        if</span><span class="identifier"> len</span><span class="special">(</span><span class="identifier">lines</span><span class="special">)</span><span class="special"> &gt;</span><span class="number"> 0</span><span class="special">:</span><span class="identifier">
+            line</span><span class="special"> =</span><span class="identifier"> lines</span><span class="special">.</span><span class="identifier">pop</span><span class="special">(</span><span class="number">0</span><span class="special">)</span><span class="special"> +</span><span class="string"> '\n'</span><span class="keyword">
+        return</span><span class="identifier"> line</span><span class="identifier">
+
+    marked_up</span><span class="special"> =</span><span class="string"> ''</span><span class="identifier">
+    row</span><span class="special">,</span><span class="identifier"> col</span><span class="special"> =</span><span class="number"> 0</span><span class="special">,</span><span class="number"> 0</span><span class="comment"> # Location of the end of the previous token
+</span><span class="keyword">    
+    for</span><span class="identifier"> tok</span><span class="keyword"> in</span><span class="identifier"> tokenize</span><span class="special">.</span><span class="identifier">generate_tokens</span><span class="special">(</span><span class="identifier">popLine</span><span class="special">):</span><span class="comment">
+        # The tokenizer skips whitespace. We must put it back.        
+</span><span class="identifier">        srow</span><span class="special">,</span><span class="identifier"> scol</span><span class="special"> =</span><span class="identifier"> tok</span><span class="special">[</span><span class="number">2</span><span class="special">]</span><span class="keyword">
+        if</span><span class="special"> (</span><span class="identifier">srow</span><span class="special"> &gt;</span><span class="identifier"> row</span><span class="special">):</span><span class="identifier">
+            col</span><span class="special"> =</span><span class="number"> 0</span><span class="keyword">
+        if</span><span class="special"> (</span><span class="identifier">scol</span><span class="special"> &gt;=</span><span class="identifier"> col</span><span class="special">):</span><span class="identifier">
+            marked_up</span><span class="special"> +=</span><span class="string"> ' '</span><span class="special"> *</span><span class="special"> (</span><span class="identifier">scol</span><span class="special"> -</span><span class="identifier"> col</span><span class="special">)</span><span class="identifier">
+        
+        tok_name</span><span class="special"> =</span><span class="identifier"> token</span><span class="special">.</span><span class="identifier">tok_name</span><span class="special">[</span><span class="identifier">tok</span><span class="special">[</span><span class="number">0</span><span class="special">]]</span><span class="identifier">
+        str</span><span class="special"> =</span><span class="identifier"> cookForHtml</span><span class="special">(</span><span class="identifier">tok</span><span class="special">[</span><span class="number">1</span><span class="special">])</span><span class="keyword">
+        
+        if</span><span class="special"> (</span><span class="identifier">tok_name</span><span class="special"> ==</span><span class="string"> 'STRING'</span><span class="special">):</span><span class="identifier">
+            marked_up</span><span class="special"> +=</span><span class="identifier"> colour</span><span class="special">(</span><span class="identifier">str</span><span class="special">,</span><span class="string"> 'green'</span><span class="special">)</span><span class="keyword">
+        elif</span><span class="special"> (</span><span class="identifier">tok_name</span><span class="special"> ==</span><span class="string"> 'COMMENT'</span><span class="special">):</span><span class="identifier">
+            marked_up</span><span class="special"> +=</span><span class="identifier"> colour</span><span class="special">(</span><span class="identifier">italics</span><span class="special">(</span><span class="identifier">str</span><span class="special">),</span><span class="string"> 'red'</span><span class="special">)</span><span class="keyword">
+        elif</span><span class="special"> (</span><span class="identifier">tok_name</span><span class="special"> ==</span><span class="string"> 'NAME'</span><span class="keyword"> and</span><span class="identifier">
+            keyword</span><span class="special">.</span><span class="identifier">iskeyword</span><span class="special">(</span><span class="identifier">tok</span><span class="special">[</span><span class="number">1</span><span class="special">])):</span><span class="identifier">
+            marked_up</span><span class="special"> +=</span><span class="identifier"> colour</span><span class="special">(</span><span class="identifier">bold</span><span class="special">(</span><span class="identifier">str</span><span class="special">),</span><span class="string"> 'blue'</span><span class="special">)</span><span class="keyword">
+        else</span><span class="special">:</span><span class="identifier">
+            marked_up</span><span class="special"> +=</span><span class="identifier"> str</span><span class="identifier">
+                              
+        row</span><span class="special">,</span><span class="identifier"> col</span><span class="special"> =</span><span class="identifier"> tok</span><span class="special">[</span><span class="number">3</span><span class="special">]</span><span class="keyword">
+
+    return</span><span class="identifier"> preformat</span><span class="special">(</span><span class="identifier">marked_up</span><span class="special">)</span></code>
+</pre>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><small>Copyright &copy; 2004 Thomas Guest</small></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="closing_thoughts.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="think_again.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

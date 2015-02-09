@@ -1,0 +1,178 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>The Doctest Module</title>
+<link rel="stylesheet" href="../../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.67.0">
+<link rel="start" href="../index.html" title="Chickens, Eggs, Python, Tests">
+<link rel="up" href="../index.html" title="Chickens, Eggs, Python, Tests">
+<link rel="prev" href="a_test_driven_enhancement_to_cpp2html.html" title="A Test-Driven Enhancement to cpp2html">
+<link rel="next" href="conclusions.html" title="Conclusions">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><td valign="top"></td></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="a_test_driven_enhancement_to_cpp2html.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="conclusions.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+<div class="section" lang="en">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="chickens__eggs__python__tests.the_doctest_module"></a>The Doctest Module</h2></div></div></div>
+<a name="the_doctest_module.an_example_from_the_python_library"></a><h1>
+<a name="id4751020"></a>An example from the Python Library</h1>
+<p>
+<a href="http://www.python.org" target="_top">Python</a>'s <code class="code"><span class="identifier">doctest</span></code> module provides a unit testing framework which
+showcases some of the language's introspective powers.</p>
+<p>
+To start with an example from <a href="http://www.python.org" target="_top">Python</a>'s standard library: search the
+<code class="code"><span class="identifier">pickle</span></code> module (on my machine, this lives at
+<code class="code"><span class="special">/</span><span class="identifier">python23</span><span class="special">/</span><span class="identifier">Lib</span><span class="special">/</span><span class="identifier">pickle</span><span class="special">.</span><span class="identifier">py</span></code>) for the function
+<code class="code"><span class="identifier">encode_long</span></code>. This function's docstring provides a brief
+description of what the function does illustrated by several examples of
+the function in action in an interactive <a href="http://www.python.org" target="_top">Python</a> session:</p>
+<pre class="programlisting">
+<code class="literal">
+<span class="keyword">def</span><span class="identifier"> encode_long</span><span class="special">(</span><span class="identifier">x</span><span class="special">):</span><span class="identifier">
+   r</span><span class="string">"""Encode a long to a two's complement little-endian binary string.
+   Note that 0L is a special case, returning an empty string, to save a
+   byte in the LONG1 pickling context.
+    &gt;&gt;&gt; encode_long(0L)
+   ''
+   &gt;&gt;&gt; encode_long(255L)
+   '\xff\x00'
+   &gt;&gt;&gt; encode_long(32767L)
+   '\xff\x7f'
+   &gt;&gt;&gt; encode_long(-256L)
+   '\x00\xff'
+   &gt;&gt;&gt; encode_long(-32768L)
+   '\x00\x80'
+   &gt;&gt;&gt; encode_long(-128L)
+   '\x80'
+   &gt;&gt;&gt; encode_long(127L)
+   '\x7f'
+   &gt;&gt;&gt;
+   """</span></code>
+</pre>
+<p>
+The <code class="code"><span class="identifier">doctest</span></code> module enables us to validate the function's
+documentation. In essence it searches docstrings for anything which looks like
+the output of interactive <a href="http://www.python.org" target="_top">Python</a> sessions, then replays these sessions and
+confirms the output is indeed as documented.</p>
+<p>
+We could doctest the pickle module like this:</p>
+<pre class="programlisting"><code class="literal">&gt;&gt;&gt; import pickle
+&gt;&gt;&gt; import doctest
+&gt;&gt;&gt; doctest.testmod(pickle)
+(0, 14)
+</code></pre>
+<p>
+The output <code class="code"><span class="special">(</span><span class="number">0</span><span class="special">,</span><span class="number"> 14</span><span class="special">)</span></code> tells us that none of the fourteen tests has
+failed. For more details of what these tests were, try:</p>
+<pre class="programlisting"><code class="literal">&gt;&gt;&gt; doctest.testmod(pickle, verbose=True)
+</code></pre>
+<p>
+The final lines of the pickle module read as follows:</p>
+<pre class="programlisting">
+<code class="literal">
+<span class="comment"># Doctest
+</span><span class="keyword">
+def</span><span class="identifier"> _test</span><span class="special">():</span><span class="keyword">
+    import</span><span class="identifier"> doctest</span><span class="keyword">
+    return</span><span class="identifier"> doctest</span><span class="special">.</span><span class="identifier">testmod</span><span class="special">()</span><span class="keyword">
+
+if</span><span class="identifier"> __name__</span><span class="special"> ==</span><span class="string"> "__main__"</span><span class="special">:</span><span class="identifier">
+    _test</span><span class="special">()</span></code>
+</pre>
+<p>
+In other words, if the module is run as a standalone program &#8211; rather than
+imported by some other program &#8211; then doctest it. Once again, we can
+try this for ourselves by typing at a command prompt:</p>
+<pre class="programlisting"><code class="literal">&gt; python /python23/Lib/pickle.py
+</code></pre>
+<p>
+An absence of output means no tests have failed. For verbose output, try:</p>
+<pre class="programlisting"><code class="literal">&gt; python/python23/Lib/pickle.py -v
+</code></pre>
+<p>
+The verbose output tells us that out of 103 objects, 2 had tests. To see
+doctest putting a module through a more thorough workout, turn it on itself:</p>
+<pre class="programlisting"><code class="literal">&gt; python /python23/Lib/doctest.py -v
+</code></pre>
+<a name="the_doctest_module.how_does_doctest_work_"></a><h1>
+<a name="id4751603"></a>How Does Doctest Work?</h1>
+<p>
+The module itself provides the definitive answer to this question. Its source
+code runs to about 1500 lines of which the majority are documentation and many
+of the rest are to do with providing flexibility for more advanced use. I get
+the impression that to fully understand this module is to understand how the
+core of the <a href="http://www.python.org" target="_top">Python</a> object model works.</p>
+<p>
+I cannot claim such understanding but it's not too hard to see what's going
+on. <a href="http://www.python.org" target="_top">Python</a> modules contain objects &#8211; functions, classes, data and so on. The
+container used is a dictionary, <code class="code"><span class="identifier">__dict__</span></code>, which maps object names
+to object values. <a href="http://www.python.org" target="_top">Python</a> allows us to query an object's type at runtime so we
+can filter the objects we are interested in. The <code class="code"><span class="identifier">inspect</span></code>
+module provides some useful functions to do this. For example, we could list
+the functions contained in a module as follows:</p>
+<pre class="programlisting">
+<code class="literal">
+<span class="keyword">def</span><span class="identifier"> listFunctions</span><span class="special">(</span><span class="identifier">m</span><span class="special">):</span><span class="string">
+    """List the function objects in a module m."""</span><span class="keyword">
+    from</span><span class="identifier"> inspect</span><span class="keyword"> import</span><span class="identifier"> isfunction</span><span class="keyword">
+    return</span><span class="special"> [</span><span class="identifier">f</span><span class="keyword"> for</span><span class="identifier"> f</span><span class="keyword"> in</span><span class="identifier"> m</span><span class="special">.</span><span class="identifier">__dict__</span><span class="special">.</span><span class="identifier">values</span><span class="special">()</span><span class="keyword"> if</span><span class="identifier"> isfunction</span><span class="special">(</span><span class="identifier">f</span><span class="special">)]</span></code>
+</pre>
+<p>
+Once we have a function, its <code class="code"><span class="identifier">__doc__</span></code> attribute gives us its
+docstring. Similarly, we can pull out the docstrings for classes, class
+methods and for the module itself. Once we have all these docstrings, we
+can search them to find anything which looks like the output of an interactive
+session using <a href="http://www.python.org" target="_top">Python</a>'s text parsing capabilities.</p>
+<p>
+The remaining twist is <a href="http://www.python.org" target="_top">Python</a>'s ability to dynamically compile and execute
+source code using the <code class="code"><span class="identifier">compile</span></code> and <code class="code"><span class="keyword">exec</span></code> commands. So,
+we can replay the documentation examples, capturing and checking the output.</p>
+<a name="the_doctest_module.a_doctested_module"></a><h1>
+<a name="id4751863"></a>A Doctested Module</h1>
+<p>
+The file <code class="code"><span class="identifier">htmlmarkup</span><span class="special">.</span><span class="identifier">py</span></code>, which appears at the end of this article,
+provides a few simple html markup functions. These functions are documented by
+example. If the script is run as a standalone program these examples are
+doctested.</p>
+<a name="the_doctest_module.doctest_as_a_unit_testing_framework"></a><h1>
+<a name="id4751895"></a>Doctest as a Unit Testing Framework</h1>
+<p>
+In some ways, <code class="code"><span class="identifier">doctest</span></code> appears to outdo <code class="code"><span class="identifier">unittest</span></code> as
+a unit testing framework:</p>
+<div class="itemizedlist"><ul type="disc">
+<li>
+The tests live close to what they test. In fact, the tests are actually
+      part of what they test: a function's docstring is part of the function
+      &#8211; unlike a comment, which disappears during some phase of compilation.
+</li>
+<li>
+Using the framework imposes almost no overhead.
+</li>
+</ul></div>
+<p>
+These are fair points. However it's also true that <code class="code"><span class="identifier">doctest</span></code> tests
+are all too easily written by cutting-and-pasting the output from the <a href="http://www.python.org" target="_top">Python</a>
+interpreter (for example, who can remember the exact format of the output when
+an exception is thown?) which in turn implies that <code class="code"><span class="identifier">doctest</span></code> is less
+suitable for test-first development.</p>
+<p>
+We must take care here not to confuse chickens and eggs again. The purpose of a
+docstring is to document what a function (etc.) does, not to provide a
+convenient home for unit tests. Often a function's documentation can be
+clarified by including examples of usage: and in this case <code class="code"><span class="identifier">doctest</span></code>
+will validate these examples are correct.</p>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><small>Copyright &copy; 2004 Thomas Guest</small></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="a_test_driven_enhancement_to_cpp2html.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="conclusions.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

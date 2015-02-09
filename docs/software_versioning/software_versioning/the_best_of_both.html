@@ -1,0 +1,97 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>The Best of Both</title>
+<link rel="stylesheet" href="../../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.67.0">
+<link rel="start" href="../index.html" title="The Trouble with Version Numbers">
+<link rel="up" href="../index.html" title="The Trouble with Version Numbers">
+<link rel="prev" href="build_numbers_and_version_numbers.html" title="Build numbers and version numbers">
+<link rel="next" href="concluding_thoughts.html" title="Concluding Thoughts">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><td valign="top"></td></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="build_numbers_and_version_numbers.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="concluding_thoughts.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+<div class="section" lang="en">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="software_versioning.the_best_of_both"></a>The Best of Both</h2></div></div></div>
+<p>
+The way to break out of this apparent conflict is simple.  We
+must give up on the idea of tying the version number to the version
+control system: it just doesn't work. Instead, we can adapt the build
+number idea to automate our versioning as follows.</p>
+<div class="orderedlist"><ol type="1">
+<li>
+Again, a single file &#8212; VERSION, let's say &#8212; must provide the
+single source of version information. This file is version controlled,
+but doesn't use keyword expansion <sup>[<a name="id4758284" href="#ftn.id4758284">2</a>]</sup>. Instead, it will
+(generally) only be modified automatically by the build system.
+</li>
+<li>
+At the <span class="underline">start</span> of the countdown to release 2.0, the contents of this file read
+2.0.0. Here, the leading "2.0" is the major and minor part of the
+version number, and the trailing "0" is the build number.
+</li>
+<li>
+From this point onwards, each time the build server produces a
+build it uses up a build number. As a post-build step, the server
+edits the VERSION file to increment the build number by 1, then checks
+this change in, ensuring that no subsequent build can have the same
+version number.
+</li>
+</ol></div>
+<p>
+We now have the build server generating a series of release
+candidates, each with its very own version number, 2.0.0, 2.0.1,
+2.0.2, ...  When a release candidate meets the required quality
+level it can be promoted to being a formal release. This promotion is
+essentially a book-keeping operation: the software may be tagged, the
+deliverables may be archived; but whatever happens, there should be no
+further change to the code, and what gets shipped will be <span class="emphasis"><em>identical</em></span>
+to what was tested.</p>
+<a name="the_best_of_both.refinements"></a><h3>
+<a name="id4758354"></a>Refinements</h3>
+<p>
+You'll notice that the full version of the final 2.0 release is
+unlikely to be 2.0.0. If it took us another 29 builds to fix all the
+defects, we will ship 2.0.29 &#8212; a rather less attractive
+number. Typically, in most cases, we should truncate the version
+number before presenting it to the user. You certainly won't see a 
+press release announcing the completion of version 2.0.29!</p>
+<p>
+Often, a three part version number is insufficient. It's more common
+to choose a number of the form 2.2.3.67, interpreted as: major version
+2, minor version 2, patch number 3, build number 67.</p>
+<p>
+There is a convention <sup>[<a name="id4758392" href="#ftn.id4758392">3</a>]</sup>
+to use odd minor version numbers for ongoing development and even version 
+numbers for released versions. Thus, while the release team are knocking
+<code class="literal">2.0.x</code> into shape, the development team continue with <code class="literal">2.1.x</code> on the trunk.</p>
+<p>
+Scripts should be written to perform all the common operations: to
+create release branches, to promote release candidates into full
+releases, and so on. It's important to have these scripts, and indeed
+the whole process, tested and in place well before the countdown to the final
+release.</p>
+<div class="footnotes">
+<br><hr width="100" align="left">
+<div class="footnote"><p><sup>[<a name="ftn.id4758284" href="#id4758284">2</a>] </sup>I also strongly recommend that keyword expansion is
+disabled for all files in the repository, for the reasons described in
+this article and also <a href="http://blog.wordaligned.org/articles/2006/08/02/keyword-substitution-just-say-no" target="_top">here</a>.</p></div>
+<div class="footnote"><p><sup>[<a name="ftn.id4758392" href="#id4758392">3</a>] </sup>
+This convention is used by the Linux community. See <a href="http://en.wikipedia.org/wiki/Software_versioning" target="_top">Wikipedia on Software Versioning</a> for more information.</p></div>
+</div>
+</div>
+<table width="100%"><tr>
+<td align="left"></td>
+<td align="right"><small>Copyright &copy; 2007 Thomas Guest</small></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="build_numbers_and_version_numbers.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="concluding_thoughts.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

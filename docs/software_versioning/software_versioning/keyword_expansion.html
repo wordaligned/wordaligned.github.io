@@ -1,0 +1,117 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Keyword Expansion</title>
+<link rel="stylesheet" href="../../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.67.0">
+<link rel="start" href="../index.html" title="The Trouble with Version Numbers">
+<link rel="up" href="../index.html" title="The Trouble with Version Numbers">
+<link rel="prev" href="the_problems.html" title="The Problems">
+<link rel="next" href="what_gets_tested_anyway_.html" title="What gets tested anyway?">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><td valign="top"></td></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="the_problems.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="what_gets_tested_anyway_.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+<div class="section" lang="en">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="software_versioning.keyword_expansion"></a>Keyword Expansion</h2></div></div></div>
+<p>
+We might turn to our version control system to help us overcome the
+manual intervention problem. Rather than edit a file by hand,
+shouldn't the version control system provide the version number
+directly?  This is a seductive argument but I'm going to suggest it's
+wrong. Before explaining why I think it's wrong, let's show how you can
+indeed derive a version number directly from the metadata stored in
+the code repository.</p>
+<p>
+To provide a concrete example, assume we're using Subversion for
+version control. A typical Subversion repository layout would be:</p>
+<pre class="programlisting"><code class="literal">`-- trunk
+  |   |-- file1
+  |   `-- file2
+  |-- branches
+  |   |-- 1.0
+  |   |   |-- file1
+  |   |   `-- file2
+  |   `-- 2.0
+  |       |-- file1
+  |       `-- file2
+  `-- tags
+      |-- 1.0
+      |   |-- file1
+      |   `-- file2
+      `-- 2.0
+          |-- file1
+          `-- file2
+</code></pre>
+<p>
+The trunk area is where most development goes on. When we want to
+branch the code before making a release, we copy the trunk into the
+branches area; and when we finally freeze the release, we tag it by
+copying it into the tags area. To check out release 2.0 of the
+software we'd issue the command:</p>
+<pre class="programlisting"><code class="literal">svn checkout svn://svnserver/tags/2.0</code></pre>
+<p>
+As you can see, the repository URL embeds the desired version string,
+2.0.  If we want to get the VERSION file to reflect the URL it was
+checked out from, we must enable keyword expansion and set
+its contents to read:</p>
+<pre class="programlisting"><code class="literal">$URL: $</code></pre>
+<p>
+When we update this file on the trunk, the magic <code class="literal">$URL: $</code> keyword
+expands to read something like:</p>
+<pre class="programlisting"><code class="literal">$URL: svn://svnserver/trunk/VERSION $</code></pre>
+<p>
+When we copy this file to our 2.0 branch and update, we'll see:</p>
+<pre class="programlisting"><code class="literal">$URL: svn://svnserver/branches/2.0/VERSION $</code></pre>
+<p>
+and in the tagged release area we get:</p>
+<pre class="programlisting"><code class="literal">$URL: svn://svnserver/tags/2.0/VERSION $</code></pre>
+<p>
+With some simple text parsing we can extract this information. Here's
+a minimal Python program which parses the repository URL it came from
+in order to display version information.</p>
+<pre class="programlisting">
+<code class="literal">
+<span class="keyword">def</span><span class="identifier"> version</span><span class="special">():</span><span class="string">
+        " Return the software version. "</span><span class="keyword">
+        import</span><span class="identifier"> re</span><span class="identifier">
+        match</span><span class="special"> =</span><span class="identifier"> re</span><span class="special">.</span><span class="identifier">search</span><span class="special">(</span><span class="string">"svn://svnserver/tags/([^/]*)"</span><span class="special">,</span><span class="string"> "$URL$"</span><span class="special">)</span><span class="keyword">
+        return</span><span class="identifier"> match</span><span class="special">.</span><span class="identifier">group</span><span class="special">(</span><span class="number">1</span><span class="special">)</span><span class="keyword"> if</span><span class="identifier"> match</span><span class="keyword"> else</span><span class="string"> "Development"</span><span class="keyword">
+    
+    print</span><span class="string"> "Version:"</span><span class="special">,</span><span class="identifier"> version</span><span class="special">()</span><span class="identifier">
+k</span><span class="identifier"> out</span><span class="identifier"> r</span></code>
+</pre>
+<p>
+If this program has been checked out from a base URL 
+<code class="literal">svn://svnserver/tags/2.0</code>, running it yields the output:</p>
+<pre class="programlisting"><code class="literal">Version: 2.0</code></pre>
+<p>
+Running it checked out from the trunk, we'll see:</p>
+<pre class="programlisting"><code class="literal">Version: Development</code></pre>
+<p>
+Note, incidentally, that the CVS keyword designed for this purpose is
+<code class="literal">"$Name$"</code> &#8212; this keyword won't even expand unless we checked out a
+tagged version of the code.</p>
+<a name="keyword_expansion.a_misuse_of_keyword_expansion"></a><h3>
+<a name="id4758115"></a>A Misuse of Keyword Expansion</h3>
+<p>
+Look at what's happening here: we tag the software to ensure we can
+recover exactly what went into a build; but by enabling keyword
+expansion, the code we check out <span class="emphasis"><em>differs</em></span> depending on the repository
+URL we use to access it. By tangling the software with version control
+meta-data we're changing the very thing we want to stabilise.</p>
+</div>
+<table width="100%"><tr>
+<td align="left"></td>
+<td align="right"><small>Copyright &copy; 2007 Thomas Guest</small></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="the_problems.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="what_gets_tested_anyway_.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

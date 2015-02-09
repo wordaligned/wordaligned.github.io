@@ -1,0 +1,111 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Reflection and Introspection</title>
+<link rel="stylesheet" href="../../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.67.0">
+<link rel="start" href="../index.html" title="Metaprogramming is Your Friend">
+<link rel="up" href="../index.html" title="Metaprogramming is Your Friend">
+<link rel="prev" href="cpp.html" title=" Metaprogramming in C++">
+<link rel="next" href="domain_specific_extensions.html" title="Domain Specific Extensions">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><td valign="top"></td></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="cpp.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="domain_specific_extensions.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+<div class="section" lang="en">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="metaprogramming_is_your_friend.reflection_and_introspection"></a>Reflection and Introspection</h2></div></div></div>
+<a name="reflection_and_introspection.validating_python_documentation"></a><h1>
+<a name="id4751480"></a>Validating Python Documentation</h1>
+<p>
+Take a look at the following <a href="http://www.python.org" target="_top">Python</a> function which on my machine lives in
+<code class="literal">&lt;PYTHON_ROOT&gt;/Lib/pickle.py</code>:</p>
+<p>
+</p>
+<pre class="programlisting">
+<code class="literal">
+<span class="keyword">def</span><span class="identifier"> encode_long</span><span class="special">(</span><span class="identifier">x</span><span class="special">):</span><span class="identifier">
+   r</span><span class="string">"""Encode a long to a two's complement little-endian binary string.
+   Note that 0L is a special case, returning an empty string, to save a
+   byte in the LONG1 pickling context.
+    &gt;&gt;&gt; encode_long(0L)
+   ''
+   &gt;&gt;&gt; encode_long(255L)
+   '\xff\x00'
+   &gt;&gt;&gt; encode_long(32767L)
+   '\xff\x7f'
+   &gt;&gt;&gt; encode_long(-256L)
+   '\x00\xff'
+   &gt;&gt;&gt; encode_long(-32768L)
+   '\x00\x80'
+   &gt;&gt;&gt; encode_long(-128L)
+   '\x80'
+   &gt;&gt;&gt; encode_long(127L)
+   '\x7f'
+   &gt;&gt;&gt;
+   """</span><span class="special">
+   ....</span></code>
+</pre>
+<p>
+The triple quoted string which follows the function declaration is the
+function's docstring (and the <code class="code"><span class="identifier">r</span></code> which prefixes the string makes this a raw
+string, ensuring that the <code class="code"><span class="special">\</span></code>'s which follow are not used as escape
+characters). This particular docstring provides a concise description of what
+the function does, fleshed out with some examples of the function in action.
+These examples exercise special cases and boundary cases, rather like a unit
+test might.</p>
+<p>
+<a href="http://www.python.org" target="_top">Python</a>'s <code class="code"><span class="identifier">doctest</span></code> module enables a user to test that these examples
+work correctly. Here's how to <code class="code"><span class="identifier">doctest</span><span class="identifier"> pickle</span></code> in an interactive <a href="http://www.python.org" target="_top">Python</a> session:</p>
+<pre class="programlisting">
+<code class="literal">
+<span class="special">&gt;&gt;&gt;</span><span class="keyword"> import</span><span class="identifier"> pickle</span><span class="special">
+&gt;&gt;&gt;</span><span class="keyword"> import</span><span class="identifier"> doctest</span><span class="special">
+&gt;&gt;&gt;</span><span class="identifier"> doctest</span><span class="special">.</span><span class="identifier">testmod</span><span class="special">(</span><span class="identifier">pickle</span><span class="special">)</span><span class="special">
+(</span><span class="number">0</span><span class="special">,</span><span class="number"> 14</span><span class="special">)</span></code>
+</pre>
+<p>
+The test result, <code class="code"><span class="special">(</span><span class="number">0</span><span class="special">,</span><span class="number"> 14</span><span class="special">)</span></code>, indicates 14 tests have run with 0 failures. For
+more details try <code class="code"><span class="identifier">doctest</span><span class="special">.</span><span class="identifier">testmod</span><span class="special">(</span><span class="identifier">pickle</span><span class="special">,</span><span class="identifier"> verbose</span><span class="special">=</span><span class="identifier">True</span><span class="special">)</span></code>. In case anyone is
+confused, 7 of the tests apply to <code class="code"><span class="identifier">encode_long</span></code> &#8211; and unsurprisingly the
+other 7 apply to <code class="code"><span class="identifier">decode_long</span></code>.</p>
+<p>
+Incidentally, if <code class="code"><span class="identifier">pickle</span><span class="special">.</span><span class="identifier">py</span></code> is executed (rather than imported as a library) it
+runs these tests directly.</p>
+<p>
+The <code class="code"><span class="identifier">doctest</span></code> module is a metaprogram &#8211; an example of <a href="http://www.python.org" target="_top">Python</a> being used to
+both read and execute <a href="http://www.python.org" target="_top">Python</a>. To see how it works I suggest taking a
+look at its implementation. The code runs to about 1500 lines of which the
+majority are documentation and many of the rest are to do with providing
+flexibility for more advanced use.</p>
+<p>
+In essence, note that docstrings are not a comments, they are formal object
+attributes. Now, <a href="http://www.python.org" target="_top">Python</a> allows you to list and categorise objects at runtime,
+so we can collect up the docstrings for classes, class methods and for the
+module itself. Once we have all these docstrings we can search them to find
+anything which looks like the output of an interactive session using <a href="http://www.python.org" target="_top">Python</a>'s
+text parsing capabilities. The remaining twist is <a href="http://www.python.org" target="_top">Python</a>'s ability to
+dynamically compile and execute source code using the <code class="code"><span class="identifier">compile</span></code> and <code class="code"><span class="keyword">exec</span></code>
+commands. So, we can replay the documentation examples, capturing and checking
+the output.</p>
+<p>
+The <code class="code"><span class="identifier">doctest</span></code> module provides no more than an introduction to metaprogramming in
+<a href="http://www.python.org" target="_top">Python</a>. Given a <a href="http://www.python.org" target="_top">Python</a> object it is possible to get at the object's class,
+which is itself an object which can be dynamically queried and even modified
+at run-time. This isn't the sort of trick which is often required: I haven't
+tried it myself so I'd better keep quiet and refer you to the experts. See for
+example <a href="refs.html#refs.van_rossum">van Rossum</a> or <a href="refs.html#refs.raymond">Raymond</a>.</p>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><small>Copyright &copy; 2005 Thomas Guest</small></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="cpp.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="domain_specific_extensions.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

@@ -1,0 +1,861 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title> Part Two - Implementation</title>
+<link rel="stylesheet" href="../../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.67.0">
+<link rel="start" href="../index.html" title="A Mini-Project to Decode a Mini-Language">
+<link rel="up" href="../index.html" title="A Mini-Project to Decode a Mini-Language">
+<link rel="prev" href="part_one.html" title=" Part One - Design and Test">
+<link rel="next" href="part_three.html" title=" Part Three - Refactor">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><td valign="top"></td></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="part_one.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="part_three.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+<div class="section" lang="en">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="a_mini_project_to_decode_a_mini_language.part_two"></a> Part Two - Implementation</h2></div></div></div>
+<a name="part_two.introduction"></a><h2>
+<a name="id4751070"></a>Introduction</h2>
+<p>
+This article appears in two parts. Part one described the preliminary
+stages of a miniproject to write a codec for a minilanguage, delivering:</p>
+<div class="itemizedlist"><ul type="disc">
+<li>
+a rough specification of the codec,
+</li>
+<li>
+a suite of test data,
+</li>
+<li>
+some prototype code,
+</li>
+<li>
+three implementation strategies.
+</li>
+</ul></div>
+<p>
+Part two &#8211; this part &#8211; continues the project and presents the final
+implementation.</p>
+<a name="part_two.motivation"></a><h2>
+<a name="id4751108"></a>Motivation</h2>
+<p>
+<a href="part_one.html#part_one.motivation">Part one</a> of this article drew inspiration
+from <span class="emphasis"><em>The Art of UNIX Programming</em></span>, by <a href="refs.html#refs.raymond">Eric S. Raymond</a>. 
+Part two continues to draw from this same source,
+which applies as readily to implementation as it did to design.</p>
+<p>
+At this point, I can reveal a second motivating source, <span class="emphasis"><em>The Tale of a
+Struggling Template Programmer</em></span>, by <a href="refs.html#refs.heinzmann">Stephan Heinzmann</a>,
+which served to remind me how frustrating software development can be:
+sometimes the tools are to blame, sometimes the languages appear faulty, and
+sometimes the poor programmer takes a wrong turn. On a more personal note, it
+reminded me that I ought to experiment with modern C++.</p>
+<div class="informaltable"><table class="table" width="74%">
+<colgroup><col></colgroup>
+<tbody><tr><td class="blurb">
+<span class="inlinemediaobject"><img src="../../images/info.png"></span> My job involves writing portable C++ to run on
+embedded platforms. The compilers supplied for these platforms often
+do not support "modern" C++ features such as templates.</td></tr></tbody>
+</table></div>
+<p>
+Anyone familiar with both sources will appreciate there's a degree of tension
+between them. In what follows, I document my attempts to resolve this tension.
+Along the way, we shall revisit the world of <a href="http://www.chiariglione.org/mpeg/standards/mpeg-2/mpeg-2.htm" target="_top">MPEG-2</a> video encoding and get
+started with the <a href="http://www.boost.org/" target="_top">Boost</a> <a href="http://spirit.sourceforge.net" target="_top">Spirit</a> library.</p>
+<a name="part_two.project_recap"></a><h2>
+<a name="id4751230"></a>Project Recap</h2>
+<a name="program_association_section"></a><p>
+To briefly recap, then, our goal is to write a tool to convert the binary
+format used in <a href="http://www.chiariglione.org/mpeg/standards/mpeg-2/mpeg-2.htm" target="_top">MPEG-2</a> digital video broadcasting into a textual form and
+back again &#8211; to write a <code class="code"><span class="identifier">dvbcodec</span></code>. For example, we would like to convert a
+section of the  Program Association Table (PAT),
+whose syntax is as follows:</p>
+<pre class="programlisting"><code class="literal">program_association_section() {
+        table_id                   8
+        section_syntax_indicator   1
+        '0'                        1
+        reserved                   2
+        section_length            12
+        transport_stream_id       16
+        reserved                   2
+        version_number             5
+        current_next_indicator     1
+        section_number             8
+        last_section_number        8
+        for (i=0; i&lt;N;i++) {
+            program_number        16
+            reserved               3
+            if(program_number == '0') {
+                network_PID       13
+            }
+            else {
+                program_map_PID   13
+            }
+        }
+        CRC_32                    32
+    }
+</code></pre>
+<p>
+The numerical values here represent field widths in bits: the first byte of
+the section encodes the <code class="code"><span class="identifier">table_id</span></code>, the next bit the
+<code class="code"><span class="identifier">section_syntax_indicator</span></code>, and so on until the final four bytes which encode
+the cyclic redundancy check.</p>
+<p>
+The PAT is just one of the tables we would like to decode. There are many
+others, the next three most important being the the Conditional Access Table,
+the Program Map Table and the Network Information Table (CAT, PMT and NIT).</p>
+<p>
+The textual output format we decided on should reflect the syntax description
+as follows:</p>
+<pre class="programlisting"><code class="literal">program_association_section() {
+        table_id                   8 = 0x0
+        section_syntax_indicator   1 = 0x1
+        '0'                        1 = 0x0
+        ...
+        CRC_32                    32 = 0xcae52d9f
+    }
+</code></pre>
+<a name="implementation_strategies"></a><p>
+ We came up with three possible
+implementation strategies for our <code class="code"><span class="identifier">dvbcodec</span></code>:</p>
+<div class="itemizedlist"><ul type="disc">
+<li>
+Implement a pat-codec. Then implement a cat-codec, then a pmt-codec, etc.
+</li>
+<li>
+Implement a general codec which understands the full bitstream syntax and
+can use it to parse an arbitrary section format. All that then remains is to
+prime this codec with the required section formats.
+</li>
+<li>
+Devise a code generator which, given a section format, will generate a
+program to encode/decode that particular format.
+</li>
+</ul></div>
+<a name="part_two.towards_a_solution"></a><h2>
+<a name="id4751384"></a>Towards a Solution</h2>
+<p>
+The first strategy holds little appeal: it risks being a recipe for
+cut-and-paste code and boring repetition. We reject it.</p>
+<p>
+The second and third strategies look to have more going from them,
+particularly since we have restricted our scope to a subset of the full
+bitstream syntax. Although these strategies appear rather different, they both
+require us to parse syntax descriptions of the general form exemplified by the
+<code class="code"><span class="identifier">program_association_section</span></code>.</p>
+<p>
+So, we need a parser. We need one capable of handling conditionals and loops:
+one capable, that is, of handling a Turing-complete minilanguage. <a href="refs.html#refs.raymond">Raymond</a>
+can advise. In general terms, he suggests:</p>
+<div class="itemizedlist"><ul type="disc">
+<li>
+Where possible, reuse. Look for a proven, documented, supported, portable,
+parser. (He argues these criteria pretty much imply an open source solution.)
+</li>
+<li>
+Prefer scripting languages such as <a href="http://www.python.org" target="_top">Python</a> and <a href="http://www.perl.org" target="_top">Perl</a>. These facilitate
+rapid development and are less prone to memory management bugs. You may
+not need the raw performance offered by <code class="code"><span class="identifier">C</span><span class="special">/</span><span class="identifier">C</span><span class="special">++</span></code>, and the library support
+offered by these languages is often superior.
+</li>
+</ul></div>
+<p>
+On the more specific subject of parsers, <a href="refs.html#refs.raymond">Raymond</a> recommends <code class="code"><span class="identifier">lex</span></code> and <code class="code"><span class="identifier">yacc</span></code>
+though, in keeping with the Unix philosophy of documenting weaknesses, he
+admits these tools are not perfect. He also suggests:</p>
+<div class="blockquote"><blockquote class="blockquote"><p><span class="emphasis"><em>If you can implement your parser in a higher-level language than C (which
+we recommend you do ...) then look for equivalent facilities like
+<a href="http://www.python.org" target="_top">Python's</a> <a href="refs.html#refs.ply">PLY</a> ...</em></span></p></blockquote></div>
+<p>
+I tend to agree with <a href="refs.html#refs.raymond">Raymond</a> but I'm not convinced <a href="refs.html#refs.ply">PLY</a> is
+the way to go here. Of course, it won't get me very far with my aim of finding
+out about modern C++, but it's also not part of the standard <a href="http://www.python.org" target="_top">Python</a>
+distribution. In fact, a web search reveals several other <a href="http://www.python.org" target="_top">Python</a> parser
+frameworks &#8211; it's unclear which will prevail.</p>
+<p>
+The C++ standard library doesn't provide a parser either. We might make some
+progress tokenising our data with <code class="code"><span class="identifier">std</span><span class="special">::</span><span class="identifier">strtok</span></code> or even <code class="code"><span class="identifier">std</span><span class="special">::</span><span class="identifier">sscanf</span></code>,
+but this won't suffice. <code class="code"><span class="identifier">Lex</span></code> and <code class="code"><span class="identifier">yacc</span></code> are of course a time-tested
+combination, but I'd rather not have to learn two more minilanguages.</p>
+<p>
+The next place to look is in the next best thing to the C++ standard
+library, namely <a href="http://www.boost.org/" target="_top">Boost</a>. Three clicks from the <a href="http://www.boost.org" target="_top">front
+page</a> takes us to the Spirit parser, which claims to be a scalable parser
+framework written in C++. We trust the source, the
+<a href="http://www.boost.org/libs/spirit/index.html" target="_top">documentation</a> is good, the
+examples work first time: let's try some code.</p>
+<a name="part_two.getting_started_with__ulink_url__http___spirit_sourceforge_net__spirit__ulink_"></a><h2>
+<a name="id4751662"></a>Getting Started with <a href="http://spirit.sourceforge.net" target="_top">Spirit</a>
+</h2>
+<p>
+The code below is a complete program to recognise lines of the form:</p>
+<pre class="programlisting"><code class="literal">reserved 2 = 0x3
+</code></pre>
+<p>
+this being the format we arrived at for fields of our text sections.</p>
+<pre class="programlisting">
+<code class="literal">
+<span class="preprocessor">#include</span><span class="special"> &lt;</span><span class="identifier">boost</span><span class="special">/</span><span class="identifier">spirit</span><span class="special">/</span><span class="identifier">core</span><span class="special">.</span><span class="identifier">hpp</span><span class="special">&gt;</span><span class="preprocessor">
+#include</span><span class="special"> &lt;</span><span class="identifier">iostream</span><span class="special">&gt;</span><span class="preprocessor">
+#include</span><span class="special"> &lt;</span><span class="identifier">string</span><span class="special">&gt;</span><span class="keyword">
+
+using</span><span class="keyword"> namespace</span><span class="identifier"> boost</span><span class="special">;</span><span class="comment">
+
+/**
+ * @brief Parse a string representing a field 
+ * @returns True if the field matches the format:
+ * &lt;field_name&gt; &lt;bitwidth&gt; = &lt;value&gt;, false otherwise.
+ */</span><span class="keyword">
+bool</span><span class="identifier">
+parseField</span><span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">string</span><span class="keyword"> const</span><span class="special"> &amp;</span><span class="identifier"> str</span><span class="special">)</span><span class="special"> {</span><span class="keyword">
+    return</span><span class="identifier"> spirit</span><span class="special">::</span><span class="identifier">parse</span><span class="special">(</span><span class="identifier">
+         str</span><span class="special">.</span><span class="identifier">begin</span><span class="special">(),</span><span class="identifier"> 
+         str</span><span class="special">.</span><span class="identifier">end</span><span class="special">(),</span><span class="identifier">
+         
+         spirit</span><span class="special">::</span><span class="identifier">lexeme_d</span><span class="special">[+</span><span class="identifier">spirit</span><span class="special">::</span><span class="identifier">graph_p</span><span class="special">]</span><span class="special">
+         &gt;&gt;</span><span class="identifier">   spirit</span><span class="special">::</span><span class="identifier">uint_p</span><span class="special">
+         &gt;&gt;</span><span class="char">   '='</span><span class="special">
+         &gt;&gt;</span><span class="identifier">   spirit</span><span class="special">::</span><span class="identifier">hex_p</span><span class="special">,</span><span class="identifier">
+         
+         spirit</span><span class="special">::</span><span class="identifier">space_p</span><span class="special">).</span><span class="identifier">full</span><span class="special">;</span><span class="special">
+}</span><span class="keyword">
+
+int</span><span class="identifier"> main</span><span class="special">()</span><span class="special"> {</span><span class="identifier">
+
+    std</span><span class="special">::</span><span class="identifier">cout</span><span class="special">
+        &lt;&lt;</span><span class="string"> "Enter text.\n"</span><span class="special">
+        &lt;&lt;</span><span class="string"> "Lines will be matched against: \n"</span><span class="special">
+        &lt;&lt;</span><span class="string"> "&lt;field_name&gt; &lt;bitwidth&gt; = &lt;hexvalue&gt;\n"</span><span class="special">
+        &lt;&lt;</span><span class="string"> "Type 'q' to quit\n"</span><span class="special">;</span><span class="identifier">
+    
+    std</span><span class="special">::</span><span class="identifier">string</span><span class="identifier"> str</span><span class="special">;</span><span class="identifier">
+    std</span><span class="special">::</span><span class="identifier">string</span><span class="keyword"> const</span><span class="identifier"> quit</span><span class="special">(</span><span class="string">"q"</span><span class="special">);</span><span class="keyword">
+
+    while</span><span class="special"> (</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">getline</span><span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">cin</span><span class="special">,</span><span class="identifier"> str</span><span class="special">)</span><span class="special"> &amp;&amp;</span><span class="identifier">
+           str</span><span class="special"> !=</span><span class="identifier"> quit</span><span class="special">)</span><span class="special"> {</span><span class="identifier">
+        std</span><span class="special">::</span><span class="identifier">cout</span><span class="special"> 
+            &lt;&lt;</span><span class="special"> (</span><span class="identifier">parseField</span><span class="special">(</span><span class="identifier">str</span><span class="special">)</span><span class="special"> ?</span><span class="string"> "hit"</span><span class="special"> :</span><span class="string"> "miss"</span><span class="special">)</span><span class="special">
+            &lt;&lt;</span><span class="identifier"> std</span><span class="special">::</span><span class="identifier">endl</span><span class="special">;</span><span class="special">
+    }</span><span class="keyword">
+    return</span><span class="number"> 0</span><span class="special">;</span><span class="special">
+}</span>
+</code>
+</pre>
+<p>
+Here, the action is concentrated in the function <code class="code"><span class="identifier">parseField</span><span class="special">()</span></code>, which
+wraps a call to <code class="code"><span class="identifier">spirit</span><span class="special">::</span><span class="identifier">parse</span><span class="special">()</span></code>. <code class="code"><span class="identifier">spirit</span><span class="special">::</span><span class="identifier">parse</span><span class="special">()</span></code> accepts as arguments:</p>
+<div class="itemizedlist"><ul type="disc">
+<li>
+two iterators marking the start and end of the data to be parsed,
+</li>
+<li>
+a parser,
+</li>
+<li>
+a skip parser.
+</li>
+</ul></div>
+<p>
+We have used <code class="code"><span class="identifier">spirit</span><span class="special">::</span><span class="identifier">space_p</span></code> directly as our skip parser. This primitive
+parser recognizes whitespace and tells <code class="code"><span class="identifier">spirit</span><span class="special">::</span><span class="identifier">parse</span><span class="special">()</span></code> which characters it
+should skip past in the input. A more sophisticated skip parser might be used
+to skip comments.</p>
+<a name="part_two.operator_overloading"></a><h2>
+<a name="id4752482"></a>Operator Overloading</h2>
+<p>
+The parser itself is a sequence of sub-parsers which can be read: recognise
+input consisting of a block one or more printable characters, followed by an
+unsigned integer, followed by the equals sign, followed by a hexadecimal
+integer.</p>
+<p>
+Operator overloading is used by <a href="http://spirit.sourceforge.net" target="_top">Spirit</a> to make such expressions into readable
+approximations of EBNF syntax descriptions (see also <a href="refs.html#refs.antonsen">Antonsen</a> for more on
+this technique). Here, we see that <code class="code"><span class="keyword">operator</span><span class="special">&gt;&gt;()</span></code> has been overloaded as a
+sequencing operator, <code class="code"><span class="identifier">prefix</span><span class="keyword"> operator</span><span class="special">+()</span></code> has been overloaded to mean "one or
+more of", and <code class="code"><span class="keyword">operator</span><span class="special">[]()</span></code> is overloaded to adapt the behaviour of a
+sub-parser &#8211; in this case using <code class="code"><span class="identifier">spirit</span><span class="special">::</span><span class="identifier">lexeme_d</span></code> to turn off whitespace
+skipping.</p>
+<a name="part_two.parser_generators"></a><h2>
+<a name="id4752581"></a>Parser Generators</h2>
+<p>
+I should also mention that the <code class="code"><span class="char">'='</span></code> sub-parser is a shorthand for
+<code class="code"><span class="identifier">spirit</span><span class="special">::</span><span class="identifier">ch_p</span><span class="special">(</span><span class="char">'='</span><span class="special">)</span></code>, which in turn is a parser generator 
+returning the character literal parser <code class="code"><span class="identifier">spirit</span><span class="special">::</span><span class="identifier">chlit</span><span class="special">&lt;</span><span class="keyword">char</span><span class="special">&gt;(</span><span class="char">'='</span><span class="special">)</span></code>.</p>
+<p>
+Similarly, <code class="code"><span class="identifier">spirit</span><span class="special">::</span><span class="identifier">hex_p</span></code> and <code class="code"><span class="identifier">spirit</span><span class="special">::</span><span class="identifier">uint_p</span></code> are parser generator functions
+which return suitable specialisations of the <code class="code"><span class="identifier">spirit</span><span class="special">::</span><span class="identifier">uint_parser</span></code> template
+struct.  The full template parameters of this struct are as follows:</p>
+<pre class="programlisting">
+<code class="literal">
+<span class="keyword">template</span><span class="special"> &lt;</span><span class="keyword">
+    typename</span><span class="identifier"> T</span><span class="special"> =</span><span class="keyword"> unsigned</span><span class="special">,</span><span class="keyword">
+    int</span><span class="identifier"> Radix</span><span class="special"> =</span><span class="number"> 10</span><span class="special">,</span><span class="keyword">
+    unsigned</span><span class="identifier"> MinDigits</span><span class="special"> =</span><span class="number"> 1</span><span class="special">,</span><span class="keyword">
+    int</span><span class="identifier"> MaxDigits</span><span class="special"> =</span><span class="special"> -</span><span class="number">1</span><span class="special">&gt;</span><span class="keyword">
+struct</span><span class="identifier"> uint_parser</span><span class="special"> {</span><span class="comment"> /* */</span><span class="special"> };</span>
+</code>
+</pre>
+<p>
+The helper functions <code class="code"><span class="identifier">hex_p</span></code> and <code class="code"><span class="identifier">uint_p</span></code> are often good enough, but it's also
+useful to have the full flexibility of the base parser. For example, if we
+need to match larger hex values, and <code class="code"><span class="keyword">long</span><span class="keyword"> long</span></code> is available, we could create
+an alternative hex parser:</p>
+<pre class="programlisting">
+<code class="literal">
+<span class="identifier">uint_parser</span><span class="special">&lt;</span><span class="keyword">unsigned</span><span class="keyword"> long</span><span class="keyword"> long</span><span class="special">,</span><span class="number"> 16</span><span class="special">&gt;</span><span class="keyword"> const</span><span class="identifier">
+    long_long_hex_p</span><span class="special">   
+        =</span><span class="identifier"> uint_parser</span><span class="special">&lt;</span><span class="keyword">unsigned</span><span class="keyword"> long</span><span class="keyword"> long</span><span class="special">,</span><span class="number"> 16</span><span class="special">&gt;();</span>
+</code>
+</pre>
+<p>
+In fact, the <code class="code"><span class="identifier">uint_parser</span></code> should work with any user defined scalar type.</p>
+<p>
+(You've probably noticed I'm now working in the <code class="code"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">spirit</span></code> namespace. I
+continue to do so for the remainder of this article.)</p>
+<p>
+One thing I cannot do with the hex parser, unfortunately, is get it to accept
+the <code class="code"><span class="number">0</span><span class="identifier">x</span></code> we've used to prefix hex digits. We can fix the bug
+in our program by introducing a new parser rule.</p>
+<pre class="programlisting">
+<code class="literal">
+<span class="identifier">with_base_hex_p</span><span class="special">
+    =</span><span class="identifier">   lexeme_d</span><span class="special">
+        [</span><span class="identifier">
+            as_lower_d</span><span class="special">[</span><span class="string">"0x"</span><span class="special">]</span><span class="special">
+            &gt;&gt;</span><span class="identifier">  hex_p</span><span class="special">
+        ];</span>
+</code>
+</pre>
+<p>
+Note here:</p>
+<div class="itemizedlist"><ul type="disc">
+<li>
+the <code class="code"><span class="identifier">as_lower_d</span></code> directive, which converts all characters from the input
+      to lowercase, and therefore recognising both <code class="code"><span class="number">0</span><span class="identifier">x</span></code> and <code class="code"><span class="number">0</span><span class="identifier">X</span></code>.
+</li>
+<li>
+the rather unusual code layout. I have tried to follow the
+<a href="http://www.boost.org/libs/spirit/doc/style_guide.html" target="_top">Spirit style
+guide</a> when writing parser grammars.  This will become
+increasingly more important when we develop a more substantial grammar.
+</li>
+<li>
+the string literal <code class="code"><span class="string">"0x"</span></code>, which in this context becomes yet another parser.
+</li>
+</ul></div>
+<a name="part_two.semantic_actions"></a><h2>
+<a name="id4753177"></a>Semantic Actions</h2>
+<p>
+Simply recognising fields is not enough: we need to act on their contents.
+That is, we must associate semantic actions with the sub-parsers. This can be
+done using another overload of <code class="code"><span class="keyword">operator</span><span class="special">[]()</span></code>, which enables us to link an
+action to a parser.</p>
+<p>
+Here, then, is an encoder which will convert text versions of sections to
+binary. I have omitted <code class="code"><span class="preprocessor">#include</span></code> directives etc. for brevity. The full
+implementation is available with the <a href="downloads.html#downloads.introduction">source distribution</a> for
+this article.</p>
+<pre class="programlisting">
+<code class="literal">
+<span class="keyword">typedef</span><span class="identifier"> std</span><span class="special">::</span><span class="identifier">string</span><span class="special">::</span><span class="identifier">const_iterator</span><span class="identifier"> iter</span><span class="special">;</span><span class="comment">
+
+/**
+ * @brief Put the input value to the output stream 
+ * using the specified bitwidth
+ */</span><span class="keyword">
+void</span><span class="identifier">
+putBits</span><span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">ostream</span><span class="special"> &amp;,</span><span class="keyword"> unsigned</span><span class="identifier"> w</span><span class="special">,</span><span class="keyword"> unsigned</span><span class="identifier"> v</span><span class="special">)</span><span class="special">
+{</span><span class="comment"> /* */</span><span class="special"> }</span><span class="comment">
+
+/**
+ * @brief Parse a field of the form:
+ * &lt;field_name&gt; &lt;bitwidth&gt; = &lt;value&gt;
+ */</span><span class="keyword">
+bool</span><span class="identifier">
+parseField</span><span class="special">(</span><span class="identifier">iter</span><span class="keyword"> const</span><span class="special"> &amp;</span><span class="identifier"> begin</span><span class="special">,</span><span class="identifier"> iter</span><span class="keyword"> const</span><span class="special"> &amp;</span><span class="identifier"> end</span><span class="special">,</span><span class="keyword">
+           unsigned</span><span class="special"> &amp;</span><span class="identifier"> bitwidth</span><span class="special">,</span><span class="keyword"> unsigned</span><span class="special"> &amp;</span><span class="identifier"> value</span><span class="special">)</span><span class="special"> {</span><span class="keyword">
+    return</span><span class="identifier"> parse</span><span class="special">(</span><span class="identifier">
+         begin</span><span class="special">,</span><span class="identifier"> 
+         end</span><span class="special">,</span><span class="identifier">
+         
+         lexeme_d</span><span class="special">[+</span><span class="identifier">graph_p</span><span class="special">]</span><span class="special">
+         &gt;&gt;</span><span class="identifier">   uint_p</span><span class="special">[</span><span class="identifier">assign_a</span><span class="special">(</span><span class="identifier">bitwidth</span><span class="special">)]</span><span class="special">
+         &gt;&gt;</span><span class="char">   '='</span><span class="special">
+         &gt;&gt;</span><span class="identifier">   lexeme_d</span><span class="special">
+              [</span><span class="special">
+                  !</span><span class="identifier"> as_lower_d</span><span class="special">[</span><span class="string">"0x"</span><span class="special">]</span><span class="special">
+                  &gt;&gt;</span><span class="identifier">  hex_p</span><span class="special">[</span><span class="identifier">assign_a</span><span class="special">(</span><span class="identifier">value</span><span class="special">)]</span><span class="special">
+              ]</span><span class="special">
+         ,</span><span class="identifier">
+         
+         space_p</span><span class="special">).</span><span class="identifier">full</span><span class="special">;</span><span class="special">
+}</span><span class="keyword">
+
+int</span><span class="identifier"> main</span><span class="special">()</span><span class="special"> {</span><span class="identifier">
+    std</span><span class="special">::</span><span class="identifier">string</span><span class="identifier"> str</span><span class="special">;</span><span class="keyword">
+    int</span><span class="identifier"> line</span><span class="special"> =</span><span class="number"> 0</span><span class="special">;</span><span class="keyword">
+    try</span><span class="special"> {</span><span class="keyword">
+        while</span><span class="special"> (</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">getline</span><span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">cin</span><span class="special">,</span><span class="identifier"> str</span><span class="special">))</span><span class="special"> {</span><span class="special">
+            ++</span><span class="identifier">line</span><span class="special">;</span><span class="keyword">
+            unsigned</span><span class="identifier"> bitwidth</span><span class="special">,</span><span class="identifier"> value</span><span class="special">;</span><span class="keyword">
+            
+            if</span><span class="special"> (</span><span class="identifier">parseField</span><span class="special">(</span><span class="identifier">str</span><span class="special">.</span><span class="identifier">begin</span><span class="special">(),</span><span class="identifier"> str</span><span class="special">.</span><span class="identifier">end</span><span class="special">(),</span><span class="identifier"> 
+                           bitwidth</span><span class="special">,</span><span class="identifier"> value</span><span class="special">))</span><span class="special"> {</span><span class="identifier">
+                putBits</span><span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">cout</span><span class="special">,</span><span class="identifier"> 
+                        bitwidth</span><span class="special">,</span><span class="identifier">
+                        value</span><span class="special">);</span><span class="special">
+            }</span><span class="special">
+        }</span><span class="special">
+    }</span><span class="keyword">    
+    catch</span><span class="special"> (</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">exception</span><span class="special"> &amp;</span><span class="identifier"> exc</span><span class="special">)</span><span class="special"> {</span><span class="identifier">
+        std</span><span class="special">::</span><span class="identifier">cerr</span><span class="special"> 
+            &lt;&lt;</span><span class="string"> "Error parsing line "</span><span class="special"> &lt;&lt;</span><span class="identifier"> line</span><span class="special"> 
+            &lt;&lt;</span><span class="string"> "\n"</span><span class="special"> &lt;&lt;</span><span class="identifier"> str</span><span class="special"> &lt;&lt;</span><span class="string"> "\n"</span><span class="special">
+            &lt;&lt;</span><span class="identifier"> exc</span><span class="special">.</span><span class="identifier">what</span><span class="special">()</span><span class="special"> &lt;&lt;</span><span class="identifier"> std</span><span class="special">::</span><span class="identifier">endl</span><span class="special">;</span><span class="keyword">
+        return</span><span class="special"> -</span><span class="number">1</span><span class="special">;</span><span class="special">
+    }</span><span class="keyword">
+    return</span><span class="number"> 0</span><span class="special">;</span><span class="special">
+}</span>
+</code>
+</pre>
+<p>
+Note here:</p>
+<div class="itemizedlist"><ul type="disc">
+<li>
+I have used typedefs for the iterators passed into the parser. This will
+ease switching to another forward iterator type, if required.
+</li>
+<li>
+I decided to make the <code class="code"><span class="number">0</span><span class="identifier">x</span></code> preceding hexadecimal values optional, using
+<a href="http://spirit.sourceforge.net" target="_top">Spirit</a>'s overload of <code class="code"><span class="keyword">operator</span><span class="special">!()</span></code>
+</li>
+<li>
+The use of the <code class="code"><span class="identifier">assign_a</span></code> actor for our semantic action. We could have used
+any function accepting an unsigned integer or any functor providing
+<code class="code"><span class="keyword">operator</span><span class="special">()(</span><span class="keyword">unsigned</span><span class="keyword"> int</span><span class="special">)</span><span class="keyword"> const</span></code>. Again, it's simpler to use one of <a href="http://spirit.sourceforge.net" target="_top">Spirit</a>'s
+off-the-peg actors.
+</li>
+<li>
+The program implements a classic Unix filter. This makes it suitable for
+use in a Unix pipeline. See <a href="refs.html#refs.raymond">Raymond</a> for more on this. Unfortunately, I'm
+not sure this is a great idea for binary output: I haven't found a portable
+way to reset <code class="code"><span class="identifier">std</span><span class="special">::</span><span class="identifier">cout</span></code> to binary mode.
+</li>
+</ul></div>
+<a name="part_two.exceptions_in_parsers"></a><h2>
+<a name="id4754282"></a>Exceptions in Parsers</h2>
+<p>
+Another important point to note about our simple encoder is the way it handles
+failure conditions using C++ exceptions rather than C-style error codes.
+There are plenty of failure conditions to handle: a value might not fit in the
+available bitwidth, the output stream might not be in a suitable state, and so
+on.</p>
+<p>
+In this simple parser we might equally well have passed error codes around,
+but a more complex parser is likely to involve recursion and/or nested
+function calls. Exceptions perform well in both the simple and the complex case,
+offering a scalable solution.</p>
+<p>
+The <a href="http://spirit.sourceforge.net" target="_top">Spirit</a> parser framework itself uses exceptions internally for similar
+reasons. To quote the <a href="http://www.boost.org/libs/spirit/index.html" target="_top">documentation</a>:</p>
+<div class="blockquote"><blockquote class="blockquote"><p><span class="emphasis"><em>C++'s exception handling mechanism is a perfect match for Spirit due to
+its highly recursive functional nature. C++ exceptions are used extensively
+by this module for handling errors.</em></span></p></blockquote></div>
+<p>
+Like our program, <a href="http://spirit.sourceforge.net" target="_top">Spirit</a> should not leak any such exceptions to its users.</p>
+<a name="part_two.weaknesses"></a><h2>
+<a name="id4754354"></a>Weaknesses</h2>
+<p>
+The simple encoder presented above follows <a href="refs.html#refs.postel">Postel's prescription</a>,
+to a degree . It doesn't mind too much about whitespace; it allows any
+sequence of printable characters as a field name; and it isn't fussy about the
+presentation of hexadecimal numbers.</p>
+<p>
+Its main flaw is that it does not look at the text format of our sections as a
+whole: it simply skips the lines which close blocks or start loops, for
+example. This means the encoding will quietly do the wrong thing given input
+where a new-line has gone missing, or where the data has been truncated. This
+is dangerous. It also means the encoder cannot check the integrity of our text
+data &#8211; for example, to confirm the <code class="code"><span class="identifier">section_length</span></code> field contains the actual
+section length, or to validate a CRC.</p>
+<p>
+When we start thinking along these lines, we realise that perhaps the encoder
+should calculate the values of these fields for us. We'll need a CRC generator
+anyway &#8211; why not embed it in the encoder?</p>
+<p>
+These are important points. However, we never considered data validation when
+we planned our codec and I'm not going to worry about it just yet &#8211; I need to
+get started on the decoder. Data validation, though valuable, would need to be
+optional since an encoder must let us generate broken data for test purposes.
+Also, <a href="refs.html#refs.raymond">Raymond</a> encourages us to limit options whenever possible: if we can
+release code earlier then our users can tell us which options they really
+want. Ideally, he suggests we make the release open source, and allow users to
+(submit patches which) implement these options.</p>
+<a name="part_two.progress_review"></a><h2>
+<a name="id4754440"></a>Progress Review</h2>
+<p>
+We've used <a href="http://spirit.sourceforge.net" target="_top">Spirit</a> to write a micro-parser to drive the encoder. We're ready to
+start on the decoder. <a href="http://spirit.sourceforge.net" target="_top">Spirit</a>'s scalability will be tested.</p>
+<a name="part_two.the_decoder"></a><h2>
+<a name="id4754468"></a>The Decoder</h2>
+<p>
+I decided to attempt the second implementation strategy: to develop a codec
+which understands the bitstream syntax and can use it to parse an arbitrary
+section format. I had no good reason for preferring this to the code-generator
+strategy.</p>
+<p>
+As already noted, this is a parsing task. We will use <a href="http://spirit.sourceforge.net" target="_top">Spirit</a> to define the
+grammar used by the bitstream syntax. We can then parse our static program
+data &#8211; the section formats we're interested in &#8211; which gives us the
+basis we need to parse the run-time program inputs, that is, actual
+instances of binary encoded sections.</p>
+<a name="part_two.grammar_definitions_and_parse_trees"></a><h2>
+<a name="id4754503"></a>Grammar Definitions and Parse Trees</h2>
+<p>
+I do not propose to dwell on the practical use of <a href="http://spirit.sourceforge.net" target="_top">Spirit</a> for much longer:
+we've already seen enough of what it can do, so for full implementation
+details please refer to <a href="http://spirit.sourceforge.net" target="_top">Spirit</a> and the codec <a href="downloads.html#downloads.introduction">source
+distribution</a>.</p>
+<p>
+For the decoder, note that simply parsing the data once and associating
+semantic actions to the various lexical elements is not enough. For instance,
+to process descriptor loops we need to revisit the same parser node several
+times. <a href="http://spirit.sourceforge.net" target="_top">Spirit</a> provides abstract syntax trees for exactly this purpose.</p>
+<p>
+I do think it is worth presenting here a portion of the section grammar. To
+me, this is a quite remarkable application of C++. For even more remarkable
+transcriptions of EBNF syntax definitions into Spirit grammars &#8211; including a
+C++ tokenizer and a C parser &#8211; I recommend a visit to the 
+<a href="http://spirit.sourceforge.net/repository/applications/show_contents.php" target="_top">Spirit
+Applications Repository</a>.</p>
+<pre class="programlisting">
+<code class="literal">
+<span class="comment">/**
+ * @brief MPEG-2 Section grammar defined using Boost Spirit.
+ *
+ * Reference:
+ *   - ISO/IEC 13818-1, MPEG-2 Transport Stream
+ */</span><span class="keyword">
+struct</span><span class="identifier"> Section</span><span class="special"> :</span><span class="keyword">
+    public</span><span class="identifier"> boost</span><span class="special">::</span><span class="identifier">spirit</span><span class="special">::</span><span class="identifier">grammar</span><span class="special">&lt;</span><span class="identifier">Section</span><span class="special">&gt;</span><span class="special">
+{</span><span class="keyword">
+    template</span><span class="special"> &lt;</span><span class="keyword">typename</span><span class="identifier"> ScannerT</span><span class="special">&gt;</span><span class="keyword">
+    struct</span><span class="identifier"> definition</span><span class="special">
+    {</span><span class="identifier">
+        definition</span><span class="special">(</span><span class="identifier">Section</span><span class="keyword"> const</span><span class="special"> &amp;</span><span class="comment"> /*self*/</span><span class="special">)</span><span class="special">
+        {</span><span class="identifier">
+            section_</span><span class="special">
+                =</span><span class="identifier">   section_ref_</span><span class="special">
+                    &gt;&gt;</span><span class="identifier"> section_body_</span><span class="special">
+                ;</span><span class="identifier">
+
+            section_ref_</span><span class="special">
+                =</span><span class="identifier">   text_id_</span><span class="special">
+                    &gt;&gt;</span><span class="char">   '('</span><span class="special">
+                    &gt;&gt;</span><span class="char">   ')'</span><span class="special">
+                ;</span><span class="identifier">
+        
+            text_id_</span><span class="special">
+                =</span><span class="identifier">   leaf_node_d</span><span class="special">[</span><span class="identifier">
+                        lexeme_d</span><span class="special">[</span><span class="identifier">
+                            alpha_p</span><span class="special">
+                            &gt;&gt;</span><span class="special"> *</span><span class="special"> (</span><span class="identifier">alnum_p</span><span class="special"> |</span><span class="char"> '_'</span><span class="special">)</span><span class="special">
+                            ]</span><span class="special">
+                        ]</span><span class="special">
+                ;</span><span class="identifier">
+
+            quoted_binary_</span><span class="special">
+                =</span><span class="identifier">   leaf_node_d</span><span class="special">[</span><span class="identifier">
+                        lexeme_d</span><span class="special">[</span><span class="char">    
+                            '\''</span><span class="special">
+                            &gt;&gt;</span><span class="identifier">  bin_p</span><span class="special">
+                            &gt;&gt;</span><span class="char"> '\''</span><span class="special">
+                        ]</span><span class="special">
+                    ]</span><span class="special">
+                ;</span><span class="identifier">
+            
+            section_body_</span><span class="special">
+                =</span><span class="identifier">   ch_p</span><span class="special">(</span><span class="char">'{'</span><span class="special">)</span><span class="special">
+                    &gt;&gt;</span><span class="special"> *(</span><span class="identifier">       field_</span><span class="special">
+                            |</span><span class="identifier">   loop_</span><span class="special">
+                            |</span><span class="identifier">   conditional_</span><span class="special">
+                            |</span><span class="identifier">   section_ref_</span><span class="special">
+                        )</span><span class="special">
+                    &gt;&gt;</span><span class="char"> '}'</span><span class="special">
+                ;</span><span class="identifier">
+            
+            field_</span><span class="special">
+                =</span><span class="identifier">   identifier_</span><span class="special">
+                    &gt;&gt;</span><span class="identifier">   uint_p</span><span class="special">
+                ;</span><span class="identifier">
+
+            identifier_</span><span class="special">
+                =</span><span class="identifier">   text_id_</span><span class="special">
+                    |</span><span class="identifier">   quoted_binary_</span><span class="special">
+                ;</span><span class="identifier">
+
+            conditional_</span><span class="special">
+                =</span><span class="identifier">   str_p</span><span class="special">(</span><span class="string">"if"</span><span class="special">)</span><span class="special">
+                    &gt;&gt;</span><span class="identifier"> condition_</span><span class="special">
+                    &gt;&gt;</span><span class="identifier"> section_body_</span><span class="special">
+                    &gt;&gt;</span><span class="special">  !</span><span class="special"> (</span><span class="identifier">str_p</span><span class="special">(</span><span class="string">"else"</span><span class="special">)</span><span class="special">
+                           &gt;&gt;</span><span class="identifier">   section_body_</span><span class="special">)</span><span class="special">
+                ;</span><span class="identifier">
+
+            condition_</span><span class="special">
+                =</span><span class="identifier">   inner_node_d</span><span class="special">[</span><span class="char">'('</span><span class="special">
+                        &gt;&gt;</span><span class="identifier"> text_id_</span><span class="special">
+                        &gt;&gt;</span><span class="string"> "=="</span><span class="special">
+                        &gt;&gt;</span><span class="identifier"> quoted_binary_</span><span class="special">
+                        &gt;&gt;</span><span class="char"> ')'</span><span class="special">
+                        ]</span><span class="special">
+                ;</span><span class="identifier">
+
+            loop_</span><span class="special">
+                =</span><span class="identifier">   loop_control_</span><span class="special">
+                    &gt;&gt;</span><span class="identifier"> section_body_</span><span class="special">
+                ;</span><span class="identifier">
+
+            loop_control_</span><span class="special">
+                =</span><span class="identifier">   leaf_node_d</span><span class="special">[</span><span class="identifier">str_p</span><span class="special">(</span><span class="string">"for"</span><span class="special">)</span><span class="special">
+                    &gt;&gt;</span><span class="char">   '('</span><span class="special">
+                    &gt;&gt;</span><span class="special">   *</span><span class="special"> (</span><span class="identifier">anychar_p</span><span class="special"> -</span><span class="char"> ')'</span><span class="special">)</span><span class="special">
+                    &gt;&gt;</span><span class="char">   ')'</span><span class="special">
+                    ]</span><span class="special">
+                ;</span><span class="special">
+
+        }</span><span class="special">
+        
+        ...</span><span class="identifier">
+        
+        boost</span><span class="special">::</span><span class="identifier">spirit</span><span class="special">::</span><span class="identifier">rule</span><span class="special">&lt;</span><span class="identifier">ScannerT</span><span class="special">&gt;</span><span class="keyword"> const</span><span class="special"> &amp;</span><span class="identifier">
+        start</span><span class="special">()</span><span class="keyword"> const</span><span class="special">
+        {</span><span class="keyword">
+            return</span><span class="identifier"> section_</span><span class="special">;</span><span class="special">
+        }</span><span class="special">
+    };</span><span class="special">
+};</span>
+</code>
+</pre>
+<a name="part_two.decisions_taken"></a><h2>
+<a name="id4755496"></a>Decisions Taken</h2>
+<p>
+Many of the decisions taken when writing our naive encoder scale up to the
+decoder: limited options; exceptions used in preference to error codes; <a href="http://spirit.sourceforge.net" target="_top">Spirit</a>
+style guide for grammar definitions; typedefs for iterators.</p>
+<p>
+Some decisions were ones we haven't yet faced. The main one was: where should
+we put section format definitions (for the PAT, CAT, PMT and NIT)? There are
+two obvious alternatives:</p>
+<div class="itemizedlist"><ul type="disc">
+<li>
+create a C++ source file containing these definitions &#8211; perhaps as an array
+of string literals,
+</li>
+<li>
+place them in a text file in a known location, and have this file read when
+the decoder starts up.
+</li>
+</ul></div>
+<p>
+The second alternative is perhaps most faithful to our original aims. Program
+logic and program data are nicely separated, and extending the decoder to
+handle other sections is a simple matter of editing the text file. No
+recompilation necessary.</p>
+<p>
+Despite these attractions, I went for the first option &#8211; partly because it's
+easier to implement and partly because I didn't want to work out where to put
+the text file.</p>
+<p>
+The other corner I cut concerns determining how and when to exit loops. The
+issue is fully described in the first part of this article (see the subsection
+headed <a href="part_one.html#part_one.complications">Complications</a>. My resolution was to
+notice that loops always exit when we've used up the number of bytes encoded
+in a <code class="code"><span class="identifier">length</span></code> field &#8211; with the single exception of the outermost loop, which
+may end four bytes early in order to leave space for a CRC. So, the decoder
+maintains a stack of <code class="code"><span class="identifier">length</span></code> fields, testing the top value after each loop
+iteration, popping it on loop exit. The first item to be stacked may need
+adjusting to allow for the four byte CRC. Again, the <a href="downloads.html#downloads.introduction">source
+distribution</a> should make this clear.</p>
+<p>
+I could find no official statement regarding what could be used as a field
+name in the section format definitions: inspection suggested that these names
+were rather similar to C identifiers, with the important addition of quoted
+binary values for fixed fields (e.g. the <code class="code"><span class="char">'0'</span></code> which is the third named field in
+the <code class="code"><span class="identifier">program_association_section</span></code> format definition).</p>
+<p>
+A few more parse tree node directives might have resulted in a leaner decoder,
+but I wanted the syntax grammar to be as simple as possible. I am
+inexperienced in writing grammars and preferred a small amount of extra code
+in my application. The application is quite compact anyway.</p>
+<a name="part_two._link_linkend__refs_alexandrescu__ship_happens__link_"></a><h2>
+<a name="id4755642"></a><a href="refs.html#refs.alexandrescu">Ship Happens</a>
+</h2>
+<a name="ship_happens"></a><p>
+</p>
+<p>
+<a href="refs.html#refs.raymond">Raymond</a> has lots of practical advice on how to ship a source code
+distribution, going down to details of file naming conventions. Some of the
+suggestions I have followed are:</p>
+<div class="itemizedlist"><ul type="disc">
+<li>
+choose a suitable license
+</li>
+<li>
+include a <code class="code"><span class="identifier">README</span></code>
+</li>
+<li>
+set up a project homepage
+</li>
+<li>
+include a <code class="code"><span class="identifier">BUGS</span></code> file, listing known defects and limitations
+</li>
+<li>
+include platform/compiler details
+</li>
+<li>
+include self-test code
+</li>
+</ul></div>
+<p>
+The <code class="code"><span class="identifier">BUGS</span></code> file is a strangely satisfying thing to write, particularly if
+you've ever delivered software which doesn't admit to defects, let alone
+limitations (or indeed if you've ever used such software). In this case it is
+essential to document both.</p>
+<p>
+Version 0.1 of the <code class="code"><span class="identifier">dvbcodec</span></code> features the naive encoder described in the
+preceding &#8211; really only of use for system testing (we can check that
+decoding then encoding a file recreates the original file). The decoder is
+rather better &#8211; in fact, I've extended it beyond the original specification
+to handle a few more section formats: <code class="code"><span class="identifier">dvbcodec</span><span class="special"> -</span><span class="identifier">l</span></code> gives details.</p>
+<p>
+Having done the hard work and shipped our beta release, the rest of this
+part of the article is dedicated to some closing thoughts.</p>
+<a name="part_two.is_c___the_right_tool_for_the_job_"></a><h2>
+<a name="id4755768"></a>Is C++ the Right Tool for the Job?</h2>
+<p>
+My criteria for language selection were somewhat artificial. If I had given
+myself a free hand I almost certainly would have been biased towards <a href="http://www.python.org" target="_top">Python</a>.
+However, having gone the C++ route &#8211; the modern C++ route, even &#8211; it would
+seem a good point to step back and review my selection.</p>
+<p>
+<a href="refs.html#refs.raymond">Raymond</a> has reservations about C++, which I summarise here:</p>
+<div class="itemizedlist"><ul type="disc">
+<li>
+By not automating memory management it fails to address C's biggest
+shortcoming; and backwards compatibility with C has compromised the language's
+design.
+</li>
+<li>
+Object oriented software design isn't all it's cracked up to be. All too
+often it leads to shaky object hierarchies, unnecessary abstractions and code
+which is hard to maintain.
+</li>
+<li>
+C++ is so complex that no one programmer can be expected to know it all.
+</li>
+<li>
+If C++ really were superior to C, it would now dominate it.
+</li>
+</ul></div>
+<p>
+(Incidentally, as already mentioned, <a href="refs.html#refs.raymond">Raymond</a> is not knocking C++ to promote
+C.  His recommendation is to adopt scripted and mixed language solutions.)</p>
+<p>
+To fully address all these points is outside the scope of this article.
+Instead I shall consider each in the context of the development of our codec:</p>
+<div class="itemizedlist"><ul type="disc">
+<li>
+By using standard library containers &#8211; <code class="code"><span class="identifier">map</span></code>, <code class="code"><span class="identifier">vector</span></code>, <code class="code"><span class="identifier">stack</span></code>, <code class="code"><span class="identifier">string</span></code>
+etc &#8211; I have avoided a single direct call to <code class="code"><span class="keyword">operator</span><span class="keyword"> new</span></code>. If I've got my
+exception handling and my use of <a href="http://spirit.sourceforge.net" target="_top">Spirit</a> right, there should be no leaks.
+Regarding C compatibility, I have benefited from the C standard library in a
+few places.
+</li>
+<li>
+The application code (as opposed to the <a href="http://spirit.sourceforge.net" target="_top">Spirit</a> framework code) uses only
+a few concrete classes. I have resisted the temptation to make these generic,
+or to make them derive from an abstract class. The <code class="code"><span class="identifier">RAII</span></code> class idiom is
+usefully employed. The <a href="http://spirit.sourceforge.net" target="_top">Spirit</a> framework itself has moved with the times: what
+was <span class="emphasis"><em>implemented with run-time polymorphic classes</em></span> is now <span class="emphasis"><em>a complete rewrite
+... using expression templates and static polymorphism</em></span>.
+</li>
+<li>
+Agreed! <a href="http://spirit.sourceforge.net" target="_top">Spirit</a>'s fine documentation includes examples which have served
+as a basis for my own application. When I deviated from these examples too far
+the result was a barely comprehensible torrent of compiler errors. Typeless
+programming in a strongly typed language can be tough.
+</li>
+</ul></div>
+<div class="informaltable"><table class="table" width="74%">
+<colgroup><col></colgroup>
+<tbody><tr><td class="blurb">
+<span class="inlinemediaobject"><img src="../../images/info.png"></span> The "Techniques" section of the <a href="http://spirit.sourceforge.net" target="_top">Spirit</a> documentation 
+describes an extraordinary method for obtaining an object's type: <span class="emphasis"><em>"... Try 
+to compile. Then, the compiler will generate an obnoxious error message ... 
+THERE YOU GO! You got its type! I just copy and paste the correct type."</em></span> 
+Elsewhere, the <a href="http://spirit.sourceforge.net" target="_top">Spirit</a> documentation mentions Dave Abrahams' proposal to 
+reuse the <code class="code"><span class="keyword">auto</span></code> keyword for type deduced variables. See also 
+<a href="refs.html#refs.colvin">Colvin</a> for a radical take on this issue.</td></tr></tbody>
+</table></div>
+<div class="itemizedlist"><ul type="disc"><li>
+C is far more portable. I believe our codec is standards compliant, so maybe
+in the long term it will be portable. However, at the moment (September 2004)
+the list of compilers which cope with <a href="http://spirit.sourceforge.net" target="_top">Spirit</a> is small. So our codec isn't
+truly portable. Not one of the compilers I use at work could cope with this
+program. This reflects my experience with C++ over the years: to get the good
+stuff, either you wait, or you work around compiler limitations. Bear in mind
+too that of two types of compiler bugs &#8211; incorrect error messages, no object
+code; no error messages, incorrect object code &#8211; the second is far more
+insidious: and the presence of the first naturally leads a
+programmer to suspect the existence of the second.
+</li></ul></div>
+<p>
+Despite all this, <a href="http://spirit.sourceforge.net" target="_top">Spirit</a> has proven itself flexible, scalable, capable of
+expressing grammars clearly and of writing efficient parsers without the need
+to step outside C++. Indeed, it could never have been done without C++. I am
+sure I will use <a href="http://spirit.sourceforge.net" target="_top">Spirit</a> again.</p>
+<a name="part_two.open_source"></a><h2>
+<a name="id4756083"></a>Open Source</h2>
+<p>
+The future of Unix is <a href="http://www.linux.org" target="_top">Linux</a> is
+<a href="http://www.opensource.org" target="_top">open source</a>. <a href="refs.html#refs.raymond">Raymond</a> is passionate about
+software quality and argues convincingly that <a href="http://www.opensource.org" target="_top">open
+source</a> is the best way to deliver the highest quality software. I do not
+propose to rehearse these arguments here: <a href="refs.html#refs.raymond">Raymond</a>'s writings are available
+both in print form and online. (See, for example 
+<a href="http://www.catb.org/~esr/writings/cathedral-bazaar/" target="_top"><span class="emphasis"><em>The Cathedral and the
+Bazaar</em></span></a>).</p>
+<p>
+What does interest me is that I cannot see how the full power of <a href="http://spirit.sourceforge.net" target="_top">Spirit</a> could
+be realised using anything other than a full source code distribution. It's
+all done with header files. Maybe with some reworking the implementation could
+be delivered in pre-built libraries, multiplied up by the various operating
+system, platform, version permutations &#8211; but wouldn't this make it even
+harder for compilers to build applications based on <a href="http://spirit.sourceforge.net" target="_top">Spirit</a>?</p>
+<p>
+Of course, <a href="http://www.opensource.org" target="_top">open source</a> means more than just
+access to source: but it's still notable that this style of C++ favours open
+source distribution.</p>
+<a name="part_two.and_finally"></a><h2>
+<a name="id4756180"></a>And Finally</h2>
+<p>
+I'm still not sure if it would have been better to write a code generator, to
+generate our codec from the section formats.</p>
+<p>
+Maybe I'll try using <a href="http://spirit.sourceforge.net" target="_top">Spirit</a> and C++ to generate a C codec.</p>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><small>Copyright &copy; 2004 Thomas Guest</small></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="part_one.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="part_three.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

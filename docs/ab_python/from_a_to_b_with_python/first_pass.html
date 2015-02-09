@@ -1,0 +1,243 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>First Pass</title>
+<link rel="stylesheet" href="../../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.67.0">
+<link rel="start" href="../index.html" title="From A to B with Python">
+<link rel="up" href="../index.html" title="From A to B with Python">
+<link rel="prev" href="../index.html" title="From A to B with Python">
+<link rel="next" href="second_pass.html" title="Second Pass">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><td valign="top"></td></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="../index.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="second_pass.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+<div class="section" lang="en">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="from_a_to_b_with_python.first_pass"></a>First Pass</h2></div></div></div>
+<a name="first_pass.iterating_over_files"></a><h1>
+<a name="id4748960"></a>Iterating Over Files</h1>
+<p>
+We want to map existing files to their new locations. In <a href="http://www.python.org" target="_top">Python</a>, the built-in
+mapping type is called a dictionary. The output of pass one will be a
+dictionary, which we initialise to be empty.</p>
+<pre class="programlisting">
+<code class="literal">
+<span class="identifier">files_map</span><span class="special"> =</span><span class="special"> {}</span></code>
+</pre>
+<p>
+There are two standard modules which support file and directory operations:</p>
+<div class="itemizedlist"><ul type="disc">
+<li>
+<code class="code"><span class="identifier">os</span></code> Miscellaneous operating system interfaces
+</li>
+<li>
+<code class="code"><span class="identifier">os</span><span class="special">.</span><span class="identifier">path</span></code> Common pathname manipulations
+</li>
+</ul></div>
+<p>
+Both of these will be of use to our script.  In fact, both provide a mechanism
+for traversing a directory tree:</p>
+<div class="itemizedlist"><ul type="disc">
+<li>
+<code class="code"><span class="identifier">os</span><span class="special">.</span><span class="identifier">path</span><span class="special">.</span><span class="identifier">walk</span></code>, which calls back a supplied function at each subdirectory,
+    passing that function the subdirectory name and a list of the files it
+    contains.
+</li>
+<li>
+<code class="code"><span class="identifier">os</span><span class="special">.</span><span class="identifier">walk</span></code>, which generates a 3-tuple <code class="code"><span class="special">(</span><span class="identifier">dirpath</span><span class="special">,</span><span class="identifier"> dirnames</span><span class="special">,</span><span class="identifier"> filenames</span><span class="special">)</span></code> for 
+    each subdirectory in the tree.
+</li>
+</ul></div>
+<p>
+The second option, <code class="code"><span class="identifier">os</span><span class="special">.</span><span class="identifier">walk</span></code>, only came into being in <a href="http://www.python.org" target="_top">Python</a> 2.3 (2.3 strengthens the
+language's support for generators). I prefer it since it makes the script more
+direct.</p>
+<pre class="programlisting">
+<code class="literal">
+<span class="keyword">import</span><span class="identifier"> os</span><span class="comment">
+
+# Initialise a dictionary to map current file path
+# to new file path.
+</span><span class="identifier">files_map</span><span class="special"> =</span><span class="special"> {}</span><span class="comment">
+
+# Fill the dictionary by remapping all files beneath
+# the current working directory.
+</span><span class="keyword">for</span><span class="special"> (</span><span class="identifier">subdir</span><span class="special">,</span><span class="identifier"> dirs</span><span class="special">,</span><span class="identifier"> files</span><span class="special">)</span><span class="keyword"> in</span><span class="identifier"> os</span><span class="special">.</span><span class="identifier">walk</span><span class="special">(</span><span class="string">'.'</span><span class="special">):</span><span class="keyword">
+    print</span><span class="string"> "Mapping files in subdir [%s]"</span><span class="special"> %</span><span class="identifier"> subdir</span><span class="identifier"> 
+    files_map</span><span class="special">.</span><span class="identifier">update</span><span class="special">(</span><span class="identifier">
+        mapFiles</span><span class="special">(</span><span class="identifier">subdir</span><span class="special">,</span><span class="identifier"> files</span><span class="special">)</span><span class="special">
+        )</span></code>
+</pre>
+<p>
+Note the general absence of visible symbols to delimit blocks and expressions
+&#8211; a colon marks the end of the <code class="code"><span class="keyword">for</span></code> condition, and that's about
+it. Expressions are terminated by a newline, unless the newline is escaped
+with a backslash or the expression requires a closing bracket to
+complete it. Thus the print statement terminates at the newline, but the
+dictionary update statement spreads over three lines. Note also that
+statements can be grouped into a block by placing them at the same indentation
+level: the body of the for loop is a block of two statements.</p>
+<p>
+To a C/C++ programmer these syntactical rules may seem unusual, dangerous even
+&#8211; attaching meaning to whitespace!? &#8211; but I would argue that they actually
+encourage clean and well laid out scripts.</p>
+<p>
+Incidentally, the default behaviour of the print statement is to add a newline
+after printing. Appending a trailing comma would print a space instead of this
+newline.</p>
+<a name="first_pass.mapping_files"></a><h2>
+<a name="id4749370"></a>Mapping Files</h2>
+<p>
+If we attempt to run the script as it stands, we'll see an exception thrown:</p>
+<pre class="programlisting">
+<code class="literal">
+<span class="identifier">NameError</span><span class="special">:</span><span class="identifier"> name</span><span class="char"> 'mapFiles'</span><span class="identifier"> is</span><span class="keyword"> not</span><span class="identifier"> defined</span>
+</code>
+</pre>
+<p>
+which is as we'd expect.  We need to define the function:</p>
+<pre class="programlisting">
+<code class="literal">
+<span class="keyword">def</span><span class="identifier"> mapFiles</span><span class="special">(</span><span class="identifier">dirname</span><span class="special">,</span><span class="identifier"> files</span><span class="special">):</span><span class="string">
+    """Return a dictionary mapping files to their new locations."""</span><span class="identifier">
+    new_dir</span><span class="special"> =</span><span class="identifier"> mapDirectory</span><span class="special">(</span><span class="identifier">dirname</span><span class="special">)</span><span class="keyword">
+    print</span><span class="string"> "mapDirectory [%s] -&gt; [%s]"</span><span class="special"> %</span><span class="special"> (</span><span class="identifier">dirname</span><span class="special">,</span><span class="identifier"> new_dir</span><span class="special">)</span><span class="identifier">
+    fm</span><span class="special"> =</span><span class="special"> {}</span><span class="keyword">
+    for</span><span class="identifier"> f</span><span class="keyword"> in</span><span class="identifier"> files</span><span class="special">:</span><span class="identifier">
+        fm</span><span class="special">[</span><span class="identifier">os</span><span class="special">.</span><span class="identifier">path</span><span class="special">.</span><span class="identifier">join</span><span class="special">(</span><span class="identifier">dirname</span><span class="special">,</span><span class="identifier"> f</span><span class="special">)]</span><span class="special"> =</span><span class="special"> \</span><span class="identifier">
+           os</span><span class="special">.</span><span class="identifier">path</span><span class="special">.</span><span class="identifier">join</span><span class="special">(</span><span class="identifier">new_dir</span><span class="special">,</span><span class="identifier"> f</span><span class="special">)</span><span class="keyword">
+    return</span><span class="identifier"> fm</span></code>
+</pre>
+<p>
+The <a href="http://www.python.org" target="_top">Python</a> interpreter needs to know about this function before it can use it,
+so we'll place it before the path traversal loop.</p>
+<p>
+The first statement of the function body is the function's (optional)
+documentation string, or docstring. The <a href="http://www.python.org" target="_top">Python</a> documentation explains why it's
+worth getting the habit of using docstrings and the conventions for their use.</p>
+<p>
+The function fills a dictionary mapping files to their new location. It uses
+<code class="code"><span class="identifier">os</span><span class="special">.</span><span class="identifier">path</span><span class="special">.</span><span class="identifier">join</span></code> from the <code class="code"><span class="identifier">os</span><span class="special">.</span><span class="identifier">path</span></code> module to construct a file
+path. The backslash is there to escape a newline, allowing the dictionary
+item-setter to continue onto a second line.</p>
+<a name="first_pass.examining_objects_with_the_python_interpreter"></a><h2>
+<a name="id4749771"></a>Examining Objects with the Python Interpreter</h2>
+<p>
+If we were to start an interactive <a href="http://www.python.org" target="_top">Python</a> shell and load the <code class="code"><span class="identifier">mapFiles</span></code>
+function, we could then query it and its attributes:</p>
+<pre class="programlisting">
+<code class="literal">
+<span class="special">&gt;&gt;&gt;</span><span class="identifier"> mapFiles</span><span class="special">
+&lt;</span><span class="identifier">function</span><span class="identifier"> mapFiles</span><span class="identifier"> at</span><span class="number"> 0x01106630</span><span class="special">&gt;</span><span class="special">
+&gt;&gt;&gt;</span><span class="identifier"> dir</span><span class="special">(</span><span class="identifier">mapFiles</span><span class="special">)</span><span class="special">
+[</span><span class="string">'__call__'</span><span class="special">,</span><span class="string"> '__class__'</span><span class="special">,</span><span class="string"> '__delattr__'</span><span class="special">,</span><span class="string"> '__dict__'</span><span class="special">,</span><span class="string"> '__doc__'</span><span class="special">,</span><span class="string"> '__get__'</span><span class="special">,</span><span class="string">
+'__getattribute__'</span><span class="special">,</span><span class="string"> '__hash__'</span><span class="special">,</span><span class="string"> '__init__'</span><span class="special">,</span><span class="string"> '__module__'</span><span class="special">,</span><span class="string"> '__name__'</span><span class="special">,</span><span class="string">
+'__new__'</span><span class="special">,</span><span class="string"> '__reduce__'</span><span class="special">,</span><span class="string"> '__reduce_ex__'</span><span class="special">,</span><span class="string"> '__repr__'</span><span class="special">,</span><span class="string"> '__setattr__'</span><span class="special">,</span><span class="string">
+'__str__'</span><span class="special">,</span><span class="string"> 'func_closure'</span><span class="special">,</span><span class="string"> 'func_code'</span><span class="special">,</span><span class="string"> 'func_defaults'</span><span class="special">,</span><span class="string"> 'func_dict'</span><span class="special">,</span><span class="string">
+'func_doc'</span><span class="special">,</span><span class="string"> 'func_globals'</span><span class="special">,</span><span class="string"> 'func_name'</span><span class="special">]</span><span class="special">
+&gt;&gt;&gt;</span><span class="identifier"> mapFiles</span><span class="special">.</span><span class="identifier">func_doc</span><span class="string">
+'Return a dictionary mapping files in dir to their new locations.'</span></code>
+</pre>
+<p>
+I like to switch between editor and interpreter when developing scripts (on
+Windows, the <a href="credits.html#pythonwin">PythonWin IDE</a> makes this easy to do, or, alternatively, <a href="http://www.python.org" target="_top">Python</a>'s
+-i option), since it helps me understand both how my script works and how
+<a href="http://www.python.org" target="_top">Python</a> works. Here we can see the name <code class="code"><span class="identifier">mapFiles</span></code> refers to a function object
+which has a list of attributes.</p>
+<p>
+The <a href="http://www.python.org" target="_top">Python</a> interpreter also allows functions to be exercised immediately:</p>
+<pre class="programlisting">
+<code class="literal">
+<span class="special">&gt;&gt;&gt;</span><span class="identifier"> mapFiles</span><span class="special">(</span><span class="string">'png'</span><span class="special">,</span><span class="special"> (</span><span class="string">'pngRead.h'</span><span class="special">,</span><span class="string"> 'pngWrite.h'</span><span class="special">))</span></code>
+</pre>
+<a name="first_pass.mapping_directories"></a><h2>
+<a name="id4750214"></a>Mapping Directories</h2>
+<p>
+The final component of the first pass is the function <code class="code"><span class="identifier">mapDirectory</span></code>, which
+maps an existing directory to its new location.</p>
+<pre class="programlisting">
+<code class="literal">
+<span class="keyword">def</span><span class="identifier"> mapDirectory</span><span class="special">(</span><span class="identifier">dname</span><span class="special">):</span><span class="string">
+   """Return the new location of the input directory."""</span><span class="comment">
+   
+   # The following dictionary maps existing
+   # directories to their new locations.
+</span><span class="identifier">   dirmap</span><span class="special"> =</span><span class="special"> {</span><span class="string">
+       'png'</span><span class="special">     :</span><span class="string"> 'graphics/thirdparty/png'</span><span class="special">,</span><span class="string">
+       'jpeg'</span><span class="special">    :</span><span class="string"> 'graphics/thirdparty/jpeg'</span><span class="special">,</span><span class="string">
+       'bitmap'</span><span class="special">  :</span><span class="string"> 'graphics/common/bitmap'</span><span class="special">,</span><span class="string">
+       'UserIF'</span><span class="special">  :</span><span class="string"> 'ui'</span><span class="special">,</span><span class="string">
+       'UserIF/Wgts'</span><span class="special"> :</span><span class="string"> 'ui/widgets'</span><span class="special">,</span><span class="string">
+       'os'</span><span class="special">      :</span><span class="string"> 'platform/os'</span><span class="special">,</span><span class="string">
+       'os/hpux'</span><span class="special"> :</span><span class="string"> 'platform/os/hpux10'</span><span class="special">
+   }</span><span class="comment">
+   # Successively reduce the directory path until it
+   # matches one of the keys in the dictionary.
+</span><span class="identifier">   mapped_dir</span><span class="special"> =</span><span class="identifier"> p</span><span class="special"> =</span><span class="identifier"> dname</span><span class="keyword">
+   while</span><span class="identifier"> p</span><span class="keyword"> and</span><span class="keyword"> not</span><span class="identifier"> p</span><span class="keyword"> in</span><span class="identifier"> dirmap</span><span class="special">:</span><span class="identifier">
+       p</span><span class="special"> =</span><span class="identifier"> os</span><span class="special">.</span><span class="identifier">path</span><span class="special">.</span><span class="identifier">dirname</span><span class="special">(</span><span class="identifier">p</span><span class="special">)</span><span class="keyword">
+       
+   if</span><span class="identifier"> p</span><span class="special">:</span><span class="identifier">
+       mapped_dir</span><span class="special"> =</span><span class="identifier"> os</span><span class="special">.</span><span class="identifier">path</span><span class="special">.</span><span class="identifier">join</span><span class="special">(</span><span class="identifier">dirmap</span><span class="special">[</span><span class="identifier">p</span><span class="special">],</span><span class="identifier"> 
+                                 dname</span><span class="special">[</span><span class="identifier">len</span><span class="special">(</span><span class="identifier">p</span><span class="special">)</span><span class="special"> +</span><span class="number"> 1</span><span class="special">:])</span><span class="keyword">
+   
+   return</span><span class="identifier"> mapped_dir</span></code>
+</pre>
+<p>
+The directory rearrangement described earlier in this article has been
+represented as a dictionary. The input directory is reduced until we match a
+key in this dictionary. As soon as we find such a match, we construct our
+return value from the value at this key and the un-matched tail of the input
+directory; or, if no such match is found, the input value is returned
+unmodified.</p>
+<p>
+The expression <code class="code"><span class="identifier">dname</span><span class="special">[</span><span class="identifier">len</span><span class="special">(</span><span class="identifier">p</span><span class="special">)</span><span class="special"> +</span><span class="number"> 1</span><span class="special">:]</span></code> is a slice operation applied to a
+string. Bearing in mind that <code class="code"><span class="identifier">p</span></code> is the first <code class="code"><span class="identifier">len</span><span class="special">(</span><span class="identifier">p</span><span class="special">)</span></code>
+characters in <code class="code"><span class="identifier">dname</span></code>, this expression returns what's left of
+<code class="code"><span class="identifier">dname</span></code>, omitting the slash which separates the head from the tail of
+this path.</p>
+<p>
+For example, when mapping the directory <code class="literal">os/hpux/include</code> we would
+expect to exit the while loop when <code class="code"><span class="identifier">p</span><span class="special"> ==</span><span class="identifier"> os</span><span class="special">/</span><span class="identifier">hpux</span></code>, and return the
+result of joining the path <code class="literal">platform/os/hpux10</code> to
+<code class="literal">include</code>.</p>
+<pre class="programlisting"><code class="literal"><code class="literal">
+    mapDirectory('os/hpux/include') 
+        &#8211;&gt; os.path.join('platform/os/hpux10', 'include')
+        &#8211;&gt; 'platform/os/hpux10/include' 
+</code></code></pre>
+<a name="first_pass.testing"></a><h1>
+<a name="id4750813"></a>Testing</h1>
+<p>
+Let's test these expectations by adding the following lines to our script:</p>
+<pre class="programlisting">
+<code class="literal">
+<span class="keyword">assert</span><span class="special">(</span><span class="identifier">mapDirectory</span><span class="special">(</span><span class="string">'os/hpux/include'</span><span class="special">)</span><span class="special">
+       ==</span><span class="string"> 'platform/os/hpux10/include'</span><span class="special">)</span><span class="keyword">
+       
+assert</span><span class="special">(</span><span class="identifier">mapDirectory</span><span class="special">(</span><span class="string">'os/win32'</span><span class="special">)</span><span class="special">
+       ==</span><span class="string"> 'platform/os/win32'</span><span class="special">)</span><span class="keyword">
+
+assert</span><span class="special">(</span><span class="identifier">mapDirectory</span><span class="special">(</span><span class="string">'unittests'</span><span class="special">)</span><span class="special">
+       ==</span><span class="string"> 'unittests'</span><span class="special">)</span></code>
+</pre>
+<p>
+These tests pass on Unix platforms, but if you run them on Windows the first
+two tests raise <code class="code"><span class="identifier">AssertionError</span></code> exceptions (although the final one passes). For
+now, I'll leave you to work out why &#8211; but promise a more platform independent
+solution in the final version of the script.</p>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><small>Copyright &copy; 2004 Thomas Guest</small></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="../index.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="second_pass.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>
