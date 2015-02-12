@@ -7,6 +7,97 @@
 <dc:creator>tag@wordaligned.org</dc:creator>
 <language>en-gb</language>
 <item>
+<title>2147483647</title>
+<description>&lt;h1&gt;Magic!&lt;/h1&gt;
+&lt;p&gt;When software developers refer to &amp;#8220;magic numbers&amp;#8221; they mean those numeric literals which appear in a program without explanation &amp;#8212; as if by magic. Consider the mysterious figures in this incantation:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;int cigarettes()
+{
+    return 365 * 20 * 10 + 2 * 20 + 17;
+}
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Why is the &lt;code&gt;&lt;a href="http://www.richardbeard.info/category/my-books/x20/
+"&gt;20&lt;/a&gt;&lt;/code&gt; repeated? Does the first &lt;code&gt;20&lt;/code&gt; mean the same as the second one? Could &lt;code&gt;365&lt;/code&gt; be the number of days in a year? Named constants would make the code easier to read and maintain.
+&lt;/p&gt;
+&lt;p&gt;Some numbers truly are &lt;strong&gt;magical&lt;/strong&gt; though.
+&lt;/p&gt;
+
+&lt;h1&gt;2147483647&lt;/h1&gt;
+&lt;p&gt;The number 2147483647 is special and terrible.
+&lt;/p&gt;
+&lt;p&gt;It&amp;#8217;s a substantial number, far greater than the number of goals Lionel Messi has scored or the number of hot dinners I&amp;#8217;ve eaten, and comparable with the number of heart beats in a lifetime or the number of instructions a processor executes in a second; but it&amp;#8217;s not that large. You&amp;#8217;ll need more than 2147483647 bytes to install a modern operating system, let alone store your video collection. And shuffling a pack of just 52 cards has 80658175170943878571660636856403766975289505440883277824000000000000 possible outcomes.
+&lt;/p&gt;
+&lt;p&gt;If 2147483647 isn&amp;#8217;t remarkable for its size it certainly has a noteworthy history. In 1772 the Swiss mathematician Leonhard Euler proved it a prime. I&amp;#8217;m guessing it was the largest known prime at the time. Euler didn&amp;#8217;t have a computer to hunt for primes so he narrowed the field by focusing on &lt;a href="http://www.mersenne.org/"&gt;Mersenne numbers&lt;/a&gt; &amp;#8212; numbers one less than a power of two &amp;#8212; a strategy which remains a winner even today, when computers are networked to search.
+&lt;/p&gt;
+&lt;p&gt;Actually, 2147483647 is a double Mersenne prime, which is to say it takes the form 2&lt;sup&gt;m&lt;/sup&gt; - 1, where &lt;code&gt;m&lt;/code&gt; itself takes the form 2&lt;sup&gt;n&lt;/sup&gt; - 1. 
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; 2**(2**5 - 1) - 1
+2147483647
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Magic!
+&lt;/p&gt;
+
+&lt;h1&gt;Dragons!&lt;/h1&gt;
+&lt;p&gt;2147483647 has a special significance for C programmers, who know it by the name &lt;code&gt;INT_MAX&lt;/code&gt;, and for C++ programmers, who demystify the digits as &lt;code&gt;std::numeric_limits&amp;lt;int&amp;gt;::max()&lt;/code&gt;.
+&lt;/p&gt;
+&lt;p&gt;Remember, 2147483647 is Mersenne(Mersenne(5)), which is Mersenne(31), or 2 to the power 31 minus 1. In binary arithmetic you add a zero on the right to multiply by 2 so 2 to the 31 is 1 followed by 31 zeros; and subtracting 1 leaves 31 1&amp;#8217;s. It&amp;#8217;s the largest signed value you can fit in a 32 bit register.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; mersenne31 = 2**31-1
+&amp;gt;&amp;gt;&amp;gt; bin(mersenne31)
+'0b1111111111111111111111111111111'
+&amp;gt;&amp;gt;&amp;gt; hex(mersenne31)
+'0x7fffffffL'
+&amp;gt;&amp;gt;&amp;gt; mersenne31
+2147483647L
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;It&amp;#8217;s quite possible to inadvertantly increment an &lt;code&gt;int&lt;/code&gt; which has reached &lt;code&gt;INT_MAX&lt;/code&gt;. The result is undefined behaviour: anything could happen. 
+&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://en.wikipedia.org/wiki/Myth_of_the_Flat_Earth"&gt;&lt;img src="http://wordaligned.org/images/flammarion.jpg"/&gt;&lt;/a&gt;
+&lt;/p&gt;
+
+&lt;h1&gt;Gangnam Style&lt;/h1&gt;
+&lt;blockquote&gt;&lt;p&gt;We never thought a video would be watched in numbers greater than a 32-bit integer (=2,147,483,647 views), but that was before we met PSY. Gangnam Style has been viewed so many times we had to upgrade to a 64-bit integer (9,223,372,036,854,775,808)!
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;&amp;mdash; &lt;a href="https://plus.google.com/u/0/wm/4/+youtube/posts/BUXfdWqu86Q"&gt;youtube developers&lt;/a&gt;
+&lt;/p&gt;
+&lt;img src="http://wordaligned.org/images/psy.png" alt="Psy"/&gt;
+
+&lt;p&gt;Exactly what undefined behaviour was provoked when PSY&amp;#8217;s popularity broke the magic limit isn&amp;#8217;t disclosed. Maybe a server leaked account details to North Korean hackers. Or maybe the video&amp;#8217;s viewing figures were wrong for a while. 
+&lt;/p&gt;
+&lt;p&gt;Note that the new limit of 9,223,372,036,854,775,808 is an unsigned value, which is exempt from this flavour of undefined behaviour and wraps to zero when you bump it up.
+&lt;/p&gt;
+
+&lt;h1&gt;Bugwards compatibility&lt;/h1&gt;
+&lt;p&gt;There&amp;#8217;s another reason for preferring &lt;code&gt;INT_MAX&lt;/code&gt; to the magical 2147483647: the two values might be different. 2147483647 is 2147483647 but &lt;code&gt;INT_MAX&lt;/code&gt; depends on the implementation.
+&lt;/p&gt;
+&lt;p&gt;A modern computer probably has 64 bit registers making a 64 bit &lt;code&gt;int&lt;/code&gt; a more natural choice. However, for compatibility reasons, &lt;code&gt;int&lt;/code&gt;s may intentionally be limited to 32 bits!
+&lt;/p&gt;</description>
+<dc:date>2015-02-12</dc:date>
+<guid>http://wordaligned.org/articles/2147483647</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/2147483647</link>
+<category>C</category>
+</item>
+
+<item>
 <title>Singly Linked Lists in C++</title>
 <description>&lt;p&gt;In a &lt;a href="http://wordaligned.org/articles/two-star-programming.html"&gt;recent post&lt;/a&gt; I wrote about removing items from a singly linked list. I presented a couple of alternative implementations, and in the comments section readers suggested yet more versions.
 &lt;/p&gt;

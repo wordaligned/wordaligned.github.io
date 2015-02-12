@@ -11,7 +11,7 @@
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
 <meta name="author" content="Thomas Guest" />
 <meta name="description" content="A collection of articles on software development written by Thomas Guest." />
-<meta name="keywords" content="CLRS, Regex, Missiles, Cycling, apple, Pictures, Self, Editors, Emacs, Torvalds, ImageMagick, IDE, Decorators, Shell, PIL, Lcs, Turing, Ruby on Rails, Puzzles, Europython, iphone, Characters, Fractals, Crabs, DocBook, Dynamic Languages, lighttpd, Bugs, CVS, Reviews, Steganography, Oulipo, Perec, Content, Markdown, Two Wheels, Conferences, Syntax, Unix, Arc, Go, Web-applications, Chess, Web Applications, Java, Esr, Recursion, Charts, Perl, Subversion, Recommended, Teamwork, Build, ACCU, Knuth, Android, Erlang, Boost, php, OCR, nm, Python, cvs2svn, self, SICP, Lisp, Books, Graphics, Disqus, Ruby, openid, C, Zlib, Trac, Windows, Documentation, C++, Etc, Streams, Bristol, Tesseract, Drawing, Accidents, Google, Apple, Functional Programming, Pi, Haskell, Design, Virtualization, Spolsky, Algorithms, Curl, Scheme" />
+<meta name="keywords" content="CLRS, Regex, Missiles, Cycling, apple, Pictures, Self, Editors, Emacs, Torvalds, ImageMagick, IDE, Decorators, Shell, PIL, Lcs, Turing, Ruby on Rails, Puzzles, Europython, iphone, Characters, Fractals, Crabs, DocBook, Dynamic Languages, lighttpd, Bugs, CVS, Reviews, Steganography, Oulipo, Perec, Content, Markdown, Two Wheels, Conferences, Syntax, Unix, Arc, Go, Web-applications, Chess, Web Applications, Java, Esr, Recursion, Charts, Perl, Subversion, Recommended, Teamwork, Build, ACCU, Knuth, Android, Erlang, Boost, php, OCR, nm, Python, cvs2svn, self, SICP, Windows, Books, Graphics, Disqus, Ruby, openid, C, Zlib, Trac, Lisp, Documentation, C++, Etc, Streams, Bristol, Tesseract, Drawing, Accidents, Google, Apple, Functional Programming, Pi, Haskell, Design, Virtualization, Spolsky, Algorithms, Curl, Scheme" />
 <link rel="alternate" type="application/rss+xml" title="Feed" href="http://feeds.wordaligned.org/wordaligned" />
 </head>
 
@@ -25,7 +25,96 @@
 
   <div id="page">
     <div id="content">
-      <div class="atomentry" id="lessons-from-the-oulipo">
+      <div class="atomentry" id="2147483647">
+<h2 class="title"><a href="/articles/2147483647">2147483647</a></h2>
+<p class="meta"><abbr class="published" title="2015-02-12">2015-02-12</abbr> &bull; <a href="/tag/c" rel="tag">C</a>, <a href="/tag/c++" rel="tag">C++</a> &bull; <a href="/articles/2147483647#disqus_thread">Comments</a></p>
+<h1>Magic!</h1>
+<p>When software developers refer to &#8220;magic numbers&#8221; they mean those numeric literals which appear in a program without explanation &#8212; as if by magic. Consider the mysterious figures in this incantation:
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">int cigarettes()
+{
+    return 365 * 20 * 10 + 2 * 20 + 17;
+}
+
+</pre>
+
+</div>
+
+<p>Why is the <code><a href="http://www.richardbeard.info/category/my-books/x20/
+">20</a></code> repeated? Does the first <code>20</code> mean the same as the second one? Could <code>365</code> be the number of days in a year? Named constants would make the code easier to read and maintain.
+</p>
+<p>Some numbers truly are <strong>magical</strong> though.
+</p>
+
+<h1>2147483647</h1>
+<p>The number 2147483647 is special and terrible.
+</p>
+<p>It&#8217;s a substantial number, far greater than the number of goals Lionel Messi has scored or the number of hot dinners I&#8217;ve eaten, and comparable with the number of heart beats in a lifetime or the number of instructions a processor executes in a second; but it&#8217;s not that large. You&#8217;ll need more than 2147483647 bytes to install a modern operating system, let alone store your video collection. And shuffling a pack of just 52 cards has 80658175170943878571660636856403766975289505440883277824000000000000 possible outcomes.
+</p>
+<p>If 2147483647 isn&#8217;t remarkable for its size it certainly has a noteworthy history. In 1772 the Swiss mathematician Leonhard Euler proved it a prime. I&#8217;m guessing it was the largest known prime at the time. Euler didn&#8217;t have a computer to hunt for primes so he narrowed the field by focusing on <a href="http://www.mersenne.org/">Mersenne numbers</a> &#8212; numbers one less than a power of two &#8212; a strategy which remains a winner even today, when computers are networked to search.
+</p>
+<p>Actually, 2147483647 is a double Mersenne prime, which is to say it takes the form 2<sup>m</sup> - 1, where <code>m</code> itself takes the form 2<sup>n</sup> - 1. 
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">&gt;&gt;&gt; 2**(2**5 - 1) - 1
+2147483647
+
+</pre>
+
+</div>
+
+<p>Magic!
+</p>
+
+<h1>Dragons!</h1>
+<p>2147483647 has a special significance for C programmers, who know it by the name <code>INT_MAX</code>, and for C++ programmers, who demystify the digits as <code>std::numeric_limits&lt;int&gt;::max()</code>.
+</p>
+<p>Remember, 2147483647 is Mersenne(Mersenne(5)), which is Mersenne(31), or 2 to the power 31 minus 1. In binary arithmetic you add a zero on the right to multiply by 2 so 2 to the 31 is 1 followed by 31 zeros; and subtracting 1 leaves 31 1&#8217;s. It&#8217;s the largest signed value you can fit in a 32 bit register.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">&gt;&gt;&gt; mersenne31 = 2**31-1
+&gt;&gt;&gt; bin(mersenne31)
+'0b1111111111111111111111111111111'
+&gt;&gt;&gt; hex(mersenne31)
+'0x7fffffffL'
+&gt;&gt;&gt; mersenne31
+2147483647L
+
+</pre>
+
+</div>
+
+<p>It&#8217;s quite possible to inadvertantly increment an <code>int</code> which has reached <code>INT_MAX</code>. The result is undefined behaviour: anything could happen. 
+</p>
+<p><a href="http://en.wikipedia.org/wiki/Myth_of_the_Flat_Earth"><img src="/images/flammarion.jpg"/></a>
+</p>
+
+<h1>Gangnam Style</h1>
+<blockquote><p>We never thought a video would be watched in numbers greater than a 32-bit integer (=2,147,483,647 views), but that was before we met PSY. Gangnam Style has been viewed so many times we had to upgrade to a 64-bit integer (9,223,372,036,854,775,808)!
+</p>
+</blockquote><p>&mdash; <a href="https://plus.google.com/u/0/wm/4/+youtube/posts/BUXfdWqu86Q">youtube developers</a>
+</p>
+<img src="/images/psy.png" alt="Psy"/>
+
+<p>Exactly what undefined behaviour was provoked when PSY&#8217;s popularity broke the magic limit isn&#8217;t disclosed. Maybe a server leaked account details to North Korean hackers. Or maybe the video&#8217;s viewing figures were wrong for a while. 
+</p>
+<p>Note that the new limit of 9,223,372,036,854,775,808 is an unsigned value, which is exempt from this flavour of undefined behaviour and wraps to zero when you bump it up.
+</p>
+
+<h1>Bugwards compatibility</h1>
+<p>There&#8217;s another reason for preferring <code>INT_MAX</code> to the magical 2147483647: the two values might be different. 2147483647 is 2147483647 but <code>INT_MAX</code> depends on the implementation.
+</p>
+<p>A modern computer probably has 64 bit registers making a 64 bit <code>int</code> a more natural choice. However, for compatibility reasons, <code>int</code>s may intentionally be limited to 32 bits!
+</p>
+
+</div>
+
+
+<div class="atomentry" id="lessons-from-the-oulipo">
 <h2 class="title"><a href="/articles/lessons-from-the-oulipo">Lessons from the OuLiPo</a></h2>
 <p class="meta"><abbr class="published" title="2015-01-12">2015-01-12</abbr> &bull; <a href="/tag/accu" rel="tag">ACCU</a>, <a href="/tag/oulipo" rel="tag">Oulipo</a>, <a href="/tag/perec" rel="tag">Perec</a>, <a href="/tag/bristol" rel="tag">Bristol</a> &bull; <a href="/articles/lessons-from-the-oulipo#disqus_thread">Comments</a></p>
 <p>I&#8217;m delighted to announce that my talk, <a href="http://accu.org/index.php/conferences/accu_conference_2015/accu2015_sessions#lessons_from_the_oulipo">Lessons from the OuLiPo</a>, has been accepted for the <a href="http://accu.org/index.php/conferences/accu_conference_2015" title="ACCU 2015 conference">ACCU 2015 conference</a>.
@@ -803,21 +892,6 @@ function animate() {
 </div>
 
 
-<div class="atomentry" id="hosting-for-life-textdrive-revived">
-<h2 class="title"><a href="/articles/hosting-for-life-textdrive-revived">Hosting for Life? TextDrive revived!</a></h2>
-<p class="meta"><abbr class="published" title="2013-03-06">2013-03-06</abbr> &bull; <a href="/tag/self" rel="tag">Self</a>, <a href="/tag/webapplications" rel="tag">Web-applications</a> &bull; <a href="/articles/hosting-for-life-textdrive-revived#disqus_thread">Comments</a></p>
-<p>Towards the end of last year I was emailed by Jason Hoffman from Joyent. <a href="http://en.wikipedia.org/wiki/Joyent" title="Wikipedia on Joyent and TextDrive">Joyent owned TextDrive</a>, the company which, 6 years ago, offered web hosting <strong>for life</strong> in return for a single up-front payment. Jason&#8217;s email said this lifetime hosting &#8212; legacy service, he called it &#8212; was nearing <strong>End of Life</strong> (!) and would be sunsetted (!!) at the end of October 2012.
-</p>
-<p><a href="http://textdrive.com"><img src="/images/txd-banner.png" alt="TextDrive banner"/></a> 
-</p>
-<p>As a TextDrive customer I reckon I&#8217;d had good value from the original deal, but while six years may seem like forever on the internet it&#8217;s surely not a lifetime. Happily TextDrive&#8217;s original founder, Dean Allen, <a href="http://techcrunch.com/2012/08/30/happy-ending-to-the-joyent-lifetime-subscription-story/" title="TechCrunch reports on Joyent/TextDrive">felt the same way</a>: <strong>he</strong> emailed me to say he&#8217;d be relaunching <a href="http://textdrive.com/">TextDrive</a> on a new, modern, infrastructure.
-</p>
-<p>Quite how this pans out remains to be seen but I&#8217;m sticking it out. If you&#8217;re reading this page, great: it&#8217;s been served up by the new, modern infrastructure which Dean mentioned. Whilst migrating <a href="/">wordaligned.org</a> I&#8217;ve had to fiddle with rewrite rules and tinker with DNS records and file permissions. Any glitches or oddities, please <a href="mailto:tag@wordaligned.org?subject=Wordaligned.org%20glitches">let me know</a>.
-</p>
-
-</div>
-
-
 <div class="extended">
 <p><a href="/articles/">Visit the Word Aligned archives...</a></p>
 </div>
@@ -862,7 +936,7 @@ function animate() {
 <div class="sidebar-node">
 <h3>Top Tags</h3>
 <ul id="categories"><li><a href="/tag/python" rel="tag">Python</a> <em>(110)</em></li>
-<li><a href="/tag/c++" rel="tag">C++</a> <em>(66)</em></li>
+<li><a href="/tag/c++" rel="tag">C++</a> <em>(67)</em></li>
 <li><a href="/tag/self" rel="tag">Self</a> <em>(53)</em></li>
 <li><a href="/tag/puzzles" rel="tag">Puzzles</a> <em>(30)</em></li>
 <li><a href="/tag/accu" rel="tag">ACCU</a> <em>(29)</em></li>
@@ -893,7 +967,7 @@ function animate() {
 <div class="sidebar-node">
 <h3>Chain</h3>
 <ul>
-<li><a accesskey="p" href="/articles/lessons-from-the-oulipo" title="First article">&raquo; Lessons from the OuLiPo</a></li>
+<li><a accesskey="p" href="/articles/2147483647" title="First article">&raquo; 2147483647</a></li>
 
 </ul>
 
