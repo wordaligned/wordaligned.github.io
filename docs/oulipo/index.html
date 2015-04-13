@@ -1,0 +1,781 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Lessons from the OuLiPo</title>
+<link rel="icon" href="./files/favicon.png" type="image/png"/>
+<link rel="stylesheet" href="./css/reveal.css">
+<link rel="stylesheet" href="./css/theme/serif.css"
+id="theme">
+<link rel="stylesheet" href="./lib/css/ascetic.css">
+<link href="./textillate/assets/animate.css" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" href="./knights-tour.css">
+<script type="text/javascript" src="./files/jquery-1.11.1.min.js"></script>
+</head>
+<body>
+<div class="reveal">
+<div class="slides">
+
+  <section>
+  <h1>Lessons from the OuLiPo</h1>
+  <p>Computer programmers and OuLiPians write constrained texts. This talk follows the links.
+
+  <div><img src="./files/black-knight.png" alt="Black Knight"/></div>
+
+  <p><small><a href="http://wordaligned.org">Thomas Guest</a> &bull;
+  <a href="http://wordaligned.org">wordaligned.org</a></small>
+  <p><small>{ code ~ queneau ~ quine ~ puzzle ~ perec ~ knight ~ knuth ~ tour ~
+  tag ~ easter ~ egg ~ bug }</small>
+    <aside class="notes">
+<p>As software developers, we often ponder what it is we do: are we architects, engineers, or scientists? Are we &ndash; even &ndash; rock stars or ninjas? Which metaphors best fit? Tending a code base is like gardening. Through the seasons we encourage new growth, whilst pruning back dead code and squashing bugs. Programming is like carpentry, maybe. We wield a set of tools, kept sharp and ready for action. Programming is like cooking. Source the finest ingredients and follow the recipe.
+
+<p>I think there's a more obvious metaphor. Actually there's nothing meta- about it. It is what we do.
+
+<p><big>We're writers.</big>
+
+<p>We write to communicate and to instruct. We write for fun and profit. We edit and adapt. We rewrite. We borrow text from other writers. The languages we think we write in ... C++, Python, Javascript ... are actually just highly stylised dialects of our native tongue. Like poets we're particular about punctuation and space. We have strict (and strange) rules about spelling. The texts we write &ndash; programs &ndash; are subject to formal constraints.
+
+<p>We're writers bound by mathematical rules.
+
+<p>November, 1960. Paris. The poet Raymond Queneau organises the first Oulipo meeting. A dozen turn up: writers, mathematicians, surrealists. Their mission: to explore the literary potential of applying mathematical constraints to texts.
+
+<p>Of course constrained writing is nothing new &ndash; consider the haiku: 17 syllables, arranged as 3 phrases of 5, 7 and 5 syllables (can you see the prime numbers?), a Japanese form many centuries old &ndash; and one strand of the Oulipo's efforts is devoted to researching past experiments and structures, but I claim it's no coincidence the Oulipo emerged at much the same time as our own novel form of constrained writing: computer programming.
+
+<p>In this talk I'll discuss the Oulipo in more depth, investigating the parallels between their work and ours. We'll focus on Georges Perec, whose book Life A User's Manual is an OuLipian tour de force. There will be some code, not much, as well as algorithms, tweets, poems, easter eggs and &ndash; as you'd expect &ndash; bugs.
+
+    </aside>
+
+  </section>
+
+  <section>
+  <section>
+  <h1>OuLiPo &amp; Me</h1>
+<aside class="notes">
+At work last year I gave a lightning talk along similar lines, and afterwards several people asked me: how did I find out about this stuff? Today I'm going to start by answering that question.
+</aside>
+  </section>
+
+  <section data-background="files/mamils.jpg">
+<aside class="notes">
+The chap in the polka dot jeresy who isn't me is Richard Beard, a writer who I met on a creative writing course in 1997. This photo was taken a few years later when we went on a cycling trip in the Vosges mountains. I should apologise for the outfits: I now realise you're not supposed to wear that jersey unless you've led the king of the mountains competition in the Tour de France, which neither of us have.
+</aside>
+  </section>
+  
+  <section>
+  <h2 style="font-family: tahoma, arial, sans-serif;font-weight:bold;">X20</h2>
+  <h4>Richard Beard, 1996</h4>
+  <img src="./files/x20.png" alt="X20 cover" />
+  <blockquote>
+  {365 &times; 20 &times; 10} + {2 &times; 20} (leap years). Equals exactly 73,040. Plus
+  17 irregulars. Not give or take, not approximately, but exactly
+  seventy-three thousand and fifty-seven. All the same, it&#8217;s difficult
+  to prove.
+  </blockquote>
+<aside class="notes">
+<p>Anyway, on the writing course he was working on a first draft of this book, X20. As you can see from the cover, it's about smoking. Actually, it's about not smoking, because the main character, Gregory Simpson, is trying to give up. There are 20 cigarettes in a packet and there are 20 chapters in the book. The first chapter comprises 20 short sections. I've put the entire text of one such section on a slide.
+
+<p>The book is structured around a packet of cigarettes much as Gregory's life has been shaped by his addiction 
+
+<p>Notice the language. Only one sentence in this section is a proper sentence. So Richard makes and breaks rules.
+</aside>
+
+  </section>
+  
+<section>
+
+  <h2 style="font-family: tahoma, arial, sans-serif;font-weight:bold;">X20</h2>
+    <blockquote>
+  {365 &times; 20 &times; 10} + {2 &times; 20} (leap years). Equals exactly 73,040. Plus
+  17 irregulars.
+  </blockquote>
+  <pre><code data-trim>
+cigarettes_in_pack   = x20 = 20
+days_in_year         = 365
+leap_days_in_decade  = 2
+days_in_decade       = 10 * days_in_year + leap_days_in_decade
+irregulars           = 17
+cigarettes_smoked    = days_in_decade * x20 + irregulars
+
+assert chapters == x20
+assert cigarettes_smoked == word_count
+assert sections[chapter] + chapter == x20 + 1
+  </code></pre>
+
+<aside class="notes">
+Why does the code use ASTERISKS? Look at the names (UNDERSCORES)
+</aside>
+  </section>
+
+  <section data-background="files/wide-pencil-plan.jpg">
+  <h2>Life A User&#8217;s Manual</h2>
+  <h4>Georges Perec, 1978</h4>
+  <img src="./files/black-knight.png" alt="Black knight"/>
+  <blockquote>Perhaps the greatest 20th century novel &mdash; <a href="http://www-cs-faculty.stanford.edu/~uno/retd.html">Donald Knuth</a></blockquote>
+<aside class="notes">
+<p>Gregoire Simpson! Gregor Samsa
+<p>Donald Knuth is without doubt one of the world's best known
+  mathematicians and computer scientists. It took Perec 9 years to
+  advise people on living. Knuth - born at a very similar time to
+  Perec - started his own user manual for programmers - the Art of
+  Computer Programming - back in the 60s, and he's still working on it.
+</aside>
+  </section>
+
+  <section>
+  <a href="http://www.dcs.warwick.ac.uk/bshm/meetings/Fiction.html">
+  <img src="./files/maths-and-fiction.png" alt="Maths and Fiction programme" /></a>
+  </section>
+  
+  <section>
+  <h2>Surreal Numbers</h2>
+  <h4>Donald Knuth, 1974</h4>
+  <img class="bare" src="./files/surreal-numbers.jpg" alt="Surreal Numbers cover"/>
+  <p><small>How two ex-students turned on to pure mathematics and
+  found total happiness: a novelette</small>
+  </section>
+
+  <section>
+
+  <p style="margin:0;font-size:200%"><span
+  style="color:#036">E</span><span style="color:#888">O</span><span
+style="color:#930">D</span><span style="color:#036">E</span><span
+style="color:#555">R</span><span style="color:#e50">M</span><span
+style="color:#930">D</span><span style="color:#555">R</span><span
+style="color:#888">O</span><span style="color:#e50">M</span><span
+style="color:#036">E</span>
+
+
+<div>
+<img src="./files/eod.png" alt="Eodermdrome graph" />
+<img src="./files/shoes-on-hens.jpg" alt="Hens on shoes" />
+</div>
+
+  <p class="fragment" style="margin:0;font-size:200%"><span style="color:#888">S</span><span style="color:#930">H</span><span style="color:#036">O</span><span style="color:#555">E</span><span style="color:#888">S</span> <span style="color:#036">O</span><span style="color:#e50">N</span> <span style="color:#930">H</span><span style="color:#555">E</span><span style="color:#e50">N</span><span style="color:#888">S</span>
+
+<p class="fragment"><span style="color:#555">figs</span> <span
+style="color:#930">lizards</span> <span
+style="color:#888">snakes</span> <span style="color:#036">heat</span>
+<span style="color:#930">light</span> <span
+style="color:#e50">figs</span> <span style="color:#555">snakes</span>
+<span style="color:#036">light</span> <span
+style="color:#e50">lizards</span> <span style="color:#888">heat</span>
+<span style="color:#555">figs</span>
+<aside class="notes">
+This is an Euler tour. A novel Oulipo form, recommended by
+mathematician Claude Berge.
+</aside>
+
+</section>
+</section>
+
+  <section>
+  <section>
+  <h1>OuLiPo &amp; We</h1>
+  </section>
+
+  <section>
+  <h2>OuLiPo</h2>
+  <p><em>Ouvroir de littérature potentielle</em>
+  <p>Founded by poet, Raymond Queneau, in Paris, 1960
+  <p>Primarily mathematicians and writers
+  <p><strong>Analytic OuLiPo</strong> &ndash; investigate formal devices used by writers
+  <p><strong>Synthetic OuLiPo</strong> &ndash; apply patterns from formal languages
+  such as maths, logic, computer science ... chess!
+  <p>&#x265e;
+  <p>Deceased members are excused from meetings but are not allowed to
+  withdraw.
+  <p>&#x2658;
+  <p>{ queneau ~ berge ~ duchamps ~ calvino ~ perec ~ fournel }
+  </section>
+
+<section>
+<blockquote><p style="font-size:200%">Rats who build the labyrinth from which they will try to escape</blockquote>
+<img src="./files/rat.jpg" alt="Rattus Norvegicus"/>
+</section>
+
+<section>
+<h3>Cent Mille Milliard de po&egrave;mes</h3>
+<img src="./files/queneau.jpg" alt="Open sonnets book" />
+</section>
+
+<section>
+<h2>Writing is hard!</h2>
+<h2>Why make it harder?</h2>
+</section>
+  
+<section>
+<h3 style="font-variant:small-caps;">US SPACE TEAM&#8217;S UP GOER FIVE</h3>
+<a href="http://xkcd.com/1133/" title="Another thing that is a bad problem is if you're flying toward space and the parts start to fall off your space car in the wrong order. If that happens, it means you  won&#8217;t go to space today, or maybe ever.">
+<img src="./files/up-goer-5.png"
+alt="XKCD UP GOER FIVE"
+title="Another thing that is a bad problem is if you&#8217;re flying toward space and the parts start to fall off your space car in the wrong order. If that happens, it means you won&#8217;t go to space today, or maybe ever." />
+</a>
+</section>
+
+  <section>
+	<h2>Writing is hard!</h2>
+	<h2>Why make it harder?</h2>
+    <ol>
+      <li class="fragment">Structure
+      <li class="fragment">Comedy
+      <li class="fragment">Accessibility
+    </ol>
+  </section>
+
+  <section>
+  <a href="http://store-xkcd-com.myshopify.com/products/up-goer-five-poster"><img src="./files/up-goer-5-poster.png"/></a>
+  </section>
+
+  <section>
+	<h2>Writing is hard!</h2>
+	<h2>Why make it harder?</h2>
+    <ol>
+      <li>Structure
+      <li>Comedy
+      <li>Accessibility
+      <li class="fragment">Profit
+    </ol>
+  </section>
+
+    <section>
+    <h2>What&#8217;s happening?</h2><h3>(Answers limited to 140 characters)</h3>
+    <a class="fragment" href="https://twitter.com/HiddenPinky/status/552436829912596481"><img src="./files/limerick.png"/></a>
+<aside class="notes">
+<p>self referential
+<p>Like the programming character set, this restriction is down to input device. It's also largely obsolete!
+<p>As programmers, it's bad practise to limit how large something can be &ndash; the length of a file name, the size of a command line, the number of characters to represent a year (Y2K problem) &ndash; but we do it all the time!
+</aside>
+    </section>
+
+    <section data-background="files/fibo-tweet.png">
+<aside class="notes">
+<p>The poem is a witty Oulipian text
+<p>It's also a terrible hack: a few bytes of text encoded as a 13K picture, and badly encoded at that
+<p>Another hack inspired by twitter's constraints: short URLs.
+</aside>
+    </section>
+    
+<section>
+<ul id="concretepoem" style="list-style:none;line-height:80%">
+<li>no error in the system 
+<li>no reror in the system 
+<li>no rreor in the system 
+<li>no rroer in the system 
+<li>no rrore in the system 
+<li>no rror ein the system 
+<li>no rror ien the system 
+<li>no rror ine the system 
+<li>no rror in ethe system 
+<li>no rror in tehe system 
+<li>no rror in thee system 
+<li>no rror in the esystem 
+<li>no rror in the seystem 
+<li>no rror in the syestem 
+<li>no rror in the sysetem 
+<li>no rror in the systeem 
+<li>no rror in the systeem 
+<li>no rror in the systeme 
+<li>eno rror in the system 
+<li>neo rror in the system 
+<li>noe rror in the system 
+<li>no error in the system
+</ul>
+<p class="fragment"><small>Eugen Gomringer 1969</small></h4>
+</section>
+<aside class="notes">
+<p>There's an error in the system. But there's no error in the error in the system.
+<p>Some sort of cyclical buffer scribble? Very familiar to programmers.
+</aside>
+
+<section>
+<h2>Writing <em>programs</em> is hard!</h2>
+<h2>Why make it harder?</h2>
+<aside class="notes">
+<p>To answer this, need to consider what the constraints are. Some are obvious: others, less so.
+</aside>
+</section>
+
+<section>
+<h1 style="font-size:700%" id="keywords">if</h1>
+</section>
+
+<section>
+<h1>The Rules</h1>
+<h2>integer literals</h2>
+<img src="./files/integral-literals.png" alt="integers">
+</section>
+
+<section data-background="files/style-guide.png">
+</section>
+
+<section>
+	<blockquote class="sicp">
+First, we want to establish the idea that <span class="sicp2">a computer language</span> is not
+	just a way of getting a computer to perform operations but rather
+	that it <span class="sicp2">is a novel formal medium for expressing ideas</span> about
+	methodology. Thus, <span class="sicp1">programs must be written for people to read, and only incidentally for machines to execute</span>.
+	</blockquote>
+    <p>&mdash; <a href="https://mitpress.mit.edu/sicp/front/node3.html">Structure and Interpretation of Computer Programs, 1984</a>
+      <a href="http://mitpress.mit.edu/sicp"><img src="./files/sicp.gif" alt="SICP graphic"></a>
+  </section>
+
+  <section>
+	<h2>Writing programs is hard!</h2>
+	<h2>Why make it harder?</h2>
+    <ol>
+      <li class="fragment">... for machines to execute
+    </ol>
+  </section>
+
+
+  <section>
+	<h1>2147483647</h1>
+    <p class="fragment">A Magic Number
+	<p class="fragment">Proved a prime by <a href="http://en.wikipedia.org/wiki/Leonhard_Euler">Leonhard Euler</a>
+	<p class="fragment"><img alt="Euler on a stamp" src="./files/euler.jpg"/><img src="./files/mersenne.png" alt="Mersenne prime"/>
+  </section>
+
+    <section>
+    <h1>2147483647</h1>
+    <h2><code>INT_MAX</code></h2>
+<h4><code>std::numeric_limits&lt;int&gt;::max()</code></h4>
+    <h1>&#x2620;</h1>
+    <h3>Integers must not exceed this value</h3>
+  </section>
+
+  <section>
+<blockquote>We never thought a video would be watched in numbers greater than a 32-bit integer (=2,147,483,647 views), but that was before we met PSY. <a href="https://www.youtube.com/watch?v=9bZkp7q19f0">Gangnam Style</a> has been viewed so many times we had to upgrade to a 64-bit integer (9,223,372,036,854,775,808)!</blockquote>
+<a href="https://plus.google.com/u/0/wm/4/+youtube/posts/BUXfdWqu86Q">&mdash; youtube developers</a>
+    <p><img src="./files/psy.png" alt="Psy"/>
+  </section>
+
+  <section>
+    <h3><a href="http://www.cs.berkeley.edu/~brewer/cs262/unix.pdf">The UNIX Time-Sharing System</a></h3>
+<blockquote>There have always been fairly severe size constraints on the system and its software. Given the partially antagonistic desires for reasonable efficiency and expressive power, the size constraint has encouraged not only economy but a certain elegance of design.</blockquote>
+<p>&mdash; Dennis Ritchie and Ken Thompson
+</section>
+
+  <section>
+    <h2>Small. Fast. Reliable.</h2>
+    <h2>Choose any three.</h2>
+    <a href="http://www.sqlite.org"><img src="./files/sqlite.gif" alt="SQLite"/></a>
+  </section>
+
+<section data-background="files/amulet.jpg">
+<aside class="notes">
+<p>Archaeologists discovered the amulet, which is roughly 1,500 years old, at the ancient city of Nea Paphos in southwest Cyprus.
+<p>Iahweh (a god)is the bearer of the secret name, the lion of Re secure in his shrine
+</aside>
+</section>
+
+    <section data-background="files/potstop.jpg">
+  </section>
+
+    <section>
+  <h3 class="palindrome">A man, a plan, a canal &ndash; Panama!</h3>
+  <img src="./files/panama-canal.jpg"/>
+  <h3 class="emordnilap">!amanaP &ndash; lanac a ,nalp a ,nam A</h3>
+  <p class="fragment">A man, a plan, a canoe, pasta, heros, rajahs, 
+       a coloratura, maps, snipe, percale, macaroni, a gag, 
+       a banana bag, a tan, a tag, a banana bag again 
+       (or a camel), a crepe, pins, Spam, a rut, a Rolo, 
+       cash, a jar, sore hats, a peon, a canal &ndash; Panama!
+  </section>
+<aside class="notes">
+<p>Univocalic. Microfiction. Newspaper headline. Not just words which read the same backwards. Extensible - but this changes it from a story to a shopping list. Proper nouns and trademarks. 
+</aside>
+
+  <section>
+  <h2><a href="http://homepage.urbanet.ch/cruci.com/lexique/palindrome.htm">Le Grand Palindrome</a></h2>
+    <h3>Georges Perec, 1969</h3>
+
+<blockquote> Trace l’inégal palindrome. Neige. Bagatelle, dira
+Hercule. Le brut repentir, cet écrit né Perec. L’arc lu pèse trop, lis
+à vice-versa. Perte. Cerise ... Désire ce trépas rêvé : Ci va ! S’il porte,
+sépulcral, ce repentir, cet écrit ne perturbe le lucre : Haridelle, ta
+gabegie ne mord ni la plage ni l’écart </blockquote>
+
+<aside class="notes">
+<p>Trace the uneven palindrome. Snow. A trifle, says Hercules. Unadorned repentance, this piece born [of] Perec. [If] the bow of reading is too heavy, read back-to-front.
+
+<p>Loss. Cherry...
+
+<p>Desire this dreamt-of death: Here goes! If it bears, entombed, this repentance, this writing bears not on lucre. Strumpet, your trickery has no bite on range or space!
+</aside>
+
+  <p>
+  <p><small>word count = 1247</small>
+
+  </section>
+
+  <section>
+	<h2>Writing is hard!</h2>
+	<h2>Why make it harder?</h2>
+    <ol>
+      <li>Structure
+      <li>Comedy
+      <li>Accessibility
+      <li>Profit
+      <li class="fragment">Challenge
+    </ol>
+  </section>
+
+<section>
+<blockquote><p style="text-align:left;">[&hellip;] Perec&#8217;s palindrome barely made sense to the readers. Some teachers took it for the work of an incompetent student, while
+others suspected that they had been treated to a surrealist text produced by
+&ldquo;automatic writing&rdquo;. Those with psychiatric interests identified the
+author as an adolescent in a dangerously paranoid state; those who had not
+forgotten the swinging sixties wondered whether it was LSD or marijuana that had
+generated the disconnected images of the text. Readers seem to project their own
+positive and negative fantasies onto Perec&#8217;s palindrome, as they do onto
+other difficult, obscure and unattributed works.</blockquote>
+
+<p>&mdash; David Bellos, Georges Perec: a Life in Words
+  </section>
+
+  <section>
+  <h2>20:02 20/02 2002</h2>
+  <h4><a href="http://norvig.com/palindrome.html">Peter Norvig</a></h4>
+<blockquote>A man, a plan, a caddy, Ore, Lee, tsuba, Thaine, a lair,
+  <a href="http://norvig.com/pal1txt.html">...</a>, Hell, a burial, Aeniah, Tabu, Steele, Roydd, a canal, Panama</blockquote>
+  <p>
+  <p><small>word count = 15139</small>
+  </section>
+
+  <section>
+  <h3><a href="http://norvig.com/pal2.html">Norvig&#8217;s Palindrome Finder</a></h3>
+<pre><code data-trim>def consider_candidates(self):
+    """Push a new state with a set of candidate words onto stack."""
+    if self.diff &gt; 0: # Left is longer, consider adding on right
+        dir = 'right'
+        substr =  self.left[-1][-self.diff:]
+        candidates = self.dict.endswith(substr)
+    elif self.diff &lt; 0: # Right is longer, consider adding on left
+        dir = 'left'
+        substr =  reversestr(self.right[-1][0:-self.diff])
+        candidates = self.dict.startswith(substr)
+    else: # Both sides are same size
+        dir = 'left'
+        if not self.used_reversibles:
+            self.add_reversibles()
+        substr = ''
+        candidates = self.dict.startswith('')
+    if substr == reversestr(substr):
+        self.report()
+    self.stack.append(('trying', dir, substr, candidates))
+</code></pre>
+<aside class="notes">
+Look at the punctuation. The highlighting. The names - abbreviations (dir, dict, diff).
+The code is a short master class in a depth first search strategy.
+</aside>
+  </section>
+
+  <section>
+	<h2>Writing programs is hard!</h2>
+	<h2>Why make it harder?</h2>
+    <ol>
+      <li>... So machines can execute them
+      <li class="fragment">Challenge
+      <li class="fragment">Education
+    </ol>
+  </section>
+
+  <section>
+    <h3>Algol Poetry &ndash; No&euml;l Arnaud, 1968</h3>
+<pre style="width:33%"><big>    Table
+Begin: to make format,
+go down to comment
+while channel false
+    (if not true). End.
+</big></pre>
+<img src="./files/algol-poems.jpg" alt="Algol Poems cover"/>
+</section>
+
+    <section>
+<h3><code>Black Perl</code></h3>
+<pre style="font-size:14pt">BEFOREHAND: close door, each window &amp; exit; wait until time.
+    open spellbook, study, read (scan, select, tell us);
+write it, print the hex while each watches,
+    reverse its length, write again;
+    kill spiders, pop them, chop, split, kill them.
+        unlink arms, shift, wait &amp; listen (listening, wait),
+sort the flock (then, warn the "goats" &amp; kill the "sheep");
+    kill them, dump qualms, shift moralities,
+    values aside, each one;
+        die sheep! die to reverse the system
+        you accept (reject, respect);
+next step,
+    kill the next sacrifice, each sacrifice,
+    wait, redo ritual until "all the spirits are pleased";
+    do it ("as they say").
+do it(*everyone***must***participate***in***forbidden**s*e*x*).
+return last victim; package body;
+    exit crypt (time, times &amp; "half a time") &amp; close it,
+    select (quickly) &amp; warn your next victim;
+AFTERWARDS: tell nobody.
+    wait, wait until time;
+    wait until next year, next decade;
+        sleep, sleep, die yourself,
+        die at last
+# Larry Wall, 1990
+</pre>
+</section>
+
+
+<section>
+<h4><a href="http://www.ioccc.org/">&#x2e2e;&#x2e2e; International
+Obfuscated C Code Contest ??</a></h4>
+<pre style="width:360px;font-size:32px;">/*(c) 2001 <a href="http://accu.org/index.php/journals/256">Thad</a> */
+#include&lt;string.h&gt;
+#include &lt;stdio.h&gt;
+#define abc stdout
+int main(int a,ch\
+ar*b){char*c="??="
+"??(??/??/??)??'{"
+"??!??&gt;??-";while(
+!((a=fgetc(stdin))
+==EOF))fputc((b=s\
+trchr(c,a))?fputc(
+fputc(077,abc),abc
+),"=(/)'&lt;!&gt;""-"??(
+b-c??):a, abc);??&gt;
+</big></pre>
+</section>
+
+  </section>
+  <section>
+
+  <section>
+  <h1>Perec</h1>
+  </section>
+
+<section data-background="files/ascii-gp.png">
+<aside class="notes">
+<p>Constraint: originally from input device. Draw a picture on a device which only supports print. In this case, the letters from Perec's surname are used, along with W which had special meaning for him.
+</aside>
+</section>
+
+    <section>
+    <h2>Georges Perec, 1936 &ndash; 1982</h2>
+    <p>parents died in World War II
+    <p>won <em>Prix Renaudot</em> in 1965 for his first novel, <em>Les Choses</em>
+    <p>archivist, 1961 &ndash; 1978
+    <p>chess player
+    <p>cruciverbist
+    <p>genius
+    <p><big>OuLiPian 1967 &ndash;</big>
+    </section>
+
+<section>
+<h2>Perec in the Lab</h2>
+<img src="./files/flambo.jpg" alt="Flambo Card"/>
+<p>Designed and and managed a scientific database for the Laboratoire
+de Physiologie at the Centre Hospitalier et Universitaire
+Saint-Antoine.
+</section>
+
+<section>
+  <h2>La Disparition</h2>
+<h3>1969</h3>
+  <p>This book avoids using a particular symbol. How crazy is
+  that? Author GP must adapt sounds
+  and jump through hoops to finish this book. Such a constraint
+  constructs an unusual story about a group of humans looking
+  for a missing companion, Anton Vowl. I could try and go on ...
+<p style="font-size:200%">&#x2702;  &#x2702;  &#x2702;  &#x2702;  &#x2702;  &#x2702;  &#x2702;
+<pre style="font-size:120%">8&lt;--8&lt;--8&lt;--8&lt;--8&lt;--8&lt;--8&lt;--8&lt;--</pre>
+  <h2 class="fragment"><span style="color:#930">Lipo</span>gram</h2>
+<aside class="notes">
+<p>Notice the limitations on language. No Perec, mere, pere (though the more childish maman, papa are allowed). Readable. Overcame a very mild bout of writer's block! You think you're blocked: try and write 90000 words without using an E.
+</aside>
+  </section>
+
+<section>
+	<h2>Writing is hard!</h2>
+	<h2>Why make it harder?</h2>
+    <ol>
+      <li>Structure
+      <li>Comedy
+      <li>Accessibility
+      <li>Profit
+      <li>Challenge
+      <li class="fragment">Inspiration
+    </ol>
+  </section>
+
+  </section>
+
+  <section>
+  <section>
+  <h1>Life A User&#8217;s Manual</h1>
+  </section>
+
+  <section>
+    <h3>11 rue Simon Crubellier</h3>
+    <h3>8pm, June 23, 1975</h3>
+    <a target="_blank" href="/knights-tour"><img src="./files/knights-tour.jpg"/></a>
+  </section>
+
+  <section>
+    <h2>Knight&#8217;s Tour</h2>
+    <p>On an <strong>8 × 8</strong> board, there are <strong>26,534,728,821,064</strong> directed closed tours.
+<aside class="notes">
+<p>Apparently recreational. Actually, fundamental.
+<p>Finding a knight's tour is a special case of the NP-hard problem of finding a Hamiltonian path on a generic graph and because it can be easily solved, its study provides a method of understanding the more general problem.
+<p>The semi-regularity of the knight move is what makes it so interesting. The continual stagger across the board. It's trivial to finish a game of chess if you have two rooks - or a queen. With two bishops, it's impossible. But to trap a lone king with just two knights requires finesse.
+</aside>
+  </section>
+
+  <section data-background="files/60x60.png">
+<aside class="notes">
+Divide and conquer strategy for larger boards.
+</aside>
+
+  </section>
+
+<section data-background="files/greco-latin-wide.png">
+<aside class="notes">
+Euler showed there's no square of order 6. He found a procedure to generate one of any odd order, or any order which is a multiple of 4. He conjectured no square existed for order 10, 14, 18 ... (the odd evens). 
+</aside>
+</section>
+
+<section>
+<img src="./files/bose-knuth-bi-squares.png" />
+<aside class="notes">
+I'm unaware of any practical use for greco-latin squares
+</aside>
+</section>
+
+  <section>
+    <h3>11 rue Simon Crubellier</h3>
+    <h3>8pm, June 23, 1975</h3>
+    <a target="_blank" href="/knights-tour"><img src="./files/knights-tour.jpg"/></a>
+  </section>
+
+<section data-background="files/constraints-table.png">
+</section>
+
+<section>
+<h2>Easter Egg</h2>
+<blockquote>The woman carries in her right hand a bulky set of keys,
+  no doubt the keys of all the flats she has visited that day; some
+  are fixed to novelty key rings: a miniature bottle of Marie Brizard
+  <em>ap&eacute;ritif</em>, a golf tee and a wasp, a
+  <strong>double-six domino</strong>, and a plastic octagonal token in
+  which is set a tuberose flower.</blockquote>
+<img src="./files/double6.jpg"/>
+</section>
+
+<section>
+<h2>Easter Egg</h2>
+<p>When writing a specialization, be careful about its location; or to make it
+compile will be such a trial as to kindle its self-immolation.
+</section>
+
+  </section>
+
+<section>
+  <section>
+  <h1>Clinamen</h1>
+  </section>
+
+  <section>
+  
+  <h2>On the Nature of Things</h2>
+  <h3>Lucretius, 99-55 BC</h3>
+  <blockquote>
+When atoms move straight down through the void by their own weight, they deflect
+a bit in space at a quite uncertain time and in uncertain places, just enough
+that you could say that their motion has changed. But if they were not in the
+habit of swerving, they would all fall straight down through the depths of the
+void, like drops of rain, and no collision would occur, nor would any blow be
+produced among the atoms. In that case, nature would never have produced
+anything.
+  </blockquote>
+  </section>
+
+<section data-background="files/atlas-particle-detector.jpg">
+<aside class="notes">
+ATLAS is 46 metres long, 25 metres in diameter, and weighs about 7,000 tonnes; it contains some 3000 km of cable. The experiment is a collaboration involving roughly 3,000 physicists from over 175 institutions in 38 countries
+</aside>
+</section>
+
+<section>
+<h1>Rules for Use</h1>
+<h3>The clinamen can be used freely anywhere it isn&#8217;t required. According
+to Calvino it is the only device that &ldquo;can make the text a true work of
+art&rdquo;.</h3>
+</section>
+
+<section>
+<a target="_blank" href="/knights-tour"><img src="./files/knights-tour.jpg"/></a>
+</section>
+
+<section>
+<a href="http://wordaligned.org/articles/stop-the-clock-squash-the-bug">
+<img src="./files/bugs-life.png" alt="Bugs Life"/></a>
+</section>
+
+</section>
+
+<section>
+<h2>References</h2>
+<ul>
+  <li>Life A User&#8217;s Manual, Georges Perec
+  <li>Georges Perec: A Life in Words, David Bellos
+  <li>X20, Richard Beard
+  <li>Oulipo Compendium, Harry Matthews
+</ul>
+  <div><img src="./files/black-knight.png" alt="Black Knight"/></div>
+  <p>{ <span
+  style="color:#036">E</span><span style="color:#888">N</span><span
+style="color:#930">D</span> ~ <span style="color:#036">C</span><span
+style="color:#555">O</span><span style="color:#e50">D</span><span
+style="color:#930">E</span> ~ <span style="color:#555">O</span><span
+style="color:#888">N</span><span style="color:#e50">C</span><span
+style="color:#036">E</span> }
+</section>
+
+</div>
+</div>
+
+<script src="textillate/assets/jquery.fittext.js"></script>
+<script src="textillate/assets/jquery.lettering.js"></script>
+<script src="textillate/jquery.textillate.js"></script>
+<script src="textillate/palindrome.js" type="text/javascript"></script>
+<script src="textillate/rotate.js" type="text/javascript"></script>
+<script src="textillate/e.js" type="text/javascript"></script>
+<script src="lib/js/head.min.js"></script>
+<script src="js/reveal.min.js"></script>
+
+<script>
+Reveal.initialize({
+    // The "normal" size of the presentation, aspect ratio will be preserved
+    // when the presentation is scaled to fit different resolutions. Can be
+    // specified using percentage units.
+    width: 960,
+    height: 700,
+
+    // Factor of the display size that should remain empty around the content
+    margin: 0.1,
+
+    // Bounds for smallest/largest possible scale to apply to content
+    minScale: 0.2,
+    maxScale: 5.0,
+
+    controls: false,
+    transitionSpeed: 'slow',
+    transition: 'linear',
+    dependencies: [
+        { src: 'plugin/highlight/highlight.js',
+          async: true,
+          callback: function() { hljs.initHighlightingOnLoad(); }
+        },
+        { src: 'plugin/notes/notes.js', async: true },
+    ]
+});
+Reveal.configure({keyboard: {66: null, 75: null}});
+</script>
+
+</body>
+</html>
