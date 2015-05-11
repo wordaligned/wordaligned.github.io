@@ -1,0 +1,182 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<link rel="icon" href="/images/favicon.png" type="image/png"/>
+<link href="/styles/application.css" media="all" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="/scripts/prettify.js"></script>
+<script type="text/javascript" src="/scripts/lang-lisp.js"></script>
+<title>Jokey Code?</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="author" content="Thomas Guest" />
+<meta name="description" content="A Word Aligned article posted 2015-05-11, tagged Documentation, ACCU." />
+<meta name="keywords" content="Documentation, ACCU" />
+<link rel="alternate" type="application/rss+xml" title="Feed" href="http://feeds.wordaligned.org/wordaligned" />
+</head>
+
+<body onload="prettyPrint()">
+<div id="container">
+  <div id="header">
+<h1><span><a accesskey="h" href="/">Word Aligned</a></span></h1>
+<h2>professionalism in programming</h2>
+<a class="button" href="http://feeds.wordaligned.org/wordaligned" title="Subscribe to Word Aligned"><img style="float: right;" src="/images/feed.png" alt="Feed Logo" height="28" width="28"/></a>
+</div>
+
+  <div id="page">
+    <div id="content">
+      <div class="atomentry" id="jokey-code">
+<h2 class="title"><a href="/articles/jokey-code">Jokey Code?</a></h2>
+<p class="meta"><abbr class="published" title="2015-05-11">2015-05-11</abbr> &bull; <a href="/tag/documentation" rel="tag">Documentation</a>, <a href="/tag/accu" rel="tag">ACCU</a> &bull; <a href="/articles/jokey-code#disqus_thread">Comments</a></p>
+<h3>Choose Talks</h3>
+<p>I usually leave it as late as possible before deciding which sessions to attend at the <a href="http://accu.org/index.php/conferences/accu_conference_2015">ACCU conference</a>. There&#8217;s ample time to study the <a href="http://accu.org/index.php/conferences/accu_conference_2015/accu2015_schedule">schedule</a> when you&#8217;re there and anyway, it&#8217;s subject to change.
+</p>
+<p>This year I stuck with this policy with a couple of notable exceptions. First, there was <a href="/docs/oulipo/">my own talk</a>, where I noted that computer programmers are writers who impose formal constraints on their texts, and who can learn from other writers who practice the same discipline. Second, there was Peter Hilton&#8217;s talk, <a href="http://accu.org/index.php/conferences/accu_conference_2015/accu2015_sessions#how_to_name_things_-_the_hardest_problem_in_programming">&#8220;How to name things &#8212; the hardest problem in programming&#8221;</a>, in which he argued more generally that programmers had much to learn from writers.
+</p>
+<p>I <strong>had</strong> to see Peter Hilton&#8217;s talk and it did not disappoint. It engaged me at the time, in discussions afterwards, and it continues to make me think. I won&#8217;t post a full response here but I do want to consider one aspect: humour.
+</p>
+<div><iframe src="//www.slideshare.net/slideshow/embed_code/key/qnND7jVVQOmWCS" width="425" height="355" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" allowfullscreen></iframe><div style="margin-bottom:5px"><strong><a href="//www.slideshare.net/pirhilton/how-to-name-things-the-hardest-problem-in-programming" title="How to name things: the hardest problem in programming" target="_blank">How to name things: the hardest problem in programming</a></strong> from <strong><a href="//www.slideshare.net/pirhilton" target="_blank">Peter Hilton</a></strong></div></div>
+
+
+<h3>Tell Jokes</h3>
+<p>Peter Hilton argued we should pay attention to tips from the likes of George Orwell and Stephen King because their advice is better written and also because it&#8217;s <strong>funnier</strong>. Why does this humourous aspect matter? Well, perhaps we&#8217;re more likely to listen to someone who makes us laugh. Witty advice sounds less pompous.
+</p>
+<p>It goes deeper than this, though. Another point from the talk:
+</p>
+<blockquote><p>Improve your general vocabulary. Read books, especially funny novels.
+</p>
+</blockquote><p>Why <strong>funny novels</strong>, especially? At this point in the talk Peter Hilton disingenously suggested such books were easier to read. A point he made later goes deeper:
+</p>
+<blockquote><p>Tell jokes &#8230; Puns are important for naming, because they rely on double-meanings. Spotting double-meanings is the essential skill for avoiding ambiguous names.
+</p>
+</blockquote><p>Interesting! I agree that word play and word power are linked: but do you need to be a punster to avoid ambiguity? I&#8217;m not sure. In the words of <a href="http://chrisoldwood.blogspot.co.uk/2015/04/the-daily-stand-up.html">Chris Oldwood</a>:
+</p>
+<blockquote><p>I&#8217;ve been writing more functional code lately. I recently tried a few numerical recipes with currying functions, but all I got was a NaN.
+</p>
+</blockquote><p><a href="http://en.wikipedia.org/wiki/Naan"><img src="/images/naan.jpg" alt="all I got was a NaN"/></a>
+</p>
+
+<h3>Laughable Code</h3>
+<p>Is there a place for humour in code? Rarely, I&#8217;d say. Code is read,
+   re-read and then read again: most jokes become tired and then
+   irritating under such scrutiny. Peter Hilton, though, described his
+   amusement on discovering this <a href="http://www.slideshare.net/pirhilton/how-to-name-things-the-hardest-problem-in-programming/55">function</a>, which configures
+   and starts <a href="http://camel.apache.org/">Apache Camel</a>:
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">/** Configure and start Apache Camel */
+def mountCamel() {
+    Logger.info("Starting Camel...")
+    val context = new DefaultCamelContext()
+    configuredRoutes foreach { route =&gt;
+        context.addRoutes(route)
+    }
+    context.start()
+}
+
+</pre>
+
+</div>
+
+<p>The obvious alternative, <code>startCamel()</code>, just isn&#8217;t funny enough, apparently. I&#8217;m glad the author resisted the temptation to call it <code>humpCamel()</code>.
+</p>
+<p>I&#8217;m reminded of a colleague with a fondness for <a href="http://en.wikipedia.org/wiki/Franglais">franglais</a> who
+   would, for example, check in a graphics routine called
+   <code>do_le_render()</code>. Mildly amusing first time round, maybe, but less so
+   each time it got revisited to fix les bugs.
+</p>
+<p><a href="https://www.flickr.com/photos/ahmedrabea/7929947448" title="Ark of Desert - Camel by Ahmed Rabea, on Flickr"><img src="https://farm9.staticflickr.com/8180/7929947448_06dd57700c_z.jpg" width="640" height="427" alt="Ark of Desert - Camel"></a>
+</p>
+<p>I don&#8217;t see many jokes in the code I read and I don&#8217;t think it&#8217;s
+   because the authors lack a sense of humour. Just as <a href="./entertaining-documentation" title="Entertaining documentation">good
+documentation should inform rather than entertain</a>, good code
+   should express complex ideas as plainly as possible: humour doesn&#8217;t
+   get a look in.
+</p>
+<p>There are exceptions. We&#8217;ve already seen the name &#8220;camel&#8221; used for something which isn&#8217;t a camel: libraries, products and projects can benefit from short, memorable and quirky names. In unit tests, too, code is less complex, which can leave space for quips and in-jokes. When an integer is expected it often turns out to be <a href="https://www.google.co.uk/webhp?q=the%20answer%20to%20life%20the%20universe%20and%20everything">42</a>. Binary input data is laid out to form strange messages when viewed as <a href="http://nedbatchelder.com/text/hexwords.html">hexadecimal</a>. If some text &#8212; any old text &#8212; is needed, <a href="http://en.wikipedia.org/wiki/Lorem_ipsum">lorem ipsum</a> would indicate a lack of imagination. Even so, well-chosen names and values from the domain under test would probably be more helpful when a failing test needs fixing.
+</p>
+
+<h3>Charming code</h3>
+<p>I&#8217;m down on jokes in code but I do think code can be a pleasure to read and that well written programs can delight. Whilst I agree with Peter Hilton&#8217;s recommendation to read widely and well, I was surprised he didn&#8217;t recommend reading <strong>code</strong>, and when I discussed this with him afterwards he asked, where is it? Where is it! That will be the subject of another article, but off the top of my head, <a href="http://www.freetype.org">freetype</a>, <a href="https://www.ffmpeg.org/">ffmpeg</a>, <a href="http://llvm.org/">llvm</a>, the Go and Python standard libraries. If you read through any of these you&#8217;ll enjoy their clarity and internal consistency &#8212; their style; and should you code against them, these same attributes show through their interfaces.
+</p>
+<p>I haven&#8217;t found any jokes in the <a href="https://www.sqlite.org/">SQLite</a> source but if you decide
+   to integrate it in your application, when you check the license you&#8217;ll
+   find, instead, a <a href="https://www.sqlite.org/different.html">blessing</a>. This may seem funny &#8212; unusual,
+   certainly &#8212; but it&#8217;s actually quite serious.
+</p>
+<blockquote>May you do good and not evil<br>
+May you find forgiveness for yourself and forgive others<br>
+May you share freely, never taking more than you give.</blockquote>
+
+<p>We may not issue blessings with our own code but maybe we can find other ways to surprise and delight.
+</p>
+</div>
+
+<div class="comments"><hr/><div id="disqus_thread"></div><script type="text/javascript" src="http://disqus.com/forums/wordaligned/embed.js"></script></div>
+      
+<div id="comments"><script type="text/javascript">
+//<![CDATA[
+(function() {
+    var links = document.getElementsByTagName('a');
+    var query = '?';
+    for(var i = 0; i < links.length; i++) {
+        if(links[i].href.indexOf('#disqus_thread') >= 0) {
+            query += 'url' + i + '=' + encodeURIComponent(links[i].href) + '&amp;';
+        }
+    }
+    document.write('<script type="text/javascript" src="http://disqus.com/forums/wordaligned/get_num_replies.js' + query + '"></' + 'script>');
+})();
+//]]>
+</script></div>
+
+    </div>
+    <div id="sidebar">
+      
+<div class="sidebar-node">
+<h3>Tagged</h3>
+<ul id="categories"><li><a href="/tag/documentation" rel="tag">Documentation</a></li>
+<li><a href="/tag/accu" rel="tag">ACCU</a></li></ul>
+
+</div>
+
+<div class="sidebar-node">
+<h3>Chain</h3>
+<ul>
+
+<li><a accesskey="p" href="/articles/election-manifesto" title="Previous article">&raquo; Election Manifesto - a timely activity for agile retrospectives</a></li>
+</ul>
+
+
+</div>
+
+<div class="sidebar-node">
+<h3>Feeds</h3>
+
+<ul>
+<li><a href="http://feeds.wordaligned.org/wordaligned"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Articles</a></li>
+<li><a href="http://feeds.wordaligned.org/wordaligned/comments"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Comments</a></li>
+</ul>
+
+
+</div>
+
+    </div>
+  </div>
+  <div id="footer">
+<hr />
+<p><a href="http://tag.wordaligned.org">Thomas Guest</a></p>
+</div>
+
+</div>
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-3373724-1']);
+  _gaq.push(['_trackPageview']);
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ga);
+  })();
+</script>
+</body>
+
+</html>
