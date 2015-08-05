@@ -1,0 +1,123 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<link rel="icon" href="/images/favicon.png" type="image/png"/>
+<link href="/styles/application.css" media="all" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="/scripts/prettify.js"></script>
+<script type="text/javascript" src="/scripts/lang-lisp.js"></script>
+<title>Code Reviews - the rules</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="author" content="Thomas Guest" />
+<meta name="description" content="A Word Aligned article posted 2015-08-05, tagged Self, Design, Build, Go." />
+<meta name="keywords" content="Self, Design, Build, Go" />
+<link rel="alternate" type="application/rss+xml" title="Feed" href="http://feeds.wordaligned.org/wordaligned" />
+</head>
+
+<body onload="prettyPrint()">
+<div id="container">
+  <div id="header">
+<h1><span><a accesskey="h" href="/">Word Aligned</a></span></h1>
+<h2>whatsoever I do, it&#8217;s got to be funky</h2>
+<a class="button" href="http://feeds.wordaligned.org/wordaligned" title="Subscribe to Word Aligned"><img style="float: right;" src="/images/feed.png" alt="Feed Logo" height="28" width="28"/></a>
+</div>
+
+  <div id="page">
+    <div id="content">
+      <div class="atomentry" id="code-reviews--the-rules">
+<h2 class="title"><a href="/articles/code-reviews--the-rules">Code Reviews - the rules</a></h2>
+<p class="meta"><abbr class="published" title="2015-08-05">2015-08-05</abbr> &bull; <a href="/tag/self" rel="tag">Self</a>, <a href="/tag/design" rel="tag">Design</a>, <a href="/tag/build" rel="tag">Build</a>, <a href="/tag/go" rel="tag">Go</a> &bull; <a href="/articles/code-reviews--the-rules#disqus_thread">Comments</a></p>
+<p>The rule is: no code gets checked in without a review.
+</p>
+<p>It&#8217;s not always easy to get a reviewer to sign off a changelist. Does the code build? In all configurations and on all platforms? Do the tests pass? Are all new code paths covered? Does the commit message describe the change? Does the formatting match the style guide? Does the code match its surroundings? How about documentation, compiler warnings, license requirements?
+</p>
+<p>Is the change really necessary? Could it have been realised more simply?
+</p>
+<p>Certainly the reviewer&#8217;s task is easier if the task has been <a href="/articles/programming-paired-and-shared">paired on</a>. Small and self-contained changelists are more straightforward. Removing code, too, should be less contentious.
+</p>
+<p>Depending on infrastructure, some checklist items can be automated. Ideally the changelist has already been though CI, for example, ticking the builds-cleanly and passes-its-tests boxes.
+</p>
+<p>So far, so what? (So obvious!)
+</p>
+<p>Here&#8217;s another rule, and one I&#8217;ve not seen written down before.
+</p>
+<p>When I review code I might well consider how I would have made the change. That doesn&#8217;t mean I&#8217;ll insist the submitter does things my way. In the absence of <a href="https://blog.golang.org/go-fmt-your-code" title="go fmt your code">automated formatters</a> there will be more than one acceptable way to lay out the code. Sometimes there&#8217;s little reason to prefer an explicit loop over an algorithm + lambda combination, or vice-versa. <a href="/articles/go-for-short-variable-names">Short names</a> work for me but not for everyone. It&#8217;s hard to argue against test coverage, but is more always better?
+</p>
+<p>In such cases I won&#8217;t try to impose my own style on the changelist. Instead, the question becomes: <strong>does the code match the standards we, as a team, have set</strong>? Or, <strong>do these changes merit a place in our codebase</strong>?
+</p>
+<p>It&#8217;s a simple principle but not an obvious one. It helps me review fairly and also to learn from others on my team.
+</p>
+<p>There <strong>is</strong> more than one way to do it!
+</p>
+</div>
+
+<div class="comments"><hr/><div id="disqus_thread"></div><script type="text/javascript" src="http://disqus.com/forums/wordaligned/embed.js"></script></div>
+      
+<div id="comments"><script type="text/javascript">
+//<![CDATA[
+(function() {
+    var links = document.getElementsByTagName('a');
+    var query = '?';
+    for(var i = 0; i < links.length; i++) {
+        if(links[i].href.indexOf('#disqus_thread') >= 0) {
+            query += 'url' + i + '=' + encodeURIComponent(links[i].href) + '&amp;';
+        }
+    }
+    document.write('<script type="text/javascript" src="http://disqus.com/forums/wordaligned/get_num_replies.js' + query + '"></' + 'script>');
+})();
+//]]>
+</script></div>
+
+    </div>
+    <div id="sidebar">
+      
+<div class="sidebar-node">
+<h3>Tagged</h3>
+<ul id="categories"><li><a href="/tag/self" rel="tag">Self</a></li>
+<li><a href="/tag/design" rel="tag">Design</a></li>
+<li><a href="/tag/build" rel="tag">Build</a></li>
+<li><a href="/tag/go" rel="tag">Go</a></li></ul>
+
+</div>
+
+<div class="sidebar-node">
+<h3>Chain</h3>
+<ul>
+
+<li><a accesskey="p" href="/articles/programming-paired-and-shared" title="Previous article">&raquo; Programming Paired and Shared</a></li>
+</ul>
+
+
+</div>
+
+<div class="sidebar-node">
+<h3>Feeds</h3>
+
+<ul>
+<li><a href="http://feeds.wordaligned.org/wordaligned"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Articles</a></li>
+<li><a href="http://feeds.wordaligned.org/wordaligned/comments"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Comments</a></li>
+</ul>
+
+
+</div>
+
+    </div>
+  </div>
+  <div id="footer">
+<hr />
+<p><a href="http://tag.wordaligned.org">Thomas Guest</a></p>
+</div>
+
+</div>
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-3373724-1']);
+  _gaq.push(['_trackPageview']);
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ga);
+  })();
+</script>
+</body>
+
+</html>

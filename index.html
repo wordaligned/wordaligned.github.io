@@ -11,7 +11,7 @@
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
 <meta name="author" content="Thomas Guest" />
 <meta name="description" content="A collection of articles on software development written by Thomas Guest." />
-<meta name="keywords" content="CLRS, Regex, Missiles, Cycling, apple, Pictures, Self, Editors, Emacs, Torvalds, ImageMagick, IDE, Decorators, Shell, PIL, Lcs, Turing, Ruby on Rails, Puzzles, Europython, iphone, Characters, Fractals, Crabs, DocBook, Dynamic Languages, lighttpd, Bugs, CVS, Reviews, Steganography, Algorithms, Perec, Content, Markdown, Two Wheels, Conferences, Syntax, Unix, Arc, Go, Web-applications, Chess, Web Applications, Java, Esr, Recursion, Charts, Perl, Subversion, Recommended, Teamwork, Build, ACCU, Knuth, Android, Erlang, Boost, php, OCR, nm, Python, cvs2svn, self, Scrum, SICP, Windows, Books, Graphics, Disqus, Ruby, openid, C, Documentation, Trac, Lisp, Zlib, C++, Etc, Streams, Bristol, Tesseract, Drawing, Accidents, Google, Apple, Functional Programming, Pi, Haskell, Design, Virtualization, Spolsky, Oulipo, Curl, Scheme" />
+<meta name="keywords" content="CLRS, Regex, Missiles, Cycling, apple, Pictures, Self, Editors, Emacs, Torvalds, ImageMagick, IDE, Decorators, Shell, PIL, Lcs, Turing, Ruby on Rails, Puzzles, Europython, iphone, Characters, Fractals, Crabs, DocBook, Dynamic Languages, lighttpd, Bugs, CVS, Reviews, Steganography, Algorithms, Perec, Content, Markdown, Two Wheels, Conferences, Syntax, Unix, Arc, Go, Web-applications, Chess, Web Applications, Java, Esr, Recursion, Charts, Perl, Subversion, Recommended, Teamwork, Build, ACCU, Knuth, Android, Erlang, Boost, php, OCR, nm, Python, cvs2svn, self, Scrum, SICP, Lisp, Books, Graphics, Disqus, Ruby, openid, C, Documentation, Trac, Windows, Zlib, C++, Etc, Streams, Bristol, Tesseract, Drawing, Accidents, Google, Apple, Functional Programming, Pi, Haskell, Design, Virtualization, Spolsky, Oulipo, Curl, Scheme" />
 <link rel="alternate" type="application/rss+xml" title="Feed" href="http://feeds.wordaligned.org/wordaligned" />
 </head>
 
@@ -25,7 +25,36 @@
 
   <div id="page">
     <div id="content">
-      <div class="atomentry" id="programming-paired-and-shared">
+      <div class="atomentry" id="code-reviews--the-rules">
+<h2 class="title"><a href="/articles/code-reviews--the-rules">Code Reviews - the rules</a></h2>
+<p class="meta"><abbr class="published" title="2015-08-05">2015-08-05</abbr> &bull; <a href="/tag/self" rel="tag">Self</a>, <a href="/tag/design" rel="tag">Design</a>, <a href="/tag/build" rel="tag">Build</a>, <a href="/tag/go" rel="tag">Go</a> &bull; <a href="/articles/code-reviews--the-rules#disqus_thread">Comments</a></p>
+<p>The rule is: no code gets checked in without a review.
+</p>
+<p>It&#8217;s not always easy to get a reviewer to sign off a changelist. Does the code build? In all configurations and on all platforms? Do the tests pass? Are all new code paths covered? Does the commit message describe the change? Does the formatting match the style guide? Does the code match its surroundings? How about documentation, compiler warnings, license requirements?
+</p>
+<p>Is the change really necessary? Could it have been realised more simply?
+</p>
+<p>Certainly the reviewer&#8217;s task is easier if the task has been <a href="/articles/programming-paired-and-shared">paired on</a>. Small and self-contained changelists are more straightforward. Removing code, too, should be less contentious.
+</p>
+<p>Depending on infrastructure, some checklist items can be automated. Ideally the changelist has already been though CI, for example, ticking the builds-cleanly and passes-its-tests boxes.
+</p>
+<p>So far, so what? (So obvious!)
+</p>
+<p>Here&#8217;s another rule, and one I&#8217;ve not seen written down before.
+</p>
+<p>When I review code I might well consider how I would have made the change. That doesn&#8217;t mean I&#8217;ll insist the submitter does things my way. In the absence of <a href="https://blog.golang.org/go-fmt-your-code" title="go fmt your code">automated formatters</a> there will be more than one acceptable way to lay out the code. Sometimes there&#8217;s little reason to prefer an explicit loop over an algorithm + lambda combination, or vice-versa. <a href="/articles/go-for-short-variable-names">Short names</a> work for me but not for everyone. It&#8217;s hard to argue against test coverage, but is more always better?
+</p>
+<p>In such cases I won&#8217;t try to impose my own style on the changelist. Instead, the question becomes: <strong>does the code match the standards we, as a team, have set</strong>? Or, <strong>do these changes merit a place in our codebase</strong>?
+</p>
+<p>It&#8217;s a simple principle but not an obvious one. It helps me review fairly and also to learn from others on my team.
+</p>
+<p>There <strong>is</strong> more than one way to do it!
+</p>
+
+</div>
+
+
+<div class="atomentry" id="programming-paired-and-shared">
 <h2 class="title"><a href="/articles/programming-paired-and-shared">Programming Paired and Shared</a></h2>
 <p class="meta"><abbr class="published" title="2015-05-27">2015-05-27</abbr> &bull; <a href="/tag/self" rel="tag">Self</a>, <a href="/tag/emacs" rel="tag">Emacs</a>, <a href="/tag/design" rel="tag">Design</a> &bull; <a href="/articles/programming-paired-and-shared#disqus_thread">Comments</a></p>
 <p>We <a href="http://en.wikipedia.org/wiki/Pair_programming">pair program</a> where I work. Two people, one desk. It can get intense.
@@ -834,113 +863,6 @@ SAFE TO A MAXIMUM OF 75KG</pre>
 </div>
 
 
-<div class="atomentry" id="angle-brackets-hurt-my-eyes">
-<h2 class="title"><a href="/articles/angle-brackets-hurt-my-eyes">Angle brackets hurt my eyes</a></h2>
-<p class="meta"><abbr class="published" title="2013-05-01">2013-05-01</abbr> &bull; <a href="/tag/lisp" rel="tag">Lisp</a>, <a href="/tag/syntax" rel="tag">Syntax</a> &bull; <a href="/articles/angle-brackets-hurt-my-eyes#disqus_thread">Comments</a></p>
-<blockquote><p>&#8220;All these angle brackets, they&#8217;re hurting my eyes.&#8221;
-</p>
-</blockquote><p>I&#8217;m quoting a colleague who sits next to me and I sympathise. Perhaps a section from a build file was causing him pain?
-</p>
-<div class="typocode">
-
-<pre class="prettyprint">&lt;target name="all" description="Build product."&gt;
-  &lt;mkdir dir="build" if="${not directory::exists('build')}" /&gt;
-   ....
-&lt;/target&gt;
-
-</pre>
-
-</div>
-
-<p>Or maybe it was some XSL to generate XML by applying XML to XML?
-</p>
-<div class="typocode">
-
-<pre class="prettyprint">&lt;xsl:if test="$index-make or @index!='false'"&gt;
-  &lt;xsl:if test="//index"&gt;
-    &lt;fo:block text-align-last="justify" space-before="5pt"&gt;
-      &lt;fo:basic-link internal-destination="index-page"&gt;
-        &lt;xsl:choose&gt;
-          &lt;xsl:when test="(/doc/@lang = 'ja') or (/doc/@lang = '')&lt;/xsl:when&gt;
-          &lt;xsl:otherwise&gt;INDEX&lt;/xsl:otherwise&gt;
-        &lt;/xsl:choose&gt;
-      &lt;/fo:basic-link&gt;
-      &lt;fo:page-number-citation ref-id="index-page"/&gt;
-    &lt;/fo:block&gt;
-  &lt;/xsl:if&gt;
-&lt;/xsl:if&gt;
-
-</pre>
-
-</div>
-
-<p>Or perhaps he was wrestling with a C++ compile error.
-</p>
-<div class="typocode">
-
-<pre class="prettyprint">print.cpp: In function 'void print(const
-std::map&lt;std::basic_string&lt;char, std::char_traits&lt;char&gt;,
-std::allocator&lt;char&gt; &gt;, int, std::less&lt;std::basic_string&lt;char,
-std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt; &gt;,
-std::allocator&lt;std::pair&lt;const std::basic_string&lt;char,
-std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt;, int&gt; &gt; &gt;&amp;)':
-print.cpp:7: error: no match for 'operator&lt;&lt;' in 'std::cout &lt;&lt;
-details' /usr/include/c++/4.2.1/ostream:112: note: candidates are:
-std::basic_ostream&lt;_CharT, _Traits&gt;&amp; std::basic_ostream&lt;_CharT,
-_Traits&gt;::operator&lt;&lt;(std::basic_ostream&lt;_CharT, _Traits&gt;&amp;
-(*)(std::basic_ostream&lt;_CharT, _Traits&gt;&amp;)) [with _CharT = char,
-_Traits = std::char_traits&lt;char&gt;]
-
-</pre>
-
-</div>
-
-<p>What makes angle brackets so vexatious. Could it be their sharp corners?
-</p>
-<p>Lisp is as elegant as XML is prickly, yet it too is famous for brackets, <a href="http://en.wikipedia.org/wiki/S-expression">albeit round ones</a> &#8212; and lots of them.
-</p>
-<blockquote class="twitter-tweet"><p>It&#8217;s not that Clojure/Lisp has a lot of parentheses. Its just that we removed everything else.</p>&mdash; Alex Miller (@puredanger) <a href="https://twitter.com/puredanger/status/313507982623268865">March 18, 2013</a></blockquote>
-<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
-
-Imagine a parallel universe with angle-bracket Lisp. I wonder if the language would have proved so enduring?
-
-
-
-<div class="typocode"><div class="codetitle">Not so pretty now?</div>
-
-<pre class="prettyprint">&lt;define &lt;euler-transform s&gt;
-  &lt;let &lt;&lt;s0 &lt;stream-ref s 0&gt;&gt;
-        &lt;s1 &lt;stream-ref s 1&gt;&gt;    
-        &lt;s2 &lt;stream-ref s 2&gt;&gt;&gt;
-    &lt;cons-stream &lt;- s2 &lt;/ &lt;square &lt;- s2 s1&gt;&gt;
-                          &lt;+ s0 &lt;* -2 s1&gt; s2&gt;&gt;&gt;
-                 &lt;euler-transform &lt;stream-cdr s&gt;&gt;&gt;&gt;&gt;
-
-</pre>
-
-</div>
-
-
-
-Looking more closely at the first code snippet, the section from a build file, we can see the problem isn&#8217;t so much the angle brackets as all the others.
-
-
-
-<div class="typocode">
-
-<pre class="prettyprint">&lt;mkdir dir="build" if="${not directory::exists('build')}" /&gt;
-
-</pre>
-
-</div>
-
-
-
-The braces and parentheses may be embedded in a double quoted string but that only makes things worse. The nested levels hurt my eyes and, if you can bear to look at the code long enough, you&#8217;ll realise there&#8217;s a simpler message trying to get out: <tt>mkdir -p build</tt>.
-
-</div>
-
-
 <div class="extended">
 <p><a href="/articles/">Visit the Word Aligned archives...</a></p>
 </div>
@@ -986,7 +908,7 @@ The braces and parentheses may be embedded in a double quoted string but that on
 <h3>Top Tags</h3>
 <ul id="categories"><li><a href="/tag/python" rel="tag">Python</a> <em>(110)</em></li>
 <li><a href="/tag/c++" rel="tag">C++</a> <em>(67)</em></li>
-<li><a href="/tag/self" rel="tag">Self</a> <em>(56)</em></li>
+<li><a href="/tag/self" rel="tag">Self</a> <em>(57)</em></li>
 <li><a href="/tag/accu" rel="tag">ACCU</a> <em>(31)</em></li>
 <li><a href="/tag/puzzles" rel="tag">Puzzles</a> <em>(30)</em></li>
 <li><a href="/tag/web-applications" rel="tag">Web Applications</a> <em>(27)</em></li>
@@ -1016,7 +938,7 @@ The braces and parentheses may be embedded in a double quoted string but that on
 <div class="sidebar-node">
 <h3>Chain</h3>
 <ul>
-<li><a accesskey="p" href="/articles/programming-paired-and-shared" title="First article">&raquo; Programming Paired and Shared</a></li>
+<li><a accesskey="p" href="/articles/code-reviews--the-rules" title="First article">&raquo; Code Reviews - the rules</a></li>
 
 </ul>
 
