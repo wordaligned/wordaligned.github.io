@@ -7,6 +7,149 @@
 <dc:creator>tag@wordaligned.org</dc:creator>
 <language>en-gb</language>
 <item>
+<title>Advent of Code</title>
+<description>&lt;p&gt;I enjoyed solving &lt;a href="http://was.tl"&gt;Eric Wastl&lt;/a&gt;&amp;#8217;s excellent &lt;a href="http://adventofcode.com"&gt;Advent of Code&lt;/a&gt; programming puzzles over Christmas last year. The puzzles are nicely themed and the site itself is a delight: lighting up an ascii art Christmas tree, row by row, became an addiction.
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;Advent of Code is a series of small programming puzzles for a variety of skill levels. They are self-contained and are just as appropriate for an expert who wants to stay sharp as they are for a beginner who is just learning to code.
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;First time through, I blasted through all the puzzles using Python, leaning on its standard containers, &lt;a href="https://docs.python.org/3/library/itertools.html"&gt;algorithms&lt;/a&gt; and text munging capabilities: &amp;#8220;an expert who wants to stay sharp&amp;#8221;, if you like. Now I&amp;#8217;m tackling the problems again using languages and techniques I&amp;#8217;m less comfortable with: &amp;#8220;a beginner who is just learning to code&amp;#8221;, which I like.
+&lt;/p&gt;
+&lt;p&gt;Second time round is fun, slow and instructive. I&amp;#8217;m posting solutions on &lt;a href="https://github.com/wordaligned/advent-of-code"&gt;github&lt;/a&gt;.
+&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://adventofcode.com"&gt;&lt;img src="http://wordaligned.org/images/advent-of-code.png" alt="ascii xmas tree"&gt;&amp;lt;/a
+&lt;/p&gt;</description>
+<dc:date>2016-02-22</dc:date>
+<guid>http://wordaligned.org/articles/advent-of-code</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/advent-of-code</link>
+<category>Self</category>
+</item>
+
+<item>
+<title>Code Reviews - the rules</title>
+<description>&lt;p&gt;The rule is: no code gets checked in without a review.
+&lt;/p&gt;
+&lt;p&gt;It&amp;#8217;s not always easy to get a reviewer to sign off a changelist. Does the code build? In all configurations and on all platforms? Do the tests pass? Are all new code paths covered? Does the commit message describe the change? Does the formatting match the style guide? Does the code match its surroundings? How about documentation, compiler warnings, license requirements?
+&lt;/p&gt;
+&lt;p&gt;Is the change really necessary? Could it have been realised more simply?
+&lt;/p&gt;
+&lt;p&gt;Certainly the reviewer&amp;#8217;s task is easier if the task has been &lt;a href="http://wordaligned.org/articles/programming-paired-and-shared"&gt;paired on&lt;/a&gt;. Small and self-contained changelists are more straightforward. Removing code, too, should be less contentious.
+&lt;/p&gt;
+&lt;p&gt;Depending on infrastructure, some checklist items can be automated. Ideally the changelist has already been though CI, for example, ticking the builds-cleanly and passes-its-tests boxes.
+&lt;/p&gt;
+&lt;p&gt;So far, so what? (So obvious!)
+&lt;/p&gt;
+&lt;p&gt;Here&amp;#8217;s another rule, and one I&amp;#8217;ve not seen written down before.
+&lt;/p&gt;
+&lt;p&gt;When I review code I might well consider how I would have made the change. That doesn&amp;#8217;t mean I&amp;#8217;ll insist the submitter does things my way. In the absence of &lt;a href="https://blog.golang.org/go-fmt-your-code" title="go fmt your code"&gt;automated formatters&lt;/a&gt; there will be more than one acceptable way to lay out the code. Sometimes there&amp;#8217;s little reason to prefer an explicit loop over an algorithm + lambda combination, or vice-versa. &lt;a href="http://wordaligned.org/articles/go-for-short-variable-names"&gt;Short names&lt;/a&gt; work for me but not for everyone. It&amp;#8217;s hard to argue against test coverage, but is more always better?
+&lt;/p&gt;
+&lt;p&gt;In such cases I won&amp;#8217;t try to impose my own style on the changelist. Instead, the question becomes: &lt;strong&gt;does the code match the standards we, as a team, have set&lt;/strong&gt;? Or, &lt;strong&gt;do these changes merit a place in our codebase&lt;/strong&gt;?
+&lt;/p&gt;
+&lt;p&gt;It&amp;#8217;s a simple principle but not an obvious one. It helps me review fairly and also to learn from others on my team.
+&lt;/p&gt;
+&lt;p&gt;There &lt;strong&gt;is&lt;/strong&gt; more than one way to do it!
+&lt;/p&gt;</description>
+<dc:date>2015-08-05</dc:date>
+<guid>http://wordaligned.org/articles/code-reviews--the-rules</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/code-reviews--the-rules</link>
+<category>Self</category>
+</item>
+
+<item>
+<title>Programming Paired and Shared</title>
+<description>&lt;p&gt;We &lt;a href="http://en.wikipedia.org/wiki/Pair_programming"&gt;pair program&lt;/a&gt; where I work. Two people, one desk. It can get intense.
+&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://en.wikipedia.org/wiki/Vim_%28cleaning_product%29"&gt;&lt;img style="align:top" src="http://wordaligned.org/images/vim.jpg" alt="Floor cleaner"/&gt;&lt;/a&gt;
+   &lt;a href="http://wordaligned.org/articles/accidental-emacs"&gt;&lt;img style="align:top" src="http://wordaligned.org/images/gnu.jpg" alt="Emacs"/&gt;&lt;/a&gt;
+&lt;/p&gt;
+&lt;p&gt;Editor wars claim few casualties &amp;mdash; until an emacs and a vim user are forced to share a keyboard and screen, that is. Anyone for notepad?
+&lt;/p&gt;
+&lt;p&gt;Sharing the typing isn&amp;#8217;t why we pair. Where I work we also do code reviews. Whilst pair programming is encouraged, code reviews are mandated: code cannot be checked in until approved by a reviewer. That reviewer could be the person you paired with, and it soon becomes apparent that reviews conducted with a pair go more smoothly than ones where the reviewer is new to the task. It&amp;#8217;s hard for someone to review a tricky changeset without the context of its development.
+&lt;/p&gt;
+&lt;p&gt;The &lt;strong&gt;context of its development&lt;/strong&gt; turns out to be paramount for understanding a codebase, not just a changeset. Pair programming helps provide that context.
+&lt;/p&gt;
+&lt;p&gt;The term &lt;strong&gt;pairing&lt;/strong&gt; serves better than &lt;strong&gt;pair programming&lt;/strong&gt;. The former suggests sharing; the latter, typing. The benefits come from sharing all aspects of the work: decisions and responsibility; research, design, development; how to test; where to cut corners and where to go beyond the immediate requirement; when to take a break. Anyone for table football?
+&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://www.snsystems.com/careers/"&gt;&lt;img src="http://wordaligned.org/images/table-football.jpg" alt="Edd and Bridget vs Bridget and Edd" title="Edd and Bridget kicking a ball around" /&gt;&lt;/a&gt;
+&lt;/p&gt;</description>
+<dc:date>2015-05-27</dc:date>
+<guid>http://wordaligned.org/articles/programming-paired-and-shared</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/programming-paired-and-shared</link>
+<category>Self</category>
+</item>
+
+<item>
+<title>Election Manifesto - a timely activity for agile retrospectives</title>
+<description>&lt;p&gt;Did I mention that I&amp;#8217;ve become scrum master for my team? I have now. It&amp;#8217;s a new thing for me (and for this blog) but I enjoy it, especially running the retrospective meetings. You have to keep these fresh and one way of doing this is to connect them with what&amp;#8217;s going on in the world outside: the &lt;a href="http://plans-for-retrospectives.com/?id=54" title="Story Oscars, a retromat activity"&gt;Oscars&lt;/a&gt;, the eclipse, the &lt;a href="http://www.bbc.co.uk/news/election/2015"&gt;general election&lt;/a&gt; &amp;#8230;
+&lt;/p&gt;
+&lt;p style="margin:0;text-align:center;font-size:800%;"&gt;&amp;#x2611;&lt;/p&gt;
+
+&lt;p&gt;With a week to go, my vote has been posted. So, here&amp;#8217;s an activity I devised for a recent retrospective. We were focusing on infrastructure issues and trying to come with improvements. For this, it worked well.
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;Ask the team to split into three or four &amp;#8220;political&amp;#8221; parties. Each party must come up with a manifesto for change. What isn&amp;#8217;t working? How would they improve things, given the chance? After 20 minutes of discussion, reconvene and ask the party leaders to present their manifesto to the electorate. Be prepared for tough questions and heckling!&lt;/p&gt;
+&lt;p&gt;Now it&amp;#8217;s time to plan a brighter future. Summarise the key points of each manifesto and write them up on sticky notes, using different colours for the different parties. What do the parties agree on? Which promises are unrealistic and which can be delivered?&lt;/p&gt;&lt;/blockquote&gt;
+
+&lt;p style="margin:0;text-align:center;font-size:800%;"&gt;&amp;#x2611;&lt;/p&gt;
+
+&lt;p&gt;For more retrospective ideas, I recommend &lt;a href="http://plans-for-retrospectives.com" title="Retromat, plans for retrospectives"&gt;Retromat&lt;/a&gt; by &lt;a href="https://twitter.com/findingmarbles" title="@findingmarbles"&gt;Corinna Baldauf&lt;/a&gt;. You can find another suggestion of mine, &lt;a href="http://plans-for-retrospectives.com/?id=97"&gt;#tweetmysprint&lt;/a&gt;, on the Retromat and I&amp;#8217;ve submitted this one too.
+&lt;/p&gt;
+&lt;p style="margin:0;text-align:center;font-size:800%;"&gt;&amp;#x2611;&lt;/p&gt;
+
+&lt;div&gt;&lt;blockquote class="twitter-tweet" lang="en"&gt;&lt;p&gt;&lt;a href="https://twitter.com/hashtag/tweetmysprint?src=hash"&gt;#tweetmysprint&lt;/a&gt; Please write 3 tweets describing this sprint. Stories, suggestions, rants all welcome &amp;mdash; but be brief ;-)&lt;/p&gt;&amp;mdash; Professor Scrum (@professorscrum) &lt;a href="https://twitter.com/professorscrum/status/583018772891639808"&gt;March 31, 2015&lt;/a&gt;&lt;/blockquote&gt;&lt;script async src="http://wordaligned.org//platform.twitter.com/widgets.js" charset="utf-8"&gt;&lt;/script&gt;&lt;/div&gt;</description>
+<dc:date>2015-04-29</dc:date>
+<guid>http://wordaligned.org/articles/election-manifesto</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/election-manifesto</link>
+<category>Self</category>
+</item>
+
+<item>
+<title>Speaking at the ACCU Conference 2015</title>
+<description>&lt;p&gt;This time last week I was on my way to the &lt;a href="http://accu.org/index.php/conferences/accu_conference_2015" title="ACCU 2015 main page"&gt;ACCU 2015 conference&lt;/a&gt; in Bristol. The past couple of years I&amp;#8217;ve been, but for one day only. This year, as a presenter of a full length (90 minute!) session I got to go to the whole thing.
+&lt;/p&gt;
+&lt;p&gt;Being a speaker made all the difference. Having the chance to attend plenty of sessions meant I was more relaxed about choosing which ones to pick &amp;#8212; each slot during the day offered &lt;a href="http://accu.org/index.php/conferences/accu_conference_2015/accu2015_schedule" title="ACCU 2015 Schedule"&gt;5 options&lt;/a&gt; &amp;#8212; and less upset if I thought, 10 minutes into a presentation, that I could have picked something else. Perhaps as a consequence of this, I was happy with all my choices. That said, I&amp;#8217;d love the whole thing to run again so I could take a second route through the schedule.
+&lt;/p&gt;
+&lt;blockquote class="twitter-tweet" lang="en"&gt;&lt;p&gt;I have no idea what &lt;a href="https://twitter.com/thomasguest"&gt;@thomasguest&lt;/a&gt;&amp;rsquot;s &lt;a href="https://twitter.com/hashtag/accu2015?src=hash"&gt;#accu2015&lt;/a&gt; talk will be about, which is why I&amp;rsquot;m here. &amp;ldqou;Lessons from the OuLiPo&amp;rdquo;. &lt;a href="http://t.co/l6CKhCBJ7f"&gt;pic.twitter.com/l6CKhCBJ7f&lt;/a&gt;&lt;/p&gt;&amp;mdash; Robert Smallshire (@robsmallshire) &lt;a href="https://twitter.com/robsmallshire/status/591256120783728640"&gt;April 23, 2015&lt;/a&gt;&lt;/blockquote&gt;
+
+&lt;p&gt;I&amp;#8217;d run a couple of practice versions of my talk at ACCU local groups in &lt;a href="http://www.meetup.com/ACCU-Bristol"&gt;Bristol&lt;/a&gt; and then in &lt;a href="http://www.meetup.com/ACCU-Oxford"&gt;Oxford&lt;/a&gt;, which meant I was comfortable with the material and convinced it would hold an audience&amp;#8217;s interest.
+&lt;/p&gt;
+&lt;div&gt;&lt;blockquote class="twitter-tweet" lang="en"&gt;&lt;p&gt;Beautiful talk by &lt;a href="https://twitter.com/thomasguest"&gt;@thomasguest&lt;/a&gt; at &lt;a href="https://twitter.com/hashtag/accu2015?src=hash"&gt;#accu2015&lt;/a&gt; on adopting artificial constraints in design and programming guided by the OuLiPo.&lt;/p&gt;&amp;mdash; Robert Smallshire (@robsmallshire) &lt;a href="https://twitter.com/robsmallshire/status/591264421470666752"&gt;April 23, 2015&lt;/a&gt;&lt;/blockquote&gt;&lt;script async src="http://wordaligned.org//platform.twitter.com/widgets.js" charset="utf-8"&gt;&lt;/script&gt;&lt;/div&gt;
+
+&lt;p&gt;Some things to consider for next year:
+&lt;/p&gt;
+&lt;ul&gt;
+ &lt;li&gt;
+     I&amp;#8217;m going to submit another talk proposal, and if it&amp;#8217;s accepted
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     I&amp;#8217;ll practise it twice, at least and
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     I&amp;#8217;ll get a remote control.
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     My laptop is too bulky for comfort. &lt;a href="https://www.themobilepresenter.com/"&gt;Dirk Haun&lt;/a&gt; ran &lt;a href="http://www.slideshare.net/dhaun/braindump-how-to-leave-your-knowledge-when-leaving-your-job"&gt;his talk&lt;/a&gt; from a tablet. Could a phone be used?
+ &lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;My lightning talk &amp;#9758; &lt;a href="http://wordaligned.org/knights-tour" title="Perhaps the greatest 20th century novel &amp;amp;mdash; Donald Knuth"&gt;Life A User&amp;#8217;s Manual&lt;/a&gt;.
+&lt;/p&gt;
+&lt;p&gt;Slides for my main talk &amp;#9758; &lt;a href="http://wordaligned.org/docs/oulipo/"&gt;Lessons from the OuLiPo&lt;/a&gt;.
+&lt;/p&gt;
+&lt;p&gt;I would like to thank all the organisers of the conference, everyone who presented, and everyone who attended. Especial mention to &lt;a href="https://twitter.com/jonjagger" title="Loves people; software; fishing; built http://cyber-dojo.org"&gt;Jon Jagger&lt;/a&gt; who announced that this would be his last year as conference chair. Let&amp;#8217;s hope that in future years the mail bag continues to be inundated with letters! &lt;a href="http://www.goodliffe.net/"&gt;Pete Goodliffe&lt;/a&gt; too deserves a special mention for setting up three excellent lightning talk sessions. Controlled anarchy &amp;mdash; he&amp;#8217;s good at it!
+&lt;/p&gt;</description>
+<dc:date>2015-04-28</dc:date>
+<guid>http://wordaligned.org/articles/speaking-at-the-accu-conference-2015</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/speaking-at-the-accu-conference-2015</link>
+<category>Self</category>
+</item>
+
+<item>
 <title>Word Aligned, hosted by Github</title>
 <description>&lt;p&gt;To anyone who subscribes to this site&amp;#8217;s &lt;a href="http://feeds.wordaligned.org/wordaligned"&gt;feed&lt;/a&gt;, my apologies if your reader recently got filled with items you&amp;#8217;d already seen. I can explain.
 &lt;/p&gt;
@@ -33,7 +176,1265 @@
 <guid>http://wordaligned.org/articles/word-aligned-hosted-by-github</guid>
 <author>tag@wordaligned.org (Thomas Guest)</author>
 <link>http://wordaligned.org/articles/word-aligned-hosted-by-github</link>
-<category>self</category>
+<category>Self</category>
+</item>
+
+<item>
+<title>Patience Sorted</title>
+<description>&lt;p&gt;I gave a lightning talk today about patience sorting and its application to the longest increasing subsequence problem. It&amp;#8217;s a subject I&amp;#8217;ve &lt;a href="http://wordaligned.org/articles/patience-sort.html" title="Patience sort and the longest increasing subsequence"&gt;written about&lt;/a&gt; before. My computer has been put through several million simulations. I&amp;#8217;ve even coded up a &lt;a href="http://wordaligned.org/pages/psort"&gt;javascript demo&lt;/a&gt; which deals out virtual playing cards and sorts them at the click of a button.
+&lt;/p&gt;
+&lt;script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.1/jquery.min.js"&gt;&lt;/script&gt;
+&lt;script type="text/javascript"&gt;
+var zz = 0;
+
+var xtop  = ["330px", "302px", "275px", "255px", "234px", "209px", "187px", "158px", "128px", "99px", "70px", "43px", "15px"];
+var ytop  = ["26px", "30px", "28px", "29px", "31px", "28px", "27px", "28px", "28px", "30px", "26px", "30px", "29px"];
+var xpile = ["10px", "13px", "12px", "115px", "14px", "220px", "220px", "319px", "15px", "216px", "118px", "118px", "321px"];
+var ypile = ["205px", "233px", "266px", "206px", "295px", "206px", "236px", "209px", "325px", "267px", "235px", "263px", "234px"];
+var result = ["#card7", "#card6", "#card3", "#card2"];
+
+function reset_cards() {
+    jQuery("img").stop();
+    zz += 13;
+    for (var j = 0; j != 13; ++j, --zz) {
+        jQuery("#card" + j)
+        .css({"z-index":zz, "margin-left":xtop[j], "margin-top":ytop[j], "border-width":0});
+    }
+    zz += 13;
+}
+
+function lis(j) {
+    var it = jQuery(result[j]);
+    if (it.length &gt; 0) {
+        it.animate({borderWidth : "5px"}, "slow", 0, function(){lis(++j);});
+    }
+}
+
+function psort(j) {
+    var it = jQuery("#card"+j);
+    if (it.length != 0) {
+        it
+        .animate({marginLeft : xpile[j], marginTop: ypile[j]}, "slow", 0, function(){psort(++j);})
+        .css({"z-index" : ++zz});
+    } else {
+        lis(0);
+    }
+}
+
+function animate() {
+    reset_cards();
+    psort(0);
+}
+&lt;/script&gt;
+
+&lt;div class="cardtable" style="background-color: #093; width:440px; height:480px;"&gt;
+&lt;img id="card0" style="border: 0 orange solid; position: absolute; margin-left: 330px; margin-top: 27px; z-index: 13;" src="http://wordaligned.org/images/cards/1s.png" alt="Ace of Spades"/&gt;
+&lt;img id="card1" style="border: 0 orange solid; position: absolute; margin-left: 302px; margin-top: 27px; z-index: 12;" src="http://wordaligned.org/images/cards/10s.png" alt="10 of Spades"/&gt;
+&lt;img id="card2" style="border: 0 orange solid; position: absolute; margin-left: 275px; margin-top: 27px; z-index: 11;" src="http://wordaligned.org/images/cards/6s.png" alt="6 of Spades"/&gt;
+&lt;img id="card3" style="border: 0 orange solid; position: absolute; margin-left: 255px; margin-top: 26px; z-index: 10;" src="http://wordaligned.org/images/cards/7s.png" alt="7 of Spades"/&gt;
+&lt;img id="card4" style="border: 0 orange solid; position: absolute; margin-left: 234px; margin-top: 28px; z-index: 9;" src="http://wordaligned.org/images/cards/5s.png" alt="5 of Spades"/&gt;
+&lt;img id="card5" style="border: 0 orange solid; position: absolute; margin-left: 209px; margin-top: 26px; z-index: 8;" src="http://wordaligned.org/images/cards/13s.png" alt="King of Spades"/&gt;
+&lt;img id="card6" style="border: 0 orange solid; position: absolute; margin-left: 187px; margin-top: 31px; z-index: 7;" src="http://wordaligned.org/images/cards/9s.png" alt="9 of Spades"/&gt;
+&lt;img id="card7" style="border: 0 orange solid; position: absolute; margin-left: 158px; margin-top: 27px; z-index: 6;" src="http://wordaligned.org/images/cards/12s.png" alt="Queen of Spades"/&gt;
+&lt;img id="card8" style="border: 0 orange solid; position: absolute; margin-left: 128px; margin-top: 29px; z-index: 5;" src="http://wordaligned.org/images/cards/2s.png" alt="2 of Spades"/&gt;
+&lt;img id="card9" style="border: 0 orange solid; position: absolute; margin-left: 99px; margin-top: 29px; z-index: 4;" src="http://wordaligned.org/images/cards/8s.png" alt="8 of Spades"/&gt;
+&lt;img id="card10" style="border: 0 orange solid; position: absolute; margin-left: 70px; margin-top: 26px; z-index: 3;" src="http://wordaligned.org/images/cards/4s.png" alt="4 of Spades"/&gt;
+&lt;img id="card11" style="border: 0 orange solid; position: absolute; margin-left: 43px; margin-top: 27px; z-index: 2;" src="http://wordaligned.org/images/cards/3s.png" alt="3 of Spades"/&gt;
+&lt;img id="card12" style="border: 0 orange solid; position: absolute; margin-left: 15px; margin-top: 28px; z-index: 1;" src="http://wordaligned.org/images/cards/11s.png" alt="Knave of Spades"/&gt;
+&lt;/div&gt;&lt;div&gt;&lt;p&gt;&lt;button onclick="reset_cards();"&gt;Reset&lt;/button&gt;&lt;button onclick="animate();"&gt;Play&lt;/button&gt;&lt;/p&gt;&lt;/div&gt;
+
+&lt;p&gt;Today I used real playing cards; a linen-finished standard deck. For any talk it&amp;#8217;s nice to have a prop.
+&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://www.flickr.com/photos/thomasguest/8558343442/" title="Rock &amp;amp; Pop Legends by Thomas Guest, on Flickr"&gt;&lt;img src="http://farm9.staticflickr.com/8100/8558343442_0402f04e83.jpg" width="500" height="361" alt="Rock &amp;amp; Pop Legends"&gt;&lt;/a&gt;
+&lt;/p&gt;
+&lt;p&gt;Now, I &lt;strong&gt;thought&lt;/strong&gt; I understood the patience sort algorithm but until yesterday I&amp;#8217;d never actually played it with real cards. I&amp;#8217;ve been surprised by how much this physical dimension has developed my understanding.
+&lt;/p&gt;
+&lt;p&gt;I&amp;#8217;ll be testing my new cards on some other sorting algorithms; I have high hopes. It would be good to find a similarly simple prop for linked data structures so I can balance trees, flip lists and walk graphs.
+&lt;/p&gt;</description>
+<dc:date>2013-03-14</dc:date>
+<guid>http://wordaligned.org/articles/patience-sorted</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/patience-sorted</link>
+<category>Self</category>
+</item>
+
+<item>
+<title>Hosting for Life? TextDrive revived!</title>
+<description>&lt;p&gt;Towards the end of last year I was emailed by Jason Hoffman from Joyent. &lt;a href="http://en.wikipedia.org/wiki/Joyent" title="Wikipedia on Joyent and TextDrive"&gt;Joyent owned TextDrive&lt;/a&gt;, the company which, 6 years ago, offered web hosting &lt;strong&gt;for life&lt;/strong&gt; in return for a single up-front payment. Jason&amp;#8217;s email said this lifetime hosting &amp;#8212; legacy service, he called it &amp;#8212; was nearing &lt;strong&gt;End of Life&lt;/strong&gt; (!) and would be sunsetted (!!) at the end of October 2012.
+&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://textdrive.com"&gt;&lt;img src="http://wordaligned.org/images/txd-banner.png" alt="TextDrive banner"/&gt;&lt;/a&gt; 
+&lt;/p&gt;
+&lt;p&gt;As a TextDrive customer I reckon I&amp;#8217;d had good value from the original deal, but while six years may seem like forever on the internet it&amp;#8217;s surely not a lifetime. Happily TextDrive&amp;#8217;s original founder, Dean Allen, &lt;a href="http://techcrunch.com/2012/08/30/happy-ending-to-the-joyent-lifetime-subscription-story/" title="TechCrunch reports on Joyent/TextDrive"&gt;felt the same way&lt;/a&gt;: &lt;strong&gt;he&lt;/strong&gt; emailed me to say he&amp;#8217;d be relaunching &lt;a href="http://textdrive.com/"&gt;TextDrive&lt;/a&gt; on a new, modern, infrastructure.
+&lt;/p&gt;
+&lt;p&gt;Quite how this pans out remains to be seen but I&amp;#8217;m sticking it out. If you&amp;#8217;re reading this page, great: it&amp;#8217;s been served up by the new, modern infrastructure which Dean mentioned. Whilst migrating &lt;a href="http://wordaligned.org/"&gt;wordaligned.org&lt;/a&gt; I&amp;#8217;ve had to fiddle with rewrite rules and tinker with DNS records and file permissions. Any glitches or oddities, please &lt;a href="mailto:tag@wordaligned.org?subject=Wordaligned.org%20glitches"&gt;let me know&lt;/a&gt;.
+&lt;/p&gt;</description>
+<dc:date>2013-03-06</dc:date>
+<guid>http://wordaligned.org/articles/hosting-for-life-textdrive-revived</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/hosting-for-life-textdrive-revived</link>
+<category>Self</category>
+</item>
+
+<item>
+<title>ACCU Bristol and Bath</title>
+<description>&lt;p&gt;Lightning talks. In a pub. Me first! I hadn&amp;#8217;t actually practised but I knew what I wanted to say and had picked a subject so trivial I couldn&amp;#8217;t possibly overrun.
+&lt;/p&gt;
+&lt;p&gt;Yes, it was time, at last, for the first &lt;a href="https://twitter.com/accuBristol" title="Follow ACCU Bristol &amp;amp; Bath on twitter"&gt;ACCU Bristol &amp;amp; Bath&lt;/a&gt; meeting, to be held in an upstairs room at the Cornubia. We&amp;#8217;d reconnoitred the venue a few weeks earlier. Although the room was dingy and we couldn&amp;#8217;t work out where to put a screen, and despite disturbance from the increasingly raucous CAMRA meeting next door, the location was ideal and the beer superb. I looked forward to returning.
+&lt;/p&gt;
+&lt;p&gt;Plans change. In an agile last minute switch the meeting relocated to the Marriot &amp;#8212; which, coincidentally, had just been announced as the host of next year&amp;#8217;s &lt;a href="http://accu.org/index.php/conferences" title="ACCU 2013 comes to Bristol!"&gt;ACCU conference&lt;/a&gt;. I shuffled through revolving doors into the hotel&amp;#8217;s vacant lobby rehearsing my talk in my head. Where was everyone? It took some backtracking and interrogation to locate the subterranean room but fortunately they hadn&amp;#8217;t started without me.
+&lt;/p&gt;
+&lt;p&gt;Now &lt;strong&gt;this&lt;/strong&gt; was a proper meeting room. Panelled walls, no windows. A blank TV screen; green apples; red glasses; bottled water.
+&lt;/p&gt;
+&lt;img src="http://wordaligned.org/images/apple-display-adapter.jpg" alt="I carry one with me at all times"/&gt;
+
+&lt;p&gt;Ewan welcomed me. &amp;#8220;Have you got a macbook display adapter?&amp;#8221;
+&lt;/p&gt;
+&lt;p&gt;No. I didn&amp;#8217;t even have the slides to my own presentation &amp;#8212; I&amp;#8217;d emailed them ahead to be merged into a single deck.
+&lt;/p&gt;
+&lt;p&gt;The screen flicked to life. Nine talks, five minutes each. We&amp;#8217;d be done in an hour. After a brief welcome my slides were on screen and I was off.
+&lt;/p&gt;
+&lt;p&gt;Unfortunately I ran out of time, laughing too long at my own lightning anecdote which framed a talk about ellipses, the triple-dots &amp;#8230; which mean different things in different places in different programming languages. Next up was Dan Towner who walked us through the algorithm used by compilers for allocating registers. It&amp;#8217;s a greedy colouring of a planar map, he said, wrapped in a bail-and-retry loop. Dan Tallis spoke about the single committer model which works so well on open source projects. Developers don&amp;#8217;t have write access to the repository and must submit patches to the committer for review, a protocol which encourages incremental and considered changes to a codebase. &lt;a href="http://curbralan.com"&gt;Kevlin Henney&lt;/a&gt; needed just a single slide to clear up some misconceptions in exactly five minutes. Chris Simons didn&amp;#8217;t need any slides to describe where designs come from. Pacing the floor and waving his fingers, he explained that &lt;span /&gt;computer systems are punchlines; design is a matter of figuring out the joke. Attack the solution space with ants! No ACCU meeting would be complete without a discourse on C++ test frameworks and Malcolm Noyes duly dazzled us developing a C++ mocking library before our very eyes. Jim Thomson compared before and after binaries to prove his source code rearrangements hadn&amp;#8217;t caused any damage. Ewan Milne, who&amp;#8217;d not only organised and chaired the meeting, also contributed a talk on (guess what?) planning, subtitled how agile can Kanban be (say it!)
+&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://www.jaggersoft.com"&gt;Jon Jagger&lt;/a&gt; postponed his closing talk. Macs just work if you&amp;#8217;ve got the right connectors. We hadn&amp;#8217;t. The audience wanted more but that&amp;#8217;s no bad thing. We regathered in the hotel bar to crunch apples and chew over the evening. The ACCU Bristol &amp;amp; Bath launch had been a success! The price of a pint and anodyne surroundings discouraged lingering. We drank up and headed off towards trains, homes, and, for a select few, the &lt;a href="http://www.travelswithbeer.com/2010/07/09/the-cornubia-bristol/" title="CAMRA members can get pints at a reduced prices depending on the strength of the ale"&gt;Cornubia&lt;/a&gt;.
+&lt;/p&gt;</description>
+<dc:date>2012-08-31</dc:date>
+<guid>http://wordaligned.org/articles/accu-bristol-and-bath</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/accu-bristol-and-bath</link>
+<category>Self</category>
+</item>
+
+<item>
+<title>Life on Canvas</title>
+<description>&lt;p&gt;I was lucky enough to be taught maths by &lt;a href="http://www.math.princeton.edu/directory/john-conway" title="John Conway, now at Princeton University"&gt;John Horton Conway&lt;/a&gt;, if only for an hour a week for a single term. He was lucky enough to be teaching number theory: a subject packed with treasures picked from the full history of mathematics.
+&lt;/p&gt;
+&lt;p&gt;I remember him as animated and unkempt. He bustled into that first lecture with a carrier bag and started pulling out groceries one by one. How many items were in the bag, he wondered? Could he count them all &amp;#8212; it was a &lt;em&gt;very&lt;/em&gt; large bag &amp;#8212; and what exactly did &lt;a href="http://mathworld.wolfram.com/Aleph-0.html" title="The 'small' infinite set of integers"&gt;infinity&lt;/a&gt; mean? Later I would see him pacing along Kings Parade dragging a shopping tolley, lost in thought.
+&lt;/p&gt;
+&lt;p&gt;Number theory may be as old as mathematics but it remains very much alive. Some 40 years ago Professor Conway discovered a primitive and novel mathematical life form: the Game of Life. 
+&lt;/p&gt;
+&lt;p&gt;The rules are simple. A colony of cells inhabits a two dimensional grid. At any one time each cell is either alive or dead, and as time advances the fate of a cell is determined entirely by its immediate 8 neighbours:
+&lt;/p&gt;
+&lt;ul&gt;
+ &lt;li&gt;
+     reproduction: a dead cell with exactly 3 live neighbours becomes alive
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     survival: a live cell with 2 or 3 live neighbours lives on
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     overcrowding or loneliness: in all other cases the cell dies or stays dead
+ &lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;In code, we might represent the colony as a two dimensional array filled with &lt;code&gt;1&lt;/code&gt;&amp;#8217;s and &lt;code&gt;0&lt;/code&gt;&amp;#8217;s for live and dead cells and code up the rules like this:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;// Determine the fate of cell i, j in the next generation.
+// Return 1 for "lives", 0 for "dies"
+function fate(cells, i, j) {
+    var neighbours = [[-1,-1],[-1,0],[-1,1],
+                      [0,-1],        [0,1],
+                      [1,-1], [1,0], [1,1]];
+        live_neighbours = 0;
+    neighbours.forEach(function(n) { 
+        live_neighbours += cells[i + n[0]][j + n[1]];
+    });
+    return (live_neighbours == 3 || 
+            cells[i][j] == 1 &amp;amp;&amp;amp; live_neighbours == 2) ? 1 : 0;
+}
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;It turns out these simple rules generate an astonishing ecosystem. Simple patterns flourish, evolving into complex patterns which, many generations later may decay into stable forms and repeating patterns, or, occasionally, become extinct. 
+&lt;/p&gt;
+&lt;p&gt;Can a finite pattern grow indefinitely? Conway originally conjectured no, this was impossible, offering $50 to the first person who could prove or disprove the his conjecture before the end of 1970. In November of that year a team from MIT led by Bill Gosper claimed the prize, disproving the conjecture with a glider gun pattern which spits out a new spaceship every 30 generations.
+&lt;/p&gt;
+&lt;img src=http://upload.wikimedia.org/wikipedia/commons/e/e5/Gospers_glider_gun.gif alt="Gosper's glider gun, Wikimedia commons" style="border:1px solid black;"&gt;
+
+&lt;span id="continue-reading"/&gt;
+
+&lt;p&gt;A 2 dimensional array can naturally be represented on the most basic computer screen &amp;#8212; think raster graphics, pixels &amp;#8212; and the parallel emergence and development of the personal computer helps explain life&amp;#8217;s continuing appeal&lt;a id="fn1link" href="http://wordaligned.org/articles/life-on-canvas#fn1"&gt;&lt;sup&gt;[1]&lt;/sup&gt;&lt;/a&gt;. The game of life has become the &lt;a href="http://programmer.97things.oreilly.com/wiki/index.php/Learn_to_Say_%22Hello%2C_World%22" title="Laern to say Hello, world"&gt;hello world&lt;/a&gt; of graphics frameworks. In 2012 we can use the HTML5 canvas, a 2 dimensional surface for drawing on.
+&lt;/p&gt;
+&lt;p&gt;&lt;canvas id="lifecanvas" width="480" height="320" style="border:1px solid black;"&gt;Unfortunately your client does not support the &lt;a href="http://www.w3.org/TR/html5/the-canvas-element.html#the-canvas-element"&gt;HTML5 canvas element&lt;/a&gt;. If you are using a feed reader, try visiting the &lt;a href="http://wordaligned.org/articles/life-on-canvas.html"&gt;original page&lt;/a&gt;.&lt;/canvas&gt;
+   &lt;div&gt;
+   &lt;button type="button" id="random" title="Random pattern" style="vertical-align:top;width:50px;height:50px;"&gt;&lt;img src="http://wordaligned.org/images/glyphicons_322_playing_dices.png" /&gt;&lt;/button&gt;
+   &lt;button type="button" id="clear" title="Clear screen" style="vertical-align:top;width:50px;height:50px;"&gt;&lt;img src="http://wordaligned.org/images/glyphicons_192_circle_remove.png" /&gt;&lt;/button&gt;
+   &lt;button type="button" id="toggle" title="Play/Pause" style="vertical-align:top;width:50px;height:50px;"&gt;&lt;img src="http://wordaligned.org/images/glyphicons_174_pause.png" /&gt;&lt;/button&gt;
+   &lt;button type="button" id="step" title="Single step" style="vertical-align:top;width:50px;height:50px;"&gt;&lt;img src="http://wordaligned.org/images/glyphicons_178_step_forward.png" /&gt;&lt;/button&gt;
+   &lt;button type="button" id="info" title="Help" style="vertical-align:top;width:50px;height:50px;"&gt;&lt;img src="http://wordaligned.org/images/glyphicons_195_circle_info.png" /&gt;&lt;/button&gt;
+   &lt;/div&gt;
+   &lt;script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"&gt;&lt;/script&gt;
+   &lt;script type="text/javascript" src="http://wordaligned.org/scripts/simple-life.js"&gt;&lt;/script&gt;
+&lt;/p&gt;
+&lt;p&gt;After a little experimentation you&amp;#8217;re sure to uncover life&amp;#8217;s three main domains: still lives, which remain unchanged; oscillators, which repeat; and spaceships, which move across the board. Then there are methuselahs, puffers, guns &amp;#8230;
+&lt;/p&gt;
+&lt;p&gt;Here&amp;#8217;s a pulsar, an oscillator with period 3.
+&lt;/p&gt;
+&lt;img src="http://wordaligned.org/images/pulsar.gif" alt="Pulsar"/&gt;
+
+&lt;p&gt;And here&amp;#8217;s a glider, classed as a diagonal spaceship, &lt;a href="http://www.catb.org/hacker-emblem/" title="When you put the glider emblem on your web page, or wear it on clothing, or display it in some other way, you are visibly associating yourself with the hacker culture"&gt;a pattern chosen&lt;/a&gt; by Eric S Raymond as a hackers&amp;#8217; emblem.
+&lt;/p&gt;
+&lt;img src="http://wordaligned.org/images/glider.gif" alt="Glider, an orthogonal spaceship"/&gt;
+
+&lt;p&gt;Here&amp;#8217;s another 5 cell pattern &amp;#8212; the R-pentomino. Clear the canvas, pick out an R-pentomino cluster of cells with the mouse, click play, and watch what evolves!
+&lt;/p&gt;
+&lt;img src="http://wordaligned.org/images/Rpentomino.png" alt="Rpentomino"/&gt;
+
+&lt;p&gt;&lt;a href="http://www.conwaylife.com/wiki/Turtle" title="An orthogonal c/3 spaceship"&gt;Turtle&lt;/a&gt;, &lt;a href="http://www.conwaylife.com/wiki/Garden_of_Eden" title="A pattern that has no parents and thus can only occur in generation 0"&gt;garden&lt;/a&gt;, &lt;a href="http://www.conwaylife.com/wiki/Unicycle" title="Unicycle is a period 6 oscillator made up of four copies of unix"&gt;unicycle&lt;/a&gt;: animal, vegetable, mineral. The kingdom of life is inclusive and extensive, a delight for naturalists and taxonomists alike. It&amp;#8217;s seduced logophiles and lexicographers too: reading through Stephen A. Silver&amp;#8217;s comprehensive &lt;a href="http://www.argentum.freeserve.co.uk/lex.htm" title="A lexicon of terms relating to John Horton Conway's Game of Life, by Stephen Silver"&gt;Life Lexicon&lt;/a&gt;, I learned that an anteater consumes ants, a &lt;a href="http://www.argentum.freeserve.co.uk/lex_c.htm#caterpillar"&gt;caterpillar&lt;/a&gt; works by laying tracks at its front end, a baker&amp;#8217;s dozen is a loaf &lt;a href="http://www.argentum.freeserve.co.uk/lex_h.htm#hassler"&gt;hassled&lt;/a&gt; by two blocks and two caterers, and an &lt;a href="http://www.argentum.freeserve.co.uk/lex_a.htm#ak47reaction"&gt;AK47&lt;/a&gt; reaction occurs when a honey farm predecessor, catalysed by an eater and a block, reappears at another location 47 generations later, having produced a glider and a traffic light. I could go on&amp;#8230;
+&lt;/p&gt;
+&lt;hr /&gt;
+
+&lt;p&gt;&lt;a id="fn1" href="http://wordaligned.org/articles/life-on-canvas#fn1link"&gt;[1]&lt;/a&gt;: I&amp;#8217;m glossing over details here. The true game of life is played out on an infinite grid, and patterns such as &lt;a href="http://en.wikipedia.org/wiki/Gun_(cellular_automaton)"&gt;Gosper&amp;#8217;s glider gun&lt;/a&gt; show that it really does have to be infinite. Computers have trouble with such an unconstrained requirement, and a computer animation might try and adapt the screen as the pattern grows, or limit the region of interest. Another approach is to wrap the canvas, left to right, top to bottom, so the game of life is played out on what&amp;#8217;s topologically a toriodal surface. That&amp;#8217;s what the canvas shown here does.
+&lt;/p&gt;
+&lt;p style="text-align:center"&gt;&amp;sect;&lt;/p&gt;
+
+&lt;p&gt;The icons used on this page were downloaded from &lt;a href="http://glyphicons.com"&gt;http://glyphicons.com&lt;/a&gt; and are licensed under the &lt;a href=http://creativecommons.org/licenses/by/3.0/deed.en&gt;CC BY 3.0&lt;/a&gt; terms. The animated gifs were placed in the public domain by their authors.
+&lt;/p&gt;</description>
+<dc:date>2012-06-27</dc:date>
+<guid>http://wordaligned.org/articles/life-on-canvas</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/life-on-canvas</link>
+<category>Self</category>
+</item>
+
+<item>
+<title>Desktop preferences</title>
+<description>&lt;p&gt;Paul grumbled about the lack of new content on &lt;a href="http://wordaligned.org" title="Once popular, now dormant programming blog"&gt;wordaligned.org&lt;/a&gt; and since he&amp;#8217;d just bought me lunch I thought I&amp;#8217;d better do something about it. He also said he didn&amp;#8217;t like the stuff about &lt;a href="http://wordaligned.org/tag/algorithms/" title="Wordaligned articles about algorithms"&gt;algorithms&lt;/a&gt; and maths. Well, that makes my life easier too.
+&lt;/p&gt;
+&lt;p&gt;I&amp;#8217;m moving jobs &amp;#8212; the &lt;a href="http://www.wagamama.com/locations/showlocation/555/" title="Yaki Udon, fat noodles, filling"&gt;lunch&lt;/a&gt; he paid for was a leaving do &amp;#8212; and my employers kindly allowed me to buy this macbook pro at a reasonable price. Of course I had to wipe and reinstall it. It took an hour and a half to fill the hard drive with zeros and a similar amount of time to load a few ones back on&lt;a id="fn1link" href="http://wordaligned.org/articles/desktop-preferences#fn1"&gt;&lt;sup&gt;[1]&lt;/sup&gt;&lt;/a&gt;.
+&lt;/p&gt;
+&lt;img src="http://upload.wikimedia.org/wikipedia/en/0/07/Itchyscratchy.png" alt="Itchy" /&gt;
+
+&lt;p&gt;Installation done, I set about customisation. The official term is &lt;a href="http://support.apple.com/kb/HT2490" title="Set your preferences"&gt;preferences&lt;/a&gt; but &lt;strong&gt;annoyances&lt;/strong&gt; would be more accurate: you fix things which irk you before they cause real pain or, worse, you become immune to them. Typing hurt until I set key repeat to the max. Thomas Guest&amp;#8217;s macbook pro is a lousy name. I&amp;#8217;ve used &lt;a href="http://wordaligned.org/articles/oberon-cromarty-lisa-waggledance-ariel.html" title="Computer names"&gt;Itchy&lt;/a&gt; before and I like it so I&amp;#8217;m using it again. I booted Safari off the dock and stood Chrome in its place. I undocked some other things which I didn&amp;#8217;t recognise by their icons and were obviously of no use to me. By now I&amp;#8217;d seen the galactic login backdrop too many times. I&amp;#8217;ve never found a customisable preference for it but &lt;a href="https://www.google.co.uk/search?q=os+x+change+login+background" title="2nd hit worked for me"&gt;google&lt;/a&gt; told me what to do.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;$ sudo cp Downloads/matt-burns-pylon.jpg \
+          /System/Library/CoreServices/DefaultDesktop.jpg
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;&lt;a href="http://www.flickr.com/photos/floater81/4433735546/" title="IMG_3738 by mattburns.co.uk, on Flickr"&gt;&lt;img src="http://farm5.staticflickr.com/4050/4433735546_42b2bf1ce7.jpg" width="500" height="333" alt="IMG_3738"&gt;&lt;/a&gt;
+&lt;/p&gt;
+&lt;p&gt;Actually, that&amp;#8217;s pretty much all I needed to fix. Now it really was about preferences I prefer. Aquamacs. Skype. I chose two pictures for my desktop backgrounds. What you want on a desktop &amp;#8212; no, what &lt;strong&gt;I&lt;/strong&gt; want on &lt;strong&gt;my&lt;/strong&gt; desktop &amp;#8212; is something gorgeous but not distracting, something personal but not too personal, something which works in widescreen, something of a &lt;a href="http://www.flickr.com/photos/rbrwr/308905101" title="Too grainy for my desktop"&gt;high enough resolution&lt;/a&gt;, something which &lt;a href="http://www.flickr.com/photos/thomasguest/5017113982" title="Which sadly rules out this picture, my favourite of the sketches I made at Bristol museum"&gt;doesn&amp;#8217;t get spoiled&lt;/a&gt; when application windows are slathered over it. I went with a couple more &lt;a href="http://www.flickr.com/photos/floater81/4432979527/in/photostream" title="Superb pictures of the second severn crossing"&gt;Burnsy&amp;#8217;s&lt;/a&gt;.
+&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://www.flickr.com/photos/floater81/4432979527/" title="The Second Severn Crossing by mattburns.co.uk, on Flickr"&gt;&lt;img src="http://farm3.staticflickr.com/2723/4432979527_aaac753da6.jpg" width="500" height="333" alt="The Second Severn Crossing"&gt;&lt;/a&gt;
+&lt;/p&gt;
+&lt;p&gt;I remember the second Severn crossing being built. I&amp;#8217;d just moved to Bristol, joining a company which did virtual reality. The hardware was too expensive and the software too slow but we were a good team. Summer lunchtimes, we would play frisbee on the grassy hill by the Almondsbury garden centre. You could see the estuary, the new concrete pylons stepping into it, and, rising to the East, the towers of the original suspension bridge. Anyone who cycles around Bristol knows this view well. Interval training with &lt;a href="https://twitter.com/drbyrne255/status/187257262748876800"&gt;Owen&lt;/a&gt;, we spin out along Passage Road and catch our breath before turning back.
+&lt;/p&gt;
+&lt;iframe width="540" height="256" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="https://maps.google.co.uk/maps?f=q&amp;amp;source=embed&amp;amp;hl=en&amp;amp;geocode=&amp;amp;q=aust&amp;amp;aq=&amp;amp;sll=51.587465,-4.195722&amp;amp;sspn=0.019305,0.035963&amp;amp;ie=UTF8&amp;amp;hq=&amp;amp;hnear=Aust,+South+Gloucestershire,+United+Kingdom&amp;amp;t=m&amp;amp;layer=c&amp;amp;cbll=51.593919,-2.632873&amp;amp;panoid=b9ap7_VnelTDzEUhtGFcPQ&amp;amp;cbp=13,259.11,,0,0&amp;amp;ll=51.590016,-2.632856&amp;amp;spn=0.013651,0.046349&amp;amp;z=14&amp;amp;output=svembed"&gt;&lt;/iframe&gt;
+
+&lt;p&gt;More recently I&amp;#8217;ve moved to Swansea but kept my job in Bristol, crossing from and to Wales &lt;a href="http://en.wikipedia.org/wiki/Severn_Tunnel" title="The tunnel was built by the Great Western Railway between 1873 and 1886"&gt;under the river&lt;/a&gt; twice a week, Tuesdays and Thursdays, working from home on Mondays and Fridays. Now that too has come to an end. We were a good team but &amp;#8230; anyway. My new job will be home-based. Next I&amp;#8217;ll be partitioning the hard drive and booting into Linux.
+&lt;/p&gt;
+&lt;p style="text-align:center"&gt;&amp;sect;&lt;/p&gt;
+
+&lt;p&gt;My thanks, again, to &lt;a href="http://www.mattburns.co.uk/mattburns.html"&gt;Matt Burns&lt;/a&gt; for allowing me to use his superb photos.
+&lt;/p&gt;
+&lt;hr /&gt;
+
+&lt;p&gt;&lt;a id="fn1" href="http://wordaligned.org/articles/desktop-preferences#fn1link"&gt;[1]&lt;/a&gt; Which reminds me, I should write about a cunning data structure which lazily initialises a sparse vector. &lt;a href="http://wordaligned.org" title="Once popular, now dormant programming blog"&gt;Wordaligned.org&lt;/a&gt; &lt;strong&gt;is&lt;/strong&gt; a programming blog, honest.
+&lt;/p&gt;</description>
+<dc:date>2012-06-21</dc:date>
+<guid>http://wordaligned.org/articles/desktop-preferences</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/desktop-preferences</link>
+<category>Self</category>
+</item>
+
+<item>
+<title>Think, quote, escape</title>
+<description>&lt;p&gt;Evidently Jamie had got in before me. Somehow he&amp;#8217;d unpacked the new 2U server and balanced it on the side of his desk. He looked hassled. I didn&amp;#8217;t ask. The server&amp;#8217;s fans whirred noisily. On Jamie&amp;#8217;s second monitor I could see the familiar chatter of Linux installing itself. I stepped over the cardboard and polystyrene, sat, woke my machine.
+&lt;/p&gt;
+&lt;p&gt;Moments later I heard the install disk eject. Jamie typed something, cursed. The disk clattered into the bin. The room grew quiet as the server shut down.
+&lt;/p&gt;
+&lt;p&gt;We were a small, new team. Nonetheless, we&amp;#8217;d put something substantial together. It built on a Java framework and ran on Linux. We&amp;#8217;d tweaked the framework, meaning we had to build it from source before building our own stuff, so a clean build took almost half an hour. Just over half an hour later, Jamie had burned a new install disk. He placed it in the server&amp;#8217;s DVD drive. The fans roared up again. Ten minutes later, more cursing, another disk in the bin.
+&lt;/p&gt;
+&lt;p&gt;I walked across. Jamie was glaring at some code. A Perl list? His cursor was poised over an item in this list, a single-quoted string, inside which was a sed command, whose arguments themselves needed quoting, which was evidently meant to edit the contents of a double-quoted string in some configuration file. Think: quote and escape. I could see there were &lt;em&gt;four&lt;/em&gt; DVDs in the bin. Jamie must have been in for some time. No wonder he looked hassled.
+&lt;/p&gt;
+&lt;p&gt;So, what&amp;#8217;s up?
+&lt;/p&gt;
+&lt;p&gt;A trade show in the States. The salesman was out there. A bare machine had already been delivered and he needed the software, so Jamie had to cut a DVD which would directly install the operating system together with our application. Please don&amp;#8217;t expect a salesman to download an ISO image and set up enough of a network to boot from it. A courier was booked for midday to collect the DVD. That&amp;#8217;s what&amp;#8217;s up. So leave me alone and let me get on with it.
+&lt;/p&gt;
+&lt;p&gt;He didn&amp;#8217;t actually say that last bit. It&amp;#8217;s true, though, he was the Linux expert. I stubbornly watched as he changed some double quotes for single ones, added a couple more backslashes, checked in the file, kicked off another build.
+&lt;/p&gt;
+&lt;p&gt;Back at my desk, I reviewed the version control change logs. Evidently Jamie was working on a post-install script which took the form of a list of actions which would be evaluated and executed in Perl. Looking at the file diffs, the sticking point seemed to be a sed command to edit the X display settings. Embedding sed within Perl was proving tricky.
+&lt;/p&gt;
+&lt;p&gt;Jamie&amp;#8217;s edit-build-burn-install-check cycle seemed crazy to me. Why not recreate the broken post-install step as a standalone operation? Soon enough I&amp;#8217;d found a way to reproduce the problem. After reading documentation and experimenting I figured out how to nest and escape the various strings. I admit, it took me longer than I expected. By this time Jamie solved the problem by trial and error anyway &amp;#8212; and as proof he had an install disk which he knew worked. He may well have spent less time actually concentrating on the issue than I had; the build-burn-install phases of his process all ran as background activities.
+&lt;/p&gt;
+&lt;p&gt;In the event we needed to revise the software anyway. So the salesman had to download a new build at the last minute. Jamie stayed late the next day to talk him through the installation.
+&lt;/p&gt;</description>
+<dc:date>2010-03-30</dc:date>
+<guid>http://wordaligned.org/articles/think-quote-escape</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/think-quote-escape</link>
+<category>Self</category>
+</item>
+
+<item>
+<title>When you comment on a comment</title>
+<description>&lt;blockquote&gt;&lt;p&gt;&lt;a href="http://twitter.com/ianbicking/status/8891604954"&gt;@ianbicking&lt;/a&gt; these days, I very rarely bother reading anything where I cannot comment. &amp;#8212; &lt;a href="http://twitter.com/drjtwit/status/8898216561"&gt;@drjtwit&lt;/a&gt;
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p style="text-align:center"&gt;&amp;sect;&lt;/p&gt;
+
+&lt;blockquote&gt;&lt;p&gt;You&amp;#8217;ll notice there are no comments here. I hate discussing things via blog comments. If you&amp;#8217;d like to talk, drop me a line. If you&amp;#8217;d like to discuss things in public, post on your blog. 
+&lt;/p&gt;
+&lt;p&gt;&amp;#8212; &lt;a href="http://codahale.com"&gt;Coda Hale&lt;/a&gt;
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p style="text-align:center"&gt;&amp;sect;&lt;/p&gt;
+
+&lt;blockquote&gt;&lt;p&gt;When you leave a comment on a comment, how often do you wonder what your rights are? Not too often, I&amp;#8217;d guess. Over the years, it has become an accepted fact that content contributed to a website simply belongs to that website. If the website, or blog for today&amp;#8217;s web, goes away then all of your contributions disappear along with it.
+   A real world analogy would be sending in letters or artwork to a magazine. There&amp;#8217;s usually that disclaimer which says the publication can do whatever with your submission. And, of course, they can&amp;#8217;t return anything to you. It belongs to the magazine now.
+&lt;/p&gt;
+&lt;p&gt;&amp;#8212; Daniel Ha, &lt;a href="http://blog.disqus.net/2008/05/30/a-commenters-rights/"&gt;A commenter&amp;#8217;s rights&lt;/a&gt;
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p style="text-align:center"&gt;&amp;sect;&lt;/p&gt;
+
+&lt;p&gt;In a recent &lt;a href="http://dantwining.com/2010/01/30/using-twitter-ids-for-comments/"&gt;blog post Dan Twining&lt;/a&gt; writes about blog comments and asks what I think of &lt;a href="http://disqus.com"&gt;Disqus&lt;/a&gt;, the commenting service used here at &lt;a href="http://wordaligned.org/"&gt;Word Aligned&lt;/a&gt;. The question comes at an interesting time.
+&lt;/p&gt;
+&lt;span id="continue-reading"/&gt;
+
+&lt;p&gt;&lt;a href="http://disqus.com"&gt;&lt;img src="http://wordaligned.org/images/disqus-comments.gif" alt="Disqus comments" style="float:right;"/&gt;&lt;/a&gt;
+&lt;/p&gt;
+&lt;ol&gt;
+ &lt;li&gt;&lt;p&gt;Unlike Blogger, Wordpress, Typepad etc. Disqus isn&amp;#8217;t a blogging platform. Disqus do comments, and their central idea is integration. You don&amp;#8217;t need yet another online id to leave a disqus comment. Sign in using your OpenID or Yahoo! account, for example. You can have your comments tweeted or posted on Facebook. Disqus works with whatever blogging system you use and it works &lt;strong&gt;across&lt;/strong&gt; different systems: if a blog uses disqus and you post a comment on that blog, then that comment remains yours &amp;#8212; the blog owner can&amp;#8217;t edit it, and other readers can click through to see comments you&amp;#8217;ve posted on other sites. Well, other comments posted using disqus that is. Clearly these connections extend as more sites adopt disqus, and this seems to be happening.
+&lt;/p&gt;
+
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;p&gt;I used to use Haloscan for comments. I switched to Disqus about this time last year. I had no particular complaints with Haloscan; installation was simple, I didn&amp;#8217;t get any spam comments, and the service proved reliable enough. It just seemed Haloscan wasn&amp;#8217;t going anywhere. As it turns out, Haloscan will soon be gone. They&amp;#8217;re shutting down the service this week.
+&lt;/p&gt;
+
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;p&gt;It so happens Dan&amp;#8217;s question comes when the action on this site is happening in the comments section. Which makes me think.
+&lt;/p&gt;
+
+ &lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Back to Daniel Ha, the Disqus CEO, who has clearly thought harder about comments than I ever will. Towards the top of this note is a quote from his article &lt;a href="http://blog.disqus.net/2008/05/30/a-commenters-rights/"&gt;&amp;#8220;A Commenter&amp;#8217;s Rights&amp;#8221;&lt;/a&gt;. Daniel Ha goes on to point out that times have changed, and that online publishers are able to involve their readers and include their input in more sophisticated ways. It&amp;#8217;s better for both commenters and publishers, he suggests, if commenters retain rights over their original material.
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;So what are a commenter&amp;#8217;s rights? I&amp;#8217;m going to make an initial attempt to materialize what some rights should be.&lt;/p&gt;
+&lt;ol style="list-style-type:lower-alpha"&gt;&lt;li&gt;The ability to edit and remove their comments&lt;/li&gt;
+&lt;li&gt;Access to all of their comments, even if it has been deleted on a blog&lt;/li&gt;
+&lt;li&gt;The right to use their own comments as blog posts. After all, a commenter is just a publisher not writing on his own website.&lt;/li&gt;
+&lt;li&gt;A life for the comment beyond a single blog. I want to take my comments with me, even if the blog shuts down.&lt;/li&gt;&lt;/ol&gt;
+&lt;p&gt;This may seem threatening to the publisher, but it really isn&amp;#8217;t. A commenter should have rights to what they post, but bloggers should still have control over content that appear on their blogs. Bloggers should still control:&lt;/p&gt;
+&lt;ol style="list-style-type:lower-alpha"&gt;&lt;li&gt;Whether or not someone is allowed to comment on his blog&lt;/li&gt;
+&lt;li&gt;The deletion of a comment&lt;/li&gt;
+&lt;li&gt;The modification of a comment, as long as the original copy is still accessible and the edit is transparent&lt;/li&gt;&lt;/ol&gt;&lt;p&gt;&amp;mdash; Daniel Ha, &lt;a href="http://blog.disqus.net/2008/05/30/a-commenters-rights/"&gt;A commenter&amp;#8217;s rights&lt;/a&gt;&lt;/p&gt;&lt;/blockquote&gt;
+
+&lt;p style="text-align:center"&gt;&amp;sect;&lt;/p&gt;
+
+&lt;p&gt;Why bother with site-hosted comments at all? If people want to comment they can do so on specially designed community sites like Proggit or Hacker News. This is the internet: we go where we please, we find what we like.
+&lt;/p&gt;
+&lt;p&gt;Well, I guess I included comments on this site because that&amp;#8217;s what other blogs did, and because I thought it was a way to engage readers and persuade them to return. The truth is, most readers arrive here via &lt;a href="http://www.reddit.com/domain/wordaligned.org"&gt;proggit&lt;/a&gt;; if I did away with comments here I might get more comments on reddit, and consequently more visits.
+&lt;/p&gt;
+&lt;p&gt;Look again at Daniel Ha&amp;#8217;s words
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;When you leave a comment on a comment &amp;#8230;
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;I&amp;#8217;m guessing this is a typo, and that he meant &amp;#8220;When you leave a comment on a &lt;strong&gt;website&lt;/strong&gt; &amp;#8230;&amp;#8221;. If so, it&amp;#8217;s an interesting slip. Modern comment systems are designed for comments on comments as much as for comments on the original article. Why bother with the original if the comments are more interesting? Jump straight into the discussion!
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;[&amp;#8230;] It&amp;#8217;s not that I don&amp;#8217;t like sites with comments on, but when you read a site with comments it automatically puts you, the reader, in a defensive mode where you&amp;#8217;re saying, &amp;#8220;what&amp;#8217;s good in this comment thread? What can I skim?&amp;#8221;
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;These are John Gruber&amp;#8217;s words but you won&amp;#8217;t find them on his &lt;a href="http://daringfireball.net"&gt;Daring Fireball&lt;/a&gt; website (the quotation has been &lt;a href="http://shawnblanc.net/2007/07/why-daring-fireball-is-comment-free/"&gt;transcribed&lt;/a&gt; by Shawn Blanc from an interview), and you won&amp;#8217;t find comments there either. Have a look at an article on Daring Fireball. &lt;a href="http://daringfireball.net/2010/02/winer_flash_open_standards"&gt;Here&amp;#8217;s a recent one about Adobe Flash&lt;/a&gt;. Now try to imagine how the article would look with comments.
+&lt;/p&gt;
+&lt;p style="text-align:center"&gt;&amp;sect;&lt;/p&gt;
+
+&lt;p&gt;I&amp;#8217;ve exported any Haloscan comments left on this site and imported them into Disqus using the &lt;a href="http://groups.google.com/group/disqus-dev"&gt;disqus developer API&lt;/a&gt;. My thanks to Roberto Alsina for his &lt;a href="http://lateral.netmanagers.com.ar/weblog/posts/BB856.html" title="Migrating from Haloscan to Disqus - instructions"&gt;helpful pointers&lt;/a&gt; on how to do this. Links to comments will have broken, but everything else should be fine. I&amp;#8217;m sticking with comments and I&amp;#8217;m sticking with Disqus, which gets better all the time. Please &lt;a href="mailto:tag@wordaligned.org"&gt;let me know&lt;/a&gt; if you spot any problems.
+&lt;/p&gt;
+&lt;p style="text-align:center"&gt;&amp;sect;&lt;/p&gt;
+
+&lt;p&gt;I&amp;#8217;ll &lt;a href="http://stevenf.com/pages/shutup/" title="A user style sheet which hides comments"&gt;shut up&lt;/a&gt; now.
+&lt;/p&gt;</description>
+<dc:date>2010-02-10</dc:date>
+<guid>http://wordaligned.org/articles/comments-on-comments</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/comments-on-comments</link>
+<category>Self</category>
+</item>
+
+<item>
+<title>Favicon</title>
+<description>&lt;p&gt;On the subject of &lt;a href="http://wordaligned.org/"&gt;this site&lt;/a&gt;, I wanted to mention the recent addition of a favicon &lt;img src="http://wordaligned.org/images/favicon.png" alt="Little chap favicon"/&gt;. Per pixel, it&amp;#8217;s cost me more effort than any other feature; but then it&amp;#8217;s accessed more than any other asset. It&amp;#8217;s meant to be a piece from a jigsaw puzzle. I got the idea when &lt;a href="http://wordaligned.org/articles/recursive-pictures.html"&gt;re-reading Life A User&amp;#8217;s Manual&lt;/a&gt;. I like &lt;a href="http://wordaligned.org/tag/puzzles/"&gt;puzzles&lt;/a&gt; and piecing things together.
+&lt;/p&gt;
+&lt;div class="amazon"&gt;&lt;a href="http://www.amazon.com/gp/product/0002719991?ie=UTF8&amp;amp;tag=wordalig-20"&gt;&lt;img src="http://wordaligned.org/images/books/life-a-users-manual.jpg" alt="Life A User's Manual"/&gt;&lt;/a&gt;&lt;/div&gt;
+
+&lt;p&gt;Perec&amp;#8217;s great masterpiece is packed with interwoven stories and trickery, but at its heart is the epic battle between the millionaire, Bartlebooth, and the puzzle-maker Gaspard Winckler. Bartlebooth begins his campaign by learning how to paint, which takes him 10 years. For the next 20 years he travels the world, painting a water colour picture of a different port every couple of weeks. He sends the paintings back home to Paris. On receipt, Winckler glues each picture to a board which he then cuts, making a series of jigsaw puzzles for Bartlebooth to solve on his return. Once Bartlebooth completes each puzzle, an ingenious process is used to glue its pieces together and re-join the cut fibres of the paper; then the picture itself is lifted from the board, returned to the port it depicts, and washed clean in the sea; and finally the paper is returned in something close to its original state to Bartlebooth.
+&lt;/p&gt;
+&lt;p&gt;Thus, after 50 years of work, there will be nothing to show.
+&lt;/p&gt;
+&lt;img src="http://wordaligned.org/images/jigsaw-fr.png" alt="French jigsaw pieces"/&gt;
+
+&lt;p&gt;In the book&amp;#8217;s preamble Perec describes familiar die-cut jigsaws, classifying the best known pieces of such puzzles as &amp;#8220;little chaps&amp;#8221;, &amp;#8220;double crosses&amp;#8221; and &amp;#8220;crossbars&amp;#8221;. Such diversions are eschewed by the true puzzler:
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;The art of jigsaw puzzling begins with wooden puzzles cut by hand, whose maker undertakes to ask himself all the questions the player will have to solve, and, instead of allowing chance to cover his tracks, aims to replace it with cunning, trickery and subterfuge. All the elements occurring in the image to be reassembled &amp;#8212; this armchair covered in gold brocade, that three-pointed black hat with its rather ruined black plume, or that silver-braided bright yellow livery &amp;#8212; serve by design as points of departure for trails that lead to false information.
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;hr /&gt;
+
+&lt;p&gt;My thanks to Tim Beard for scanning a couple of pages from his edition of &lt;a href="http://en.wikipedia.org/wiki/La_Vie_mode_d%27emploi" title="Life A User's Manual, Wikipedia"&gt;La Vie, Mode d&amp;#8217;Emploi&lt;/a&gt;. I wanted to know what the &amp;#8220;little chaps&amp;#8221; etc. were before they got translated into English. I realise my favicon &lt;img src="http://wordaligned.org/images/favicon.png" alt="Little chap favicon"/&gt; could be &lt;a href="http://typophile.com/node/60577" title="Astonishing exploded view of improved YouTube favicon"&gt;improved&lt;/a&gt; but I don&amp;#8217;t know how to go about it. Anyone?
+&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://typophile.com/node/60577" title="YouTube Favicon - improved"&gt;&lt;img src="http://wordaligned.org/images/youtube1.png" width="52px" height="26px" alt="YouTube Favicon - improved"/&gt;&lt;/a&gt;&lt;a href="http://typophile.com/node/60577" title="YouTube Favicon - improved"&gt;&lt;img src="http://wordaligned.org/images/youtube2.png" width="104px" height="52px" alt="YouTube Favicon - improved"/&gt;&lt;/a&gt;&lt;a href="http://typophile.com/node/60577" title="YouTube Favicon - improved"&gt;&lt;img src="http://wordaligned.org/images/youtube3.png" width="208px" height="104px" alt="YouTube Favicon - improved"/&gt;&lt;/a&gt;
+&lt;/p&gt;</description>
+<dc:date>2009-09-16</dc:date>
+<guid>http://wordaligned.org/articles/favicon</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/favicon</link>
+<category>Self</category>
+</item>
+
+<item>
+<title>Ordered sublists. A brute force approach</title>
+<description>&lt;h3&gt;Younger runners&lt;/h3&gt;
+&lt;p&gt;Recently &lt;a href="http://wordaligned.org/articles/a-race-within-a-race.html"&gt;I posed a puzzle&lt;/a&gt;:
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;Starting with a list of runners ordered by their finishing time in a race, select a sublist of runners who are getting younger. &lt;strong&gt;What is the longest such sublist?&lt;/strong&gt;
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;Below, I&amp;#8217;ve highlighted just such a sublist within the list of 8 runners who completed last year&amp;#8217;s &lt;a href="http://www.nycmarathon.org"&gt;New York marathon&lt;/a&gt; in under two and a quarter hours. As you can see, MARILSON GOMES DO SANTOS, 31, is older and faster than RONO, 30, who is older and faster in turn than ROHATINSKY, 26.
+&lt;/p&gt;
+&lt;ol&gt;
+ &lt;li&gt;
+     &lt;strong&gt;MARILSON GOMES DOS SANTOS, 31&lt;/strong&gt;, M, 2:08:43
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     ABDERRAHIM GOUMRI, 32, M, 2:09:07
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     &lt;strong&gt;DANIEL RONO, 30&lt;/strong&gt;, M, 2:11:22
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     PAUL TERGAT, 39, M, 2:13:10
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     ABDERRAHIME BOURAMDANE, 30, M, 2:13:33
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     ABDI ABDIRAHMAN, 31, M, 2:14:17
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     &lt;strong&gt;JOSH ROHATINSKY, 26&lt;/strong&gt;, M, 2:14:23
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     JASON LEHMKUHLE, 31, M, 2:14:30
+ &lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;This is a deceptively tricky problem. Even on such a small input list it&amp;#8217;s hard to be absolutely sure our solution is optimal. Certainly there are other ordered triples with decreasing ages, but might there be a quartet? And even if we&amp;#8217;re convinced Gomes, Rono, Rohatinsky &lt;strong&gt;do&lt;/strong&gt; form a longest ordered sublist, I think it&amp;#8217;s already clear that as more runners finish, there may be no longer be a longest ordered sublist which starts with these three.
+&lt;/p&gt;
+
+&lt;h3&gt;Dumb computers&lt;/h3&gt;
+&lt;p&gt;Rather than invent a clever strategy to find an optimal solution, why not get a computer to exhaust the possibilities? If we generate all possible sublists then filter out the ones whose age fields decrease, then our answer will be the longest of these.
+&lt;/p&gt;
+&lt;span id="continue-reading"/&gt;
+
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;Exhaustive search&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;from itertools import combinations as sublists
+from functools import partial
+
+def is_ordered(xs, comp):
+    '''Return True if the sequence xs is ordered, False otherwise.
+    
+    &amp;gt;&amp;gt;&amp;gt; from operator import gt
+    &amp;gt;&amp;gt;&amp;gt; is_ordered((3, 2, 1), gt)
+    True
+    '''
+    return all(comp(xs[i], xs[i+1]) for i in range(len(xs)-1))
+
+def longest_ordered_sublist(xs, comp):
+    '''Find a longest sublist of "xs" which is ordered by "comp"
+    
+    (Note: there may be no unique solution, and this function makes
+    no guarantees about which longest sublist is returned.)
+    
+    &amp;gt;&amp;gt;&amp;gt; from operator import lt
+    &amp;gt;&amp;gt;&amp;gt; items = 2, 1, 5, 2, 2, 3, 1
+    &amp;gt;&amp;gt;&amp;gt; longest_ordered_sublist(items, lt)
+    (1, 2, 3)
+    '''
+    in_order = partial(is_ordered, comp=comp)
+    xss = (xss for n in range(len(xs)) for xss in sublists(xs, n))
+    return max(filter(in_order, xss), key=len)
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;The heavy lifting here is done by a recent addition to the &lt;code&gt;itertools&lt;/code&gt; module, &lt;a href="http://docs.python.org/library/itertools.html#itertools.combinations"&gt;itertools.combinations&lt;/a&gt;.
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;itertools.combinations(iterable, r)
+&lt;/p&gt;
+&lt;p&gt;Return r length subsequences of elements from the input iterable.
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;Generating all possible sublists is as easy (too easy!) as looping over &lt;code&gt;r&lt;/code&gt;. All that remains is to filter the ordered sublists, then use the &lt;code&gt;max&lt;/code&gt; builtin function keyed by length.
+&lt;/p&gt;
+&lt;p&gt;Let&amp;#8217;s apply this function to our top 8 finishers.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; results = (
+... ("Gomes", 31), ("Goumri", 32), ("Rono", 30),
+... ("Tergat", 39), ("Bouramdane", 30), ("Abdirahman", 31),
+... ("Rohatinsky", 26), ("Lehmkuhle", 31))
+&amp;gt;&amp;gt;&amp;gt; def older(runner_a, runner_b):
+...     return runner_a[1] &amp;gt; runner_b[1]
+&amp;gt;&amp;gt;&amp;gt; longest_ordered_sublist(results, older)
+(('Gomes', 31), ('Rono', 30), ('Rohatinsky', 26))
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;So, the longest ordered sublist has length 3, and Gomes, Rono, Rohatinsky is such a sublist.
+&lt;/p&gt;
+&lt;p&gt;Adapting &lt;code&gt;longest_ordered_sublist&lt;/code&gt; to return &lt;strong&gt;all&lt;/strong&gt; longest ordered sublists is easy enough:
+&lt;/p&gt;
+&lt;ul&gt;
+ &lt;li&gt;
+     replace &lt;code&gt;max(filter(in_order, xss), key=len)&lt;/code&gt; with &lt;code&gt;sorted(filter(in_order, xss), key=len)&lt;/code&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     feed the sorted results through &lt;code&gt;itertools.groupby&lt;/code&gt; 
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     and capture the final group. 
+ &lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;It turns out there are no fewer than 7 longest subsequences ordered by decreasing age.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;All longest ordered subsequences&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;(('Gomes', 31), ('Rono', 30), ('Rohatinsky', 26))
+(('Gomes', 31), ('Bouramdane', 30), ('Rohatinsky', 26))
+(('Goumri', 32), ('Rono', 30), ('Rohatinsky', 26))
+(('Goumri', 32), ('Bouramdane', 30), ('Rohatinsky', 26))
+(('Goumri', 32), ('Abdirahman', 31), ('Rohatinsky', 26))
+(('Tergat', 39), ('Bouramdane', 30), ('Rohatinsky', 26))
+(('Tergat', 39), ('Abdirahman', 31), ('Rohatinsky', 26))
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+
+&lt;h3&gt;Dumber programmers&lt;/h3&gt;
+&lt;p&gt;Did you spot the defects in &lt;code&gt;longest_ordered_sublist()&lt;/code&gt;? It gets the answer wrong for empty sequences and totally ordered sequences.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; import operator
+&amp;gt;&amp;gt;&amp;gt; longest_ordered_sublist([], operator.lt)
+Traceback (most recent call last):
+....
+ValueError: max() arg is an empty sequence
+&amp;gt;&amp;gt;&amp;gt; longest_ordered_sublist((1, 2, 3), operator.lt)
+(1, 2)
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Fixing the code is easy enough, but what should we do about the documentation, and indeed about testing these edge cases? Certainly edge cases &lt;strong&gt;should&lt;/strong&gt; be tested, and it&amp;#8217;s tempting to add a couple more examples to the function&amp;#8217;s docstring and let &lt;a href="http://docs.python.org/library/doctest.html"&gt;doctest&lt;/a&gt; confirm correctness.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;def longest_ordered_sublist(xs, comp):
+    '''Find a longest sublist of "xs" which is ordered by "comp"
+    
+    (Note: there may be no unique solution, and this function makes
+    no guarantees about which longest sublist is returned.)
+    
+    &amp;gt;&amp;gt;&amp;gt; from operator import lt
+    &amp;gt;&amp;gt;&amp;gt; items = 2, 1, 5, 2, 2, 3, 1
+    &amp;gt;&amp;gt;&amp;gt; longest_ordered_sublist(items, lt)
+    (1, 2, 3)
+    &amp;gt;&amp;gt;&amp;gt; longest_ordered_sublist((1, 2, 3), lt)
+    (1, 2, 3)
+    &amp;gt;&amp;gt;&amp;gt; longest_ordered_sublist((), lt)
+    ()
+    '''
+    in_order = partial(is_ordered, comp=comp)
+    xss = (xss for n in range(len(xs) + 1) for xss in sublists(xs, n))
+    return max(filter(in_order, xss), key=len)
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Tempting, yes. Good idea? Not really!
+&lt;/p&gt;
+&lt;p&gt;As &lt;a href="http://nedbatchelder.com/blog/200811/things_i_dont_like_about_doctest.html"&gt;Ned Batchelder puts it&lt;/a&gt;:
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;Docstrings, and the long sequence of code they encourage, may be good ways to explain what code does, but explaining and testing are two different tasks, and the code you write for each will be different. So why try to serve two masters at once?
+&lt;/p&gt;
+&lt;p&gt;Either your expository text will be cluttered with uninformative edge cases, or your tests will merely skim the surface of what your code can do.
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;In the case of the revised version of &lt;code&gt;longest_ordered_sublist()&lt;/code&gt;, the first example in the docstring explains clearly what the function does, but the second and third count as &lt;a href="http://docs.python.org/library/doctest.html#soapbox"&gt;clutter&lt;/a&gt;.
+&lt;/p&gt;
+
+&lt;h3&gt;Ignorant machines&lt;/h3&gt;
+&lt;p&gt;Returning to our combinatorial algorithm, this kind of exhaustive search approach is often referred to as brute force. When you&amp;#8217;ve got a machine which can do billions of things every second without breaking a sweat, it&amp;#8217;s a great technique.
+&lt;/p&gt;
+&lt;p&gt;In this case, though, brute force turns out to be machine ignorance. If a list has N items, then each item will be either in or out of any particular combination, giving a total of 2&lt;sup&gt;N&lt;/sup&gt; possible combinations. On my machine it took over 5 seconds to confirm the longest ordered subsequence of the &lt;a href="http://wordaligned.org/articles/a-race-within-a-race.html"&gt;first 20 runners&lt;/a&gt; in the New York marathon was of length 7.
+&lt;/p&gt;
+&lt;p&gt;5 seconds isn&amp;#8217;t so very long but every additional runner doubles up the time, and we can predict this particular algorithm would fail to process a result list of just 32 entries within the 2 and a bit hours it took Mar&amp;iacute;lson Gomes dos Santos to complete the course.
+&lt;/p&gt;
+&lt;p&gt;We need to do better.
+&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://www.nycmarathon.org/2008_coverage.htm"&gt;&lt;img src="http://www.nyrr.org/resources/photos/images/2008/marathon/men/pro_men_15.jpg" alt="Marilson Gomes dos Santos"/&gt;&lt;/a&gt;
+&lt;/p&gt;
+&lt;p&gt;We can do better! This problem has been studied and some particularly interesting solutions have been found. All talk here about races, ages, etc. only exists to disguise the real problem and encourage you to consider it afresh. If you want an answer now, search for &lt;a href="http://www.google.com/search?q=longest+ordered+subsequence"&gt;&amp;#8220;longest ordered subsequence&amp;#8221;&lt;/a&gt; or &lt;a href="http://www.google.com/search?q=longest+increasing+subsequence"&gt;&amp;#8220;longest increasing subsequence&amp;#8221;&lt;/a&gt;. If you&amp;#8217;d like to have a crack at the problem yourself, the 2008 New York marathon results can be found &lt;a href="http://www.nycmarathon.org/Results.htm"&gt;online&lt;/a&gt;.
+&lt;/p&gt;
+&lt;p&gt;I get an answer of 1724 for the length of the longest sublist of these results formed of runners whose ages are non-increasing, and 60 for the longest sublist formed of runners whose ages are strictly decreasing.
+&lt;/p&gt;
+&lt;p&gt;Alternatively, stick around &amp;#8212; I&amp;#8217;ll be writing up my own notes in the next couple of articles.
+&lt;/p&gt;
+&lt;hr /&gt;
+
+
+&lt;h3&gt;Python 3.0 notes&lt;/h3&gt;
+&lt;p&gt;As I mentioned at the start of the year, &lt;a href="http://wordaligned.org/articles/perl-6-python-3.html"&gt;I intend to use Python 3.0 for all new code examples&lt;/a&gt; posted here on &lt;a href="http://wordaligned.org/"&gt;Word Aligned&lt;/a&gt;. I&amp;#8217;ll also be making notes about what I discover about using this new version of Python, starting right here.
+&lt;/p&gt;
+&lt;ul&gt;
+ &lt;li&gt;
+     my emacs python editing mode stopped working when I moved to Python 3.0. (I was using whatever came as standard with Carbon Emacs 22). The fix was to use &lt;a href="http://svn.python.org/view/python/tags/r30/Misc/python-mode.el?rev=67506"&gt;Python-3.0/Misc/python-mode.el&lt;/a&gt; straight out of the Python 3.0 tarball. Happily this also works with Python 2.6 and earlier.
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     the code presented runs out of time before running out of memory since, in Python 3.0, the &lt;code&gt;filter&lt;/code&gt; builtin function generates elements on demand. Use &lt;code&gt;future_builtins.filter&lt;/code&gt; or &lt;code&gt;itertools.ifilter&lt;/code&gt; if you want this behaviour with 2.6.
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     while not strictly Python 3.0 (it appears in 2.6 as well) &lt;code&gt;itertools.combinations&lt;/code&gt; is worth mentioning again, as is another related member of the itertools module. Check out &lt;a href="http://code.activestate.com/recipes/576647/"&gt;Raymond Hettinger&amp;#8217;s clever solution&lt;/a&gt; of the eight Queens puzzle, which uses &lt;code&gt;itertools.permutations&lt;/code&gt; to shuffle pieces around a chessboard. Unlike other itertools, &lt;code&gt;combinations&lt;/code&gt; and &lt;code&gt;permutations&lt;/code&gt; won&amp;#8217;t cope with infinite streams. 
+ &lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;Another way to exhaust your computer&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; from itertools import combinations, count
+&amp;gt;&amp;gt;&amp;gt; pairs = combinations(count(), 2)
+
+&lt;/pre&gt;
+
+&lt;/div&gt;</description>
+<dc:date>2009-03-09</dc:date>
+<guid>http://wordaligned.org/articles/ordered-sublists-a-brute-force-approach</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/ordered-sublists-a-brute-force-approach</link>
+<category>Self</category>
+</item>
+
+<item>
+<title>A race within a race</title>
+<description>&lt;p&gt;In 2003 the route of the Bristol half marathon took runners out of the city, following the Portway along the base of the Avon Gorge before turning 180&amp;deg; and taking them straight back again. So runners heading out along one side of the road got to watch the faster runners in front of them, heading back.
+&lt;/p&gt;
+&lt;p&gt;&lt;a style="align:top;" href="http://www.runnerslife.co.uk/Guest-Runners/Nick-Rose"&gt;&lt;img width="150" height="200" src="http://wordaligned.org/images/nick-rose-then.jpg" alt="Nick Rose then"/&gt;&lt;/a&gt;
+   &lt;a style="align:top;" href="http://www.upandrunning.co.uk/shops/bristol.php"&gt;&lt;img width="150" height="200" src="http://wordaligned.org/images/nick-rose-now.jpg" alt="Nick Rose now"/&gt;&lt;/a&gt;
+&lt;/p&gt;
+&lt;p&gt;The beauty of the Avon Gorge was probably lost on most competitors, myself included. What did impress me, though, was the sight of Nick Rose sprinting back along the Portway, his white hair swept back by his astonishing speed. Despite being 13 years older than me he completed the 13 mile race 13 minutes ahead of me. (I did beat &lt;a href="http://en.wikipedia.org/wiki/Steve_Cram"&gt;Steve Cram&lt;/a&gt; though!)
+&lt;/p&gt;
+&lt;span id="continue-reading"/&gt;
+
+&lt;p&gt;The &lt;a href="http://www.bristolhalfmarathon.com/about/race-history/"&gt;2003 Bristol half marathon&lt;/a&gt; featured a &lt;strong&gt;race within a race&lt;/strong&gt;, the &amp;#8220;Legends Challenge&amp;#8221;, which reunited veteran British athletes Nick Rose, Steve Cram, Tim Hutchings, Hugh Jones, Steve Jones and Mike McLeod to compete against each other for the first time since the 1984 Los Angeles Olympics. Nick Rose won this race within a race, aged 52, in 16&lt;sup&gt;th&lt;/sup&gt; place overall, with a time of just 1:11:08. This inspiring result set me wondering about another slice of the results: starting with a list of runners ordered by their finishing time in a race, select, in order, a sublist of runners who are getting younger. &lt;strong&gt;What is the longest such sublist?&lt;/strong&gt;
+&lt;/p&gt;
+&lt;p&gt;Unfortunately I don&amp;#8217;t have access to the full results for the Bristol 2003 half marathon. Instead, here are the top 20 finishers in the 2008 &lt;a href="http://www.nycmarathon.org"&gt;New York marathon&lt;/a&gt;&lt;a id="fn1link" href="http://wordaligned.org/articles/a-race-within-a-race#fn1"&gt;&lt;sup&gt;[1]&lt;/sup&gt;&lt;/a&gt;.
+&lt;/p&gt;
+&lt;ol&gt;
+ &lt;li&gt;
+     MARILSON GOMES DOS SANTOS, 31, M, 2:08:43
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     ABDERRAHIM GOUMRI, 32, M, 2:09:07
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     DANIEL RONO, 30, M, 2:11:22
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     &lt;strong&gt;PAUL TERGAT, 39&lt;/strong&gt;, M, 2:13:10
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     ABDERRAHIME BOURAMDANE, 30, M, 2:13:33
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     &lt;strong&gt;ABDI ABDIRAHMAN, 31&lt;/strong&gt;, M, 2:14:17
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     JOSH ROHATINSKY, 26, M, 2:14:23
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     JASON LEHMKUHLE, 31, M, 2:14:30
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     HOSEA ROTICH, 29, M, 2:15:25
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     &lt;strong&gt;BOLOTA ASMEROM, 30&lt;/strong&gt;, M, 2:16:37
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     &lt;strong&gt;LUKE HUMPHREY, 27&lt;/strong&gt;, M, 2:18:38
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     HENDRICK RAMAALA, 36, M, 2:19:11
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     MOHAMMED AWOL, 30, M, 2:19:13
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     &lt;strong&gt;KASSAHUN KABISO, 25&lt;/strong&gt;, M, 2:19:54
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     JACOB FREY, 27, M, 2:20:17
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     &lt;strong&gt;GENNA TUFA, 24&lt;/strong&gt;, M, 2:20:23
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     &lt;strong&gt;KYLE SHACKLETON, 22&lt;/strong&gt;, M, 2:20:38
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     TEKLU TEFERA DENEKE, 29, M, 2:20:47
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     BOAZ CHEBOIYWO, 30, M, 2:21:40
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     DERESSE DENIBOBA, 26, M, 2:21:54
+ &lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;As you can see Paul Tergat, 39, finished ahead of the younger runner Abdi Abdirahman, 31, who beat Bolota Asmerom, 30, etc., giving a sublist of 7 runners which fits our criteria. Certainly this isn&amp;#8217;t the only such sublist of this small sample, but is there a longer one?
+&lt;/p&gt;
+&lt;p&gt;After a few minutes we may convince ourselves we&amp;#8217;ve found an optimal solution. How would you approach this problem for the full results list, ending with YURIKO OKADA, 59, F, 9:59:58 in 38096&lt;sup&gt;th&lt;/sup&gt; place?
+&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://www.nyc-architecture.com/BRI/BR-010.htm" title="How many runners?"&gt;&lt;img width="300" src="http://www.nyc-architecture.com/BRI/Verrazano-Narrows_Bridge_New_York_City_Marathon_2.jpg" alt="How many runners?"/&gt;&lt;/a&gt;
+&lt;/p&gt;
+&lt;p&gt;I&amp;#8217;ll be discussing this problem in the next few posts, so please make sure you&amp;#8217;re &lt;a href="http://feeds.wordaligned.org/wordaligned"&gt;subscribed&lt;/a&gt; to read on. In the meanwhile, here&amp;#8217;s a picture of the Avon Gorge taken from the western pier of the Clifton Suspension bridge. You can see the Portway down at the bottom. Nick Rose is a past winner of the Bristol Half Marathon. In 1979 &lt;a href="http://www.nationmaster.com/encyclopedia/Half-marathon#World_record_progression_-_Men"&gt;he set a world record time&lt;/a&gt; for the distance of 1:02:36, and his &lt;a href="http://hem.bredband.net/athletics/atb-m59.htm"&gt;personal best of 1:01:03&lt;/a&gt; still stands as a British record. He lives in Bristol, now working at &lt;a href="http://www.upandrunning.co.uk/shops/bristol.php"&gt;&amp;#8220;Up and Running&amp;#8221;&lt;/a&gt; in Westbury Park, and he continues to participate in the sport.
+&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://www.flickr.com/photos/thomasguest/3163729064/" title="Avon Gorge and Clifton Suspension Bridge by Thomas Guest, on Flickr"&gt;&lt;img src="http://farm4.static.flickr.com/3120/3163729064_6f0feec1b8.jpg" width="500" height="154" alt="Avon Gorge and Clifton Suspension Bridge" /&gt;&lt;/a&gt;
+&lt;/p&gt;
+&lt;hr /&gt;
+
+&lt;p&gt;&lt;a id="fn1" href="http://wordaligned.org/articles/a-race-within-a-race#fn1link"&gt;[1]&lt;/a&gt; I&amp;#8217;m using capital letters since these names are scraped directly from the &lt;a href="http://www.nycmarathon.org"&gt;New York Marathon website&lt;/a&gt;, which uses capital letters almost exclusively, except for non-ascii athletes such as CORN&amp;eacute; VAN OIRSCHOT.
+&lt;/p&gt;</description>
+<dc:date>2009-03-04</dc:date>
+<guid>http://wordaligned.org/articles/a-race-within-a-race</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/a-race-within-a-race</link>
+<category>Self</category>
+</item>
+
+<item>
+<title>Distorted Software</title>
+<description>&lt;div class="toc"&gt;
+&lt;h2&gt;Contents&lt;/h2&gt;
+&lt;ul&gt;
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/distorted-software#tochelicopter-view" name="toc0" id="toc0"&gt;Helicopter View&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/distorted-software#tocquick-pictures" name="toc1" id="toc1"&gt;Quick pictures&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/distorted-software#tocdependencies" name="toc2" id="toc2"&gt;Dependencies&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/distorted-software#toclines-and-arrows" name="toc3" id="toc3"&gt;Lines and Arrows&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/distorted-software#tocdistorted-pictures" name="toc4" id="toc4"&gt;Distorted pictures&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/distorted-software#tocsensory-homunculus" name="toc5" id="toc5"&gt;Sensory Homunculus&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/distorted-software#tocapplication-in-proportion" name="toc6" id="toc6"&gt;Application in Proportion&lt;/a&gt;
+ &lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;&lt;p&gt;&lt;a href="http://piclib.nhm.ac.uk/results.asp?image=041490" title="Sensory homunculus"&gt;&lt;img src="http://wordaligned.org/images/sensory-homunculus.jpg" alt="Sensory homunculus"/&gt;&lt;/a&gt;
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/distorted-software#toc0" name="tochelicopter-view" id="tochelicopter-view"&gt;Helicopter View&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Recently I&amp;#8217;ve been helping scope a project to develop a new Product. In an Agile world &lt;a href="http://c2.com/xp/BigDesignUpFront.html"&gt;big design up front&lt;/a&gt; may be frowned-upon, but commercial reality requires some idea of costs from the outset. You need to plan, to size up the job. You must somehow answer the question: &lt;strong&gt;What will the software for this Product look like?&lt;/strong&gt;
+&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://www.google.com/enterprise/gsa/"&gt;&lt;img src="http://www.google.co.uk/enterprise/gsa/images/GSA_beautyshot.jpg" alt="Google search appliance, with funky yellow chassis"/&gt;&lt;/a&gt;
+&lt;/p&gt;
+&lt;p&gt;I don&amp;#8217;t mean &amp;#8220;What does the UI look like?&amp;#8221; any more than I mean &amp;#8220;Will it have a funky yellow chassis?&amp;#8221; or even &amp;#8220;What will &lt;a href="http://vis.cs.ucdavis.edu/~ogawa/codeswarm/"&gt;source tree look like&lt;/a&gt;?&amp;#8221;. 
+&lt;/p&gt;
+&lt;p&gt;&lt;object width="400" height="302"&gt;&lt;param name="allowfullscreen" value="true" /&gt;&lt;param name="allowscriptaccess" value="always" /&gt;&lt;param name="movie" value="http://www.vimeo.com/moogaloop.swf?clip_id=1093745&amp;amp;server=www.vimeo.com&amp;amp;show_title=1&amp;amp;show_byline=1&amp;amp;show_portrait=0&amp;amp;color=&amp;amp;fullscreen=1" /&gt;&lt;embed src="http://www.vimeo.com/moogaloop.swf?clip_id=1093745&amp;amp;server=www.vimeo.com&amp;amp;show_title=1&amp;amp;show_byline=1&amp;amp;show_portrait=0&amp;amp;color=&amp;amp;fullscreen=1" type="application/x-shockwave-flash" allowfullscreen="true" allowscriptaccess="always" width="400" height="302"&gt;&lt;/embed&gt;&lt;/object&gt;
+&lt;/p&gt;
+&lt;p&gt;I&amp;#8217;m talking about something less easy to visualise:
+&lt;/p&gt;
+&lt;ul&gt;
+ &lt;li&gt;
+     what will the main components be?
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     how do they connect?
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     how big are they?
+ &lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;So, what exactly does a database look like? How about a web server? Or a message queue? A state machine?
+&lt;/p&gt;
+&lt;span id="continue-reading"/&gt;
+
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/distorted-software#toc1" name="tocquick-pictures" id="tocquick-pictures"&gt;Quick pictures&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;I have my own shorthand for depicting all of these things. I&amp;#8217;m aware of more formal visual languages which aim to define software designs for programmers, much as circuit diagrams do for electricians, but I&amp;#8217;ve resisted learning these languages. For me, the act of making the drawing is a large part of what the drawing communicates. A frozen snapshot only tells half the story.
+&lt;/p&gt;
+&lt;img src="http://wordaligned.org/images/pipe-and-onion.png" alt="Pipeline and Onion"/&gt;
+
+&lt;p&gt;For our planning exercise we needed a picture of the software. Something simple, archetypal even, like the Pipeline or the Onion, would have been nice, but a few hours at the whiteboard left us looking at something more typical, the Application.
+&lt;/p&gt;
+&lt;img src="http://wordaligned.org/images/application.png" alt="Application"/&gt;
+
+&lt;p&gt;As a basis for ongoing discussion and design this picture works. It&amp;#8217;s expressive and flexible, and, by uniting my favourite drawing tools (pencil and paper/white board and marker) with my favourite digital imaging tools (a scanner/digital camera) and my favourite project management tool (a &lt;a href="http://trac.edgewall.org"&gt;wiki&lt;/a&gt;), we can create a visual record of the evolving design.
+&lt;/p&gt;
+&lt;p&gt;For planning purposes, though, such pictures can be dangerously misleading. If you want to know how many people you&amp;#8217;ll need and how long it will take them, you&amp;#8217;d be inclined to focus on the blocks &amp;#8212; the closed shapes on the picture. Won&amp;#8217;t the total effort just be the total area of all the blocks?
+&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;No! It won&amp;#8217;t.&lt;/strong&gt;
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/distorted-software#toc2" name="tocdependencies" id="tocdependencies"&gt;Dependencies&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;For one thing, there&amp;#8217;s the issue of dependencies: the UI depends on the Engine, which in turns depends on the Database, which needs a License Key, requiring a Signature, waiting on a Person, who&amp;#8217;s on holiday etc. At this point the Project Manager steps in and turns our simple diagram into an ugly &lt;a href="http://en.wikipedia.org/wiki/Gantt_chart"&gt;Gantt chart&lt;/a&gt;.
+&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://en.wikipedia.org/wiki/Gantt_chart"&gt;&lt;img src="http://upload.wikimedia.org/wikipedia/commons/thumb/e/e2/GanttChartAnatomy.png/300px-GanttChartAnatomy.png" alt="Gant chart"/&gt;&lt;/a&gt;
+&lt;/p&gt;
+&lt;p&gt;I consider a Gantt chart a poor way to visualise a project. It&amp;#8217;s brittle, complicated and expensive to maintain. Driving the associated planning software seems a black art. The only good thing about Gantt charts is a side-effect: generating one requires a bit of thought. You have to think how you&amp;#8217;ll transform your Application design into a working Product. Maybe then, just maybe, you&amp;#8217;ll realise the important tasks &amp;#8212; the biggest horizontal bars on the chart &amp;#8212; do not correspond directly to the block shapes on the picture.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/distorted-software#toc3" name="toclines-and-arrows" id="toclines-and-arrows"&gt;Lines and Arrows&lt;/a&gt;&lt;/h3&gt;
+&lt;img style="float:right;" width="30%" src="http://wordaligned.org/images/application.png" alt="Application"/&gt;
+
+&lt;p&gt;Those slender lines and arrows on our Application diagram take time. The bulk of the work will not be developing the boxes, bubbles and circles; connecting them up might take as long again, or, more likely, ten times as long again. There are interfaces to design, protocols to code up, error conditions to handle. 
+&lt;/p&gt;
+&lt;p&gt;Bugs in individual components are, by definition, easy to isolate, making them straightforward to squash. Combining these same components makes the defects harder to pin-down, let alone fix. It&amp;#8217;s almost impossible to estimate the time required to fix integration issues.
+&lt;/p&gt;
+&lt;p&gt;The most dangerous mistake of all occurs when we already have some of the components, ready to pull down from the shelf. The argument goes: we have the Database, we have the Server, we can adapt the Engine, bolt on a new Interface, so the Product is nothing more than a software plumbing task. How long can it take?
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/distorted-software#toc4" name="tocdistorted-pictures" id="tocdistorted-pictures"&gt;Distorted pictures&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;I suggest the problem stems, in part, from using a design picture too literally&lt;a id="fn1link" href="http://wordaligned.org/articles/distorted-software#fn1"&gt;&lt;sup&gt;[1]&lt;/sup&gt;&lt;/a&gt; as a planning picture. We need a representation which distorts our original picture to properly emphasise interfaces, connections, protocols, integration.
+&lt;/p&gt;
+&lt;p&gt;&lt;img src="http://wordaligned.org/images/tube-map-w.png" alt="Tube Map" style="align:top;"/&gt;&lt;img style="align:top;" src="http://maps.google.com/staticmap?center=51.511048,-0.138819&amp;amp;zoom=12&amp;amp;size=250x300&amp;amp;key=ABQIAAAA4XbHXQGTml12zwtM4CjICxTeGXmhp-edP41sIKC3sS2f11di4hR0EgBH_NoVBpYYYf9smXsm4QKQzw" alt="Central London Streetmap"/&gt;
+&lt;/p&gt;
+&lt;p&gt;The &lt;a href="http://journeyplanner.tfl.gov.uk/im/SI-T.html"&gt;London Underground map&lt;/a&gt; is one famous visual distortion. When you want to travel from, say, &lt;a href="http://www.londontoolkit.com/whattodo/southkensingtonmuseums.htm"&gt;South Kensington&lt;/a&gt; to &lt;a href="http://en.wikipedia.org/wiki/Mornington_Crescent_(game)"&gt;Mornington Crescent&lt;/a&gt;, you need to know which train to take, for how many stops, then which train to change to, and so on. That is: you care about topology rather than geography, and the tube map gets the emphasis right. A street map doesn&amp;#8217;t help much and a visually accurate satellite photo would be almost useless.
+&lt;/p&gt;
+&lt;img src="http://www.bbc.co.uk/london/content/images/2006/01/13/west_470x321.jpg" alt="Satellite Map of London"/&gt;
+
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/distorted-software#toc5" name="tocsensory-homunculus" id="tocsensory-homunculus"&gt;Sensory Homunculus&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;&lt;a href="http://piclib.nhm.ac.uk/results.asp?image=041490" title="Sensory homunculus"&gt;&lt;img width="40%" style="float:right" src="http://wordaligned.org/images/sensory-homunculus.jpg" alt="Sensory homunculus"/&gt;&lt;/a&gt;
+&lt;/p&gt;
+&lt;p&gt;Another famous distortion, the &lt;a href="http://en.wikipedia.org/wiki/Homunculus"&gt;sensory homunculus&lt;/a&gt;, appears at the top of this page and in miniature here. The image is hosted by the &lt;a href="http://piclib.nhm.ac.uk/results.asp?image=041490"&gt;Natural History Museum&amp;#8217;s online picture library&lt;/a&gt;, with the explanation:
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;This model shows what a man&amp;#8217;s body would look like if each part grew in proportion to the area of the cortex of the brain concerned with its sensory perception.
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;Or, as &lt;a href="http://en.wikipedia.org/wiki/Homunculus"&gt;Wikipedia&lt;/a&gt; puts it:
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;Well known in the field of neurology, this is also commonly called &amp;#8216;the little man inside the brain.&amp;#8217;
+&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/distorted-software#toc6" name="tocapplication-in-proportion" id="tocapplication-in-proportion"&gt;Application in Proportion&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;So, what would our Application diagram look like if each component grew in proportion to the time taken to develop it? Maybe something like this:
+&lt;/p&gt;
+&lt;img src="http://wordaligned.org/images/distorted-application.png" alt="Distorted application"/&gt;
+
+&lt;p&gt;The sensory homunculus is striking because we&amp;#8217;re all so highly attuned to what people really look like. The figure is instantly recognisable as human but the proportions diverge so radically from what we expect &amp;#8212; from what we &lt;em&gt;know&lt;/em&gt; &amp;#8212; that we&amp;#8217;re forced to look again. A simple image constructed by applying a logical rule can change the way we look at ourselves.
+&lt;/p&gt;
+&lt;p&gt;Having no such feelings for software, surely we can change our pictures to suit? 
+&lt;/p&gt;
+&lt;p&gt;I don&amp;#8217;t pretend this final picture, with its fat orange arrows, makes a great planning aid, but perhaps it may help us look afresh at our estimates.
+&lt;/p&gt;
+&lt;hr /&gt;
+
+&lt;p&gt;There are techniques to reduce the overheads and risks I discuss in this article, but I&amp;#8217;ll save them for another time. Even if careful planning and execution can shrink the arrows down to a more comfortable size, I still maintain connections take longer than blocks. I would be interested to know of any software architecture diagrams which show this clearly.
+&lt;/p&gt;
+&lt;p&gt;&lt;a id="fn1" href="http://wordaligned.org/articles/distorted-software#fn1link"&gt;[1]&lt;/a&gt; Literally means &amp;#8220;as read&amp;#8221;. Its root meaning has to do with words and text. Is there an equivalent for &amp;#8220;as seen&amp;#8221;?
+&lt;/p&gt;</description>
+<dc:date>2008-07-23</dc:date>
+<guid>http://wordaligned.org/articles/distorted-software</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/distorted-software</link>
+<category>Self</category>
+</item>
+
+<item>
+<title>tag.wordaligned.org</title>
+<description>&lt;p&gt;&lt;a href="http://feeds.wordaligned.org/thomasguest" title="Subscribe to my personal site" style="float:right;"&gt;&lt;img src="http://wordaligned.org/images/feed.png" alt="Feed Icon"&gt;&lt;/a&gt;
+&lt;/p&gt;
+&lt;p&gt;I&amp;#8217;ve set up the subdomain &lt;a href="http://tag.wordaligned.org"&gt;tag.wordaligned.org&lt;/a&gt; for personal material. If you want to see pictures of &lt;a href="http://tag.wordaligned.org/posts/a-picture-of-tyrannosauruses"&gt;Tyrannosauruses&lt;/a&gt; or &lt;a href="http://tag.wordaligned.org/posts/cycling-the-celtic-trail"&gt;Transporter Bridges&lt;/a&gt;, or read about my &lt;a href="http://tag.wordaligned.org/posts/newport-velodrome"&gt;first visit to the fabulous Newport Velodrome&lt;/a&gt;, or celebrate Mark Cavendish&amp;#8217;s amazing turn of speed in the Tour de France, or even find out who &lt;a href="http://tag.wordaligned.org/posts/pete-t-dayjournay"&gt;Pete T Day-Journay&lt;/a&gt; is, then take a look.
+&lt;/p&gt;
+&lt;p&gt;On the subject of the Newport Velodrome, the UK cycling squad will be using it as a base for an Olympic training camp from Thursday July 24th through until August 5th, and apparently you&amp;#8217;re allowed in to watch them train.
+&lt;/p&gt;</description>
+<dc:date>2008-07-22</dc:date>
+<guid>http://wordaligned.org/articles/tagwordalignedorg</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/tagwordalignedorg</link>
+<category>Self</category>
+</item>
+
+<item>
+<title>Nonce Sense</title>
+<description>&lt;p&gt;&lt;a href="http://openid.net"&gt;&lt;img src="http://openid.net/logo-graphics/openid-icon-100x100.png" alt="[openid icon]" style="float:right;"/&gt;&lt;/a&gt;
+&lt;/p&gt;
+&lt;p&gt;I tried to set up a personal &lt;a href="http://openid.net"&gt;OpenID&lt;/a&gt; server here at &lt;a href="http://wordaligned.org"&gt;wordaligned&lt;/a&gt;. The process went smoothly enough and a couple of tests on my localhost suggested all was working so I deployed the changes. When I then tried logging in to a website using my shiny new identity I found that, not only had I cocked something up, but, as you can see from the query parameter in my browser&amp;#8217;s address bar, the site &lt;strong&gt;thought I was a nonce&lt;/strong&gt;.
+&lt;/p&gt;
+&lt;img src="http://wordaligned.org/images/nonce.png" alt="[Nonce in the address bar]"/&gt;
+
+&lt;p&gt;Hey, I&amp;#8217;m guilty of entering an invalid ID, but I&amp;#8217;m no &lt;a href="http://en.wikipedia.org/wiki/Nonce_(slang)"&gt;pervert&lt;/a&gt;!
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;In the UK, the term nonce (sometimes spelled &amp;#8220;nonse&amp;#8221;) is a slang word used to refer to a sex offender and/or child sexual abuser, and thus as an insult.
+&lt;/p&gt;
+&lt;p&gt;&amp;#8212; &lt;a href="http://en.wikipedia.org/wiki/Nonce_(slang)"&gt;Wikipedia&lt;/a&gt;
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;Once I&amp;#8217;d got past the initial shock a quick &lt;a href="http://www.google.co.uk/search?q=nonce"&gt;web search&lt;/a&gt; exposed my mistake: in &lt;a href="http://en.wikipedia.org/wiki/Cryptographic_nonce"&gt;cryptography, a nonce&lt;/a&gt; is a &lt;b&gt;n&lt;/b&gt;umber used &lt;b&gt;once&lt;/b&gt;. Here&amp;#8217;s &lt;a href="http://openid.net/specs/openid-authentication-2_0.html#verify_nonce"&gt;a reference&lt;/a&gt; in the OpenID 2.0 specification.
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;h4&gt;11.3.  Checking the Nonce&lt;/h4&gt;&lt;p&gt;To prevent replay attacks, the agent checking the signature keeps track of the nonce values included in positive assertions and never accepts the same value more than once for the same OP Endpoint URL.&lt;/p&gt;&lt;/blockquote&gt;
+
+&lt;p&gt;Digging deeper, I learn that outside the world of crime and cryptography:
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;It&amp;#8217;s mainly a term of trade among lexicographers and linguists and turns up also in phrases like nonce compound, nonce borrowing and nonce formation.
+&lt;/p&gt;
+&lt;p&gt;&amp;#8212; &lt;a href="http://www.worldwidewords.org/qa/qa-non1.htm"&gt;Michael Quinion&lt;/a&gt;
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;hr /&gt;
+
+&lt;p&gt;In case you were wondering &amp;#8230; this note shares its title, &amp;#8220;Nonce Sense&amp;#8221;, with a &lt;a href="http://news.bbc.co.uk/1/hi/entertainment/tv_and_radio/1445870.stm"&gt;hoax anti-paedophile campaign&lt;/a&gt; shown on the controversial comedy show &lt;a href="http://www.garbledonline.net/Brasseye.html"&gt;Brass Eye&lt;/a&gt;.
+&lt;/p&gt;</description>
+<dc:date>2008-07-08</dc:date>
+<guid>http://wordaligned.org/articles/nonce-sense</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/nonce-sense</link>
+<category>Self</category>
+</item>
+
+<item>
+<title>Accidental Emacs</title>
+<description>&lt;div class="toc"&gt;
+&lt;h2&gt;Contents&lt;/h2&gt;
+&lt;ul&gt;
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/accidental-emacs#tocemacs-the-operating-system" name="toc0" id="toc0"&gt;Emacs the Operating System&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/accidental-emacs#tocwindow-management" name="toc1" id="toc1"&gt;Window Management&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/accidental-emacs#tocremote-editing" name="toc2" id="toc2"&gt;Remote Editing&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/accidental-emacs#tocbinary-editing" name="toc3" id="toc3"&gt;Binary Editing&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/accidental-emacs#tocarchive-editing" name="toc4" id="toc4"&gt;Archive Editing&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/accidental-emacs#tocdired-mode" name="toc5" id="toc5"&gt;Dired Mode&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/accidental-emacs#tockeyboard-macros" name="toc6" id="toc6"&gt;Keyboard Macros&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/accidental-emacs#tocan-ide-for-dynamic-languages" name="toc7" id="toc7"&gt;An IDE for Dynamic Languages&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/accidental-emacs#toccode-completion-for-cheats" name="toc8" id="toc8"&gt;Code completion for cheats&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/accidental-emacs#tocemail-surfing-media-editing" name="toc9" id="toc9"&gt;Email, Surfing, Media Editing&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/accidental-emacs#tocnotes" name="toc10" id="toc10"&gt;Notes&lt;/a&gt;
+ &lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;&lt;p&gt;&lt;a href="http://homepage.mac.com/zenitani/emacs-e.html" title="Carbon Emacs for Mac OS X page"&gt;&lt;img style="float:left;" src="http://wordaligned.org/images/carbon-emacs-doc.png" alt="Carbon Emacs"/&gt;&lt;/a&gt;
+&lt;/p&gt;
+&lt;p&gt;Nice to see Emacs &lt;a href="http://www.informit.com/articles/article.aspx?p=1193856" title="After pencil and paper, Donald Knuth likes Emacs"&gt;getting&lt;/a&gt; a &lt;a href="http://wrds.wordpress.com/2007/05/18/ten-mostly-false-ideas-about-emacs/" title="Alexandru Laz&amp;#259;r on Emacs misconceptions"&gt;bit&lt;/a&gt; of &lt;a href="http://steve-yegge.blogspot.com/2008/03/js2-mode-new-javascript-mode-for-emacs.html" title="Steve Yegge writes elisp enabling Emacs customisation using JavaScript."&gt;press&lt;/a&gt; &lt;a href="http://www.johndcook.com/blog/2008/04/27/one-program-to-rule-them-all/" title="John D. Cook discusses life in a software application"&gt;recently&lt;/a&gt;. I&amp;#8217;ve used it for almost 20 years now and it dominates my time at the keyboard. It isn&amp;#8217;t perfect and I&amp;#8217;m reluctant to recommend it but I wouldn&amp;#8217;t want to be without it. Let me explain.
+&lt;/p&gt;
+&lt;p&gt;The best thing about &lt;a href="http://www.gnu.org/software/emacs/"&gt;Emacs&lt;/a&gt; is that it can do &lt;strong&gt;everything&lt;/strong&gt; (including the things it can&amp;#8217;t do yet). The worst thing about Emacs is finding out how it does &lt;strong&gt;anything&lt;/strong&gt;. I wouldn&amp;#8217;t call it discoverable. In fact, on several occasions, I&amp;#8217;ve learned about Emacs by accident: you press the wrong key combination (easy to do when you&amp;#8217;re holding down a couple of keys and stretching for a third) and, look, something interesting happens!
+&lt;/p&gt;
+&lt;p&gt;The rest of this article describes a few of these happy accidents: modes I never knew about and tricks I wish I&amp;#8217;d learned earlier.
+&lt;/p&gt;
+&lt;span id="continue-reading"/&gt;
+
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/accidental-emacs#toc0" name="tocemacs-the-operating-system" id="tocemacs-the-operating-system"&gt;Emacs the Operating System&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;&lt;a href="http://wordaligned.org/images/welcome-to-emacs.png" title="Emacs splash screen"&gt;&lt;img style="float:right;padding-left:10px;" src="http://wordaligned.org/images/welcome-to-emacs.jpg" alt="Emacs splash screen"/&gt;&lt;/a&gt;
+&lt;/p&gt;
+&lt;p&gt;Whenever I see the Emacs splash screen (click on the graphic for a close-up) I&amp;#8217;m amazed anyone ever gets past it. Computer users want instant gratification and a familiar interface &amp;#8212; thus the encouraging tip:
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;You can do basic editing with the menu bar and scroll bar using the mouse.
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;Unhappily the rest of the screen discredits this friendly proposition. Where are the menu and scroll bars&lt;a id="fn1link" href="http://wordaligned.org/articles/accidental-emacs#fn1"&gt;&lt;sup&gt;[1]&lt;/sup&gt;&lt;/a&gt;, and what&amp;#8217;s with all the &lt;code&gt;Control&lt;/code&gt; this and &lt;code&gt;Meta&lt;/code&gt; that? If the scratchy artwork and bizarre mix of font styles don&amp;#8217;t put new users off, the remaining content surely will, with its dark warnings about sessions crashing and how to recover&lt;a id="fn2link" href="http://wordaligned.org/articles/accidental-emacs#fn2"&gt;&lt;sup&gt;[2]&lt;/sup&gt;&lt;/a&gt;.
+&lt;/p&gt;
+&lt;p&gt;Best of all, though, is the opening proposition:
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;GNU Emacs is one component of the GNU operating system
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;which I read as a straight-faced rebuttal of the old gag:
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;It is a common joke, both among fans and detractors of Emacs, to describe it as an operating system masquerading as an editor&lt;a id="fn3link" href="http://wordaligned.org/articles/accidental-emacs#fn3"&gt;&lt;sup&gt;[3]&lt;/sup&gt;&lt;/a&gt;.
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;GNU hasn&amp;#8217;t quite become an operating system but it does supply most of the standard Unix tools and Emacs works beautifully with them &amp;#8212; even on (Cyg-)Windows. &lt;code&gt;META-!&lt;/code&gt; executes a single shell command, for example. &lt;code&gt;META-|&lt;/code&gt; executes a shell command on the current region and puts the output in a temporary buffer. &lt;code&gt;META-X grep&lt;/code&gt; and &lt;code&gt;META-X grep-find&lt;/code&gt; build search on top of &lt;code&gt;grep&lt;/code&gt; and &lt;code&gt;find&lt;/code&gt;. &lt;code&gt;META-X shell&lt;/code&gt; opens up a shell window within Emacs, meaning you can run shell commands and process their output using the standard editor commands. Emacs info is a better man page browser than info. And so on.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;OS integration examples&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;META-!
+META-|
+META-X grep
+META-X grep-find
+META-X shell
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;When Emacs shells out to external tools their execution is never hidden from you, so you lose none of the power of these tools. The converse of this also holds: if you don&amp;#8217;t know how to use &lt;code&gt;grep&lt;/code&gt; and &lt;code&gt;find&lt;/code&gt;, even basic search commands in Emacs will seem &lt;a href="http://wordaligned.org/articles/ignoring-svn-directories.html"&gt;cryptic and hard to customise&lt;/a&gt;. Emacs is, above all else, customisable. In fact, most of Emacs is customisation, and you&amp;#8217;ll soon give up on it if you can&amp;#8217;t accept this&lt;a id="fn4link" href="http://wordaligned.org/articles/accidental-emacs#fn4"&gt;&lt;sup&gt;[4]&lt;/sup&gt;&lt;/a&gt;.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/accidental-emacs#toc1" name="tocwindow-management" id="tocwindow-management"&gt;Window Management&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Over at Coding Horror, Jeff Atwood talks about &lt;a href="http://www.codinghorror.com/blog/archives/000928.html"&gt;&amp;#8220;large display paradox&amp;#8221;&lt;/a&gt;:
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;One of the &lt;i&gt;advantages&lt;/i&gt; of small monitors, ironically, is that &lt;b&gt;because they&amp;#8217;re small, they nudge users into a simpler, windowless method of working&lt;/b&gt;. Instead of wasting time sizing, moving, and z-ordering windows, users only need to deal with one maximized window at a time. They can flip between maximized applications in much the same way they change channels on the television. But once your display gets to 1600 x 1200 or beyond, this easy one-app-per-display model isn&amp;#8217;t feasible any more &amp;#8230;&lt;/p&gt;
+&lt;p&gt;That&amp;#8217;s the &lt;b&gt;large display paradox&lt;/b&gt;. Having all that space can make you &lt;i&gt;less&lt;/i&gt; productive due to all the window manipulation excise you have to deal with to make effective use of it.&lt;/p&gt;&lt;/blockquote&gt;
+
+&lt;p&gt;Well, I reckon Emacs has this problem cracked. On a small screen you can use a single maximised window: &lt;code&gt;CTRL-X B&lt;/code&gt; switches editor buffers (a bit like tabbed browsing) and &lt;code&gt;CTRL-X CTRL-B&lt;/code&gt; gets you a buffer management window. On a large screen &lt;code&gt;CTRL-X 3&lt;/code&gt; splits the enclosing window vertically, and &lt;code&gt;CTRL-X 2&lt;/code&gt; splits it horizontally. Repeat these commands to slice up your work space. &lt;code&gt;CTRL-X 1&lt;/code&gt; gets you back to a single window. The same commands work when you haven&amp;#8217;t got a proper windowing environment &amp;#8212; on a stripped down server for example, or one which hasn&amp;#8217;t booted properly. Very handy! 
+&lt;/p&gt;
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;Buffer and window management&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;CTRL-X B
+CTRl-X CTRL-B
+CTRL-X 3
+CTRL-X 2
+CTRL-X 1
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/accidental-emacs#toc2" name="tocremote-editing" id="tocremote-editing"&gt;Remote Editing&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;If, for example, the stripped down server discussed in the previous section allows SSH access or similar, you don&amp;#8217;t need to install or run Emacs natively. Just use &lt;a href="http://www.gnu.org/software/tramp"&gt;tramp mode&lt;/a&gt; (&lt;strong&gt;T&lt;/strong&gt;ransparent &lt;strong&gt;R&lt;/strong&gt;emote file &lt;strong&gt;A&lt;/strong&gt;ccess, &lt;strong&gt;M&lt;/strong&gt;ultiple &lt;strong&gt;P&lt;/strong&gt;rotocol). Quoting from the &lt;a href="http://www.gnu.org/software/tramp"&gt;manual&lt;/a&gt;:
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;To access the file &lt;code&gt;localname&lt;/code&gt; on the remote machine &lt;code&gt;machine&lt;/code&gt; you would specify the filename /machine:localname.
+   &amp;#8230;
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;You can specify protocol (ftp, rsh, smb etc.) and user name too:
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;So, to connect to the machine &lt;code&gt;melancholia&lt;/code&gt; as &lt;code&gt;daniel&lt;/code&gt;, using the &lt;code&gt;ssh&lt;/code&gt; method to transfer files, and edit &lt;code&gt;.emacs&lt;/code&gt; in my home directory I would specify the filename &lt;code&gt;/ssh:daniel@melancholia:.emacs&lt;/code&gt;.
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;You can omit both username and protocol: the former defaults to your current username, the latter to SSH. As usual, there are plenty of configuration options. I haven&amp;#8217;t touched any of them. Tramp mode just works: if I can access a remote machine, I can edit files on it and transfer files to and from it just as if it were local.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;Remote editing example&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;Find file: /ssh:daniel@melancholia:.emacs
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/accidental-emacs#toc3" name="tocbinary-editing" id="tocbinary-editing"&gt;Binary Editing&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Programmers often need to view the raw bytes packed into a file, and occasionally to edit these byte values. That&amp;#8217;s what &lt;a href="http://www.gnu.org/software/emacs/manual/html_node/emacs/Editing-Binary-Files.html"&gt;Hexl mode&lt;/a&gt; is for. &lt;code&gt;META-X hexl-find-file&lt;/code&gt; opens a file in this mode and &lt;code&gt;META-X hexl-mode&lt;/code&gt; switches a buffer to this mode.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;META-X hexl-find-file
+META-X hexl-mode
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/accidental-emacs#toc4" name="tocarchive-editing" id="tocarchive-editing"&gt;Archive Editing&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Did you know that Emacs can work on &lt;code&gt;.zip&lt;/code&gt;, &lt;code&gt;.tar&lt;/code&gt;, &lt;code&gt;.tgz&lt;/code&gt; etc archives directly? I found out when I opened one by accident: Emacs presents you with a view of the archive and you can browse files, edit them, rename them, remove them from the archive, and save the modified archive without ever having to manually extract it. No special knowledge required: it just works, a bit like &lt;code&gt;dired-mode&lt;/code&gt;.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/accidental-emacs#toc5" name="tocdired-mode" id="tocdired-mode"&gt;Dired Mode&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;If you open a directory with Emacs it puts you in &lt;a href="http://www.gnu.org/software/emacs/manual/html_node/emacs/Dired.html"&gt;dired-mode&lt;/a&gt;, the Emacs take on Windows Explorer, OS X Finder and so on. Many of the Emacs users I know don&amp;#8217;t use this mode, preferring either the native system file manager or plain old terminal windows for file operations (copy, move, list, &amp;#8230;) but I use it all the time and it&amp;#8217;s led to many happy Emacs accidents.
+&lt;/p&gt;
+&lt;p&gt;As an example, suppose you have a directory full of files with &lt;code&gt;names-like-this&lt;/code&gt;, and you want to rename all the files to use &lt;code&gt;names_like_this&lt;/code&gt; instead. Just switch to editable dired mode, run a standard search and replace to swap hyphens for underscores, then save the directory.
+&lt;/p&gt;
+&lt;p&gt;As a second example, suppose you want to view thumbnails of all the .png files in a directory. Use a pattern match &lt;code&gt;% m png&lt;/code&gt; to &amp;#8220;mark&amp;#8221; them (i.e. select them) then &lt;code&gt;CTRL-t d&lt;/code&gt; to display them. Now you can visit the thumbnails, removing, renaming, copying the associated files.
+&lt;/p&gt;
+&lt;p&gt;Cryptic, yes, but powerful, and no mouse required &amp;#8212; handy for laptops.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/accidental-emacs#toc6" name="tockeyboard-macros" id="tockeyboard-macros"&gt;Keyboard Macros&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;You can hear when someone sitting nearby doesn&amp;#8217;t know about editor macros or is using an editor which doesn&amp;#8217;t support them. The tedious repetition of the same sequence of keystrokes grows audible.
+&lt;/p&gt;
+&lt;p&gt;In Emacs you start recording a &lt;a href="http://www.gnu.org/software/emacs/manual/html_node/emacs/Keyboard-Macros.html"&gt;keyboard macro&lt;/a&gt; with &lt;code&gt;CTRL-X (&lt;/code&gt; and finish recording with &lt;code&gt;CTRL-X )&lt;/code&gt;. Everything typed between these bracketed commands has been recorded as a keyboard macro which &lt;code&gt;CTRL-X e&lt;/code&gt; executes and then &lt;code&gt;e&lt;/code&gt; repeats. If typing all those &lt;code&gt;eeeeee&lt;/code&gt;&amp;#8217;s is repetitive, supply a repeat count. A repeat count of 0 processes the whole buffer, and is often what&amp;#8217;s wanted.
+&lt;/p&gt;
+&lt;p&gt;There&amp;#8217;s far more to keyboard macros but this basic use alone will save your fingers and your sanity.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;CTRL-X (
+CTRL-X )
+CTRL-X e
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/accidental-emacs#toc7" name="tocan-ide-for-dynamic-languages" id="tocan-ide-for-dynamic-languages"&gt;An IDE for Dynamic Languages&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Emacs has a proven architecture: a compact, stable core which is dynamically configured by a huge library of scripts. These scripts are written in elisp. You can edit, reload and add to them at any point, without the need to &lt;a href="http://steve-yegge.blogspot.com/2007/01/pinocchio-problem.html"&gt;reboot the main application&lt;/a&gt;. Rebooting wouldn&amp;#8217;t be such a big thing, though &amp;#8212; Emacs starts up in less than a couple of seconds &amp;#8212; what&amp;#8217;s important is that Emacs is dynamic to the core.
+&lt;/p&gt;
+&lt;p&gt;So it&amp;#8217;s not surprising Emacs has great modes for dynamic languages like Python, Ruby, Scheme. Here&amp;#8217;s how to develop Python code using Emacs:
+&lt;/p&gt;
+&lt;ul&gt;
+ &lt;li&gt;
+     Pull up a full-screen window
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     Split the window vertically
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     Use one side for the code you&amp;#8217;re working on
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     Use the other side to run an interpreted session
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     Switch sides as desired
+ &lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;You continually select regions of code to execute. You step
+   into the interpreter and use the Python &lt;code&gt;help&lt;/code&gt; command to get help on
+   modules and functions &amp;#8212; including the ones you&amp;#8217;re creating right now.
+   You rework a function in one window then exercise it in the other. You
+   sketch experimental code, run it, rub it out.
+&lt;/p&gt;
+&lt;p&gt;The same technique works for Scheme and Ruby, and is likely to work for any other dynamic language. The gap between writing and running code disappears.
+&lt;/p&gt;
+&lt;p&gt;As computers grow more powerful, specialised programmers&amp;#8217; IDEs do what they can to support this style of working for compiled languages. I understand Eclipse parses, compiles, and executes Java code as you write it, and it&amp;#8217;s certainly an impressive piece of software. I&amp;#8217;d be interested to know how it fares with C++.
+&lt;/p&gt;
+&lt;p&gt;Emacs also works well enough with compiled languages. I&amp;#8217;ve heard Make described as &lt;a href="http://en.wikipedia.org/wiki/REPL"&gt;REPL&lt;/a&gt; for compiled languages, and &lt;code&gt;make -k&lt;/code&gt; is the default Emacs compile command. The usual IDE things are available. For more interactive probing of a compiled executable, &lt;code&gt;META-X gdb&lt;/code&gt; is about as good an interface to GDB as I&amp;#8217;ve seen. But I can&amp;#8217;t (for example) imagine Emacs persuading anyone to dispense with Visual Studio for .Net development.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/accidental-emacs#toc8" name="toccode-completion-for-cheats" id="toccode-completion-for-cheats"&gt;Code completion for cheats&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;This article cherry-picks a few Emacs modes you may not have discovered which I find invaluable. I haven&amp;#8217;t bothered listing the basics of how to open or close files, without which you won&amp;#8217;t get anywhere. One basic command I &lt;strong&gt;do&lt;/strong&gt; want to mention is &lt;code&gt;META-/&lt;/code&gt;, which dynamically expands whatever you&amp;#8217;re typing whatever mode you&amp;#8217;re in. I think of it as code completion for cheats, since it doesn&amp;#8217;t parse any source code and it works equally well on any type of file type. It&amp;#8217;s as useful as shell TAB-completion and I discovered it by accident.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/accidental-emacs#toc9" name="tocemail-surfing-media-editing" id="tocemail-surfing-media-editing"&gt;Email, Surfing, Media Editing&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;You can&amp;#8217;t edit photo, video or audio content in Emacs (perhaps I should say I don&amp;#8217;t know of an Emacs mode for doing so&lt;a id="fn5link" href="http://wordaligned.org/articles/accidental-emacs#fn5"&gt;&lt;sup&gt;[5]&lt;/sup&gt;&lt;/a&gt;). I don&amp;#8217;t use Emacs for spreadsheets or other &amp;#8220;office&amp;#8221; documents. You can use Emacs for ascii-art (&lt;a href="http://www.cinsk.org/emacs/emacs-artist.html"&gt;and here&amp;#8217;s a great flash animation showing someone do just that&lt;/a&gt;) but ascii-art doesn&amp;#8217;t look much good outside source code.
+&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://homepage.mac.com/zenitani/emacs-e.html" title="Carbon Emacs for Mac OS X page"&gt;&lt;img style="float:left;" src="http://wordaligned.org/images/carbon-emacs.png" alt="Carbon Emacs"/&gt;&lt;/a&gt;
+   &lt;a href="http://www.mozilla.com/firefox/" title="Firefox home page"&gt;&lt;img style="float:right;" src="http://wordaligned.org/images/firefox.png" alt="Firefox logo"/&gt;&lt;/a&gt;
+&lt;/p&gt;
+&lt;p&gt;Hardcore Emacs users swear by their editor as an email client and even use it as a web browser. I prefer the comfort of my second most used application, &lt;a href="http://www.mozilla.com/firefox/"&gt;Firefox&lt;/a&gt;. Come to think of it, Firefox adopts a lot of what&amp;#8217;s good about Emacs: the tabbed window, for example, which reinvents multiple buffers for the web browser; the clean, simple look&lt;a id="fn6link" href="http://wordaligned.org/articles/accidental-emacs#fn6"&gt;&lt;sup&gt;[6]&lt;/sup&gt;&lt;/a&gt;; the extensible architecture.
+&lt;/p&gt;
+&lt;p&gt;Funnily enough, you &lt;strong&gt;can&lt;/strong&gt; work with photo, video and audio using Firefox; and boring old online office suites have been news for a long while. Amazingly, you can continue to edit your rich media content even if you switch to Internet Explorer, without the need to relearn anything; a transition which puts the &lt;a href="http://en.wikipedia.org/wiki/Editor_war"&gt;Vi/Emacs wars&lt;/a&gt; into perspective. Could the web browser be the one true editor of the future?
+&lt;/p&gt;
+&lt;hr /&gt;
+
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/accidental-emacs#toc10" name="tocnotes" id="tocnotes"&gt;Notes&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;My thanks to &lt;a href="http://www.iwebthereforeiam.com/"&gt;Hugh Brown&lt;/a&gt; for pointing out a couple of errors with the original version of this article.
+&lt;/p&gt;
+&lt;p&gt;&lt;a id="fn1" href="http://wordaligned.org/articles/accidental-emacs#fn1link"&gt;[1]&lt;/a&gt; OK, so my &lt;code&gt;.emacs&lt;/code&gt; disables the scroll bar and menu bar before this splash screen appears, but telling people what their mouse is for hardly seems necessary.
+&lt;/p&gt;
+&lt;p&gt;&lt;a id="fn2" href="http://wordaligned.org/articles/accidental-emacs#fn2link"&gt;[2]&lt;/a&gt; I can&amp;#8217;t remember when Emacs last crashed on me. It&amp;#8217;s one of the three applications I auto-start on login and I usually leave it running until I shutdown. On occasion I&amp;#8217;ve forced it to quit but this has always been down to my own error, for example coding and executing (within Emacs) a tight loop.
+&lt;/p&gt;
+&lt;div class="amazon"&gt;&lt;a href="http://www.amazon.com/gp/product/0131429019?ie=UTF8&amp;amp;tag=wordalig-20"&gt;&lt;img src="http://wordaligned.org/images/books/taoup.jpg" alt="The Art of Unix Programming"/&gt;&lt;/a&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;a id="fn3" href="http://wordaligned.org/articles/accidental-emacs#fn3link"&gt;[3]&lt;/a&gt; &lt;a href="http://catb.org/~esr/writings/taoup/html/ch13s02.html#emacs_editing"&gt;Quoted&lt;/a&gt; from Eric S. Raymond&amp;#8217;s excellent book &lt;a href="http://catb.org/~esr/writings/taoup/"&gt;&amp;#8220;The Art of Unix Programming&amp;#8221;&lt;/a&gt; 
+&lt;/p&gt;
+&lt;p&gt;&lt;a id="fn4" href="http://wordaligned.org/articles/accidental-emacs#fn4link"&gt;[4]&lt;/a&gt; In &lt;a href="http://catb.org/~esr/writings/taoup/"&gt;&amp;#8220;The Art of Unix Programming&amp;#8221;&lt;/a&gt; Eric S. Raymond discusses the question: &lt;a href="http://catb.org/~esr/writings/taoup/html/ch13s03.html#id2967765"&gt;&amp;#8220;Is Emacs an Argument against the Unix Tradition?&amp;#8221;&lt;/a&gt;. This is a rather long quotation to include here, I know, but I&amp;#8217;m sure the author wouldn&amp;#8217;t want me to alter his words in any way. I highly recommend the book and suggest you &lt;a href="http://www.amazon.com/gp/product/0131429019?ie=UTF8&amp;amp;tag=wordalig-20"&gt;buy a copy&lt;/a&gt; to read in full.
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;The central tension in the Unix tradition has always been between doing more with less and doing more with more.  It recurs in a
+lot of different contexts, often as a struggle between designs that
+have the quality of clean minimalism and others that choose expressive
+range and power even at the cost of high complexity.  For both sides,
+the arguments for or against Emacs have
+exemplified this tension since it was first ported to Unix in the
+early 1980s.&lt;/p&gt;&lt;p&gt;Programs that are both as useful and as large as
+Emacs make Unix programmers uncomfortable
+precisely because they force us to face the tension.  They suggest
+that old-school Unix minimalism is valuable as a discipline, but
+that we may have fallen into the error of dogmatism.&lt;/p&gt;&lt;p&gt;There are two ways Unix programmers can address this problem.
+One is to deny that large is actually large. The other is to develop
+a way of thinking about complexity that is not a dogma.&lt;/p&gt;&lt;p&gt;Our thought experiment with replacing Lisp and the extension
+libraries gives us a new perspective on the oft-heard charge that
+Emacs is bloated because its extension
+library is so large.  Perhaps this is as unfair as charging that
+&lt;code&gt;/bin/sh&lt;/code&gt; is bloated because the collection
+of all shellscripts on a system is large.
+Emacs could be considered a virtual machine
+or framework around a collection of small, sharp tools (the modes)
+that happen to be written in Lisp&lt;/p&gt;&lt;p&gt;On this view, the main difference between the shell and
+Emacs is that Unix distributors don&amp;#8217;t ship
+all the world&amp;#8217;s shellscripts along with the shell.  Objecting to
+Emacs because having a general-purpose
+language in it feels like bloat is approximately as silly as refusing
+to use shellscripts because shell has conditionals and for loops.
+Just as one doesn&amp;#8217;t have to learn shell to use shellscripts, one
+doesn&amp;#8217;t have to learn Lisp to use Emacs.  If
+Emacs has a design problem, it&amp;#8217;s not so
+much the Lisp interpreter (the framework part) as the fact that the
+mode library is an untidy heap of historical accretions &amp;#8212; but
+that&amp;#8217;s a source of complexity users can ignore, because they won&amp;#8217;t be
+affected by what they don&amp;#8217;t use.&lt;/p&gt;&lt;p&gt;This mode of argument is very comforting.  It can be applied to
+other tool-integration frameworks, such as the (uncomfortably large)
+GNOME and KDE desktop projects.  There is some force to it.
+And yet, we should be suspicious of any &amp;#8216;perspective&amp;#8217; that
+offers to resolve all our doubts so neatly; it might be a
+rationalization, not a rationale.&lt;/p&gt;&lt;p&gt;Therefore, let&amp;#8217;s avoid the possibility of falling into denial
+and accept that Emacs is both useful
+and large &amp;#8212; that it &lt;span class="emphasis"&gt;&lt;em&gt;is&lt;/em&gt;&lt;/span&gt; an argument against
+Unix minimalism.  What does our analysis of the kinds of complexity in
+it, and the motives for it, suggest beyond that?  And is there reason
+to believe that those lessons generalize?&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;&lt;a id="fn5" href="http://wordaligned.org/articles/accidental-emacs#fn5link"&gt;[5]&lt;/a&gt; So now I know better! In a &lt;a href="http://www.haloscan.com/comments/wordaligned/accidental_emacs/#19336"&gt;comment&lt;/a&gt; on this site, Johan Lindstrom says you can edit video using Emacs, &lt;a href="http://1010.co.uk/gneve.html"&gt;http://1010.co.uk/gneve.html&lt;/a&gt;, and in an email Arnold M&amp;#xe1;ty&amp;#xe1;si pointed me at this &lt;a href="http://www.youtube.com/watch?v=0vumR5Hcz7s"&gt;YouTube GNEVE demo&lt;/a&gt;, while over at reddit another &lt;a href="http://reddit.com/r/programming/info/6igup/comments/"&gt;comment&lt;/a&gt; mentions an audio editing mode, &lt;a href="http://delysid.org/emacs/ecasound-el.html"&gt;http://delysid.org/emacs/ecasound-el.html&lt;/a&gt;.
+&lt;/p&gt;
+&lt;p&gt;&lt;a id="fn6" href="http://wordaligned.org/articles/accidental-emacs#fn6link"&gt;[6]&lt;/a&gt; Splash screen excluded!
+&lt;/p&gt;</description>
+<dc:date>2008-05-06</dc:date>
+<guid>http://wordaligned.org/articles/accidental-emacs</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/accidental-emacs</link>
+<category>Self</category>
 </item>
 
 </channel>

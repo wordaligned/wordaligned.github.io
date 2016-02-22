@@ -7,6 +7,27 @@
 <dc:creator>tag@wordaligned.org</dc:creator>
 <language>en-gb</language>
 <item>
+<title>Advent of Code</title>
+<description>&lt;p&gt;I enjoyed solving &lt;a href="http://was.tl"&gt;Eric Wastl&lt;/a&gt;&amp;#8217;s excellent &lt;a href="http://adventofcode.com"&gt;Advent of Code&lt;/a&gt; programming puzzles over Christmas last year. The puzzles are nicely themed and the site itself is a delight: lighting up an ascii art Christmas tree, row by row, became an addiction.
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;Advent of Code is a series of small programming puzzles for a variety of skill levels. They are self-contained and are just as appropriate for an expert who wants to stay sharp as they are for a beginner who is just learning to code.
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;First time through, I blasted through all the puzzles using Python, leaning on its standard containers, &lt;a href="https://docs.python.org/3/library/itertools.html"&gt;algorithms&lt;/a&gt; and text munging capabilities: &amp;#8220;an expert who wants to stay sharp&amp;#8221;, if you like. Now I&amp;#8217;m tackling the problems again using languages and techniques I&amp;#8217;m less comfortable with: &amp;#8220;a beginner who is just learning to code&amp;#8221;, which I like.
+&lt;/p&gt;
+&lt;p&gt;Second time round is fun, slow and instructive. I&amp;#8217;m posting solutions on &lt;a href="https://github.com/wordaligned/advent-of-code"&gt;github&lt;/a&gt;.
+&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://adventofcode.com"&gt;&lt;img src="http://wordaligned.org/images/advent-of-code.png" alt="ascii xmas tree"&gt;&amp;lt;/a
+&lt;/p&gt;</description>
+<dc:date>2016-02-22</dc:date>
+<guid>http://wordaligned.org/articles/advent-of-code</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/advent-of-code</link>
+<category>Self</category>
+<category>Algorithms</category>
+<category>Github</category>
+</item>
+
+<item>
 <title>Code Reviews - the rules</title>
 <description>&lt;p&gt;The rule is: no code gets checked in without a review.
 &lt;/p&gt;
@@ -705,7 +726,8 @@ def odd(x):
 <guid>http://wordaligned.org/articles/word-aligned-hosted-by-github</guid>
 <author>tag@wordaligned.org (Thomas Guest)</author>
 <link>http://wordaligned.org/articles/word-aligned-hosted-by-github</link>
-<category>self</category>
+<category>Self</category>
+<category>Github</category>
 </item>
 
 <item>
@@ -1060,87 +1082,6 @@ The braces and parentheses may be embedded in a double quoted string but that on
 <author>tag@wordaligned.org (Thomas Guest)</author>
 <link>http://wordaligned.org/articles/an-exploration-of-the-phenomenology-of-software-development</link>
 <category>ACCU</category>
-</item>
-
-<item>
-<title>Patience Sorted</title>
-<description>&lt;p&gt;I gave a lightning talk today about patience sorting and its application to the longest increasing subsequence problem. It&amp;#8217;s a subject I&amp;#8217;ve &lt;a href="http://wordaligned.org/articles/patience-sort.html" title="Patience sort and the longest increasing subsequence"&gt;written about&lt;/a&gt; before. My computer has been put through several million simulations. I&amp;#8217;ve even coded up a &lt;a href="http://wordaligned.org/pages/psort"&gt;javascript demo&lt;/a&gt; which deals out virtual playing cards and sorts them at the click of a button.
-&lt;/p&gt;
-&lt;script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.1/jquery.min.js"&gt;&lt;/script&gt;
-&lt;script type="text/javascript"&gt;
-var zz = 0;
-
-var xtop  = ["330px", "302px", "275px", "255px", "234px", "209px", "187px", "158px", "128px", "99px", "70px", "43px", "15px"];
-var ytop  = ["26px", "30px", "28px", "29px", "31px", "28px", "27px", "28px", "28px", "30px", "26px", "30px", "29px"];
-var xpile = ["10px", "13px", "12px", "115px", "14px", "220px", "220px", "319px", "15px", "216px", "118px", "118px", "321px"];
-var ypile = ["205px", "233px", "266px", "206px", "295px", "206px", "236px", "209px", "325px", "267px", "235px", "263px", "234px"];
-var result = ["#card7", "#card6", "#card3", "#card2"];
-
-function reset_cards() {
-    jQuery("img").stop();
-    zz += 13;
-    for (var j = 0; j != 13; ++j, --zz) {
-        jQuery("#card" + j)
-        .css({"z-index":zz, "margin-left":xtop[j], "margin-top":ytop[j], "border-width":0});
-    }
-    zz += 13;
-}
-
-function lis(j) {
-    var it = jQuery(result[j]);
-    if (it.length &gt; 0) {
-        it.animate({borderWidth : "5px"}, "slow", 0, function(){lis(++j);});
-    }
-}
-
-function psort(j) {
-    var it = jQuery("#card"+j);
-    if (it.length != 0) {
-        it
-        .animate({marginLeft : xpile[j], marginTop: ypile[j]}, "slow", 0, function(){psort(++j);})
-        .css({"z-index" : ++zz});
-    } else {
-        lis(0);
-    }
-}
-
-function animate() {
-    reset_cards();
-    psort(0);
-}
-&lt;/script&gt;
-
-&lt;div class="cardtable" style="background-color: #093; width:440px; height:480px;"&gt;
-&lt;img id="card0" style="border: 0 orange solid; position: absolute; margin-left: 330px; margin-top: 27px; z-index: 13;" src="http://wordaligned.org/images/cards/1s.png" alt="Ace of Spades"/&gt;
-&lt;img id="card1" style="border: 0 orange solid; position: absolute; margin-left: 302px; margin-top: 27px; z-index: 12;" src="http://wordaligned.org/images/cards/10s.png" alt="10 of Spades"/&gt;
-&lt;img id="card2" style="border: 0 orange solid; position: absolute; margin-left: 275px; margin-top: 27px; z-index: 11;" src="http://wordaligned.org/images/cards/6s.png" alt="6 of Spades"/&gt;
-&lt;img id="card3" style="border: 0 orange solid; position: absolute; margin-left: 255px; margin-top: 26px; z-index: 10;" src="http://wordaligned.org/images/cards/7s.png" alt="7 of Spades"/&gt;
-&lt;img id="card4" style="border: 0 orange solid; position: absolute; margin-left: 234px; margin-top: 28px; z-index: 9;" src="http://wordaligned.org/images/cards/5s.png" alt="5 of Spades"/&gt;
-&lt;img id="card5" style="border: 0 orange solid; position: absolute; margin-left: 209px; margin-top: 26px; z-index: 8;" src="http://wordaligned.org/images/cards/13s.png" alt="King of Spades"/&gt;
-&lt;img id="card6" style="border: 0 orange solid; position: absolute; margin-left: 187px; margin-top: 31px; z-index: 7;" src="http://wordaligned.org/images/cards/9s.png" alt="9 of Spades"/&gt;
-&lt;img id="card7" style="border: 0 orange solid; position: absolute; margin-left: 158px; margin-top: 27px; z-index: 6;" src="http://wordaligned.org/images/cards/12s.png" alt="Queen of Spades"/&gt;
-&lt;img id="card8" style="border: 0 orange solid; position: absolute; margin-left: 128px; margin-top: 29px; z-index: 5;" src="http://wordaligned.org/images/cards/2s.png" alt="2 of Spades"/&gt;
-&lt;img id="card9" style="border: 0 orange solid; position: absolute; margin-left: 99px; margin-top: 29px; z-index: 4;" src="http://wordaligned.org/images/cards/8s.png" alt="8 of Spades"/&gt;
-&lt;img id="card10" style="border: 0 orange solid; position: absolute; margin-left: 70px; margin-top: 26px; z-index: 3;" src="http://wordaligned.org/images/cards/4s.png" alt="4 of Spades"/&gt;
-&lt;img id="card11" style="border: 0 orange solid; position: absolute; margin-left: 43px; margin-top: 27px; z-index: 2;" src="http://wordaligned.org/images/cards/3s.png" alt="3 of Spades"/&gt;
-&lt;img id="card12" style="border: 0 orange solid; position: absolute; margin-left: 15px; margin-top: 28px; z-index: 1;" src="http://wordaligned.org/images/cards/11s.png" alt="Knave of Spades"/&gt;
-&lt;/div&gt;&lt;div&gt;&lt;p&gt;&lt;button onclick="reset_cards();"&gt;Reset&lt;/button&gt;&lt;button onclick="animate();"&gt;Play&lt;/button&gt;&lt;/p&gt;&lt;/div&gt;
-
-&lt;p&gt;Today I used real playing cards; a linen-finished standard deck. For any talk it&amp;#8217;s nice to have a prop.
-&lt;/p&gt;
-&lt;p&gt;&lt;a href="http://www.flickr.com/photos/thomasguest/8558343442/" title="Rock &amp;amp; Pop Legends by Thomas Guest, on Flickr"&gt;&lt;img src="http://farm9.staticflickr.com/8100/8558343442_0402f04e83.jpg" width="500" height="361" alt="Rock &amp;amp; Pop Legends"&gt;&lt;/a&gt;
-&lt;/p&gt;
-&lt;p&gt;Now, I &lt;strong&gt;thought&lt;/strong&gt; I understood the patience sort algorithm but until yesterday I&amp;#8217;d never actually played it with real cards. I&amp;#8217;ve been surprised by how much this physical dimension has developed my understanding.
-&lt;/p&gt;
-&lt;p&gt;I&amp;#8217;ll be testing my new cards on some other sorting algorithms; I have high hopes. It would be good to find a similarly simple prop for linked data structures so I can balance trees, flip lists and walk graphs.
-&lt;/p&gt;</description>
-<dc:date>2013-03-14</dc:date>
-<guid>http://wordaligned.org/articles/patience-sorted</guid>
-<author>tag@wordaligned.org (Thomas Guest)</author>
-<link>http://wordaligned.org/articles/patience-sorted</link>
-<category>Algorithms</category>
-<category>Puzzles</category>
-<category>Self</category>
 </item>
 
 </channel>
