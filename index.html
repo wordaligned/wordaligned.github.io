@@ -11,7 +11,7 @@
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
 <meta name="author" content="Thomas Guest" />
 <meta name="description" content="A collection of articles on software development written by Thomas Guest." />
-<meta name="keywords" content="CLRS, Regex, Missiles, Cycling, apple, Pictures, Self, Editors, Emacs, Torvalds, ImageMagick, IDE, Decorators, Shell, PIL, Lcs, Turing, Ruby on Rails, Puzzles, Europython, iphone, Characters, Fractals, Crabs, Github, DocBook, Dynamic Languages, lighttpd, Bugs, CVS, Reviews, Steganography, Algorithms, Perec, Content, Markdown, Two Wheels, Conferences, Syntax, Unix, Arc, Go, Web-applications, Chess, Web Applications, Java, Esr, Recursion, Charts, Perl, Subversion, Recommended, Teamwork, Build, ACCU, Knuth, Android, Erlang, Boost, php, OCR, Python, cvs2svn, Scrum, SICP, Lisp, Books, Graphics, Disqus, Ruby, openid, C, Zlib, Trac, Windows, Documentation, C++, Etc, Streams, Bristol, Tesseract, Drawing, Accidents, Google, Apple, Functional Programming, Pi, Haskell, Design, Virtualization, Spolsky, Oulipo, Curl, Scheme" />
+<meta name="keywords" content="CLRS, Regex, Missiles, Cycling, apple, Pictures, Self, Editors, Emacs, Torvalds, ImageMagick, IDE, Decorators, Shell, PIL, Lcs, Turing, Ruby on Rails, Puzzles, Europython, iphone, Characters, Fractals, Crabs, Github, DocBook, Dynamic Languages, lighttpd, Bugs, CVS, Reviews, Steganography, Algorithms, Perec, Content, Markdown, Two Wheels, Conferences, Syntax, Unix, Arc, Go, Web-applications, Chess, Web Applications, Java, Esr, Recursion, Charts, Perl, Subversion, Recommended, Teamwork, Build, ACCU, Knuth, Android, Erlang, Boost, php, OCR, Python, cvs2svn, Scrum, SICP, Windows, Books, Awk, Graphics, Disqus, Ruby, openid, C, Zlib, Trac, Lisp, Documentation, C++, Etc, Streams, Bristol, Tesseract, Drawing, Accidents, Google, Apple, Functional Programming, Pi, Haskell, Design, Virtualization, Spolsky, Oulipo, Curl, Scheme" />
 <link rel="alternate" type="application/rss+xml" title="Feed" href="http://feeds.wordaligned.org/wordaligned" />
 </head>
 
@@ -25,7 +25,56 @@
 
   <div id="page">
     <div id="content">
-      <div class="atomentry" id="advent-of-code">
+      <div class="atomentry" id="sledgehammers-vs-nut-crackers">
+<h2 class="title"><a href="/articles/sledgehammers-vs-nut-crackers">Sledgehammers vs Nut Crackers</a></h2>
+<p class="meta"><abbr class="published" title="2016-02-23">2016-02-23</abbr> &bull; <a href="/tag/awk" rel="tag">Awk</a>, <a href="/tag/python" rel="tag">Python</a> &bull; <a href="/articles/sledgehammers-vs-nut-crackers#disqus_thread">Comments</a></p>
+<h2>Awk</h2>
+<p>I get awk and can read awk programs but find the language of little use. Its focus is narrow and its syntax can be surprising. Python matches it at home and smashes it away. Nonetheless, a number of the <a href="./advent-of-code">advent of code</a> puzzles fit the awk processing model &#8212; line based instructions, the interpretation of which builds state contributing to the final result &#8212; and I enjoyed writing awk solutions. There&#8217;s satisfaction in using a tool which is up to the job, no more and no less: in using a nutcracker, rather than a sledgehammer, to crack a nut.
+</p>
+
+<h2>Puzzle</h2>
+<p>For example, the puzzle set on <a href="http://adventofcode.com/day/6">day 6</a> consists of a list of instructions for switching and toggling a 1000 x 1000 grid of lights. The instructions read:
+</p>
+<pre><code>turn on 296,50 through 729,664
+turn on 212,957 through 490,987
+toggle 171,31 through 688,88
+turn off 991,989 through 994,998
+....
+</code></pre><p>and the question is, after following these instructions, <strong>how many lights are lit</strong>?
+</p>
+<p>Each instruction is a single line; the actions &#8212; turn on, turn off, toggle &#8212; can be matched by patterns; and to follow these actions requires no more than a basic container and simple arithmetic: <code>awk</code> fits nicely.
+</p>
+
+<h2>Code</h2>
+<script src="https://gist.github.com/wordaligned/ceb8671aad6a3416e094.js"></script>
+
+
+<h2>Comments</h2>
+<p>Here, the <code>BEGIN</code> action sets the field separator <code>FS</code> to the regular expression <code>[ ,]</code>, which picks out the textual and numeric fields from each instruction. Awk is highly dynamic: use a variable as a number and it becomes a number, in this case the coordinates of a lighting grid; and similarly, the fields &#8220;on&#8221;, &#8220;off&#8221; and &#8220;toggle&#8221; are matched and treated as strings.
+</p>
+<p>The grid of lights appears to be represented as a two dimensional array, accessed <code>lights[x,y]</code> rather than <code>lights[x][y]</code>. In fact, the array &#8212; like all arrays in awk &#8212; is an associative container, which maps from strings &#8212; not numbers &#8212; to values.  The key <code>x,y</code> is the string which joins the values of <code>x</code> and <code>y</code> with a separator which defaults to <code>"\034"</code>.
+</p>
+
+<h2>Niggles</h2>
+<p>The escape character at the end of line 5 is needed to continue the long line. I&#8217;d prefer to use parentheses to wrap the expression over more than one line, <a href="http://pep8.org/#indentation">as I would in Python</a>, but this trick doesn&#8217;t seem to work. I was somewhat surprised there was no built in <code>sum()</code> function to count up the number of lights turned on by the <code>END</code>. It would have been cute to pass <code>on()</code>, <code>off()</code> and <code>toggle()</code> as functions into <code>switch()</code>, separating traversal from action, but I couldn&#8217;t find a way to pass functions as parameters in awk.
+</p>
+<p>My awk script solved the puzzle in 45 seconds. A Python solution took 17 seconds. I didn&#8217;t try optimising either.
+</p>
+<script src="https://gist.github.com/wordaligned/007c5cb30a3f7490e3ff.js"></script>
+
+
+<h2>Don&#8217;t use a sledgehammer to crack a nut!</h2>
+<p>This advice, commonly given to programmers, demands exploration and explanation. If it&#8217;s intended to imply a sledgehammer is more likely to pulverise the nut than open it, then fine, true &#8212; but the analogy fails in this case: a solution written in Python, say, or C++, would have been equally correct.
+</p>
+<p>Alternatively, if we mean you shouldn&#8217;t use a powerful language when a simple one would do, then the question becomes: <strong>why not</strong>? Python is a powerful general purpose programming language. It can crack nuts, peel bananas, serve web pages and so much more. If you know Python why bother with Awk?
+</p>
+<p>At the outset of this post I admitted I don&#8217;t generally bother with awk. Sometimes, though, I encounter the language and need to read and possibly adapt an existing script. So that&#8217;s one reason to bother. Another reason is that it&#8217;s an elegant language. Studying its operation and motivation may help us compose and factor our own programs &#8212; programs and indeed systems far more substantial than the toy examples presented here, and in which there will surely be places for mini-languages of our own.
+</p>
+
+</div>
+
+
+<div class="atomentry" id="advent-of-code">
 <h2 class="title"><a href="/articles/advent-of-code">Advent of Code</a></h2>
 <p class="meta"><abbr class="published" title="2016-02-22">2016-02-22</abbr> &bull; <a href="/tag/self" rel="tag">Self</a>, <a href="/tag/algorithms" rel="tag">Algorithms</a>, <a href="/tag/github" rel="tag">Github</a> &bull; <a href="/articles/advent-of-code#disqus_thread">Comments</a></p>
 <p>I enjoyed solving <a href="http://was.tl">Eric Wastl</a>&#8217;s excellent <a href="http://adventofcode.com">Advent of Code</a> programming puzzles over Christmas last year. The puzzles are nicely themed and the site itself is a delight: lighting up an ascii art Christmas tree, row by row, became an addiction.
@@ -36,7 +85,7 @@
 </p>
 <p>Second time round is fun, slow and instructive. I&#8217;m posting solutions on <a href="https://github.com/wordaligned/advent-of-code">github</a>.
 </p>
-<p><a href="http://adventofcode.com"><img src="/images/advent-of-code.png" alt="ascii xmas tree">&lt;/a
+<p><a href="http://adventofcode.com"><img src="/images/advent-of-code.png" alt="ascii xmas tree" /></a>
 </p>
 
 </div>
@@ -800,21 +849,6 @@ bool all_of_(Iter b, Iter e, Pred p)
 </div>
 
 
-<div class="atomentry" id="reverse-esrever">
-<h2 class="title"><a href="/articles/reverse-esrever">Reverse, Esrever</a></h2>
-<p class="meta"><abbr class="published" title="2013-09-27">2013-09-27</abbr> &bull; <a href="/tag/c++" rel="tag">C++</a>, <a href="/tag/puzzles" rel="tag">Puzzles</a> &bull; <a href="/articles/reverse-esrever#disqus_thread">Comments</a></p>
-<p><code><a href="http://en.cppreference.com/w/cpp/algorithm/reverse">Reverse</a></code> is a member of the C++ standard library, but its reverse, <code>esrever</code>, isn&#8217;t. Similarly <code>keep</code> isn&#8217;t but <code><a href="http://en.cppreference.com/w/cpp/io/basic_istream/peek">peek</a></code> is.
-</p>
-<p>Can anyone think of a C++ standard library member whose reverse <strong>is also a member</strong>?
-</p>
-<p>Answers in the comments below.
-</p>
-<p>Go!
-</p>
-
-</div>
-
-
 <div class="extended">
 <p><a href="/articles/">Visit the Word Aligned archives...</a></p>
 </div>
@@ -858,7 +892,7 @@ bool all_of_(Iter b, Iter e, Pred p)
 
 <div class="sidebar-node">
 <h3>Top Tags</h3>
-<ul id="categories"><li><a href="/tag/python" rel="tag">Python</a> <em>(110)</em></li>
+<ul id="categories"><li><a href="/tag/python" rel="tag">Python</a> <em>(111)</em></li>
 <li><a href="/tag/c++" rel="tag">C++</a> <em>(67)</em></li>
 <li><a href="/tag/self" rel="tag">Self</a> <em>(59)</em></li>
 <li><a href="/tag/accu" rel="tag">ACCU</a> <em>(31)</em></li>
@@ -873,7 +907,7 @@ bool all_of_(Iter b, Iter e, Pred p)
 
 <div class="sidebar-node">
 <h3>All Tags</h3>
-<p><a href="/tag/accidents" rel="tag">accidents</a>, <a href="/tag/accu" rel="tag">accu</a>, <a href="/tag/algorithms" rel="tag">algorithms</a>, <a href="/tag/android" rel="tag">android</a>, <a href="/tag/apple" rel="tag">apple</a>, <a href="/tag/apple" rel="tag">apple</a>, <a href="/tag/arc" rel="tag">arc</a>, <a href="/tag/books" rel="tag">books</a>, <a href="/tag/boost" rel="tag">boost</a>, <a href="/tag/bristol" rel="tag">bristol</a>, <a href="/tag/bugs" rel="tag">bugs</a>, <a href="/tag/build" rel="tag">build</a>, <a href="/tag/c" rel="tag">c</a>, <a href="/tag/c++" rel="tag">c++</a>, <a href="/tag/characters" rel="tag">characters</a>, <a href="/tag/charts" rel="tag">charts</a>, <a href="/tag/chess" rel="tag">chess</a>, <a href="/tag/clrs" rel="tag">clrs</a>, <a href="/tag/conferences" rel="tag">conferences</a>, <a href="/tag/content" rel="tag">content</a>, <a href="/tag/crabs" rel="tag">crabs</a>, <a href="/tag/curl" rel="tag">curl</a>, <a href="/tag/cvs" rel="tag">cvs</a>, <a href="/tag/cvs2svn" rel="tag">cvs2svn</a>, <a href="/tag/cycling" rel="tag">cycling</a>, <a href="/tag/decorators" rel="tag">decorators</a>, <a href="/tag/design" rel="tag">design</a>, <a href="/tag/disqus" rel="tag">disqus</a>, <a href="/tag/docbook" rel="tag">docbook</a>, <a href="/tag/documentation" rel="tag">documentation</a>, <a href="/tag/drawing" rel="tag">drawing</a>, <a href="/tag/dynamic-languages" rel="tag">dynamic-languages</a>, <a href="/tag/editors" rel="tag">editors</a>, <a href="/tag/emacs" rel="tag">emacs</a>, <a href="/tag/erlang" rel="tag">erlang</a>, <a href="/tag/esr" rel="tag">esr</a>, <a href="/tag/etc" rel="tag">etc</a>, <a href="/tag/europython" rel="tag">europython</a>, <a href="/tag/fractals" rel="tag">fractals</a>, <a href="/tag/functional-programming" rel="tag">functional-programming</a>, <a href="/tag/github" rel="tag">github</a>, <a href="/tag/go" rel="tag">go</a>, <a href="/tag/google" rel="tag">google</a>, <a href="/tag/graphics" rel="tag">graphics</a>, <a href="/tag/haskell" rel="tag">haskell</a>, <a href="/tag/ide" rel="tag">ide</a>, <a href="/tag/imagemagick" rel="tag">imagemagick</a>, <a href="/tag/iphone" rel="tag">iphone</a>, <a href="/tag/java" rel="tag">java</a>, <a href="/tag/knuth" rel="tag">knuth</a>, <a href="/tag/lcs" rel="tag">lcs</a>, <a href="/tag/lighttpd" rel="tag">lighttpd</a>, <a href="/tag/lisp" rel="tag">lisp</a>, <a href="/tag/markdown" rel="tag">markdown</a>, <a href="/tag/missiles" rel="tag">missiles</a>, <a href="/tag/ocr" rel="tag">ocr</a>, <a href="/tag/openid" rel="tag">openid</a>, <a href="/tag/oulipo" rel="tag">oulipo</a>, <a href="/tag/perec" rel="tag">perec</a>, <a href="/tag/perl" rel="tag">perl</a>, <a href="/tag/php" rel="tag">php</a>, <a href="/tag/pi" rel="tag">pi</a>, <a href="/tag/pictures" rel="tag">pictures</a>, <a href="/tag/pil" rel="tag">pil</a>, <a href="/tag/puzzles" rel="tag">puzzles</a>, <a href="/tag/python" rel="tag">python</a>, <a href="/tag/recommended" rel="tag">recommended</a>, <a href="/tag/recursion" rel="tag">recursion</a>, <a href="/tag/regex" rel="tag">regex</a>, <a href="/tag/reviews" rel="tag">reviews</a>, <a href="/tag/ruby" rel="tag">ruby</a>, <a href="/tag/ruby-on-rails" rel="tag">ruby-on-rails</a>, <a href="/tag/scheme" rel="tag">scheme</a>, <a href="/tag/scrum" rel="tag">scrum</a>, <a href="/tag/self" rel="tag">self</a>, <a href="/tag/shell" rel="tag">shell</a>, <a href="/tag/sicp" rel="tag">sicp</a>, <a href="/tag/spolsky" rel="tag">spolsky</a>, <a href="/tag/steganography" rel="tag">steganography</a>, <a href="/tag/streams" rel="tag">streams</a>, <a href="/tag/subversion" rel="tag">subversion</a>, <a href="/tag/syntax" rel="tag">syntax</a>, <a href="/tag/teamwork" rel="tag">teamwork</a>, <a href="/tag/tesseract" rel="tag">tesseract</a>, <a href="/tag/torvalds" rel="tag">torvalds</a>, <a href="/tag/trac" rel="tag">trac</a>, <a href="/tag/turing" rel="tag">turing</a>, <a href="/tag/two-wheels" rel="tag">two-wheels</a>, <a href="/tag/unix" rel="tag">unix</a>, <a href="/tag/virtualization" rel="tag">virtualization</a>, <a href="/tag/web-applications" rel="tag">web-applications</a>, <a href="/tag/webapplications" rel="tag">webapplications</a>, <a href="/tag/windows" rel="tag">windows</a>, <a href="/tag/zlib" rel="tag">zlib</a></p>
+<p><a href="/tag/accidents" rel="tag">accidents</a>, <a href="/tag/accu" rel="tag">accu</a>, <a href="/tag/algorithms" rel="tag">algorithms</a>, <a href="/tag/android" rel="tag">android</a>, <a href="/tag/apple" rel="tag">apple</a>, <a href="/tag/apple" rel="tag">apple</a>, <a href="/tag/arc" rel="tag">arc</a>, <a href="/tag/awk" rel="tag">awk</a>, <a href="/tag/books" rel="tag">books</a>, <a href="/tag/boost" rel="tag">boost</a>, <a href="/tag/bristol" rel="tag">bristol</a>, <a href="/tag/bugs" rel="tag">bugs</a>, <a href="/tag/build" rel="tag">build</a>, <a href="/tag/c" rel="tag">c</a>, <a href="/tag/c++" rel="tag">c++</a>, <a href="/tag/characters" rel="tag">characters</a>, <a href="/tag/charts" rel="tag">charts</a>, <a href="/tag/chess" rel="tag">chess</a>, <a href="/tag/clrs" rel="tag">clrs</a>, <a href="/tag/conferences" rel="tag">conferences</a>, <a href="/tag/content" rel="tag">content</a>, <a href="/tag/crabs" rel="tag">crabs</a>, <a href="/tag/curl" rel="tag">curl</a>, <a href="/tag/cvs" rel="tag">cvs</a>, <a href="/tag/cvs2svn" rel="tag">cvs2svn</a>, <a href="/tag/cycling" rel="tag">cycling</a>, <a href="/tag/decorators" rel="tag">decorators</a>, <a href="/tag/design" rel="tag">design</a>, <a href="/tag/disqus" rel="tag">disqus</a>, <a href="/tag/docbook" rel="tag">docbook</a>, <a href="/tag/documentation" rel="tag">documentation</a>, <a href="/tag/drawing" rel="tag">drawing</a>, <a href="/tag/dynamic-languages" rel="tag">dynamic-languages</a>, <a href="/tag/editors" rel="tag">editors</a>, <a href="/tag/emacs" rel="tag">emacs</a>, <a href="/tag/erlang" rel="tag">erlang</a>, <a href="/tag/esr" rel="tag">esr</a>, <a href="/tag/etc" rel="tag">etc</a>, <a href="/tag/europython" rel="tag">europython</a>, <a href="/tag/fractals" rel="tag">fractals</a>, <a href="/tag/functional-programming" rel="tag">functional-programming</a>, <a href="/tag/github" rel="tag">github</a>, <a href="/tag/go" rel="tag">go</a>, <a href="/tag/google" rel="tag">google</a>, <a href="/tag/graphics" rel="tag">graphics</a>, <a href="/tag/haskell" rel="tag">haskell</a>, <a href="/tag/ide" rel="tag">ide</a>, <a href="/tag/imagemagick" rel="tag">imagemagick</a>, <a href="/tag/iphone" rel="tag">iphone</a>, <a href="/tag/java" rel="tag">java</a>, <a href="/tag/knuth" rel="tag">knuth</a>, <a href="/tag/lcs" rel="tag">lcs</a>, <a href="/tag/lighttpd" rel="tag">lighttpd</a>, <a href="/tag/lisp" rel="tag">lisp</a>, <a href="/tag/markdown" rel="tag">markdown</a>, <a href="/tag/missiles" rel="tag">missiles</a>, <a href="/tag/ocr" rel="tag">ocr</a>, <a href="/tag/openid" rel="tag">openid</a>, <a href="/tag/oulipo" rel="tag">oulipo</a>, <a href="/tag/perec" rel="tag">perec</a>, <a href="/tag/perl" rel="tag">perl</a>, <a href="/tag/php" rel="tag">php</a>, <a href="/tag/pi" rel="tag">pi</a>, <a href="/tag/pictures" rel="tag">pictures</a>, <a href="/tag/pil" rel="tag">pil</a>, <a href="/tag/puzzles" rel="tag">puzzles</a>, <a href="/tag/python" rel="tag">python</a>, <a href="/tag/recommended" rel="tag">recommended</a>, <a href="/tag/recursion" rel="tag">recursion</a>, <a href="/tag/regex" rel="tag">regex</a>, <a href="/tag/reviews" rel="tag">reviews</a>, <a href="/tag/ruby" rel="tag">ruby</a>, <a href="/tag/ruby-on-rails" rel="tag">ruby-on-rails</a>, <a href="/tag/scheme" rel="tag">scheme</a>, <a href="/tag/scrum" rel="tag">scrum</a>, <a href="/tag/self" rel="tag">self</a>, <a href="/tag/shell" rel="tag">shell</a>, <a href="/tag/sicp" rel="tag">sicp</a>, <a href="/tag/spolsky" rel="tag">spolsky</a>, <a href="/tag/steganography" rel="tag">steganography</a>, <a href="/tag/streams" rel="tag">streams</a>, <a href="/tag/subversion" rel="tag">subversion</a>, <a href="/tag/syntax" rel="tag">syntax</a>, <a href="/tag/teamwork" rel="tag">teamwork</a>, <a href="/tag/tesseract" rel="tag">tesseract</a>, <a href="/tag/torvalds" rel="tag">torvalds</a>, <a href="/tag/trac" rel="tag">trac</a>, <a href="/tag/turing" rel="tag">turing</a>, <a href="/tag/two-wheels" rel="tag">two-wheels</a>, <a href="/tag/unix" rel="tag">unix</a>, <a href="/tag/virtualization" rel="tag">virtualization</a>, <a href="/tag/web-applications" rel="tag">web-applications</a>, <a href="/tag/webapplications" rel="tag">webapplications</a>, <a href="/tag/windows" rel="tag">windows</a>, <a href="/tag/zlib" rel="tag">zlib</a></p>
 
 </div>
 
@@ -890,7 +924,7 @@ bool all_of_(Iter b, Iter e, Pred p)
 <div class="sidebar-node">
 <h3>Chain</h3>
 <ul>
-<li><a accesskey="p" href="/articles/advent-of-code" title="First article">&raquo; Advent of Code</a></li>
+<li><a accesskey="p" href="/articles/sledgehammers-vs-nut-crackers" title="First article">&raquo; Sledgehammers vs Nut Crackers</a></li>
 
 </ul>
 

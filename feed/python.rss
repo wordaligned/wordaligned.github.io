@@ -7,6 +7,57 @@
 <dc:creator>tag@wordaligned.org</dc:creator>
 <language>en-gb</language>
 <item>
+<title>Sledgehammers vs Nut Crackers</title>
+<description>&lt;h2&gt;Awk&lt;/h2&gt;
+&lt;p&gt;I get awk and can read awk programs but find the language of little use. Its focus is narrow and its syntax can be surprising. Python matches it at home and smashes it away. Nonetheless, a number of the &lt;a href="./advent-of-code"&gt;advent of code&lt;/a&gt; puzzles fit the awk processing model &amp;#8212; line based instructions, the interpretation of which builds state contributing to the final result &amp;#8212; and I enjoyed writing awk solutions. There&amp;#8217;s satisfaction in using a tool which is up to the job, no more and no less: in using a nutcracker, rather than a sledgehammer, to crack a nut.
+&lt;/p&gt;
+
+&lt;h2&gt;Puzzle&lt;/h2&gt;
+&lt;p&gt;For example, the puzzle set on &lt;a href="http://adventofcode.com/day/6"&gt;day 6&lt;/a&gt; consists of a list of instructions for switching and toggling a 1000 x 1000 grid of lights. The instructions read:
+&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;turn on 296,50 through 729,664
+turn on 212,957 through 490,987
+toggle 171,31 through 688,88
+turn off 991,989 through 994,998
+....
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;and the question is, after following these instructions, &lt;strong&gt;how many lights are lit&lt;/strong&gt;?
+&lt;/p&gt;
+&lt;p&gt;Each instruction is a single line; the actions &amp;#8212; turn on, turn off, toggle &amp;#8212; can be matched by patterns; and to follow these actions requires no more than a basic container and simple arithmetic: &lt;code&gt;awk&lt;/code&gt; fits nicely.
+&lt;/p&gt;
+
+&lt;h2&gt;Code&lt;/h2&gt;
+&lt;script src="https://gist.github.com/wordaligned/ceb8671aad6a3416e094.js"&gt;&lt;/script&gt;
+
+
+&lt;h2&gt;Comments&lt;/h2&gt;
+&lt;p&gt;Here, the &lt;code&gt;BEGIN&lt;/code&gt; action sets the field separator &lt;code&gt;FS&lt;/code&gt; to the regular expression &lt;code&gt;[ ,]&lt;/code&gt;, which picks out the textual and numeric fields from each instruction. Awk is highly dynamic: use a variable as a number and it becomes a number, in this case the coordinates of a lighting grid; and similarly, the fields &amp;#8220;on&amp;#8221;, &amp;#8220;off&amp;#8221; and &amp;#8220;toggle&amp;#8221; are matched and treated as strings.
+&lt;/p&gt;
+&lt;p&gt;The grid of lights appears to be represented as a two dimensional array, accessed &lt;code&gt;lights[x,y]&lt;/code&gt; rather than &lt;code&gt;lights[x][y]&lt;/code&gt;. In fact, the array &amp;#8212; like all arrays in awk &amp;#8212; is an associative container, which maps from strings &amp;#8212; not numbers &amp;#8212; to values.  The key &lt;code&gt;x,y&lt;/code&gt; is the string which joins the values of &lt;code&gt;x&lt;/code&gt; and &lt;code&gt;y&lt;/code&gt; with a separator which defaults to &lt;code&gt;"\034"&lt;/code&gt;.
+&lt;/p&gt;
+
+&lt;h2&gt;Niggles&lt;/h2&gt;
+&lt;p&gt;The escape character at the end of line 5 is needed to continue the long line. I&amp;#8217;d prefer to use parentheses to wrap the expression over more than one line, &lt;a href="http://pep8.org/#indentation"&gt;as I would in Python&lt;/a&gt;, but this trick doesn&amp;#8217;t seem to work. I was somewhat surprised there was no built in &lt;code&gt;sum()&lt;/code&gt; function to count up the number of lights turned on by the &lt;code&gt;END&lt;/code&gt;. It would have been cute to pass &lt;code&gt;on()&lt;/code&gt;, &lt;code&gt;off()&lt;/code&gt; and &lt;code&gt;toggle()&lt;/code&gt; as functions into &lt;code&gt;switch()&lt;/code&gt;, separating traversal from action, but I couldn&amp;#8217;t find a way to pass functions as parameters in awk.
+&lt;/p&gt;
+&lt;p&gt;My awk script solved the puzzle in 45 seconds. A Python solution took 17 seconds. I didn&amp;#8217;t try optimising either.
+&lt;/p&gt;
+&lt;script src="https://gist.github.com/wordaligned/007c5cb30a3f7490e3ff.js"&gt;&lt;/script&gt;
+
+
+&lt;h2&gt;Don&amp;#8217;t use a sledgehammer to crack a nut!&lt;/h2&gt;
+&lt;p&gt;This advice, commonly given to programmers, demands exploration and explanation. If it&amp;#8217;s intended to imply a sledgehammer is more likely to pulverise the nut than open it, then fine, true &amp;#8212; but the analogy fails in this case: a solution written in Python, say, or C++, would have been equally correct.
+&lt;/p&gt;
+&lt;p&gt;Alternatively, if we mean you shouldn&amp;#8217;t use a powerful language when a simple one would do, then the question becomes: &lt;strong&gt;why not&lt;/strong&gt;? Python is a powerful general purpose programming language. It can crack nuts, peel bananas, serve web pages and so much more. If you know Python why bother with Awk?
+&lt;/p&gt;
+&lt;p&gt;At the outset of this post I admitted I don&amp;#8217;t generally bother with awk. Sometimes, though, I encounter the language and need to read and possibly adapt an existing script. So that&amp;#8217;s one reason to bother. Another reason is that it&amp;#8217;s an elegant language. Studying its operation and motivation may help us compose and factor our own programs &amp;#8212; programs and indeed systems far more substantial than the toy examples presented here, and in which there will surely be places for mini-languages of our own.
+&lt;/p&gt;</description>
+<dc:date>2016-02-23</dc:date>
+<guid>http://wordaligned.org/articles/sledgehammers-vs-nut-crackers</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/sledgehammers-vs-nut-crackers</link>
+<category>Python</category>
+</item>
+
+<item>
 <title>Why zip when you can map?</title>
 <description>&lt;p&gt;&lt;a href="http://en.wikipedia.org/wiki/Zipper"&gt;&lt;img src="http://wordaligned.org/images/zip.jpg" title="Why zip?" alt="Why zip?"/&gt;&lt;/a&gt;
    &lt;a href="http://www.strava.com/activities/158661061"&gt;&lt;img src="http://wordaligned.org/images/dundry-thunder.jpg" alt="when you can map?" title="when you can map!"/&gt;&lt;/a&gt;
@@ -4142,140 +4193,6 @@ ValueError: Stop argument for islice() must be a non-negative integer or None.
 <guid>http://wordaligned.org/articles/partitioning-with-python</guid>
 <author>tag@wordaligned.org (Thomas Guest)</author>
 <link>http://wordaligned.org/articles/partitioning-with-python</link>
-<category>Python</category>
-</item>
-
-<item>
-<title>Run-length encoding in Python</title>
-<description>&lt;p&gt;Recently I discussed &lt;a href="http://wordaligned.org/articles/deflate-runlength-encoding-but-better.html" title="DEFLATE: run-length encoding, but better"&gt;run-length encoding and DEFLATE&lt;/a&gt; compression. I never actually showed a Python implementation of a run-length encoder, so here&amp;#8217;s one now.
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
-
-&lt;pre class="prettyprint"&gt;import itertools as its
-
-def ilen(it):
-    '''Return the length of an iterable.
-    
-    &amp;gt;&amp;gt;&amp;gt; ilen(range(7))
-    7
-    '''
-    return sum(1 for _ in it)
-
-def runlength_enc(xs):
-    '''Return a run-length encoded version of the stream, xs.
-    
-    The resulting stream consists of (count, x) pairs.
-    
-    &amp;gt;&amp;gt;&amp;gt; ys = runlength_enc('AAABBCCC')
-    &amp;gt;&amp;gt;&amp;gt; next(ys)
-    (3, 'A')
-    &amp;gt;&amp;gt;&amp;gt; list(ys)
-    [(2, 'B'), (3, 'C')]
-    '''
-    return ((ilen(gp), x) for x, gp in its.groupby(xs))
-
-&lt;/pre&gt;
-
-&lt;/div&gt;
-
-&lt;p&gt;The decoder is equally simple. &lt;code&gt;Itertools.repeat&lt;/code&gt; expands a &lt;code&gt;(count, value)&lt;/code&gt; pair into an iterable which will generate &lt;code&gt;count&lt;/code&gt; elements. &lt;code&gt;Itertools.chain&lt;/code&gt; flattens these iterables into a single stream.
-&lt;/p&gt;
-&lt;span id="continue-reading"/&gt;
-
-&lt;div class="typocode"&gt;
-
-&lt;pre class="prettyprint"&gt;def runlength_dec(xs):
-    '''Expand a run-length encoded stream.
-    
-    Each element of xs is a pair, (count, x).
-    
-    &amp;gt;&amp;gt;&amp;gt; ys = runlength_dec(((3, 'A'), (2, 'B')))
-    &amp;gt;&amp;gt;&amp;gt; next(ys)
-    'A'
-    &amp;gt;&amp;gt;&amp;gt; ''.join(ys)
-    'AABB'
-    '''
-    return its.chain.from_iterable(its.repeat(x, n) for n, x in xs)
-
-&lt;/pre&gt;
-
-&lt;/div&gt;
-
-&lt;p&gt;If you haven&amp;#8217;t seen &lt;code&gt;&lt;a href="http://docs.python.org/library/itertools.html#itertools.itertools.chain.from_iterable"&gt;itertools.chain.from_iterable()&lt;/a&gt;&lt;/code&gt; yet, it was introduced at Python 3.0/2.6. The important feature here is that it lazily works its way through a single iterable argument. If instead we&amp;#8217;d written:
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
-
-&lt;pre class="prettyprint"&gt;def runlength_dec(xs):
-    ....
-    return its.chain(*(its.repeat(x, n) for n, x in xs))
-
-&lt;/pre&gt;
-
-&lt;/div&gt;
-
-&lt;p&gt;then our run-length decoder would need to consume all of &lt;code&gt;xs&lt;/code&gt; before yielding results (which is why we must interrupt the interpreter&amp;#8217;s execution below).
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
-
-&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; xs = its.cycle((3, 'A'), (2, 'B'))
-&amp;gt;&amp;gt;&amp;gt; runlength_dec(xs)
-  C-c C-cTraceback (most recent call last):
-  File "&amp;lt;stdin&amp;gt;", line 1, in &amp;lt;module&amp;gt;
-  File "&amp;lt;string&amp;gt;", line 25, in runlength_dec
-  File "&amp;lt;string&amp;gt;", line 25, in &amp;lt;genexpr&amp;gt;
-KeyboardInterrupt
-
-&lt;/pre&gt;
-
-&lt;/div&gt;
-
-
-&lt;h3&gt;Named tuples for clarity&lt;/h3&gt;
-&lt;p&gt;Streams of pairs (as shown above) are perfectly Pythonic. If we run-length encode a stream of numbers, clients will just have to read the manual and remember that &lt;code&gt;item[0]&lt;/code&gt; is a repeat count and &lt;code&gt;item[1]&lt;/code&gt; is a value.
-&lt;/p&gt;
-&lt;p&gt;If this seems fragile, a new-ish member of the &lt;a href="http://docs.python.org/dev/library/collections.html"&gt;collections module&lt;/a&gt; can give the pair more structure.
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
-
-&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; from collections import namedtuple
-&amp;gt;&amp;gt;&amp;gt; Run = namedtuple('Run', 'count value') 
-&amp;gt;&amp;gt;&amp;gt; run1 = Run(count=10, value=2)
-&amp;gt;&amp;gt;&amp;gt; run2 = Run(value=2, count=10)
-&amp;gt;&amp;gt;&amp;gt; run1
-Run(count=10, value=2)
-&amp;gt;&amp;gt;&amp;gt; run2
-Run(count=10, value=2)
-&amp;gt;&amp;gt;&amp;gt; run1.count
-10
-&amp;gt;&amp;gt;&amp;gt; run1[0]
-10
-
-&lt;/pre&gt;
-
-&lt;/div&gt;
-
-&lt;p&gt;Here&amp;#8217;s how we&amp;#8217;d change &lt;code&gt;runlength_enc()&lt;/code&gt; to use the new type.
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
-
-&lt;pre class="prettyprint"&gt;def runlength_enc(xs):
-    '''Return a run-length encoded version of the stream, xs.
-    
-    &amp;gt;&amp;gt;&amp;gt; ys = runlength_enc('AAABBCCC')
-    &amp;gt;&amp;gt;&amp;gt; next(ys)
-    Run(count=3, value='A')
-    &amp;gt;&amp;gt;&amp;gt; list(ys)
-    [Run(count=2, value='B'), Run(count=3, value='C')]
-    '''
-    return (Run(ilen(gp), x) for x, gp in its.groupby(xs))
-
-&lt;/pre&gt;
-
-&lt;/div&gt;</description>
-<dc:date>2009-06-01</dc:date>
-<guid>http://wordaligned.org/articles/runlength-encoding-in-python</guid>
-<author>tag@wordaligned.org (Thomas Guest)</author>
-<link>http://wordaligned.org/articles/runlength-encoding-in-python</link>
 <category>Python</category>
 </item>
 
