@@ -42,7 +42,7 @@ turn off 991,989 through 994,998
 ....
 </code></pre><p>and the question is, after following these instructions, <strong>how many lights are lit</strong>?
 </p>
-<p>Each instruction is a single line; the actions &#8212; turn on, turn off, toggle &#8212; can be matched by patterns; and to follow these actions requires no more than a basic container and simple arithmetic: <code>awk</code> fits nicely.
+<p>Each instruction is a single line; the actions &#8212; turn on, turn off, toggle &#8212; can be matched by patterns; and to follow these actions requires no more than an array and arithmetic: <code>awk</code> fits nicely.
 </p>
 
 <h2>Code</h2>
@@ -50,13 +50,13 @@ turn off 991,989 through 994,998
 
 
 <h2>Comments</h2>
-<p>Here, the <code>BEGIN</code> action sets the field separator <code>FS</code> to the regular expression <code>[ ,]</code>, which picks out the textual and numeric fields from each instruction. Awk is highly dynamic: use a variable as a number and it becomes a number, in this case the coordinates of a lighting grid; and similarly, the fields &#8220;on&#8221;, &#8220;off&#8221; and &#8220;toggle&#8221; are matched and treated as strings.
+<p>Here, the <code>BEGIN</code> action sets the field separator <code>FS</code> to the regular expression <code>[ ,]</code> which picks out the textual and numeric fields from each instruction. Awk is highly dynamic: use a variable as a number and it becomes a number, in this case the coordinates of a lighting grid; and similarly, the fields &#8220;on&#8221;, &#8220;off&#8221; and &#8220;toggle&#8221; are matched and treated as strings.
 </p>
-<p>The grid of lights appears to be represented as a two dimensional array, accessed <code>lights[x,y]</code> rather than <code>lights[x][y]</code>. In fact, the array &#8212; like all arrays in awk &#8212; is an associative container, which maps from strings &#8212; not numbers &#8212; to values.  The key <code>x,y</code> is the string which joins the values of <code>x</code> and <code>y</code> with a separator which defaults to <code>"\034"</code>.
+<p>The grid of lights appears to be represented as a two dimensional array, accessed <code>lights[x,y]</code> rather than <code>lights[x][y]</code>. In fact, the array &#8212; like all arrays in awk &#8212; is an associative container, which maps from strings &#8212; not numbers &#8212; to values.  The key <code>x,y</code> becomes a string which joins the values of <code>x</code> and <code>y</code> with a separator defaulted to <code>"\034"</code>.
 </p>
 
 <h2>Niggles</h2>
-<p>The escape character at the end of line 5 is needed to continue the long line. I&#8217;d prefer to use parentheses to wrap the expression over more than one line, <a href="http://pep8.org/#indentation">as I would in Python</a>, but this trick doesn&#8217;t seem to work. I was somewhat surprised there was no built in <code>sum()</code> function to count up the number of lights turned on by the <code>END</code>. It would have been cute to pass <code>on()</code>, <code>off()</code> and <code>toggle()</code> as functions into <code>switch()</code>, separating traversal from action, but I couldn&#8217;t find a way to pass functions as parameters in awk.
+<p>The escape character at the end of line 5 is needed to continue the long line. I&#8217;d prefer to use parentheses to wrap the expression over more than one line, <a href="http://pep8.org/#indentation">as I would in Python</a>, but this trick doesn&#8217;t seem to work. I was somewhat surprised there was no built in <code>sum()</code> function to count up the number of lights turned on by the <code>END</code>. It would have been cute to pass <code>on()</code>, <code>off()</code> and <code>toggle()</code> as functions into <code>switch()</code>, separating traversal from action, but I couldn&#8217;t find a way to do this in awk.
 </p>
 <p>My awk script solved the puzzle in 45 seconds. A Python solution took 17 seconds. I didn&#8217;t try optimising either.
 </p>
@@ -64,11 +64,11 @@ turn off 991,989 through 994,998
 
 
 <h2>Don&#8217;t use a sledgehammer to crack a nut!</h2>
-<p>This advice, commonly given to programmers, demands exploration and explanation. If it&#8217;s intended to imply a sledgehammer is more likely to pulverise the nut than open it, then fine, true &#8212; but the analogy fails in this case: a solution written in Python, say, or C++, would have been equally correct.
+<p>This advice, commonly given to programmers, demands explanation. If it&#8217;s intended to imply a sledgehammer is more likely to pulverise the nut than open it, then fine, that&#8217;s true &#8212; but the analogy fails in this case: a solution written in Python would have been equally correct.
 </p>
-<p>Alternatively, if we mean you shouldn&#8217;t use a powerful language when a simple one would do, then the question becomes: <strong>why not</strong>? Python is a powerful general purpose programming language. It can crack nuts, peel bananas, serve web pages and so much more. If you know Python why bother with Awk?
+<p>Alternatively, if we mean you shouldn&#8217;t use a powerful language when a less powerful one would do, then the question becomes: <strong>why not</strong>? Python is a general purpose programming language. It can crack nuts, peel bananas, serve web pages and so much more. If you know Python why bother with Awk?
 </p>
-<p>At the outset of this post I admitted I don&#8217;t generally bother with awk. Sometimes, though, I encounter the language and need to read and possibly adapt an existing script. So that&#8217;s one reason to bother. Another reason is that it&#8217;s an elegant language. Studying its operation and motivation may help us compose and factor our own programs &#8212; programs and indeed systems far more substantial than the toy examples presented here, and in which there will surely be places for mini-languages of our own.
+<p>At the outset of this post I admitted I don&#8217;t generally bother with awk. Sometimes, though, I encounter the language and need to read and possibly adapt an existing script. So that&#8217;s one reason to bother. Another reason is that it&#8217;s elegant and compact. Studying its operation and motivation may help us compose and factor our own programs &#8212; programs far more substantial than the scripts presented here, and in which there will surely be places for mini-languages of our own.
 </p>
 
 </div>
@@ -203,7 +203,7 @@ def mountCamel() {
    <code>do_le_render()</code>. Mildly amusing first time round, maybe, but less so
    each time it got revisited to fix les bugs.
 </p>
-<p><a href="https://www.flickr.com/photos/ahmedrabea/7929947448" title="Ark of Desert - Camel by Ahmed Rabea, on Flickr"><img src="https://farm9.staticflickr.com/8180/7929947448_06dd57700c_z.jpg" width="640" height="427" alt="Ark of Desert - Camel"></a>
+<p><a href="https://www.flickr.com/photos/ahmedrabea/7929947448" title="Ark of Desert - Camel by Ahmed Rabea, on Flickr"><img src="https://farm9.staticflickr.com/8180/7929947448_06dd57700c_z.jpg" width="640" height="427" alt="Ark of Desert - Camel"/></a>
 </p>
 <p>I don&#8217;t see many jokes in the code I read and I don&#8217;t think it&#8217;s
    because the authors lack a sense of humour. Just as <a href="/articles/entertaining-documentation" title="Entertaining documentation">good
@@ -222,9 +222,9 @@ documentation should inform rather than entertain</a>, good code
    find, instead, a <a href="https://www.sqlite.org/different.html">blessing</a>. This may seem funny &#8212; unusual,
    certainly &#8212; but it&#8217;s actually quite serious.
 </p>
-<blockquote>May you do good and not evil<br>
-May you find forgiveness for yourself and forgive others<br>
-May you share freely, never taking more than you give.</blockquote>
+<blockquote><p>May you do good and not evil<br/>
+May you find forgiveness for yourself and forgive others<br/>
+May you share freely, never taking more than you give.</p></blockquote>
 
 <p>We may not issue blessings with our own code but maybe we can find other ways to surprise and delight.
 </p>
