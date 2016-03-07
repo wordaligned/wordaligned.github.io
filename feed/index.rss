@@ -7,6 +7,309 @@
 <dc:creator>tag@wordaligned.org</dc:creator>
 <language>en-gb</language>
 <item>
+<title>Gofmt knows best</title>
+<description>&lt;div class="toc"&gt;
+&lt;h2&gt;Contents&lt;/h2&gt;
+&lt;ul&gt;
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/gofmt-knows-best#toceveryones-favourite" name="toc0" id="toc0"&gt;Everyone&amp;#8217;s favourite&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/gofmt-knows-best#tocgo-knows-best" name="toc1" id="toc1"&gt;Go knows best&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/gofmt-knows-best#tocwhen-formatters-fail" name="toc2" id="toc2"&gt;When formatters fail&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/gofmt-knows-best#tocdecluttered-java" name="toc3" id="toc3"&gt;Decluttered Java&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/gofmt-knows-best#toctetrominoes" name="toc4" id="toc4"&gt;Tetrominoes&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/gofmt-knows-best#tocobfuscation" name="toc5" id="toc5"&gt;Obfuscation&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/gofmt-knows-best#tocdepth-first-search" name="toc6" id="toc6"&gt;Depth First Search&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/gofmt-knows-best#tocconclusion" name="toc7" id="toc7"&gt;Conclusion&lt;/a&gt;
+ &lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;h2&gt;&lt;a href="http://wordaligned.org/articles/gofmt-knows-best#toc0" name="toceveryones-favourite" id="toceveryones-favourite"&gt;Everyone&amp;#8217;s favourite&lt;/a&gt;&lt;/h2&gt;
+&lt;blockquote&gt;&lt;p&gt;Gofmt&amp;#8217;s style is no one&amp;#8217;s favorite, yet gofmt is everyone&amp;#8217;s favorite.
+   &amp;#8212; &lt;a href="https://go-proverbs.github.io"&gt;Rob Pike&lt;/a&gt;
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;Code formatting tools are nothing new but Go notches them up a level. Your Go installation comes with an automated formatter, &lt;a href="https://golang.org/cmd/gofmt/"&gt;gofmt&lt;/a&gt;, and this tool has been used to layout the entire code base. As a result, Go code looks uniform and familiar. The recommendation is to gofmt your own code, ideally on save and certainly before submitting for review.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;(add-hook 'before-save-hook 'gofmt-before-save)
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;&lt;a href="http://clang.llvm.org/docs/ClangFormatStyleOptions.html"&gt;Formatting tools for other languages&lt;/a&gt; require configuration. You must instruct the tool about your preferences for spaces and braces. Gofmt is inflexible and this is a strength.
+&lt;/p&gt;
+&lt;p&gt;The language designers did Go a favour by supplying and promoting gofmt early on, before alternative style guides had been developed and adopted. There can be no more arguments about tabs vs spaces, for example. Code reviews must focus on content rather than layout.
+&lt;/p&gt;
+&lt;p&gt;There are also more subtle benefits. Certain kinds of manual layout are fragile: the insertion of space to vertically align assignment statements, for example. A code formatter gets it right every time.
+&lt;/p&gt;
+
+&lt;h2&gt;&lt;a href="http://wordaligned.org/articles/gofmt-knows-best#toc1" name="tocgo-knows-best" id="tocgo-knows-best"&gt;Go knows best&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;As writers &amp;#8212; and programmers are, fundamentally, &lt;a href="http://wordaligned.org/articles/lessons-from-the-oulipo"&gt;writers&lt;/a&gt; &amp;#8212; maybe we don&amp;#8217;t want our work to look uniform or familiar. Maybe we prefer more control over what we produce. Maybe sometimes, we&amp;#8217;d like to surprise or provoke.
+&lt;/p&gt;
+&lt;p&gt;Does the regularity gofmt imposes render our code bland, even boring?
+&lt;/p&gt;
+&lt;p&gt;I&amp;#8217;ve heard this point extended to be a criticism of Go in general: that the language restricts what you can do because the language designers know best, and that it&amp;#8217;s for your own good.
+&lt;/p&gt;
+&lt;p&gt;Well, if I&amp;#8217;ve ever submitted extravagently formatted code for review, it&amp;#8217;s been slapped back. Substantial programs are developed by teams who adopt idiom and share style rules for good reason. It&amp;#8217;s how we work together. Imagine how much easier it would be if the third party code in your code base was also written to your preferred style. Go gives you that, so long as everyone plays by the rules.
+&lt;/p&gt;
+&lt;p&gt;gofmt does not completely over-ride a programmer&amp;#8217;s choices. Two programs which are semantically identical but laid out differently will probably still be laid out differently after a pass through gofmt.
+&lt;/p&gt;
+
+&lt;h2&gt;&lt;a href="http://wordaligned.org/articles/gofmt-knows-best#toc2" name="tocwhen-formatters-fail" id="tocwhen-formatters-fail"&gt;When formatters fail&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Formatting sometimes fails. Some examples follow.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/gofmt-knows-best#toc3" name="tocdecluttered-java" id="tocdecluttered-java"&gt;Decluttered Java&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Here&amp;#8217;s some creatively formatted Java. Of course it&amp;#8217;s a joke, and a funny one, but a language like Python gets the last laugh. It &lt;strong&gt;is&lt;/strong&gt; possible to cut out braces and semi-colons and your code will look better for it.
+&lt;/p&gt;
+&lt;div&gt;&lt;blockquote class="twitter-tweet" data-lang="en"&gt;&lt;p lang="en" dir="ltr"&gt;I finally figured out how to get those pesky semicolons and curly braces out of my Java code &lt;a href="http://t.co/Ns96HdCuKO"&gt;pic.twitter.com/Ns96HdCuKO&lt;/a&gt;&lt;/p&gt;&amp;mdash; Uncle Bob&amp;#39;s Nephew (@thedirtycoder) &lt;a href="https://twitter.com/thedirtycoder/status/569339014085517312"&gt;February 22, 2015&lt;/a&gt;&lt;/blockquote&gt;&lt;script async src="http://wordaligned.org//platform.twitter.com/widgets.js" charset="utf-8"&gt;&lt;/script&gt;&lt;/div&gt;
+
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/gofmt-knows-best#toc4" name="toctetrominoes" id="toctetrominoes"&gt;Tetrominoes&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Here&amp;#8217;s an equally witty but perfectly serious use of layout.
+&lt;/p&gt;
+&lt;blockquote class="twitter-tweet" data-cards="hidden" data-lang="en"&gt;&lt;p lang="en" dir="ltr"&gt;I always love it when code is formatted in the shape of the problem it&amp;#39;s solving.&lt;a href="https://t.co/XC7J2cSENj"&gt;pic.twitter.com/XC7J2cSENj&lt;/a&gt;&lt;/p&gt;&amp;mdash; Mathias Verraes (@mathiasverraes) &lt;a href="https://twitter.com/mathiasverraes/status/669490082022367232"&gt;November 25, 2015&lt;/a&gt;&lt;/blockquote&gt;
+
+&lt;p&gt;Mathias is referring to some tetrominoes &amp;#8212; tetris shapes &amp;#8212; coded in &lt;a href="http://elm-lang.org"&gt;elm&lt;/a&gt; by &lt;a href="https://github.com/jcollard/elmtris/blob/master/src/Tetromino.elm"&gt;Joseph Collard&lt;/a&gt;.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;-- A Tetromino is a list of Locations. By definition, a valid tetromino
+-- should contain exactly 4 different locations
+type Tetromino = [Location]
+
+line : Tetromino
+line = [(0,0), (1,0), (2,0), (3,0)]
+
+square : Tetromino
+square = [(0,0), (1,0),
+          (0,1), (1,1)]
+
+spiece : Tetromino
+spiece = [       (1,0), (2,0),
+          (0,1), (1,1)]
+
+jpiece : Tetromino
+jpiece = [       (1,0),
+                 (1,1),
+          (0,2), (1,2)]
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;For brevity, I&amp;#8217;ve left out the Z and L pieces. I&amp;#8217;ve also omitted comments from the original, which I would suggest are redundant since the code has been painstakingly formatted to indicate the shape of the pieces.
+&lt;/p&gt;
+&lt;p&gt;The same tetrominoes in hand-formatted Go read:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;package tetris
+
+type Tetronimo [4][2]int
+
+var (
+    Line   = Tetronimo   {{0, 0}, {1, 0}, {2, 0}, {3, 0}}
+    
+    Square = Tetronimo   {{0, 0}, {1, 0}, 
+                          {0, 1}, {1, 1}}
+    
+    Spiece = Tetronimo   {        {1, 0}, {2, 0}, 
+                          {0, 1}, {1, 1}}
+    
+    Jpiece = Tetronimo   {        {1, 0}, 
+                                  {1, 1}, 
+                          {0, 2}, {1, 2}}
+)
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;gofmt spoils them.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;package tetris
+
+type Tetronimo [4][2]int
+
+var (
+	Line = Tetronimo{{0, 0}, {1, 0}, {2, 0}, {3, 0}}
+    
+	Square = Tetronimo{{0, 0}, {1, 0},
+		{0, 1}, {1, 1}}
+    
+	Spiece = Tetronimo{{1, 0}, {2, 0},
+		{0, 1}, {1, 1}}
+    
+	Jpiece = Tetronimo{{1, 0},
+		{1, 1},
+		{0, 2}, {1, 2}}
+)
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/gofmt-knows-best#toc5" name="tocobfuscation" id="tocobfuscation"&gt;Obfuscation&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Here&amp;#8217;s a tiny rectangular program &lt;a href="http://accu.org/index.php/journals/256"&gt;submitted by Thaddaeus Frogley to the International Obfuscated C Code Contest&lt;/a&gt; in 2001. It&amp;#8217;s &lt;strong&gt;meant&lt;/strong&gt; to be hard to read and the compact layout helps &amp;#8212; by hindering.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;/*(c) 2001 Thad */
+#include&amp;lt;string.h&amp;gt;
+#include &amp;lt;stdio.h&amp;gt;
+#define abc stdout
+int main(int a,ch\
+ar*b){char*c="??="
+"??(??/??/??)??'{"
+"??!??&amp;gt;??-";while(
+!((a=fgetc(stdin))
+==EOF))fputc((b=s\
+trchr(c,a))?fputc(
+fputc(077,abc),abc
+),"=(/)'&amp;lt;!&amp;gt;""-"??(
+b-c??):a, abc);??&amp;gt;
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;In the author&amp;#8217;s own words:
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt; I wanted to create a piece of code that could be considered to be &amp;#8220;art&amp;#8221; on multiple levels.
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;He&amp;#8217;s succeeded. It&amp;#8217;s impossible to translate this program into Go so I cannot gofmt it. If, instead, I try &lt;a href="http://clang.llvm.org/docs/ClangFormatStyleOptions.html"&gt;clang-format&lt;/a&gt;, the resulting code &lt;strong&gt;no longer compiles&lt;/strong&gt;!
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;/*(c) 2001 Thad */
+#include &amp;lt;stdio.h&amp;gt;
+#include &amp;lt;string.h&amp;gt;
+#define abc stdout
+int main(int a, ch\
+ar *b) {
+  char *c = "??="
+            "??(??/??/??)??'{"
+            "??!??&amp;gt;??-";
+  while (!((a = fgetc(stdin)) == EOF))fputc((b=s\
+trchr(c,a))?fputc(
+fputc(077,abc),abc
+),"=(/)'&amp;lt;!&amp;gt;""-"??(
+b-c??):a, abc);
+? ? &amp;gt;
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/gofmt-knows-best#toc6" name="tocdepth-first-search" id="tocdepth-first-search"&gt;Depth First Search&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Here&amp;#8217;s a recursive depth first search from the &lt;a href="https://github.com/boostorg/graph/blob/develop/include/boost/graph/depth_first_search.hpp#L181"&gt;boost graph library&lt;/a&gt;
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;template &amp;lt;class IncidenceGraph, class DFSVisitor, class ColorMap,
+          class TerminatorFunc&amp;gt;
+void depth_first_visit_impl
+  (const IncidenceGraph&amp;amp; g,
+   typename graph_traits&amp;lt;IncidenceGraph&amp;gt;::vertex_descriptor u,
+   DFSVisitor&amp;amp; vis,  // pass-by-reference here, important!
+   ColorMap color, TerminatorFunc func)
+{
+  typedef typename graph_traits&amp;lt;IncidenceGraph&amp;gt;::vertex_descriptor Vertex;
+  typedef typename property_traits&amp;lt;ColorMap&amp;gt;::value_type ColorValue;
+  typedef color_traits&amp;lt;ColorValue&amp;gt; Color;
+  typename graph_traits&amp;lt;IncidenceGraph&amp;gt;::out_edge_iterator ei, ei_end;
+  
+  put(color, u, Color::gray());          vis.discover_vertex(u, g);
+  
+  if (!func(u, g))
+    for (boost::tie(ei, ei_end) = out_edges(u, g); ei != ei_end; ++ei) {
+      Vertex v = target(*ei, g);           vis.examine_edge(*ei, g);
+      ColorValue v_color = get(color, v);
+      if (v_color == Color::white()) {     vis.tree_edge(*ei, g);
+      depth_first_visit_impl(g, v, vis, color, func);
+      } else if (v_color == Color::gray()) vis.back_edge(*ei, g);
+      else                                 vis.forward_or_cross_edge(*ei, g);
+      call_finish_edge(vis, *ei, g);
+    }
+  put(color, u, Color::black());         vis.finish_vertex(u, g);
+}
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Clients of the function supply a visitor, &lt;code&gt;vis&lt;/code&gt;, which is called back as vertices and edges are discovered and classified. These callbacks are carefully placed on the right hand side, visually distinguishing traversal from events. Note too the alignment, with edge events indented to the right of vertex events. Again, a code formatter tramples over this elegantly shaped code:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;template &amp;lt;class IncidenceGraph, class DFSVisitor, class ColorMap,
+          class TerminatorFunc&amp;gt;
+void depth_first_visit_impl(
+    const IncidenceGraph &amp;amp;g,
+    typename graph_traits&amp;lt;IncidenceGraph&amp;gt;::vertex_descriptor u,
+    DFSVisitor &amp;amp;vis, // pass-by-reference here, important!
+    ColorMap color, TerminatorFunc func) {
+  typedef typename graph_traits&amp;lt;IncidenceGraph&amp;gt;::vertex_descriptor Vertex;
+  typedef typename property_traits&amp;lt;ColorMap&amp;gt;::value_type ColorValue;
+  typedef color_traits&amp;lt;ColorValue&amp;gt; Color;
+  typename graph_traits&amp;lt;IncidenceGraph&amp;gt;::out_edge_iterator ei, ei_end;
+  
+  put(color, u, Color::gray());
+  vis.discover_vertex(u, g);
+  
+  if (!func(u, g))
+    for (boost::tie(ei, ei_end) = out_edges(u, g); ei != ei_end; ++ei) {
+      Vertex v = target(*ei, g);
+      vis.examine_edge(*ei, g);
+      ColorValue v_color = get(color, v);
+      if (v_color == Color::white()) {
+        vis.tree_edge(*ei, g);
+        depth_first_visit_impl(g, v, vis, color, func);
+      } else if (v_color == Color::gray())
+        vis.back_edge(*ei, g);
+      else
+        vis.forward_or_cross_edge(*ei, g);
+      call_finish_edge(vis, *ei, g);
+    }
+  put(color, u, Color::black());
+  vis.finish_vertex(u, g);
+}
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+
+&lt;h2&gt;&lt;a href="http://wordaligned.org/articles/gofmt-knows-best#toc7" name="tocconclusion" id="tocconclusion"&gt;Conclusion&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Creative code formatting does have a place. Generally, though, gofmt gets it right. Formatting is automatically taken care of, allowing us to focus our creative energy where it really counts. 
+&lt;/p&gt;</description>
+<dc:date>2016-03-07</dc:date>
+<guid>http://wordaligned.org/articles/gofmt-knows-best</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/gofmt-knows-best</link>
+<category>Go</category>
+</item>
+
+<item>
 <title>Sledgehammers vs Nut Crackers</title>
 <description>&lt;h2&gt;Awk&lt;/h2&gt;
 &lt;p&gt;I get awk and can read awk programs but find the language of little use. Its focus is narrow and its syntax can be surprising. Python matches it at home and smashes it away. Nonetheless, a number of the &lt;a href="./advent-of-code"&gt;advent of code&lt;/a&gt; puzzles fit the awk processing model &amp;#8212; line based instructions, the interpretation of which builds state contributing to the final result &amp;#8212; and I enjoyed writing awk solutions. There&amp;#8217;s satisfaction in using a tool which is up to the job, no more and no less: in using a nutcracker, rather than a sledgehammer, to crack a nut.
@@ -1092,29 +1395,6 @@ The braces and parentheses may be embedded in a double quoted string but that on
 <category>Windows</category>
 <category>C++</category>
 <category>Emacs</category>
-</item>
-
-<item>
-<title>ACCU 2013</title>
-<description>&lt;img src="http://accu.org/content/images/conferences/2013/accu2013web.png" alt="ACCU 2013" /&gt;
-
-&lt;p&gt;Brian Marick opened the second day of ACCU 2013 with a keynote presentation entitled: &lt;a href="http://accu.org/index.php/conferences/accu_conference_2013/accu2013_sessions#cheating_decline:acting_now_to_let_you_program_well_for_a_really_long_time"&gt;&amp;#8220;Cheating Decline: Acting now to let you program well for a really long time&amp;#8221;&lt;/a&gt;. He drew a distinction between effortful and automatic thinking. For example, we can drive a car along a clear road automatically but it requires considerable concentration to parallel park that same car. By tuning out unwanted signals crickets can locate their mates using minimal brainpower, and cricket players have no need of Newtonian dynamics to track the trajectory of a ball &amp;#8212; they apply a simple visual self-calibrating algorithm to catch out batsmen. Tango dancers disturb and re-establish invariants. A robot can walk for hours without thinking about what it&amp;#8217;s doing. Actually, if it&amp;#8217;s your job to park cars, you can probably do &lt;strong&gt;that&lt;/strong&gt; without thinking; and this was Brian Marick&amp;#8217;s main cheat &amp;#8212; find the work practices which allow you to lean on your perceptions and so avoid effortful thinking.
-&lt;/p&gt;
-&lt;iframe width="560" height="315" src="http://www.youtube.com/embed/rhu2xNIpgDE?rel=0" frameborder="0" allowfullscreen&gt;&lt;/iframe&gt;
-
-&lt;p&gt;Anthony Williams&amp;#8217; talk on &lt;a href="http://accu.org/index.php/conferences/accu_conference_2013/accu2013_sessions#c_11_features_and_real-world_code"&gt;C++11 Features and Real World code&lt;/a&gt; did require effortful thinking but that was what I&amp;#8217;d hoped for. He provided a concise and expert summary of the new language features in action, focusing on the biggest early winners. Leading with &lt;code&gt;auto&lt;/code&gt;, &lt;code&gt;lambda&lt;/code&gt;, &lt;code&gt;range-for&lt;/code&gt;, he went on to talk about concurrency and move semantics. I learned that &lt;code&gt;lambda&lt;/code&gt; functions can have a mutable qualifier. Ha!
-&lt;/p&gt;
-&lt;p&gt;I couldn&amp;#8217;t resist &lt;a href="http://www.pvv.org/~oma/"&gt;Olve Maudal&amp;#8217;s&lt;/a&gt; C++11 pub quiz, appropriately held in the Marriot Hotel bar, for which we formed teams and mentally compiled and executed dodgy code, capturing standard output on an answer sheet. Some of the answers may well have have been implementation dependent but Olve specified an implementation: our answers should match &lt;strong&gt;this&lt;/strong&gt; laptop running &lt;strong&gt;this&lt;/strong&gt; software. I was simultaneously appalled by the limits of my knowledge on fundamental subjects such as integral promotion and initialisation order, and surprised by my ability to correctly predict the behaviour of some esoteric and perverse code. I&amp;#8217;m chastened and will be studying the answers in the cold light of day. Brian Marick may have advocated programming after a beer or two in his morning session, but the afternoon pub quiz proved that coffee works better for me!
-&lt;/p&gt;
-&lt;p&gt;A programmer&amp;#8217;s dozen (13, which is 12 counting from zero!) lightning talks kept the day crackling with energy. Ewan Milne chaired the session expertly, adeptly dispatching a birthday cake as proceedings commenced. I wish I could describe all the talks but you really had to be there. Phil Nash&amp;#8217;s use of the little known &lt;a href="http://ideone.com/jWHxu2"&gt;left arrow operator&lt;/a&gt; &amp;larr; got a well deserved response from the audience. Sander Hoogendoorn stuck the boot into &lt;a href="http://sanderhoogendoorn.com/blog/?p=1059"&gt;&amp;#8220;Agile Fluffiness&amp;#8221;&lt;/a&gt;. &lt;a href="http://www.renaissancesoftware.net/blog/"&gt;James Grenning&amp;#8217;s&lt;/a&gt; talk on embedded development was a lightning keynote: hilarious, moving and, ultimately, tragic.
-&lt;/p&gt;</description>
-<dc:date>2013-04-11</dc:date>
-<guid>http://wordaligned.org/articles/accu-2013</guid>
-<author>tag@wordaligned.org (Thomas Guest)</author>
-<link>http://wordaligned.org/articles/accu-2013</link>
-<category>ACCU</category>
-<category>C++</category>
-<category>Bristol</category>
 </item>
 
 </channel>

@@ -25,7 +25,308 @@
 
   <div id="page">
     <div id="content">
-      <div class="atomentry" id="sledgehammers-vs-nut-crackers">
+      <div class="atomentry" id="gofmt-knows-best">
+<h2 class="title"><a href="/articles/gofmt-knows-best">Gofmt knows best</a></h2>
+<p class="meta"><abbr class="published" title="2016-03-07">2016-03-07</abbr> &bull; <a href="/tag/go" rel="tag">Go</a> &bull; <a href="/articles/gofmt-knows-best#disqus_thread">Comments</a></p>
+<div class="toc">
+<h2>Contents</h2>
+<ul>
+ <li><a href="#toceveryones-favourite" name="toc0" id="toc0">Everyone&#8217;s favourite</a>
+ </li>
+
+ <li><a href="#tocgo-knows-best" name="toc1" id="toc1">Go knows best</a>
+ </li>
+
+ <li><a href="#tocwhen-formatters-fail" name="toc2" id="toc2">When formatters fail</a>
+ </li>
+
+ <li><a href="#tocdecluttered-java" name="toc3" id="toc3">Decluttered Java</a>
+ </li>
+
+ <li><a href="#toctetrominoes" name="toc4" id="toc4">Tetrominoes</a>
+ </li>
+
+ <li><a href="#tocobfuscation" name="toc5" id="toc5">Obfuscation</a>
+ </li>
+
+ <li><a href="#tocdepth-first-search" name="toc6" id="toc6">Depth First Search</a>
+ </li>
+
+ <li><a href="#tocconclusion" name="toc7" id="toc7">Conclusion</a>
+ </li>
+</ul>
+</div>
+<h2><a href="#toc0" name="toceveryones-favourite" id="toceveryones-favourite">Everyone&#8217;s favourite</a></h2>
+<blockquote><p>Gofmt&#8217;s style is no one&#8217;s favorite, yet gofmt is everyone&#8217;s favorite.
+   &#8212; <a href="https://go-proverbs.github.io">Rob Pike</a>
+</p>
+</blockquote><p>Code formatting tools are nothing new but Go notches them up a level. Your Go installation comes with an automated formatter, <a href="https://golang.org/cmd/gofmt/">gofmt</a>, and this tool has been used to layout the entire code base. As a result, Go code looks uniform and familiar. The recommendation is to gofmt your own code, ideally on save and certainly before submitting for review.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">(add-hook 'before-save-hook 'gofmt-before-save)
+
+</pre>
+
+</div>
+
+<p><a href="http://clang.llvm.org/docs/ClangFormatStyleOptions.html">Formatting tools for other languages</a> require configuration. You must instruct the tool about your preferences for spaces and braces. Gofmt is inflexible and this is a strength.
+</p>
+<p>The language designers did Go a favour by supplying and promoting gofmt early on, before alternative style guides had been developed and adopted. There can be no more arguments about tabs vs spaces, for example. Code reviews must focus on content rather than layout.
+</p>
+<p>There are also more subtle benefits. Certain kinds of manual layout are fragile: the insertion of space to vertically align assignment statements, for example. A code formatter gets it right every time.
+</p>
+
+<h2><a href="#toc1" name="tocgo-knows-best" id="tocgo-knows-best">Go knows best</a></h2>
+<p>As writers &#8212; and programmers are, fundamentally, <a href="http://wordaligned.org/articles/lessons-from-the-oulipo">writers</a> &#8212; maybe we don&#8217;t want our work to look uniform or familiar. Maybe we prefer more control over what we produce. Maybe sometimes, we&#8217;d like to surprise or provoke.
+</p>
+<p>Does the regularity gofmt imposes render our code bland, even boring?
+</p>
+<p>I&#8217;ve heard this point extended to be a criticism of Go in general: that the language restricts what you can do because the language designers know best, and that it&#8217;s for your own good.
+</p>
+<p>Well, if I&#8217;ve ever submitted extravagently formatted code for review, it&#8217;s been slapped back. Substantial programs are developed by teams who adopt idiom and share style rules for good reason. It&#8217;s how we work together. Imagine how much easier it would be if the third party code in your code base was also written to your preferred style. Go gives you that, so long as everyone plays by the rules.
+</p>
+<p>gofmt does not completely over-ride a programmer&#8217;s choices. Two programs which are semantically identical but laid out differently will probably still be laid out differently after a pass through gofmt.
+</p>
+
+<h2><a href="#toc2" name="tocwhen-formatters-fail" id="tocwhen-formatters-fail">When formatters fail</a></h2>
+<p>Formatting sometimes fails. Some examples follow.
+</p>
+
+<h3><a href="#toc3" name="tocdecluttered-java" id="tocdecluttered-java">Decluttered Java</a></h3>
+<p>Here&#8217;s some creatively formatted Java. Of course it&#8217;s a joke, and a funny one, but a language like Python gets the last laugh. It <strong>is</strong> possible to cut out braces and semi-colons and your code will look better for it.
+</p>
+<div><blockquote class="twitter-tweet" data-lang="en"><p lang="en" dir="ltr">I finally figured out how to get those pesky semicolons and curly braces out of my Java code <a href="http://t.co/Ns96HdCuKO">pic.twitter.com/Ns96HdCuKO</a></p>&mdash; Uncle Bob&#39;s Nephew (@thedirtycoder) <a href="https://twitter.com/thedirtycoder/status/569339014085517312">February 22, 2015</a></blockquote><script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script></div>
+
+
+<h3><a href="#toc4" name="toctetrominoes" id="toctetrominoes">Tetrominoes</a></h3>
+<p>Here&#8217;s an equally witty but perfectly serious use of layout.
+</p>
+<blockquote class="twitter-tweet" data-cards="hidden" data-lang="en"><p lang="en" dir="ltr">I always love it when code is formatted in the shape of the problem it&#39;s solving.<a href="https://t.co/XC7J2cSENj">pic.twitter.com/XC7J2cSENj</a></p>&mdash; Mathias Verraes (@mathiasverraes) <a href="https://twitter.com/mathiasverraes/status/669490082022367232">November 25, 2015</a></blockquote>
+
+<p>Mathias is referring to some tetrominoes &#8212; tetris shapes &#8212; coded in <a href="http://elm-lang.org">elm</a> by <a href="https://github.com/jcollard/elmtris/blob/master/src/Tetromino.elm">Joseph Collard</a>.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">-- A Tetromino is a list of Locations. By definition, a valid tetromino
+-- should contain exactly 4 different locations
+type Tetromino = [Location]
+
+line : Tetromino
+line = [(0,0), (1,0), (2,0), (3,0)]
+
+square : Tetromino
+square = [(0,0), (1,0),
+          (0,1), (1,1)]
+
+spiece : Tetromino
+spiece = [       (1,0), (2,0),
+          (0,1), (1,1)]
+
+jpiece : Tetromino
+jpiece = [       (1,0),
+                 (1,1),
+          (0,2), (1,2)]
+
+</pre>
+
+</div>
+
+<p>For brevity, I&#8217;ve left out the Z and L pieces. I&#8217;ve also omitted comments from the original, which I would suggest are redundant since the code has been painstakingly formatted to indicate the shape of the pieces.
+</p>
+<p>The same tetrominoes in hand-formatted Go read:
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">package tetris
+
+type Tetronimo [4][2]int
+
+var (
+    Line   = Tetronimo   {{0, 0}, {1, 0}, {2, 0}, {3, 0}}
+    
+    Square = Tetronimo   {{0, 0}, {1, 0}, 
+                          {0, 1}, {1, 1}}
+    
+    Spiece = Tetronimo   {        {1, 0}, {2, 0}, 
+                          {0, 1}, {1, 1}}
+    
+    Jpiece = Tetronimo   {        {1, 0}, 
+                                  {1, 1}, 
+                          {0, 2}, {1, 2}}
+)
+
+</pre>
+
+</div>
+
+<p>gofmt spoils them.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">package tetris
+
+type Tetronimo [4][2]int
+
+var (
+	Line = Tetronimo{{0, 0}, {1, 0}, {2, 0}, {3, 0}}
+    
+	Square = Tetronimo{{0, 0}, {1, 0},
+		{0, 1}, {1, 1}}
+    
+	Spiece = Tetronimo{{1, 0}, {2, 0},
+		{0, 1}, {1, 1}}
+    
+	Jpiece = Tetronimo{{1, 0},
+		{1, 1},
+		{0, 2}, {1, 2}}
+)
+
+</pre>
+
+</div>
+
+
+<h3><a href="#toc5" name="tocobfuscation" id="tocobfuscation">Obfuscation</a></h3>
+<p>Here&#8217;s a tiny rectangular program <a href="http://accu.org/index.php/journals/256">submitted by Thaddaeus Frogley to the International Obfuscated C Code Contest</a> in 2001. It&#8217;s <strong>meant</strong> to be hard to read and the compact layout helps &#8212; by hindering.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">/*(c) 2001 Thad */
+#include&lt;string.h&gt;
+#include &lt;stdio.h&gt;
+#define abc stdout
+int main(int a,ch\
+ar*b){char*c="??="
+"??(??/??/??)??'{"
+"??!??&gt;??-";while(
+!((a=fgetc(stdin))
+==EOF))fputc((b=s\
+trchr(c,a))?fputc(
+fputc(077,abc),abc
+),"=(/)'&lt;!&gt;""-"??(
+b-c??):a, abc);??&gt;
+
+</pre>
+
+</div>
+
+<p>In the author&#8217;s own words:
+</p>
+<blockquote><p> I wanted to create a piece of code that could be considered to be &#8220;art&#8221; on multiple levels.
+</p>
+</blockquote><p>He&#8217;s succeeded. It&#8217;s impossible to translate this program into Go so I cannot gofmt it. If, instead, I try <a href="http://clang.llvm.org/docs/ClangFormatStyleOptions.html">clang-format</a>, the resulting code <strong>no longer compiles</strong>!
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">/*(c) 2001 Thad */
+#include &lt;stdio.h&gt;
+#include &lt;string.h&gt;
+#define abc stdout
+int main(int a, ch\
+ar *b) {
+  char *c = "??="
+            "??(??/??/??)??'{"
+            "??!??&gt;??-";
+  while (!((a = fgetc(stdin)) == EOF))fputc((b=s\
+trchr(c,a))?fputc(
+fputc(077,abc),abc
+),"=(/)'&lt;!&gt;""-"??(
+b-c??):a, abc);
+? ? &gt;
+
+</pre>
+
+</div>
+
+
+<h3><a href="#toc6" name="tocdepth-first-search" id="tocdepth-first-search">Depth First Search</a></h3>
+<p>Here&#8217;s a recursive depth first search from the <a href="https://github.com/boostorg/graph/blob/develop/include/boost/graph/depth_first_search.hpp#L181">boost graph library</a>
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">template &lt;class IncidenceGraph, class DFSVisitor, class ColorMap,
+          class TerminatorFunc&gt;
+void depth_first_visit_impl
+  (const IncidenceGraph&amp; g,
+   typename graph_traits&lt;IncidenceGraph&gt;::vertex_descriptor u,
+   DFSVisitor&amp; vis,  // pass-by-reference here, important!
+   ColorMap color, TerminatorFunc func)
+{
+  typedef typename graph_traits&lt;IncidenceGraph&gt;::vertex_descriptor Vertex;
+  typedef typename property_traits&lt;ColorMap&gt;::value_type ColorValue;
+  typedef color_traits&lt;ColorValue&gt; Color;
+  typename graph_traits&lt;IncidenceGraph&gt;::out_edge_iterator ei, ei_end;
+  
+  put(color, u, Color::gray());          vis.discover_vertex(u, g);
+  
+  if (!func(u, g))
+    for (boost::tie(ei, ei_end) = out_edges(u, g); ei != ei_end; ++ei) {
+      Vertex v = target(*ei, g);           vis.examine_edge(*ei, g);
+      ColorValue v_color = get(color, v);
+      if (v_color == Color::white()) {     vis.tree_edge(*ei, g);
+      depth_first_visit_impl(g, v, vis, color, func);
+      } else if (v_color == Color::gray()) vis.back_edge(*ei, g);
+      else                                 vis.forward_or_cross_edge(*ei, g);
+      call_finish_edge(vis, *ei, g);
+    }
+  put(color, u, Color::black());         vis.finish_vertex(u, g);
+}
+
+</pre>
+
+</div>
+
+<p>Clients of the function supply a visitor, <code>vis</code>, which is called back as vertices and edges are discovered and classified. These callbacks are carefully placed on the right hand side, visually distinguishing traversal from events. Note too the alignment, with edge events indented to the right of vertex events. Again, a code formatter tramples over this elegantly shaped code:
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">template &lt;class IncidenceGraph, class DFSVisitor, class ColorMap,
+          class TerminatorFunc&gt;
+void depth_first_visit_impl(
+    const IncidenceGraph &amp;g,
+    typename graph_traits&lt;IncidenceGraph&gt;::vertex_descriptor u,
+    DFSVisitor &amp;vis, // pass-by-reference here, important!
+    ColorMap color, TerminatorFunc func) {
+  typedef typename graph_traits&lt;IncidenceGraph&gt;::vertex_descriptor Vertex;
+  typedef typename property_traits&lt;ColorMap&gt;::value_type ColorValue;
+  typedef color_traits&lt;ColorValue&gt; Color;
+  typename graph_traits&lt;IncidenceGraph&gt;::out_edge_iterator ei, ei_end;
+  
+  put(color, u, Color::gray());
+  vis.discover_vertex(u, g);
+  
+  if (!func(u, g))
+    for (boost::tie(ei, ei_end) = out_edges(u, g); ei != ei_end; ++ei) {
+      Vertex v = target(*ei, g);
+      vis.examine_edge(*ei, g);
+      ColorValue v_color = get(color, v);
+      if (v_color == Color::white()) {
+        vis.tree_edge(*ei, g);
+        depth_first_visit_impl(g, v, vis, color, func);
+      } else if (v_color == Color::gray())
+        vis.back_edge(*ei, g);
+      else
+        vis.forward_or_cross_edge(*ei, g);
+      call_finish_edge(vis, *ei, g);
+    }
+  put(color, u, Color::black());
+  vis.finish_vertex(u, g);
+}
+
+</pre>
+
+</div>
+
+
+<h2><a href="#toc7" name="tocconclusion" id="tocconclusion">Conclusion</a></h2>
+<p>Creative code formatting does have a place. Generally, though, gofmt gets it right. Formatting is automatically taken care of, allowing us to focus our creative energy where it really counts. 
+</p>
+
+</div>
+
+
+<div class="atomentry" id="sledgehammers-vs-nut-crackers">
 <h2 class="title"><a href="/articles/sledgehammers-vs-nut-crackers">Sledgehammers vs Nut Crackers</a></h2>
 <p class="meta"><abbr class="published" title="2016-02-23">2016-02-23</abbr> &bull; <a href="/tag/awk" rel="tag">Awk</a>, <a href="/tag/python" rel="tag">Python</a> &bull; <a href="/articles/sledgehammers-vs-nut-crackers#disqus_thread">Comments</a></p>
 <h2>Awk</h2>
@@ -799,56 +1100,6 @@ Character character, char, ch, <b>c</b>;</code></pre>
 </div>
 
 
-<div class="atomentry" id="all-any-none">
-<h2 class="title"><a href="/articles/all-any-none">You wait all day for a bus&#8230;</a></h2>
-<p class="meta"><abbr class="published" title="2013-10-02">2013-10-02</abbr> &bull; <a href="/tag/c++" rel="tag">C++</a>, <a href="/tag/python" rel="tag">Python</a> &bull; <a href="/articles/all-any-none#disqus_thread">Comments</a></p>
-<p><a href="http://docs.python.org/3/library/functions.html#any"><code>Any</code></a> and <a href="http://docs.python.org/3/library/functions.html#all"><code>all</code></a>  didn&#8217;t appear in Python until version 2.5, released in 2006, when the language was already well into its teens.
-</p>
-<p>Why the delay in offering such fundamental functions? An oversight? Or simply that they&#8217;re so easy to implement they weren&#8217;t thought necessary. Either way, they&#8217;re here now.
-</p>
-<p>The functions are closely related and complementary. We can define <code>any</code> in terms of <code>all</code> and vice-versa.
-</p>
-<div class="typocode">
-
-<pre class="prettyprint">def any_(xs):
-    return not all(map(operator.not_, xs))
-
-def all_(xs):
-    return not any(map(operator.not_, xs))
-
-</pre>
-
-</div>
-
-<p>C++ reached its 30s before introducing <a href="http://en.cppreference.com/w/cpp/algorithm/all_any_none_of">its own versions</a> of these logical algorithms, <code>any_of</code> and <code>all_of</code>, but made up for lost time by finding room for a third, <code>none_of</code>, which is not <code>any_of</code>.
-</p>
-<div class="typocode">
-
-<pre class="prettyprint">template &lt;class Iter, class Pred&gt;
-bool none_of_(Iter b, Iter e, Pred p)
-{
-    return std::find_if(b, e, p) == e;
-}
-
-template &lt;class Iter, class Pred&gt;
-bool any_of_(Iter b, Iter e, Pred p)
-{
-    return !none_of_(b, e, p);
-}
-
-template &lt;class Iter, class Pred&gt;
-bool all_of_(Iter b, Iter e, Pred p)
-{
-    return !any_of_(b, e, std::not1(p));
-}
-
-</pre>
-
-</div>
-
-</div>
-
-
 <div class="extended">
 <p><a href="/articles/">Visit the Word Aligned archives...</a></p>
 </div>
@@ -924,7 +1175,7 @@ bool all_of_(Iter b, Iter e, Pred p)
 <div class="sidebar-node">
 <h3>Chain</h3>
 <ul>
-<li><a accesskey="p" href="/articles/sledgehammers-vs-nut-crackers" title="First article">&raquo; Sledgehammers vs Nut Crackers</a></li>
+<li><a accesskey="p" href="/articles/gofmt-knows-best" title="First article">&raquo; Gofmt knows best</a></li>
 
 </ul>
 
