@@ -84,9 +84,9 @@
 </p>
 <p>I&#8217;ve heard this point extended to be a criticism of Go in general: that the language restricts what you can do because the language designers know best, and that it&#8217;s for your own good.
 </p>
-<p>Well, if I&#8217;ve ever submitted extravagently formatted code for review, it&#8217;s been slapped back. Substantial programs are developed by teams who adopt idiom and share style rules for good reason. It&#8217;s how we work together. Imagine how much easier it would be if the third party code in your code base was also written to your preferred style. Go gives you that, so long as everyone plays by the rules.
+<p>Well, if I&#8217;ve ever submitted extravagently formatted code for review, it&#8217;s been slapped back. Substantial programs are developed by teams who adopt idiom and share style rules for good reason. It&#8217;s how we work together. Imagine how much easier it would be if the third party code in your code base was also written to your preferred style. Go gives you that, so long as you prefer its native style.
 </p>
-<p>gofmt does not completely over-ride a programmer&#8217;s choices. Two programs which are semantically identical but laid out differently will probably still be laid out differently after a pass through gofmt.
+<p>Gofmt does not completely over-ride a programmer&#8217;s choices. Two programs which are semantically identical but laid out differently will probably still be laid out differently after a pass through gofmt.
 </p>
 
 <h2><a href="#toc2" name="tocwhen-formatters-fail" id="tocwhen-formatters-fail">When formatters fail</a></h2>
@@ -94,13 +94,13 @@
 </p>
 
 <h3><a href="#toc3" name="tocdecluttered-java" id="tocdecluttered-java">Decluttered Java</a></h3>
-<p>Here&#8217;s some creatively formatted Java. Of course it&#8217;s a joke, and a funny one, but a language like Python gets the last laugh. It <strong>is</strong> possible to cut out braces and semi-colons and your code will look better for it.
+<p>Here&#8217;s some creatively formatted Java. Of course it&#8217;s a joke, and a funny one, but a language like Python, and indeed go, gets the last laugh. It <strong>is</strong> possible to get rid of braces and semicolons and your code <strong>will</strong> look better for it.
 </p>
 <div><blockquote class="twitter-tweet" data-lang="en"><p lang="en" dir="ltr">I finally figured out how to get those pesky semicolons and curly braces out of my Java code <a href="http://t.co/Ns96HdCuKO">pic.twitter.com/Ns96HdCuKO</a></p>&mdash; Uncle Bob&#39;s Nephew (@thedirtycoder) <a href="https://twitter.com/thedirtycoder/status/569339014085517312">February 22, 2015</a></blockquote><script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script></div>
 
 
 <h3><a href="#toc4" name="toctetrominoes" id="toctetrominoes">Tetrominoes</a></h3>
-<p>Here&#8217;s an equally witty but perfectly serious use of layout.
+<p>Here&#8217;s an equally witty but perfectly sensible use of non-standard layout.
 </p>
 <blockquote class="twitter-tweet" data-cards="hidden" data-lang="en"><p lang="en" dir="ltr">I always love it when code is formatted in the shape of the problem it&#39;s solving.<a href="https://t.co/XC7J2cSENj">pic.twitter.com/XC7J2cSENj</a></p>&mdash; Mathias Verraes (@mathiasverraes) <a href="https://twitter.com/mathiasverraes/status/669490082022367232">November 25, 2015</a></blockquote>
 
@@ -160,7 +160,7 @@ var (
 
 </div>
 
-<p>gofmt spoils them.
+<p>Gofmt spoils them:
 </p>
 <div class="typocode">
 
@@ -188,7 +188,7 @@ var (
 
 
 <h3><a href="#toc5" name="tocobfuscation" id="tocobfuscation">Obfuscation</a></h3>
-<p>Here&#8217;s a tiny rectangular program <a href="http://accu.org/index.php/journals/256">submitted by Thaddaeus Frogley to the International Obfuscated C Code Contest</a> in 2001. It&#8217;s <strong>meant</strong> to be hard to read and the compact layout helps &#8212; by hindering.
+<p>Here&#8217;s a tiny rectangular program <a href="http://accu.org/index.php/journals/256">submitted by Thaddaeus Frogley</a> to the International Obfuscated C Code Contest in 2001. It&#8217;s <strong>meant</strong> to be hard to read and the compact layout helps, by hindering.
 </p>
 <div class="typocode">
 
@@ -215,7 +215,7 @@ b-c??):a, abc);??&gt;
 </p>
 <blockquote><p> I wanted to create a piece of code that could be considered to be &#8220;art&#8221; on multiple levels.
 </p>
-</blockquote><p>He&#8217;s succeeded. It&#8217;s impossible to translate this program into Go so I cannot gofmt it. If, instead, I try <a href="http://clang.llvm.org/docs/ClangFormatStyleOptions.html">clang-format</a>, the resulting code <strong>no longer compiles</strong>!
+</blockquote><p>He&#8217;s succeeded. It&#8217;s impossible to translate this program into Go so I cannot gofmt it. If, instead, I try <a href="http://clang.llvm.org/docs/ClangFormatStyleOptions.html">clang-format</a>, the resulting code <strong>no longer compiles</strong>! Obfuscation has bamboozled the formatter.
 </p>
 <div class="typocode">
 
@@ -241,7 +241,7 @@ b-c??):a, abc);
 
 
 <h3><a href="#toc6" name="tocdepth-first-search" id="tocdepth-first-search">Depth First Search</a></h3>
-<p>Here&#8217;s a recursive depth first search from the <a href="https://github.com/boostorg/graph/blob/develop/include/boost/graph/depth_first_search.hpp#L181">boost graph library</a>
+<p>Finally, here&#8217;s a recursive depth first search from the <a href="https://github.com/boostorg/graph/blob/develop/include/boost/graph/depth_first_search.hpp#L181">boost graph library</a>
 </p>
 <div class="typocode">
 
@@ -277,7 +277,7 @@ void depth_first_visit_impl
 
 </div>
 
-<p>Clients of the function supply a visitor, <code>vis</code>, which is called back as vertices and edges are discovered and classified. These callbacks are carefully placed on the right hand side, visually distinguishing traversal from events. Note too the alignment, with edge events indented to the right of vertex events. Again, a code formatter tramples over this elegantly shaped code:
+<p>Clients of the function supply a visitor, <code>vis</code>, which is called back as vertices and edges are discovered and classified. These callbacks are carefully placed on the right hand side, visually distinguishing the core traversal from associated events. Note too the alignment, with edge events indented to the right of vertex events. Again, a code formatter tramples over this elegantly shaped code:
 </p>
 <div class="typocode">
 
@@ -320,7 +320,7 @@ void depth_first_visit_impl(
 
 
 <h2><a href="#toc7" name="tocconclusion" id="tocconclusion">Conclusion</a></h2>
-<p>Creative code formatting does have a place. Generally, though, gofmt gets it right. Formatting is automatically taken care of, allowing us to focus our creative energy where it really counts. 
+<p>Creative code formatting does have a place. Generally, though, gofmt gets it right: an automated tool can and should take care of formatting our code base, and the benefits are amplified if the tool is inflexible. With formatting solved we can focus our creative energy where it counts. 
 </p>
 
 </div>
