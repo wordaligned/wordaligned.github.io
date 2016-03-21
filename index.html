@@ -65,13 +65,13 @@
 
 <p>None of these is difficult, especially in a high-level language which builds in support for sequence operations. What I found noteworthy is that a solution can be found without any <a href="https://docs.python.org/3/reference/compound_stmts.html">loops or if statements</a>. What&#8217;s more, every operation can handled using nothing more than <a href="https://docs.python.org/3/library/stdtypes.html#sequence-types-list-tuple-range">slice operations</a>.
 </p>
-<p>Here&#8217;s my solution. The machines use slices, helped by a couple of conditional expressions and recursive calls. The solution can then be brute-forced: there are only 5040 ways of permuting 6 out of 7 machines.
+<p>Here&#8217;s my solution. The machines consist of slice operations, helped by a couple of conditional expressions and recursive calls. The solution can then be brute-forced: there are only 5040 ways of permuting 6 out of 7 machines.
 </p>
 <script src="https://gist.github.com/wordaligned/a04308eac7ee2aa37e01.js"></script>
 
-<p>I&#8217;ve used <code>reduce</code> to apply a chain of functions, in sequence, to a string of sausages &#8212; an explicit loop might be clearer, but I want a loop-free solution. For this same reason I use recursion in the pairwise swapper and the element dropper. Generally in Python, recursion is a poor choice. In this case I know I&#8217;m starting with a string of just 36 elements which cannot get any longer; there&#8217;s no risk of exceeding the recursion limit.
+<p>I&#8217;ve used <code>reduce</code> to apply a chain of functions to a string of sausages &#8212; an explicit loop might be clearer, but I want a loop-free solution. For this same reason I use recursion in the pairwise swapper and the element dropper. Generally in Python, recursion is a poor choice. In this case I know I&#8217;m starting with a string of just 36 elements which cannot get any longer; there&#8217;s no risk of exceeding the <a href="https://docs.python.org/3/library/sys.html#sys.getrecursionlimit">system recursion limit</a>.
 </p>
-<p>The list reversal <code>s[::-1]</code> is idiomatic but alarming to the uninitiated. Slices have a <code>[start:stop:stride]</code> fields, any of which may be defaulted. Usually <code>start</code> and <code>stop</code> default to the start and end of the list, but in this case the negative stride reverses them. The equally idiomatic <code>list(reversed(s))</code> would be more clear.
+<p>The list reversal <code>s[::-1]</code> is idiomatic but alarming to the uninitiated. Slices have <code>[start:stop:stride]</code> fields, any of which may be defaulted. Usually <code>start</code> and <code>stop</code> default to the start and end of the list, but in this case the negative stride reverses them. The equally idiomatic <code>list(reversed(s))</code> would be more clear.
 </p>
 <p>To rotate the last element of the list to the front, prefer:
 </p>
