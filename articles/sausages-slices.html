@@ -1,0 +1,157 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<link rel="icon" href="/images/favicon.png" type="image/png"/>
+<link href="/styles/application.css" media="all" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="/scripts/prettify.js"></script>
+<script type="text/javascript" src="/scripts/lang-lisp.js"></script>
+<title>Sausages, sausages, sausages - slice, slice, slice</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="author" content="Thomas Guest" />
+<meta name="description" content="A Word Aligned article posted 2016-03-21, tagged Puzzles, Python." />
+<meta name="keywords" content="Puzzles, Python" />
+<link rel="alternate" type="application/rss+xml" title="Feed" href="http://feeds.wordaligned.org/wordaligned" />
+</head>
+
+<body onload="prettyPrint()">
+<div id="container">
+  <div id="header">
+<h1><span><a accesskey="h" href="/">Word Aligned</a></span></h1>
+<h2>think about it</h2>
+<a class="button" href="http://feeds.wordaligned.org/wordaligned" title="Subscribe to Word Aligned"><img style="float: right;" src="/images/feed.png" alt="Feed Logo" height="28" width="28"/></a>
+</div>
+
+  <div id="page">
+    <div id="content">
+      <div class="atomentry" id="sausages-slices">
+<h2 class="title"><a href="/articles/sausages-slices">Sausages, sausages, sausages - slice, slice, slice</a></h2>
+<p class="meta"><abbr class="published" title="2016-03-21">2016-03-21</abbr> &bull; <a href="/tag/puzzles" rel="tag">Puzzles</a>, <a href="/tag/python" rel="tag">Python</a> &bull; <a href="/articles/sausages-slices#disqus_thread">Comments</a></p>
+<p>A friend asked for help reaching the next level of a puzzle game. The test which stalled her involves machine placement in a sausage factory.
+</p>
+<blockquote><p>&#8230; each sausage was branded with a letter for quality control purposes, thus:
+   <strong>ypbtkizfgxptclcoirdsuhjwulqkoszrabfc</strong>
+</p>
+<p>The string was then drawn through seven machines which rearranged the sausages in flavour enhancing ways.
+</p>
+<p><strong>Machine A: The Reversifier</strong>
+</p>
+<p>Reverses the order of the sausages, so they get tastier as you go along.
+</p>
+<p>&#8230;
+</p>
+<p><strong>Machine G: Secondhalffirstifier</strong>
+</p>
+<p>move the second half of the string to the beginning, as the earlier sausages are too spicy to eat early in the morning.
+</p>
+<p>He attached these machines in a certain sequence, though one of them was out for repair so only six were used. He then fed a string of sausages through and was surprised to discover the string that came out at the other end said <strong>lickyourlips</strong>. What order were the machines in?
+</p>
+</blockquote><p>It&#8217;s nicely phrased, but what&#8217;s really wanted is the sequence of simple transformations that takes input &#8220;ypbtkizfgxptclcoirdsuhjwulqkoszrabfc&#8221; and produces output &#8220;lickyourlips&#8221;.
+</p>
+<p>It&#8217;s no doubt possible to work backwards and figure out a solution using no more than logic, pencil and paper. For example, only two of the machines change the length of the string, and &#8212; looking at the before and after lengths &#8212; these must both be used. It&#8217;s rather easier to write a short program to find a solution.
+</p>
+<p>First we must simulate the sausage machines. If we represent our string as a list, the seven machines, A-G, perform the following operations.
+</p>
+<ol type="A">
+<li>reverse the order of a list</li>
+<li>remove every other element of a list</li>
+<li>remove every third element of a list</li>
+<li>pairwise reverse elements of a list</li>
+<li>move even numbered elements to the front of a list</li>
+<li>move the last element of a list to the front</li>
+<li>swap the front and back half of a list</li>
+</ol>
+
+<p>None of these is difficult, especially in a high-level language which builds in support for sequence operations. What I found noteworthy is that a solution can be found without any <a href="https://docs.python.org/3/reference/compound_stmts.html">loops or if statements</a>. What&#8217;s more, every operation can handled using nothing more than <a href="https://docs.python.org/3/library/stdtypes.html#sequence-types-list-tuple-range">slice operations</a>.
+</p>
+<p>Here&#8217;s my solution. The machines use slices, helped by a couple of conditional expressions and recursive calls. The solution can then be brute-forced: there are only 5040 ways of permuting 6 out of 7 machines.
+</p>
+<script src="https://gist.github.com/wordaligned/a04308eac7ee2aa37e01.js"></script>
+
+<p>I&#8217;ve used <code>reduce</code> to apply a chain of functions, in sequence, to a string of sausages &#8212; an explicit loop might be clearer, but I want a loop-free solution. For this same reason I use recursion in the pairwise swapper and the element dropper. Generally in Python, recursion is a poor choice. In this case I know I&#8217;m starting with a string of just 36 elements which cannot get any longer; there&#8217;s no risk of exceeding the recursion limit.
+</p>
+<p>The list reversal <code>s[::-1]</code> is idiomatic but alarming to the uninitiated. Slices have a <code>[start:stop:stride]</code> fields, any of which may be defaulted. Usually <code>start</code> and <code>stop</code> default to the start and end of the list, but in this case the negative stride reverses them. The equally idiomatic <code>list(reversed(s))</code> would be more clear.
+</p>
+<p>To rotate the last element of the list to the front, prefer:
+</p>
+<pre><code>return s[-1:] + s[:-1]
+</code></pre><p>to:
+</p>
+<pre><code>return [s[-1]] + s[:-1]
+</code></pre><p>because the latter raises an <code>IndexError</code> for an empty sequence.
+</p>
+<p>Slicing is a formidable tool for sequence manipulation, especially when combined with the option of using negative indices to count back from the end of the list. Slices allow you to reverse, rotate and partition lists, to pairwise swap elements, and to drop every nth element.
+</p>
+<p>The miniature recipes presented here don&#8217;t even use slice assignment, which gives me an excuse to reproduce this elegant prime sieve function, which does.
+</p>
+<script src="https://gist.github.com/wordaligned/09c17eaabb6cd4c6bcfb.js"></script>
+</div>
+
+<div class="comments"><hr/><div id="disqus_thread"></div><script type="text/javascript" src="http://disqus.com/forums/wordaligned/embed.js"></script></div>
+      
+<div id="comments"><script type="text/javascript">
+//<![CDATA[
+(function() {
+    var links = document.getElementsByTagName('a');
+    var query = '?';
+    for(var i = 0; i < links.length; i++) {
+        if(links[i].href.indexOf('#disqus_thread') >= 0) {
+            query += 'url' + i + '=' + encodeURIComponent(links[i].href) + '&amp;';
+        }
+    }
+    document.write('<script type="text/javascript" src="http://disqus.com/forums/wordaligned/get_num_replies.js' + query + '"></' + 'script>');
+})();
+//]]>
+</script></div>
+
+    </div>
+    <div id="sidebar">
+      
+<div class="sidebar-node">
+<h3>Tagged</h3>
+<ul id="categories"><li><a href="/tag/puzzles" rel="tag">Puzzles</a></li>
+<li><a href="/tag/python" rel="tag">Python</a></li></ul>
+
+</div>
+
+<div class="sidebar-node">
+<h3>Chain</h3>
+<ul>
+
+<li><a accesskey="p" href="/articles/gofmt-knows-best" title="Previous article">&raquo; Gofmt knows best</a></li>
+</ul>
+
+
+</div>
+
+<div class="sidebar-node">
+<h3>Feeds</h3>
+
+<ul>
+<li><a href="http://feeds.wordaligned.org/wordaligned"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Articles</a></li>
+<li><a href="http://feeds.wordaligned.org/wordaligned/comments"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Comments</a></li>
+</ul>
+
+
+</div>
+
+    </div>
+  </div>
+  <div id="footer">
+<hr />
+<p><a href="http://tag.wordaligned.org">Thomas Guest</a></p>
+</div>
+
+</div>
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-3373724-1']);
+  _gaq.push(['_trackPageview']);
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ga);
+  })();
+</script>
+</body>
+
+</html>

@@ -7,6 +7,74 @@
 <dc:creator>tag@wordaligned.org</dc:creator>
 <language>en-gb</language>
 <item>
+<title>Sausages, sausages, sausages - slice, slice, slice</title>
+<description>&lt;p&gt;A friend asked for help reaching the next level of a puzzle game. The test which stalled her involves machine placement in a sausage factory.
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;&amp;#8230; each sausage was branded with a letter for quality control purposes, thus:
+   &lt;strong&gt;ypbtkizfgxptclcoirdsuhjwulqkoszrabfc&lt;/strong&gt;
+&lt;/p&gt;
+&lt;p&gt;The string was then drawn through seven machines which rearranged the sausages in flavour enhancing ways.
+&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Machine A: The Reversifier&lt;/strong&gt;
+&lt;/p&gt;
+&lt;p&gt;Reverses the order of the sausages, so they get tastier as you go along.
+&lt;/p&gt;
+&lt;p&gt;&amp;#8230;
+&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Machine G: Secondhalffirstifier&lt;/strong&gt;
+&lt;/p&gt;
+&lt;p&gt;move the second half of the string to the beginning, as the earlier sausages are too spicy to eat early in the morning.
+&lt;/p&gt;
+&lt;p&gt;He attached these machines in a certain sequence, though one of them was out for repair so only six were used. He then fed a string of sausages through and was surprised to discover the string that came out at the other end said &lt;strong&gt;lickyourlips&lt;/strong&gt;. What order were the machines in?
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;It&amp;#8217;s nicely phrased, but what&amp;#8217;s really wanted is the sequence of simple transformations that takes input &amp;#8220;ypbtkizfgxptclcoirdsuhjwulqkoszrabfc&amp;#8221; and produces output &amp;#8220;lickyourlips&amp;#8221;.
+&lt;/p&gt;
+&lt;p&gt;It&amp;#8217;s no doubt possible to work backwards and figure out a solution using no more than logic, pencil and paper. For example, only two of the machines change the length of the string, and &amp;#8212; looking at the before and after lengths &amp;#8212; these must both be used. It&amp;#8217;s rather easier to write a short program to find a solution.
+&lt;/p&gt;
+&lt;p&gt;First we must simulate the sausage machines. If we represent our string as a list, the seven machines, A-G, perform the following operations.
+&lt;/p&gt;
+&lt;ol type="A"&gt;
+&lt;li&gt;reverse the order of a list&lt;/li&gt;
+&lt;li&gt;remove every other element of a list&lt;/li&gt;
+&lt;li&gt;remove every third element of a list&lt;/li&gt;
+&lt;li&gt;pairwise reverse elements of a list&lt;/li&gt;
+&lt;li&gt;move even numbered elements to the front of a list&lt;/li&gt;
+&lt;li&gt;move the last element of a list to the front&lt;/li&gt;
+&lt;li&gt;swap the front and back half of a list&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;None of these is difficult, especially in a high-level language which builds in support for sequence operations. What I found noteworthy is that a solution can be found without any &lt;a href="https://docs.python.org/3/reference/compound_stmts.html"&gt;loops or if statements&lt;/a&gt;. What&amp;#8217;s more, every operation can handled using nothing more than &lt;a href="https://docs.python.org/3/library/stdtypes.html#sequence-types-list-tuple-range"&gt;slice operations&lt;/a&gt;.
+&lt;/p&gt;
+&lt;p&gt;Here&amp;#8217;s my solution. The machines use slices, helped by a couple of conditional expressions and recursive calls. The solution can then be brute-forced: there are only 5040 ways of permuting 6 out of 7 machines.
+&lt;/p&gt;
+&lt;script src="https://gist.github.com/wordaligned/a04308eac7ee2aa37e01.js"&gt;&lt;/script&gt;
+
+&lt;p&gt;I&amp;#8217;ve used &lt;code&gt;reduce&lt;/code&gt; to apply a chain of functions, in sequence, to a string of sausages &amp;#8212; an explicit loop might be clearer, but I want a loop-free solution. For this same reason I use recursion in the pairwise swapper and the element dropper. Generally in Python, recursion is a poor choice. In this case I know I&amp;#8217;m starting with a string of just 36 elements which cannot get any longer; there&amp;#8217;s no risk of exceeding the recursion limit.
+&lt;/p&gt;
+&lt;p&gt;The list reversal &lt;code&gt;s[::-1]&lt;/code&gt; is idiomatic but alarming to the uninitiated. Slices have a &lt;code&gt;[start:stop:stride]&lt;/code&gt; fields, any of which may be defaulted. Usually &lt;code&gt;start&lt;/code&gt; and &lt;code&gt;stop&lt;/code&gt; default to the start and end of the list, but in this case the negative stride reverses them. The equally idiomatic &lt;code&gt;list(reversed(s))&lt;/code&gt; would be more clear.
+&lt;/p&gt;
+&lt;p&gt;To rotate the last element of the list to the front, prefer:
+&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;return s[-1:] + s[:-1]
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;to:
+&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;return [s[-1]] + s[:-1]
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;because the latter raises an &lt;code&gt;IndexError&lt;/code&gt; for an empty sequence.
+&lt;/p&gt;
+&lt;p&gt;Slicing is a formidable tool for sequence manipulation, especially when combined with the option of using negative indices to count back from the end of the list. Slices allow you to reverse, rotate and partition lists, to pairwise swap elements, and to drop every nth element.
+&lt;/p&gt;
+&lt;p&gt;The miniature recipes presented here don&amp;#8217;t even use slice assignment, which gives me an excuse to reproduce this elegant prime sieve function, which does.
+&lt;/p&gt;
+&lt;script src="https://gist.github.com/wordaligned/09c17eaabb6cd4c6bcfb.js"&gt;&lt;/script&gt;</description>
+<dc:date>2016-03-21</dc:date>
+<guid>http://wordaligned.org/articles/sausages-slices</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/sausages-slices</link>
+<category>Puzzles</category>
+<category>Python</category>
+</item>
+
+<item>
 <title>Gofmt knows best</title>
 <description>&lt;div class="toc"&gt;
 &lt;h2&gt;Contents&lt;/h2&gt;
@@ -1376,25 +1444,6 @@ The braces and parentheses may be embedded in a double quoted string but that on
 <link>http://wordaligned.org/articles/angle-brackets-hurt-my-eyes</link>
 <category>Lisp</category>
 <category>Syntax</category>
-</item>
-
-<item>
-<title>&#8220;Solutions&#8221;</title>
-<description>&lt;p&gt;I like working around enthusiasts and optimists but that doesn&amp;#8217;t mean I want to use chirpy or bombastic software.
-&lt;/p&gt;
-&lt;p&gt;These days I build programs using visual studio. Sure, it&amp;#8217;s a decent tool but part of me cringes every time I&amp;#8217;m asked to open a &lt;strong&gt;&amp;#8220;Solution&amp;#8221;&lt;/strong&gt; especially when what I get seems more like a &lt;strong&gt;&amp;#8220;Muddle&amp;#8221;&lt;/strong&gt;. A progress bar slides into action after my program links: &lt;strong&gt;&amp;#8220;Updating Intellisense &amp;#8230;&amp;#8221;&lt;/strong&gt;
-&lt;/p&gt;
-&lt;p&gt;Who coined that galumphing portmanteau? It means auto-completion and I don&amp;#8217;t want to know it&amp;#8217;s going on &amp;#8212; especially since I edit code using &lt;a href="http://wordaligned.org/articles/accidental-emacs.html"&gt;Emacs&lt;/a&gt;.
-&lt;/p&gt;
-&lt;p&gt;Perforce is new to me and I lean on a &lt;a href="http://www.perforce.com/product/components/perforce-visual-client" title="P4V"&gt;graphical client&lt;/a&gt; so heavily I sometimes trip over it. So when I&amp;#8217;m trying to dance round client workspaces and their half-baked integration with microsoft &lt;del&gt;muddles&lt;/del&gt; solutions, the last thing I want is to be asked to &lt;strong&gt;&amp;#8220;Choose a Favorite Connection&amp;#8221;&lt;/strong&gt;. When it comes to Perforce Servers I don&amp;#8217;t have favourites let alone favorites. Sorry.
-&lt;/p&gt;</description>
-<dc:date>2013-04-17</dc:date>
-<guid>http://wordaligned.org/articles/solutions</guid>
-<author>tag@wordaligned.org (Thomas Guest)</author>
-<link>http://wordaligned.org/articles/solutions</link>
-<category>Windows</category>
-<category>C++</category>
-<category>Emacs</category>
 </item>
 
 </channel>
