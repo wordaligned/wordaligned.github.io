@@ -25,7 +25,39 @@
 
   <div id="page">
     <div id="content">
-      <div class="atomentry" id="sausages-slices">
+      <div class="atomentry" id="easy-as-py">
+<h2 class="title"><a href="/articles/easy-as-py">Easy as Py</a></h2>
+<p class="meta"><abbr class="published" title="2016-03-23">2016-03-23</abbr> &bull; <a href="/tag/python" rel="tag">Python</a>, <a href="/tag/c++" rel="tag">C++</a>, <a href="/tag/c" rel="tag">C</a> &bull; <a href="/articles/easy-as-py#disqus_thread">Comments</a></p>
+<h2>What makes Python Simple?</h2>
+<p>I consider Python a simple language. Here&#8217;s why.
+</p>
+
+<h2>Easy to Read</h2>
+<p>I can read and understand Python code (unless it&#8217;s <a href="https://benkurtovic.com/2014/06/01/obfuscating-hello-world.html">wilfully perverse</a>). Syntactic whitespace and the associated removal of punctuation results in a regular, open layout. The combination of built in containers, extensive standard libraries and high level constructs allow for clear, compact code: code which fits in your head.
+</p>
+
+<h2>Easy to Write</h2>
+<p>I can write Python code which is free of syntax errors and which does what I want. Of course it helps that I&#8217;ve been actively using the language for 15 years, but I&#8217;ve been using C++ for longer and still make mistakes with it: ask me to declare a pointer to a member function, for example, or to knock up a variadic template function, and I&#8217;ll need a moment or two.
+</p>
+
+<h2>Transparent</h2>
+<p>I also consider C a simple language. C offers a transparent abstraction of a register machine, with a stack, a heap, and addressable memory. If you can imagine the operation of such a machine, you can figure out C. Python is less transparent but reveals its workings if pressed. Dicts form a part of the language seen by users, and under the hood they provide the dynamic context which supports a running program. The <a href="https://en.wikipedia.org/wiki/Read%E2%80%93eval%E2%80%93print_loop">read-eval-print loop</a> makes it easy to poke and reshape your program. You can <a href="https://docs.python.org/3/library/dis.html">disassemble code</a> to see what the virtual machine sees.
+</p>
+
+<h2>Consistent improvement</h2>
+<p>The language has got better since I first started using it. It has also got bigger, and this growth would, at first, seem at odds with simplicity. However, consider &#8212; as an example &#8212; the point when list comprehensions were introduced. Language support for building a list from an iterable results in compact declarative code. Simple code. What&#8217;s more, the square brackets which now delimit list comprehensions are the same square brackets that were previously used to delimit lists. The syntax may have been new but it didn&#8217;t surprise. Now consider the introduction of set and dict comprehensions, which follow logically and naturally from list comprehensions, almost as if they were discovered rather than invented.
+</p>
+<p>There are many other examples where additions to the language have unified and simplified.
+</p>
+
+<h2>Vision</h2>
+<p>I&#8217;m not a Python insider and cannot comment on the exact balance of benevolence and dictatorship which goes into the <a href="https://www.python.org/dev/peps/">language enhancement process</a>. I would say Python doesn&#8217;t suffer from being designed by a committee. It sticks to its strengths and its direction, to its vision.
+</p>
+
+</div>
+
+
+<div class="atomentry" id="sausages-slices">
 <h2 class="title"><a href="/articles/sausages-slices">Sausages, sausages, sausages - slice, slice, slice</a></h2>
 <p class="meta"><abbr class="published" title="2016-03-21">2016-03-21</abbr> &bull; <a href="/tag/puzzles" rel="tag">Puzzles</a>, <a href="/tag/python" rel="tag">Python</a> &bull; <a href="/articles/sausages-slices#disqus_thread">Comments</a></p>
 <p>A friend asked for help reaching the next level of a puzzle game. The test which stalled her involves machine placement in a sausage factory.
@@ -51,16 +83,16 @@
 </p>
 <p>It&#8217;s no doubt possible to work backwards and figure out a solution using no more than logic, pencil and paper. For example, only two of the machines change the length of the string, and &#8212; looking at the before and after lengths &#8212; these must both be used. It&#8217;s rather easier to write a short program to find a solution.
 </p>
-<p>First we must simulate the sausage machines. If we represent our string as a list, the seven machines, A-G, perform the following operations.
+<p>First we must simulate the seven sausage machines, A-G, which perform the following sequence operations.
 </p>
 <ol type="A">
-<li>reverse the order of a list</li>
-<li>remove every other element of a list</li>
-<li>remove every third element of a list</li>
-<li>pairwise reverse elements of a list</li>
-<li>move even numbered elements to the front of a list</li>
-<li>move the last element of a list to the front</li>
-<li>swap the front and back half of a list</li>
+<li>reverse the order of a sequence</li>
+<li>remove every other element of a sequence</li>
+<li>remove every third element of a sequence</li>
+<li>pairwise reverse elements of a sequence</li>
+<li>move even numbered elements to the front of a sequence</li>
+<li>move the last element of a sequence to the front</li>
+<li>swap the front and back half of a sequence</li>
 </ol>
 
 <p>None of these is difficult, especially in a high-level language which builds in support for sequence operations. What I found noteworthy is that a solution can be found without any <a href="https://docs.python.org/3/reference/compound_stmts.html">loops or if statements</a>. What&#8217;s more, every operation can handled using nothing more than <a href="https://docs.python.org/3/library/stdtypes.html#sequence-types-list-tuple-range">slice operations</a>.
@@ -71,9 +103,9 @@
 
 <p>I&#8217;ve used <code>reduce</code> to apply a chain of functions to a string of sausages &#8212; an explicit loop might be clearer, but I want a loop-free solution. For this same reason I use recursion in the pairwise swapper and the element dropper. Generally in Python, recursion is a poor choice. In this case I know I&#8217;m starting with a string of just 36 elements which cannot get any longer; there&#8217;s no risk of exceeding the <a href="https://docs.python.org/3/library/sys.html#sys.getrecursionlimit">system recursion limit</a>.
 </p>
-<p>The list reversal <code>s[::-1]</code> is idiomatic but alarming to the uninitiated. Slices have <code>[start:stop:stride]</code> fields, any of which may be defaulted. Usually <code>start</code> and <code>stop</code> default to the start and end of the list, but in this case the negative stride reverses them. The equally idiomatic <code>list(reversed(s))</code> would be more clear.
+<p>The sequence reversal <code>s[::-1]</code> is idiomatic but alarming to the uninitiated. Slices have <code>[start:stop:stride]</code> fields, any of which may be defaulted. Usually <code>start</code> and <code>stop</code> default to the start and end of the sequence, but in this case the negative stride reverses them.
 </p>
-<p>To rotate the last element of the list to the front, prefer:
+<p>To rotate the last element of a sequence to the front, prefer:
 </p>
 <pre><code>return s[-1:] + s[:-1]
 </code></pre><p>to:
@@ -81,7 +113,7 @@
 <pre><code>return [s[-1]] + s[:-1]
 </code></pre><p>because the latter raises an <code>IndexError</code> for an empty sequence.
 </p>
-<p>Slicing is a formidable tool for sequence manipulation, especially when combined with the option of using negative indices to count back from the end of the list. Slices allow you to reverse, rotate and partition lists, to pairwise swap elements, and to drop every nth element.
+<p>Slicing is a formidable tool for sequence manipulation, especially when combined with the option of using negative indices to count back from the end. Slices allow you to reverse, rotate and partition sequences, to pairwise swap elements, and to drop every nth element.
 </p>
 <p>The miniature recipes presented here don&#8217;t even use slice assignment, which gives me an excuse to reproduce this elegant prime sieve function, which does.
 </p>
@@ -1094,34 +1126,6 @@ def odd(x):
 </div>
 
 
-<div class="atomentry" id="word-aligned-hosted-by-github">
-<h2 class="title"><a href="/articles/word-aligned-hosted-by-github">Word Aligned, hosted by Github</a></h2>
-<p class="meta"><abbr class="published" title="2014-03-13">2014-03-13</abbr> &bull; <a href="/tag/self" rel="tag">Self</a>, <a href="/tag/github" rel="tag">Github</a> &bull; <a href="/articles/word-aligned-hosted-by-github#disqus_thread">Comments</a></p>
-<p>To anyone who subscribes to this site&#8217;s <a href="http://feeds.wordaligned.org/wordaligned">feed</a>, my apologies if your reader recently got filled with items you&#8217;d already seen. I can explain.
-</p>
-<p>About seven years ago, I signed up for a great deal on hosting for life with a company called <a href="/articles/hosting-for-life-textdrive-revived.html">TextDrive</a>. For most of the time since then, this service was actually provided by Joyent &#8212; who took over TextDrive. Then they, Joyent, said the hosting for life deal was being &#8220;sunsetted&#8221;, i.e. canned. Happily TextDrive&#8217;s original founder, Dean Allen, stepped in to revive his company and honour the original offer, which has indeed happened, though it&#8217;s been all too clear that he&#8217;s been hard to get hold of whilst the operations staff have been over-stretched.
-</p>
-<p>Last week, a tweet from one of these hardworking ops tipped me off that TextDrive would soon be gone.
-</p>
-<div><blockquote class="twitter-tweet" lang="en"><p>Public Service Announcement: TextDrivers please note that TextDrive is ceasing operation on the 14th of March 2014  <a href="http://t.co/AMIO3xS2wX">http://t.co/AMIO3xS2wX</a></p>&mdash; Jacques Marneweck (@txdjm) <a href="https://twitter.com/txdjm/statuses/441774463386800129">March 7, 2014</a></blockquote>
-<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script></div>
-
-<p>Tomorrow!
-</p>
-<p>What to do?
-</p>
-<p>After some <a href="https://www.google.com/search?q=static+website+hosting">googling</a> I&#8217;ve chosen <a href="http://pages.github.com">Github pages</a> as the new host for Word Aligned. I&#8217;ve had to relinquish a little control over URLs to make the site truly static. (A side-effect being old content appearing with new identifiers in the RSS <a href="http://feeds.wordaligned.org/wordaligned">feed</a>). I also won&#8217;t be configuring a web server or rooting around in rotating log files. The experts at Github can take care of that.
-</p>
-<p>I do get to keep my own domain, which was paramount. I don&#8217;t have to pay anything, which is nice.
-</p>
-<p>Previously, I used version control to track my site&#8217;s contents and <code>rsync</code> over <code>SSH</code> to publish. Now I simply use version control: pushing a change to <a href="https://github.com/wordaligned">github</a> <strong>is</strong> publication.
-</p>
-<p>It&#8217;s early days yet, but I&#8217;m happy with the change. The <a href="http://feeds.wordaligned.org/wordaligned">feed</a> should settle down now, so stay subscribed. Please <a href="mailto:tag@wordaligned.org?subject=Wordaligned.org%20glitches">let me know</a> if you spot any problems with the site.
-</p>
-
-</div>
-
-
 <div class="extended">
 <p><a href="/articles/">Visit the Word Aligned archives...</a></p>
 </div>
@@ -1165,8 +1169,8 @@ def odd(x):
 
 <div class="sidebar-node">
 <h3>Top Tags</h3>
-<ul id="categories"><li><a href="/tag/python" rel="tag">Python</a> <em>(112)</em></li>
-<li><a href="/tag/c++" rel="tag">C++</a> <em>(67)</em></li>
+<ul id="categories"><li><a href="/tag/python" rel="tag">Python</a> <em>(113)</em></li>
+<li><a href="/tag/c++" rel="tag">C++</a> <em>(68)</em></li>
 <li><a href="/tag/self" rel="tag">Self</a> <em>(59)</em></li>
 <li><a href="/tag/puzzles" rel="tag">Puzzles</a> <em>(31)</em></li>
 <li><a href="/tag/accu" rel="tag">ACCU</a> <em>(31)</em></li>
@@ -1197,7 +1201,7 @@ def odd(x):
 <div class="sidebar-node">
 <h3>Chain</h3>
 <ul>
-<li><a accesskey="p" href="/articles/sausages-slices" title="First article">&raquo; Sausages, sausages, sausages - slice, slice, slice</a></li>
+<li><a accesskey="p" href="/articles/easy-as-py" title="First article">&raquo; Easy as Py</a></li>
 
 </ul>
 

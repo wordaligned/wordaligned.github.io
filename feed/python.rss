@@ -7,6 +7,40 @@
 <dc:creator>tag@wordaligned.org</dc:creator>
 <language>en-gb</language>
 <item>
+<title>Easy as Py</title>
+<description>&lt;h2&gt;What makes Python Simple?&lt;/h2&gt;
+&lt;p&gt;I consider Python a simple language. Here&amp;#8217;s why.
+&lt;/p&gt;
+
+&lt;h2&gt;Easy to Read&lt;/h2&gt;
+&lt;p&gt;I can read and understand Python code (unless it&amp;#8217;s &lt;a href="https://benkurtovic.com/2014/06/01/obfuscating-hello-world.html"&gt;wilfully perverse&lt;/a&gt;). Syntactic whitespace and the associated removal of punctuation results in a regular, open layout. The combination of built in containers, extensive standard libraries and high level constructs allow for clear, compact code: code which fits in your head.
+&lt;/p&gt;
+
+&lt;h2&gt;Easy to Write&lt;/h2&gt;
+&lt;p&gt;I can write Python code which is free of syntax errors and which does what I want. Of course it helps that I&amp;#8217;ve been actively using the language for 15 years, but I&amp;#8217;ve been using C++ for longer and still make mistakes with it: ask me to declare a pointer to a member function, for example, or to knock up a variadic template function, and I&amp;#8217;ll need a moment or two.
+&lt;/p&gt;
+
+&lt;h2&gt;Transparent&lt;/h2&gt;
+&lt;p&gt;I also consider C a simple language. C offers a transparent abstraction of a register machine, with a stack, a heap, and addressable memory. If you can imagine the operation of such a machine, you can figure out C. Python is less transparent but reveals its workings if pressed. Dicts form a part of the language seen by users, and under the hood they provide the dynamic context which supports a running program. The &lt;a href="https://en.wikipedia.org/wiki/Read%E2%80%93eval%E2%80%93print_loop"&gt;read-eval-print loop&lt;/a&gt; makes it easy to poke and reshape your program. You can &lt;a href="https://docs.python.org/3/library/dis.html"&gt;disassemble code&lt;/a&gt; to see what the virtual machine sees.
+&lt;/p&gt;
+
+&lt;h2&gt;Consistent improvement&lt;/h2&gt;
+&lt;p&gt;The language has got better since I first started using it. It has also got bigger, and this growth would, at first, seem at odds with simplicity. However, consider &amp;#8212; as an example &amp;#8212; the point when list comprehensions were introduced. Language support for building a list from an iterable results in compact declarative code. Simple code. What&amp;#8217;s more, the square brackets which now delimit list comprehensions are the same square brackets that were previously used to delimit lists. The syntax may have been new but it didn&amp;#8217;t surprise. Now consider the introduction of set and dict comprehensions, which follow logically and naturally from list comprehensions, almost as if they were discovered rather than invented.
+&lt;/p&gt;
+&lt;p&gt;There are many other examples where additions to the language have unified and simplified.
+&lt;/p&gt;
+
+&lt;h2&gt;Vision&lt;/h2&gt;
+&lt;p&gt;I&amp;#8217;m not a Python insider and cannot comment on the exact balance of benevolence and dictatorship which goes into the &lt;a href="https://www.python.org/dev/peps/"&gt;language enhancement process&lt;/a&gt;. I would say Python doesn&amp;#8217;t suffer from being designed by a committee. It sticks to its strengths and its direction, to its vision.
+&lt;/p&gt;</description>
+<dc:date>2016-03-23</dc:date>
+<guid>http://wordaligned.org/articles/easy-as-py</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/easy-as-py</link>
+<category>Python</category>
+</item>
+
+<item>
 <title>Sausages, sausages, sausages - slice, slice, slice</title>
 <description>&lt;p&gt;A friend asked for help reaching the next level of a puzzle game. The test which stalled her involves machine placement in a sausage factory.
 &lt;/p&gt;
@@ -31,16 +65,16 @@
 &lt;/p&gt;
 &lt;p&gt;It&amp;#8217;s no doubt possible to work backwards and figure out a solution using no more than logic, pencil and paper. For example, only two of the machines change the length of the string, and &amp;#8212; looking at the before and after lengths &amp;#8212; these must both be used. It&amp;#8217;s rather easier to write a short program to find a solution.
 &lt;/p&gt;
-&lt;p&gt;First we must simulate the sausage machines. If we represent our string as a list, the seven machines, A-G, perform the following operations.
+&lt;p&gt;First we must simulate the seven sausage machines, A-G, which perform the following sequence operations.
 &lt;/p&gt;
 &lt;ol type="A"&gt;
-&lt;li&gt;reverse the order of a list&lt;/li&gt;
-&lt;li&gt;remove every other element of a list&lt;/li&gt;
-&lt;li&gt;remove every third element of a list&lt;/li&gt;
-&lt;li&gt;pairwise reverse elements of a list&lt;/li&gt;
-&lt;li&gt;move even numbered elements to the front of a list&lt;/li&gt;
-&lt;li&gt;move the last element of a list to the front&lt;/li&gt;
-&lt;li&gt;swap the front and back half of a list&lt;/li&gt;
+&lt;li&gt;reverse the order of a sequence&lt;/li&gt;
+&lt;li&gt;remove every other element of a sequence&lt;/li&gt;
+&lt;li&gt;remove every third element of a sequence&lt;/li&gt;
+&lt;li&gt;pairwise reverse elements of a sequence&lt;/li&gt;
+&lt;li&gt;move even numbered elements to the front of a sequence&lt;/li&gt;
+&lt;li&gt;move the last element of a sequence to the front&lt;/li&gt;
+&lt;li&gt;swap the front and back half of a sequence&lt;/li&gt;
 &lt;/ol&gt;
 
 &lt;p&gt;None of these is difficult, especially in a high-level language which builds in support for sequence operations. What I found noteworthy is that a solution can be found without any &lt;a href="https://docs.python.org/3/reference/compound_stmts.html"&gt;loops or if statements&lt;/a&gt;. What&amp;#8217;s more, every operation can handled using nothing more than &lt;a href="https://docs.python.org/3/library/stdtypes.html#sequence-types-list-tuple-range"&gt;slice operations&lt;/a&gt;.
@@ -51,9 +85,9 @@
 
 &lt;p&gt;I&amp;#8217;ve used &lt;code&gt;reduce&lt;/code&gt; to apply a chain of functions to a string of sausages &amp;#8212; an explicit loop might be clearer, but I want a loop-free solution. For this same reason I use recursion in the pairwise swapper and the element dropper. Generally in Python, recursion is a poor choice. In this case I know I&amp;#8217;m starting with a string of just 36 elements which cannot get any longer; there&amp;#8217;s no risk of exceeding the &lt;a href="https://docs.python.org/3/library/sys.html#sys.getrecursionlimit"&gt;system recursion limit&lt;/a&gt;.
 &lt;/p&gt;
-&lt;p&gt;The list reversal &lt;code&gt;s[::-1]&lt;/code&gt; is idiomatic but alarming to the uninitiated. Slices have &lt;code&gt;[start:stop:stride]&lt;/code&gt; fields, any of which may be defaulted. Usually &lt;code&gt;start&lt;/code&gt; and &lt;code&gt;stop&lt;/code&gt; default to the start and end of the list, but in this case the negative stride reverses them. The equally idiomatic &lt;code&gt;list(reversed(s))&lt;/code&gt; would be more clear.
+&lt;p&gt;The sequence reversal &lt;code&gt;s[::-1]&lt;/code&gt; is idiomatic but alarming to the uninitiated. Slices have &lt;code&gt;[start:stop:stride]&lt;/code&gt; fields, any of which may be defaulted. Usually &lt;code&gt;start&lt;/code&gt; and &lt;code&gt;stop&lt;/code&gt; default to the start and end of the sequence, but in this case the negative stride reverses them.
 &lt;/p&gt;
-&lt;p&gt;To rotate the last element of the list to the front, prefer:
+&lt;p&gt;To rotate the last element of a sequence to the front, prefer:
 &lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;return s[-1:] + s[:-1]
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;to:
@@ -61,7 +95,7 @@
 &lt;pre&gt;&lt;code&gt;return [s[-1]] + s[:-1]
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;because the latter raises an &lt;code&gt;IndexError&lt;/code&gt; for an empty sequence.
 &lt;/p&gt;
-&lt;p&gt;Slicing is a formidable tool for sequence manipulation, especially when combined with the option of using negative indices to count back from the end of the list. Slices allow you to reverse, rotate and partition lists, to pairwise swap elements, and to drop every nth element.
+&lt;p&gt;Slicing is a formidable tool for sequence manipulation, especially when combined with the option of using negative indices to count back from the end. Slices allow you to reverse, rotate and partition sequences, to pairwise swap elements, and to drop every nth element.
 &lt;/p&gt;
 &lt;p&gt;The miniature recipes presented here don&amp;#8217;t even use slice assignment, which gives me an excuse to reproduce this elegant prime sieve function, which does.
 &lt;/p&gt;
@@ -3922,57 +3956,6 @@ Traceback (most recent call last):
 <guid>http://wordaligned.org/articles/undogfooding</guid>
 <author>tag@wordaligned.org (Thomas Guest)</author>
 <link>http://wordaligned.org/articles/undogfooding</link>
-<category>Python</category>
-</item>
-
-<item>
-<title>Tony Hoare&#8217;s vision, car crashes, and Alan Turing</title>
-<description>&lt;p&gt;&lt;a href="http://www.europython.eu"&gt;&lt;img src="http://www.europython.eu/images/europython_logo.png" alt="Europython Logo"/&gt;&lt;/a&gt;
-&lt;/p&gt;
-&lt;p&gt;Yesterday afternoon, at &lt;a href="http://www.europython.eu"&gt;Europython 2009&lt;/a&gt;, David Jones addressed the subject &lt;a href="http://www.europython.eu/talks/talk_abstracts/index.html#talk21"&gt;&amp;#8220;What sucks about Python?&amp;#8221;&lt;/a&gt; Despite this provocative title, David Jones had lots of good things to say about Python, and the two topics which really roused the audience (the global interpreter lock and the over-crowded Python packaging space) had more to do with the Python-the-platform than Python-the-language. He also failed to mention the thing I miss most when working with Python: via Peter Norvig&amp;#8217;s &lt;a href="http://norvig.com/python-iaq.html"&gt;Python IAQ&lt;/a&gt;, quoting Bjarne Stroustrup:
-&lt;/p&gt;
-&lt;blockquote&gt;&lt;p&gt;&amp;#8220;If I were to design a language from scratch, I would follow the Algol68 path and make every statement and declaration an expression that yields a value.&amp;#8221;
-&lt;/p&gt;
-&lt;/blockquote&gt;&lt;p&gt;Of course what &lt;strong&gt;really&lt;/strong&gt; matters to an engineer is Python-the-platform rather than Python-the-language. Python famously comes with batteries included, and, stretching the metaphor, it also excels at integrating with the other batteries used in modern software applications. The packaging confusion is a side-effect of Python-the-platform&amp;#8217;s success. More on over-stretched batteries later &amp;#8230;
-&lt;/p&gt;
-&lt;p&gt;The day had started with &lt;a href="http://www.mindviewinc.com"&gt;Bruce Eckel&lt;/a&gt;&amp;#8217;s keynote on Software Archeology. Bruce Eckel is a relaxed and engaging speaker but I found his presentation rather flimsy. Its substance could (and did!) fit on to a couple of David Jones&amp;#8217; slides and the remainder dwelt a little too long on Bruce Eckel, his Java and C++ books, blogs, and &lt;a href="http://www.mindviewinc.com"&gt;www.mindviewinc.com&lt;/a&gt;.
-&lt;/p&gt;
-&lt;p&gt;During the rest of the day, I had a choice of 4 or 5 different presentations at any one time, generally on the subject of Python modules or frameworks. The common theme I took away is that &lt;strong&gt;people turn to Python to get things done&lt;/strong&gt;, and they&amp;#8217;re reluctant to turn back. As the afternoon drew on everyone regathered in the Adrian Boult Hall to listen to a brilliant series of lightning talks which developed on this same theme. We also heard a wonderful &lt;a href="http://europython09.blip.tv/file/2351409"&gt;short story&lt;/a&gt; about the best way to wreck cars and software systems.
-&lt;/p&gt;
-&lt;p&gt;&lt;a href="http://www.europython.eu/gallery/europython-2009"&gt;&lt;img alt="Sir Tony Hoare" src="http://www.europython.eu/gallery/media/gallery-title/thumbs/3kxu_jpg_310x260_crop_q85.jpg"/&gt;&lt;/a&gt;
-&lt;/p&gt;
-&lt;span id="continue-reading"/&gt;
-
-&lt;p&gt;On the subject of car crashes, it seemed a shame to stem the flow of these talks and keep &lt;a href="http://research.microsoft.com/en-us/people/thoare/"&gt;Sir Tony Hoare&lt;/a&gt; waiting in the wings in order to pull Guido van Rossum on stage, especially since Guido wasn&amp;#8217;t even at the conference. Nonetheless, the the benevolent dictator for life dutifully skyped in, and his face beamed up on the 12m&lt;sup&gt;2&lt;/sup&gt; screen. We could see and hear him. He couldn&amp;#8217;t hear us. The connection fizzed and chirped until all protocol broke down. Eventually the skype laptop popped up a message warning its batteries were running low, then promptly and mercifully shut down, ending the experiment.
-&lt;/p&gt;
-&lt;p&gt;&lt;a href="http://en.wikipedia.org/wiki/C._A._R._Hoare"&gt;&lt;img src="http://upload.wikimedia.org/wikipedia/commons/thumb/7/70/CAR_Hoare.jpg/225px-CAR_Hoare.jpg" alt="Sir Tony Hoare"/&gt;&lt;/a&gt;
-&lt;/p&gt;
-&lt;p&gt;On walked Sir Tony Hoare, the programmer, software engineer, computer scientist and academic who now works for Microsoft research. His thoughtful keynote analysed the differences between science and engineering, and considered their interplay in the field of software development. His presentation challenged my way of thinking about software specification and program correctness, and the message on his closing slide was both shaming and inspirational:
-&lt;/p&gt;
-&lt;blockquote&gt;&lt;h3&gt;One Day&lt;/h3&gt;
-&lt;ul&gt;&lt;li&gt;Software will be the most reliable component of every product which contains it&lt;/li&gt;
-&lt;li&gt;Software engineering will be the most dependable of all engineering professions&lt;/li&gt;
-&lt;li&gt;Because of the successful interplay of research
-&lt;ul&gt;&lt;li&gt;into the science of programming&lt;/li&gt;
-&lt;li&gt;and the engineering of software&lt;/li&gt;&lt;/ul&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;&amp;#8212; &lt;a href="http://research.microsoft.com/en-us/people/thoare/"&gt;Tony Hoare&lt;/a&gt;, The Science of Computing and the Engineering of Software, 2009
-&lt;/p&gt;&lt;/blockquote&gt;
-
-&lt;p&gt;&lt;a href="http://www.flickr.com/photos/thomasguest/3681644236/" title="Enigma machine by Thomas Guest, on Flickr"&gt;&lt;img style="float:right;" src="http://farm4.static.flickr.com/3614/3681644236_2b40e5b726_m.jpg" width="240" height="199" alt="Enigma machine" /&gt;&lt;/a&gt;
-&lt;/p&gt;
-&lt;p&gt;Sir Tony Hoare is a Turing Award winner. I think he said he&amp;#8217;d been working with computers for 50 years &amp;#8212; it may well have been longer. Certainly he remembered when ALGOL was the hot new language, poised to supplant FORTRAN. The conference provided an opportunity to go further back, to Turing himself, and to the first ever programmable digital computer. In another memorable keynote session after lunch &lt;a href="http://www.europython.eu/talks/speakers/index.html#greenish_simon"&gt;Simon Greenish&lt;/a&gt; and &lt;a href="http://www.europython.eu/talks/speakers/index.html#black_sue"&gt;Dr Sue Black&lt;/a&gt; spoke passionately about &lt;a href="http://www.bletchleypark.org.uk/"&gt;Bletchley Park&lt;/a&gt;, the expansive Milton Keynes mansion which was converted into a code-breaking factory during the second World War and which is now a museum struggling to make ends meet. At the end of the presentation they unveiled a real Enigma machine to a huge round of applause.
-&lt;/p&gt;
-&lt;p&gt;&lt;a href="http://en.wikipedia.org/wiki/Colossus_computer"&gt;Colossus&lt;/a&gt;, the world&amp;#8217;s first ever programmable digital computer, &lt;a href="http://www.codesandciphers.org.uk/lorenz/rebuild.htm"&gt;has been painstakingly rebuilt&lt;/a&gt; at Bletchley Park. Although it won&amp;#8217;t be running Python, it will resume its orginal task of cracking the &lt;a href="http://en.wikipedia.org/wiki/Lorenz_cipher"&gt;Lorenz cipher&lt;/a&gt;.
-&lt;/p&gt;
-&lt;p&gt;&lt;a href="http://www.bletchleypark.org.uk"&gt;&lt;img src="http://www.bletchleypark.org.uk/doc/image.rhtm/Head%20detail%20web.jpg" alt="Statue of Turing at Bletchley Park"/&gt;&lt;/a&gt;
-&lt;/p&gt;
-&lt;p&gt;There can be no such return for &lt;a href="http://www.turing.org.uk/turing/"&gt;Alan Turing&lt;/a&gt;, who would have been 97 last week, but who tragically took his own life 55 years ago. He was a brilliant mathematician and scientist, famously eccentric, yet his papers on machine intelligence and computability remain highly accessible, forming the way we now think about computers. Over 11 thousand people worked at Bletchley Park during the war, and Alan Turing helped direct the decryption effort, a huge task which succeeded in shortening the war by two years and saving an estimated 22 million lives. In 2007 a statue of Alan Turing was erected at Bletchley Park. Dr Sue Black showed us a photo of his coffee mug which remains where he kept it, chained to a radiator.
-&lt;/p&gt;</description>
-<dc:date>2009-07-02</dc:date>
-<guid>http://wordaligned.org/articles/europython-2009</guid>
-<author>tag@wordaligned.org (Thomas Guest)</author>
-<link>http://wordaligned.org/articles/europython-2009</link>
 <category>Python</category>
 </item>
 

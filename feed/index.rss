@@ -7,6 +7,42 @@
 <dc:creator>tag@wordaligned.org</dc:creator>
 <language>en-gb</language>
 <item>
+<title>Easy as Py</title>
+<description>&lt;h2&gt;What makes Python Simple?&lt;/h2&gt;
+&lt;p&gt;I consider Python a simple language. Here&amp;#8217;s why.
+&lt;/p&gt;
+
+&lt;h2&gt;Easy to Read&lt;/h2&gt;
+&lt;p&gt;I can read and understand Python code (unless it&amp;#8217;s &lt;a href="https://benkurtovic.com/2014/06/01/obfuscating-hello-world.html"&gt;wilfully perverse&lt;/a&gt;). Syntactic whitespace and the associated removal of punctuation results in a regular, open layout. The combination of built in containers, extensive standard libraries and high level constructs allow for clear, compact code: code which fits in your head.
+&lt;/p&gt;
+
+&lt;h2&gt;Easy to Write&lt;/h2&gt;
+&lt;p&gt;I can write Python code which is free of syntax errors and which does what I want. Of course it helps that I&amp;#8217;ve been actively using the language for 15 years, but I&amp;#8217;ve been using C++ for longer and still make mistakes with it: ask me to declare a pointer to a member function, for example, or to knock up a variadic template function, and I&amp;#8217;ll need a moment or two.
+&lt;/p&gt;
+
+&lt;h2&gt;Transparent&lt;/h2&gt;
+&lt;p&gt;I also consider C a simple language. C offers a transparent abstraction of a register machine, with a stack, a heap, and addressable memory. If you can imagine the operation of such a machine, you can figure out C. Python is less transparent but reveals its workings if pressed. Dicts form a part of the language seen by users, and under the hood they provide the dynamic context which supports a running program. The &lt;a href="https://en.wikipedia.org/wiki/Read%E2%80%93eval%E2%80%93print_loop"&gt;read-eval-print loop&lt;/a&gt; makes it easy to poke and reshape your program. You can &lt;a href="https://docs.python.org/3/library/dis.html"&gt;disassemble code&lt;/a&gt; to see what the virtual machine sees.
+&lt;/p&gt;
+
+&lt;h2&gt;Consistent improvement&lt;/h2&gt;
+&lt;p&gt;The language has got better since I first started using it. It has also got bigger, and this growth would, at first, seem at odds with simplicity. However, consider &amp;#8212; as an example &amp;#8212; the point when list comprehensions were introduced. Language support for building a list from an iterable results in compact declarative code. Simple code. What&amp;#8217;s more, the square brackets which now delimit list comprehensions are the same square brackets that were previously used to delimit lists. The syntax may have been new but it didn&amp;#8217;t surprise. Now consider the introduction of set and dict comprehensions, which follow logically and naturally from list comprehensions, almost as if they were discovered rather than invented.
+&lt;/p&gt;
+&lt;p&gt;There are many other examples where additions to the language have unified and simplified.
+&lt;/p&gt;
+
+&lt;h2&gt;Vision&lt;/h2&gt;
+&lt;p&gt;I&amp;#8217;m not a Python insider and cannot comment on the exact balance of benevolence and dictatorship which goes into the &lt;a href="https://www.python.org/dev/peps/"&gt;language enhancement process&lt;/a&gt;. I would say Python doesn&amp;#8217;t suffer from being designed by a committee. It sticks to its strengths and its direction, to its vision.
+&lt;/p&gt;</description>
+<dc:date>2016-03-23</dc:date>
+<guid>http://wordaligned.org/articles/easy-as-py</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/easy-as-py</link>
+<category>Python</category>
+<category>C++</category>
+<category>C</category>
+</item>
+
+<item>
 <title>Sausages, sausages, sausages - slice, slice, slice</title>
 <description>&lt;p&gt;A friend asked for help reaching the next level of a puzzle game. The test which stalled her involves machine placement in a sausage factory.
 &lt;/p&gt;
@@ -31,16 +67,16 @@
 &lt;/p&gt;
 &lt;p&gt;It&amp;#8217;s no doubt possible to work backwards and figure out a solution using no more than logic, pencil and paper. For example, only two of the machines change the length of the string, and &amp;#8212; looking at the before and after lengths &amp;#8212; these must both be used. It&amp;#8217;s rather easier to write a short program to find a solution.
 &lt;/p&gt;
-&lt;p&gt;First we must simulate the sausage machines. If we represent our string as a list, the seven machines, A-G, perform the following operations.
+&lt;p&gt;First we must simulate the seven sausage machines, A-G, which perform the following sequence operations.
 &lt;/p&gt;
 &lt;ol type="A"&gt;
-&lt;li&gt;reverse the order of a list&lt;/li&gt;
-&lt;li&gt;remove every other element of a list&lt;/li&gt;
-&lt;li&gt;remove every third element of a list&lt;/li&gt;
-&lt;li&gt;pairwise reverse elements of a list&lt;/li&gt;
-&lt;li&gt;move even numbered elements to the front of a list&lt;/li&gt;
-&lt;li&gt;move the last element of a list to the front&lt;/li&gt;
-&lt;li&gt;swap the front and back half of a list&lt;/li&gt;
+&lt;li&gt;reverse the order of a sequence&lt;/li&gt;
+&lt;li&gt;remove every other element of a sequence&lt;/li&gt;
+&lt;li&gt;remove every third element of a sequence&lt;/li&gt;
+&lt;li&gt;pairwise reverse elements of a sequence&lt;/li&gt;
+&lt;li&gt;move even numbered elements to the front of a sequence&lt;/li&gt;
+&lt;li&gt;move the last element of a sequence to the front&lt;/li&gt;
+&lt;li&gt;swap the front and back half of a sequence&lt;/li&gt;
 &lt;/ol&gt;
 
 &lt;p&gt;None of these is difficult, especially in a high-level language which builds in support for sequence operations. What I found noteworthy is that a solution can be found without any &lt;a href="https://docs.python.org/3/reference/compound_stmts.html"&gt;loops or if statements&lt;/a&gt;. What&amp;#8217;s more, every operation can handled using nothing more than &lt;a href="https://docs.python.org/3/library/stdtypes.html#sequence-types-list-tuple-range"&gt;slice operations&lt;/a&gt;.
@@ -51,9 +87,9 @@
 
 &lt;p&gt;I&amp;#8217;ve used &lt;code&gt;reduce&lt;/code&gt; to apply a chain of functions to a string of sausages &amp;#8212; an explicit loop might be clearer, but I want a loop-free solution. For this same reason I use recursion in the pairwise swapper and the element dropper. Generally in Python, recursion is a poor choice. In this case I know I&amp;#8217;m starting with a string of just 36 elements which cannot get any longer; there&amp;#8217;s no risk of exceeding the &lt;a href="https://docs.python.org/3/library/sys.html#sys.getrecursionlimit"&gt;system recursion limit&lt;/a&gt;.
 &lt;/p&gt;
-&lt;p&gt;The list reversal &lt;code&gt;s[::-1]&lt;/code&gt; is idiomatic but alarming to the uninitiated. Slices have &lt;code&gt;[start:stop:stride]&lt;/code&gt; fields, any of which may be defaulted. Usually &lt;code&gt;start&lt;/code&gt; and &lt;code&gt;stop&lt;/code&gt; default to the start and end of the list, but in this case the negative stride reverses them. The equally idiomatic &lt;code&gt;list(reversed(s))&lt;/code&gt; would be more clear.
+&lt;p&gt;The sequence reversal &lt;code&gt;s[::-1]&lt;/code&gt; is idiomatic but alarming to the uninitiated. Slices have &lt;code&gt;[start:stop:stride]&lt;/code&gt; fields, any of which may be defaulted. Usually &lt;code&gt;start&lt;/code&gt; and &lt;code&gt;stop&lt;/code&gt; default to the start and end of the sequence, but in this case the negative stride reverses them.
 &lt;/p&gt;
-&lt;p&gt;To rotate the last element of the list to the front, prefer:
+&lt;p&gt;To rotate the last element of a sequence to the front, prefer:
 &lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;return s[-1:] + s[:-1]
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;to:
@@ -61,7 +97,7 @@
 &lt;pre&gt;&lt;code&gt;return [s[-1]] + s[:-1]
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;because the latter raises an &lt;code&gt;IndexError&lt;/code&gt; for an empty sequence.
 &lt;/p&gt;
-&lt;p&gt;Slicing is a formidable tool for sequence manipulation, especially when combined with the option of using negative indices to count back from the end of the list. Slices allow you to reverse, rotate and partition lists, to pairwise swap elements, and to drop every nth element.
+&lt;p&gt;Slicing is a formidable tool for sequence manipulation, especially when combined with the option of using negative indices to count back from the end. Slices allow you to reverse, rotate and partition sequences, to pairwise swap elements, and to drop every nth element.
 &lt;/p&gt;
 &lt;p&gt;The miniature recipes presented here don&amp;#8217;t even use slice assignment, which gives me an excuse to reproduce this elegant prime sieve function, which does.
 &lt;/p&gt;
@@ -1334,116 +1370,6 @@ SAFE TO A MAXIMUM OF 75KG&lt;/pre&gt;
 <author>tag@wordaligned.org (Thomas Guest)</author>
 <link>http://wordaligned.org/articles/clown-flee-jump</link>
 <category>Puzzles</category>
-</item>
-
-<item>
-<title>Angle brackets hurt my eyes</title>
-<description>&lt;blockquote&gt;&lt;p&gt;&amp;#8220;All these angle brackets, they&amp;#8217;re hurting my eyes.&amp;#8221;
-&lt;/p&gt;
-&lt;/blockquote&gt;&lt;p&gt;I&amp;#8217;m quoting a colleague who sits next to me and I sympathise. Perhaps a section from a build file was causing him pain?
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
-
-&lt;pre class="prettyprint"&gt;&amp;lt;target name="all" description="Build product."&amp;gt;
-  &amp;lt;mkdir dir="build" if="${not directory::exists('build')}" /&amp;gt;
-   ....
-&amp;lt;/target&amp;gt;
-
-&lt;/pre&gt;
-
-&lt;/div&gt;
-
-&lt;p&gt;Or maybe it was some XSL to generate XML by applying XML to XML?
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
-
-&lt;pre class="prettyprint"&gt;&amp;lt;xsl:if test="$index-make or @index!='false'"&amp;gt;
-  &amp;lt;xsl:if test="//index"&amp;gt;
-    &amp;lt;fo:block text-align-last="justify" space-before="5pt"&amp;gt;
-      &amp;lt;fo:basic-link internal-destination="index-page"&amp;gt;
-        &amp;lt;xsl:choose&amp;gt;
-          &amp;lt;xsl:when test="(/doc/@lang = 'ja') or (/doc/@lang = '')&amp;lt;/xsl:when&amp;gt;
-          &amp;lt;xsl:otherwise&amp;gt;INDEX&amp;lt;/xsl:otherwise&amp;gt;
-        &amp;lt;/xsl:choose&amp;gt;
-      &amp;lt;/fo:basic-link&amp;gt;
-      &amp;lt;fo:page-number-citation ref-id="index-page"/&amp;gt;
-    &amp;lt;/fo:block&amp;gt;
-  &amp;lt;/xsl:if&amp;gt;
-&amp;lt;/xsl:if&amp;gt;
-
-&lt;/pre&gt;
-
-&lt;/div&gt;
-
-&lt;p&gt;Or perhaps he was wrestling with a C++ compile error.
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
-
-&lt;pre class="prettyprint"&gt;print.cpp: In function 'void print(const
-std::map&amp;lt;std::basic_string&amp;lt;char, std::char_traits&amp;lt;char&amp;gt;,
-std::allocator&amp;lt;char&amp;gt; &amp;gt;, int, std::less&amp;lt;std::basic_string&amp;lt;char,
-std::char_traits&amp;lt;char&amp;gt;, std::allocator&amp;lt;char&amp;gt; &amp;gt; &amp;gt;,
-std::allocator&amp;lt;std::pair&amp;lt;const std::basic_string&amp;lt;char,
-std::char_traits&amp;lt;char&amp;gt;, std::allocator&amp;lt;char&amp;gt; &amp;gt;, int&amp;gt; &amp;gt; &amp;gt;&amp;amp;)':
-print.cpp:7: error: no match for 'operator&amp;lt;&amp;lt;' in 'std::cout &amp;lt;&amp;lt;
-details' /usr/include/c++/4.2.1/ostream:112: note: candidates are:
-std::basic_ostream&amp;lt;_CharT, _Traits&amp;gt;&amp;amp; std::basic_ostream&amp;lt;_CharT,
-_Traits&amp;gt;::operator&amp;lt;&amp;lt;(std::basic_ostream&amp;lt;_CharT, _Traits&amp;gt;&amp;amp;
-(*)(std::basic_ostream&amp;lt;_CharT, _Traits&amp;gt;&amp;amp;)) [with _CharT = char,
-_Traits = std::char_traits&amp;lt;char&amp;gt;]
-
-&lt;/pre&gt;
-
-&lt;/div&gt;
-
-&lt;p&gt;What makes angle brackets so vexatious. Could it be their sharp corners?
-&lt;/p&gt;
-&lt;p&gt;Lisp is as elegant as XML is prickly, yet it too is famous for brackets, &lt;a href="http://en.wikipedia.org/wiki/S-expression"&gt;albeit round ones&lt;/a&gt; &amp;#8212; and lots of them.
-&lt;/p&gt;
-&lt;blockquote class="twitter-tweet"&gt;&lt;p&gt;It&amp;#8217;s not that Clojure/Lisp has a lot of parentheses. Its just that we removed everything else.&lt;/p&gt;&amp;mdash; Alex Miller (@puredanger) &lt;a href="https://twitter.com/puredanger/status/313507982623268865"&gt;March 18, 2013&lt;/a&gt;&lt;/blockquote&gt;
-&lt;script async src="http://wordaligned.org//platform.twitter.com/widgets.js" charset="utf-8"&gt;&lt;/script&gt;
-
-Imagine a parallel universe with angle-bracket Lisp. I wonder if the language would have proved so enduring?
-
-
-
-&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;Not so pretty now?&lt;/div&gt;
-
-&lt;pre class="prettyprint"&gt;&amp;lt;define &amp;lt;euler-transform s&amp;gt;
-  &amp;lt;let &amp;lt;&amp;lt;s0 &amp;lt;stream-ref s 0&amp;gt;&amp;gt;
-        &amp;lt;s1 &amp;lt;stream-ref s 1&amp;gt;&amp;gt;    
-        &amp;lt;s2 &amp;lt;stream-ref s 2&amp;gt;&amp;gt;&amp;gt;
-    &amp;lt;cons-stream &amp;lt;- s2 &amp;lt;/ &amp;lt;square &amp;lt;- s2 s1&amp;gt;&amp;gt;
-                          &amp;lt;+ s0 &amp;lt;* -2 s1&amp;gt; s2&amp;gt;&amp;gt;&amp;gt;
-                 &amp;lt;euler-transform &amp;lt;stream-cdr s&amp;gt;&amp;gt;&amp;gt;&amp;gt;&amp;gt;
-
-&lt;/pre&gt;
-
-&lt;/div&gt;
-
-
-
-Looking more closely at the first code snippet, the section from a build file, we can see the problem isn&amp;#8217;t so much the angle brackets as all the others.
-
-
-
-&lt;div class="typocode"&gt;
-
-&lt;pre class="prettyprint"&gt;&amp;lt;mkdir dir="build" if="${not directory::exists('build')}" /&amp;gt;
-
-&lt;/pre&gt;
-
-&lt;/div&gt;
-
-
-
-The braces and parentheses may be embedded in a double quoted string but that only makes things worse. The nested levels hurt my eyes and, if you can bear to look at the code long enough, you&amp;#8217;ll realise there&amp;#8217;s a simpler message trying to get out: &lt;tt&gt;mkdir -p build&lt;/tt&gt;.</description>
-<dc:date>2013-05-01</dc:date>
-<guid>http://wordaligned.org/articles/angle-brackets-hurt-my-eyes</guid>
-<author>tag@wordaligned.org (Thomas Guest)</author>
-<link>http://wordaligned.org/articles/angle-brackets-hurt-my-eyes</link>
-<category>Lisp</category>
-<category>Syntax</category>
 </item>
 
 </channel>
