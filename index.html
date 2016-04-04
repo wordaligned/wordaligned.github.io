@@ -25,7 +25,73 @@
 
   <div id="page">
     <div id="content">
-      <div class="atomentry" id="easy-as-py">
+      <div class="atomentry" id="8-queens-puzzle">
+<h2 class="title"><a href="/articles/8-queens-puzzle">8 Queens Puzzle</a></h2>
+<p class="meta"><abbr class="published" title="2016-04-04">2016-04-04</abbr> &bull; <a href="/tag/puzzles" rel="tag">Puzzles</a>, <a href="/tag/python" rel="tag">Python</a> &bull; <a href="/articles/8-queens-puzzle#disqus_thread">Comments</a></p>
+<p style="font-size:4em">&#9819;&#9819;&#9819;&#9819;&#9819;&#9819;&#9819;&#9819;</p>
+
+<p>Here&#8217;s one of my favourite <a href="http://code.activestate.com/recipes/576647-eight-queens-six-lines">recipes, by Raymond Hettinger</a>, lightly adapted for Python 3.
+</p>
+<pre><code>from itertools import permutations
+
+n = width_of_chessboard = 8
+sqs = list(range(n))
+
+Qs = (Q for Q in permutations(sqs)
+      if n == len({Q[i]+i for i in sqs})
+           == len({Q[i]-i for i in sqs}))
+</code></pre><p>We start by assigning <code>sqs</code> to the list formed from the range 0 through 7.
+</p>
+<pre><code>&gt;&gt;&gt; sqs = list(range(8))
+&gt;&gt;&gt; sqs
+[0, 1, 2, 3, 4, 5, 6, 7]
+</code></pre><p>The list has 8 indices. If each index represents a column on a standard 8x8 chessboard and the value at that index represents a row on the same chessboard, then our list represents 8 positions on the board. Using the built-in <a href="https://docs.python.org/3/library/functions.html#enumerate">enumerate</a> function to generate these <code>(index, value)</code> pairs we see that <code>sqs</code> initially encodes the diagonal <code>(0, 0)</code> to <code>(7, 7)</code>:
+</p>
+<pre><code>&gt;&gt;&gt; list(enumerate(sqs))
+[(0, 0), (1, 1), (2, 2), (3, 3), (4, 4), (5, 5), (6, 6), (7, 7)]
+</code></pre><p>Next, permute the list values &#8212; the rows.
+</p>
+<pre><code>&gt;&gt;&gt; from itertools import permutations
+&gt;&gt;&gt; rooks = permutations(sqs)
+&gt;&gt;&gt; next(rooks)
+(0, 1, 2, 3, 4, 5, 6, 7)
+&gt;&gt;&gt; next(rooks)
+(0, 1, 2, 3, 4, 5, 7, 6)
+&gt;&gt;&gt; next(rooks)
+(0, 1, 2, 3, 4, 6, 5, 7)
+&gt;&gt;&gt; list(rooks)[34567]
+(6, 7, 0, 1, 3, 4, 5, 2)
+</code></pre><p><a href="https://docs.python.org/3/library/itertools.html#itertools.permutations">Itertools.permutations</a> generates values lazily. The snippet above shows the first two results, then skips forward 34568 places. <code>Permutations(sqs)</code> generates all possible arrangements of 8 pieces on a chessboard such that each row has exactly one piece on it and so does each column. That is, it generates all possible ways of placing 8 <a href="http://mathworld.wolfram.com/RooksProblem.html">rooks on a chessboard</a> so that no pair attacks each other.
+</p>
+<p>In the final program, we filter these rook positions to generate solutions to the more challenging &#8212; and more interesting &#8212; <a href="https://en.wikipedia.org/wiki/Eight_queens_puzzle">eight Queens puzzle</a>.
+</p>
+<p>Consider our starting point, the diagonal <code>(0, 0)</code> to <code>(7, 7)</code>
+</p>
+<pre><code>&gt;&gt;&gt; diagonal = list(range(8))
+&gt;&gt;&gt; {r-c for c,r in enumerate(diagonal)}
+{0}
+&gt;&gt;&gt; {r+c for c,r in enumerate(diagonal)}
+{0, 2, 4, 6, 8, 10, 12, 14}
+</code></pre><p>Here, a set comprehension collects the distinct values taken by the difference between the row and column along this diagonal, which in this case gives <code>{0}</code>. That is, if we placed 8 bishops along this &#x2197; diagonal they would all attack each other along this diagonal. The sum of the row and column takes 8 distinct values, however, meaning no pair attacks along a &#x2196; diagonal.
+</p>
+<p><a href="https://docs.python.org/3/reference/expressions.html#comparisons">Comparison operators chain in Python</a>, so the expression:
+</p>
+<pre><code>n == len({Q[i]+i for i in sqs}) == len({Q[i]-i for i in sqs})
+</code></pre><p>is <code>True</code> if both sets have 8 elements, that is, if the squares in <code>Q</code> are on distinct &#x2196; and &#x2197; diagonals; or, equivalently no pair of bishops placed on the squares in <code>Q</code> would attack each other. Since we already know <code>Q</code> positions 8 rooks so that no pair attacks each other, and a chess Queen combines the moves of a rook and a bishop, we can see that <code>Qs</code> generates every possible way of placing 8 Queens on a chessboard so that no pair attacks each other: which is to say, we&#8217;ve solved the <a href="https://en.wikipedia.org/wiki/Eight_queens_puzzle">8 Queens puzzle</a>.
+</p>
+<pre><code>Qs = (Q for Q in permutations(sqs)
+      if n == len({Q[i]+i for i in sqs})
+           == len({Q[i]-i for i in sqs}))
+</code></pre><p>This is beautiful code and there&#8217;s one final twist.
+</p>
+<p><code>Qs</code> is a <a href="https://docs.python.org/3/reference/expressions.html#generator-expressions">generator expression</a> primed to permute squares into neighbourly rooks filtered by amicable bishops yielding unthreatening Queens. Until asked, however, it does nothing.
+</p>
+<p style="font-size:4em">&#9813;&#9813;&#9813;&#9813;&#9813;&#9813;&#9813;&#9813;</p>
+
+</div>
+
+
+<div class="atomentry" id="easy-as-py">
 <h2 class="title"><a href="/articles/easy-as-py">Easy as Py</a></h2>
 <p class="meta"><abbr class="published" title="2016-03-23">2016-03-23</abbr> &bull; <a href="/tag/python" rel="tag">Python</a>, <a href="/tag/c++" rel="tag">C++</a>, <a href="/tag/c" rel="tag">C</a> &bull; <a href="/articles/easy-as-py#disqus_thread">Comments</a></p>
 <h2>What makes Python Simple?</h2>
@@ -1006,126 +1072,6 @@ Williams             42.40
 </div>
 
 
-<div class="atomentry" id="group-when">
-<h2 class="title"><a href="/articles/group-when">Group When</a></h2>
-<p class="meta"><abbr class="published" title="2014-07-16">2014-07-16</abbr> &bull; <a href="/tag/python" rel="tag">Python</a>, <a href="/tag/haskell" rel="tag">Haskell</a>, <a href="/tag/streams" rel="tag">Streams</a> &bull; <a href="/articles/group-when#disqus_thread">Comments</a></p>
-<p>Phil Nash&#8217;s recent tweet intrigued me.
-</p>
-<div><blockquote class="twitter-tweet" lang="en"><p>Functional people: I often (in F#) need to process a seq into a smaller list or seq &ndash; where items from the input are grouped in some way&hellip;</p>&mdash; Phil Nash (@phil_nash) <a href="https://twitter.com/phil_nash/statuses/489167611641724928">July 15, 2014</a></blockquote><blockquote class="twitter-tweet" lang="en"><p>&hellip; the need to group may not be known until after the first item in the group.&#10;I struggle to find a nicely functional way to do this. Ideas?</p>&mdash; Phil Nash (@phil_nash) <a href="https://twitter.com/phil_nash/statuses/489167962931482626">July 15, 2014</a></blockquote><script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script></div>
-
-<p>He later clarified what he was after &#8212; and had now found &#8212; linking to a <a href="http://fssnip.net/6A">solution</a> posted a couple of years ago by <a href="http://tomasp.net">Tomas Petricek</a>. The function <code>groupWhen</code> splits a sequence into groups, starting a new group whenever the predicate returns true.
-</p>
-<div class="typocode">
-
-<pre class="prettyprint"> module Seq =
-   /// Iterates over elements of the input sequence and groups adjacent elements.
-   /// A new group is started when the specified predicate holds about the element
-   /// of the sequence (and at the beginning of the iteration).
-   ///
-   /// For example: 
-   ///    Seq.groupWhen isOdd [3;3;2;4;1;2] = seq [[3]; [3; 2; 4]; [1; 2]]
-   let groupWhen f (input:seq&lt;_&gt;) = seq {
-     use en = input.GetEnumerator()
-     let running = ref true
-     
-     // Generate a group starting with the current element. Stops generating
-     // when it founds element such that 'f en.Current' is 'true'
-     let rec group() = 
-       [ yield en.Current
-         if en.MoveNext() then
-           if not (f en.Current) then yield! group() 
-         else running := false ]
-     
-     if en.MoveNext() then
-       // While there are still elements, start a new group
-       while running.Value do
-         yield group() |&gt; Seq.ofList }
-
-</pre>
-
-</div>
-
-<p>Here&#8217;s a nice Haskell version coded up by <a href="https://twitter.com/sdarlington">@sdarlington</a>.
-</p>
-<script src="https://gist.github.com/sdarlington/be76048bff124694769d.js"></script>
-
-<p>Maybe <a href="https://docs.python.org/3/library/itertools.html#itertools.takewhile">takewhile</a> and <a href="https://docs.python.org/3/library/itertools.html#itertools.dropwhile">dropwhile</a> could power a Python solution, but my first choice would be <a href="https://docs.python.org/3/library/itertools.html#itertools.groupby">itertools.groupby</a>. <code>Groupby</code> chops a sequence into subsequences, where the elements of each subsequence have the same key value. A suitable key function, in this case, must change its return value every time the sequence yields an element for which the predicate holds. It could toggle between a pair of values, for example. Or it could just count the number of times the predicate holds.
-</p>
-<div class="typocode">
-
-<pre class="prettyprint">class count_p:
-    ''' Return a value which increments every time the predicate holds.
-    '''
-    def __init__(self, pred):
-        self._n = 0
-        self._pred = pred
-    
-    def __call__(self, v):
-        self._n += self._pred(v)
-        return self._n
-
-def group_when(pred, xs):
-    return (gp for _, gp in groupby(xs, count_p(pred)))
-
-</pre>
-
-</div>
-
-<p>Here, <code>group_when</code> accepts an iterable and returns an iterable sequence of iterable groups. Clients choose how to consume the results.
-</p>
-<div class="typocode">
-
-<pre class="prettyprint">&gt;&gt;&gt; def odd(v): return v % 2
-&gt;&gt;&gt; xs = group_when(odd, [3, 3, 2, 4, 1, 2])
-&gt;&gt;&gt; print([list(g) for g in xs])
-[[3], [3, 2, 4], [1, 2]]
-
-</pre>
-
-</div>
-
-<p>Note that <code>count_p</code> does something very like <a href="acc">itertools.accumulate</a>. Here&#8217;s another version of <code>group_when</code> which takes advantage of this.
-</p>
-<div class="typocode">
-
-<pre class="prettyprint">def group_when(pred, xs):
-    xs, ys = tee(xs)
-    accu = accumulate(map(pred, ys))
-    return (gp for _, gp in groupby(xs, lambda _: next(accu)))
-
-</pre>
-
-</div>
-
-<p style="text-align:center">&sect;</p>
-
-<p>After a short break, here&#8217;s a third version of <code>group_when</code>. This is the first time I&#8217;ve found a use for <code>takewhile</code> and <code>dropwhile</code>. Beware: as the teed streams <code>xs</code> and <code>ys</code> diverge, the amount of backing storage required will grow &#8230; only for the stored values to then be dropped!
-</p>
-<div class="typocode">
-
-<pre class="prettyprint">from itertools import *
- 
-def group_when(p, xs):
-    def notp(x): return not p(x)
-    xs = iter(xs)
-    while True:
-        x = next(xs)
-        xs, ys = tee(xs)
-        yield chain([x], takewhile(notp, xs))
-        xs = dropwhile(notp, ys)
- 
-def odd(x):
-    return x % 2
- 
-[list(g) for g in group_when(odd, [3, 3, 2, 4, 1, 2])] # [[3], [3, 2, 4], [1, 2]]
-
-</pre>
-
-</div>
-
-</div>
-
-
 <div class="extended">
 <p><a href="/articles/">Visit the Word Aligned archives...</a></p>
 </div>
@@ -1169,10 +1115,10 @@ def odd(x):
 
 <div class="sidebar-node">
 <h3>Top Tags</h3>
-<ul id="categories"><li><a href="/tag/python" rel="tag">Python</a> <em>(113)</em></li>
+<ul id="categories"><li><a href="/tag/python" rel="tag">Python</a> <em>(114)</em></li>
 <li><a href="/tag/c++" rel="tag">C++</a> <em>(68)</em></li>
 <li><a href="/tag/self" rel="tag">Self</a> <em>(59)</em></li>
-<li><a href="/tag/puzzles" rel="tag">Puzzles</a> <em>(31)</em></li>
+<li><a href="/tag/puzzles" rel="tag">Puzzles</a> <em>(32)</em></li>
 <li><a href="/tag/accu" rel="tag">ACCU</a> <em>(31)</em></li>
 <li><a href="/tag/web-applications" rel="tag">Web Applications</a> <em>(27)</em></li>
 <li><a href="/tag/subversion" rel="tag">Subversion</a> <em>(27)</em></li>
@@ -1201,7 +1147,7 @@ def odd(x):
 <div class="sidebar-node">
 <h3>Chain</h3>
 <ul>
-<li><a accesskey="p" href="/articles/easy-as-py" title="First article">&raquo; Easy as Py</a></li>
+<li><a accesskey="p" href="/articles/8-queens-puzzle" title="First article">&raquo; 8 Queens Puzzle</a></li>
 
 </ul>
 

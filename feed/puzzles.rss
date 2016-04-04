@@ -7,6 +7,74 @@
 <dc:creator>tag@wordaligned.org</dc:creator>
 <language>en-gb</language>
 <item>
+<title>8 Queens Puzzle</title>
+<description>&lt;p style="font-size:4em"&gt;&amp;#9819;&amp;#9819;&amp;#9819;&amp;#9819;&amp;#9819;&amp;#9819;&amp;#9819;&amp;#9819;&lt;/p&gt;
+
+&lt;p&gt;Here&amp;#8217;s one of my favourite &lt;a href="http://code.activestate.com/recipes/576647-eight-queens-six-lines"&gt;recipes, by Raymond Hettinger&lt;/a&gt;, lightly adapted for Python 3.
+&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;from itertools import permutations
+
+n = width_of_chessboard = 8
+sqs = list(range(n))
+
+Qs = (Q for Q in permutations(sqs)
+      if n == len({Q[i]+i for i in sqs})
+           == len({Q[i]-i for i in sqs}))
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;We start by assigning &lt;code&gt;sqs&lt;/code&gt; to the list formed from the range 0 through 7.
+&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;&amp;gt;&amp;gt;&amp;gt; sqs = list(range(8))
+&amp;gt;&amp;gt;&amp;gt; sqs
+[0, 1, 2, 3, 4, 5, 6, 7]
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;The list has 8 indices. If each index represents a column on a standard 8x8 chessboard and the value at that index represents a row on the same chessboard, then our list represents 8 positions on the board. Using the built-in &lt;a href="https://docs.python.org/3/library/functions.html#enumerate"&gt;enumerate&lt;/a&gt; function to generate these &lt;code&gt;(index, value)&lt;/code&gt; pairs we see that &lt;code&gt;sqs&lt;/code&gt; initially encodes the diagonal &lt;code&gt;(0, 0)&lt;/code&gt; to &lt;code&gt;(7, 7)&lt;/code&gt;:
+&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;&amp;gt;&amp;gt;&amp;gt; list(enumerate(sqs))
+[(0, 0), (1, 1), (2, 2), (3, 3), (4, 4), (5, 5), (6, 6), (7, 7)]
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Next, permute the list values &amp;#8212; the rows.
+&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;&amp;gt;&amp;gt;&amp;gt; from itertools import permutations
+&amp;gt;&amp;gt;&amp;gt; rooks = permutations(sqs)
+&amp;gt;&amp;gt;&amp;gt; next(rooks)
+(0, 1, 2, 3, 4, 5, 6, 7)
+&amp;gt;&amp;gt;&amp;gt; next(rooks)
+(0, 1, 2, 3, 4, 5, 7, 6)
+&amp;gt;&amp;gt;&amp;gt; next(rooks)
+(0, 1, 2, 3, 4, 6, 5, 7)
+&amp;gt;&amp;gt;&amp;gt; list(rooks)[34567]
+(6, 7, 0, 1, 3, 4, 5, 2)
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;a href="https://docs.python.org/3/library/itertools.html#itertools.permutations"&gt;Itertools.permutations&lt;/a&gt; generates values lazily. The snippet above shows the first two results, then skips forward 34568 places. &lt;code&gt;Permutations(sqs)&lt;/code&gt; generates all possible arrangements of 8 pieces on a chessboard such that each row has exactly one piece on it and so does each column. That is, it generates all possible ways of placing 8 &lt;a href="http://mathworld.wolfram.com/RooksProblem.html"&gt;rooks on a chessboard&lt;/a&gt; so that no pair attacks each other.
+&lt;/p&gt;
+&lt;p&gt;In the final program, we filter these rook positions to generate solutions to the more challenging &amp;#8212; and more interesting &amp;#8212; &lt;a href="https://en.wikipedia.org/wiki/Eight_queens_puzzle"&gt;eight Queens puzzle&lt;/a&gt;.
+&lt;/p&gt;
+&lt;p&gt;Consider our starting point, the diagonal &lt;code&gt;(0, 0)&lt;/code&gt; to &lt;code&gt;(7, 7)&lt;/code&gt;
+&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;&amp;gt;&amp;gt;&amp;gt; diagonal = list(range(8))
+&amp;gt;&amp;gt;&amp;gt; {r-c for c,r in enumerate(diagonal)}
+{0}
+&amp;gt;&amp;gt;&amp;gt; {r+c for c,r in enumerate(diagonal)}
+{0, 2, 4, 6, 8, 10, 12, 14}
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Here, a set comprehension collects the distinct values taken by the difference between the row and column along this diagonal, which in this case gives &lt;code&gt;{0}&lt;/code&gt;. That is, if we placed 8 bishops along this &amp;#x2197; diagonal they would all attack each other along this diagonal. The sum of the row and column takes 8 distinct values, however, meaning no pair attacks along a &amp;#x2196; diagonal.
+&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://docs.python.org/3/reference/expressions.html#comparisons"&gt;Comparison operators chain in Python&lt;/a&gt;, so the expression:
+&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;n == len({Q[i]+i for i in sqs}) == len({Q[i]-i for i in sqs})
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;is &lt;code&gt;True&lt;/code&gt; if both sets have 8 elements, that is, if the squares in &lt;code&gt;Q&lt;/code&gt; are on distinct &amp;#x2196; and &amp;#x2197; diagonals; or, equivalently no pair of bishops placed on the squares in &lt;code&gt;Q&lt;/code&gt; would attack each other. Since we already know &lt;code&gt;Q&lt;/code&gt; positions 8 rooks so that no pair attacks each other, and a chess Queen combines the moves of a rook and a bishop, we can see that &lt;code&gt;Qs&lt;/code&gt; generates every possible way of placing 8 Queens on a chessboard so that no pair attacks each other: which is to say, we&amp;#8217;ve solved the &lt;a href="https://en.wikipedia.org/wiki/Eight_queens_puzzle"&gt;8 Queens puzzle&lt;/a&gt;.
+&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;Qs = (Q for Q in permutations(sqs)
+      if n == len({Q[i]+i for i in sqs})
+           == len({Q[i]-i for i in sqs}))
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;This is beautiful code and there&amp;#8217;s one final twist.
+&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;Qs&lt;/code&gt; is a &lt;a href="https://docs.python.org/3/reference/expressions.html#generator-expressions"&gt;generator expression&lt;/a&gt; primed to permute squares into neighbourly rooks filtered by amicable bishops yielding unthreatening Queens. Until asked, however, it does nothing.
+&lt;/p&gt;
+&lt;p style="font-size:4em"&gt;&amp;#9813;&amp;#9813;&amp;#9813;&amp;#9813;&amp;#9813;&amp;#9813;&amp;#9813;&amp;#9813;&lt;/p&gt;</description>
+<dc:date>2016-04-04</dc:date>
+<guid>http://wordaligned.org/articles/8-queens-puzzle</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/8-queens-puzzle</link>
+<category>Puzzles</category>
+</item>
+
+<item>
 <title>Sausages, sausages, sausages - slice, slice, slice</title>
 <description>&lt;p&gt;A friend asked for help reaching the next level of a puzzle game. The test which stalled her involves machine placement in a sausage factory.
 &lt;/p&gt;
@@ -3734,229 +3802,6 @@ if __name__ == "__main__":
 <guid>http://wordaligned.org/articles/the-maximum-subsequence-problem</guid>
 <author>tag@wordaligned.org (Thomas Guest)</author>
 <link>http://wordaligned.org/articles/the-maximum-subsequence-problem</link>
-<category>Puzzles</category>
-</item>
-
-<item>
-<title>Zippy triples served with Python</title>
-<description>&lt;h3&gt;The Problem&lt;/h3&gt;
-&lt;p&gt;Here&amp;#8217;s a problem I encountered when writing the HTML generator for this site. Logically, Word Aligned is a time-ordered collection of articles. I wanted each article to link to its predecessor and successor. So the general problem is: 
-   &lt;strong&gt;How do you iterate through a collection yielding (previous, this, next) triples?&lt;/strong&gt;
-&lt;/p&gt;
-&lt;span id="continue-reading"/&gt;
-
-
-&lt;h3&gt;Specification&lt;/h3&gt;
-&lt;p&gt;Some test cases make things clearer. Let&amp;#8217;s name the function we&amp;#8217;re developing &lt;code&gt;prev_this_next()&lt;/code&gt;.
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
-
-&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; long_weekend = 'Fri', 'Sat', 'Sun', 'Mon',
-&amp;gt;&amp;gt;&amp;gt; yesterday_today_tomorrow = prev_this_next(long_weekend)
-&amp;gt;&amp;gt;&amp;gt; yesterday_today_tomorrow.next()
-(None, 'Fri', 'Sat')
-&amp;gt;&amp;gt;&amp;gt; yesterday_today_tomorrow.next()
-('Fri', 'Sat', 'Sun')
-&amp;gt;&amp;gt;&amp;gt; yesterday_today_tomorrow.next()
-('Sat', 'Sun', 'Mon')
-&amp;gt;&amp;gt;&amp;gt; yesterday_today_tomorrow.next()
-('Sun', 'Mon', None)
-&amp;gt;&amp;gt;&amp;gt; yesterday_today_tomorrow.next()
-Traceback (most recent call last):
-    ...
-StopIteration
-&amp;gt;&amp;gt;&amp;gt; for ptn in prev_this_next(range(5)):
-...     print ptn
-... 
-(None, 0, 1)
-(0, 1, 2)
-(1, 2, 3)
-(2, 3, 4)
-(3, 4, None)
-&amp;gt;&amp;gt;&amp;gt; print "\n".join(map(repr, prev_this_next("XYZ")))
-(None, 'X', 'Y')
-('X', 'Y', 'Z')
-('Y', 'Z', None)
-
-&lt;/pre&gt;
-
-&lt;/div&gt;
-
-&lt;p&gt;You&amp;#8217;ll notice we&amp;#8217;ve specified behaviour at the boundaries: the first item in the collection has no predecessor, thus the first triple returned has its first item set to &lt;code&gt;None&lt;/code&gt;; and similarly the final triple has its third item set to &lt;code&gt;None&lt;/code&gt;. We might equally well have chosen to return a user supplied default, or to wrap the collection at its ends. For now, let&amp;#8217;s go with the simple behaviour shown.
-&lt;/p&gt;
-&lt;p&gt;You&amp;#8217;ll also have noticed I&amp;#8217;m writing Python &amp;#8212; fair enough, since this web site is generated off-line using Python. The &lt;code&gt;long_weekend&lt;/code&gt; example drives the Python iterator protocol by hand, calling &lt;code&gt;yesterday_today_tomorrow.next()&lt;/code&gt; until a &lt;code&gt;StopIteration&lt;/code&gt; exception terminates the iteration. It&amp;#8217;s quite rare to use iterators in this way: more commonly, you just loop through them using &lt;code&gt;for&lt;/code&gt;, or plug them into container operations. The second and third test cases show more typical usage.
-&lt;/p&gt;
-
-&lt;h3&gt;First Implementation&lt;/h3&gt;
-&lt;p&gt;If this were C++, we&amp;#8217;d prefer our collection to support bi-directional iteration: think of a doubly-linked &lt;code&gt;std::list&lt;/code&gt;, or a plain old random access &lt;code&gt;std::vector&lt;/code&gt;. Then we could just decrement/increment each iterator from the collection to find its neighbours. 
-&lt;/p&gt;
-&lt;p&gt;In Python, we might decide to assume a random access container and write something like this:
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
-
-&lt;pre class="prettyprint"&gt;def get_default(items):
-    "Return an item getter function."
-    n_items = len(items)
-    def inner(index):
-        "Return items[index] or None if index is out of range."
-        if index &amp;lt; 0 or index &amp;gt;= n_items:
-            return None
-        else:
-            return items[index]
-    return inner
-
-def prev_this_next(items):
-    get = get_default(items)
-    for ix, item in enumerate(items):
-        yield get(ix - 1), item, get(ix + 1)
-
-&lt;/pre&gt;
-
-&lt;/div&gt;
-
-&lt;p&gt;This code isn&amp;#8217;t elegant but it does pass our tests. Incidentally, an attempt to implement &lt;code&gt;get_default&lt;/code&gt; using &lt;a href="http://wordaligned.org/articles/permission-and-forgiveness.html"&gt;EAFP&lt;/a&gt;, as shown below, would fail. Can you see why?
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
-
-&lt;pre class="prettyprint"&gt;def inner(index):
-    try:
-        return items[index]
-    except IndexError:
-        return None
-
-&lt;/pre&gt;
-
-&lt;/div&gt;
-
-&lt;p&gt;This fails because accessing &lt;code&gt;items[-1]&lt;/code&gt; doesn&amp;#8217;t raise an &lt;code&gt;IndexError&lt;/code&gt; (unless &lt;code&gt;items&lt;/code&gt; is empty); it&amp;#8217;s a convenient way to access the final element of &lt;code&gt;items&lt;/code&gt;.
-&lt;/p&gt;
-&lt;p&gt;Even with the correct version of &lt;code&gt;get_default&lt;/code&gt;, if our collection of items is a stream &amp;#8212; by which I mean a lazily-evaluated iterable &amp;#8212; this code raises an exception. We don&amp;#8217;t know how long the stream will be (indeed, it could be infinite) and we can&amp;#8217;t just access elements from it at random. For C++ programmers, think of sequentially reading a file using an input iterator.
-&lt;/p&gt;
-
-&lt;h3&gt;Stream Test Case&lt;/h3&gt;
-&lt;p&gt;Let&amp;#8217;s adapt one of our test cases to expose this flaw.
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
-
-&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; long_weekend = iter(('Fri', 'Sat', 'Sun', 'Mon'))
-&amp;gt;&amp;gt;&amp;gt; yesterday_today_tomorrow = prev_this_next(long_weekend)
-...
-
-&lt;/pre&gt;
-
-&lt;/div&gt;
-
-&lt;p&gt;Running this code raises an exception:
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
-
-&lt;pre class="prettyprint"&gt;Traceback (most recent call last):
-    ...
-TypeError: object of type 'tupleiterator' has no len()
-
-&lt;/pre&gt;
-
-&lt;/div&gt;
-
-
-&lt;h3&gt;Stream Solution&lt;/h3&gt;
-&lt;p&gt;Thinking of this problem in terms of streams gives us a solution which is both more general and more simple. All we have to do is tee up three independent iterators into the stream, stagger them, then zip them back together. &lt;span /&gt;The itertools module supplies the components. We connect.
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
-
-&lt;pre class="prettyprint"&gt;import itertools
-
-def prev_this_next(items):
-    extend = itertools.chain([None], items, [None])
-    prev, this, next = itertools.tee(extend, 3)
-    try:
-        this.next()
-        next.next()
-        next.next()
-    except StopIteration:
-        pass
-    return itertools.izip(prev, this, next)
-
-&lt;/pre&gt;
-
-&lt;/div&gt;
-
-&lt;p&gt;This code works on any iterable, infinite, finite or empty, lazy or eager. Some more testcases:
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
-
-&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; [ptn for ptn in prev_this_next(list())]
-[]
-&amp;gt;&amp;gt;&amp;gt; [ptn for ptn in prev_this_next(set([1]))]
-[(None, 1, None)]
-&amp;gt;&amp;gt;&amp;gt; ptn = prev_this_next(itertools.count())
-&amp;gt;&amp;gt;&amp;gt; itertools.islice(ptn, 100, 101).next()
-(99, 100, 101)
-
-&lt;/pre&gt;
-
-&lt;/div&gt;
-
-
-&lt;h3&gt;Triples Times Two&lt;/h3&gt;
-&lt;p&gt;Now suppose you want to peel items from an iterable, three at a time. Let&amp;#8217;s call this function &lt;code&gt;three_at_a_time()&lt;/code&gt; and let&amp;#8217;s specify its behaviour with some simple tests:
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
-
-&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; t = three_at_a_time((1, 2, 3, 4, 5, 6))
-&amp;gt;&amp;gt;&amp;gt; t.next()
-(1, 2, 3)
-&amp;gt;&amp;gt;&amp;gt; t.next()
-(4, 5, 6)
-&amp;gt;&amp;gt;&amp;gt; t.next()
-Traceback (most recent call last):
-    ...
-StopIteration
-&amp;gt;&amp;gt;&amp;gt; ttt = three_at_a_time((1, 2, 3, 4))
-&amp;gt;&amp;gt;&amp;gt; [t for t in ttt]
-[(1, 2, 3)]
-&amp;gt;&amp;gt;&amp;gt; ttt = three_at_a_time(itertools.count())
-&amp;gt;&amp;gt;&amp;gt; ttt = itertools.islice(ttt, 0, 9, 3)
-&amp;gt;&amp;gt;&amp;gt; [t for t in ttt]
-[(0, 1, 2), (9, 10, 11), (18, 19, 20)]
-&amp;gt;&amp;gt;&amp;gt; "".join(chain(*three_at_a_time("Word Aligned")))
-'Word Aligned'
-
-&lt;/pre&gt;
-
-&lt;/div&gt;
-
-&lt;p&gt;Note that any trailing single element or pair at the end of the collection is discarded. We might equally have decided to pad the collection with a user-supplied default or throw an exception.
-&lt;/p&gt;
-&lt;p&gt;Here&amp;#8217;s one implementation.
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
-
-&lt;pre class="prettyprint"&gt;def three_at_a_time(items):
-    it = iter(items)
-    return itertools.izip(it, it, it)
-
-&lt;/pre&gt;
-
-&lt;/div&gt;
-
-&lt;p&gt;Here&amp;#8217;s another.
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
-
-&lt;pre class="prettyprint"&gt;def n_at_a_time(items, n):
-    it = iter(items)
-    return itertools.izip(* [it] * n)
-
-three_at_a_time = lambda items: n_at_a_time(items, 3)
-
-&lt;/pre&gt;
-
-&lt;/div&gt;</description>
-<dc:date>2007-11-20</dc:date>
-<guid>http://wordaligned.org/articles/zippy-triples-served-with-python</guid>
-<author>tag@wordaligned.org (Thomas Guest)</author>
-<link>http://wordaligned.org/articles/zippy-triples-served-with-python</link>
 <category>Puzzles</category>
 </item>
 

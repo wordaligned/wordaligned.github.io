@@ -7,6 +7,74 @@
 <dc:creator>tag@wordaligned.org</dc:creator>
 <language>en-gb</language>
 <item>
+<title>8 Queens Puzzle</title>
+<description>&lt;p style="font-size:4em"&gt;&amp;#9819;&amp;#9819;&amp;#9819;&amp;#9819;&amp;#9819;&amp;#9819;&amp;#9819;&amp;#9819;&lt;/p&gt;
+
+&lt;p&gt;Here&amp;#8217;s one of my favourite &lt;a href="http://code.activestate.com/recipes/576647-eight-queens-six-lines"&gt;recipes, by Raymond Hettinger&lt;/a&gt;, lightly adapted for Python 3.
+&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;from itertools import permutations
+
+n = width_of_chessboard = 8
+sqs = list(range(n))
+
+Qs = (Q for Q in permutations(sqs)
+      if n == len({Q[i]+i for i in sqs})
+           == len({Q[i]-i for i in sqs}))
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;We start by assigning &lt;code&gt;sqs&lt;/code&gt; to the list formed from the range 0 through 7.
+&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;&amp;gt;&amp;gt;&amp;gt; sqs = list(range(8))
+&amp;gt;&amp;gt;&amp;gt; sqs
+[0, 1, 2, 3, 4, 5, 6, 7]
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;The list has 8 indices. If each index represents a column on a standard 8x8 chessboard and the value at that index represents a row on the same chessboard, then our list represents 8 positions on the board. Using the built-in &lt;a href="https://docs.python.org/3/library/functions.html#enumerate"&gt;enumerate&lt;/a&gt; function to generate these &lt;code&gt;(index, value)&lt;/code&gt; pairs we see that &lt;code&gt;sqs&lt;/code&gt; initially encodes the diagonal &lt;code&gt;(0, 0)&lt;/code&gt; to &lt;code&gt;(7, 7)&lt;/code&gt;:
+&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;&amp;gt;&amp;gt;&amp;gt; list(enumerate(sqs))
+[(0, 0), (1, 1), (2, 2), (3, 3), (4, 4), (5, 5), (6, 6), (7, 7)]
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Next, permute the list values &amp;#8212; the rows.
+&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;&amp;gt;&amp;gt;&amp;gt; from itertools import permutations
+&amp;gt;&amp;gt;&amp;gt; rooks = permutations(sqs)
+&amp;gt;&amp;gt;&amp;gt; next(rooks)
+(0, 1, 2, 3, 4, 5, 6, 7)
+&amp;gt;&amp;gt;&amp;gt; next(rooks)
+(0, 1, 2, 3, 4, 5, 7, 6)
+&amp;gt;&amp;gt;&amp;gt; next(rooks)
+(0, 1, 2, 3, 4, 6, 5, 7)
+&amp;gt;&amp;gt;&amp;gt; list(rooks)[34567]
+(6, 7, 0, 1, 3, 4, 5, 2)
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;a href="https://docs.python.org/3/library/itertools.html#itertools.permutations"&gt;Itertools.permutations&lt;/a&gt; generates values lazily. The snippet above shows the first two results, then skips forward 34568 places. &lt;code&gt;Permutations(sqs)&lt;/code&gt; generates all possible arrangements of 8 pieces on a chessboard such that each row has exactly one piece on it and so does each column. That is, it generates all possible ways of placing 8 &lt;a href="http://mathworld.wolfram.com/RooksProblem.html"&gt;rooks on a chessboard&lt;/a&gt; so that no pair attacks each other.
+&lt;/p&gt;
+&lt;p&gt;In the final program, we filter these rook positions to generate solutions to the more challenging &amp;#8212; and more interesting &amp;#8212; &lt;a href="https://en.wikipedia.org/wiki/Eight_queens_puzzle"&gt;eight Queens puzzle&lt;/a&gt;.
+&lt;/p&gt;
+&lt;p&gt;Consider our starting point, the diagonal &lt;code&gt;(0, 0)&lt;/code&gt; to &lt;code&gt;(7, 7)&lt;/code&gt;
+&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;&amp;gt;&amp;gt;&amp;gt; diagonal = list(range(8))
+&amp;gt;&amp;gt;&amp;gt; {r-c for c,r in enumerate(diagonal)}
+{0}
+&amp;gt;&amp;gt;&amp;gt; {r+c for c,r in enumerate(diagonal)}
+{0, 2, 4, 6, 8, 10, 12, 14}
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Here, a set comprehension collects the distinct values taken by the difference between the row and column along this diagonal, which in this case gives &lt;code&gt;{0}&lt;/code&gt;. That is, if we placed 8 bishops along this &amp;#x2197; diagonal they would all attack each other along this diagonal. The sum of the row and column takes 8 distinct values, however, meaning no pair attacks along a &amp;#x2196; diagonal.
+&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://docs.python.org/3/reference/expressions.html#comparisons"&gt;Comparison operators chain in Python&lt;/a&gt;, so the expression:
+&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;n == len({Q[i]+i for i in sqs}) == len({Q[i]-i for i in sqs})
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;is &lt;code&gt;True&lt;/code&gt; if both sets have 8 elements, that is, if the squares in &lt;code&gt;Q&lt;/code&gt; are on distinct &amp;#x2196; and &amp;#x2197; diagonals; or, equivalently no pair of bishops placed on the squares in &lt;code&gt;Q&lt;/code&gt; would attack each other. Since we already know &lt;code&gt;Q&lt;/code&gt; positions 8 rooks so that no pair attacks each other, and a chess Queen combines the moves of a rook and a bishop, we can see that &lt;code&gt;Qs&lt;/code&gt; generates every possible way of placing 8 Queens on a chessboard so that no pair attacks each other: which is to say, we&amp;#8217;ve solved the &lt;a href="https://en.wikipedia.org/wiki/Eight_queens_puzzle"&gt;8 Queens puzzle&lt;/a&gt;.
+&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;Qs = (Q for Q in permutations(sqs)
+      if n == len({Q[i]+i for i in sqs})
+           == len({Q[i]-i for i in sqs}))
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;This is beautiful code and there&amp;#8217;s one final twist.
+&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;Qs&lt;/code&gt; is a &lt;a href="https://docs.python.org/3/reference/expressions.html#generator-expressions"&gt;generator expression&lt;/a&gt; primed to permute squares into neighbourly rooks filtered by amicable bishops yielding unthreatening Queens. Until asked, however, it does nothing.
+&lt;/p&gt;
+&lt;p style="font-size:4em"&gt;&amp;#9813;&amp;#9813;&amp;#9813;&amp;#9813;&amp;#9813;&amp;#9813;&amp;#9813;&amp;#9813;&lt;/p&gt;</description>
+<dc:date>2016-04-04</dc:date>
+<guid>http://wordaligned.org/articles/8-queens-puzzle</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/8-queens-puzzle</link>
+<category>Python</category>
+</item>
+
+<item>
 <title>Easy as Py</title>
 <description>&lt;h2&gt;What makes Python Simple?&lt;/h2&gt;
 &lt;p&gt;I consider Python a simple language. Here&amp;#8217;s why.
@@ -3877,85 +3945,6 @@ def multiset_31(xs):
 <guid>http://wordaligned.org/articles/python-counters</guid>
 <author>tag@wordaligned.org (Thomas Guest)</author>
 <link>http://wordaligned.org/articles/python-counters</link>
-<category>Python</category>
-</item>
-
-<item>
-<title>Undogfooding</title>
-<description>&lt;p&gt;David Jones perfectly &lt;a href="http://drj11.wordpress.com/2009/07/04/tony-hoare-man-of-science/"&gt;captures the look and feel&lt;/a&gt; of Sir Tony Hoare&amp;#8217;s presentation at &lt;a href="http://www.europython.eu"&gt;Europython 2009&lt;/a&gt;
-&lt;/p&gt;
-&lt;blockquote&gt;&lt;p&gt;Tony Hoare is clearly old skool. His slides had the calm and aged patina of the &lt;a href="http://en.wikipedia.org/wiki/Overhead_projector"&gt;OHP&lt;/a&gt; era, and I thought they were all the better for that. If you have a message, then that message can be conveyed without all the flash and shine that PowerPoint tempts you with (although, being a Microsoft man, of course his slides &lt;em&gt;were&lt;/em&gt; in PowerPoint). 
-&lt;/p&gt;
-&lt;/blockquote&gt;&lt;p&gt;&lt;a href="http://docs.python.org/library/turtle.html#module-turtle"&gt;&lt;img src="http://wordaligned.org/images/my-1st-turtle.png" alt="My first turtle sketch"/&gt;&lt;/a&gt;
-&lt;/p&gt;
-&lt;p&gt;Note the parenthetical comment: Tony Hoare works for Microsoft and he uses Microsoft software, an activity developers refer to as &lt;a href="http://catb.org/jargon/html/D/dogfood.html"&gt;&amp;#8220;eating your own dogfood&amp;#8221;&lt;/a&gt;. Also eating dogfood at Europython, &lt;a href="http://www.europython.eu/talks/speakers/index.html#lingl_gregor"&gt;Gregor Lingl&lt;/a&gt; employed his very own &lt;a href="http://docs.python.org/library/turtle.html#module-turtle"&gt;turtle&lt;/a&gt; to guide the audience through a nifty presentation belying the reptile&amp;#8217;s slow-and-steady reputation. I&amp;#8217;ve always enjoyed sketching code using the Python interpreter, and sketching pictures with a turtle feels very pythonic.
-&lt;/p&gt;
-&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;My first turtle sketch&lt;/div&gt;
-
-&lt;pre class="prettyprint"&gt;Python 3.1
-&amp;gt;&amp;gt;&amp;gt; from turtle import *
-&amp;gt;&amp;gt;&amp;gt; shape('turtle')
-&amp;gt;&amp;gt;&amp;gt; circle(100)
-&amp;gt;&amp;gt;&amp;gt; fillcolour('red')
-Traceback (most recent call last):
-  File "&amp;lt;stdin&amp;gt;", line 1, in &amp;lt;module&amp;gt;
-NameError: name 'fillcolour' is not defined
-&amp;gt;&amp;gt;&amp;gt; fillcolor('red')
-&amp;gt;&amp;gt;&amp;gt; begin_fill(); circle(100); end_fill()
-&amp;gt;&amp;gt;&amp;gt; def grey(pc): c = pc/100; fillcolor(c, c, c)
-... 
-&amp;gt;&amp;gt;&amp;gt; clear()
-&amp;gt;&amp;gt;&amp;gt; def doit(r): begin_fill(); grey(r); circle(r); end_fill()
-... 
-&amp;gt;&amp;gt;&amp;gt; for r in range(100): doit(r)
-... 
-^C^C
-Traceback (most recent call last):
-...
-&amp;gt;&amp;gt;&amp;gt; clear()
-&amp;gt;&amp;gt;&amp;gt; for r in range(100, 0, -5): doit(r)
-...
-&amp;gt;&amp;gt;&amp;gt; fillcolor('white')
-&amp;gt;&amp;gt;&amp;gt; forward(150)
-
-&lt;/pre&gt;
-
-&lt;/div&gt;
-
-&lt;p&gt;Gregor Lingl&amp;#8217;s session at Europython wasn&amp;#8217;t the only one delivered using software developed by the presenter. What would be the opposite of eating your own dogfood, I wondered? Abusing someone else&amp;#8217;s software, perhaps.
-&lt;/p&gt;
-&lt;span id="continue-reading"/&gt;
-
-&lt;blockquote&gt;&lt;p&gt;After one too many bad presentations at a meeting in January 2000, I decided to see if I could do something about it. &amp;#8212; &lt;a href="http://norvig.com/Gettysburg/making.html" title="The Making of the Gettysburg PowerPoint Presentation"&gt;Peter Norvig&lt;/a&gt;
-&lt;/p&gt;
-&lt;/blockquote&gt;&lt;p&gt;I&amp;#8217;m fairly sure Peter Norvig had no part in PowerPoint&amp;#8217;s development. In a &lt;a href="http://norvig.com/Gettysburg"&gt;hilarious satire&lt;/a&gt; he skewers the popular presentation tool with its own Autocontent Wizard.
-&lt;/p&gt;
-&lt;p&gt;&lt;a href="http://norvig.com/Gettysburg/index.htm"&gt;&lt;img src="http://norvig.com/Gettysburg/img001.gif" width="500px" height="375px" alt="Gettysburg PPT, slide 1"/&gt;&lt;/a&gt;
-&lt;/p&gt;
-&lt;p&gt;Back on the subject of overhead projectors, I saw one put to good use by another eminent old-skooler, Donald Knuth, at the recent &lt;a href="http://www.dcs.warwick.ac.uk/bshm/meetings/Fiction.html"&gt;Mathematics and Fiction&lt;/a&gt; workshop in Oxford. Asked by passport control at London Heathrow if he&amp;#8217;d be visiting Oxford on a business trip or a pleasure trip, Knuth had answered: no, he&amp;#8217;d come on a ego trip.
-&lt;/p&gt;
-&lt;p&gt;Knuth was in Oxford to talk to his fans about about &lt;a href="http://www-cs-faculty.stanford.edu/~knuth/sn.html"&gt;Surreal Numbers&lt;/a&gt;, a       book he wrote in just a couple of weeks in 1973 while taking a break from working on &lt;a href="http://en.wikipedia.org/wiki/The_Art_of_Computer_Programming"&gt;The Art of Computer Programming&lt;/a&gt; in a hotel in Oslo, and which may well be the only example of a mathematical &lt;a href="http://en.wikipedia.org/wiki/Surreal_numbers"&gt;theory&lt;/a&gt; first published in fictional form.
-&lt;/p&gt;
-&lt;p&gt;&lt;a href="http://www-cs-faculty.stanford.edu/~knuth/sn.html"&gt;&lt;img src="http://wordaligned.org/images/books/surreal-numbers.jpg" width="240px" height="240px" alt="Surreal Numbers book cover" style="float:right;"/&gt;&lt;/a&gt;
-&lt;/p&gt;
-&lt;p&gt;For the workshop Knuth had gone back to his files and found his working notes, the original hotel brochure, photos, hand-written reviews by P&amp;oacute;lya and others, though he couldn&amp;#8217;t locate the paper napkin on which &lt;a href="http://en.wikipedia.org/wiki/John_Horton_Conway"&gt;John Horton Conway&lt;/a&gt; had sketched the axioms underpinning the number system a few months before&lt;a id="fn1link" href="http://wordaligned.org/articles/undogfooding#fn1"&gt;&lt;sup&gt;[1]&lt;/sup&gt;&lt;/a&gt; &amp;#8212; Knuth had copied this source material onto acetates which he then sorted and shuffled on the OHP according to the direction his reminiscences and questions from the audience took him.
-&lt;/p&gt;
-&lt;p&gt;Unlike Tony Hoare, Donald Knuth wasn&amp;#8217;t making a formal presentation, but I was struck by some advantages offered by the OHP. For one, the process of getting slides displayed seemed foolproof &amp;#8212; at Europython we had the usual catalogue of computer/screen interface glitches (unwanted dialog boxes popping up, batteries dying, screensavers kicking in, missing Mac display dongles, delays while rebooting Ubuntu, alignment issues). The OHP also facilitated a dynamic presentation style: Knuth accessed his slides at random, composing screens from more than one slide on the fly, and pointing to areas of interest directly using a finger. He didn&amp;#8217;t modify his slides during the session by writing on them, but that would also have been possible.
-&lt;/p&gt;
-&lt;p&gt;In a supreme example of dogfood consumption, a couple of years after publishing Surreal Numbers Knuth took a rather longer break from TAOCP to work on &lt;a href="http://en.wikipedia.org/wiki/TeX"&gt;TeX&lt;/a&gt;, a typesetting system whose results match the beauty of his writing.
-&lt;/p&gt;
-&lt;p style="text-align:center"&gt;&amp;sect;&lt;/p&gt;
-
-&lt;blockquote&gt;&lt;p&gt;&amp;#8230; You get surreal numbers by playing games. I used to feel guilty in Cambridge that I spent all day playing games, while I was supposed to be doing mathematics. Then, when I discovered surreal numbers, I realized that playing games IS mathematics. &amp;#8212; &lt;a href="http://www.gap-system.org/~history/Quotations/Conway.html"&gt;John Horton Conway&lt;/a&gt;
-&lt;/p&gt;
-&lt;/blockquote&gt;&lt;hr /&gt;
-
-&lt;p&gt;&lt;a id="fn1" href="http://wordaligned.org/articles/undogfooding#fn1link"&gt;[1]&lt;/a&gt; In fact, he&amp;#8217;d lost the napkin before his stay in the hotel in Oslo, which explains the difference between the axioms used in Surreal Numbers and the ones originally suggested by John Horton Conway.
-&lt;/p&gt;</description>
-<dc:date>2009-07-08</dc:date>
-<guid>http://wordaligned.org/articles/undogfooding</guid>
-<author>tag@wordaligned.org (Thomas Guest)</author>
-<link>http://wordaligned.org/articles/undogfooding</link>
 <category>Python</category>
 </item>
 

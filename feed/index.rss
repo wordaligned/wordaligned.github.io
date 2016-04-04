@@ -7,6 +7,75 @@
 <dc:creator>tag@wordaligned.org</dc:creator>
 <language>en-gb</language>
 <item>
+<title>8 Queens Puzzle</title>
+<description>&lt;p style="font-size:4em"&gt;&amp;#9819;&amp;#9819;&amp;#9819;&amp;#9819;&amp;#9819;&amp;#9819;&amp;#9819;&amp;#9819;&lt;/p&gt;
+
+&lt;p&gt;Here&amp;#8217;s one of my favourite &lt;a href="http://code.activestate.com/recipes/576647-eight-queens-six-lines"&gt;recipes, by Raymond Hettinger&lt;/a&gt;, lightly adapted for Python 3.
+&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;from itertools import permutations
+
+n = width_of_chessboard = 8
+sqs = list(range(n))
+
+Qs = (Q for Q in permutations(sqs)
+      if n == len({Q[i]+i for i in sqs})
+           == len({Q[i]-i for i in sqs}))
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;We start by assigning &lt;code&gt;sqs&lt;/code&gt; to the list formed from the range 0 through 7.
+&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;&amp;gt;&amp;gt;&amp;gt; sqs = list(range(8))
+&amp;gt;&amp;gt;&amp;gt; sqs
+[0, 1, 2, 3, 4, 5, 6, 7]
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;The list has 8 indices. If each index represents a column on a standard 8x8 chessboard and the value at that index represents a row on the same chessboard, then our list represents 8 positions on the board. Using the built-in &lt;a href="https://docs.python.org/3/library/functions.html#enumerate"&gt;enumerate&lt;/a&gt; function to generate these &lt;code&gt;(index, value)&lt;/code&gt; pairs we see that &lt;code&gt;sqs&lt;/code&gt; initially encodes the diagonal &lt;code&gt;(0, 0)&lt;/code&gt; to &lt;code&gt;(7, 7)&lt;/code&gt;:
+&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;&amp;gt;&amp;gt;&amp;gt; list(enumerate(sqs))
+[(0, 0), (1, 1), (2, 2), (3, 3), (4, 4), (5, 5), (6, 6), (7, 7)]
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Next, permute the list values &amp;#8212; the rows.
+&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;&amp;gt;&amp;gt;&amp;gt; from itertools import permutations
+&amp;gt;&amp;gt;&amp;gt; rooks = permutations(sqs)
+&amp;gt;&amp;gt;&amp;gt; next(rooks)
+(0, 1, 2, 3, 4, 5, 6, 7)
+&amp;gt;&amp;gt;&amp;gt; next(rooks)
+(0, 1, 2, 3, 4, 5, 7, 6)
+&amp;gt;&amp;gt;&amp;gt; next(rooks)
+(0, 1, 2, 3, 4, 6, 5, 7)
+&amp;gt;&amp;gt;&amp;gt; list(rooks)[34567]
+(6, 7, 0, 1, 3, 4, 5, 2)
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;a href="https://docs.python.org/3/library/itertools.html#itertools.permutations"&gt;Itertools.permutations&lt;/a&gt; generates values lazily. The snippet above shows the first two results, then skips forward 34568 places. &lt;code&gt;Permutations(sqs)&lt;/code&gt; generates all possible arrangements of 8 pieces on a chessboard such that each row has exactly one piece on it and so does each column. That is, it generates all possible ways of placing 8 &lt;a href="http://mathworld.wolfram.com/RooksProblem.html"&gt;rooks on a chessboard&lt;/a&gt; so that no pair attacks each other.
+&lt;/p&gt;
+&lt;p&gt;In the final program, we filter these rook positions to generate solutions to the more challenging &amp;#8212; and more interesting &amp;#8212; &lt;a href="https://en.wikipedia.org/wiki/Eight_queens_puzzle"&gt;eight Queens puzzle&lt;/a&gt;.
+&lt;/p&gt;
+&lt;p&gt;Consider our starting point, the diagonal &lt;code&gt;(0, 0)&lt;/code&gt; to &lt;code&gt;(7, 7)&lt;/code&gt;
+&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;&amp;gt;&amp;gt;&amp;gt; diagonal = list(range(8))
+&amp;gt;&amp;gt;&amp;gt; {r-c for c,r in enumerate(diagonal)}
+{0}
+&amp;gt;&amp;gt;&amp;gt; {r+c for c,r in enumerate(diagonal)}
+{0, 2, 4, 6, 8, 10, 12, 14}
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Here, a set comprehension collects the distinct values taken by the difference between the row and column along this diagonal, which in this case gives &lt;code&gt;{0}&lt;/code&gt;. That is, if we placed 8 bishops along this &amp;#x2197; diagonal they would all attack each other along this diagonal. The sum of the row and column takes 8 distinct values, however, meaning no pair attacks along a &amp;#x2196; diagonal.
+&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://docs.python.org/3/reference/expressions.html#comparisons"&gt;Comparison operators chain in Python&lt;/a&gt;, so the expression:
+&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;n == len({Q[i]+i for i in sqs}) == len({Q[i]-i for i in sqs})
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;is &lt;code&gt;True&lt;/code&gt; if both sets have 8 elements, that is, if the squares in &lt;code&gt;Q&lt;/code&gt; are on distinct &amp;#x2196; and &amp;#x2197; diagonals; or, equivalently no pair of bishops placed on the squares in &lt;code&gt;Q&lt;/code&gt; would attack each other. Since we already know &lt;code&gt;Q&lt;/code&gt; positions 8 rooks so that no pair attacks each other, and a chess Queen combines the moves of a rook and a bishop, we can see that &lt;code&gt;Qs&lt;/code&gt; generates every possible way of placing 8 Queens on a chessboard so that no pair attacks each other: which is to say, we&amp;#8217;ve solved the &lt;a href="https://en.wikipedia.org/wiki/Eight_queens_puzzle"&gt;8 Queens puzzle&lt;/a&gt;.
+&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;Qs = (Q for Q in permutations(sqs)
+      if n == len({Q[i]+i for i in sqs})
+           == len({Q[i]-i for i in sqs}))
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;This is beautiful code and there&amp;#8217;s one final twist.
+&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;Qs&lt;/code&gt; is a &lt;a href="https://docs.python.org/3/reference/expressions.html#generator-expressions"&gt;generator expression&lt;/a&gt; primed to permute squares into neighbourly rooks filtered by amicable bishops yielding unthreatening Queens. Until asked, however, it does nothing.
+&lt;/p&gt;
+&lt;p style="font-size:4em"&gt;&amp;#9813;&amp;#9813;&amp;#9813;&amp;#9813;&amp;#9813;&amp;#9813;&amp;#9813;&amp;#9813;&lt;/p&gt;</description>
+<dc:date>2016-04-04</dc:date>
+<guid>http://wordaligned.org/articles/8-queens-puzzle</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/8-queens-puzzle</link>
+<category>Puzzles</category>
+<category>Python</category>
+</item>
+
+<item>
 <title>Easy as Py</title>
 <description>&lt;h2&gt;What makes Python Simple?&lt;/h2&gt;
 &lt;p&gt;I consider Python a simple language. Here&amp;#8217;s why.
@@ -1302,73 +1371,6 @@ bool all_of_(Iter b, Iter e, Pred p)
 <author>tag@wordaligned.org (Thomas Guest)</author>
 <link>http://wordaligned.org/articles/reverse-esrever</link>
 <category>C++</category>
-<category>Puzzles</category>
-</item>
-
-<item>
-<title>Clown, Flee, Jump</title>
-<description>&lt;p&gt;The clown is running away from the circus. The contortionist wants nothing more to do with him. She&amp;#8217;s confessed everything to her husband, the strongman, who&amp;#8217;s after the clown&amp;#8217;s blood. The clown has no time to pack. Hurrying from the big top he snatches up his most treasured possessions and some refreshments:
-&lt;/p&gt;
-&lt;ul&gt;
- &lt;li&gt;
-     a makeup case
- &lt;/li&gt;
-
- &lt;li&gt;
-     a box camera, with tripod attached
- &lt;/li&gt;
-
- &lt;li&gt;
-     a cactus
- &lt;/li&gt;
-
- &lt;li&gt;
-     a roasted goose
- &lt;/li&gt;
-
- &lt;li&gt;
-     a magnum of champagne
- &lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;Each item weighs exactly 3kg.
-&lt;/p&gt;
-&lt;p&gt;Soon he reaches the edge of a ravine. A rope bridge connected to the other side has a sign in front of it.
-&lt;/p&gt;
-&lt;pre style="align:center;width:400px;border: 2px solid red; background: white;font-size:200%;"&gt;WARNING
-UNSTABLE STRUCTURE
-SAFE TO A MAXIMUM OF 75KG&lt;/pre&gt;
-
-&lt;p&gt;The bridge is 100m long. The clown weighs 70kg. The strongman, who&amp;#8217;s closing in, weighs considerably more. The clown must cross the bridge at once to effect his escape. &lt;strong&gt;How can he do so without abandoning any of his baggage&lt;/strong&gt;?
-&lt;/p&gt;
-&lt;p style="text-align:center;font-size:200%"&gt;?&lt;/p&gt;
-
-&lt;p&gt;Elsewhere, it&amp;#8217;s school sports day. Conditions are perfect for the high jump &amp;#8212; warm, sunny, still &amp;#8212; and a talented young athlete has raised the bar to 1.85m, which happens to be his own height. On the first two attempts he fails. On the third attempt he succeeds.
-&lt;/p&gt;
-&lt;img alt="High Jump" src="http://wordaligned.org/images/high-jump.jpg"/&gt;
-
-&lt;p&gt;&amp;#8220;Chapeau!&amp;#8221; says the French teacher.
-&lt;/p&gt;
-&lt;p&gt;&amp;#8220;Awesome!&amp;#8221; says the Chaplain.
-&lt;/p&gt;
-&lt;p&gt;&amp;#8220;Unbelievable!&amp;#8221; says the head of Mathematics.
-&lt;/p&gt;
-&lt;p&gt;&amp;#8220;Actually,&amp;#8221; the sports coach says, &amp;#8220;it&amp;#8217;s quite simple: a combination of talent, training, and technique. He cleared his own height &lt;strong&gt;but his centre of gravity didn&amp;#8217;t&lt;/strong&gt;.&amp;#8221;
-&lt;/p&gt;
-&lt;p&gt;&amp;#8220;What nonsense!&amp;#8221; says the mathematician.
-&lt;/p&gt;
-&lt;p style="text-align:center;font-size:300%"&gt;??&lt;/p&gt;
-
-&lt;img alt="Grimaldi" src="http://wordaligned.org/images/grimaldi.jpg"/&gt;
-
-&lt;p&gt;The clown barely breaks stride. Juggling with mismatched objects is part of his act and quick as a flash case, camera, cactus, fowl and fizz are in the air. At no point does he have more than one object in either hand so his weight never exceeds 73kg. The bridge holds. The clown gets away.
-&lt;/p&gt;
-&lt;p&gt;&amp;#8220;Grrrr!&amp;#8221; says the strongman, shaking his fists.
-&lt;/p&gt;
-&lt;p style="text-align:center;font-size:400%"&gt;???&lt;/p&gt;</description>
-<dc:date>2013-09-11</dc:date>
-<guid>http://wordaligned.org/articles/clown-flee-jump</guid>
-<author>tag@wordaligned.org (Thomas Guest)</author>
-<link>http://wordaligned.org/articles/clown-flee-jump</link>
 <category>Puzzles</category>
 </item>
 
