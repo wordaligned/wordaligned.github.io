@@ -7,6 +7,42 @@
 <dc:creator>tag@wordaligned.org</dc:creator>
 <language>en-gb</language>
 <item>
+<title>8 Queens Puzzle++</title>
+<description>&lt;p&gt;&lt;a href="http://wordaligned.org/articles/8-queens-puzzle"&gt;Yesterday I wrote about&lt;/a&gt; a Python solution to the 8 Queens puzzle.
+&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;n = width_of_chessboard = 8
+sqs = list(range(n))
+
+Qs = (Q for Q in itertools.permutations(sqs)
+      if n == len({Q[i]+i for i in sqs})
+           == len({Q[i]-i for i in sqs}))
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;It&amp;#8217;s possible to reproduce this strategy in C++:
+&lt;/p&gt;
+&lt;ul&gt;
+ &lt;li&gt;
+     range(n) &amp;#8594; &lt;a href="http://en.cppreference.com/w/cpp/algorithm/iota"&gt;std::iota&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     itertools.permutations &amp;#8594; &lt;a href="http://wordaligned.org/articles/next-permutation"&gt;std::next_permutation&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     set comprehension &amp;#8594; set insertion
+ &lt;/li&gt;
+&lt;/ul&gt;
+&lt;script src="https://gist.github.com/wordaligned/c94649d6b37ec08a9bda16e53c43b888.js"&gt;&lt;/script&gt;
+
+&lt;p&gt;The &lt;code&gt;std::next_permutation&lt;/code&gt; algorithm stands alone in the C++ standard library. Used here, it pairs well with the similarly uncommon &lt;code&gt;do ... while&lt;/code&gt; loop. The solution depends on the vector &lt;code&gt;sqs&lt;/code&gt; starting off in sorted order, and by the end of the loop the vector will have been returned to &lt;a href="https://rosettacode.org/wiki/Sorting_algorithms/Permutation_sort"&gt;this state&lt;/a&gt;.
+&lt;/p&gt;</description>
+<dc:date>2016-04-05</dc:date>
+<guid>http://wordaligned.org/articles/8-queens-puzzle-cpp</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/8-queens-puzzle-cpp</link>
+<category>C++</category>
+</item>
+
+<item>
 <title>Easy as Py</title>
 <description>&lt;h2&gt;What makes Python Simple?&lt;/h2&gt;
 &lt;p&gt;I consider Python a simple language. Here&amp;#8217;s why.
@@ -4129,22 +4165,6 @@ typedef basic_teebuf&amp;lt;char&amp;gt; teebuf;
 <guid>http://wordaligned.org/articles/cpp-streambufs</guid>
 <author>tag@wordaligned.org (Thomas Guest)</author>
 <link>http://wordaligned.org/articles/cpp-streambufs</link>
-<category>C++</category>
-</item>
-
-<item>
-<title>Generic documentation</title>
-<description>&lt;pre&gt;/**
- *  @brief &lt;a href="http://www.google.com/codesearch?q=%22This+does+what+you+think+it+does%22"&gt;This does what you think it does.&lt;/a&gt;
- *  @param  a  A thing of arbitrary type.
- *  @param  b  Another thing of arbitrary type.
-    ....
- */
-&lt;/pre&gt;</description>
-<dc:date>2009-04-30</dc:date>
-<guid>http://wordaligned.org/articles/generic-documentation</guid>
-<author>tag@wordaligned.org (Thomas Guest)</author>
-<link>http://wordaligned.org/articles/generic-documentation</link>
 <category>C++</category>
 </item>
 

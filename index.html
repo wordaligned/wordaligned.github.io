@@ -25,7 +25,41 @@
 
   <div id="page">
     <div id="content">
-      <div class="atomentry" id="8-queens-puzzle">
+      <div class="atomentry" id="8-queens-puzzle-cpp">
+<h2 class="title"><a href="/articles/8-queens-puzzle-cpp">8 Queens Puzzle++</a></h2>
+<p class="meta"><abbr class="published" title="2016-04-05">2016-04-05</abbr> &bull; <a href="/tag/puzzles" rel="tag">Puzzles</a>, <a href="/tag/c++" rel="tag">C++</a> &bull; <a href="/articles/8-queens-puzzle-cpp#disqus_thread">Comments</a></p>
+<p><a href="/articles/8-queens-puzzle">Yesterday I wrote about</a> a Python solution to the 8 Queens puzzle.
+</p>
+<pre><code>n = width_of_chessboard = 8
+sqs = list(range(n))
+
+Qs = (Q for Q in itertools.permutations(sqs)
+      if n == len({Q[i]+i for i in sqs})
+           == len({Q[i]-i for i in sqs}))
+</code></pre><p>It&#8217;s possible to reproduce this strategy in C++:
+</p>
+<ul>
+ <li>
+     range(n) &#8594; <a href="http://en.cppreference.com/w/cpp/algorithm/iota">std::iota</a>
+ </li>
+
+ <li>
+     itertools.permutations &#8594; <a href="/articles/next-permutation">std::next_permutation</a>
+ </li>
+
+ <li>
+     set comprehension &#8594; set insertion
+ </li>
+</ul>
+<script src="https://gist.github.com/wordaligned/c94649d6b37ec08a9bda16e53c43b888.js"></script>
+
+<p>The <code>std::next_permutation</code> algorithm stands alone in the C++ standard library. Used here, it pairs well with the similarly uncommon <code>do ... while</code> loop. The solution depends on the vector <code>sqs</code> starting off in sorted order, and by the end of the loop the vector will have been returned to <a href="https://rosettacode.org/wiki/Sorting_algorithms/Permutation_sort">this state</a>.
+</p>
+
+</div>
+
+
+<div class="atomentry" id="8-queens-puzzle">
 <h2 class="title"><a href="/articles/8-queens-puzzle">8 Queens Puzzle</a></h2>
 <p class="meta"><abbr class="published" title="2016-04-04">2016-04-04</abbr> &bull; <a href="/tag/puzzles" rel="tag">Puzzles</a>, <a href="/tag/python" rel="tag">Python</a> &bull; <a href="/articles/8-queens-puzzle#disqus_thread">Comments</a></p>
 <p style="font-size:4em">&#9819;&#9819;&#9819;&#9819;&#9819;&#9819;&#9819;&#9819;</p>
@@ -967,111 +1001,6 @@ Williams             42.40
 </div>
 
 
-<div class="atomentry" id="python-averages">
-<h2 class="title"><a href="/articles/python-averages">Find the average of a collection of tuples or dicts using Python</a></h2>
-<p class="meta"><abbr class="published" title="2014-12-03">2014-12-03</abbr> &bull; <a href="/tag/python" rel="tag">Python</a> &bull; <a href="/articles/python-averages#disqus_thread">Comments</a></p>
-<p>You&#8217;ve been running some tests, each of which returns a 3-tuple of numerical results &#8212; <code>(real, user, sys)</code> times, maybe &#8212; and you&#8217;d like to combine these into a single 3-tuple, the average result.
-</p>
-<p>Easy!
-</p>
-<div class="typocode">
-
-<pre class="prettyprint">def average(times):
-    N = float(len(times))
-    return (sum(t[0] for t in times)/N,
-            sum(t[1] for t in times)/N,
-            sum(t[2] for t in times)/N)
-
-</pre>
-
-</div>
-
-<p>If you want a more generic solution, one which works when the tuples might have any number of elements, you could do this:
-</p>
-<div class="typocode">
-
-<pre class="prettyprint">def average(xs):
-    N = float(len(xs))
-    R = len(xs[0])
-    return tuple(sum(x[i] for x in xs)/N for i in range(R))
-
-</pre>
-
-</div>
-
-<p>or this:
-</p>
-<div class="typocode">
-
-<pre class="prettyprint">def average(xs):
-    N = float(len(xs))
-    return tuple(sum(col)/N for col in zip(*xs))
-
-</pre>
-
-</div>
-
-<p>The second generic variant uses <a href="https://docs.python.org/3/library/functions.html#zip">zip</a> to transpose its inputs. 
-</p>
-<p>Now suppose we have keyed collections of results which we want to average:
-</p>
-<div class="typocode">
-
-<pre class="prettyprint">&gt;&gt;&gt; times = [{'real': 34.4, 'user': 26.2, 'sys': 7.3},
-             {'real': 28.7, 'user': 21.5, 'sys': 6.4},
-             {'real': 29.3, 'user': 22.0, 'sys': 6.9}]
-
-</pre>
-
-</div>
-
-<p>If, as in the example above, each result has the same set of keys, the average result could be calculated like this:
-</p>
-<div class="typocode">
-
-<pre class="prettyprint">&gt;&gt;&gt; N = float(len(times))
-&gt;&gt;&gt; { k : sum(t[k] for t in times)/N for k in times[0] }
-{'real': 30.8, 'sys': 6.9, 'user': 23.2}
-
-</pre>
-
-</div>
-
-<p>What if the inputs don&#8217;t have the same keys? Consider the contents of four fridges.
-</p>
-<div class="typocode">
-
-<pre class="prettyprint">&gt;&gt;&gt; fridges = [
-    { 'egg': 5, 'milk': 1.700, 'sausage': 6 },
-    { 'beer': 6, 'milk': 0.568, 'egg': 1 },
-    { 'egg': 3, 'sausage': 4, 'milk': 0.125, 'lettuce': 1 },
-    { 'carrot': 4 }]
-
-</pre>
-
-</div>
-
-<p>A <a href="https://docs.python.org/3/library/collections.html#collections.Counter">Counter</a> can collect and calculate the average fridge contents. 
-</p>
-<div class="typocode">
-
-<pre class="prettyprint">&gt;&gt;&gt; from collections import Counter
-&gt;&gt;&gt; total = sum(map(Counter, fridges), Counter())
-&gt;&gt;&gt; N = float(len(fridges))
-&gt;&gt;&gt; { k: v/N for k, v in total.items() }
-{'sausage': 2.5, 'lettuce': 0.25, 'beer': 1.5, 'carrot': 1.0, 
- 'egg': 2.25, 'milk': 0.59825}
-
-</pre>
-
-</div>
-
-<p>Note that although <code>Counter</code>s were primarily designed to work with positive integers to represent counts, there&#8217;s nothing stopping us from using floating point numbers (amount of milk in our example) in the values field.
-</p>
-
-</div>
-
-
 <div class="extended">
 <p><a href="/articles/">Visit the Word Aligned archives...</a></p>
 </div>
@@ -1116,9 +1045,9 @@ Williams             42.40
 <div class="sidebar-node">
 <h3>Top Tags</h3>
 <ul id="categories"><li><a href="/tag/python" rel="tag">Python</a> <em>(114)</em></li>
-<li><a href="/tag/c++" rel="tag">C++</a> <em>(68)</em></li>
+<li><a href="/tag/c++" rel="tag">C++</a> <em>(69)</em></li>
 <li><a href="/tag/self" rel="tag">Self</a> <em>(59)</em></li>
-<li><a href="/tag/puzzles" rel="tag">Puzzles</a> <em>(32)</em></li>
+<li><a href="/tag/puzzles" rel="tag">Puzzles</a> <em>(33)</em></li>
 <li><a href="/tag/accu" rel="tag">ACCU</a> <em>(31)</em></li>
 <li><a href="/tag/web-applications" rel="tag">Web Applications</a> <em>(27)</em></li>
 <li><a href="/tag/subversion" rel="tag">Subversion</a> <em>(27)</em></li>
@@ -1147,7 +1076,7 @@ Williams             42.40
 <div class="sidebar-node">
 <h3>Chain</h3>
 <ul>
-<li><a accesskey="p" href="/articles/8-queens-puzzle" title="First article">&raquo; 8 Queens Puzzle</a></li>
+<li><a accesskey="p" href="/articles/8-queens-puzzle-cpp" title="First article">&raquo; 8 Queens Puzzle++</a></li>
 
 </ul>
 

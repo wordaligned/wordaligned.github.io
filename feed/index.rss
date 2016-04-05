@@ -7,6 +7,43 @@
 <dc:creator>tag@wordaligned.org</dc:creator>
 <language>en-gb</language>
 <item>
+<title>8 Queens Puzzle++</title>
+<description>&lt;p&gt;&lt;a href="http://wordaligned.org/articles/8-queens-puzzle"&gt;Yesterday I wrote about&lt;/a&gt; a Python solution to the 8 Queens puzzle.
+&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;n = width_of_chessboard = 8
+sqs = list(range(n))
+
+Qs = (Q for Q in itertools.permutations(sqs)
+      if n == len({Q[i]+i for i in sqs})
+           == len({Q[i]-i for i in sqs}))
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;It&amp;#8217;s possible to reproduce this strategy in C++:
+&lt;/p&gt;
+&lt;ul&gt;
+ &lt;li&gt;
+     range(n) &amp;#8594; &lt;a href="http://en.cppreference.com/w/cpp/algorithm/iota"&gt;std::iota&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     itertools.permutations &amp;#8594; &lt;a href="http://wordaligned.org/articles/next-permutation"&gt;std::next_permutation&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     set comprehension &amp;#8594; set insertion
+ &lt;/li&gt;
+&lt;/ul&gt;
+&lt;script src="https://gist.github.com/wordaligned/c94649d6b37ec08a9bda16e53c43b888.js"&gt;&lt;/script&gt;
+
+&lt;p&gt;The &lt;code&gt;std::next_permutation&lt;/code&gt; algorithm stands alone in the C++ standard library. Used here, it pairs well with the similarly uncommon &lt;code&gt;do ... while&lt;/code&gt; loop. The solution depends on the vector &lt;code&gt;sqs&lt;/code&gt; starting off in sorted order, and by the end of the loop the vector will have been returned to &lt;a href="https://rosettacode.org/wiki/Sorting_algorithms/Permutation_sort"&gt;this state&lt;/a&gt;.
+&lt;/p&gt;</description>
+<dc:date>2016-04-05</dc:date>
+<guid>http://wordaligned.org/articles/8-queens-puzzle-cpp</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/8-queens-puzzle-cpp</link>
+<category>Puzzles</category>
+<category>C++</category>
+</item>
+
+<item>
 <title>8 Queens Puzzle</title>
 <description>&lt;p style="font-size:4em"&gt;&amp;#9819;&amp;#9819;&amp;#9819;&amp;#9819;&amp;#9819;&amp;#9819;&amp;#9819;&amp;#9819;&lt;/p&gt;
 
@@ -1354,24 +1391,6 @@ bool all_of_(Iter b, Iter e, Pred p)
 <link>http://wordaligned.org/articles/all-any-none</link>
 <category>C++</category>
 <category>Python</category>
-</item>
-
-<item>
-<title>Reverse, Esrever</title>
-<description>&lt;p&gt;&lt;code&gt;&lt;a href="http://en.cppreference.com/w/cpp/algorithm/reverse"&gt;Reverse&lt;/a&gt;&lt;/code&gt; is a member of the C++ standard library, but its reverse, &lt;code&gt;esrever&lt;/code&gt;, isn&amp;#8217;t. Similarly &lt;code&gt;keep&lt;/code&gt; isn&amp;#8217;t but &lt;code&gt;&lt;a href="http://en.cppreference.com/w/cpp/io/basic_istream/peek"&gt;peek&lt;/a&gt;&lt;/code&gt; is.
-&lt;/p&gt;
-&lt;p&gt;Can anyone think of a C++ standard library member whose reverse &lt;strong&gt;is also a member&lt;/strong&gt;?
-&lt;/p&gt;
-&lt;p&gt;Answers in the comments below.
-&lt;/p&gt;
-&lt;p&gt;Go!
-&lt;/p&gt;</description>
-<dc:date>2013-09-27</dc:date>
-<guid>http://wordaligned.org/articles/reverse-esrever</guid>
-<author>tag@wordaligned.org (Thomas Guest)</author>
-<link>http://wordaligned.org/articles/reverse-esrever</link>
-<category>C++</category>
-<category>Puzzles</category>
 </item>
 
 </channel>
