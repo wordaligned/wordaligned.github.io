@@ -69,21 +69,21 @@ Qs = (Q for Q in itertools.permutations(sqs)
 <pre><code>from itertools import permutations
 
 n = width_of_chessboard = 8
-sqs = list(range(n))
+sqs = range(n)
 
 Qs = (Q for Q in permutations(sqs)
       if n == len({Q[i]+i for i in sqs})
            == len({Q[i]-i for i in sqs}))
-</code></pre><p>We start by assigning <code>sqs</code> to the list formed from the range 0 through 7.
+</code></pre><p>We start by assigning <code>sqs</code> to the range 0 through 7.
 </p>
-<pre><code>&gt;&gt;&gt; sqs = list(range(8))
-&gt;&gt;&gt; sqs
+<pre><code>&gt;&gt;&gt; sqs = range(8)
+&gt;&gt;&gt; list(sqs)
 [0, 1, 2, 3, 4, 5, 6, 7]
-</code></pre><p>The list has 8 indices. If each index represents a column on a standard 8x8 chessboard and the value at that index represents a row on the same chessboard, then our list represents 8 positions on the board. Using the built-in <a href="https://docs.python.org/3/library/functions.html#enumerate">enumerate</a> function to generate these <code>(index, value)</code> pairs we see that <code>sqs</code> initially encodes the diagonal <code>(0, 0)</code> to <code>(7, 7)</code>:
+</code></pre><p>The range has 8 indices. If each index represents a column on a standard 8x8 chessboard and the value at that index represents a row on the same chessboard, then our range represents 8 positions on the board. Using the built-in <a href="https://docs.python.org/3/library/functions.html#enumerate">enumerate</a> function to generate these <code>(index, value)</code> pairs we see that <code>sqs</code> encodes the diagonal <code>(0, 0)</code> to <code>(7, 7)</code>:
 </p>
 <pre><code>&gt;&gt;&gt; list(enumerate(sqs))
 [(0, 0), (1, 1), (2, 2), (3, 3), (4, 4), (5, 5), (6, 6), (7, 7)]
-</code></pre><p>Next, permute the list values &#8212; the rows.
+</code></pre><p>Next, permute the values &#8212; the rows.
 </p>
 <pre><code>&gt;&gt;&gt; from itertools import permutations
 &gt;&gt;&gt; rooks = permutations(sqs)
@@ -101,7 +101,7 @@ Qs = (Q for Q in permutations(sqs)
 </p>
 <p>Consider our starting point, the diagonal <code>(0, 0)</code> to <code>(7, 7)</code>
 </p>
-<pre><code>&gt;&gt;&gt; diagonal = list(range(8))
+<pre><code>&gt;&gt;&gt; diagonal = range(8)
 &gt;&gt;&gt; {r-c for c,r in enumerate(diagonal)}
 {0}
 &gt;&gt;&gt; {r+c for c,r in enumerate(diagonal)}

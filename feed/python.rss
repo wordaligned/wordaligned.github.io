@@ -15,21 +15,21 @@
 &lt;pre&gt;&lt;code&gt;from itertools import permutations
 
 n = width_of_chessboard = 8
-sqs = list(range(n))
+sqs = range(n)
 
 Qs = (Q for Q in permutations(sqs)
       if n == len({Q[i]+i for i in sqs})
            == len({Q[i]-i for i in sqs}))
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;We start by assigning &lt;code&gt;sqs&lt;/code&gt; to the list formed from the range 0 through 7.
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;We start by assigning &lt;code&gt;sqs&lt;/code&gt; to the range 0 through 7.
 &lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;&amp;gt;&amp;gt;&amp;gt; sqs = list(range(8))
-&amp;gt;&amp;gt;&amp;gt; sqs
+&lt;pre&gt;&lt;code&gt;&amp;gt;&amp;gt;&amp;gt; sqs = range(8)
+&amp;gt;&amp;gt;&amp;gt; list(sqs)
 [0, 1, 2, 3, 4, 5, 6, 7]
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;The list has 8 indices. If each index represents a column on a standard 8x8 chessboard and the value at that index represents a row on the same chessboard, then our list represents 8 positions on the board. Using the built-in &lt;a href="https://docs.python.org/3/library/functions.html#enumerate"&gt;enumerate&lt;/a&gt; function to generate these &lt;code&gt;(index, value)&lt;/code&gt; pairs we see that &lt;code&gt;sqs&lt;/code&gt; initially encodes the diagonal &lt;code&gt;(0, 0)&lt;/code&gt; to &lt;code&gt;(7, 7)&lt;/code&gt;:
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;The range has 8 indices. If each index represents a column on a standard 8x8 chessboard and the value at that index represents a row on the same chessboard, then our range represents 8 positions on the board. Using the built-in &lt;a href="https://docs.python.org/3/library/functions.html#enumerate"&gt;enumerate&lt;/a&gt; function to generate these &lt;code&gt;(index, value)&lt;/code&gt; pairs we see that &lt;code&gt;sqs&lt;/code&gt; encodes the diagonal &lt;code&gt;(0, 0)&lt;/code&gt; to &lt;code&gt;(7, 7)&lt;/code&gt;:
 &lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;&amp;gt;&amp;gt;&amp;gt; list(enumerate(sqs))
 [(0, 0), (1, 1), (2, 2), (3, 3), (4, 4), (5, 5), (6, 6), (7, 7)]
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Next, permute the list values &amp;#8212; the rows.
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Next, permute the values &amp;#8212; the rows.
 &lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;&amp;gt;&amp;gt;&amp;gt; from itertools import permutations
 &amp;gt;&amp;gt;&amp;gt; rooks = permutations(sqs)
@@ -47,7 +47,7 @@ Qs = (Q for Q in permutations(sqs)
 &lt;/p&gt;
 &lt;p&gt;Consider our starting point, the diagonal &lt;code&gt;(0, 0)&lt;/code&gt; to &lt;code&gt;(7, 7)&lt;/code&gt;
 &lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;&amp;gt;&amp;gt;&amp;gt; diagonal = list(range(8))
+&lt;pre&gt;&lt;code&gt;&amp;gt;&amp;gt;&amp;gt; diagonal = range(8)
 &amp;gt;&amp;gt;&amp;gt; {r-c for c,r in enumerate(diagonal)}
 {0}
 &amp;gt;&amp;gt;&amp;gt; {r+c for c,r in enumerate(diagonal)}
