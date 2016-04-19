@@ -25,7 +25,21 @@
 
   <div id="page">
     <div id="content">
-      <div class="atomentry" id="8-queens-puzzle-cpp">
+      <div class="atomentry" id="go-steady-ready">
+<h2 class="title"><a href="/articles/go-steady-ready">Go! Steady. Ready?</a></h2>
+<p class="meta"><abbr class="published" title="2016-04-18">2016-04-18</abbr> &bull; <a href="/tag/go" rel="tag">Go</a>, <a href="/tag/self" rel="tag">Self</a>, <a href="/tag/accu" rel="tag">ACCU</a> &bull; <a href="/articles/go-steady-ready#disqus_thread">Comments</a></p>
+<p>I&#8217;m looking forward to <a href="http://accu.org/index.php/conferences/accu_conference_2016/accu2016_sessions#Go!_Steady._Ready?">talking about Go</a> at the <a href="http://accu.org/index.php/conferences/accu_conference_2016">ACCU 2016 Conference</a> this Friday. If you&#8217;d like to find out what connects an Easter egg with <a href="https://en.wikipedia.org/wiki/Eadweard_Muybridge#Stanford_and_horse_gaits">flying horses</a> and the runner in the green vest, then come along. Expect live coding, concurrent functions and answers.
+</p>
+<pre><code>&gt;&gt;&gt; import antigravity
+</code></pre><p><a data-flickr-embed="true"  href="https://www.flickr.com/photos/thomasguest/25883297343/in/dateposted-friend/" title="muybridge-horse"><img src="https://farm2.staticflickr.com/1707/25883297343_356cc33871.jpg" width="500" height="310" alt="muybridge-horse"></a><script async src="//embedr.flickr.com/assets/client-code.js" charset="utf-8"></script>
+</p>
+<p><a data-flickr-embed="true"  href="https://www.flickr.com/photos/thomasguest/17301552044/in/datetaken/" title="Tyntesfield 10k 2014"><img src="https://farm6.staticflickr.com/5449/17301552044_92e033c6d2_z.jpg" width="547" height="640" alt="Tyntesfield 10k 2014"></a><script async src="//embedr.flickr.com/assets/client-code.js" charset="utf-8"></script>
+</p>
+
+</div>
+
+
+<div class="atomentry" id="8-queens-puzzle-cpp">
 <h2 class="title"><a href="/articles/8-queens-puzzle-cpp">8 Queens Puzzle++</a></h2>
 <p class="meta"><abbr class="published" title="2016-04-05">2016-04-05</abbr> &bull; <a href="/tag/puzzles" rel="tag">Puzzles</a>, <a href="/tag/c++" rel="tag">C++</a> &bull; <a href="/articles/8-queens-puzzle-cpp#disqus_thread">Comments</a></p>
 <p><a href="/articles/8-queens-puzzle">Yesterday I wrote about</a> a Python solution to the 8 Queens puzzle.
@@ -921,86 +935,6 @@ May you share freely, never taking more than you give.</p></blockquote>
 </div>
 
 
-<div class="atomentry" id="why-zip-when-you-can-map">
-<h2 class="title"><a href="/articles/why-zip-when-you-can-map">Why zip when you can map?</a></h2>
-<p class="meta"><abbr class="published" title="2014-12-16">2014-12-16</abbr> &bull; <a href="/tag/python" rel="tag">Python</a> &bull; <a href="/articles/why-zip-when-you-can-map#disqus_thread">Comments</a></p>
-<p><a href="http://en.wikipedia.org/wiki/Zipper"><img src="/images/zip.jpg" title="Why zip?" alt="Why zip?"/></a>
-   <a href="http://www.strava.com/activities/158661061"><img src="/images/dundry-thunder.jpg" alt="when you can map?" title="when you can map!"/></a>
-</p>
-<p>You&#8217;ve got a couple of parallel lists you&#8217;d like to combine and output, a line for each pair. Here&#8217;s one way to do it: use <code>zip</code> to do the combining.
-</p>
-<div class="typocode">
-
-<pre class="prettyprint">&gt;&gt;&gt; times = [42.12, 42.28, 42.34, 42.40, 42.45]
-&gt;&gt;&gt; names = ['Hickman', 'Guest', 'Burns', 'Williams']
-&gt;&gt;&gt; fmt = '{:20} {:.2f}'.format
-&gt;&gt;&gt; print('\n'.join(fmt(n, t) for n, t in zip(names, times)))
-Hickman              42.12
-Guest                42.28
-Burns                42.34
-Williams             42.40
-
-</pre>
-
-</div>
-
-<p>Slightly more succinctly:
-</p>
-<div class="typocode">
-
-<pre class="prettyprint">&gt;&gt;&gt; print('\n'.join(fmt(*nt) for nt in zip(names, times)))
-...
-
-</pre>
-
-</div>
-
-<p>If you look at the generator expression passed into <code>str.join</code>, you can see we&#8217;re just mapping <code>fmt</code> to the zipped <code>names</code> and <code>times</code> lists.
-</p>
-<p>Well, sort of.
-</p>
-<div class="typocode">
-
-<pre class="prettyprint">&gt;&gt;&gt; print('\n'.join(map(fmt, zip(names, times))))
-Traceback (most recent call last):
-...
-IndexError: tuple index out of range
-
-</pre>
-
-</div>
-
-<p>To fix this, we <strong>could</strong> use <code>itertools.starmap</code> which effectively unpacks the zipped pairs.
-</p>
-<div class="typocode">
-
-<pre class="prettyprint">&gt;&gt;&gt; from itertools import starmap
-&gt;&gt;&gt; print('\n'.join(starmap(fmt, zip(names, times))))
-Hickman              42.12
-Guest                42.28
-Burns                42.34
-Williams             42.40
-
-</pre>
-
-</div>
-
-<p>This latest version looks clean enough but there&#8217;s something odd about zipping two lists together only to unpack the resulting 2-tuples for consumption by the format function.
-</p>
-<p>Don&#8217;t forget, <code>map</code> happily accepts more than one sequence! There&#8217;s no need to <code>zip</code> after all.
-</p>
-<div class="typocode"><div class="codetitle">Don&#8217;t zip, map!</div>
-
-<pre class="prettyprint">&gt;&gt;&gt; print('\n'.join(map(fmt, names, times)))
-...
-
-</pre>
-
-</div>
-
-</div>
-
-
 <div class="extended">
 <p><a href="/articles/">Visit the Word Aligned archives...</a></p>
 </div>
@@ -1046,9 +980,9 @@ Williams             42.40
 <h3>Top Tags</h3>
 <ul id="categories"><li><a href="/tag/python" rel="tag">Python</a> <em>(114)</em></li>
 <li><a href="/tag/c++" rel="tag">C++</a> <em>(69)</em></li>
-<li><a href="/tag/self" rel="tag">Self</a> <em>(59)</em></li>
+<li><a href="/tag/self" rel="tag">Self</a> <em>(60)</em></li>
 <li><a href="/tag/puzzles" rel="tag">Puzzles</a> <em>(33)</em></li>
-<li><a href="/tag/accu" rel="tag">ACCU</a> <em>(31)</em></li>
+<li><a href="/tag/accu" rel="tag">ACCU</a> <em>(32)</em></li>
 <li><a href="/tag/web-applications" rel="tag">Web Applications</a> <em>(27)</em></li>
 <li><a href="/tag/subversion" rel="tag">Subversion</a> <em>(27)</em></li>
 <li><a href="/tag/algorithms" rel="tag">Algorithms</a> <em>(25)</em></li>
@@ -1076,7 +1010,7 @@ Williams             42.40
 <div class="sidebar-node">
 <h3>Chain</h3>
 <ul>
-<li><a accesskey="p" href="/articles/8-queens-puzzle-cpp" title="First article">&raquo; 8 Queens Puzzle++</a></li>
+<li><a accesskey="p" href="/articles/go-steady-ready" title="First article">&raquo; Go! Steady. Ready?</a></li>
 
 </ul>
 
