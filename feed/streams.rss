@@ -7,6 +7,630 @@
 <dc:creator>tag@wordaligned.org</dc:creator>
 <language>en-gb</language>
 <item>
+<title>Python Streams vs Unix Pipes</title>
+<description>&lt;div class="toc"&gt;
+&lt;h2&gt;Contents&lt;/h2&gt;
+&lt;ul&gt;
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/python-streams-vs-unix-pipes#tocinfinite-series-and-python" name="toc0" id="toc0"&gt;Infinite series and Python&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/python-streams-vs-unix-pipes#tocinfinite-series-in-other-languages" name="toc1" id="toc1"&gt;Infinite series in Other Languages&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/python-streams-vs-unix-pipes#tocpartial-sums" name="toc2" id="toc2"&gt;Partial sums.&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/python-streams-vs-unix-pipes#tocconsecutive-sums" name="toc3" id="toc3"&gt;Consecutive sums&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/python-streams-vs-unix-pipes#tocbug-fixes" name="toc4" id="toc4"&gt;Bug Fixes&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/python-streams-vs-unix-pipes#tocmerging-streams" name="toc5" id="toc5"&gt;Merging Streams&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/python-streams-vs-unix-pipes#tocgenerating-primes" name="toc6" id="toc6"&gt;Generating Primes&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/python-streams-vs-unix-pipes#tocpipe-connection" name="toc7" id="toc7"&gt;Pipe Connection&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/python-streams-vs-unix-pipes#tocpipe-teeing" name="toc8" id="toc8"&gt;Pipe Teeing&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/python-streams-vs-unix-pipes#tocportability" name="toc9" id="toc9"&gt;Portability&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/python-streams-vs-unix-pipes#tocstream-merge" name="toc10" id="toc10"&gt;Stream Merge&lt;/a&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;a href="http://wordaligned.org/articles/python-streams-vs-unix-pipes#tocalternative-solutions" name="toc11" id="toc11"&gt;Alternative Solutions&lt;/a&gt;
+ &lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;&lt;p&gt;I chanced upon an interesting puzzle:
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;Find the smallest number that can be expressed as the sum of 5, 17, 563, 641 consecutive prime numbers, and is itself a prime number.
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;img src="http://wordaligned.org/images/primes.png" alt="Small primes graphic"/&gt;
+
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/python-streams-vs-unix-pipes#toc0" name="tocinfinite-series-and-python" id="tocinfinite-series-and-python"&gt;Infinite series and Python&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;The prime numbers famously form an infinite series and my first thought was to tackle this puzzle using Python iterators and generators. Courtesy of the Python Cookbook, I already had a couple of &lt;a href="http://www.onlamp.com/pub/a/python/excerpt/pythonckbk_chap1/index1.html?page=2"&gt;useful&lt;/a&gt; &lt;a href="http://code.activestate.com/recipes/491285-iterator-merge/"&gt;recipes&lt;/a&gt;:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;def primes():
+    '''Generate the sequence of prime numbers: 2, 3, 5 ... '''
+    ....
+
+def stream_merge(*ss):
+    '''Merge a collection of sorted streams.
+    
+    Example: merge multiples of 2, 3, 5
+    &amp;gt;&amp;gt;&amp;gt; from itertools import count, islice
+    &amp;gt;&amp;gt;&amp;gt; def multiples(x): return (x * n for n in count(1))
+    &amp;gt;&amp;gt;&amp;gt; s = stream_merge(multiples(2), multiples(3), multiples(5))
+    &amp;gt;&amp;gt;&amp;gt; list(islice(s, 12))
+    [2, 3, 4, 5, 6, 6, 8, 9, 10, 10, 12, 12]
+    '''
+    ....
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Both these functions merit a closer look for the cunning use they make of standard containers, but we&amp;#8217;ll defer this inspection until later. In passing, note that &lt;code&gt;stream_merge()&lt;/code&gt;&amp;#8217;s docstring suggests we might try using it as basis for &lt;code&gt;primes()&lt;/code&gt;:
+&lt;/p&gt;
+&lt;ol&gt;
+ &lt;li&gt;&lt;p&gt;form the series of composite (non-prime) numbers by merging the streams formed by multiples of prime numbers; 
+&lt;/p&gt;
+
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;p&gt;the primes remain when you remove these composites from the series of natural numbers.
+&lt;/p&gt;
+
+ &lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;This scheme is hardly original &amp;#8212; it&amp;#8217;s a variant of &lt;a href="http://en.wikipedia.org/wiki/Sieve_of_Eratosthenes"&gt;Eratosthenes&amp;#8217; famous sieve&lt;/a&gt; &amp;#8212; but if you look carefully you&amp;#8217;ll notice the self-reference. Unfortunately recursive definitions of infinite series don&amp;#8217;t work well with Python&lt;a id="fn1link" href="http://wordaligned.org/articles/python-streams-vs-unix-pipes#fn1"&gt;&lt;sup&gt;[1]&lt;/sup&gt;&lt;/a&gt;, hence &lt;code&gt;primes()&lt;/code&gt; requires a little more finesse. We&amp;#8217;ll take a look at it later.
+&lt;/p&gt;
+&lt;p&gt;Moving on then, to solve the original puzzle we need a consecutive sum filter. This takes a stream of numbers and yields a stream of consecutive sums of these numbers:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;def consecutive_sum(s, n):
+    '''Generate the series of sums of n consecutive elements of s
+    
+    Example: 0, 1, 2, 3, 4 ... =&amp;gt; 0+1, 1+2, 2+3, 3+4, ...
+    &amp;gt;&amp;gt;&amp;gt; from itertools import count, islice
+    &amp;gt;&amp;gt;&amp;gt; list(islice(consecutive_sum(count(), 2), 10))
+    [1, 3, 5, 7, 9, 11, 13, 15, 17, 19]
+    '''
+    lo, hi = itertools.tee(s)
+    csum = sum(hi.next() for _ in range(n))
+    while True:
+        yield csum
+        csum += hi.next() - lo.next()
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Here we visualise the summed elements as lying within a sliding window: each time we slide the window an element gets added to the top and an element gets removed from the bottom, and we adjust &lt;code&gt;csum&lt;/code&gt; accordingly.
+&lt;/p&gt;
+&lt;p&gt;So, now we have:
+&lt;/p&gt;
+&lt;ul&gt;
+ &lt;li&gt;
+     the series of prime numbers, &lt;code&gt;primes()&lt;/code&gt;
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     a &lt;code&gt;stream_merge()&lt;/code&gt; connector
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     a &lt;code&gt;consecutive_sum()&lt;/code&gt; filter
+ &lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;The remaining stream adaptors come from the standard &lt;a href="http://docs.python.org/lib/itertools-functions.html"&gt;itertools module&lt;/a&gt;. Note that the &lt;code&gt;stream_merge()&lt;/code&gt; works here since all the consecutive sum series are strictly increasing. Note also that the stream of prime numbers can be treated as &lt;code&gt;consecutive_sum(s=primes(), n=1)&lt;/code&gt;, handling the &amp;#8220;and is itself a prime number&amp;#8221; requirement.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; lens = 1, 5, 17, 563, 641
+&amp;gt;&amp;gt;&amp;gt; N = len(lens)
+&amp;gt;&amp;gt;&amp;gt; from itertools import tee, groupby
+&amp;gt;&amp;gt;&amp;gt; ps = tee(primes(), N)
+&amp;gt;&amp;gt;&amp;gt; csums = [consecutive_sum(p, n) for p, n in zip(ps, lens)]
+&amp;gt;&amp;gt;&amp;gt; solns = (n for n, g in groupby(stream_merge(*csums)) 
+             if len(list(g)) == N)
+&amp;gt;&amp;gt;&amp;gt; solns.next()
+7002221
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Here&amp;#8217;s a picture of how these stream tools link up to solve this particular puzzle. The great thing is that we can reconnect these same tools to solve a wide range of puzzles, and indeed more practical &lt;a href="http://www.dabeaz.com/generators/"&gt;processing tasks&lt;/a&gt;. To use the common analogy, we direct data streams along pipes.
+&lt;/p&gt;
+&lt;img alt="Stream connections" src="http://wordaligned.org/images/pipeline.png"/&gt;
+
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/python-streams-vs-unix-pipes#toc1" name="tocinfinite-series-in-other-languages" id="tocinfinite-series-in-other-languages"&gt;Infinite series in Other Languages&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Python is the high-level language I find most convenient most of the time, which explains why I reached for it first. It&amp;#8217;s an increasingly popular language, which helps explain why it I didn&amp;#8217;t need to write the tricky parts of my solution from scratch: they&amp;#8217;d already been done. Python is also a language which makes compromises. Having used Python to find a solution to the puzzle I wondered if there wasn&amp;#8217;t some other language better suited to this kind of problem.
+&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://haskell.org"&gt;Haskell&lt;/a&gt; makes no compromises when it comes to functional programming. Its lazy evaluation and guilt-free recursion make it a perfect fit for this kind of puzzle &amp;#8212; but my Pythonic approach of teeing, filtering and merging streams made me think first of the Unix Shell. Now, I use Bash every day and page through its manual at least once a week. Scripting appeals and I&amp;#8217;m comfortable at the command line. How hard could it be to solve this puzzle using Bash? After all, I already knew the answer! Let&amp;#8217;s give it a go.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/python-streams-vs-unix-pipes#toc2" name="tocpartial-sums" id="tocpartial-sums"&gt;Partial sums.&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Here&amp;#8217;s a simple shell function to generate partial sums. I&amp;#8217;ve used &lt;code&gt;awk&lt;/code&gt;, a little language I gave up on a long time ago in favour of more rounded scripting languages like Perl and then Python. Now I look at it again, it seems to fill a useful gap. Awk processes a file sequentially, applying pattern-action rules to each line, a processing pattern which I&amp;#8217;ve reinvented less cleanly many times. Despite my rediscovery of &lt;code&gt;awk&lt;/code&gt;, I&amp;#8217;ll be keeping its use strongly in check in what follows.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;$ psum() { awk '{ print s += $1 }'; }
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Much like Perl, &lt;code&gt;awk&lt;/code&gt; guesses what you want to do. Here, it conjures the summation variable, &lt;code&gt;s&lt;/code&gt;, into existence, assigning it a default initial value of 0. (Good guess!) Since we&amp;#8217;re doing arithmetic &lt;code&gt;awk&lt;/code&gt; converts the first field of each input line into a number. We can test &lt;code&gt;psum&lt;/code&gt; by using &lt;code&gt;jot&lt;/code&gt; to generate the sequence 1, 2, 3, 4, 5 (on a Linux platform use &lt;code&gt;seq&lt;/code&gt; instead of &lt;code&gt;jot&lt;/code&gt;).
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;$ jot 5 | psum
+1
+3
+6
+10
+15
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/python-streams-vs-unix-pipes#toc3" name="tocconsecutive-sums" id="tocconsecutive-sums"&gt;Consecutive sums&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;You may be wondering why we&amp;#8217;ve bothered creating this partial sum filter since it&amp;#8217;s the sums of consecutive elements we&amp;#8217;re after, rather than the sum of the series so far. Well, notice that if P[i] and P[i+n] are two elements from the series of partial sums of S, then their difference, P[i+n] - P[i], is the sum of the n consecutive elements from S.
+&lt;/p&gt;
+&lt;p&gt;So to form an n-element consecutive sum series we can tee the partial sums streams, advance one of these by n, then zip through them in parallel finding their differences. An example makes things clear:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;$ mkfifo pipe
+$ jot 5 | psum | tee pipe | tail -n +2 | paste - pipe
+3       1
+6       3
+10      6
+15      10
+        15
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Here, &lt;code&gt;jot 5&lt;/code&gt; generates the sequence 1, 2, 3, 4, 5, which &lt;code&gt;psum&lt;/code&gt; progressively accumulates to 1, 3, 6, 10, 15. We then &lt;code&gt;tee&lt;/code&gt; this partial sum series through two pipes: the first, &lt;code&gt;pipe&lt;/code&gt;, is an explicitly created named pipe created by &lt;code&gt;mkfifo&lt;/code&gt;, the second is implicitly created by the pipeline operator, &lt;code&gt;|&lt;/code&gt;. The remainder of the command line delays one series by one (note that &lt;code&gt;tail&lt;/code&gt; numbers lines from &lt;code&gt;1&lt;/code&gt;, not &lt;code&gt;0&lt;/code&gt;, so &lt;code&gt;tail -n +1&lt;/code&gt; is the identity filter) then pastes the two series back together&lt;a id="fn2link" href="http://wordaligned.org/articles/python-streams-vs-unix-pipes#fn2"&gt;&lt;sup&gt;[2]&lt;/sup&gt;&lt;/a&gt;.
+&lt;/p&gt;
+&lt;p&gt;By appending a single &lt;code&gt;awk&lt;/code&gt; action to the pipeline we get a consecutive sum series.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;$ jot 5 | psum | tee pipe | tail -n +2 | paste - pipe | awk '{print $1 - $2}'
+2
+3
+4
+5
+15
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;The output 2, 3, 4, 5 is the series of consecutive sums of length 1 taken from the original series 1, 2, 3, 4, 5. The trailing 15 and the 1 missed from the start are edge case problems, and easily corrected. 
+&lt;/p&gt;
+&lt;p&gt;Accumulating an increasing series of numbers in order to find the differences between elements lying a given distance apart on this series isn&amp;#8217;t a very smart idea on a computer with a fixed word-size, but it&amp;#8217;s good to know (e.g.) that &lt;code&gt;awk&lt;/code&gt; doesn&amp;#8217;t stop counting at 32 bits.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;$ let "N=1&amp;lt;&amp;lt;32" &amp;amp;&amp;amp; echo $N | tee &amp;gt;(awk '{print $1 * $1}')
+4294967296
+18446744073709551616
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Exactly if and when awk stops counting, I&amp;#8217;m not sure. The documentation doesn&amp;#8217;t say and I haven&amp;#8217;t looked at the source code.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/python-streams-vs-unix-pipes#toc4" name="tocbug-fixes" id="tocbug-fixes"&gt;Bug Fixes&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Let&amp;#8217;s capture these tiny functions and name them. Here, then, are revised &lt;code&gt;psum()&lt;/code&gt; and &lt;code&gt;sdiff()&lt;/code&gt; filters. The edge case problems should now be fixed.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;$ psum()  { awk 'BEGIN { print 0 }{print s += $1 }'; }
+$ delay() { let "n = $1 + 1" &amp;amp;&amp;amp; tail +$n; } 
+$ sdiff() { mkfifo p.$1 &amp;amp;&amp;amp; tee p.$1 | delay $1 | paste - p.$1 | \
+            awk 'NF == 2 {print $1 - $2 }'; }
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;A quick test:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;$ jot 5 | psum | sdiff 3
+6
+9
+12
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;The output is, as expected, the series of sums of consecutive triples taken from 1, 2, 3, 4, 5 (1+2+3, 2+3+4, 3+4+5).
+&lt;/p&gt;
+&lt;p&gt;There&amp;#8217;s a more pernicious bug, though. &lt;code&gt;Sdiff&lt;/code&gt; can&amp;#8217;t handle an infinite series, so it&amp;#8217;s of limited use as a pipeline tool. For example, if we stream it the series 0, 1, 2, &amp;#8230; (generated here as the partial sums of the series 1, 1, 1, &amp;#8230;) nothing gets output and we have to interrupt the process.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;# This command appears to hang
+$ yes 1 | psum | sdiff 1
+^C
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;I found a way to work around this problem by redirecting the teed stream to a subshell which itself redirects into a named pipe.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;$ sdiff() { mkfifo p.$1 &amp;amp;&amp;amp; tee &amp;gt;(delay $1 &amp;gt;p.$1) | paste - p.$1 | \
+            awk 'NF == 2 {print $2 - $1 }'; }
+$ yes 1 | psum | sdiff 1
+1
+1
+1
+1
+^C
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;As you can see this gets data flowing once again, but I&amp;#8217;m already out of my comfort zone: I couldn&amp;#8217;t tell you why exactly this works but the preceding version doesn&amp;#8217;t.
+&lt;/p&gt;
+&lt;p&gt;(You can of course write a consecutive sum function directly in &lt;code&gt;awk&lt;/code&gt;: here&amp;#8217;s a version which leans hard on the &amp;#8220;do what I mean&amp;#8221; style of programming, accessing and deleting array entries which haven&amp;#8217;t even been set.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;csum() { 
+awk -v n=$1 
+'{lo = NR - n; w[NR] = $1; s += $1 - w[lo]; delete w[lo]}' \
+'NR &amp;gt;= n {print s}'
+}
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;For this article I&amp;#8217;ve avoided pushing the consecutive sum job &lt;code&gt;awk&lt;/code&gt;&amp;#8217;s way because I&amp;#8217;m more interested in figuring out how this pipe-connection works for non-trivial cases. Any advice would be welcome!)
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/python-streams-vs-unix-pipes#toc5" name="tocmerging-streams" id="tocmerging-streams"&gt;Merging Streams&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;The Unix shell merges streams rather more succinctly than Python. &lt;code&gt;Sort -m&lt;/code&gt; does the job directly. Note that a standard &lt;code&gt;sort&lt;/code&gt; cannot yield any output until all its inputs are exhausted, since the final input item might turn out to be the one which should appear first in the output. Merge sort, &lt;code&gt;sort -m&lt;/code&gt; can and does produce output without delay&lt;a id="fn3link" href="http://wordaligned.org/articles/python-streams-vs-unix-pipes#fn3"&gt;&lt;sup&gt;[3]&lt;/sup&gt;&lt;/a&gt;.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;$ yes | sort
+^C
+$ yes | sort -m
+y
+y
+y
+y
+y
+^C
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/python-streams-vs-unix-pipes#toc6" name="tocgenerating-primes" id="tocgenerating-primes"&gt;Generating Primes&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;No doubt it&amp;#8217;s possible to generate the infinite series of prime numbers using native Bash code, but I chose to reuse the &lt;a href="http://www.onlamp.com/pub/a/python/excerpt/pythonckbk_chap1/index1.html?page=2"&gt;Python Cookbook recipe&lt;/a&gt; for the job.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;primes&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;#!/usr/bin/env python
+import itertools
+
+def primes():
+    '''Generate the prime number series: 2, 3, 5 ... '''
+    D = {}
+    for n in itertools.count(2):
+        p = D.pop(n, None)
+        if p is None:
+            yield n
+            D[n * n] = n
+        else:
+            x = n + p
+            while x in D:
+                x += p
+            D[x] = p
+
+for p in primes():
+    print(p)
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;This is a subtle little program which makes clever use of Python&amp;#8217;s native hashed array container, the dictionary. In this case dictionary values are the primes less than &lt;code&gt;n&lt;/code&gt; and the keys are composite multiples of these primes. The loop invariant, roughly speaking, is that the dictionary values are the primes less than &lt;code&gt;n&lt;/code&gt;, and the corresponding keys are the lowest multiples of these primes greater than or equal to &lt;code&gt;n&lt;/code&gt;. It&amp;#8217;s a lazy, recursion-free variant of Eratosthenes&amp;#8217; sieve.
+&lt;/p&gt;
+&lt;p&gt;For the purposes of this article the important things about this program are:
+&lt;/p&gt;
+&lt;ul&gt;
+ &lt;li&gt;
+     it generates an infinite series of numbers to standard output&lt;a id="fn4link" href="http://wordaligned.org/articles/python-streams-vs-unix-pipes#fn4"&gt;&lt;sup&gt;[4]&lt;/sup&gt;&lt;/a&gt;, making it a good source for a shell pipeline;
+ &lt;/li&gt;
+
+ &lt;li&gt;
+     by making it executable and adding the usual shebang incantation, we can invoke this Python program seamlessly from the shell.
+ &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/python-streams-vs-unix-pipes#toc7" name="tocpipe-connection" id="tocpipe-connection"&gt;Pipe Connection&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Recall the original puzzle:
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;Find the smallest number that can be expressed as the sum of 5, 17, 563, 641 consecutive prime numbers, and is itself a prime number.
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;First, let&amp;#8217;s check the connections by solving a simpler problem which we can manually verify: to find prime numbers which are also the sum of 2 consecutive primes. As we noted before, this is the same as finding primes numbers which are the consecutive sums of 1 and 2 primes.
+&lt;/p&gt;
+&lt;p&gt;In one shell window we create a couple of named pipes, &lt;code&gt;c.1&lt;/code&gt; and &lt;code&gt;c.2&lt;/code&gt;, which we&amp;#8217;ll use to stream the consecutive sum series of 1 and 2 primes respectively. The results series comprises the duplicates when we merge these pipes.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;Shell 1&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;$ mkfifo c.{1,2}
+$ sort -mn c.{1,2} | uniq -d
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;In another shell window, stream data into c.1 and c.2:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;Shell 2&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;$ for i in 1 2; do (primes | psum | sdiff $i &amp;gt; c.$i) &amp;amp; done
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;In the first window we see the single number &lt;code&gt;5&lt;/code&gt;, which is the first and only prime number equal to the sum of two primes.
+&lt;/p&gt;
+&lt;p&gt;Prime numbers equal to the sum of three consecutive primes are more interesting. In each shell window recall the previous commands and switch the 2s to 3s (a simple command history recall and edit, &lt;code&gt;^2^3^&lt;/code&gt;, does the trick). The merged output now looks like this:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;$ sort -mn c.1 c.3 | uniq -d
+23
+31
+41
+...
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;We can check the first few values:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;23 = 5 + 7 + 11
+31 = 7 + 11 + 13
+41 = 11 + 13 + 17
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;At this point we&amp;#8217;re confident enough to give the actual puzzle a try. Start up the solutions stream.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;$ mkfifo c.{1,5,17,563,641}
+$ sort -mn c.{1,5,17,563,641} | uniq -c | grep "5 "
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Here, we use a standard &lt;a href="http://wordaligned.org/articles/shell-script-sets"&gt;shell script set intersection&lt;/a&gt; recipe: &lt;code&gt;uniq -c&lt;/code&gt; groups and counts repeated elements, and the &lt;code&gt;grep&lt;/code&gt; pattern matches those numbers common to all five input streams.
+&lt;/p&gt;
+&lt;p&gt;Now we can kick off the processes which will feed into the consecutive sum streams, which &lt;code&gt;sort&lt;/code&gt; is waiting on.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;$ for i in 1 5 17 563 641; do (primes | psum | sdiff $i &amp;gt; c.$i) &amp;amp; done
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Sure enough, after about 15 seconds elapsed time&lt;a id="fn5link" href="http://wordaligned.org/articles/python-streams-vs-unix-pipes#fn5"&gt;&lt;sup&gt;[5]&lt;/sup&gt;&lt;/a&gt;, out pops the result:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;$ sort -mn c.{1,5,17,563,641} | uniq -c | grep "5 "
+    5 7002221
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;15 seconds seems an eternity for arithmetic on a modern computer (you could start up a word processor in less time!), and you might be inclined to blame the overhead of all those processes, files, large numbers, etc. In fact it took around 6 seconds for the Python program simply to generate prime numbers up to 7002221, and my pure Python solution ran in 9 seconds.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/python-streams-vs-unix-pipes#toc8" name="tocpipe-teeing" id="tocpipe-teeing"&gt;Pipe Teeing&lt;/a&gt;&lt;/h3&gt;
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;5 &amp;times; primes | sum&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;$ for i in 1 5 17 563 641; do (primes | psum | sdiff $i &amp;gt; c.$i) &amp;amp; done
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;This shell solution works but I&amp;#8217;m not happy with it. The source loop spawns 5 separate instances of &lt;code&gt;primes&lt;/code&gt; and pipes them all through &lt;code&gt;psum&lt;/code&gt;. I don&amp;#8217;t care about giving the computer more to do than necessary, but I do wish I could figure out the details of this dataflow plumbing. What I&amp;#8217;d &lt;em&gt;like&lt;/em&gt; to do is split the output of &lt;code&gt;primes | psum&lt;/code&gt; five ways, connecting each resulting stream to an instance of &lt;code&gt;sdiff&lt;/code&gt;. Something &lt;em&gt;like&lt;/em&gt; the following:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;This doesn&amp;#8217;t work&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;$ mkfifo t.{1,5,17,563,641}
+$ primes | psum | tee t.{1,5,17,563,641} &amp;gt;/dev/null &amp;amp;
+$ for i in 1 5 17 563 641; do (sdiff $i &amp;lt; t.$i &amp;gt; c.$i) &amp;amp; done
+$ sort -mn c.{1,5,17,563,641} | uniq -c | grep " 5 "
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;When I run this sequence of commands nothing happens: by which I mean something blocks and nothing gets through to &lt;code&gt;sort&lt;/code&gt;. Again, I&amp;#8217;m out of my depth and not sure what&amp;#8217;s going on &amp;#8212; any advice would be welcome. The shell makes it all too easy to experiment, and I reckon I&amp;#8217;ve already exhausted the obvious permutations of wax, tac, crunch, wane, amp, zap, tic, pretzel.
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/python-streams-vs-unix-pipes#toc9" name="tocportability" id="tocportability"&gt;Portability&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;One of the most convenient things about Python is its portability. I don&amp;#8217;t mean &amp;#8220;portable so long as you conform to the language standard&amp;#8221; or &amp;#8220;portable if you stick to a subset of the language&amp;#8221; &amp;#8212; I mean that a Python program works whatever platform I use without me having to worry about it. In fact I&amp;#8217;m guilty of taking this portability for granted, and was surprised to discover a program of mine failed on Windows (the &lt;a href="http://docs.python.org/lib/module-fcntl.html"&gt;fcntl module&lt;/a&gt; is Unix only).
+&lt;/p&gt;
+&lt;p&gt;Non-portability put me off the Unix shell when I first encountered it: there seemed too many details, too many platform differences &amp;#8212; which shell are you using? which extensions? which implementation of the core utilities, etc, etc? Readily available and well-written documentation didn&amp;#8217;t help much here: generally I want the shell to just do what I mean, which is why I switched so happily to Perl when I discovered it.
+&lt;/p&gt;
+&lt;p&gt;Since then this situation has, for me, improved in many ways. Non-Unix platforms are declining as are the different flavours of Unix. Bash seems to have become the standard shell of choice and Cygwin gets better all the time. GNU coreutils predominate. As a consequence I&amp;#8217;ve forgotten almost all the Perl I ever knew and am actively rediscovering the Unix shell.
+&lt;/p&gt;
+&lt;p&gt;Writing this article, though, I was reminded of the platform dependent behaviour which used to discourage me. On a Linux platform close to hand I had to use &lt;code&gt;seq&lt;/code&gt; instead of &lt;code&gt;jot&lt;/code&gt;, and &lt;code&gt;awk&lt;/code&gt; formatted large integers in a scientific form with a loss of precision.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;Loss of precision&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;$ echo '10000000001 0' | awk '{print $1 - $2}'
+1e+10
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;On OS X the same command outputs 10000000001. I couldn&amp;#8217;t tell you which implementation is more correct. The fix is to explicitly format these numbers as decimal integers, but the danger is that the shell silently swallows these discrepancies and you&amp;#8217;ve got a portability problem you don&amp;#8217;t even notice.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;Precision recovered&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;$ echo '10000000001 0' | awk '{printf "%d\n", $1 - $2}'
+10000000001
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/python-streams-vs-unix-pipes#toc10" name="tocstream-merge" id="tocstream-merge"&gt;Stream Merge&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;I mentioned &lt;code&gt;stream_merge()&lt;/code&gt; at the start of this article, a general purpose function written by Raymond Hettinger which I originally found in the Python Cookbook. As with the prime number generator, you might imagine the merge algorithm to be recursively defined:
+&lt;/p&gt;
+&lt;ol&gt;
+ &lt;li&gt;&lt;p&gt;to merge a pair of streams, take items from the first which are less than the head of the second, then swap;
+&lt;/p&gt;
+
+ &lt;/li&gt;
+
+ &lt;li&gt;&lt;p&gt;to merge N streams, merge the first stream with the merged (N-1) rest.
+&lt;/p&gt;
+
+ &lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Again the Python solution does it differently, this time using a heap as a priority queue of items from the input streams. It&amp;#8217;s ingenious and efficient. Look how easy it is in Python to shunt functions and pairs in and out of queues.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;from heapq import heapify, heappop, heapreplace
+
+def stream_merge(*ss):
+    '''Merge a collection of sorted streams.'''
+    pqueue = []
+    for i in map(iter, ss):
+        try:
+            pqueue.append((i.next(), i.next))
+        except StopIteration:
+            pass
+    heapify(pqueue)
+    while pqueue:
+        val, it = pqueue[0]
+        yield val
+        try:
+            heapreplace(pqueue, (it(), it))
+        except StopIteration:
+            heappop(pqueue)
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;A more sophisticated version of this code has made it into the Python standard library, where it goes by the name of &lt;a href="http://docs.python.org/dev/library/heapq.html#heapq.merge"&gt;heapq.merge&lt;/a&gt; (I wonder why it wasn&amp;#8217;t filed in &lt;a href="http://docs.python.org/lib/itertools-functions.html"&gt;itertools&lt;/a&gt;?)
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/python-streams-vs-unix-pipes#toc11" name="tocalternative-solutions" id="tocalternative-solutions"&gt;Alternative Solutions&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;As usual Haskell wins the elegance award, so I&amp;#8217;ll quote in full a solution built without resorting to cookbookery which produces the (correct!) answer in 20 seconds.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;module Main where
+
+import List
+
+isPrime x = all (\i -&amp;gt; 0/=x`mod`i) $ takeWhile (\i -&amp;gt; i*i &amp;lt;= x) primes
+
+primes = 2:filter (\x -&amp;gt; isPrime x) [3..]
+
+cplist n = map (sum . take n) (tails primes)
+
+meet (x:xs) (y:ys) | x &amp;lt; y = meet xs (y:ys)
+                   | y &amp;lt; x = meet (x:xs) ys
+                   | x == y =  x:meet xs ys
+
+main = print $ head $ \
+(primes `meet` cplist 5) `meet` (cplist 17 `meet` cplist 563) `meet` cplist 641
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;&lt;a id="fn1" href="http://wordaligned.org/articles/python-streams-vs-unix-pipes#fn1link"&gt;[1]&lt;/a&gt; CPython, more precisely &amp;#8212; I don&amp;#8217;t think anything in the Python language itself prohibits tail recursion. Even using CPython, yet another &lt;a href="http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/496691"&gt;recipe&lt;/a&gt; from the online Python Cookbook explores the idea of an &lt;code&gt;@tail_recursion&lt;/code&gt; decorator.
+&lt;/p&gt;
+&lt;p&gt;&lt;a id="fn2" href="http://wordaligned.org/articles/python-streams-vs-unix-pipes#fn2link"&gt;[2]&lt;/a&gt; &lt;code&gt;Tail&lt;/code&gt; is more commonly used to yield a fixed number of lines from the end of the file: by prefixing the line count argument with a &lt;code&gt;+&lt;/code&gt; sign, it skips lines from the head of the file. The GNU version of &lt;code&gt;head&lt;/code&gt; can similarly be used with a &lt;code&gt;-&lt;/code&gt; prefix to skip lines at the tail of a file. The notation is {compact,powerful,subtle,implementation dependent}.
+&lt;/p&gt;
+&lt;p&gt;&lt;a id="fn3" href="http://wordaligned.org/articles/python-streams-vs-unix-pipes#fn3link"&gt;[3]&lt;/a&gt; &lt;code&gt;Sort -m&lt;/code&gt; is a sort which doesn&amp;#8217;t really sort &amp;#8212; its inputs should already be sorted &amp;#8212; rather like the &lt;code&gt;+n&lt;/code&gt; option turning &lt;code&gt;tail&lt;/code&gt; on its head.
+&lt;/p&gt;
+&lt;p&gt;&lt;a id="fn4" href="http://wordaligned.org/articles/python-streams-vs-unix-pipes#fn4link"&gt;[4]&lt;/a&gt; The series is infinite in theory only: at time &lt;code&gt;n&lt;/code&gt; the number of items in the &lt;code&gt;has_prime_factors&lt;/code&gt; dictionary equals the number of primes less than &lt;code&gt;n&lt;/code&gt;, and each key in this dictionary is larger than &lt;code&gt;n&lt;/code&gt;. So resource use increases steadily as &lt;code&gt;n&lt;/code&gt; increases.
+&lt;/p&gt;
+&lt;p&gt;&lt;a id="fn5" href="http://wordaligned.org/articles/python-streams-vs-unix-pipes#fn5link"&gt;[5]&lt;/a&gt; I used a MacBook laptop used to run these scripts. 
+&lt;/p&gt;
+&lt;pre&gt;
+  Model Name:               MacBook
+  Model Identifier:         MacBook1,1
+  Processor Name:           Intel Core Duo
+  Processor Speed:          2 GHz
+  Number Of Processors:     1
+  Total Number Of Cores:    2
+  L2 Cache (per processor): 2 MB
+  Memory:                   2 GB
+  Bus Speed:                667 MHz
+&lt;/pre&gt;</description>
+<dc:date>2016-07-28</dc:date>
+<guid>http://wordaligned.org/articles/python-streams-vs-unix-pipes</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/python-streams-vs-unix-pipes</link>
+<category>Streams</category>
+</item>
+
+<item>
 <title>Group When</title>
 <description>&lt;p&gt;Phil Nash&amp;#8217;s recent tweet intrigued me.
 &lt;/p&gt;

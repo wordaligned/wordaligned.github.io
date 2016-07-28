@@ -11,7 +11,7 @@
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
 <meta name="author" content="Thomas Guest" />
 <meta name="description" content="A collection of articles on software development written by Thomas Guest." />
-<meta name="keywords" content="CLRS, Regex, Missiles, Cycling, apple, Pictures, Self, Editors, Emacs, Torvalds, ImageMagick, IDE, Decorators, Shell, PIL, Lcs, Turing, Ruby on Rails, Puzzles, Europython, iphone, Characters, Fractals, Crabs, Github, DocBook, Dynamic Languages, lighttpd, Bugs, CVS, Reviews, Steganography, Algorithms, Perec, Content, Markdown, Two Wheels, Conferences, Syntax, Unix, Arc, Go, Web-applications, Chess, Web Applications, Java, Esr, Recursion, Charts, Perl, Subversion, Recommended, Teamwork, Build, ACCU, Knuth, Android, Erlang, Boost, php, OCR, Python, cvs2svn, Scrum, SICP, Windows, Books, Awk, Graphics, Disqus, Ruby, openid, C, Zlib, Trac, Lisp, Documentation, C++, Etc, Streams, Bristol, Tesseract, Drawing, Accidents, Google, Apple, Functional Programming, Pi, Haskell, Design, Virtualization, Spolsky, Oulipo, Curl, Scheme" />
+<meta name="keywords" content="CLRS, Regex, Missiles, Cycling, apple, Pictures, Self, Editors, Emacs, Torvalds, ImageMagick, IDE, Decorators, Shell, PIL, Lcs, Turing, Ruby on Rails, Puzzles, Europython, iphone, Characters, Fractals, Crabs, Github, DocBook, Dynamic Languages, lighttpd, Bugs, CVS, Reviews, Web-applications, Steganography, Oulipo, Perec, Content, Markdown, Two Wheels, Conferences, Syntax, Unix, Arc, Go, Primes, Chess, Web Applications, Java, Esr, Recursion, Charts, Perl, Subversion, Recommended, Teamwork, Build, ACCU, Knuth, Android, Erlang, Boost, php, OCR, Python, cvs2svn, Scrum, SICP, Lisp, Books, Awk, Graphics, Disqus, Ruby, openid, C, Documentation, Trac, Windows, Zlib, C++, Etc, Streams, Bristol, Tesseract, Drawing, Accidents, Google, Apple, Functional Programming, Pi, Haskell, Design, Virtualization, Spolsky, Algorithms, Curl, Scheme" />
 <link rel="alternate" type="application/rss+xml" title="Feed" href="http://feeds.wordaligned.org/wordaligned" />
 </head>
 
@@ -25,9 +25,631 @@
 
   <div id="page">
     <div id="content">
-      <div class="atomentry" id="productivity">
+      <div class="atomentry" id="python-streams-vs-unix-pipes">
+<h2 class="title"><a href="/articles/python-streams-vs-unix-pipes">Python Streams vs Unix Pipes</a></h2>
+<p class="meta"><abbr class="published" title="2016-07-28">2016-07-28</abbr> &bull; <a href="/tag/shell" rel="tag">Shell</a>, <a href="/tag/python" rel="tag">Python</a>, <a href="/tag/puzzles" rel="tag">Puzzles</a>, <a href="/tag/streams" rel="tag">Streams</a>, <a href="/tag/primes" rel="tag">Primes</a> &bull; <a href="/articles/python-streams-vs-unix-pipes#disqus_thread">Comments</a></p>
+<div class="toc">
+<h2>Contents</h2>
+<ul>
+ <li><a href="#tocinfinite-series-and-python" name="toc0" id="toc0">Infinite series and Python</a>
+ </li>
+
+ <li><a href="#tocinfinite-series-in-other-languages" name="toc1" id="toc1">Infinite series in Other Languages</a>
+ </li>
+
+ <li><a href="#tocpartial-sums" name="toc2" id="toc2">Partial sums.</a>
+ </li>
+
+ <li><a href="#tocconsecutive-sums" name="toc3" id="toc3">Consecutive sums</a>
+ </li>
+
+ <li><a href="#tocbug-fixes" name="toc4" id="toc4">Bug Fixes</a>
+ </li>
+
+ <li><a href="#tocmerging-streams" name="toc5" id="toc5">Merging Streams</a>
+ </li>
+
+ <li><a href="#tocgenerating-primes" name="toc6" id="toc6">Generating Primes</a>
+ </li>
+
+ <li><a href="#tocpipe-connection" name="toc7" id="toc7">Pipe Connection</a>
+ </li>
+
+ <li><a href="#tocpipe-teeing" name="toc8" id="toc8">Pipe Teeing</a>
+ </li>
+
+ <li><a href="#tocportability" name="toc9" id="toc9">Portability</a>
+ </li>
+
+ <li><a href="#tocstream-merge" name="toc10" id="toc10">Stream Merge</a>
+ </li>
+
+ <li><a href="#tocalternative-solutions" name="toc11" id="toc11">Alternative Solutions</a>
+ </li>
+</ul>
+</div><p>I chanced upon an interesting puzzle:
+</p>
+<blockquote><p>Find the smallest number that can be expressed as the sum of 5, 17, 563, 641 consecutive prime numbers, and is itself a prime number.
+</p>
+</blockquote><img src="/images/primes.png" alt="Small primes graphic"/>
+
+
+<h3><a href="#toc0" name="tocinfinite-series-and-python" id="tocinfinite-series-and-python">Infinite series and Python</a></h3>
+<p>The prime numbers famously form an infinite series and my first thought was to tackle this puzzle using Python iterators and generators. Courtesy of the Python Cookbook, I already had a couple of <a href="http://www.onlamp.com/pub/a/python/excerpt/pythonckbk_chap1/index1.html?page=2">useful</a> <a href="http://code.activestate.com/recipes/491285-iterator-merge/">recipes</a>:
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">def primes():
+    '''Generate the sequence of prime numbers: 2, 3, 5 ... '''
+    ....
+
+def stream_merge(*ss):
+    '''Merge a collection of sorted streams.
+    
+    Example: merge multiples of 2, 3, 5
+    &gt;&gt;&gt; from itertools import count, islice
+    &gt;&gt;&gt; def multiples(x): return (x * n for n in count(1))
+    &gt;&gt;&gt; s = stream_merge(multiples(2), multiples(3), multiples(5))
+    &gt;&gt;&gt; list(islice(s, 12))
+    [2, 3, 4, 5, 6, 6, 8, 9, 10, 10, 12, 12]
+    '''
+    ....
+
+</pre>
+
+</div>
+
+<p>Both these functions merit a closer look for the cunning use they make of standard containers, but we&#8217;ll defer this inspection until later. In passing, note that <code>stream_merge()</code>&#8217;s docstring suggests we might try using it as basis for <code>primes()</code>:
+</p>
+<ol>
+ <li><p>form the series of composite (non-prime) numbers by merging the streams formed by multiples of prime numbers; 
+</p>
+
+ </li>
+
+ <li><p>the primes remain when you remove these composites from the series of natural numbers.
+</p>
+
+ </li>
+</ol>
+<p>This scheme is hardly original &#8212; it&#8217;s a variant of <a href="http://en.wikipedia.org/wiki/Sieve_of_Eratosthenes">Eratosthenes&#8217; famous sieve</a> &#8212; but if you look carefully you&#8217;ll notice the self-reference. Unfortunately recursive definitions of infinite series don&#8217;t work well with Python<a id="fn1link" href="#fn1"><sup>[1]</sup></a>, hence <code>primes()</code> requires a little more finesse. We&#8217;ll take a look at it later.
+</p>
+<p>Moving on then, to solve the original puzzle we need a consecutive sum filter. This takes a stream of numbers and yields a stream of consecutive sums of these numbers:
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">def consecutive_sum(s, n):
+    '''Generate the series of sums of n consecutive elements of s
+    
+    Example: 0, 1, 2, 3, 4 ... =&gt; 0+1, 1+2, 2+3, 3+4, ...
+    &gt;&gt;&gt; from itertools import count, islice
+    &gt;&gt;&gt; list(islice(consecutive_sum(count(), 2), 10))
+    [1, 3, 5, 7, 9, 11, 13, 15, 17, 19]
+    '''
+    lo, hi = itertools.tee(s)
+    csum = sum(hi.next() for _ in range(n))
+    while True:
+        yield csum
+        csum += hi.next() - lo.next()
+
+</pre>
+
+</div>
+
+<p>Here we visualise the summed elements as lying within a sliding window: each time we slide the window an element gets added to the top and an element gets removed from the bottom, and we adjust <code>csum</code> accordingly.
+</p>
+<p>So, now we have:
+</p>
+<ul>
+ <li>
+     the series of prime numbers, <code>primes()</code>
+ </li>
+
+ <li>
+     a <code>stream_merge()</code> connector
+ </li>
+
+ <li>
+     a <code>consecutive_sum()</code> filter
+ </li>
+</ul>
+<p>The remaining stream adaptors come from the standard <a href="http://docs.python.org/lib/itertools-functions.html">itertools module</a>. Note that the <code>stream_merge()</code> works here since all the consecutive sum series are strictly increasing. Note also that the stream of prime numbers can be treated as <code>consecutive_sum(s=primes(), n=1)</code>, handling the &#8220;and is itself a prime number&#8221; requirement.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">&gt;&gt;&gt; lens = 1, 5, 17, 563, 641
+&gt;&gt;&gt; N = len(lens)
+&gt;&gt;&gt; from itertools import tee, groupby
+&gt;&gt;&gt; ps = tee(primes(), N)
+&gt;&gt;&gt; csums = [consecutive_sum(p, n) for p, n in zip(ps, lens)]
+&gt;&gt;&gt; solns = (n for n, g in groupby(stream_merge(*csums)) 
+             if len(list(g)) == N)
+&gt;&gt;&gt; solns.next()
+7002221
+
+</pre>
+
+</div>
+
+<p>Here&#8217;s a picture of how these stream tools link up to solve this particular puzzle. The great thing is that we can reconnect these same tools to solve a wide range of puzzles, and indeed more practical <a href="http://www.dabeaz.com/generators/">processing tasks</a>. To use the common analogy, we direct data streams along pipes.
+</p>
+<img alt="Stream connections" src="/images/pipeline.png"/>
+
+
+<h3><a href="#toc1" name="tocinfinite-series-in-other-languages" id="tocinfinite-series-in-other-languages">Infinite series in Other Languages</a></h3>
+<p>Python is the high-level language I find most convenient most of the time, which explains why I reached for it first. It&#8217;s an increasingly popular language, which helps explain why it I didn&#8217;t need to write the tricky parts of my solution from scratch: they&#8217;d already been done. Python is also a language which makes compromises. Having used Python to find a solution to the puzzle I wondered if there wasn&#8217;t some other language better suited to this kind of problem.
+</p>
+<p><a href="http://haskell.org">Haskell</a> makes no compromises when it comes to functional programming. Its lazy evaluation and guilt-free recursion make it a perfect fit for this kind of puzzle &#8212; but my Pythonic approach of teeing, filtering and merging streams made me think first of the Unix Shell. Now, I use Bash every day and page through its manual at least once a week. Scripting appeals and I&#8217;m comfortable at the command line. How hard could it be to solve this puzzle using Bash? After all, I already knew the answer! Let&#8217;s give it a go.
+</p>
+
+<h3><a href="#toc2" name="tocpartial-sums" id="tocpartial-sums">Partial sums.</a></h3>
+<p>Here&#8217;s a simple shell function to generate partial sums. I&#8217;ve used <code>awk</code>, a little language I gave up on a long time ago in favour of more rounded scripting languages like Perl and then Python. Now I look at it again, it seems to fill a useful gap. Awk processes a file sequentially, applying pattern-action rules to each line, a processing pattern which I&#8217;ve reinvented less cleanly many times. Despite my rediscovery of <code>awk</code>, I&#8217;ll be keeping its use strongly in check in what follows.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">$ psum() { awk '{ print s += $1 }'; }
+
+</pre>
+
+</div>
+
+<p>Much like Perl, <code>awk</code> guesses what you want to do. Here, it conjures the summation variable, <code>s</code>, into existence, assigning it a default initial value of 0. (Good guess!) Since we&#8217;re doing arithmetic <code>awk</code> converts the first field of each input line into a number. We can test <code>psum</code> by using <code>jot</code> to generate the sequence 1, 2, 3, 4, 5 (on a Linux platform use <code>seq</code> instead of <code>jot</code>).
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">$ jot 5 | psum
+1
+3
+6
+10
+15
+
+</pre>
+
+</div>
+
+
+<h3><a href="#toc3" name="tocconsecutive-sums" id="tocconsecutive-sums">Consecutive sums</a></h3>
+<p>You may be wondering why we&#8217;ve bothered creating this partial sum filter since it&#8217;s the sums of consecutive elements we&#8217;re after, rather than the sum of the series so far. Well, notice that if P[i] and P[i+n] are two elements from the series of partial sums of S, then their difference, P[i+n] - P[i], is the sum of the n consecutive elements from S.
+</p>
+<p>So to form an n-element consecutive sum series we can tee the partial sums streams, advance one of these by n, then zip through them in parallel finding their differences. An example makes things clear:
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">$ mkfifo pipe
+$ jot 5 | psum | tee pipe | tail -n +2 | paste - pipe
+3       1
+6       3
+10      6
+15      10
+        15
+
+</pre>
+
+</div>
+
+<p>Here, <code>jot 5</code> generates the sequence 1, 2, 3, 4, 5, which <code>psum</code> progressively accumulates to 1, 3, 6, 10, 15. We then <code>tee</code> this partial sum series through two pipes: the first, <code>pipe</code>, is an explicitly created named pipe created by <code>mkfifo</code>, the second is implicitly created by the pipeline operator, <code>|</code>. The remainder of the command line delays one series by one (note that <code>tail</code> numbers lines from <code>1</code>, not <code>0</code>, so <code>tail -n +1</code> is the identity filter) then pastes the two series back together<a id="fn2link" href="#fn2"><sup>[2]</sup></a>.
+</p>
+<p>By appending a single <code>awk</code> action to the pipeline we get a consecutive sum series.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">$ jot 5 | psum | tee pipe | tail -n +2 | paste - pipe | awk '{print $1 - $2}'
+2
+3
+4
+5
+15
+
+</pre>
+
+</div>
+
+<p>The output 2, 3, 4, 5 is the series of consecutive sums of length 1 taken from the original series 1, 2, 3, 4, 5. The trailing 15 and the 1 missed from the start are edge case problems, and easily corrected. 
+</p>
+<p>Accumulating an increasing series of numbers in order to find the differences between elements lying a given distance apart on this series isn&#8217;t a very smart idea on a computer with a fixed word-size, but it&#8217;s good to know (e.g.) that <code>awk</code> doesn&#8217;t stop counting at 32 bits.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">$ let "N=1&lt;&lt;32" &amp;&amp; echo $N | tee &gt;(awk '{print $1 * $1}')
+4294967296
+18446744073709551616
+
+</pre>
+
+</div>
+
+<p>Exactly if and when awk stops counting, I&#8217;m not sure. The documentation doesn&#8217;t say and I haven&#8217;t looked at the source code.
+</p>
+
+<h3><a href="#toc4" name="tocbug-fixes" id="tocbug-fixes">Bug Fixes</a></h3>
+<p>Let&#8217;s capture these tiny functions and name them. Here, then, are revised <code>psum()</code> and <code>sdiff()</code> filters. The edge case problems should now be fixed.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">$ psum()  { awk 'BEGIN { print 0 }{print s += $1 }'; }
+$ delay() { let "n = $1 + 1" &amp;&amp; tail +$n; } 
+$ sdiff() { mkfifo p.$1 &amp;&amp; tee p.$1 | delay $1 | paste - p.$1 | \
+            awk 'NF == 2 {print $1 - $2 }'; }
+
+</pre>
+
+</div>
+
+<p>A quick test:
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">$ jot 5 | psum | sdiff 3
+6
+9
+12
+
+</pre>
+
+</div>
+
+<p>The output is, as expected, the series of sums of consecutive triples taken from 1, 2, 3, 4, 5 (1+2+3, 2+3+4, 3+4+5).
+</p>
+<p>There&#8217;s a more pernicious bug, though. <code>Sdiff</code> can&#8217;t handle an infinite series, so it&#8217;s of limited use as a pipeline tool. For example, if we stream it the series 0, 1, 2, &#8230; (generated here as the partial sums of the series 1, 1, 1, &#8230;) nothing gets output and we have to interrupt the process.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint"># This command appears to hang
+$ yes 1 | psum | sdiff 1
+^C
+
+</pre>
+
+</div>
+
+<p>I found a way to work around this problem by redirecting the teed stream to a subshell which itself redirects into a named pipe.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">$ sdiff() { mkfifo p.$1 &amp;&amp; tee &gt;(delay $1 &gt;p.$1) | paste - p.$1 | \
+            awk 'NF == 2 {print $2 - $1 }'; }
+$ yes 1 | psum | sdiff 1
+1
+1
+1
+1
+^C
+
+</pre>
+
+</div>
+
+<p>As you can see this gets data flowing once again, but I&#8217;m already out of my comfort zone: I couldn&#8217;t tell you why exactly this works but the preceding version doesn&#8217;t.
+</p>
+<p>(You can of course write a consecutive sum function directly in <code>awk</code>: here&#8217;s a version which leans hard on the &#8220;do what I mean&#8221; style of programming, accessing and deleting array entries which haven&#8217;t even been set.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">csum() { 
+awk -v n=$1 
+'{lo = NR - n; w[NR] = $1; s += $1 - w[lo]; delete w[lo]}' \
+'NR &gt;= n {print s}'
+}
+
+</pre>
+
+</div>
+
+<p>For this article I&#8217;ve avoided pushing the consecutive sum job <code>awk</code>&#8217;s way because I&#8217;m more interested in figuring out how this pipe-connection works for non-trivial cases. Any advice would be welcome!)
+</p>
+
+<h3><a href="#toc5" name="tocmerging-streams" id="tocmerging-streams">Merging Streams</a></h3>
+<p>The Unix shell merges streams rather more succinctly than Python. <code>Sort -m</code> does the job directly. Note that a standard <code>sort</code> cannot yield any output until all its inputs are exhausted, since the final input item might turn out to be the one which should appear first in the output. Merge sort, <code>sort -m</code> can and does produce output without delay<a id="fn3link" href="#fn3"><sup>[3]</sup></a>.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">$ yes | sort
+^C
+$ yes | sort -m
+y
+y
+y
+y
+y
+^C
+
+</pre>
+
+</div>
+
+
+<h3><a href="#toc6" name="tocgenerating-primes" id="tocgenerating-primes">Generating Primes</a></h3>
+<p>No doubt it&#8217;s possible to generate the infinite series of prime numbers using native Bash code, but I chose to reuse the <a href="http://www.onlamp.com/pub/a/python/excerpt/pythonckbk_chap1/index1.html?page=2">Python Cookbook recipe</a> for the job.
+</p>
+<div class="typocode"><div class="codetitle">primes</div>
+
+<pre class="prettyprint">#!/usr/bin/env python
+import itertools
+
+def primes():
+    '''Generate the prime number series: 2, 3, 5 ... '''
+    D = {}
+    for n in itertools.count(2):
+        p = D.pop(n, None)
+        if p is None:
+            yield n
+            D[n * n] = n
+        else:
+            x = n + p
+            while x in D:
+                x += p
+            D[x] = p
+
+for p in primes():
+    print(p)
+
+</pre>
+
+</div>
+
+<p>This is a subtle little program which makes clever use of Python&#8217;s native hashed array container, the dictionary. In this case dictionary values are the primes less than <code>n</code> and the keys are composite multiples of these primes. The loop invariant, roughly speaking, is that the dictionary values are the primes less than <code>n</code>, and the corresponding keys are the lowest multiples of these primes greater than or equal to <code>n</code>. It&#8217;s a lazy, recursion-free variant of Eratosthenes&#8217; sieve.
+</p>
+<p>For the purposes of this article the important things about this program are:
+</p>
+<ul>
+ <li>
+     it generates an infinite series of numbers to standard output<a id="fn4link" href="#fn4"><sup>[4]</sup></a>, making it a good source for a shell pipeline;
+ </li>
+
+ <li>
+     by making it executable and adding the usual shebang incantation, we can invoke this Python program seamlessly from the shell.
+ </li>
+</ul>
+
+<h3><a href="#toc7" name="tocpipe-connection" id="tocpipe-connection">Pipe Connection</a></h3>
+<p>Recall the original puzzle:
+</p>
+<blockquote><p>Find the smallest number that can be expressed as the sum of 5, 17, 563, 641 consecutive prime numbers, and is itself a prime number.
+</p>
+</blockquote><p>First, let&#8217;s check the connections by solving a simpler problem which we can manually verify: to find prime numbers which are also the sum of 2 consecutive primes. As we noted before, this is the same as finding primes numbers which are the consecutive sums of 1 and 2 primes.
+</p>
+<p>In one shell window we create a couple of named pipes, <code>c.1</code> and <code>c.2</code>, which we&#8217;ll use to stream the consecutive sum series of 1 and 2 primes respectively. The results series comprises the duplicates when we merge these pipes.
+</p>
+<div class="typocode"><div class="codetitle">Shell 1</div>
+
+<pre class="prettyprint">$ mkfifo c.{1,2}
+$ sort -mn c.{1,2} | uniq -d
+
+</pre>
+
+</div>
+
+<p>In another shell window, stream data into c.1 and c.2:
+</p>
+<div class="typocode"><div class="codetitle">Shell 2</div>
+
+<pre class="prettyprint">$ for i in 1 2; do (primes | psum | sdiff $i &gt; c.$i) &amp; done
+
+</pre>
+
+</div>
+
+<p>In the first window we see the single number <code>5</code>, which is the first and only prime number equal to the sum of two primes.
+</p>
+<p>Prime numbers equal to the sum of three consecutive primes are more interesting. In each shell window recall the previous commands and switch the 2s to 3s (a simple command history recall and edit, <code>^2^3^</code>, does the trick). The merged output now looks like this:
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">$ sort -mn c.1 c.3 | uniq -d
+23
+31
+41
+...
+
+</pre>
+
+</div>
+
+<p>We can check the first few values:
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">23 = 5 + 7 + 11
+31 = 7 + 11 + 13
+41 = 11 + 13 + 17
+
+</pre>
+
+</div>
+
+<p>At this point we&#8217;re confident enough to give the actual puzzle a try. Start up the solutions stream.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">$ mkfifo c.{1,5,17,563,641}
+$ sort -mn c.{1,5,17,563,641} | uniq -c | grep "5 "
+
+</pre>
+
+</div>
+
+<p>Here, we use a standard <a href="/articles/shell-script-sets">shell script set intersection</a> recipe: <code>uniq -c</code> groups and counts repeated elements, and the <code>grep</code> pattern matches those numbers common to all five input streams.
+</p>
+<p>Now we can kick off the processes which will feed into the consecutive sum streams, which <code>sort</code> is waiting on.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">$ for i in 1 5 17 563 641; do (primes | psum | sdiff $i &gt; c.$i) &amp; done
+
+</pre>
+
+</div>
+
+<p>Sure enough, after about 15 seconds elapsed time<a id="fn5link" href="#fn5"><sup>[5]</sup></a>, out pops the result:
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">$ sort -mn c.{1,5,17,563,641} | uniq -c | grep "5 "
+    5 7002221
+
+</pre>
+
+</div>
+
+<p>15 seconds seems an eternity for arithmetic on a modern computer (you could start up a word processor in less time!), and you might be inclined to blame the overhead of all those processes, files, large numbers, etc. In fact it took around 6 seconds for the Python program simply to generate prime numbers up to 7002221, and my pure Python solution ran in 9 seconds.
+</p>
+
+<h3><a href="#toc8" name="tocpipe-teeing" id="tocpipe-teeing">Pipe Teeing</a></h3>
+<div class="typocode"><div class="codetitle">5 &times; primes | sum</div>
+
+<pre class="prettyprint">$ for i in 1 5 17 563 641; do (primes | psum | sdiff $i &gt; c.$i) &amp; done
+
+</pre>
+
+</div>
+
+<p>This shell solution works but I&#8217;m not happy with it. The source loop spawns 5 separate instances of <code>primes</code> and pipes them all through <code>psum</code>. I don&#8217;t care about giving the computer more to do than necessary, but I do wish I could figure out the details of this dataflow plumbing. What I&#8217;d <em>like</em> to do is split the output of <code>primes | psum</code> five ways, connecting each resulting stream to an instance of <code>sdiff</code>. Something <em>like</em> the following:
+</p>
+<div class="typocode"><div class="codetitle">This doesn&#8217;t work</div>
+
+<pre class="prettyprint">$ mkfifo t.{1,5,17,563,641}
+$ primes | psum | tee t.{1,5,17,563,641} &gt;/dev/null &amp;
+$ for i in 1 5 17 563 641; do (sdiff $i &lt; t.$i &gt; c.$i) &amp; done
+$ sort -mn c.{1,5,17,563,641} | uniq -c | grep " 5 "
+
+</pre>
+
+</div>
+
+<p>When I run this sequence of commands nothing happens: by which I mean something blocks and nothing gets through to <code>sort</code>. Again, I&#8217;m out of my depth and not sure what&#8217;s going on &#8212; any advice would be welcome. The shell makes it all too easy to experiment, and I reckon I&#8217;ve already exhausted the obvious permutations of wax, tac, crunch, wane, amp, zap, tic, pretzel.
+</p>
+
+<h3><a href="#toc9" name="tocportability" id="tocportability">Portability</a></h3>
+<p>One of the most convenient things about Python is its portability. I don&#8217;t mean &#8220;portable so long as you conform to the language standard&#8221; or &#8220;portable if you stick to a subset of the language&#8221; &#8212; I mean that a Python program works whatever platform I use without me having to worry about it. In fact I&#8217;m guilty of taking this portability for granted, and was surprised to discover a program of mine failed on Windows (the <a href="http://docs.python.org/lib/module-fcntl.html">fcntl module</a> is Unix only).
+</p>
+<p>Non-portability put me off the Unix shell when I first encountered it: there seemed too many details, too many platform differences &#8212; which shell are you using? which extensions? which implementation of the core utilities, etc, etc? Readily available and well-written documentation didn&#8217;t help much here: generally I want the shell to just do what I mean, which is why I switched so happily to Perl when I discovered it.
+</p>
+<p>Since then this situation has, for me, improved in many ways. Non-Unix platforms are declining as are the different flavours of Unix. Bash seems to have become the standard shell of choice and Cygwin gets better all the time. GNU coreutils predominate. As a consequence I&#8217;ve forgotten almost all the Perl I ever knew and am actively rediscovering the Unix shell.
+</p>
+<p>Writing this article, though, I was reminded of the platform dependent behaviour which used to discourage me. On a Linux platform close to hand I had to use <code>seq</code> instead of <code>jot</code>, and <code>awk</code> formatted large integers in a scientific form with a loss of precision.
+</p>
+<div class="typocode"><div class="codetitle">Loss of precision</div>
+
+<pre class="prettyprint">$ echo '10000000001 0' | awk '{print $1 - $2}'
+1e+10
+
+</pre>
+
+</div>
+
+<p>On OS X the same command outputs 10000000001. I couldn&#8217;t tell you which implementation is more correct. The fix is to explicitly format these numbers as decimal integers, but the danger is that the shell silently swallows these discrepancies and you&#8217;ve got a portability problem you don&#8217;t even notice.
+</p>
+<div class="typocode"><div class="codetitle">Precision recovered</div>
+
+<pre class="prettyprint">$ echo '10000000001 0' | awk '{printf "%d\n", $1 - $2}'
+10000000001
+
+</pre>
+
+</div>
+
+
+<h3><a href="#toc10" name="tocstream-merge" id="tocstream-merge">Stream Merge</a></h3>
+<p>I mentioned <code>stream_merge()</code> at the start of this article, a general purpose function written by Raymond Hettinger which I originally found in the Python Cookbook. As with the prime number generator, you might imagine the merge algorithm to be recursively defined:
+</p>
+<ol>
+ <li><p>to merge a pair of streams, take items from the first which are less than the head of the second, then swap;
+</p>
+
+ </li>
+
+ <li><p>to merge N streams, merge the first stream with the merged (N-1) rest.
+</p>
+
+ </li>
+</ol>
+<p>Again the Python solution does it differently, this time using a heap as a priority queue of items from the input streams. It&#8217;s ingenious and efficient. Look how easy it is in Python to shunt functions and pairs in and out of queues.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">from heapq import heapify, heappop, heapreplace
+
+def stream_merge(*ss):
+    '''Merge a collection of sorted streams.'''
+    pqueue = []
+    for i in map(iter, ss):
+        try:
+            pqueue.append((i.next(), i.next))
+        except StopIteration:
+            pass
+    heapify(pqueue)
+    while pqueue:
+        val, it = pqueue[0]
+        yield val
+        try:
+            heapreplace(pqueue, (it(), it))
+        except StopIteration:
+            heappop(pqueue)
+
+</pre>
+
+</div>
+
+<p>A more sophisticated version of this code has made it into the Python standard library, where it goes by the name of <a href="http://docs.python.org/dev/library/heapq.html#heapq.merge">heapq.merge</a> (I wonder why it wasn&#8217;t filed in <a href="http://docs.python.org/lib/itertools-functions.html">itertools</a>?)
+</p>
+
+<h3><a href="#toc11" name="tocalternative-solutions" id="tocalternative-solutions">Alternative Solutions</a></h3>
+<p>As usual Haskell wins the elegance award, so I&#8217;ll quote in full a solution built without resorting to cookbookery which produces the (correct!) answer in 20 seconds.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">module Main where
+
+import List
+
+isPrime x = all (\i -&gt; 0/=x`mod`i) $ takeWhile (\i -&gt; i*i &lt;= x) primes
+
+primes = 2:filter (\x -&gt; isPrime x) [3..]
+
+cplist n = map (sum . take n) (tails primes)
+
+meet (x:xs) (y:ys) | x &lt; y = meet xs (y:ys)
+                   | y &lt; x = meet (x:xs) ys
+                   | x == y =  x:meet xs ys
+
+main = print $ head $ \
+(primes `meet` cplist 5) `meet` (cplist 17 `meet` cplist 563) `meet` cplist 641
+
+</pre>
+
+</div>
+
+<hr />
+
+<p><a id="fn1" href="#fn1link">[1]</a> CPython, more precisely &#8212; I don&#8217;t think anything in the Python language itself prohibits tail recursion. Even using CPython, yet another <a href="http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/496691">recipe</a> from the online Python Cookbook explores the idea of an <code>@tail_recursion</code> decorator.
+</p>
+<p><a id="fn2" href="#fn2link">[2]</a> <code>Tail</code> is more commonly used to yield a fixed number of lines from the end of the file: by prefixing the line count argument with a <code>+</code> sign, it skips lines from the head of the file. The GNU version of <code>head</code> can similarly be used with a <code>-</code> prefix to skip lines at the tail of a file. The notation is {compact,powerful,subtle,implementation dependent}.
+</p>
+<p><a id="fn3" href="#fn3link">[3]</a> <code>Sort -m</code> is a sort which doesn&#8217;t really sort &#8212; its inputs should already be sorted &#8212; rather like the <code>+n</code> option turning <code>tail</code> on its head.
+</p>
+<p><a id="fn4" href="#fn4link">[4]</a> The series is infinite in theory only: at time <code>n</code> the number of items in the <code>has_prime_factors</code> dictionary equals the number of primes less than <code>n</code>, and each key in this dictionary is larger than <code>n</code>. So resource use increases steadily as <code>n</code> increases.
+</p>
+<p><a id="fn5" href="#fn5link">[5]</a> I used a MacBook laptop used to run these scripts. 
+</p>
+<pre>
+  Model Name:               MacBook
+  Model Identifier:         MacBook1,1
+  Processor Name:           Intel Core Duo
+  Processor Speed:          2 GHz
+  Number Of Processors:     1
+  Total Number Of Cores:    2
+  L2 Cache (per processor): 2 MB
+  Memory:                   2 GB
+  Bus Speed:                667 MHz
+</pre>
+
+</div>
+
+
+<div class="atomentry" id="productivity">
 <h2 class="title"><a href="/articles/productivity">Productivity++ != Better</a></h2>
-<p class="meta"><abbr class="published" title="2017-07-14">2017-07-14</abbr> &bull; <a href="/tag/accu" rel="tag">ACCU</a> &bull; <a href="/articles/productivity#disqus_thread">Comments</a></p>
+<p class="meta"><abbr class="published" title="2016-07-14">2016-07-14</abbr> &bull; <a href="/tag/accu" rel="tag">ACCU</a> &bull; <a href="/articles/productivity#disqus_thread">Comments</a></p>
 <p>When it comes to productivity there seems to be an assumption that it&#8217;s a good thing, and that more equals better. I&#8217;d like to question that. What matters is producing the right stuff, whatever that is, and if you&#8217;re not sure, producing less would be better.
 </p>
 <p>It can be hard to cancel work which is in progress or which has already been completed, even though, as software developers, version control can faithfully store and restore our work should we need it.
@@ -836,95 +1458,6 @@ May you share freely, never taking more than you give.</p></blockquote>
 </div>
 
 
-<div class="atomentry" id="2147483647">
-<h2 class="title"><a href="/articles/2147483647">2147483647</a></h2>
-<p class="meta"><abbr class="published" title="2015-02-12">2015-02-12</abbr> &bull; <a href="/tag/c" rel="tag">C</a>, <a href="/tag/c++" rel="tag">C++</a> &bull; <a href="/articles/2147483647#disqus_thread">Comments</a></p>
-<h1>Magic!</h1>
-<p>When software developers refer to &#8220;magic numbers&#8221; they mean those numeric literals which appear in a program without explanation &#8212; as if by magic. Consider the mysterious figures in this incantation:
-</p>
-<div class="typocode">
-
-<pre class="prettyprint">int cigarettes()
-{
-    return 365 * 20 * 10 + 2 * 20 + 17;
-}
-
-</pre>
-
-</div>
-
-<p>Why is the <code><a href="http://www.richardbeard.info/category/my-books/x20/
-">20</a></code> repeated? Does the first <code>20</code> mean the same as the second one? Could <code>365</code> be the number of days in a year? Named constants would make the code easier to read and maintain.
-</p>
-<p>Some numbers truly are <strong>magical</strong> though.
-</p>
-
-<h1>2147483647</h1>
-<p>The number 2147483647 is special and terrible.
-</p>
-<p>It&#8217;s a substantial number, far greater than the number of goals Lionel Messi has scored or the number of hot dinners I&#8217;ve eaten, and comparable with the number of heart beats in a lifetime or the number of instructions a processor executes in a second; but it&#8217;s not that large. You&#8217;ll need more than 2147483647 bytes to install a modern operating system, let alone store your video collection. And shuffling a pack of just 52 cards has 80658175170943878571660636856403766975289505440883277824000000000000 possible outcomes.
-</p>
-<p>If 2147483647 isn&#8217;t remarkable for its size it certainly has a noteworthy history. In 1772 the Swiss mathematician Leonhard Euler proved it a prime. I&#8217;m guessing it was the largest known prime at the time. Euler didn&#8217;t have a computer to hunt for primes so he narrowed the field by focusing on <a href="http://www.mersenne.org/">Mersenne numbers</a> &#8212; numbers one less than a power of two &#8212; a strategy which remains a winner even today, when computers are networked to search.
-</p>
-<p>Actually, 2147483647 is a double Mersenne prime, which is to say it takes the form 2<sup>m</sup> - 1, where <code>m</code> itself takes the form 2<sup>n</sup> - 1. 
-</p>
-<div class="typocode">
-
-<pre class="prettyprint">&gt;&gt;&gt; 2**(2**5 - 1) - 1
-2147483647
-
-</pre>
-
-</div>
-
-<p>Magic!
-</p>
-
-<h1>Dragons!</h1>
-<p>2147483647 has a special significance for C programmers, who know it by the name <code>INT_MAX</code>, and for C++ programmers, who demystify the digits as <code>std::numeric_limits&lt;int&gt;::max()</code>.
-</p>
-<p>Remember, 2147483647 is Mersenne(Mersenne(5)), which is Mersenne(31), or 2 to the power 31 minus 1. In binary arithmetic you add a zero on the right to multiply by 2 so 2 to the 31 is 1 followed by 31 zeros; and subtracting 1 leaves 31 1&#8217;s. It&#8217;s the largest signed value you can fit in a 32 bit register.
-</p>
-<div class="typocode">
-
-<pre class="prettyprint">&gt;&gt;&gt; mersenne31 = 2**31-1
-&gt;&gt;&gt; bin(mersenne31)
-'0b1111111111111111111111111111111'
-&gt;&gt;&gt; hex(mersenne31)
-'0x7fffffffL'
-&gt;&gt;&gt; mersenne31
-2147483647L
-
-</pre>
-
-</div>
-
-<p>It&#8217;s quite possible to inadvertantly increment an <code>int</code> which has reached <code>INT_MAX</code>. The result is undefined behaviour: anything could happen. 
-</p>
-<p><a href="http://en.wikipedia.org/wiki/Myth_of_the_Flat_Earth"><img src="/images/flammarion.jpg"/></a>
-</p>
-
-<h1>Gangnam Style</h1>
-<blockquote><p>We never thought a video would be watched in numbers greater than a 32-bit integer (=2,147,483,647 views), but that was before we met PSY. Gangnam Style has been viewed so many times we had to upgrade to a 64-bit integer (9,223,372,036,854,775,808)!
-</p>
-</blockquote><p>&mdash; <a href="https://plus.google.com/u/0/wm/4/+youtube/posts/BUXfdWqu86Q">youtube developers</a>
-</p>
-<img src="/images/psy.png" alt="Psy"/>
-
-<p>Exactly what undefined behaviour was provoked when PSY&#8217;s popularity broke the magic limit isn&#8217;t disclosed. Maybe a server leaked account details to North Korean hackers. Or maybe the video&#8217;s viewing figures were wrong for a while. 
-</p>
-<p>Note that the new limit of 9,223,372,036,854,775,808 is an unsigned value, which is exempt from this flavour of undefined behaviour and wraps to zero when you bump it up.
-</p>
-
-<h1>Bugwards compatibility</h1>
-<p>There&#8217;s another reason for preferring <code>INT_MAX</code> to the magical 2147483647: the two values might be different. 2147483647 is 2147483647 but <code>INT_MAX</code> depends on the implementation.
-</p>
-<p>A modern computer probably has 64 bit registers making a 64 bit <code>int</code> a more natural choice. However, for compatibility reasons, <code>int</code>s may intentionally be limited to 32 bits!
-</p>
-
-</div>
-
-
 <div class="extended">
 <p><a href="/articles/">Visit the Word Aligned archives...</a></p>
 </div>
@@ -968,10 +1501,10 @@ May you share freely, never taking more than you give.</p></blockquote>
 
 <div class="sidebar-node">
 <h3>Top Tags</h3>
-<ul id="categories"><li><a href="/tag/python" rel="tag">Python</a> <em>(114)</em></li>
+<ul id="categories"><li><a href="/tag/python" rel="tag">Python</a> <em>(115)</em></li>
 <li><a href="/tag/c++" rel="tag">C++</a> <em>(69)</em></li>
 <li><a href="/tag/self" rel="tag">Self</a> <em>(60)</em></li>
-<li><a href="/tag/puzzles" rel="tag">Puzzles</a> <em>(33)</em></li>
+<li><a href="/tag/puzzles" rel="tag">Puzzles</a> <em>(34)</em></li>
 <li><a href="/tag/accu" rel="tag">ACCU</a> <em>(33)</em></li>
 <li><a href="/tag/web-applications" rel="tag">Web Applications</a> <em>(27)</em></li>
 <li><a href="/tag/subversion" rel="tag">Subversion</a> <em>(27)</em></li>
@@ -983,7 +1516,7 @@ May you share freely, never taking more than you give.</p></blockquote>
 
 <div class="sidebar-node">
 <h3>All Tags</h3>
-<p><a href="/tag/accidents" rel="tag">accidents</a>, <a href="/tag/accu" rel="tag">accu</a>, <a href="/tag/algorithms" rel="tag">algorithms</a>, <a href="/tag/android" rel="tag">android</a>, <a href="/tag/apple" rel="tag">apple</a>, <a href="/tag/apple" rel="tag">apple</a>, <a href="/tag/arc" rel="tag">arc</a>, <a href="/tag/awk" rel="tag">awk</a>, <a href="/tag/books" rel="tag">books</a>, <a href="/tag/boost" rel="tag">boost</a>, <a href="/tag/bristol" rel="tag">bristol</a>, <a href="/tag/bugs" rel="tag">bugs</a>, <a href="/tag/build" rel="tag">build</a>, <a href="/tag/c" rel="tag">c</a>, <a href="/tag/c++" rel="tag">c++</a>, <a href="/tag/characters" rel="tag">characters</a>, <a href="/tag/charts" rel="tag">charts</a>, <a href="/tag/chess" rel="tag">chess</a>, <a href="/tag/clrs" rel="tag">clrs</a>, <a href="/tag/conferences" rel="tag">conferences</a>, <a href="/tag/content" rel="tag">content</a>, <a href="/tag/crabs" rel="tag">crabs</a>, <a href="/tag/curl" rel="tag">curl</a>, <a href="/tag/cvs" rel="tag">cvs</a>, <a href="/tag/cvs2svn" rel="tag">cvs2svn</a>, <a href="/tag/cycling" rel="tag">cycling</a>, <a href="/tag/decorators" rel="tag">decorators</a>, <a href="/tag/design" rel="tag">design</a>, <a href="/tag/disqus" rel="tag">disqus</a>, <a href="/tag/docbook" rel="tag">docbook</a>, <a href="/tag/documentation" rel="tag">documentation</a>, <a href="/tag/drawing" rel="tag">drawing</a>, <a href="/tag/dynamic-languages" rel="tag">dynamic-languages</a>, <a href="/tag/editors" rel="tag">editors</a>, <a href="/tag/emacs" rel="tag">emacs</a>, <a href="/tag/erlang" rel="tag">erlang</a>, <a href="/tag/esr" rel="tag">esr</a>, <a href="/tag/etc" rel="tag">etc</a>, <a href="/tag/europython" rel="tag">europython</a>, <a href="/tag/fractals" rel="tag">fractals</a>, <a href="/tag/functional-programming" rel="tag">functional-programming</a>, <a href="/tag/github" rel="tag">github</a>, <a href="/tag/go" rel="tag">go</a>, <a href="/tag/google" rel="tag">google</a>, <a href="/tag/graphics" rel="tag">graphics</a>, <a href="/tag/haskell" rel="tag">haskell</a>, <a href="/tag/ide" rel="tag">ide</a>, <a href="/tag/imagemagick" rel="tag">imagemagick</a>, <a href="/tag/iphone" rel="tag">iphone</a>, <a href="/tag/java" rel="tag">java</a>, <a href="/tag/knuth" rel="tag">knuth</a>, <a href="/tag/lcs" rel="tag">lcs</a>, <a href="/tag/lighttpd" rel="tag">lighttpd</a>, <a href="/tag/lisp" rel="tag">lisp</a>, <a href="/tag/markdown" rel="tag">markdown</a>, <a href="/tag/missiles" rel="tag">missiles</a>, <a href="/tag/ocr" rel="tag">ocr</a>, <a href="/tag/openid" rel="tag">openid</a>, <a href="/tag/oulipo" rel="tag">oulipo</a>, <a href="/tag/perec" rel="tag">perec</a>, <a href="/tag/perl" rel="tag">perl</a>, <a href="/tag/php" rel="tag">php</a>, <a href="/tag/pi" rel="tag">pi</a>, <a href="/tag/pictures" rel="tag">pictures</a>, <a href="/tag/pil" rel="tag">pil</a>, <a href="/tag/puzzles" rel="tag">puzzles</a>, <a href="/tag/python" rel="tag">python</a>, <a href="/tag/recommended" rel="tag">recommended</a>, <a href="/tag/recursion" rel="tag">recursion</a>, <a href="/tag/regex" rel="tag">regex</a>, <a href="/tag/reviews" rel="tag">reviews</a>, <a href="/tag/ruby" rel="tag">ruby</a>, <a href="/tag/ruby-on-rails" rel="tag">ruby-on-rails</a>, <a href="/tag/scheme" rel="tag">scheme</a>, <a href="/tag/scrum" rel="tag">scrum</a>, <a href="/tag/self" rel="tag">self</a>, <a href="/tag/shell" rel="tag">shell</a>, <a href="/tag/sicp" rel="tag">sicp</a>, <a href="/tag/spolsky" rel="tag">spolsky</a>, <a href="/tag/steganography" rel="tag">steganography</a>, <a href="/tag/streams" rel="tag">streams</a>, <a href="/tag/subversion" rel="tag">subversion</a>, <a href="/tag/syntax" rel="tag">syntax</a>, <a href="/tag/teamwork" rel="tag">teamwork</a>, <a href="/tag/tesseract" rel="tag">tesseract</a>, <a href="/tag/torvalds" rel="tag">torvalds</a>, <a href="/tag/trac" rel="tag">trac</a>, <a href="/tag/turing" rel="tag">turing</a>, <a href="/tag/two-wheels" rel="tag">two-wheels</a>, <a href="/tag/unix" rel="tag">unix</a>, <a href="/tag/virtualization" rel="tag">virtualization</a>, <a href="/tag/web-applications" rel="tag">web-applications</a>, <a href="/tag/webapplications" rel="tag">webapplications</a>, <a href="/tag/windows" rel="tag">windows</a>, <a href="/tag/zlib" rel="tag">zlib</a></p>
+<p><a href="/tag/accidents" rel="tag">accidents</a>, <a href="/tag/accu" rel="tag">accu</a>, <a href="/tag/algorithms" rel="tag">algorithms</a>, <a href="/tag/android" rel="tag">android</a>, <a href="/tag/apple" rel="tag">apple</a>, <a href="/tag/apple" rel="tag">apple</a>, <a href="/tag/arc" rel="tag">arc</a>, <a href="/tag/awk" rel="tag">awk</a>, <a href="/tag/books" rel="tag">books</a>, <a href="/tag/boost" rel="tag">boost</a>, <a href="/tag/bristol" rel="tag">bristol</a>, <a href="/tag/bugs" rel="tag">bugs</a>, <a href="/tag/build" rel="tag">build</a>, <a href="/tag/c" rel="tag">c</a>, <a href="/tag/c++" rel="tag">c++</a>, <a href="/tag/characters" rel="tag">characters</a>, <a href="/tag/charts" rel="tag">charts</a>, <a href="/tag/chess" rel="tag">chess</a>, <a href="/tag/clrs" rel="tag">clrs</a>, <a href="/tag/conferences" rel="tag">conferences</a>, <a href="/tag/content" rel="tag">content</a>, <a href="/tag/crabs" rel="tag">crabs</a>, <a href="/tag/curl" rel="tag">curl</a>, <a href="/tag/cvs" rel="tag">cvs</a>, <a href="/tag/cvs2svn" rel="tag">cvs2svn</a>, <a href="/tag/cycling" rel="tag">cycling</a>, <a href="/tag/decorators" rel="tag">decorators</a>, <a href="/tag/design" rel="tag">design</a>, <a href="/tag/disqus" rel="tag">disqus</a>, <a href="/tag/docbook" rel="tag">docbook</a>, <a href="/tag/documentation" rel="tag">documentation</a>, <a href="/tag/drawing" rel="tag">drawing</a>, <a href="/tag/dynamic-languages" rel="tag">dynamic-languages</a>, <a href="/tag/editors" rel="tag">editors</a>, <a href="/tag/emacs" rel="tag">emacs</a>, <a href="/tag/erlang" rel="tag">erlang</a>, <a href="/tag/esr" rel="tag">esr</a>, <a href="/tag/etc" rel="tag">etc</a>, <a href="/tag/europython" rel="tag">europython</a>, <a href="/tag/fractals" rel="tag">fractals</a>, <a href="/tag/functional-programming" rel="tag">functional-programming</a>, <a href="/tag/github" rel="tag">github</a>, <a href="/tag/go" rel="tag">go</a>, <a href="/tag/google" rel="tag">google</a>, <a href="/tag/graphics" rel="tag">graphics</a>, <a href="/tag/haskell" rel="tag">haskell</a>, <a href="/tag/ide" rel="tag">ide</a>, <a href="/tag/imagemagick" rel="tag">imagemagick</a>, <a href="/tag/iphone" rel="tag">iphone</a>, <a href="/tag/java" rel="tag">java</a>, <a href="/tag/knuth" rel="tag">knuth</a>, <a href="/tag/lcs" rel="tag">lcs</a>, <a href="/tag/lighttpd" rel="tag">lighttpd</a>, <a href="/tag/lisp" rel="tag">lisp</a>, <a href="/tag/markdown" rel="tag">markdown</a>, <a href="/tag/missiles" rel="tag">missiles</a>, <a href="/tag/ocr" rel="tag">ocr</a>, <a href="/tag/openid" rel="tag">openid</a>, <a href="/tag/oulipo" rel="tag">oulipo</a>, <a href="/tag/perec" rel="tag">perec</a>, <a href="/tag/perl" rel="tag">perl</a>, <a href="/tag/php" rel="tag">php</a>, <a href="/tag/pi" rel="tag">pi</a>, <a href="/tag/pictures" rel="tag">pictures</a>, <a href="/tag/pil" rel="tag">pil</a>, <a href="/tag/primes" rel="tag">primes</a>, <a href="/tag/puzzles" rel="tag">puzzles</a>, <a href="/tag/python" rel="tag">python</a>, <a href="/tag/recommended" rel="tag">recommended</a>, <a href="/tag/recursion" rel="tag">recursion</a>, <a href="/tag/regex" rel="tag">regex</a>, <a href="/tag/reviews" rel="tag">reviews</a>, <a href="/tag/ruby" rel="tag">ruby</a>, <a href="/tag/ruby-on-rails" rel="tag">ruby-on-rails</a>, <a href="/tag/scheme" rel="tag">scheme</a>, <a href="/tag/scrum" rel="tag">scrum</a>, <a href="/tag/self" rel="tag">self</a>, <a href="/tag/shell" rel="tag">shell</a>, <a href="/tag/sicp" rel="tag">sicp</a>, <a href="/tag/spolsky" rel="tag">spolsky</a>, <a href="/tag/steganography" rel="tag">steganography</a>, <a href="/tag/streams" rel="tag">streams</a>, <a href="/tag/subversion" rel="tag">subversion</a>, <a href="/tag/syntax" rel="tag">syntax</a>, <a href="/tag/teamwork" rel="tag">teamwork</a>, <a href="/tag/tesseract" rel="tag">tesseract</a>, <a href="/tag/torvalds" rel="tag">torvalds</a>, <a href="/tag/trac" rel="tag">trac</a>, <a href="/tag/turing" rel="tag">turing</a>, <a href="/tag/two-wheels" rel="tag">two-wheels</a>, <a href="/tag/unix" rel="tag">unix</a>, <a href="/tag/virtualization" rel="tag">virtualization</a>, <a href="/tag/web-applications" rel="tag">web-applications</a>, <a href="/tag/webapplications" rel="tag">webapplications</a>, <a href="/tag/windows" rel="tag">windows</a>, <a href="/tag/zlib" rel="tag">zlib</a></p>
 
 </div>
 
@@ -1000,7 +1533,7 @@ May you share freely, never taking more than you give.</p></blockquote>
 <div class="sidebar-node">
 <h3>Chain</h3>
 <ul>
-<li><a accesskey="p" href="/articles/productivity" title="First article">&raquo; Productivity++ != Better</a></li>
+<li><a accesskey="p" href="/articles/python-streams-vs-unix-pipes" title="First article">&raquo; Python Streams vs Unix Pipes</a></li>
 
 </ul>
 
