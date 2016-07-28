@@ -125,10 +125,10 @@ def stream_merge(*ss):
     [1, 3, 5, 7, 9, 11, 13, 15, 17, 19]
     '''
     lo, hi = itertools.tee(s)
-    csum = sum(hi.next() for _ in range(n))
+    csum = sum(next(hi) for _ in range(n))
     while True:
         yield csum
-        csum += hi.next() - lo.next()
+        csum += next(hi) - next(lo)
 
 </pre>
 
@@ -162,7 +162,7 @@ def stream_merge(*ss):
 &gt;&gt;&gt; csums = [consecutive_sum(p, n) for p, n in zip(ps, lens)]
 &gt;&gt;&gt; solns = (n for n, g in groupby(stream_merge(*csums)) 
              if len(list(g)) == N)
-&gt;&gt;&gt; solns.next()
+&gt;&gt;&gt; next(solns)
 7002221
 
 </pre>
