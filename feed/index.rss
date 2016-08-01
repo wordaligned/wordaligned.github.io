@@ -7,6 +7,184 @@
 <dc:creator>tag@wordaligned.org</dc:creator>
 <language>en-gb</language>
 <item>
+<title>Negative Sequence Indices in Python</title>
+<description>&lt;p&gt;Supply a negative index when accessing a sequence and Python counts back from the end. So, for example, &lt;code&gt;my_list[-2]&lt;/code&gt; is the penultimate element of &lt;code&gt;my_list&lt;/code&gt;, which is much better than &lt;code&gt;my_list[len(my_list)-2]&lt;/code&gt; or even &lt;code&gt;*(++my_list.rbegin())&lt;/code&gt;.
+&lt;/p&gt;
+&lt;p&gt;That final example uses one of C++&amp;#8217;s reverse iterators. It gets the penultimate element of a collection by advancing an iterator from the reversed beginning of that collection. If you&amp;#8217;re addicted to negative indices you &lt;strong&gt;can&lt;/strong&gt; use them with C++ arrays, sort of.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;Negative array indices in C++&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;#include &amp;lt;iostream&amp;gt;
+
+int main()
+{
+    char const * domain = "wordaligned.org";
+    char const * end = domain + strlen(domain);
+    std::cout &amp;lt;&amp;lt; end[-3] &amp;lt;&amp;lt; end[-2] &amp;lt;&amp;lt; end[-1] &amp;lt;&amp;lt; '\n';
+    return 0;
+}
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Compiling and running this program outputs the string &amp;#8220;org&amp;#8221;.
+&lt;/p&gt;
+&lt;p&gt;Going back to Python, the valid indices into a sequence of length &lt;code&gt;L&lt;/code&gt; are &lt;code&gt;-L&lt;/code&gt;, &lt;code&gt;-L+1&lt;/code&gt;, &amp;#8230; , &lt;code&gt;0&lt;/code&gt;, &lt;code&gt;1&lt;/code&gt;, &amp;#8230; &lt;code&gt;L-1&lt;/code&gt;. Whenever you write code to calculate an index used for accessing a sequence, and especially if you&amp;#8217;re catching any resulting &lt;code&gt;IndexError&lt;/code&gt;s, it&amp;#8217;s worth checking if the result of the calculation can be negative, and if &amp;#8212; in this case &amp;#8212; you really do want the from-the-back indexing behaviour.
+&lt;/p&gt;
+&lt;div&gt;&lt;div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;"&gt;&amp;nbsp;&lt;/div&gt;&lt;div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;"&gt;&amp;nbsp;&lt;/div&gt;&lt;div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;"&gt;&amp;nbsp;&lt;/div&gt;&lt;div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;"&gt;&amp;nbsp;&lt;/div&gt;&lt;div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;"&gt;0&lt;/div&gt;&lt;div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;"&gt;1&lt;/div&gt;&lt;div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;"&gt;2&lt;/div&gt;&lt;div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;"&gt;3&lt;/div&gt;&lt;div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;"&gt;4&lt;/div&gt;&lt;div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;"&gt;5&lt;/div&gt;&lt;div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;"&gt;6&lt;/div&gt;&lt;div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;"&gt;7&lt;/div&gt;&lt;div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;"&gt;8&lt;/div&gt;&lt;div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;"&gt;9&lt;/div&gt;&lt;div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;"&gt;10&lt;/div&gt;&lt;div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;"&gt;11&lt;/div&gt;&lt;div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;"&gt;12&lt;/div&gt;&lt;div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;"&gt;13&lt;/div&gt;&lt;div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;"&gt;&amp;hellip;&lt;/div&gt;&lt;/div&gt;
+&lt;div&gt;&lt;div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;"&gt;&amp;nbsp;&lt;/div&gt;&lt;div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;"&gt;&amp;nbsp;&lt;/div&gt;&lt;div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;"&gt;&amp;nbsp;&lt;/div&gt;&lt;div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;"&gt;&amp;nbsp;&lt;/div&gt;&lt;div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;"&gt;W&lt;/div&gt;&lt;div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;"&gt;O&lt;/div&gt;&lt;div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;"&gt;R&lt;/div&gt;&lt;div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;"&gt;D&lt;/div&gt;&lt;div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;"&gt;A&lt;/div&gt;&lt;div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;"&gt;L&lt;/div&gt;&lt;div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;"&gt;I&lt;/div&gt;&lt;div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;"&gt;G&lt;/div&gt;&lt;div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;"&gt;N&lt;/div&gt;&lt;div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;"&gt;E&lt;/div&gt;&lt;div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;"&gt;D&lt;/div&gt;&lt;div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;"&gt;&amp;nbsp;&lt;/div&gt;&lt;div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;"&gt;&amp;nbsp;&lt;/div&gt;&lt;div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;"&gt;&amp;nbsp;&lt;/div&gt;&lt;div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;"&gt;&amp;nbsp;&lt;/div&gt;&lt;/div&gt;
+&lt;div&gt;&lt;div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;"&gt;&amp;hellip;&lt;/div&gt;&lt;div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;"&gt;-14&lt;/div&gt;&lt;div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;"&gt;-13&lt;/div&gt;&lt;div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;"&gt;-12&lt;/div&gt;&lt;div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;"&gt;-11&lt;/div&gt;&lt;div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;"&gt;-10&lt;/div&gt;&lt;div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;"&gt;-9&lt;/div&gt;&lt;div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;"&gt;-8&lt;/div&gt;&lt;div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;"&gt;-7&lt;/div&gt;&lt;div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;"&gt;-6&lt;/div&gt;&lt;div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;"&gt;-5&lt;/div&gt;&lt;div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;"&gt;-4&lt;/div&gt;&lt;div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;"&gt;-3&lt;/div&gt;&lt;div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;"&gt;-2&lt;/div&gt;&lt;div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;"&gt;-1&lt;/div&gt;&lt;div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;"&gt;&amp;nbsp;&lt;/div&gt;&lt;div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;"&gt;&amp;nbsp;&lt;/div&gt;&lt;div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;"&gt;&amp;nbsp;&lt;/div&gt;&lt;div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;"&gt;&amp;nbsp;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;The power of negative indices increases with slicing. Take a slice of a sequence by supplying begin and end indices.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; domain = 'wordaligned.org'
+&amp;gt;&amp;gt;&amp;gt; domain[4:9]
+'align'
+&amp;gt;&amp;gt;&amp;gt; domain[4:-4]
+'aligned'
+&amp;gt;&amp;gt;&amp;gt; digits = list(range(10))
+&amp;gt;&amp;gt;&amp;gt; digits
+[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+&amp;gt;&amp;gt;&amp;gt; digits[3:4]
+[3]
+&amp;gt;&amp;gt;&amp;gt; digits[1:-1]
+[1, 2, 3, 4, 5, 6, 7, 8]
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Omitting an index defaults it to the end of the sequence. Omit both indices and both ends of the sequence are defaulted, giving a sliced copy.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; domain[-3:]
+'org'
+&amp;gt;&amp;gt;&amp;gt; domain[:4]
+'word'
+&amp;gt;&amp;gt;&amp;gt; digits[:]
+[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;I prefer the &lt;code&gt;list(digits)&lt;/code&gt; form for copying &lt;code&gt;digits&lt;/code&gt; but you should certainly be familiar with the &lt;code&gt;digits[:]&lt;/code&gt; version.
+&lt;/p&gt;
+&lt;p&gt;You can supply any indices as slice limits, even ones which wouldn&amp;#8217;t be valid for item access. Imagine laying your sequence out on an indexed chopping board, slicing it at the specified points, then taking whatever lies between these points.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; digits[-1000000]
+Traceback (most recent call last):
+  File "&amp;lt;stdin&amp;gt;", line 1, in &amp;lt;module&amp;gt;
+IndexError: list index out of range
+&amp;gt;&amp;gt;&amp;gt; digits[1000000]
+Traceback (most recent call last):
+  File "&amp;lt;stdin&amp;gt;", line 1, in &amp;lt;module&amp;gt;
+IndexError: list index out of range
+&amp;gt;&amp;gt;&amp;gt; digits[-1000000:1000000]
+[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Sequence slicing also takes a step parameter.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; digits[::2]
+[0, 2, 4, 6, 8]
+&amp;gt;&amp;gt;&amp;gt; digits[1::2]
+[1, 3, 5, 7, 9]
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;This parameter too can be negative. The sign of the step affects which limiting values the &lt;code&gt;begin&lt;/code&gt; and &lt;code&gt;end&lt;/code&gt; slice parameters default to. It&amp;#8217;s subtle behaviour, but you soon get used to it.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; digits[0:10:-2]
+[]
+&amp;gt;&amp;gt;&amp;gt; digits[::-2]
+[9, 7, 5, 3, 1]
+&amp;gt;&amp;gt;&amp;gt; digits[-2::-2]
+[8, 6, 4, 2, 0]
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;How do you reverse a string? Slice it back to front!
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; domain[::-1]
+'gro.dengiladrow'
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;To recap: the default slice limits are the start and end of the sequence, &lt;code&gt;0&lt;/code&gt; and &lt;code&gt;-1&lt;/code&gt;, or &lt;code&gt;-1&lt;/code&gt; and &lt;code&gt;0&lt;/code&gt; if the step is negative. The default step is &lt;code&gt;1&lt;/code&gt; whichever way round the limits are. When slicing, &lt;code&gt;s[i:j:k]&lt;/code&gt;, &lt;code&gt;i&lt;/code&gt; and &lt;code&gt;j&lt;/code&gt; may take any integer value, and &lt;code&gt;k&lt;/code&gt; can take any integer value &lt;strong&gt;except&lt;/strong&gt; &lt;code&gt;0&lt;/code&gt;.
+&lt;/p&gt;
+&lt;p&gt;The zero value creates another interesting edge case. Here&amp;#8217;s a function to return the last &lt;code&gt;n&lt;/code&gt; items of a sequence.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; def tail(xs, n)
+...     return xs[-n:]
+...
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;It fails when &lt;code&gt;n&lt;/code&gt; is &lt;code&gt;0&lt;/code&gt;.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; tail(digits, 3)
+[7, 8, 9]
+&amp;gt;&amp;gt;&amp;gt; tail(digits, 2)
+[8, 9]
+&amp;gt;&amp;gt;&amp;gt; tail(digits, 1)
+[9]
+&amp;gt;&amp;gt;&amp;gt; tail(digits, 0)
+[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;By the way, we&amp;#8217;ve already seen slicing working well with lists and strings. It also works nicely with range objects.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; r = range(10)
+&amp;gt;&amp;gt;&amp;gt; r[::2]
+range(0, 10, 2)
+&amp;gt;&amp;gt;&amp;gt; r[1::2]
+range(1, 10, 2)
+
+&lt;/pre&gt;
+
+&lt;/div&gt;</description>
+<dc:date>2016-08-01</dc:date>
+<guid>http://wordaligned.org/articles/negative-sequence-indices-in-python</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/negative-sequence-indices-in-python</link>
+<category>Python</category>
+<category>C++</category>
+</item>
+
+<item>
 <title>Python Streams vs Unix Pipes</title>
 <description>&lt;div class="toc"&gt;
 &lt;h2&gt;Contents&lt;/h2&gt;
@@ -1813,130 +1991,6 @@ Williams             42.40
 <author>tag@wordaligned.org (Thomas Guest)</author>
 <link>http://wordaligned.org/articles/python-averages</link>
 <category>Python</category>
-</item>
-
-<item>
-<title>Group When</title>
-<description>&lt;p&gt;Phil Nash&amp;#8217;s recent tweet intrigued me.
-&lt;/p&gt;
-&lt;div&gt;&lt;blockquote class="twitter-tweet" lang="en"&gt;&lt;p&gt;Functional people: I often (in F#) need to process a seq into a smaller list or seq &amp;ndash; where items from the input are grouped in some way&amp;hellip;&lt;/p&gt;&amp;mdash; Phil Nash (@phil_nash) &lt;a href="https://twitter.com/phil_nash/statuses/489167611641724928"&gt;July 15, 2014&lt;/a&gt;&lt;/blockquote&gt;&lt;blockquote class="twitter-tweet" lang="en"&gt;&lt;p&gt;&amp;hellip; the need to group may not be known until after the first item in the group.&amp;#10;I struggle to find a nicely functional way to do this. Ideas?&lt;/p&gt;&amp;mdash; Phil Nash (@phil_nash) &lt;a href="https://twitter.com/phil_nash/statuses/489167962931482626"&gt;July 15, 2014&lt;/a&gt;&lt;/blockquote&gt;&lt;script async src="http://wordaligned.org//platform.twitter.com/widgets.js" charset="utf-8"&gt;&lt;/script&gt;&lt;/div&gt;
-
-&lt;p&gt;He later clarified what he was after &amp;#8212; and had now found &amp;#8212; linking to a &lt;a href="http://fssnip.net/6A"&gt;solution&lt;/a&gt; posted a couple of years ago by &lt;a href="http://tomasp.net"&gt;Tomas Petricek&lt;/a&gt;. The function &lt;code&gt;groupWhen&lt;/code&gt; splits a sequence into groups, starting a new group whenever the predicate returns true.
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
-
-&lt;pre class="prettyprint"&gt; module Seq =
-   /// Iterates over elements of the input sequence and groups adjacent elements.
-   /// A new group is started when the specified predicate holds about the element
-   /// of the sequence (and at the beginning of the iteration).
-   ///
-   /// For example: 
-   ///    Seq.groupWhen isOdd [3;3;2;4;1;2] = seq [[3]; [3; 2; 4]; [1; 2]]
-   let groupWhen f (input:seq&amp;lt;_&amp;gt;) = seq {
-     use en = input.GetEnumerator()
-     let running = ref true
-     
-     // Generate a group starting with the current element. Stops generating
-     // when it founds element such that 'f en.Current' is 'true'
-     let rec group() = 
-       [ yield en.Current
-         if en.MoveNext() then
-           if not (f en.Current) then yield! group() 
-         else running := false ]
-     
-     if en.MoveNext() then
-       // While there are still elements, start a new group
-       while running.Value do
-         yield group() |&amp;gt; Seq.ofList }
-
-&lt;/pre&gt;
-
-&lt;/div&gt;
-
-&lt;p&gt;Here&amp;#8217;s a nice Haskell version coded up by &lt;a href="https://twitter.com/sdarlington"&gt;@sdarlington&lt;/a&gt;.
-&lt;/p&gt;
-&lt;script src="https://gist.github.com/sdarlington/be76048bff124694769d.js"&gt;&lt;/script&gt;
-
-&lt;p&gt;Maybe &lt;a href="https://docs.python.org/3/library/itertools.html#itertools.takewhile"&gt;takewhile&lt;/a&gt; and &lt;a href="https://docs.python.org/3/library/itertools.html#itertools.dropwhile"&gt;dropwhile&lt;/a&gt; could power a Python solution, but my first choice would be &lt;a href="https://docs.python.org/3/library/itertools.html#itertools.groupby"&gt;itertools.groupby&lt;/a&gt;. &lt;code&gt;Groupby&lt;/code&gt; chops a sequence into subsequences, where the elements of each subsequence have the same key value. A suitable key function, in this case, must change its return value every time the sequence yields an element for which the predicate holds. It could toggle between a pair of values, for example. Or it could just count the number of times the predicate holds.
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
-
-&lt;pre class="prettyprint"&gt;class count_p:
-    ''' Return a value which increments every time the predicate holds.
-    '''
-    def __init__(self, pred):
-        self._n = 0
-        self._pred = pred
-    
-    def __call__(self, v):
-        self._n += self._pred(v)
-        return self._n
-
-def group_when(pred, xs):
-    return (gp for _, gp in groupby(xs, count_p(pred)))
-
-&lt;/pre&gt;
-
-&lt;/div&gt;
-
-&lt;p&gt;Here, &lt;code&gt;group_when&lt;/code&gt; accepts an iterable and returns an iterable sequence of iterable groups. Clients choose how to consume the results.
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
-
-&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; def odd(v): return v % 2
-&amp;gt;&amp;gt;&amp;gt; xs = group_when(odd, [3, 3, 2, 4, 1, 2])
-&amp;gt;&amp;gt;&amp;gt; print([list(g) for g in xs])
-[[3], [3, 2, 4], [1, 2]]
-
-&lt;/pre&gt;
-
-&lt;/div&gt;
-
-&lt;p&gt;Note that &lt;code&gt;count_p&lt;/code&gt; does something very like &lt;a href="acc"&gt;itertools.accumulate&lt;/a&gt;. Here&amp;#8217;s another version of &lt;code&gt;group_when&lt;/code&gt; which takes advantage of this.
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
-
-&lt;pre class="prettyprint"&gt;def group_when(pred, xs):
-    xs, ys = tee(xs)
-    accu = accumulate(map(pred, ys))
-    return (gp for _, gp in groupby(xs, lambda _: next(accu)))
-
-&lt;/pre&gt;
-
-&lt;/div&gt;
-
-&lt;p style="text-align:center"&gt;&amp;sect;&lt;/p&gt;
-
-&lt;p&gt;After a short break, here&amp;#8217;s a third version of &lt;code&gt;group_when&lt;/code&gt;. This is the first time I&amp;#8217;ve found a use for &lt;code&gt;takewhile&lt;/code&gt; and &lt;code&gt;dropwhile&lt;/code&gt;. Beware: as the teed streams &lt;code&gt;xs&lt;/code&gt; and &lt;code&gt;ys&lt;/code&gt; diverge, the amount of backing storage required will grow &amp;#8230; only for the stored values to then be dropped!
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
-
-&lt;pre class="prettyprint"&gt;from itertools import *
- 
-def group_when(p, xs):
-    def notp(x): return not p(x)
-    xs = iter(xs)
-    while True:
-        x = next(xs)
-        xs, ys = tee(xs)
-        yield chain([x], takewhile(notp, xs))
-        xs = dropwhile(notp, ys)
- 
-def odd(x):
-    return x % 2
- 
-[list(g) for g in group_when(odd, [3, 3, 2, 4, 1, 2])] # [[3], [3, 2, 4], [1, 2]]
-
-&lt;/pre&gt;
-
-&lt;/div&gt;</description>
-<dc:date>2014-07-16</dc:date>
-<guid>http://wordaligned.org/articles/group-when</guid>
-<author>tag@wordaligned.org (Thomas Guest)</author>
-<link>http://wordaligned.org/articles/group-when</link>
-<category>Python</category>
-<category>Haskell</category>
-<category>Streams</category>
 </item>
 
 </channel>

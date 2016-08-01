@@ -7,6 +7,183 @@
 <dc:creator>tag@wordaligned.org</dc:creator>
 <language>en-gb</language>
 <item>
+<title>Negative Sequence Indices in Python</title>
+<description>&lt;p&gt;Supply a negative index when accessing a sequence and Python counts back from the end. So, for example, &lt;code&gt;my_list[-2]&lt;/code&gt; is the penultimate element of &lt;code&gt;my_list&lt;/code&gt;, which is much better than &lt;code&gt;my_list[len(my_list)-2]&lt;/code&gt; or even &lt;code&gt;*(++my_list.rbegin())&lt;/code&gt;.
+&lt;/p&gt;
+&lt;p&gt;That final example uses one of C++&amp;#8217;s reverse iterators. It gets the penultimate element of a collection by advancing an iterator from the reversed beginning of that collection. If you&amp;#8217;re addicted to negative indices you &lt;strong&gt;can&lt;/strong&gt; use them with C++ arrays, sort of.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;Negative array indices in C++&lt;/div&gt;
+
+&lt;pre class="prettyprint"&gt;#include &amp;lt;iostream&amp;gt;
+
+int main()
+{
+    char const * domain = "wordaligned.org";
+    char const * end = domain + strlen(domain);
+    std::cout &amp;lt;&amp;lt; end[-3] &amp;lt;&amp;lt; end[-2] &amp;lt;&amp;lt; end[-1] &amp;lt;&amp;lt; '\n';
+    return 0;
+}
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Compiling and running this program outputs the string &amp;#8220;org&amp;#8221;.
+&lt;/p&gt;
+&lt;p&gt;Going back to Python, the valid indices into a sequence of length &lt;code&gt;L&lt;/code&gt; are &lt;code&gt;-L&lt;/code&gt;, &lt;code&gt;-L+1&lt;/code&gt;, &amp;#8230; , &lt;code&gt;0&lt;/code&gt;, &lt;code&gt;1&lt;/code&gt;, &amp;#8230; &lt;code&gt;L-1&lt;/code&gt;. Whenever you write code to calculate an index used for accessing a sequence, and especially if you&amp;#8217;re catching any resulting &lt;code&gt;IndexError&lt;/code&gt;s, it&amp;#8217;s worth checking if the result of the calculation can be negative, and if &amp;#8212; in this case &amp;#8212; you really do want the from-the-back indexing behaviour.
+&lt;/p&gt;
+&lt;div&gt;&lt;div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;"&gt;&amp;nbsp;&lt;/div&gt;&lt;div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;"&gt;&amp;nbsp;&lt;/div&gt;&lt;div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;"&gt;&amp;nbsp;&lt;/div&gt;&lt;div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;"&gt;&amp;nbsp;&lt;/div&gt;&lt;div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;"&gt;0&lt;/div&gt;&lt;div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;"&gt;1&lt;/div&gt;&lt;div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;"&gt;2&lt;/div&gt;&lt;div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;"&gt;3&lt;/div&gt;&lt;div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;"&gt;4&lt;/div&gt;&lt;div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;"&gt;5&lt;/div&gt;&lt;div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;"&gt;6&lt;/div&gt;&lt;div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;"&gt;7&lt;/div&gt;&lt;div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;"&gt;8&lt;/div&gt;&lt;div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;"&gt;9&lt;/div&gt;&lt;div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;"&gt;10&lt;/div&gt;&lt;div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;"&gt;11&lt;/div&gt;&lt;div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;"&gt;12&lt;/div&gt;&lt;div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;"&gt;13&lt;/div&gt;&lt;div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;"&gt;&amp;hellip;&lt;/div&gt;&lt;/div&gt;
+&lt;div&gt;&lt;div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;"&gt;&amp;nbsp;&lt;/div&gt;&lt;div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;"&gt;&amp;nbsp;&lt;/div&gt;&lt;div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;"&gt;&amp;nbsp;&lt;/div&gt;&lt;div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;"&gt;&amp;nbsp;&lt;/div&gt;&lt;div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;"&gt;W&lt;/div&gt;&lt;div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;"&gt;O&lt;/div&gt;&lt;div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;"&gt;R&lt;/div&gt;&lt;div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;"&gt;D&lt;/div&gt;&lt;div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;"&gt;A&lt;/div&gt;&lt;div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;"&gt;L&lt;/div&gt;&lt;div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;"&gt;I&lt;/div&gt;&lt;div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;"&gt;G&lt;/div&gt;&lt;div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;"&gt;N&lt;/div&gt;&lt;div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;"&gt;E&lt;/div&gt;&lt;div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;"&gt;D&lt;/div&gt;&lt;div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;"&gt;&amp;nbsp;&lt;/div&gt;&lt;div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;"&gt;&amp;nbsp;&lt;/div&gt;&lt;div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;"&gt;&amp;nbsp;&lt;/div&gt;&lt;div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;"&gt;&amp;nbsp;&lt;/div&gt;&lt;/div&gt;
+&lt;div&gt;&lt;div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;"&gt;&amp;hellip;&lt;/div&gt;&lt;div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;"&gt;-14&lt;/div&gt;&lt;div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;"&gt;-13&lt;/div&gt;&lt;div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;"&gt;-12&lt;/div&gt;&lt;div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;"&gt;-11&lt;/div&gt;&lt;div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;"&gt;-10&lt;/div&gt;&lt;div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;"&gt;-9&lt;/div&gt;&lt;div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;"&gt;-8&lt;/div&gt;&lt;div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;"&gt;-7&lt;/div&gt;&lt;div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;"&gt;-6&lt;/div&gt;&lt;div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;"&gt;-5&lt;/div&gt;&lt;div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;"&gt;-4&lt;/div&gt;&lt;div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;"&gt;-3&lt;/div&gt;&lt;div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;"&gt;-2&lt;/div&gt;&lt;div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;"&gt;-1&lt;/div&gt;&lt;div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;"&gt;&amp;nbsp;&lt;/div&gt;&lt;div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;"&gt;&amp;nbsp;&lt;/div&gt;&lt;div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;"&gt;&amp;nbsp;&lt;/div&gt;&lt;div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;"&gt;&amp;nbsp;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;The power of negative indices increases with slicing. Take a slice of a sequence by supplying begin and end indices.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; domain = 'wordaligned.org'
+&amp;gt;&amp;gt;&amp;gt; domain[4:9]
+'align'
+&amp;gt;&amp;gt;&amp;gt; domain[4:-4]
+'aligned'
+&amp;gt;&amp;gt;&amp;gt; digits = list(range(10))
+&amp;gt;&amp;gt;&amp;gt; digits
+[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+&amp;gt;&amp;gt;&amp;gt; digits[3:4]
+[3]
+&amp;gt;&amp;gt;&amp;gt; digits[1:-1]
+[1, 2, 3, 4, 5, 6, 7, 8]
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Omitting an index defaults it to the end of the sequence. Omit both indices and both ends of the sequence are defaulted, giving a sliced copy.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; domain[-3:]
+'org'
+&amp;gt;&amp;gt;&amp;gt; domain[:4]
+'word'
+&amp;gt;&amp;gt;&amp;gt; digits[:]
+[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;I prefer the &lt;code&gt;list(digits)&lt;/code&gt; form for copying &lt;code&gt;digits&lt;/code&gt; but you should certainly be familiar with the &lt;code&gt;digits[:]&lt;/code&gt; version.
+&lt;/p&gt;
+&lt;p&gt;You can supply any indices as slice limits, even ones which wouldn&amp;#8217;t be valid for item access. Imagine laying your sequence out on an indexed chopping board, slicing it at the specified points, then taking whatever lies between these points.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; digits[-1000000]
+Traceback (most recent call last):
+  File "&amp;lt;stdin&amp;gt;", line 1, in &amp;lt;module&amp;gt;
+IndexError: list index out of range
+&amp;gt;&amp;gt;&amp;gt; digits[1000000]
+Traceback (most recent call last):
+  File "&amp;lt;stdin&amp;gt;", line 1, in &amp;lt;module&amp;gt;
+IndexError: list index out of range
+&amp;gt;&amp;gt;&amp;gt; digits[-1000000:1000000]
+[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Sequence slicing also takes a step parameter.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; digits[::2]
+[0, 2, 4, 6, 8]
+&amp;gt;&amp;gt;&amp;gt; digits[1::2]
+[1, 3, 5, 7, 9]
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;This parameter too can be negative. The sign of the step affects which limiting values the &lt;code&gt;begin&lt;/code&gt; and &lt;code&gt;end&lt;/code&gt; slice parameters default to. It&amp;#8217;s subtle behaviour, but you soon get used to it.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; digits[0:10:-2]
+[]
+&amp;gt;&amp;gt;&amp;gt; digits[::-2]
+[9, 7, 5, 3, 1]
+&amp;gt;&amp;gt;&amp;gt; digits[-2::-2]
+[8, 6, 4, 2, 0]
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;How do you reverse a string? Slice it back to front!
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; domain[::-1]
+'gro.dengiladrow'
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;To recap: the default slice limits are the start and end of the sequence, &lt;code&gt;0&lt;/code&gt; and &lt;code&gt;-1&lt;/code&gt;, or &lt;code&gt;-1&lt;/code&gt; and &lt;code&gt;0&lt;/code&gt; if the step is negative. The default step is &lt;code&gt;1&lt;/code&gt; whichever way round the limits are. When slicing, &lt;code&gt;s[i:j:k]&lt;/code&gt;, &lt;code&gt;i&lt;/code&gt; and &lt;code&gt;j&lt;/code&gt; may take any integer value, and &lt;code&gt;k&lt;/code&gt; can take any integer value &lt;strong&gt;except&lt;/strong&gt; &lt;code&gt;0&lt;/code&gt;.
+&lt;/p&gt;
+&lt;p&gt;The zero value creates another interesting edge case. Here&amp;#8217;s a function to return the last &lt;code&gt;n&lt;/code&gt; items of a sequence.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; def tail(xs, n)
+...     return xs[-n:]
+...
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;It fails when &lt;code&gt;n&lt;/code&gt; is &lt;code&gt;0&lt;/code&gt;.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; tail(digits, 3)
+[7, 8, 9]
+&amp;gt;&amp;gt;&amp;gt; tail(digits, 2)
+[8, 9]
+&amp;gt;&amp;gt;&amp;gt; tail(digits, 1)
+[9]
+&amp;gt;&amp;gt;&amp;gt; tail(digits, 0)
+[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;By the way, we&amp;#8217;ve already seen slicing working well with lists and strings. It also works nicely with range objects.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; r = range(10)
+&amp;gt;&amp;gt;&amp;gt; r[::2]
+range(0, 10, 2)
+&amp;gt;&amp;gt;&amp;gt; r[1::2]
+range(1, 10, 2)
+
+&lt;/pre&gt;
+
+&lt;/div&gt;</description>
+<dc:date>2016-08-01</dc:date>
+<guid>http://wordaligned.org/articles/negative-sequence-indices-in-python</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/negative-sequence-indices-in-python</link>
+<category>C++</category>
+</item>
+
+<item>
 <title>8 Queens Puzzle++</title>
 <description>&lt;p&gt;&lt;a href="http://wordaligned.org/articles/8-queens-puzzle"&gt;Yesterday I wrote about&lt;/a&gt; a Python solution to the 8 Queens puzzle.
 &lt;/p&gt;
@@ -3731,440 +3908,6 @@ $ echo 007 0x80 110 | ./integer_literal_value
 <guid>http://wordaligned.org/articles/inner-outer-shake-it-all-abouter</guid>
 <author>tag@wordaligned.org (Thomas Guest)</author>
 <link>http://wordaligned.org/articles/inner-outer-shake-it-all-abouter</link>
-<category>C++</category>
-</item>
-
-<item>
-<title>Copy, load, redirect and tee using C++ streambufs</title>
-<description>&lt;div class="toc"&gt;
-&lt;h2&gt;Contents&lt;/h2&gt;
-&lt;ul&gt;
- &lt;li&gt;&lt;a href="http://wordaligned.org/articles/cpp-streambufs#toccout-or-printf" name="toc0" id="toc0"&gt;Cout or printf?&lt;/a&gt;
- &lt;/li&gt;
-
- &lt;li&gt;&lt;a href="http://wordaligned.org/articles/cpp-streambufs#tocexposed-buffers" name="toc1" id="toc1"&gt;Exposed buffers&lt;/a&gt;
- &lt;/li&gt;
-
- &lt;li&gt;&lt;a href="http://wordaligned.org/articles/cpp-streambufs#toccopy-streams" name="toc2" id="toc2"&gt;Copy streams&lt;/a&gt;
- &lt;/li&gt;
-
- &lt;li&gt;&lt;a href="http://wordaligned.org/articles/cpp-streambufs#tocload-streams" name="toc3" id="toc3"&gt;Load streams&lt;/a&gt;
- &lt;/li&gt;
-
- &lt;li&gt;&lt;a href="http://wordaligned.org/articles/cpp-streambufs#tocredirect-streams" name="toc4" id="toc4"&gt;Redirect streams&lt;/a&gt;
- &lt;/li&gt;
-
- &lt;li&gt;&lt;a href="http://wordaligned.org/articles/cpp-streambufs#toctee-streams" name="toc5" id="toc5"&gt;Tee streams&lt;/a&gt;
- &lt;/li&gt;
-
- &lt;li&gt;&lt;a href="http://wordaligned.org/articles/cpp-streambufs#toca-generic-version" name="toc6" id="toc6"&gt;A generic version&lt;/a&gt;
- &lt;/li&gt;
-&lt;/ul&gt;
-&lt;/div&gt;&lt;div class="typocode"&gt;
-
-&lt;pre class="prettyprint"&gt;out &amp;lt;&amp;lt; std::setw(3) &amp;lt;&amp;lt; place &amp;lt;&amp;lt; ". "
-    &amp;lt;&amp;lt; "Name " &amp;lt;&amp;lt; name
-    &amp;lt;&amp;lt; ", Score " 
-    &amp;lt;&amp;lt; std::fixed &amp;lt;&amp;lt; std::setprecision(2) 
-    &amp;lt;&amp;lt; score &amp;lt;&amp;lt; '\n';
-
-fprintf(out, "%3d. Name %s, Score %.2f\n", 
-        place, name, score);
-
-&lt;/pre&gt;
-
-&lt;/div&gt;
-
-
-&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/cpp-streambufs#toc0" name="toccout-or-printf" id="toccout-or-printf"&gt;Cout or printf?&lt;/a&gt;&lt;/h3&gt;
-&lt;p&gt;Towards the end of an interview I was asked:
-&lt;/p&gt;
-&lt;blockquote&gt;&lt;p&gt;&amp;#8220;Cout or printf?&amp;#8221;
-&lt;/p&gt;
-&lt;/blockquote&gt;&lt;p&gt;The question made me smile. It signalled that I&amp;#8217;d done well enough in the technical section and now we&amp;#8217;d be moving on to a more relaxed discussion. Similar tailing-off questions include:
-&lt;/p&gt;
-&lt;ul&gt;
- &lt;li&gt;
-     &lt;a href="http://wordaligned.org/articles/accidental-emacs.html" title="Emacs, of course!"&gt;Which editor&lt;/a&gt; do you use?
- &lt;/li&gt;
-
- &lt;li&gt;
-     Tabs or spaces?
- &lt;/li&gt;
-
- &lt;li&gt;
-     Are &lt;a href="http://code.activestate.com/recipes/66531/" title="Yes, and borgs are no better"&gt;singletons evil&lt;/a&gt;?
- &lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;(Come to think of it, the correct answer to the &lt;code&gt;cout&lt;/code&gt; vs. &lt;code&gt;printf&lt;/code&gt; question is probably &amp;#8220;No!&amp;#8221; Both provide global access to the standard output stream, and globals, like singletons, are dangerous. &lt;a href="http://accu.org/index.php/journals/1411"&gt;Parametrise from above&lt;/a&gt;, pass down &lt;code&gt;ostreams&lt;/code&gt; or &lt;code&gt;FILE *&lt;/code&gt; handles as needed. Do the right thing! Anyway&amp;#8230;)
-&lt;/p&gt;
-&lt;div class="amazon"&gt;&lt;a href="http://www.amazon.com/gp/product/0201379260?ie=UTF8&amp;amp;tag=wordalig-20"&gt;&lt;img src="http://wordaligned.org/images/books/josuttis-cpp-book.jpg" alt="The C++ Standard Library: A Tutorial and Reference cover"/&gt;&lt;/a&gt;&lt;/div&gt;
-
-&lt;p&gt;I answered something suitably vague. The interview moved on. The truth is, the C++ iostream library may be technically superior to its C predecessor &amp;#8212; safer to use, easier to extend &amp;#8212; but it&amp;#8217;s failed to supplant it. Does anyone truly find all those chained shift operators and manipulators easier to read than a succinct format string? Does the &lt;code&gt;char&lt;/code&gt;, &lt;code&gt;wchar_t&lt;/code&gt;, &lt;code&gt;&amp;lt;your-char&amp;gt;&lt;/code&gt; dimension really help? Even Nicolai Josuttis&amp;#8217; excellent book, &lt;a href="http://www.amazon.com/gp/product/0201379260?ie=UTF8&amp;amp;tag=wordalig-20"&gt;The C++ Standard Library: A Tutorial and Reference&lt;/a&gt;, shies away:
-&lt;/p&gt;
-&lt;blockquote&gt;&lt;p&gt;This chapter does not attempt to discuss all aspects of the IOStream library in detail; to do that would take an entire book by itself.
-&lt;/p&gt;
-&lt;/blockquote&gt;
-&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/cpp-streambufs#toc1" name="tocexposed-buffers" id="tocexposed-buffers"&gt;Exposed buffers&lt;/a&gt;&lt;/h3&gt;
-&lt;p&gt;I&amp;#8217;m not the only person to find iostream formatting &lt;a href="http://www.fastformat.org/" title="Ultimate robustness! Unlimited flexibility! Unbeatable performance! (a Matthew Wilson production)"&gt;somewhat&lt;/a&gt; &lt;a href="http://www.boost.org/doc/libs/1_39_0/libs/format/index.html" title="Boost format - featuring operator %"&gt;clunky&lt;/a&gt;, but input/output is more than just formatting. There&amp;#8217;s also buffering and synchronising, for example. One under-appreciated feature of the iostream library is that the low-level read and write operations are delegated to separate stream buffer objects. 
-&lt;/p&gt;
-&lt;p&gt;C++ streams allow direct access to their underlying buffers. You can customise these buffers. You can swap them around. In some ways, C++ goes in at a lower level than C. Poke around in the &lt;a href="http://www.cplusplus.com/reference/iostream/streambuf/"&gt;streambuf&lt;/a&gt; class, and you&amp;#8217;ll find the member function names even sound like assembler instructions: &lt;code&gt;egptr&lt;/code&gt;, &lt;code&gt;xsputn&lt;/code&gt;, &lt;code&gt;pbump&lt;/code&gt;, &lt;code&gt;epptr&lt;/code&gt;, for example.
-&lt;/p&gt;
-&lt;p&gt;The remainder of this article works through some examples which use &lt;code&gt;std::streambuf&lt;/code&gt;s to copy, load, redirect and tee streams.
-&lt;/p&gt;
-&lt;span id="continue-reading"/&gt;
-
-
-&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/cpp-streambufs#toc2" name="toccopy-streams" id="toccopy-streams"&gt;Copy streams&lt;/a&gt;&lt;/h3&gt;
-&lt;div class="typocode"&gt;
-
-&lt;pre class="prettyprint"&gt;void stream_copy(std::ostream &amp;amp; dst, std::istream &amp;amp; src)
-{
-    dst &amp;lt;&amp;lt; src.rdbuf();
-}
-
-&lt;/pre&gt;
-
-&lt;/div&gt;
-
-&lt;p&gt;How does this work? &lt;code&gt;Std::stream&lt;/code&gt; derives from &lt;code&gt;std::ios&lt;/code&gt;, and &lt;code&gt;&lt;a href="http://www.cplusplus.com/reference/iostream/ios/rdbuf/"&gt;ios::rdbuf()&lt;/a&gt;&lt;/code&gt; returns a pointer to the source stream&amp;#8217;s buffer. A suitable specialisation of &lt;code&gt;&lt;a href="http://www.cplusplus.com/reference/iostream/ostream/operator%3C%3C/"&gt;ostream::operator&amp;lt;&amp;lt;()&lt;/a&gt;&lt;/code&gt; reads from this buffer until the source stream empties. Note that &lt;code&gt;stream_copy&lt;/code&gt; typically does &lt;strong&gt;not&lt;/strong&gt; result in the entire contents of either the source or destination stream being held in memory at any one time &amp;#8212; everything goes through the stream buffers in the usual way. Except, of course, if we&amp;#8217;re using an in-memory &lt;code&gt;std::stringstream&lt;/code&gt;, used below to load the contents of a file into a string.
-&lt;/p&gt;
-
-&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/cpp-streambufs#toc3" name="tocload-streams" id="tocload-streams"&gt;Load streams&lt;/a&gt;&lt;/h3&gt;
-&lt;div class="typocode"&gt;
-
-&lt;pre class="prettyprint"&gt;// Return a named file's contents as a string
-std::string load_file(char const * filepath)
-{
-    std::ifstream src(filepath);
-    std::ostringstream buf;
-    buf &amp;lt;&amp;lt; src.rdbuf();
-    return buf.str();
-}
-
-&lt;/pre&gt;
-
-&lt;/div&gt;
-
-&lt;p&gt;I&amp;#8217;ve used this simple recipe in test code to load binary data from a file.
-&lt;/p&gt;
-
-&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/cpp-streambufs#toc4" name="tocredirect-streams" id="tocredirect-streams"&gt;Redirect streams&lt;/a&gt;&lt;/h3&gt;
-&lt;p&gt;Everyone knows how to use a command shell to redirect the output of a program to a log file.
-&lt;/p&gt;
-&lt;pre&gt;
-$ echo Hello, world! &amp;gt; hello-world.log
-$ cat hello-world.log
-Hello, world!
-&lt;/pre&gt;
-
-&lt;p&gt;Stream buffers allow for more flexible stream redirection from &lt;strong&gt;within&lt;/strong&gt; the program, once again using &lt;code&gt;ios::rdbuf()&lt;/code&gt;, this time to both get and set a stream&amp;#8217;s buffer.
-&lt;/p&gt;
-&lt;p&gt;Here&amp;#8217;s a simple redirecter class, designed for use on the stack, allowing the constructor and destructor to &lt;a href="http://c2.com/cgi-bin/wiki?ExecuteAroundMethod" title="Execute around sounds better than RAII to me"&gt;execute around&lt;/a&gt; a block of code.
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
-
-&lt;pre class="prettyprint"&gt;#include &amp;lt;ostream&amp;gt;
-
-// Stream redirecter.
-class redirecter
-{
-public:
-    // Constructing an instance of this class causes
-    // anything written to the source stream to be redirected
-    // to the destination stream.
-    redirecter(std::ostream &amp;amp; dst, std::ostream &amp;amp; src)
-        : src(src)
-        , srcbuf(src.rdbuf())
-    {
-        src.rdbuf(dst.rdbuf());
-    }
-    
-    // The destructor restores the original source stream buffer
-    ~redirecter()
-    {
-        src.rdbuf(srcbuf);
-    }
-private:
-    std::ostream &amp;amp; src;
-    std::streambuf * const srcbuf;
-};
-
-&lt;/pre&gt;
-
-&lt;/div&gt;
-
-&lt;p&gt;Incidentally, when ios.rdbuf() is used in set mode it returns the original value of the stream&amp;#8217;s buffer, allowing us to write a slightly more compact constructor as shown in the complete program below.
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
-
-&lt;pre class="prettyprint"&gt;#include &amp;lt;fstream&amp;gt;
-#include &amp;lt;iostream&amp;gt;
-
-class redirecter
-{
-public:
-    redirecter(std::ostream &amp;amp; dst, std::ostream &amp;amp; src)
-        : src(src), sbuf(src.rdbuf(dst.rdbuf())) {}
-    ~redirecter() { src.rdbuf(sbuf); }
-private:
-    std::ostream &amp;amp; src;
-    std::streambuf * const sbuf;
-};
-
-void hello_world()
-{
-    std::cout &amp;lt;&amp;lt; "Hello, world!\n";
-}
-
-int main()
-{
-    std::ofstream log("hello-world.log");
-    redirecter redirect(log, std::cout);
-    hello_world();
-    return 0;
-}
-
-&lt;/pre&gt;
-
-&lt;/div&gt;
-
-&lt;p&gt;Running this program prints nothing to standard output. Instead the file &lt;code&gt;hello-world.log&lt;/code&gt; contains the redirected output, &lt;code&gt;Hello, world!&lt;/code&gt;.
-&lt;/p&gt;
-&lt;p&gt;Note that &lt;code&gt;redirect&lt;/code&gt; will be destroyed before &lt;code&gt;log&lt;/code&gt;, thus restoring &lt;code&gt;std::cout&lt;/code&gt;&amp;#8217;s original buffer. This detail is crucial, since destroying the file closes it and destroys its stream buffer, so we must not allow &lt;code&gt;std::cout&lt;/code&gt; to continue using this buffer.
-&lt;/p&gt;
-&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;A bus error on my platform&lt;/div&gt;
-
-&lt;pre class="prettyprint"&gt;#include &amp;lt;fstream&amp;gt;
-#include &amp;lt;iostream&amp;gt;
-
-int main()
-{
-    std::ofstream log("oops.log");
-    std::cout.rdbuf(log.rdbuf());
-    std::cout &amp;lt;&amp;lt; "Oops!\n";
-    return 0;
-}
-
-&lt;/pre&gt;
-
-&lt;/div&gt;
-
-
-&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/cpp-streambufs#toc5" name="toctee-streams" id="toctee-streams"&gt;Tee streams&lt;/a&gt;&lt;/h3&gt;
-&lt;p&gt;You could argue the redirection example is somewhat contrived. If &lt;code&gt;hello_world()&lt;/code&gt; had been properly written to accept an &lt;code&gt;ostream&lt;/code&gt; as a function argument, rather than rely on the global &lt;code&gt;std::cout&lt;/code&gt;, then we could simply pass it the &lt;code&gt;ofstream&lt;/code&gt; of our choice and be done. We could equally pass it an &lt;code&gt;ostringstream&lt;/code&gt; and check the contents of this stream to test that &lt;code&gt;hello_world()&lt;/code&gt; does indeed print what it&amp;#8217;s supposed to&lt;a id="fn1link" href="http://wordaligned.org/articles/cpp-streambufs#fn1"&gt;&lt;sup&gt;[1]&lt;/sup&gt;&lt;/a&gt;.
-&lt;/p&gt;
-&lt;p&gt;How about teeing streams? In a command shell the standard &lt;a href="http://www.gnu.org/software/coreutils/manual/html_node/tee-invocation.html"&gt;tee&lt;/a&gt; connector allows us to replicate a stream. The snippet below shows the output from &lt;a href="http://www.gnu.org/software/coreutils/manual/html_node/echo-invocation.html#echo-invocation"&gt;echo&lt;/a&gt; appearing on standard output and teed to a log file.
-&lt;/p&gt;
-&lt;pre&gt;
-$ echo Hello, world! | tee hello-world.log
-Hello, world!
-$ cat hello-world.log 
-Hello, world!
-&lt;/pre&gt;
-
-&lt;p&gt;Within a program, a clever stream buffer customisation can do the same job. Here&amp;#8217;s the declaration of a minimal teebuf class, which specialises a standard streambuf. The idea is that we can assign such a teebuf to a stream, causing anything written to the stream to be diverted through both teed output buffers.
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
-
-&lt;pre class="prettyprint"&gt;#include &amp;lt;streambuf&amp;gt;
-
-class teebuf: public std::streambuf
-{
-public:
-    // Construct a streambuf which tees output to both input
-    // streambufs.
-    teebuf(std::streambuf * sb1, std::streambuf * sb2);
-protected:
-    virtual int overflow(int char);
-private:
-    std::streambuf * sb1;
-    std::streambuf * sb2;
-};
-
-&lt;/pre&gt;
-
-&lt;/div&gt;
-
-&lt;p&gt;Before fleshing out the implementation, I&amp;#8217;d like to discuss what lies beneath the surface of this simple declaration. We&amp;#8217;re specialising a &lt;code&gt;std::streambuf&lt;/code&gt;, which is itself a typedef for &lt;code&gt;basic_streambuf&amp;lt;char&amp;gt;&lt;/code&gt;. We&amp;#8217;ll show how to make this code more generic &lt;a href="http://wordaligned.org/articles/cpp-streambufs#toca-generic-solution"&gt;later&lt;/a&gt;.
-&lt;/p&gt;
-&lt;p&gt;The base class, &lt;code&gt;std::streambuf&lt;/code&gt;, despite its name, has no buffer. This base class provides two public member functions for outputting character data, &lt;code&gt;sputc&lt;/code&gt; and &lt;code&gt;sputn&lt;/code&gt;, which output a single character and a run of characters respectively. If the internal buffer is full (always the case here, since there is no buffer) then the virtual overflow method ends up being called. Thus a suitable override of this method will do the job.
-&lt;/p&gt;
-&lt;p&gt;For details, consult a good reference. On my platform the actual (GNU) header files are well written and, of course, 100% accurate. The HTML documents generated from them can also be found &lt;a href="http://gcc.gnu.org/onlinedocs/libstdc++/libstdc++-html-USERS-4.4/a00216.html"&gt;online&lt;/a&gt;.
-&lt;/p&gt;
-&lt;p&gt;You may wonder why &lt;code&gt;overflow&lt;/code&gt; deals in &lt;code&gt;int&lt;/code&gt;s and not &lt;code&gt;char&lt;/code&gt;s. That&amp;#8217;s because, in the case of an error, it returns a sentinel value, &lt;code&gt;EOF&lt;/code&gt;, which does not fit in a &lt;code&gt;char&lt;/code&gt;. (More generically, it deals with &lt;code&gt;traits::int_type&lt;/code&gt;s and returns a &lt;code&gt;traits::eof()&lt;/code&gt; to indicate an error condition).
-&lt;/p&gt;
-&lt;p&gt;Actually, I can understand why &lt;code&gt;overflow&lt;/code&gt; returns an &lt;code&gt;int_type&lt;/code&gt; but I&amp;#8217;m unsure why it should accept an &lt;code&gt;int_type&lt;/code&gt; argument when external clients only put characters into the stream. A footnote in the &lt;a href="http://www.open-std.org/jtc1/sc22/wg21/docs/standards"&gt;standard&lt;/a&gt; reads:
-&lt;/p&gt;
-&lt;blockquote&gt;&lt;p&gt;Typically, &lt;code&gt;overflow&lt;/code&gt; returns c to indicate success, except when &lt;code&gt;traits::eq_int_type(c,traits::eof())&lt;/code&gt; returns &lt;code&gt;true&lt;/code&gt;, in which case it returns &lt;code&gt;traits::not_eof(c)&lt;/code&gt;.
-&lt;/p&gt;
-&lt;/blockquote&gt;&lt;p&gt;I&amp;#8217;m not sure that helps me much.
-&lt;/p&gt;
-&lt;p&gt;Nonetheless, here&amp;#8217;s a &lt;code&gt;teebuf&lt;/code&gt; implementation. I&amp;#8217;ve changed both &lt;code&gt;overflow&lt;/code&gt; to be private which stops anyone deriving from this class. Any actual buffering will be delegated to the teed buffers. We&amp;#8217;ve also over-ridden the virtual &lt;code&gt;sync()&lt;/code&gt; method: the default implementation does nothing, but here we sync the teed buffers. I can&amp;#8217;t see any way the &lt;code&gt;(c == EOF)&lt;/code&gt; test could ever return &lt;code&gt;true&lt;/code&gt; for instances of this class but I&amp;#8217;ve followed the advice from the footnote in the standard anyway.
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
-
-&lt;pre class="prettyprint"&gt;#include &amp;lt;streambuf&amp;gt;
-
-class teebuf: public std::streambuf
-{
-public:
-    // Construct a streambuf which tees output to both input
-    // streambufs.
-    teebuf(std::streambuf * sb1, std::streambuf * sb2)
-        : sb1(sb1)
-        , sb2(sb2)
-    {
-    }
-private:
-    // This tee buffer has no buffer. So every character "overflows"
-    // and can be put directly into the teed buffers.
-    virtual int overflow(int c)
-    {
-        if (c == EOF)
-        {
-            return !EOF;
-        }
-        else
-        {
-            int const r1 = sb1-&amp;gt;sputc(c);
-            int const r2 = sb2-&amp;gt;sputc(c);
-            return r1 == EOF || r2 == EOF ? EOF : c;
-        }
-    }
-    
-    // Sync both teed buffers.
-    virtual int sync()
-    {
-        int const r1 = sb1-&amp;gt;pubsync();
-        int const r2 = sb2-&amp;gt;pubsync();
-        return r1 == 0 &amp;amp;&amp;amp; r2 == 0 ? 0 : -1;
-    }   
-private:
-    std::streambuf * sb1;
-    std::streambuf * sb2;
-};
-
-&lt;/pre&gt;
-
-&lt;/div&gt;
-
-&lt;p&gt;Here&amp;#8217;s a simple helper class to create a tee stream from two input streams. (My thanks to Tony Yu for pointing out a problem with the code originally posted here.)
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
-
-&lt;pre class="prettyprint"&gt;class teestream : public std::ostream
-{
-public:
-    // Construct an ostream which tees output to the supplied
-    // ostreams.
-    teestream(std::ostream &amp;amp; o1, std::ostream &amp;amp; o2);
-private:
-    teebuf tbuf;
-};
-
-teestream::teestream(std::ostream &amp;amp; o1, std::ostream &amp;amp; o2)
-  : std::ostream(&amp;amp;tbuf)
-  , tbuf(o1.rdbuf(), o2.rdbuf())
-{
-}
-
-&lt;/pre&gt;
-
-&lt;/div&gt;
-
-&lt;p&gt;And here&amp;#8217;s a short program showing how to use these elements.
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
-
-&lt;pre class="prettyprint"&gt;#include &amp;lt;fstream&amp;gt;
-#include &amp;lt;iostream&amp;gt;
-#include &amp;lt;teestream&amp;gt;
-
-int main()
-{
-    std::ofstream log("hello-world.log");
-    teestream tee(std::cout, log);
-    tee &amp;lt;&amp;lt; "Hello, world!\n";
-    return 0;
-}
-
-&lt;/pre&gt;
-
-&lt;/div&gt;
-
-&lt;p&gt;Running this program prints the message &lt;code&gt;Hello, world!&lt;/code&gt; followed by a newline to standard output, and the file &lt;code&gt;hello-world.log&lt;/code&gt; contains this same output.
-&lt;/p&gt;
-
-&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/cpp-streambufs#toc6" name="toca-generic-version" id="toca-generic-version"&gt;A generic version&lt;/a&gt;&lt;/h3&gt;
-&lt;div class="typocode"&gt;
-
-&lt;pre class="prettyprint"&gt;template &amp;lt;typename char_type,
-          typename traits = std::char_traits&amp;lt;char_type&amp;gt; &amp;gt;
-class basic_teebuf:
-    public std::basic_streambuf&amp;lt;char_type, traits&amp;gt;
-{
-public:
-    typedef typename traits::int_type int_type;
-    
-    basic_teebuf(std::basic_streambuf&amp;lt;char_type, traits&amp;gt; * sb1,
-                 std::basic_streambuf&amp;lt;char_type, traits&amp;gt; * sb2)
-      : sb1(sb1)
-      , sb2(sb2)
-    {
-    }
-    
-private:    
-    virtual int sync()
-    {
-        int const r1 = sb1-&amp;gt;pubsync();
-        int const r2 = sb2-&amp;gt;pubsync();
-        return r1 == 0 &amp;amp;&amp;amp; r2 == 0 ? 0 : -1;
-    }
-    
-    virtual int_type overflow(int_type c)
-    {
-        int_type const eof = traits::eof();
-        
-        if (traits::eq_int_type(c, eof))
-        {
-            return traits::not_eof(c);
-        }
-        else
-        {
-            char_type const ch = traits::to_char_type(c);
-            int_type const r1 = sb1-&amp;gt;sputc(ch);
-            int_type const r2 = sb2-&amp;gt;sputc(ch);
-            
-            return
-                traits::eq_int_type(r1, eof) ||
-                traits::eq_int_type(r2, eof) ? eof : c;
-        }
-    }
-    
-private:
-    std::basic_streambuf&amp;lt;char_type, traits&amp;gt; * sb1;
-    std::basic_streambuf&amp;lt;char_type, traits&amp;gt; * sb2;
-};
-
-typedef basic_teebuf&amp;lt;char&amp;gt; teebuf;
-
-&lt;/pre&gt;
-
-&lt;/div&gt;
-
-&lt;hr /&gt;
-
-&lt;p&gt;I am placing the code samples presented here in the public domain.
-&lt;/p&gt;
-&lt;hr /&gt;
-
-&lt;p&gt;&lt;a id="fn1" href="http://wordaligned.org/articles/cpp-streambufs#fn1link"&gt;[1]&lt;/a&gt; This demonstrates one reason why globals such as &lt;code&gt;cout&lt;/code&gt; are a bad idea &amp;#8212; it becomes harder to test code which accesses them. 
-&lt;/p&gt;</description>
-<dc:date>2009-05-13</dc:date>
-<guid>http://wordaligned.org/articles/cpp-streambufs</guid>
-<author>tag@wordaligned.org (Thomas Guest)</author>
-<link>http://wordaligned.org/articles/cpp-streambufs</link>
 <category>C++</category>
 </item>
 
