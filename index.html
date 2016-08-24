@@ -25,7 +25,49 @@
 
   <div id="page">
     <div id="content">
-      <div class="atomentry" id="negative-sequence-indices-in-python">
+      <div class="atomentry" id="a-language-people-use-and-bitch-about">
+<h2 class="title"><a href="/articles/a-language-people-use-and-bitch-about">A language people use and bitch about</a></h2>
+<p class="meta"><abbr class="published" title="2016-08-24">2016-08-24</abbr> &bull; <a href="/tag/c" rel="tag">C</a>, <a href="/tag/c++" rel="tag">C++</a> &bull; <a href="/articles/a-language-people-use-and-bitch-about#disqus_thread">Comments</a></p>
+<p>Every so often a new essay hits the top of the programming news sites:
+</p>
+<ul>
+ <li>
+     why I&#8217;m rewriting <a href="http://250bpm.com/blog:4" title="Why should I have written ZeroMQ in C, not C++">X in C</a> (and abandoning C++)
+ </li>
+
+ <li>
+     why we will never use C++ for Y (which has always been written in C)
+ </li>
+
+ <li>
+     why C++ is a <a href="http://thread.gmane.org/gmane.comp.version-control.git/57643/focus=57918" title="Torvalds rants about C++">horrible language</a> (it isn&#8217;t C)
+ </li>
+</ul>
+<p>I&#8217;m a sucker for these articles and have some sympathy with them. Every so often I work with C code rather than C++, and find the experience refreshing: rapid compilation, clear build diagnostics, comprehensible APIs, easy debugging, and an agreeable reduction in layering and punctuation.
+</p>
+<p>It&#8217;s always easy to return to C because it hasn&#8217;t really changed. Well, it <strong>has</strong> changed, conservatively, and C programmers seem conservative in adopting new features.
+</p>
+<p>By contrast, C++ <strong>does</strong> change. Sure, C++0X was a long time coming &#8212; finally realised as C++11 &#8212; but since that giant step, smaller improvements continue apace. As a result C++ code soon looks stale. Every time I visit a source file it seems I have to freshen it, using the new way to prevent copying, or return containers, or manage resources, or pass functions, or &#8230; you get the idea.
+</p>
+<p>The truth is, every substantial C++ codebase I&#8217;ve worked on reads like a history of C++. Somewhere low down there&#8217;ll be hand-written intrusive linked lists; then there&#8217;ll be a few layers of classes, some nested for good measure; then templates, <a href="http://www.boost.org/">boost</a>, functions disguised as classes for use in algorithms; and finally the good stuff, in which auto, lambda, move semantics and intialisers allow us to code as we&#8217;ve always wanted.
+</p>
+<p>Bjarne Stroustrup <a href="http://www.stroustrup.com/blast.html">defends C++ on his website</a>:
+</p>
+<blockquote><p>As someone remarked: There are only two kinds of programming languages: those people always bitch about and those nobody uses.
+</p>
+</blockquote><p>If that &#8220;someone&#8221; wasn&#8217;t Stroustrup, it is now &#8212; he has become the source of his own quotation. His point is that C++ is well-used and must therefore be bitched about.
+</p>
+<p>C provides an immediate counter-example, however. It is undeniably used, but its <a href="https://en.wikipedia.org/wiki/C_Traps_and_Pitfalls">traps and pitfalls</a> are known and respected, rather than bitched about.
+</p>
+<p>Ultimately, though, I find C too limited. The lack of standard containers and algorithms combined with the overheads of heap management and ubiquitous error checking make programming in C heavy going.
+</p>
+<p>C++ is hard to learn and hard to keep up with. The language has grown, considerably, but the progression is necessary. It&#8217;s the more recent extensions which fully realise the power of the standard template library, for example. Stick with C++. The reward will be code which is expressive and efficient.
+</p>
+
+</div>
+
+
+<div class="atomentry" id="negative-sequence-indices-in-python">
 <h2 class="title"><a href="/articles/negative-sequence-indices-in-python">Negative Sequence Indices in Python</a></h2>
 <p class="meta"><abbr class="published" title="2016-08-01">2016-08-01</abbr> &bull; <a href="/tag/python" rel="tag">Python</a>, <a href="/tag/c++" rel="tag">C++</a> &bull; <a href="/articles/negative-sequence-indices-in-python#disqus_thread">Comments</a></p>
 <p>Supply a negative index when accessing a sequence and Python counts back from the end. So, for example, <code>my_list[-2]</code> is the penultimate element of <code>my_list</code>, which is much better than <code>my_list[len(my_list)-2]</code> or even <code>*(++my_list.rbegin())</code>.
@@ -1568,29 +1610,6 @@ May you share freely, never taking more than you give.</p></blockquote>
 </div>
 
 
-<div class="atomentry" id="election-manifesto">
-<h2 class="title"><a href="/articles/election-manifesto">Election Manifesto - a timely activity for agile retrospectives</a></h2>
-<p class="meta"><abbr class="published" title="2015-04-29">2015-04-29</abbr> &bull; <a href="/tag/scrum" rel="tag">Scrum</a>, <a href="/tag/self" rel="tag">Self</a> &bull; <a href="/articles/election-manifesto#disqus_thread">Comments</a></p>
-<p>Did I mention that I&#8217;ve become scrum master for my team? I have now. It&#8217;s a new thing for me (and for this blog) but I enjoy it, especially running the retrospective meetings. You have to keep these fresh and one way of doing this is to connect them with what&#8217;s going on in the world outside: the <a href="http://plans-for-retrospectives.com/?id=54" title="Story Oscars, a retromat activity">Oscars</a>, the eclipse, the <a href="http://www.bbc.co.uk/news/election/2015">general election</a> &#8230;
-</p>
-<p style="margin:0;text-align:center;font-size:800%;">&#x2611;</p>
-
-<p>With a week to go, my vote has been posted. So, here&#8217;s an activity I devised for a recent retrospective. We were focusing on infrastructure issues and trying to come with improvements. For this, it worked well.
-</p>
-<blockquote><p>Ask the team to split into three or four &#8220;political&#8221; parties. Each party must come up with a manifesto for change. What isn&#8217;t working? How would they improve things, given the chance? After 20 minutes of discussion, reconvene and ask the party leaders to present their manifesto to the electorate. Be prepared for tough questions and heckling!</p>
-<p>Now it&#8217;s time to plan a brighter future. Summarise the key points of each manifesto and write them up on sticky notes, using different colours for the different parties. What do the parties agree on? Which promises are unrealistic and which can be delivered?</p></blockquote>
-
-<p style="margin:0;text-align:center;font-size:800%;">&#x2611;</p>
-
-<p>For more retrospective ideas, I recommend <a href="http://plans-for-retrospectives.com" title="Retromat, plans for retrospectives">Retromat</a> by <a href="https://twitter.com/findingmarbles" title="@findingmarbles">Corinna Baldauf</a>. You can find another suggestion of mine, <a href="http://plans-for-retrospectives.com/?id=97">#tweetmysprint</a>, on the Retromat and I&#8217;ve submitted this one too.
-</p>
-<p style="margin:0;text-align:center;font-size:800%;">&#x2611;</p>
-
-<div><blockquote class="twitter-tweet" lang="en"><p><a href="https://twitter.com/hashtag/tweetmysprint?src=hash">#tweetmysprint</a> Please write 3 tweets describing this sprint. Stories, suggestions, rants all welcome &mdash; but be brief ;-)</p>&mdash; Professor Scrum (@professorscrum) <a href="https://twitter.com/professorscrum/status/583018772891639808">March 31, 2015</a></blockquote><script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script></div>
-
-</div>
-
-
 <div class="extended">
 <p><a href="/articles/">Visit the Word Aligned archives...</a></p>
 </div>
@@ -1635,7 +1654,7 @@ May you share freely, never taking more than you give.</p></blockquote>
 <div class="sidebar-node">
 <h3>Top Tags</h3>
 <ul id="categories"><li><a href="/tag/python" rel="tag">Python</a> <em>(116)</em></li>
-<li><a href="/tag/c++" rel="tag">C++</a> <em>(70)</em></li>
+<li><a href="/tag/c++" rel="tag">C++</a> <em>(71)</em></li>
 <li><a href="/tag/self" rel="tag">Self</a> <em>(60)</em></li>
 <li><a href="/tag/puzzles" rel="tag">Puzzles</a> <em>(34)</em></li>
 <li><a href="/tag/accu" rel="tag">ACCU</a> <em>(33)</em></li>
@@ -1666,7 +1685,7 @@ May you share freely, never taking more than you give.</p></blockquote>
 <div class="sidebar-node">
 <h3>Chain</h3>
 <ul>
-<li><a accesskey="p" href="/articles/negative-sequence-indices-in-python" title="First article">&raquo; Negative Sequence Indices in Python</a></li>
+<li><a accesskey="p" href="/articles/a-language-people-use-and-bitch-about" title="First article">&raquo; A language people use and bitch about</a></li>
 
 </ul>
 
