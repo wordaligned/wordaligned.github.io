@@ -1,0 +1,20 @@
+In this talk I want to consider if unit testing is a good use of our time.
+
+I am not questioning whether _testing_ is important. I don't expect you to read all of this abstract by Tony Hoare, but what he's saying is that you don't need to _prove_ your software works: you make it so through design and review; by testing; and by good engineering. Tony Hoare -- by the way -- invented quicksort, an algorithm which he indeed proved correct, and he also proved it couldn't be beaten.
+
+So, I'm not questioning testing itself. I'm questioning the level we should test at.
+
+A recent change in job has prompted this talk. Until September last year I was working for SN Systems in Bristol. SN Systems are part of Sony Interactive Entertainment and I worked on the toolchain games developers use to get their code up and running on the Playstation consoles. Specifically, I worked on a linker, a library archiver and various other utilities for working with object files. Computer games are written in C++ and so were the tools: I was writing C++ code for C++ coders.
+
+Since September I've been working for Clinithink; a smaller and less established company, with headquarters close by in Bridgend. Our core technology is a natural language processing engine which has been trained to extract the meaning from unstructured medical narratives. Once you've done this you can run queries against the resulting database, for example to recruit subjects for a clinical trial. So, we have a text engine, written in C++, which is embedded in a Python web service and application.
+
+Despite being very different companies, both SN Systems and Clinithink agree with experts such as Tony Hoare on the best way to get working code: primarily, by testing, backed up by more testing, code reviews, continual integration and team work. You don't have to prove your code is correct but you do have to show it.
+
+Testing, though, is a broad discipline, and the two companies place a different emphasis on how and at what level to test. Certainly my views on unit testing have been challenged, and that's what I would like to talk about today.
+
+
+Here's one model of how to build software. Like a pyramid. Almost all of your tests are automated, and the bulk of these tests are unit tests. You might like to think of your software as being assembled from blocks each of which has been -- and continues to be -- unit tested. At the next level, but still automated, you have system tests: integration tests, API tests and so on. There aren't so many of these, because they are more expensive to develop and run, their results suffer from flakiness, and because they give less accurate diagnostics when they fail. At the next level you exercise the product directly through its UI -- using selenium for a web application, for example. And at the very top of the pile are the manual tests.
+
+This is the model we operated at SN Systems. I've been at a few places which paid lip service to the automated test culture. At SN Systems we embraced it. No code went in without a review, and it would be very hard to get your code through review if the changes were not covered by tests.
+
+The most fragile and expensive tests were the ones which required code to be run on a games console, depending, as they did, on the network, on firmware, on shared resources. We made every effort to keep We had a substantial system test suite which essentially ran the linker on specially tailored inputs and checked the results.
