@@ -7,6 +7,49 @@
 <dc:creator>tag@wordaligned.org</dc:creator>
 <language>en-gb</language>
 <item>
+<title>Unit Tests Questioned</title>
+<description>&lt;p&gt;I&amp;#8217;m looking forward to &lt;a href="http://www.gwern.net/docs/1996-hoare.pdf" title="(PDF) How did software get so reliable without proof?"&gt;talking at TechHub Swansea&lt;/a&gt; at the end of the month on the subject of unit testing. 
+&lt;/p&gt;
+&lt;p&gt;The introduction to the talk is here. 
+&lt;/p&gt;
+&lt;p&gt;Hope to see you there.
+&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://wordaligned.org/docs/unit-tests/"&gt;&lt;img width=640 src="http://wordaligned.org/images/unit-tests-questioned.png" alt="Unit Tests Questioned"/&gt;&lt;/a&gt;
+&lt;/p&gt;
+&lt;p&gt;In this talk we&amp;#8217;ll consider if unit testing is a good use of our time.
+&lt;/p&gt;
+&lt;p&gt;I am not questioning whether &lt;strong&gt;testing&lt;/strong&gt; is important. This slide shows the abstract of &lt;a href="http://www.gwern.net/docs/1996-hoare.pdf" title="(PDF) How did software get so reliable without proof?"&gt;a paper published in 1996 by Tony Hoare&lt;/a&gt;. What he says is that you don&amp;#8217;t need to &lt;strong&gt;prove&lt;/strong&gt; your software works: you can make it so through design and review; by testing; and by good engineering.
+&lt;/p&gt;
+&lt;img width=640 src="http://wordaligned.org/docs/unit-tests/images/how-did-software-get-so-reliable.png" alt="How did software get so reliable without proof?"/&gt;
+
+&lt;p&gt;This may no longer seem controversial or novel but maybe it was a surprising thing for Tony Hoare to say. After all, he invented &lt;a href="https://en.wikipedia.org/wiki/Quicksort"&gt;quicksort&lt;/a&gt; back in 1959, an algorithm which he &lt;strong&gt;proved&lt;/strong&gt; correct. He also proved how quickly it runs, and that &amp;#8212; in the general case &amp;#8212; it couldn&amp;#8217;t be beaten. Much of Hoare&amp;#8217;s subsequent research was dedicated to proving software works using techniques known as &lt;a href="https://en.wikipedia.org/wiki/Formal_methods" title="Formal Methods (Wikipedia)"&gt;formal methods&lt;/a&gt;. The idea is that you write a formal specification of what your program should do, and then you mathematically verify your code satisfies that specification. Surely nothing less is good enough for software which really is a matter of life and death: a life support system, or a device driver in a nuclear warhead, for example? Actually, no, he says in this paper, there are more pragmatic routes to reliable software.
+&lt;/p&gt;
+&lt;p&gt;So, the idea that you can build reliability via testing may once have seemed radical. It doesn&amp;#8217;t any more. Maybe, though, the conventional modern wisdom that &lt;strong&gt;unit tests&lt;/strong&gt; are a good thing should be questioned.
+&lt;/p&gt;
+&lt;img src="http://wordaligned.org/docs/unit-tests/images/coplien.jpg" alt="Coplien" /&gt;
+
+&lt;p&gt;James O Coplien voices an opinion in a more recent paper, &lt;a href="http://rbcs-us.com/documents/Why-Most-Unit-Testing-is-Waste.pdf" title="(PDF) Why Most Unit Testing is Waste"&gt;&amp;#8220;Why most unit testing is waste&amp;#8221;&lt;/a&gt;.
+&lt;/p&gt;
+&lt;p&gt;What&amp;#8217;s Cope on about!?
+&lt;/p&gt;
+&lt;p&gt;Such is the force of current thinking that even the title of this paper makes it seem like he&amp;#8217;s trolling. Having read the paper carefully, I don&amp;#8217;t think he is. That doesn&amp;#8217;t mean I agree with him, but I agree with his attitude:
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;There&amp;#8217;s a lot of advice, but very little of it is backed either by theory, data, or even a model of why you should believe a given piece of advice. Good testing begs skepticism. Be skeptical of yourself: measure, prove, retry. Be skeptical of me for heaven&amp;#8217;s sake.
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;So, this talk will do just that.
+&lt;/p&gt;
+&lt;p&gt;Unit tests: let&amp;#8217;s get skeptical!
+&lt;/p&gt;</description>
+<dc:date>2017-01-21</dc:date>
+<guid>http://wordaligned.org/articles/unit-tests-questioned</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/unit-tests-questioned</link>
+<category>self</category>
+<category>tests</category>
+<category>talks</category>
+</item>
+
+<item>
 <title>A language people use and bitch about</title>
 <description>&lt;p&gt;Every so often a new essay hits the top of the programming news sites:
 &lt;/p&gt;
@@ -1912,88 +1955,6 @@ May you share freely, never taking more than you give.&lt;/p&gt;&lt;/blockquote&
 <category>Oulipo</category>
 <category>Perec</category>
 <category>Bristol</category>
-</item>
-
-<item>
-<title>Why zip when you can map?</title>
-<description>&lt;p&gt;&lt;a href="http://en.wikipedia.org/wiki/Zipper"&gt;&lt;img src="http://wordaligned.org/images/zip.jpg" title="Why zip?" alt="Why zip?"/&gt;&lt;/a&gt;
-   &lt;a href="http://www.strava.com/activities/158661061"&gt;&lt;img src="http://wordaligned.org/images/dundry-thunder.jpg" alt="when you can map?" title="when you can map!"/&gt;&lt;/a&gt;
-&lt;/p&gt;
-&lt;p&gt;You&amp;#8217;ve got a couple of parallel lists you&amp;#8217;d like to combine and output, a line for each pair. Here&amp;#8217;s one way to do it: use &lt;code&gt;zip&lt;/code&gt; to do the combining.
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
-
-&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; times = [42.12, 42.28, 42.34, 42.40, 42.45]
-&amp;gt;&amp;gt;&amp;gt; names = ['Hickman', 'Guest', 'Burns', 'Williams']
-&amp;gt;&amp;gt;&amp;gt; fmt = '{:20} {:.2f}'.format
-&amp;gt;&amp;gt;&amp;gt; print('\n'.join(fmt(n, t) for n, t in zip(names, times)))
-Hickman              42.12
-Guest                42.28
-Burns                42.34
-Williams             42.40
-
-&lt;/pre&gt;
-
-&lt;/div&gt;
-
-&lt;p&gt;Slightly more succinctly:
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
-
-&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; print('\n'.join(fmt(*nt) for nt in zip(names, times)))
-...
-
-&lt;/pre&gt;
-
-&lt;/div&gt;
-
-&lt;p&gt;If you look at the generator expression passed into &lt;code&gt;str.join&lt;/code&gt;, you can see we&amp;#8217;re just mapping &lt;code&gt;fmt&lt;/code&gt; to the zipped &lt;code&gt;names&lt;/code&gt; and &lt;code&gt;times&lt;/code&gt; lists.
-&lt;/p&gt;
-&lt;p&gt;Well, sort of.
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
-
-&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; print('\n'.join(map(fmt, zip(names, times))))
-Traceback (most recent call last):
-...
-IndexError: tuple index out of range
-
-&lt;/pre&gt;
-
-&lt;/div&gt;
-
-&lt;p&gt;To fix this, we &lt;strong&gt;could&lt;/strong&gt; use &lt;code&gt;itertools.starmap&lt;/code&gt; which effectively unpacks the zipped pairs.
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
-
-&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; from itertools import starmap
-&amp;gt;&amp;gt;&amp;gt; print('\n'.join(starmap(fmt, zip(names, times))))
-Hickman              42.12
-Guest                42.28
-Burns                42.34
-Williams             42.40
-
-&lt;/pre&gt;
-
-&lt;/div&gt;
-
-&lt;p&gt;This latest version looks clean enough but there&amp;#8217;s something odd about zipping two lists together only to unpack the resulting 2-tuples for consumption by the format function.
-&lt;/p&gt;
-&lt;p&gt;Don&amp;#8217;t forget, &lt;code&gt;map&lt;/code&gt; happily accepts more than one sequence! There&amp;#8217;s no need to &lt;code&gt;zip&lt;/code&gt; after all.
-&lt;/p&gt;
-&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;Don&amp;#8217;t zip, map!&lt;/div&gt;
-
-&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; print('\n'.join(map(fmt, names, times)))
-...
-
-&lt;/pre&gt;
-
-&lt;/div&gt;</description>
-<dc:date>2014-12-16</dc:date>
-<guid>http://wordaligned.org/articles/why-zip-when-you-can-map</guid>
-<author>tag@wordaligned.org (Thomas Guest)</author>
-<link>http://wordaligned.org/articles/why-zip-when-you-can-map</link>
-<category>Python</category>
 </item>
 
 </channel>

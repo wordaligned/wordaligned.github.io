@@ -11,7 +11,7 @@
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
 <meta name="author" content="Thomas Guest" />
 <meta name="description" content="A collection of articles on software development written by Thomas Guest." />
-<meta name="keywords" content="CLRS, Regex, Missiles, Cycling, apple, Pictures, Self, Editors, Emacs, Torvalds, ImageMagick, IDE, Decorators, Shell, PIL, Lcs, Turing, Ruby on Rails, Puzzles, Europython, iphone, Characters, Fractals, Crabs, Github, DocBook, Dynamic Languages, lighttpd, Bugs, CVS, Reviews, Web-applications, Steganography, Oulipo, Perec, Content, Markdown, Two Wheels, Conferences, Syntax, Unix, Arc, Go, Primes, Chess, Web Applications, Java, Esr, Recursion, Charts, Perl, Subversion, Recommended, Teamwork, Build, ACCU, Knuth, Android, Erlang, Boost, php, OCR, Python, cvs2svn, Scrum, SICP, Lisp, Books, Awk, Graphics, Disqus, Ruby, openid, C, Documentation, Trac, Windows, Zlib, C++, Etc, Streams, Bristol, Tesseract, Drawing, Accidents, Google, Apple, Functional Programming, Pi, Haskell, Design, Virtualization, Spolsky, Algorithms, Curl, Scheme" />
+<meta name="keywords" content="CLRS, Regex, Missiles, Cycling, apple, Pictures, Self, Editors, Emacs, Torvalds, talks, ImageMagick, IDE, Decorators, Shell, PIL, Lcs, Turing, Ruby on Rails, Drawing, Puzzles, Europython, iphone, Characters, Fractals, Crabs, tests, Github, DocBook, Dynamic Languages, lighttpd, Bugs, CVS, Reviews, Steganography, Oulipo, Perec, Content, Markdown, Two Wheels, Conferences, Syntax, Unix, Arc, Go, Web-applications, Chess, Web Applications, Java, Esr, Recursion, Charts, Perl, Subversion, Recommended, Teamwork, Build, ACCU, Knuth, Android, Erlang, Boost, php, OCR, Python, cvs2svn, self, Scrum, SICP, Lisp, Books, Awk, Graphics, Disqus, Ruby, openid, C, Documentation, Trac, Windows, Zlib, C++, Etc, Streams, Bristol, Tesseract, Primes, Accidents, Google, Apple, Functional Programming, Pi, Haskell, Design, Virtualization, Spolsky, Algorithms, Curl, Scheme" />
 <link rel="alternate" type="application/rss+xml" title="Feed" href="http://feeds.wordaligned.org/wordaligned" />
 </head>
 
@@ -25,7 +25,46 @@
 
   <div id="page">
     <div id="content">
-      <div class="atomentry" id="a-language-people-use-and-bitch-about">
+      <div class="atomentry" id="unit-tests-questioned">
+<h2 class="title"><a href="/articles/unit-tests-questioned">Unit Tests Questioned</a></h2>
+<p class="meta"><abbr class="published" title="2017-01-21">2017-01-21</abbr> &bull; <a href="/tag/self" rel="tag">self</a>, <a href="/tag/tests" rel="tag">tests</a>, <a href="/tag/talks" rel="tag">talks</a> &bull; <a href="/articles/unit-tests-questioned#disqus_thread">Comments</a></p>
+<p>I&#8217;m looking forward to <a href="http://www.gwern.net/docs/1996-hoare.pdf" title="(PDF) How did software get so reliable without proof?">talking at TechHub Swansea</a> at the end of the month on the subject of unit testing. 
+</p>
+<p>The introduction to the talk is here. 
+</p>
+<p>Hope to see you there.
+</p>
+<p><a href="/docs/unit-tests/"><img width=640 src="/images/unit-tests-questioned.png" alt="Unit Tests Questioned"/></a>
+</p>
+<p>In this talk we&#8217;ll consider if unit testing is a good use of our time.
+</p>
+<p>I am not questioning whether <strong>testing</strong> is important. This slide shows the abstract of <a href="http://www.gwern.net/docs/1996-hoare.pdf" title="(PDF) How did software get so reliable without proof?">a paper published in 1996 by Tony Hoare</a>. What he says is that you don&#8217;t need to <strong>prove</strong> your software works: you can make it so through design and review; by testing; and by good engineering.
+</p>
+<img width=640 src="/docs/unit-tests/images/how-did-software-get-so-reliable.png" alt="How did software get so reliable without proof?"/>
+
+<p>This may no longer seem controversial or novel but maybe it was a surprising thing for Tony Hoare to say. After all, he invented <a href="https://en.wikipedia.org/wiki/Quicksort">quicksort</a> back in 1959, an algorithm which he <strong>proved</strong> correct. He also proved how quickly it runs, and that &#8212; in the general case &#8212; it couldn&#8217;t be beaten. Much of Hoare&#8217;s subsequent research was dedicated to proving software works using techniques known as <a href="https://en.wikipedia.org/wiki/Formal_methods" title="Formal Methods (Wikipedia)">formal methods</a>. The idea is that you write a formal specification of what your program should do, and then you mathematically verify your code satisfies that specification. Surely nothing less is good enough for software which really is a matter of life and death: a life support system, or a device driver in a nuclear warhead, for example? Actually, no, he says in this paper, there are more pragmatic routes to reliable software.
+</p>
+<p>So, the idea that you can build reliability via testing may once have seemed radical. It doesn&#8217;t any more. Maybe, though, the conventional modern wisdom that <strong>unit tests</strong> are a good thing should be questioned.
+</p>
+<img src="/docs/unit-tests/images/coplien.jpg" alt="Coplien" />
+
+<p>James O Coplien voices an opinion in a more recent paper, <a href="http://rbcs-us.com/documents/Why-Most-Unit-Testing-is-Waste.pdf" title="(PDF) Why Most Unit Testing is Waste">&#8220;Why most unit testing is waste&#8221;</a>.
+</p>
+<p>What&#8217;s Cope on about!?
+</p>
+<p>Such is the force of current thinking that even the title of this paper makes it seem like he&#8217;s trolling. Having read the paper carefully, I don&#8217;t think he is. That doesn&#8217;t mean I agree with him, but I agree with his attitude:
+</p>
+<blockquote><p>There&#8217;s a lot of advice, but very little of it is backed either by theory, data, or even a model of why you should believe a given piece of advice. Good testing begs skepticism. Be skeptical of yourself: measure, prove, retry. Be skeptical of me for heaven&#8217;s sake.
+</p>
+</blockquote><p>So, this talk will do just that.
+</p>
+<p>Unit tests: let&#8217;s get skeptical!
+</p>
+
+</div>
+
+
+<div class="atomentry" id="a-language-people-use-and-bitch-about">
 <h2 class="title"><a href="/articles/a-language-people-use-and-bitch-about">A language people use and bitch about</a></h2>
 <p class="meta"><abbr class="published" title="2016-08-24">2016-08-24</abbr> &bull; <a href="/tag/c" rel="tag">C</a>, <a href="/tag/c++" rel="tag">C++</a> &bull; <a href="/articles/a-language-people-use-and-bitch-about#disqus_thread">Comments</a></p>
 <p>Every so often a new essay hits the top of the programming news sites:
@@ -1585,96 +1624,6 @@ turn off 991,989 through 994,998
 </div>
 
 
-<div class="atomentry" id="jokey-code">
-<h2 class="title"><a href="/articles/jokey-code">Jokey Code?</a></h2>
-<p class="meta"><abbr class="published" title="2015-05-11">2015-05-11</abbr> &bull; <a href="/tag/documentation" rel="tag">Documentation</a>, <a href="/tag/accu" rel="tag">ACCU</a> &bull; <a href="/articles/jokey-code#disqus_thread">Comments</a></p>
-<h3>Choose Talks</h3>
-<p>I usually leave it as late as possible before deciding which sessions to attend at the <a href="http://accu.org/index.php/conferences/accu_conference_2015">ACCU conference</a>. There&#8217;s ample time to study the <a href="http://accu.org/index.php/conferences/accu_conference_2015/accu2015_schedule">schedule</a> when you&#8217;re there and anyway, it&#8217;s subject to change.
-</p>
-<p>This year I stuck with this policy with a couple of notable exceptions. First, there was <a href="/docs/oulipo/">my own talk</a>, where I noted that computer programmers are writers who impose formal constraints on their texts, and who can learn from other writers who practice the same discipline. Second, there was Peter Hilton&#8217;s talk, <a href="http://accu.org/index.php/conferences/accu_conference_2015/accu2015_sessions#how_to_name_things_-_the_hardest_problem_in_programming">&#8220;How to name things &#8212; the hardest problem in programming&#8221;</a>, in which he argued more generally that programmers had much to learn from writers.
-</p>
-<p>I <strong>had</strong> to see Peter Hilton&#8217;s talk and it did not disappoint. It engaged me at the time, in discussions afterwards, and it continues to make me think. I won&#8217;t post a full response here but I do want to consider one aspect: humour.
-</p>
-<div><iframe src="//www.slideshare.net/slideshow/embed_code/key/qnND7jVVQOmWCS" width="425" height="355" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" allowfullscreen></iframe></div>
-
-
-<h3>Tell Jokes</h3>
-<p>Peter Hilton argued we should pay attention to tips from the likes of George Orwell and Stephen King because their advice is better written and also because it&#8217;s <strong>funnier</strong>. Why does this humourous aspect matter? Well, perhaps we&#8217;re more likely to listen to someone who makes us laugh. Witty advice sounds less pompous.
-</p>
-<p>It goes deeper than this, though. Another point from the talk:
-</p>
-<blockquote><p>Improve your general vocabulary. Read books, especially funny novels.
-</p>
-</blockquote><p>Why <strong>funny novels</strong>? At this point in the talk Peter Hilton disingenously suggested such books were easier to read. A point he made later goes deeper:
-</p>
-<blockquote><p>Tell jokes &#8230; Puns are important for naming, because they rely on double-meanings. Spotting double-meanings is the essential skill for avoiding ambiguous names.
-</p>
-</blockquote><p>Interesting! I agree that word play and word power are linked: but do you need to be a punster to avoid ambiguity? I&#8217;m not sure. In the words of <a href="http://chrisoldwood.blogspot.co.uk/2015/04/the-daily-stand-up.html">Chris Oldwood</a>:
-</p>
-<blockquote><p>I&#8217;ve been writing more functional code lately. I recently tried a few numerical recipes with currying functions, but all I got was a NaN.
-</p>
-</blockquote><p><a href="http://en.wikipedia.org/wiki/Naan"><img src="/images/naan.jpg" alt="all I got was a NaN"/></a>
-</p>
-
-<h3>Laughable Code</h3>
-<p>Is there a place for humour in code? Rarely, I&#8217;d say. Code is read,
-   re-read and then read again: most jokes become tired and then
-   irritating under such scrutiny. Peter Hilton, though, described his
-   amusement on discovering this <a href="http://www.slideshare.net/pirhilton/how-to-name-things-the-hardest-problem-in-programming/55">function</a>, which configures
-   and starts <a href="http://camel.apache.org/">Apache Camel</a>:
-</p>
-<div class="typocode">
-
-<pre class="prettyprint">/** Configure and start Apache Camel */
-def mountCamel() {
-    Logger.info("Starting Camel...")
-    val context = new DefaultCamelContext()
-    configuredRoutes foreach { route =&gt;
-        context.addRoutes(route)
-    }
-    context.start()
-}
-
-</pre>
-
-</div>
-
-<p>The obvious alternative, <code>startCamel()</code>, just isn&#8217;t funny enough, apparently. I&#8217;m glad the author resisted the temptation to call it <code>humpCamel()</code>.
-</p>
-<p>I&#8217;m reminded of a colleague with a fondness for <a href="http://en.wikipedia.org/wiki/Franglais">franglais</a> who
-   would, for example, check in a graphics routine called
-   <code>do_le_render()</code>. Mildly amusing first time round, maybe, but less so
-   each time it got revisited to fix les bugs.
-</p>
-<p><a href="https://www.flickr.com/photos/ahmedrabea/7929947448" title="Ark of Desert - Camel by Ahmed Rabea, on Flickr"><img src="https://farm9.staticflickr.com/8180/7929947448_06dd57700c_z.jpg" width="640" height="427" alt="Ark of Desert - Camel"/></a>
-</p>
-<p>I don&#8217;t see many jokes in the code I read and I don&#8217;t think it&#8217;s
-   because the authors lack a sense of humour. Just as <a href="/articles/entertaining-documentation" title="Entertaining documentation">good
-documentation should inform rather than entertain</a>, good code
-   should express complex ideas as plainly as possible: humour doesn&#8217;t
-   get a look in.
-</p>
-<p>There are exceptions. We&#8217;ve already seen the name &#8220;camel&#8221; used for something which isn&#8217;t a camel: libraries, products and projects can benefit from short, memorable and quirky names. In unit tests, too, code is less complex, which can leave space for quips and in-jokes. When an integer is expected it often turns out to be <a href="https://www.google.co.uk/webhp?q=the%20answer%20to%20life%20the%20universe%20and%20everything">42</a>. Binary input data is laid out to form strange messages when viewed as <a href="http://nedbatchelder.com/text/hexwords.html">hexadecimal</a>. If some text &#8212; any old text &#8212; is needed, <a href="http://en.wikipedia.org/wiki/Lorem_ipsum">lorem ipsum</a> would indicate a lack of imagination. Even so, well-chosen names and values from the domain under test would probably be more helpful when a failing test needs fixing.
-</p>
-
-<h3>Charming code</h3>
-<p>I&#8217;m down on jokes in code but I do think code can be a pleasure to read and that well written programs can delight. Whilst I agree with Peter Hilton&#8217;s recommendation to read widely and well, I was surprised he didn&#8217;t recommend reading <strong>code</strong>, and when I discussed this with him afterwards he asked, where is it? Where is it! That will be the subject of another article, but off the top of my head, <a href="http://www.freetype.org">freetype</a>, <a href="https://www.ffmpeg.org/">ffmpeg</a>, <a href="http://llvm.org/">llvm</a>, the Go and Python standard libraries. If you read through any of these you&#8217;ll enjoy their clarity and internal consistency &#8212; their style; and should you code against them, these same attributes show through their interfaces.
-</p>
-<p>I haven&#8217;t found any jokes in the <a href="https://www.sqlite.org/">SQLite</a> source but if you decide
-   to integrate it in your application, when you check the license you&#8217;ll
-   find, instead, a <a href="https://www.sqlite.org/different.html">blessing</a>. This may seem funny &#8212; unusual,
-   certainly &#8212; but it&#8217;s actually quite serious.
-</p>
-<blockquote><p>May you do good and not evil<br/>
-May you find forgiveness for yourself and forgive others<br/>
-May you share freely, never taking more than you give.</p></blockquote>
-
-<p>We may not issue blessings with our own code but maybe we can find other ways to surprise and delight.
-</p>
-
-</div>
-
-
 <div class="extended">
 <p><a href="/articles/">Visit the Word Aligned archives...</a></p>
 </div>
@@ -1733,7 +1682,7 @@ May you share freely, never taking more than you give.</p></blockquote>
 
 <div class="sidebar-node">
 <h3>All Tags</h3>
-<p><a href="/tag/accidents" rel="tag">accidents</a>, <a href="/tag/accu" rel="tag">accu</a>, <a href="/tag/algorithms" rel="tag">algorithms</a>, <a href="/tag/android" rel="tag">android</a>, <a href="/tag/apple" rel="tag">apple</a>, <a href="/tag/apple" rel="tag">apple</a>, <a href="/tag/arc" rel="tag">arc</a>, <a href="/tag/awk" rel="tag">awk</a>, <a href="/tag/books" rel="tag">books</a>, <a href="/tag/boost" rel="tag">boost</a>, <a href="/tag/bristol" rel="tag">bristol</a>, <a href="/tag/bugs" rel="tag">bugs</a>, <a href="/tag/build" rel="tag">build</a>, <a href="/tag/c" rel="tag">c</a>, <a href="/tag/c++" rel="tag">c++</a>, <a href="/tag/characters" rel="tag">characters</a>, <a href="/tag/charts" rel="tag">charts</a>, <a href="/tag/chess" rel="tag">chess</a>, <a href="/tag/clrs" rel="tag">clrs</a>, <a href="/tag/conferences" rel="tag">conferences</a>, <a href="/tag/content" rel="tag">content</a>, <a href="/tag/crabs" rel="tag">crabs</a>, <a href="/tag/curl" rel="tag">curl</a>, <a href="/tag/cvs" rel="tag">cvs</a>, <a href="/tag/cvs2svn" rel="tag">cvs2svn</a>, <a href="/tag/cycling" rel="tag">cycling</a>, <a href="/tag/decorators" rel="tag">decorators</a>, <a href="/tag/design" rel="tag">design</a>, <a href="/tag/disqus" rel="tag">disqus</a>, <a href="/tag/docbook" rel="tag">docbook</a>, <a href="/tag/documentation" rel="tag">documentation</a>, <a href="/tag/drawing" rel="tag">drawing</a>, <a href="/tag/dynamic-languages" rel="tag">dynamic-languages</a>, <a href="/tag/editors" rel="tag">editors</a>, <a href="/tag/emacs" rel="tag">emacs</a>, <a href="/tag/erlang" rel="tag">erlang</a>, <a href="/tag/esr" rel="tag">esr</a>, <a href="/tag/etc" rel="tag">etc</a>, <a href="/tag/europython" rel="tag">europython</a>, <a href="/tag/fractals" rel="tag">fractals</a>, <a href="/tag/functional-programming" rel="tag">functional-programming</a>, <a href="/tag/github" rel="tag">github</a>, <a href="/tag/go" rel="tag">go</a>, <a href="/tag/google" rel="tag">google</a>, <a href="/tag/graphics" rel="tag">graphics</a>, <a href="/tag/haskell" rel="tag">haskell</a>, <a href="/tag/ide" rel="tag">ide</a>, <a href="/tag/imagemagick" rel="tag">imagemagick</a>, <a href="/tag/iphone" rel="tag">iphone</a>, <a href="/tag/java" rel="tag">java</a>, <a href="/tag/knuth" rel="tag">knuth</a>, <a href="/tag/lcs" rel="tag">lcs</a>, <a href="/tag/lighttpd" rel="tag">lighttpd</a>, <a href="/tag/lisp" rel="tag">lisp</a>, <a href="/tag/markdown" rel="tag">markdown</a>, <a href="/tag/missiles" rel="tag">missiles</a>, <a href="/tag/ocr" rel="tag">ocr</a>, <a href="/tag/openid" rel="tag">openid</a>, <a href="/tag/oulipo" rel="tag">oulipo</a>, <a href="/tag/perec" rel="tag">perec</a>, <a href="/tag/perl" rel="tag">perl</a>, <a href="/tag/php" rel="tag">php</a>, <a href="/tag/pi" rel="tag">pi</a>, <a href="/tag/pictures" rel="tag">pictures</a>, <a href="/tag/pil" rel="tag">pil</a>, <a href="/tag/primes" rel="tag">primes</a>, <a href="/tag/puzzles" rel="tag">puzzles</a>, <a href="/tag/python" rel="tag">python</a>, <a href="/tag/recommended" rel="tag">recommended</a>, <a href="/tag/recursion" rel="tag">recursion</a>, <a href="/tag/regex" rel="tag">regex</a>, <a href="/tag/reviews" rel="tag">reviews</a>, <a href="/tag/ruby" rel="tag">ruby</a>, <a href="/tag/ruby-on-rails" rel="tag">ruby-on-rails</a>, <a href="/tag/scheme" rel="tag">scheme</a>, <a href="/tag/scrum" rel="tag">scrum</a>, <a href="/tag/self" rel="tag">self</a>, <a href="/tag/shell" rel="tag">shell</a>, <a href="/tag/sicp" rel="tag">sicp</a>, <a href="/tag/spolsky" rel="tag">spolsky</a>, <a href="/tag/steganography" rel="tag">steganography</a>, <a href="/tag/streams" rel="tag">streams</a>, <a href="/tag/subversion" rel="tag">subversion</a>, <a href="/tag/syntax" rel="tag">syntax</a>, <a href="/tag/teamwork" rel="tag">teamwork</a>, <a href="/tag/tesseract" rel="tag">tesseract</a>, <a href="/tag/torvalds" rel="tag">torvalds</a>, <a href="/tag/trac" rel="tag">trac</a>, <a href="/tag/turing" rel="tag">turing</a>, <a href="/tag/two-wheels" rel="tag">two-wheels</a>, <a href="/tag/unix" rel="tag">unix</a>, <a href="/tag/virtualization" rel="tag">virtualization</a>, <a href="/tag/web-applications" rel="tag">web-applications</a>, <a href="/tag/webapplications" rel="tag">webapplications</a>, <a href="/tag/windows" rel="tag">windows</a>, <a href="/tag/zlib" rel="tag">zlib</a></p>
+<p><a href="/tag/accidents" rel="tag">accidents</a>, <a href="/tag/accu" rel="tag">accu</a>, <a href="/tag/algorithms" rel="tag">algorithms</a>, <a href="/tag/android" rel="tag">android</a>, <a href="/tag/apple" rel="tag">apple</a>, <a href="/tag/apple" rel="tag">apple</a>, <a href="/tag/arc" rel="tag">arc</a>, <a href="/tag/awk" rel="tag">awk</a>, <a href="/tag/books" rel="tag">books</a>, <a href="/tag/boost" rel="tag">boost</a>, <a href="/tag/bristol" rel="tag">bristol</a>, <a href="/tag/bugs" rel="tag">bugs</a>, <a href="/tag/build" rel="tag">build</a>, <a href="/tag/c" rel="tag">c</a>, <a href="/tag/c++" rel="tag">c++</a>, <a href="/tag/characters" rel="tag">characters</a>, <a href="/tag/charts" rel="tag">charts</a>, <a href="/tag/chess" rel="tag">chess</a>, <a href="/tag/clrs" rel="tag">clrs</a>, <a href="/tag/conferences" rel="tag">conferences</a>, <a href="/tag/content" rel="tag">content</a>, <a href="/tag/crabs" rel="tag">crabs</a>, <a href="/tag/curl" rel="tag">curl</a>, <a href="/tag/cvs" rel="tag">cvs</a>, <a href="/tag/cvs2svn" rel="tag">cvs2svn</a>, <a href="/tag/cycling" rel="tag">cycling</a>, <a href="/tag/decorators" rel="tag">decorators</a>, <a href="/tag/design" rel="tag">design</a>, <a href="/tag/disqus" rel="tag">disqus</a>, <a href="/tag/docbook" rel="tag">docbook</a>, <a href="/tag/documentation" rel="tag">documentation</a>, <a href="/tag/drawing" rel="tag">drawing</a>, <a href="/tag/dynamic-languages" rel="tag">dynamic-languages</a>, <a href="/tag/editors" rel="tag">editors</a>, <a href="/tag/emacs" rel="tag">emacs</a>, <a href="/tag/erlang" rel="tag">erlang</a>, <a href="/tag/esr" rel="tag">esr</a>, <a href="/tag/etc" rel="tag">etc</a>, <a href="/tag/europython" rel="tag">europython</a>, <a href="/tag/fractals" rel="tag">fractals</a>, <a href="/tag/functional-programming" rel="tag">functional-programming</a>, <a href="/tag/github" rel="tag">github</a>, <a href="/tag/go" rel="tag">go</a>, <a href="/tag/google" rel="tag">google</a>, <a href="/tag/graphics" rel="tag">graphics</a>, <a href="/tag/haskell" rel="tag">haskell</a>, <a href="/tag/ide" rel="tag">ide</a>, <a href="/tag/imagemagick" rel="tag">imagemagick</a>, <a href="/tag/iphone" rel="tag">iphone</a>, <a href="/tag/java" rel="tag">java</a>, <a href="/tag/knuth" rel="tag">knuth</a>, <a href="/tag/lcs" rel="tag">lcs</a>, <a href="/tag/lighttpd" rel="tag">lighttpd</a>, <a href="/tag/lisp" rel="tag">lisp</a>, <a href="/tag/markdown" rel="tag">markdown</a>, <a href="/tag/missiles" rel="tag">missiles</a>, <a href="/tag/ocr" rel="tag">ocr</a>, <a href="/tag/openid" rel="tag">openid</a>, <a href="/tag/oulipo" rel="tag">oulipo</a>, <a href="/tag/perec" rel="tag">perec</a>, <a href="/tag/perl" rel="tag">perl</a>, <a href="/tag/php" rel="tag">php</a>, <a href="/tag/pi" rel="tag">pi</a>, <a href="/tag/pictures" rel="tag">pictures</a>, <a href="/tag/pil" rel="tag">pil</a>, <a href="/tag/primes" rel="tag">primes</a>, <a href="/tag/puzzles" rel="tag">puzzles</a>, <a href="/tag/python" rel="tag">python</a>, <a href="/tag/recommended" rel="tag">recommended</a>, <a href="/tag/recursion" rel="tag">recursion</a>, <a href="/tag/regex" rel="tag">regex</a>, <a href="/tag/reviews" rel="tag">reviews</a>, <a href="/tag/ruby" rel="tag">ruby</a>, <a href="/tag/ruby-on-rails" rel="tag">ruby-on-rails</a>, <a href="/tag/scheme" rel="tag">scheme</a>, <a href="/tag/scrum" rel="tag">scrum</a>, <a href="/tag/self" rel="tag">self</a>, <a href="/tag/self" rel="tag">self</a>, <a href="/tag/shell" rel="tag">shell</a>, <a href="/tag/sicp" rel="tag">sicp</a>, <a href="/tag/spolsky" rel="tag">spolsky</a>, <a href="/tag/steganography" rel="tag">steganography</a>, <a href="/tag/streams" rel="tag">streams</a>, <a href="/tag/subversion" rel="tag">subversion</a>, <a href="/tag/syntax" rel="tag">syntax</a>, <a href="/tag/talks" rel="tag">talks</a>, <a href="/tag/teamwork" rel="tag">teamwork</a>, <a href="/tag/tesseract" rel="tag">tesseract</a>, <a href="/tag/tests" rel="tag">tests</a>, <a href="/tag/torvalds" rel="tag">torvalds</a>, <a href="/tag/trac" rel="tag">trac</a>, <a href="/tag/turing" rel="tag">turing</a>, <a href="/tag/two-wheels" rel="tag">two-wheels</a>, <a href="/tag/unix" rel="tag">unix</a>, <a href="/tag/virtualization" rel="tag">virtualization</a>, <a href="/tag/web-applications" rel="tag">web-applications</a>, <a href="/tag/webapplications" rel="tag">webapplications</a>, <a href="/tag/windows" rel="tag">windows</a>, <a href="/tag/zlib" rel="tag">zlib</a></p>
 
 </div>
 
@@ -1750,7 +1699,7 @@ May you share freely, never taking more than you give.</p></blockquote>
 <div class="sidebar-node">
 <h3>Chain</h3>
 <ul>
-<li><a accesskey="p" href="/articles/a-language-people-use-and-bitch-about" title="First article">&raquo; A language people use and bitch about</a></li>
+<li><a accesskey="p" href="/articles/unit-tests-questioned" title="First article">&raquo; Unit Tests Questioned</a></li>
 
 </ul>
 
