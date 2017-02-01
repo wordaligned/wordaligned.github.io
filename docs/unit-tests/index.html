@@ -33,7 +33,28 @@
 
 		<section>
 		  <h1>Unit Tests Questioned</h1>
-		  <p><small><a href="http://twitter.com/thomasguest">@thomasguest</a> &bull; <a href="http://wordaligned.org">wordaligned.org</a></small></p>
+		  <p><small><a href="http://twitter.com/thomasguest">@thomasguest</a> &bull; <a href="http://wordaligned.org">wordaligned.org</a> &bull; <a href="https://twitter.com/ClinithinkWales">@clinithinkwales</a></small></p>
+		</section>
+
+		<section>
+		  <h2>Agenda</h2>
+          <h3>setUp</h3>
+          <h3>questions</h3>
+          <h3>assertions</h3>
+          <h3>tearDown</h3>
+		</section>
+
+		<section>
+		  <h2>What&rsquo;s a Unit Test?</h2>
+          <p class="fragment"><strong>A unit test calls a function and checks the result.</strong></p>
+          <p class="fragment">
+            <strong>
+              <span style="color:green">PASS &#x2611;</span>
+              <span style="color:red">FAIL &#x2612;</span>
+            </strong>
+          </p>
+          <p class="fragment"><strong><span style="color:green">2017 tests passed in 225ms &#x2611;</span></strong></p>
+          <p class="fragment"><strong><span style="color:red">1/2017 tests failed in 228ms &#x2612;</span></strong></p>
 		</section>
 
         <section>
@@ -47,30 +68,34 @@
         </section>
 
         <section>
-          <h2>There's more to programming than getting code to function as intended</h2>
+          <h2>Reliability is not the only goal</h2>
         </section>
 
 		<section>
-		  <h1>whoami</h1>
+		  <h2>whoami</h2>
 		  <pre>assert self.job(time.then()) \
-    == "SN Systems, BRI"
-              
-assert self.job(time.now()) \
-    == "Clinithink, BGN"
+    == "<a href="https://twitter.com/SNSystemsEU">@SNSystems</a> #BRI"
 </pre>
 		</section>
 
         <section>
-          <h1>Test Pyramid</h1>
+          <h2>Test Pyramid</h2>
           <img src="./images/pyramid.jpg" alt="Test Pyramid" />
         </section>
 
 		<section>
-		  <h2>more unit tests = more code = more bugs!</h2>
+		  <h2>whoami</h2>
+		  <pre>assert self.job(time.now()) \
+    == "<a href="https://twitter.com/ClinithinkWales">@ClinithinkWales</a> #BGN"
+</pre>
+		</section>
+		<section>
+		  <h2>more unit tests = <br>more code = <br>more bugs!</h2>
 		</section>
 
         <section>
           <h2>Unit Tests slow you down</h2>
+          <pre class="fragment">git commit -m "Implement feature"</pre>
           <pre class="fragment">git commit -m "Fix the unit tests"</pre>
           <pre class="fragment">git commit -m "Fix the unit tests (again!)"</pre>
         </section>
@@ -92,30 +117,31 @@ assert self.job(time.now()) \
         </section>
 
         <section>
-          <h2>No, No, disagreee</h2>
+          <h2>Assert False</h2>
           <ul>
             <li>unit tests cannot touch the system (DB, files, sockets...)</li>
             <li>unit test all possible inputs</li>
             <li>unit test all code paths</li>
             <li>more tests = better</li>
-            <li>the type system tests your code</li>
+            <li>more tests = more code = more bugs</li>
             <li>delete any test which has passed for a year</li>
           </ul>
         </section>
 
         <section>
-          <h2>No, No, not for me</h2>
+          <h2>Assert False</h2>
           <ul>
             <li>you can&rsquo;t test legacy code</li>
             <li>you can&rsquo;t test code which uses singletons</li>
             <li>you can&rsquo;t test private methods</li>
+            <li>the type system tests your code</li>
             <li>don&rsquo;t write unit tests when prototyping</li>
             <li>don&rsquo;t write unit tests for code which will change</li>
           </ul>
         </section>
 
         <section>
-          <h2>No, No, not really</h2>
+          <h2>Assert False</h2>
           <ul>
             <li>you need the latest greatest unit test library</li>
             <li>you need to write your own unit test library</li>
@@ -125,7 +151,7 @@ assert self.job(time.now()) \
         </section>
 
         <section>
-          <h2>Yes, Yes, yes indeed</h2>
+          <h2>Assert True</h2>
           <ul>
             <li>unit tests run quickly</li>
             <li>unit tests run automatically</li>
@@ -136,11 +162,10 @@ assert self.job(time.now()) \
         </section>
 
         <section>
-          <h2>Yes, no, that could be</h2>
+          <h2>Assert Maybe</h2>
           <ul>
             <li>unit tests suit low level code</li>
             <li>writing unit tests is boring</li>
-            <li>testing is boring</li>
             <li>testing is creative</li>
             <li>get another engineer to write the tests</li>
             <li>system test failure &#8658; unit test missing</li>
@@ -199,22 +224,18 @@ def test_sort():
         </section>
 
 		<section>
-          <h1>Conclusions</h1>
-          <p class="fragment">Professor Sir Tony Hoare is right.</p>
-          <p class="fragment">James O Coplien isn&rsquo;t.</p>
-        </section>
-
-        <section>
-          <blockquote><small>The first tests of newly written code are those conducted by the programmer separately on isolated segments. These are extraordinarily effective in removing typographical errors, miskeying, and the results of misunderstanding the complexity of the programming language, the run-time library or the operating system. This is the kind of error that is easily made, even by the most experienced and diligent programmer, and fortunately just as easily corrected in today&rsquo;s fast-turnaround visual program debugging environments. Usually, the error is glaringly obvious on the first occasion that a given line of code is executed.</small></blockquote>
-          <p>Tony Hoare, <a href="http://www.gwern.net/docs/1996-hoare.pdf">How Did Software Get So Reliable Without Proof?</a></p>
+          <h2>Conclusions</h2>
+          <p class="fragment">Professor Sir Tony Hoare is right &#x2714;</p>
+          <p class="fragment">James O Coplien isn&rsquo;t &#x2718;</p>
+          <p class="fragment">Donald Knuth <a href="https://staff.fnwi.uva.nl/p.vanemdeboas/knuthnote.pdf">is being serious!</a></p>
         </section>
 
 		<section data-background="./images/beware-of-bugs.png">
         </section>
 
 		<section>
-          <h1>Thank you</h1>
-		  <p><small><a href="http://twitter.com/thomasguest">@thomasguest</a> &bull; <a href="http://wordaligned.org">wordaligned.org</a></small></p>
+          <h2>Thank you</h2>
+		  <p><small><a href="http://twitter.com/thomasguest">@thomasguest</a> &bull; <a href="http://wordaligned.org">wordaligned.org</a> &bull; <a href="https://twitter.com/ClinithinkWales">@clinithinkwales</a></small></p>
         </section>
 
       </div>
