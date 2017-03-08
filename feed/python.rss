@@ -7,6 +7,78 @@
 <dc:creator>tag@wordaligned.org</dc:creator>
 <language>en-gb</language>
 <item>
+<title>24 Puzzles</title>
+<description>&lt;p&gt;On &lt;a href="http://blog.plover.com"&gt;The Universe of Discourse&lt;/a&gt; Mark Dominus discusses the classic &lt;a href="http://blog.plover.com/math/24-puzzle.html"&gt;24 Puzzle&lt;/a&gt;:
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;You are given a sequence of four digits, say 1, 2, 3, 4, and your job is to combine them with ordinary arithmetic operations (+, -, &amp;times;, and &amp;divide;) in any order to make a target number, typically 24. For example, with 1, 2, 3, 4, you can go with &lt;code&gt;((1+2)+3)&amp;times;4=24&lt;/code&gt; or with &lt;code&gt;4&amp;times;((2&amp;times;3)&amp;times;1)=24&lt;/code&gt;.
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;Here&amp;#8217;s a solver for such puzzles. It uses &lt;code&gt;itertools&lt;/code&gt; to generate possible expressions, &lt;code&gt;fractions&lt;/code&gt; to get the arithmetic right, and &lt;code&gt;eval&lt;/code&gt; to evaluate expressions. It&amp;#8217;s limited to expressions formed from 4 numbers which means I don&amp;#8217;t have to programmatically calculate different ways of parenthesising: there are only 5.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;# http://blog.plover.com/math/24-puzzle.html
+import re
+import math
+
+# Use fractions for exact calculations
+from fractions import Fraction
+
+# Solve for 4 numbers only!
+N = 4
+
+# So these are the only expression templates
+# where X is a number and @ is an operation
+templates = '''\
+((X @ X) @ X) @ X
+(X @ (X @ X)) @ X
+X @ ((X @ X) @ X)
+X @ (X @ (X @ X))
+(X @ X) @ (X @ X)'''.splitlines()
+
+import itertools as its
+
+def defrac(s):
+    return re.compile(r'Fraction\((\d+)\)').sub(r'\1', s)
+
+def evaluate(nums, ops, template):
+    fracs = ('Fraction(%s)' % n for n in nums)
+    ops = iter(ops)
+    expr = ''.join(next(fracs) if c == 'X' else
+                   next(ops) if c == '@' else c
+                   for c in template)
+    try:
+        return expr, eval(expr)
+    except ZeroDivisionError:
+        return expr, None
+
+def solve(spec, ops):
+    numbers = re.compile(r'\d+').findall(spec)
+    assert len(numbers) == N + 1
+    result = F(numbers.pop())
+    seqs = its.product(its.permutations(numbers),
+                       its.product(ops, repeat=N-1),
+                       templates)
+    print(defrac(next((e for e, v in starmap(evaluate, seqs)
+                       if v == result),
+                      'Impossible')))
+
+def main():
+    solve('2,5,6,6 =&amp;gt; 17', '+-/*')
+    solve('3,3,8,8 =&amp;gt; 24', '+-/*')
+
+main()
+
+&lt;/pre&gt;
+
+&lt;/div&gt;</description>
+<dc:date>2017-03-08</dc:date>
+<guid>http://wordaligned.org/articles/24-puzzles</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/24-puzzles</link>
+<category>Python</category>
+</item>
+
+<item>
 <title>Negative Sequence Indices in Python</title>
 <description>&lt;p&gt;Supply a negative index when accessing a sequence and Python counts back from the end. So, for example, &lt;code&gt;my_list[-2]&lt;/code&gt; is the penultimate element of &lt;code&gt;my_list&lt;/code&gt;, which is much better than &lt;code&gt;my_list[len(my_list)-2]&lt;/code&gt; or even &lt;code&gt;*(++my_list.rbegin())&lt;/code&gt;.
 &lt;/p&gt;
@@ -4356,170 +4428,6 @@ def multiset_31(xs):
 <guid>http://wordaligned.org/articles/a-useful-octal-escape-sequence</guid>
 <author>tag@wordaligned.org (Thomas Guest)</author>
 <link>http://wordaligned.org/articles/a-useful-octal-escape-sequence</link>
-<category>Python</category>
-</item>
-
-<item>
-<title>Converting integer literals in C++ and Python</title>
-<description>&lt;p&gt;An integral literal in a C program can be decimal, hexadecimal or octal.
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
-
-&lt;pre class="prettyprint"&gt;int percent = 110;
-unsigned flags = 0x80;
-unsigned agent = 007;
-
-&lt;/pre&gt;
-
-&lt;/div&gt;
-
-&lt;p&gt;This snippet would be equivalent to (e.g.):
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
-
-&lt;pre class="prettyprint"&gt;int percent = 0156;
-unsigned flags = 128;
-unsigned agent = 0x7;
-
-&lt;/pre&gt;
-
-&lt;/div&gt;
-
-&lt;p&gt;So programmers can choose the best of these options when including numbers in their code.
-&lt;/p&gt;
-&lt;p&gt;Python adopted this same C syntax, but has recently gone on to extend and modify it. Some Python 2.6 numbers:
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
-
-&lt;pre class="prettyprint"&gt;Python 2.6
-&amp;gt;&amp;gt;&amp;gt; 0x80, 110, 007, 0O7, 0o7, 0b10000000
-(128, 110, 7, 7, 7, 128)
-
-&lt;/pre&gt;
-
-&lt;/div&gt;
-
-&lt;p&gt;I&amp;#8217;m pleased to see support for binary literals, which are useful for (e.g.) bitmasks. I&amp;#8217;ve never really seen the point of &lt;a href="http://wordaligned.org/articles/octal-literals.html"&gt;octals&lt;/a&gt;; nonetheless, they&amp;#8217;ve been enhanced for Python 3. Python 2.6 backports the new improved &lt;a href="http://www.python.org/dev/peps/pep-3127"&gt;octal literal syntax&lt;/a&gt; whilst retaining support for classic C-style octals. Python 3 drops C-style octals.
-&lt;/p&gt;
-&lt;span id="continue-reading"/&gt;
-
-&lt;div class="typocode"&gt;
-
-&lt;pre class="prettyprint"&gt;Python 3.1
-&amp;gt;&amp;gt;&amp;gt; 007
-  File "&amp;lt;stdin&amp;gt;", line 1
-    007
-      ^
-SyntaxError: invalid token
-&amp;gt;&amp;gt;&amp;gt; 0O7
-7
-
-&lt;/pre&gt;
-
-&lt;/div&gt;
-
-&lt;p&gt;Now consider the compiler/interpreter writer&amp;#8217;s problem. Clearly it must be possible to take a string representing an integer literal and work out what number it represents. At a first glance, the &lt;a href="http://docs.python.org/library/functions.html#int"&gt;int()&lt;/a&gt; builtin isn&amp;#8217;t quite smart enough to do the job without us supplying an explicit base for the conversion:
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
-
-&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; int('0xff')
-Traceback (most recent call last):
-  File "&amp;lt;stdin&amp;gt;", line 1, in &amp;lt;module&amp;gt;
-ValueError: invalid literal for int() with base 10: '0xff'
-&amp;gt;&amp;gt;&amp;gt; int('0xff', 16)
-255
-
-&lt;/pre&gt;
-
-&lt;/div&gt;
-
-&lt;p&gt;We might consider reading any prefix from the literal and dispatching the string to an appropriate handler. Something like this:
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
-
-&lt;pre class="prettyprint"&gt;def integer_literal_value(s):
-    if s.startswith('0x'):
-        return int(s, 16)
-    if s.startswith('0b'):
-        return int(s, 2)
-    ...
-
-&lt;/pre&gt;
-
-&lt;/div&gt;
-
-&lt;p&gt;Yuck! Surely there&amp;#8217;s an easier way to do something this fundamental? Well, there&amp;#8217;s always &lt;a href="http://docs.python.org/library/functions.html#eval"&gt;eval()&lt;/a&gt;, which turns the interpreter on itself.
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
-
-&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; def integer_literal_value(s): return eval(s)
-... 
-&amp;gt;&amp;gt;&amp;gt; v = integer_literal_value
-&amp;gt;&amp;gt;&amp;gt; v('0x80'), v('0o7'), v('0b1010101'), v('42')
-(128, 7, 85, 42)
-
-&lt;/pre&gt;
-
-&lt;/div&gt;
-
-&lt;p&gt;We should have looked more carefully at the &lt;a href="http://docs.python.org/library/functions.html#int"&gt;int()&lt;/a&gt; documentation:
-&lt;/p&gt;
-&lt;blockquote&gt;&lt;p&gt;&lt;strong&gt;int([x[, radix]])&lt;/strong&gt; &amp;#8230; The &lt;em&gt;radix&lt;/em&gt; parameter gives the base for the conversion (which is 10 by default) and may be any integer in the range [2, 36], or zero. If &lt;em&gt;radix&lt;/em&gt; is zero, the proper &lt;em&gt;radix&lt;/em&gt; is determined based on the contents of string; the interpretation is the same as for integer literals. 
-&lt;/p&gt;
-&lt;/blockquote&gt;&lt;p&gt;Perfect!
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
-
-&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; from functools import partial
-&amp;gt;&amp;gt;&amp;gt; integer_literal_value = partial(int, base=0)
-&amp;gt;&amp;gt;&amp;gt; v = integer_literal_value
-&amp;gt;&amp;gt;&amp;gt; v('0x80'), v('0o7'), v('0b1010101'), v('42')
-(128, 7, 85, 42)
-
-&lt;/pre&gt;
-
-&lt;/div&gt;
-
-&lt;p&gt;(Notice, by the way, that &lt;em&gt;radix&lt;/em&gt; is used in the online documentation but the actual argument name is &lt;em&gt;base&lt;/em&gt;. I&amp;#8217;ll confess that before I wrote this note I hadn&amp;#8217;t spotted this use of zero as a special value for string&amp;rarr;integer conversions even though it&amp;#8217;s been available since Python 2.1)
-&lt;/p&gt;
-&lt;p&gt;C++ also offers a way to convert integer literals into the numbers they represent, but it&amp;#8217;s not very well known. As is usual for format conversions, we use streams &amp;#8212; stringstreams typically, but here I show an example using standard input and output. The trick is to disable any numeric formatting of the input stream.
-&lt;/p&gt;
-&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;integer_literal_value.cpp&lt;/div&gt;
-
-&lt;pre class="prettyprint"&gt;#include &amp;lt;iostream&amp;gt;
-
-int main()
-{
-    int x;
-    std::cin.unsetf(std::ios::basefield);
-    while (std::cin &amp;gt;&amp;gt; x)
-    {
-        std::cout &amp;lt;&amp;lt; x &amp;lt;&amp;lt; '\n';
-    }
-    return std::cin.eof() ? 0 : 1;
-}
-
-&lt;/pre&gt;
-
-&lt;/div&gt;
-
-&lt;p&gt;It &lt;a href="http://www.cplusplus.com/reference/iostream/ios_base/fmtflags"&gt;works by magic&lt;/a&gt;.
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
-
-&lt;pre class="prettyprint"&gt;$ g++ integer_literal_value.cpp -o integer_literal_value
-$ echo 007 0x80 110 | ./integer_literal_value
-7
-128
-110
-
-&lt;/pre&gt;
-
-&lt;/div&gt;</description>
-<dc:date>2009-08-06</dc:date>
-<guid>http://wordaligned.org/articles/integer-literal-values</guid>
-<author>tag@wordaligned.org (Thomas Guest)</author>
-<link>http://wordaligned.org/articles/integer-literal-values</link>
 <category>Python</category>
 </item>
 

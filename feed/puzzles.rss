@@ -7,6 +7,78 @@
 <dc:creator>tag@wordaligned.org</dc:creator>
 <language>en-gb</language>
 <item>
+<title>24 Puzzles</title>
+<description>&lt;p&gt;On &lt;a href="http://blog.plover.com"&gt;The Universe of Discourse&lt;/a&gt; Mark Dominus discusses the classic &lt;a href="http://blog.plover.com/math/24-puzzle.html"&gt;24 Puzzle&lt;/a&gt;:
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;You are given a sequence of four digits, say 1, 2, 3, 4, and your job is to combine them with ordinary arithmetic operations (+, -, &amp;times;, and &amp;divide;) in any order to make a target number, typically 24. For example, with 1, 2, 3, 4, you can go with &lt;code&gt;((1+2)+3)&amp;times;4=24&lt;/code&gt; or with &lt;code&gt;4&amp;times;((2&amp;times;3)&amp;times;1)=24&lt;/code&gt;.
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;Here&amp;#8217;s a solver for such puzzles. It uses &lt;code&gt;itertools&lt;/code&gt; to generate possible expressions, &lt;code&gt;fractions&lt;/code&gt; to get the arithmetic right, and &lt;code&gt;eval&lt;/code&gt; to evaluate expressions. It&amp;#8217;s limited to expressions formed from 4 numbers which means I don&amp;#8217;t have to programmatically calculate different ways of parenthesising: there are only 5.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;# http://blog.plover.com/math/24-puzzle.html
+import re
+import math
+
+# Use fractions for exact calculations
+from fractions import Fraction
+
+# Solve for 4 numbers only!
+N = 4
+
+# So these are the only expression templates
+# where X is a number and @ is an operation
+templates = '''\
+((X @ X) @ X) @ X
+(X @ (X @ X)) @ X
+X @ ((X @ X) @ X)
+X @ (X @ (X @ X))
+(X @ X) @ (X @ X)'''.splitlines()
+
+import itertools as its
+
+def defrac(s):
+    return re.compile(r'Fraction\((\d+)\)').sub(r'\1', s)
+
+def evaluate(nums, ops, template):
+    fracs = ('Fraction(%s)' % n for n in nums)
+    ops = iter(ops)
+    expr = ''.join(next(fracs) if c == 'X' else
+                   next(ops) if c == '@' else c
+                   for c in template)
+    try:
+        return expr, eval(expr)
+    except ZeroDivisionError:
+        return expr, None
+
+def solve(spec, ops):
+    numbers = re.compile(r'\d+').findall(spec)
+    assert len(numbers) == N + 1
+    result = F(numbers.pop())
+    seqs = its.product(its.permutations(numbers),
+                       its.product(ops, repeat=N-1),
+                       templates)
+    print(defrac(next((e for e, v in starmap(evaluate, seqs)
+                       if v == result),
+                      'Impossible')))
+
+def main():
+    solve('2,5,6,6 =&amp;gt; 17', '+-/*')
+    solve('3,3,8,8 =&amp;gt; 24', '+-/*')
+
+main()
+
+&lt;/pre&gt;
+
+&lt;/div&gt;</description>
+<dc:date>2017-03-08</dc:date>
+<guid>http://wordaligned.org/articles/24-puzzles</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/24-puzzles</link>
+<category>Puzzles</category>
+</item>
+
+<item>
 <title>Python Streams vs Unix Pipes</title>
 <description>&lt;div class="toc"&gt;
 &lt;h2&gt;Contents&lt;/h2&gt;
@@ -3523,42 +3595,6 @@ results.
 <guid>http://wordaligned.org/articles/drawing-chessboards</guid>
 <author>tag@wordaligned.org (Thomas Guest)</author>
 <link>http://wordaligned.org/articles/drawing-chessboards</link>
-<category>Puzzles</category>
-</item>
-
-<item>
-<title>Sugar Pie</title>
-<description>&lt;p&gt;&lt;strong&gt;Question:&lt;/strong&gt; in the code snippet bleow, what does the result stream, &lt;code&gt;rs&lt;/code&gt;, approximate?
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
-
-&lt;pre class="prettyprint"&gt;from itertools import count, ifilter, izip
-from random import random as xy
-from math import hypot
-    
-pt = lambda: (xy(), xy())
-on = ifilter(lambda n: hypot(*pt()) &amp;lt; 1., count(1))
-rs = (4. * j / i for i, j in izip(on, count(1)))
-
-&lt;/pre&gt;
-
-&lt;/div&gt;
-
-&lt;p&gt;The code isn&amp;#8217;t wilfully obscure but I&amp;#8217;ll admit it&amp;#8217;s unusual. Although written in a functional style, the source of the stream, &lt;code&gt;pt&lt;/code&gt;, is utterly impure, generating a sequence of random results: it sprinkles points in a unit square. Despite this random input the results stream always tends to the same value. Well, in theory it should!
-&lt;/p&gt;
-&lt;p&gt;Here&amp;#8217;s a picture of a round pie on a square baking tray being dusted with sugar.    &lt;br /&gt;
-&lt;/p&gt;
-&lt;img alt="Dusting a pie" src="http://wordaligned.org/images/sugar-pie.gif"/&gt;
-
-&lt;p&gt;Thanks again to &lt;a href="http://gedmin.as"&gt;Marius Gedminas&lt;/a&gt; for pointing me at
-   &lt;code&gt;math.hypot&lt;/code&gt;, the best way to find the length of a 2D vector. (The
-   previous version of this note used &lt;code&gt;abs(complex(*pt())&lt;/code&gt;, which it
-   claimed to be better than &lt;code&gt;math.sqrt(x * x + y * y)&lt;/code&gt;).
-&lt;/p&gt;</description>
-<dc:date>2008-03-06</dc:date>
-<guid>http://wordaligned.org/articles/sugar-pie</guid>
-<author>tag@wordaligned.org (Thomas Guest)</author>
-<link>http://wordaligned.org/articles/sugar-pie</link>
 <category>Puzzles</category>
 </item>
 
