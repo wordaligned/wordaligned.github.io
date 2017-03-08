@@ -54,11 +54,11 @@ def evaluate(nums, ops, template):
 def solve(spec, ops):
     numbers = re.compile(r'\d+').findall(spec)
     assert len(numbers) == N + 1
-    result = F(numbers.pop())
+    result = Fraction(numbers.pop())
     seqs = its.product(its.permutations(numbers),
                        its.product(ops, repeat=N-1),
                        templates)
-    print(defrac(next((e for e, v in starmap(evaluate, seqs)
+    print(defrac(next((e for e, v in its.starmap(evaluate, seqs)
                        if v == result),
                       'Impossible')))
 
