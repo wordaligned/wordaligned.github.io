@@ -92,6 +92,51 @@ main()
 
 </div>
 
+<p>Here&#8217;s a second attempt, which doesn&#8217;t assume there will just be 4 numbers on the left hand side of the equation. Given a sequence of numbers and a set of operators, it repeatedly reduces the sequence length by picking pair of numbers and combining them using one of the operators, iterating over all possible ways of doing this. The first sequence of length 1 which equals the target value gives a solution and terminates the search.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint"># http://blog.plover.com/math/24-puzzle.html
+from fractions import Fraction
+import itertools as its
+import operator
+import re
+
+def pick2(xs):
+    return ((p[:2], p[2:]) for p in its.permutations(xs))
+
+def allow(op, l, r):
+    return op != '/' or eval(r) != 0
+
+def apply(op, l, r):
+    return '(%s%s%s)'%(l, op, r)
+
+def values(xs, ops):
+    L = [xs]
+    while L:
+        xs = L.pop()
+        if len(xs) == 1:
+            yield xs.pop()
+        else:
+            L.extend([apply(op, *lr)] + list(tl)
+                     for op, (lr, tl) in its.product(ops, pick2(xs))
+                     if allow(op, *lr))
+
+def solve(spec, ops):
+    numbers = ['Fraction(%s)'%n for n in re.compile(r'\d+').findall(spec)]
+    target = eval(numbers.pop())
+    print(next((v for v in values(numbers, ops) if eval(v) == target), 'Impossible'))
+
+def main():
+    solve('2,5,6,6 =&gt; 17', '+-/*')
+    solve('3,3,8,8 =&gt; 24', '+-/*')
+
+main()
+
+</pre>
+
+</div>
+
 </div>
 
 
