@@ -1,0 +1,181 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<link rel="icon" href="/images/favicon.png" type="image/png"/>
+<link href="/styles/application.css" media="all" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="/scripts/prettify.js"></script>
+<script type="text/javascript" src="/scripts/lang-lisp.js"></script>
+<title>From bytes to strings in Python and back again</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="author" content="Thomas Guest" />
+<meta name="description" content="A Word Aligned article posted 2017-03-24, tagged Python, Unicode." />
+<meta name="keywords" content="Python, Unicode" />
+<link rel="alternate" type="application/rss+xml" title="Feed" href="http://feeds.wordaligned.org/wordaligned" />
+</head>
+
+<body onload="prettyPrint()">
+<div id="container">
+  <div id="header">
+<h1><span><a accesskey="h" href="/">Word Aligned</a></span></h1>
+<h2>space sensitive programming</h2>
+<a class="button" href="http://feeds.wordaligned.org/wordaligned" title="Subscribe to Word Aligned"><img style="float: right;" src="/images/feed.png" alt="Feed Logo" height="28" width="28"/></a>
+</div>
+
+  <div id="page">
+    <div id="content">
+      <div class="atomentry" id="from-bytes-to-strings-in-python-and-back-again">
+<h2 class="title"><a href="/articles/from-bytes-to-strings-in-python-and-back-again">From bytes to strings in Python and back again</a></h2>
+<p class="meta"><abbr class="published" title="2017-03-24">2017-03-24</abbr> &bull; <a href="/tag/python" rel="tag">Python</a>, <a href="/tag/unicode" rel="tag">Unicode</a> &bull; <a href="/articles/from-bytes-to-strings-in-python-and-back-again#disqus_thread">Comments</a></p>
+<p>Low level languages like C have little opinion about what goes in a string, which is simply a null-terminated sequence of bytes. Those bytes could be ASCII or UTF-8 encoded text, or they could be raw data &#8212; object code, for example. It&#8217;s quite possible and legal to have a C string with mixed content.
+</p>
+<pre><code>char const * mixed =
+    "EURO SIGN "          // ASCII
+    "UTF-8 \xE2\x82\xAC " // UTF-8 encoded EURO SIGN
+    "Latin-9 \xA4";       // Latin-9 encoded EURO SIGN
+</code></pre><p>This might seem indisciplined and risky but it can be useful. Environment variables are notionally text but actually C strings, for example, meaning they can hold whatever data you want. Similarly filenames and command line parameters are only loosely text.
+</p>
+<p>A higher level language like Python makes a strict distinction between bytes and strings. Bytes objects contain raw data &#8212; a sequence of octets &#8212; whereas strings are Unicode sequences. Conversion between the two types is explicit: you encode a string to get bytes, specifying an encoding (which defaults to UTF-8); and you decode bytes to get a string. Clients of these functions should be aware that such conversions may fail, and should consider how failures are handled.
+</p>
+<p>Simply put, a string in Python is a valid Unicode sequence. Real world text data may not be. Programmers need to take charge of reconciling any discrepancies.
+</p>
+<p>We faced such problems recently <a href="https://clinithink.com">at work</a>. We&#8217;re in the business of extracting meaning from clinical narratives &#8212; text data stored on medical records systems in hospitals, for example. These documents may well have passed through a variety of systems. They may be unclear about their text encoding. They may not be encoded as they claim. So what? They can and do contain abbreviations, mispellings, jargon and colloquialisms. Refining the signal from such noise is our core business: if we can correctly interpret positional and temporal aspects of a sentence such as:
+</p>
+<blockquote><p>Previous fracture of left neck of femur
+</p>
+</blockquote><p>then we can surely deal with text which claims to be UTF-8 encoded but isn&#8217;t really.
+</p>
+<p>Our application stack is server-based: a REST API to a Python application handles document ingest; lower down, a C++ engine does the actual document processing. The problem we faced was supporting a modern API capable of handling real world data.
+</p>
+<p>It&#8217;s both undesirable and unnecessary to require clients to clean their text before submitting it. We want to make the ingest direct and idiomatic. Also, we shouldn&#8217;t penalise clients whose data <strong>is</strong> clean. Thus document upload is an HTTP POST request, and the document content is a JSON string &#8212; rather than, say, base64 encoded binary data. Our server, however, will be permissive about the contents of this string.
+</p>
+<p>So far so good. <a href="http://www.catb.org/jargon/html/P/Postels-Prescription.html" title="Postel's prescription">Postel&#8217;s prescription</a> advises:
+</p>
+<blockquote><p>Be liberal in what you accept, and conservative in what you send.
+</p>
+</blockquote><p>This would suggest accepting messy text data but presenting it in a cleaned up form. In our case, we <strong>do</strong> normalise the input data &#8212; a process which includes detecting and standardising date/time information, expanding abbreviations, fixing typos and so on &#8212; but this normalised form links back to a faithful copy of the original data. What gets presented to the user is their own text annotated with our findings. That is, we subscribe to a <a href="https://en.wikipedia.org/wiki/Garbage_in,_garbage_out">more primitive prescription</a> than Postel&#8217;s:
+</p>
+<blockquote><p>Garbage in, garbage out
+</p>
+</blockquote><p>with the caveat that the garbage shouldn&#8217;t be damaged in transit.
+</p>
+<p>Happily, there is a simple way to pass dodgy strings through Python. It&#8217;s used in the standard library to handle text data which isn&#8217;t guaranteed to be clean &#8212; those environment variables, command line parameters, and filenames for example.
+</p>
+<p>The <code>surrogateescape</code> error handler smuggles non-decodable bytes into the (Unicode) Python string in such a way that the original bytes can be recovered on encode, as described in <a href="https://www.python.org/dev/peps/pep-0383/" title="PEP 383 -- Non-decodable Bytes in System Character Interfaces">PEP 383</a>:
+</p>
+<blockquote><p>On POSIX systems, Python currently applies the locale&#8217;s encoding to convert the byte data to Unicode, failing for characters that cannot be decoded. With <a href="https://www.python.org/dev/peps/pep-0383/" title="PEP 383 -- Non-decodable Bytes in System Character Interfaces">this PEP</a>, non-decodable bytes &gt;= 128 will be represented as lone surrogate codes U+DC80..U+DCFF.
+</p>
+</blockquote><p>This workaround is possible because Unicode surrogates are intended for use in pairs. Quoting the Unicode specification, they <a href="http://www.unicode.org/versions/Unicode9.0.0/ch03.pdf#G2630">&#8220;have no interpretation on their own&#8221;</a>. The lone trailing surrogate code &#8212; the half-a-pair &#8212; can only be the result of a <code>surrogateescape</code> error handler being invoked, and the original bytes can be recovered by using the same error handler on encode.
+</p>
+<p>In conclusion, text data is handled differently in C++ and Python, posing a problem for layered applications. The <code>surrogateescape</code> error handler provides a standard and robust way of closing the gap.
+</p>
+
+<h2>Unicode Surrogate Pairs</h2>
+<p><a href="http://www.unicode.org/versions/Unicode9.0.0/ch03.pdf#G2630"><img src="/images/unicode-surrogates.png" alt="Surrogates"/></a>
+</p>
+
+<h2>Code Listing</h2>
+<pre><code>&gt;&gt;&gt; mixed = b"EURO SIGN \xE2\x82\xAC \xA4"
+&gt;&gt;&gt; mixed
+b'EURO SIGN \xe2\x82\xac \xa4'
+&gt;&gt;&gt; mixed.decode()
+Traceback (most recent call last):
+  File "&lt;stdin&gt;", line 1, in &lt;module&gt;
+UnicodeDecodeError: 'utf-8' codec can't decode byte 0xa4 in position 14:
+  invalid start byte
+&gt;&gt;&gt; help(mixed.decode)
+Help on built-in function decode:
+
+decode(encoding='utf-8', errors='strict') method of builtins.bytes instance
+    Decode the bytes using the codec registered for encoding.
+
+encoding
+      The encoding with which to decode the bytes.
+    errors
+      The error handling scheme to use for the handling of decoding errors.
+      The default is 'strict' meaning that decoding errors raise a
+      UnicodeDecodeError. Other possible values are 'ignore' and 'replace'
+      as well as any other name registered with codecs.register_error that
+      can handle UnicodeDecodeErrors.
+
+&gt;&gt;&gt; mixed.decode(errors='surrogateescape')
+'EURO SIGN &euro; \udca4'
+&gt;&gt;&gt; s = mixed.decode(errors='surrogateescape')
+&gt;&gt;&gt; s.encode()
+Traceback (most recent call last):
+  File "&lt;stdin&gt;", line 1, in &lt;module&gt;
+UnicodeEncodeError: 'utf-8' codec can't encode character '\udca4' in position 12:
+  surrogates not allowed
+&gt;&gt;&gt; s.encode(errors='surrogateescape')
+b'EURO SIGN \xe2\x82\xac \xa4'
+</code></pre>
+</div>
+
+<div class="comments"><hr/><div id="disqus_thread"></div><script type="text/javascript" src="http://disqus.com/forums/wordaligned/embed.js"></script></div>
+      
+<div id="comments"><script type="text/javascript">
+//<![CDATA[
+(function() {
+    var links = document.getElementsByTagName('a');
+    var query = '?';
+    for(var i = 0; i < links.length; i++) {
+        if(links[i].href.indexOf('#disqus_thread') >= 0) {
+            query += 'url' + i + '=' + encodeURIComponent(links[i].href) + '&amp;';
+        }
+    }
+    document.write('<script type="text/javascript" src="http://disqus.com/forums/wordaligned/get_num_replies.js' + query + '"></' + 'script>');
+})();
+//]]>
+</script></div>
+
+    </div>
+    <div id="sidebar">
+      
+<div class="sidebar-node">
+<h3>Tagged</h3>
+<ul id="categories"><li><a href="/tag/python" rel="tag">Python</a></li>
+<li><a href="/tag/unicode" rel="tag">Unicode</a></li></ul>
+
+</div>
+
+<div class="sidebar-node">
+<h3>Chain</h3>
+<ul>
+
+<li><a accesskey="p" href="/articles/24-puzzles" title="Previous article">&raquo; 24 Puzzles</a></li>
+</ul>
+
+
+</div>
+
+<div class="sidebar-node">
+<h3>Feeds</h3>
+
+<ul>
+<li><a href="http://feeds.wordaligned.org/wordaligned"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Articles</a></li>
+<li><a href="http://feeds.wordaligned.org/wordaligned/comments"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Comments</a></li>
+</ul>
+
+
+</div>
+
+    </div>
+  </div>
+  <div id="footer">
+<hr />
+<p><a href="http://tag.wordaligned.org">Thomas Guest</a></p>
+</div>
+
+</div>
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-3373724-1']);
+  _gaq.push(['_trackPageview']);
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ga);
+  })();
+</script>
+</body>
+
+</html>
