@@ -25,7 +25,165 @@
 
   <div id="page">
     <div id="content">
-      <div class="atomentry" id="agile-at-a-distance">
+      <div class="atomentry" id="slicing-a-list-evenly-with-python">
+<h2 class="title"><a href="/articles/slicing-a-list-evenly-with-python">Slicing a list evenly with Python</a></h2>
+<p class="meta"><abbr class="published" title="2017-05-14">2017-05-14</abbr> &bull; <a href="/tag/python" rel="tag">Python</a> &bull; <a href="/articles/slicing-a-list-evenly-with-python#disqus_thread">Comments</a></p>
+<img src="/images/sliced-python.jpg" alt="Sliced Python"/>
+
+<p>Here&#8217;s a problem I came up against recently.
+</p>
+<p>The task was to chop a list into exactly <code>n</code> evenly slized chunks. To give a little more context, let&#8217;s suppose we want to divide a list of jobs equally between <code>n</code> workers, where <code>n</code> might be the number of CPU cores available.
+</p>
+<p>We can build the result by repeatedly slicing the input:
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">def chunk(xs, n):
+    '''Split the list, xs, into n chunks'''
+    L = len(xs)
+    assert 0 &lt; n &lt;= L
+    s = L//n
+    return [xs[p:p+s] for p in range(0, L, s)]
+
+</pre>
+
+</div>
+
+<p>This looks promising
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">&gt;&gt;&gt; chunk('abcdefghi', 3)
+['abc', 'def', 'ghi']
+
+</pre>
+
+</div>
+
+<p>but if the size of the list is not an exact multiple of <code>n</code>, the result won&#8217;t contain <strong>exactly</strong> <code>n</code> chunks.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">&gt;&gt;&gt; chunk('abcde', 3)
+['a', 'b', 'c', 'd', 'e']
+&gt;&gt;&gt; chunk('abcdefgh', 3)
+['ab', 'cd', 'ef', 'gh']
+&gt;&gt;&gt; chunk('abcdefghij', 3)
+['abc', 'def', 'ghi', 'j']
+
+</pre>
+
+</div>
+
+<p>(By the way, I&#8217;m using strings rather than lists in the examples. The code works equally well for both types, and strings make it slightly easier to see what&#8217;s going on.)
+</p>
+<p>One way to fix the problem is to group the final chunks together.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">def chunk(xs, n):
+    '''Split the list, xs, into n chunks'''
+    L = len(xs)
+    assert 0 &lt; n &lt;= L
+    s, r = divmod(L, n)
+    chunks = [xs[p:p+s] for p in range(0, L, s)]
+    chunks[n-1:] = [xs[-r-s:]]
+    return chunks
+
+</pre>
+
+</div>
+
+<p>Now we have exactly <code>n</code> chunks, but they may not be evenly sized, since the last chunk gets padded with any surplus.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">&gt;&gt;&gt; chunk('abcde', 3)
+['a', 'b', 'cde']
+&gt;&gt;&gt; chunk('abcdefgh', 3)
+['ab', 'cd', 'efgh']
+&gt;&gt;&gt; chunk('abcdefghij', 3)
+['abc', 'def', 'ghij']
+
+</pre>
+
+</div>
+
+<p>What does &#8220;evenly sized&#8221; actually mean? Loosely speaking, we want the resulting chunks as closely sized as possible.
+</p>
+<p>More precisely, if the result of dividing the length of the list <code>L</code> by the number of chunks <code>n</code> gives a size <code>s</code> with remainder <code>r</code>, then the function should return <code>r</code> chunks of size <code>s+1</code> and <code>n-r</code> chunks of size <code>s</code>. There are <a href="https://en.wikipedia.org/wiki/Combination">choose(n, r)</a> ways of doing this. Here&#8217;s a solution which puts the longer chunks to the front of the results.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">def chunk(xs, n):
+    '''Split the list, xs, into n evenly sized chunks'''
+    L = len(xs)
+    assert 0 &lt; n &lt;= L
+    s, r = divmod(L, n)
+    t = s + 1
+    return ([xs[p:p+t] for p in range(0, r*t, t)] +
+            [xs[p:p+s] for p in range(r*t, L, s)])
+
+</pre>
+
+</div>
+
+<p>Here&#8217;s a second implementation, this time using <code>itertools</code>. Chaining <code>r</code> copies of <code>s+1</code> and <code>n-r</code> copies of <code>s</code> gives us the <code>n</code> chunk widths. Accumulating the widths gives us the list offsets for slicing &#8212; though note we need to prepend an initial <code>0</code>. Now we can form a <a href="/articles/zippy-triples-served-with-python">(this, next) pair of iterators</a> over the offsets, and the result is the accumulation of repeated <code>(begin, end)</code> slices taken from the original list.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">from itertools import accumulate, chain, repeat, tee
+
+def chunk(xs, n):
+    assert n &gt; 0
+    L = len(xs)
+    s, r = divmod(L, n)
+    widths = chain(repeat(s+1, r), repeat(s, n-r))
+    offsets = accumulate(chain((0,), widths))
+    b, e = tee(offsets)
+    next(e)
+    return [xs[s] for s in map(slice, b, e)]
+
+</pre>
+
+</div>
+
+<p>This version does something sensible in the case when the number of slices, <code>n</code>, exceeds the length of the list.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">&gt;&gt;&gt; chunk('ab', 5)
+['a', 'b', '', '', '']
+
+</pre>
+
+</div>
+
+<p>Finally, some tests.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">def test_chunk():
+    assert chunk('', 1) == ['']
+    assert chunk('ab', 2) == ['a', 'b']
+    assert chunk('abc', 2) == ['ab', 'c']
+    
+    xs = list(range(8))
+    assert chunk(xs, 2) == [[0, 1, 2, 3], [4, 5, 6, 7]]
+    assert chunk(xs, 3) == [[0, 1, 2], [3, 4, 5], [6, 7]]
+    assert chunk(xs, 5) == [[0, 1], [2, 3], [4, 5], [6], [7]]
+    
+    rs = range(1000000)
+    assert chunk(rs, 2) == [range(500000), range(500000, 1000000)]
+
+</pre>
+
+</div>
+
+</div>
+
+
+<div class="atomentry" id="agile-at-a-distance">
 <h2 class="title"><a href="/articles/agile-at-a-distance">Agile at a distance &#x1f44d;</a></h2>
 <p class="meta"><abbr class="published" title="2017-04-14">2017-04-14</abbr> &bull; <a href="/tag/self" rel="tag">Self</a>, <a href="/tag/agile" rel="tag">Agile</a> &bull; <a href="/articles/agile-at-a-distance#disqus_thread">Comments</a></p>
 <img width="540px" src="/docs/agile-at-a-distance/we-are-here.jpg" alt="We are here"/>
@@ -1473,307 +1631,6 @@ Qs = (Q for Q in permutations(sqs)
 </div>
 
 
-<div class="atomentry" id="gofmt-knows-best">
-<h2 class="title"><a href="/articles/gofmt-knows-best">Gofmt knows best</a></h2>
-<p class="meta"><abbr class="published" title="2016-03-07">2016-03-07</abbr> &bull; <a href="/tag/go" rel="tag">Go</a> &bull; <a href="/articles/gofmt-knows-best#disqus_thread">Comments</a></p>
-<div class="toc">
-<h2>Contents</h2>
-<ul>
- <li><a href="#toceveryones-favourite" name="toc0" id="toc0">Everyone&#8217;s favourite</a>
- </li>
-
- <li><a href="#tocgo-knows-best" name="toc1" id="toc1">Go knows best</a>
- </li>
-
- <li><a href="#tocwhen-formatters-fail" name="toc2" id="toc2">When formatters fail</a>
- </li>
-
- <li><a href="#tocdecluttered-java" name="toc3" id="toc3">Decluttered Java</a>
- </li>
-
- <li><a href="#toctetrominoes" name="toc4" id="toc4">Tetrominoes</a>
- </li>
-
- <li><a href="#tocobfuscation" name="toc5" id="toc5">Obfuscation</a>
- </li>
-
- <li><a href="#tocdepth-first-search" name="toc6" id="toc6">Depth First Search</a>
- </li>
-
- <li><a href="#tocconclusion" name="toc7" id="toc7">Conclusion</a>
- </li>
-</ul>
-</div>
-<h2><a href="#toc0" name="toceveryones-favourite" id="toceveryones-favourite">Everyone&#8217;s favourite</a></h2>
-<blockquote><p>Gofmt&#8217;s style is no one&#8217;s favorite, yet gofmt is everyone&#8217;s favorite.
-   &#8212; <a href="https://go-proverbs.github.io">Rob Pike</a>
-</p>
-</blockquote><p>Code formatting tools are nothing new but Go notches them up a level. Your Go installation comes with an automated formatter, <a href="https://golang.org/cmd/gofmt/">gofmt</a>, and this tool has been used to layout the entire code base. As a result, Go code looks uniform and familiar. The recommendation is to gofmt your own code, ideally on save and certainly before submitting for review.
-</p>
-<div class="typocode">
-
-<pre class="prettyprint">(add-hook 'before-save-hook 'gofmt-before-save)
-
-</pre>
-
-</div>
-
-<p><a href="http://clang.llvm.org/docs/ClangFormatStyleOptions.html">Formatting tools for other languages</a> require configuration. You must instruct the tool about your preferences for spaces and braces. Gofmt is inflexible and this is a strength.
-</p>
-<p>The language designers did Go a favour by supplying and promoting gofmt early on, before alternative style guides had been developed and adopted. There can be no more arguments about tabs vs spaces, for example. Code reviews must focus on content rather than layout.
-</p>
-<p>There are also more subtle benefits. Certain kinds of manual layout are fragile: the insertion of space to vertically align assignment statements, for example. A code formatter gets it right every time.
-</p>
-
-<h2><a href="#toc1" name="tocgo-knows-best" id="tocgo-knows-best">Go knows best</a></h2>
-<p>As writers &#8212; and programmers are, fundamentally, <a href="http://wordaligned.org/articles/lessons-from-the-oulipo">writers</a> &#8212; maybe we don&#8217;t want our work to look uniform or familiar. Maybe we prefer more control over what we produce. Maybe sometimes, we&#8217;d like to surprise or provoke.
-</p>
-<p>Does the regularity gofmt imposes render our code bland, even boring?
-</p>
-<p>I&#8217;ve heard this point extended to be a criticism of Go in general: that the language restricts what you can do because the language designers know best, and that it&#8217;s for your own good.
-</p>
-<p>Well, if I&#8217;ve ever submitted extravagently formatted code for review, it&#8217;s been slapped back. Substantial programs are developed by teams who adopt idiom and share style rules for good reason. It&#8217;s how we work together. Imagine how much easier it would be if the third party code in your code base was also written to your preferred style. Go gives you that, so long as you prefer its native style.
-</p>
-<p>Gofmt does not completely over-ride a programmer&#8217;s choices. Two programs which are semantically identical but laid out differently will probably still be laid out differently after a pass through gofmt.
-</p>
-
-<h2><a href="#toc2" name="tocwhen-formatters-fail" id="tocwhen-formatters-fail">When formatters fail</a></h2>
-<p>Formatting sometimes fails. Some examples follow.
-</p>
-
-<h3><a href="#toc3" name="tocdecluttered-java" id="tocdecluttered-java">Decluttered Java</a></h3>
-<p>Here&#8217;s some creatively formatted Java. Of course it&#8217;s a joke, and a funny one, but a language like Python, and indeed go, gets the last laugh. It <strong>is</strong> possible to get rid of braces and semicolons and your code <strong>will</strong> look better for it.
-</p>
-<div><blockquote class="twitter-tweet" data-lang="en"><p lang="en" dir="ltr">I finally figured out how to get those pesky semicolons and curly braces out of my Java code <a href="http://t.co/Ns96HdCuKO">pic.twitter.com/Ns96HdCuKO</a></p>&mdash; Uncle Bob&#39;s Nephew (@thedirtycoder) <a href="https://twitter.com/thedirtycoder/status/569339014085517312">February 22, 2015</a></blockquote><script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script></div>
-
-
-<h3><a href="#toc4" name="toctetrominoes" id="toctetrominoes">Tetrominoes</a></h3>
-<p>Here&#8217;s an equally witty but perfectly sensible use of non-standard layout.
-</p>
-<blockquote class="twitter-tweet" data-cards="hidden" data-lang="en"><p lang="en" dir="ltr">I always love it when code is formatted in the shape of the problem it&#39;s solving.<a href="https://t.co/XC7J2cSENj">pic.twitter.com/XC7J2cSENj</a></p>&mdash; Mathias Verraes (@mathiasverraes) <a href="https://twitter.com/mathiasverraes/status/669490082022367232">November 25, 2015</a></blockquote>
-
-<p>Mathias is referring to some tetrominoes &#8212; tetris shapes &#8212; coded in <a href="http://elm-lang.org">elm</a> by <a href="https://github.com/jcollard/elmtris/blob/master/src/Tetromino.elm">Joseph Collard</a>.
-</p>
-<div class="typocode">
-
-<pre class="prettyprint">-- A Tetromino is a list of Locations. By definition, a valid tetromino
--- should contain exactly 4 different locations
-type Tetromino = [Location]
-
-line : Tetromino
-line = [(0,0), (1,0), (2,0), (3,0)]
-
-square : Tetromino
-square = [(0,0), (1,0),
-          (0,1), (1,1)]
-
-spiece : Tetromino
-spiece = [       (1,0), (2,0),
-          (0,1), (1,1)]
-
-jpiece : Tetromino
-jpiece = [       (1,0),
-                 (1,1),
-          (0,2), (1,2)]
-
-</pre>
-
-</div>
-
-<p>For brevity, I&#8217;ve left out the Z and L pieces. I&#8217;ve also omitted comments from the original, which I would suggest are redundant since the code has been painstakingly formatted to indicate the shape of the pieces.
-</p>
-<p>The same tetrominoes in hand-formatted Go read:
-</p>
-<div class="typocode">
-
-<pre class="prettyprint">package tetris
-
-type Tetronimo [4][2]int
-
-var (
-    Line   = Tetronimo   {{0, 0}, {1, 0}, {2, 0}, {3, 0}}
-    
-    Square = Tetronimo   {{0, 0}, {1, 0}, 
-                          {0, 1}, {1, 1}}
-    
-    Spiece = Tetronimo   {        {1, 0}, {2, 0}, 
-                          {0, 1}, {1, 1}}
-    
-    Jpiece = Tetronimo   {        {1, 0}, 
-                                  {1, 1}, 
-                          {0, 2}, {1, 2}}
-)
-
-</pre>
-
-</div>
-
-<p>Gofmt spoils them:
-</p>
-<div class="typocode">
-
-<pre class="prettyprint">package tetris
-
-type Tetronimo [4][2]int
-
-var (
-	Line = Tetronimo{{0, 0}, {1, 0}, {2, 0}, {3, 0}}
-    
-	Square = Tetronimo{{0, 0}, {1, 0},
-		{0, 1}, {1, 1}}
-    
-	Spiece = Tetronimo{{1, 0}, {2, 0},
-		{0, 1}, {1, 1}}
-    
-	Jpiece = Tetronimo{{1, 0},
-		{1, 1},
-		{0, 2}, {1, 2}}
-)
-
-</pre>
-
-</div>
-
-
-<h3><a href="#toc5" name="tocobfuscation" id="tocobfuscation">Obfuscation</a></h3>
-<p>Here&#8217;s a tiny rectangular program <a href="http://accu.org/index.php/journals/256">submitted by Thaddaeus Frogley</a> to the International Obfuscated C Code Contest in 2001. It&#8217;s <strong>meant</strong> to be hard to read and the compact layout helps, by hindering.
-</p>
-<div class="typocode">
-
-<pre class="prettyprint">/*(c) 2001 Thad */
-#include&lt;string.h&gt;
-#include &lt;stdio.h&gt;
-#define abc stdout
-int main(int a,ch\
-ar*b){char*c="??="
-"??(??/??/??)??'{"
-"??!??&gt;??-";while(
-!((a=fgetc(stdin))
-==EOF))fputc((b=s\
-trchr(c,a))?fputc(
-fputc(077,abc),abc
-),"=(/)'&lt;!&gt;""-"??(
-b-c??):a, abc);??&gt;
-
-</pre>
-
-</div>
-
-<p>In the author&#8217;s own words:
-</p>
-<blockquote><p> I wanted to create a piece of code that could be considered to be &#8220;art&#8221; on multiple levels.
-</p>
-</blockquote><p>He&#8217;s succeeded. It&#8217;s impossible to translate this program into Go so I cannot gofmt it. If, instead, I try <a href="http://clang.llvm.org/docs/ClangFormatStyleOptions.html">clang-format</a>, the resulting code <strong>no longer compiles</strong>! Obfuscation has bamboozled the formatter.
-</p>
-<div class="typocode">
-
-<pre class="prettyprint">/*(c) 2001 Thad */
-#include &lt;stdio.h&gt;
-#include &lt;string.h&gt;
-#define abc stdout
-int main(int a, ch\
-ar *b) {
-  char *c = "??="
-            "??(??/??/??)??'{"
-            "??!??&gt;??-";
-  while (!((a = fgetc(stdin)) == EOF))fputc((b=s\
-trchr(c,a))?fputc(
-fputc(077,abc),abc
-),"=(/)'&lt;!&gt;""-"??(
-b-c??):a, abc);
-? ? &gt;
-
-</pre>
-
-</div>
-
-
-<h3><a href="#toc6" name="tocdepth-first-search" id="tocdepth-first-search">Depth First Search</a></h3>
-<p>Finally, here&#8217;s a recursive depth first search from the <a href="https://github.com/boostorg/graph/blob/develop/include/boost/graph/depth_first_search.hpp#L181">boost graph library</a>
-</p>
-<div class="typocode">
-
-<pre class="prettyprint">template &lt;class IncidenceGraph, class DFSVisitor, class ColorMap,
-          class TerminatorFunc&gt;
-void depth_first_visit_impl
-  (const IncidenceGraph&amp; g,
-   typename graph_traits&lt;IncidenceGraph&gt;::vertex_descriptor u,
-   DFSVisitor&amp; vis,  // pass-by-reference here, important!
-   ColorMap color, TerminatorFunc func)
-{
-  typedef typename graph_traits&lt;IncidenceGraph&gt;::vertex_descriptor Vertex;
-  typedef typename property_traits&lt;ColorMap&gt;::value_type ColorValue;
-  typedef color_traits&lt;ColorValue&gt; Color;
-  typename graph_traits&lt;IncidenceGraph&gt;::out_edge_iterator ei, ei_end;
-  
-  put(color, u, Color::gray());          vis.discover_vertex(u, g);
-  
-  if (!func(u, g))
-    for (boost::tie(ei, ei_end) = out_edges(u, g); ei != ei_end; ++ei) {
-      Vertex v = target(*ei, g);           vis.examine_edge(*ei, g);
-      ColorValue v_color = get(color, v);
-      if (v_color == Color::white()) {     vis.tree_edge(*ei, g);
-      depth_first_visit_impl(g, v, vis, color, func);
-      } else if (v_color == Color::gray()) vis.back_edge(*ei, g);
-      else                                 vis.forward_or_cross_edge(*ei, g);
-      call_finish_edge(vis, *ei, g);
-    }
-  put(color, u, Color::black());         vis.finish_vertex(u, g);
-}
-
-</pre>
-
-</div>
-
-<p>Clients of the function supply a visitor, <code>vis</code>, which is called back as vertices and edges are discovered and classified. These callbacks are carefully placed on the right hand side, visually distinguishing the core traversal from associated events. Note too the alignment, with edge events indented to the right of vertex events. Again, a code formatter tramples over this elegantly shaped code:
-</p>
-<div class="typocode">
-
-<pre class="prettyprint">template &lt;class IncidenceGraph, class DFSVisitor, class ColorMap,
-          class TerminatorFunc&gt;
-void depth_first_visit_impl(
-    const IncidenceGraph &amp;g,
-    typename graph_traits&lt;IncidenceGraph&gt;::vertex_descriptor u,
-    DFSVisitor &amp;vis, // pass-by-reference here, important!
-    ColorMap color, TerminatorFunc func) {
-  typedef typename graph_traits&lt;IncidenceGraph&gt;::vertex_descriptor Vertex;
-  typedef typename property_traits&lt;ColorMap&gt;::value_type ColorValue;
-  typedef color_traits&lt;ColorValue&gt; Color;
-  typename graph_traits&lt;IncidenceGraph&gt;::out_edge_iterator ei, ei_end;
-  
-  put(color, u, Color::gray());
-  vis.discover_vertex(u, g);
-  
-  if (!func(u, g))
-    for (boost::tie(ei, ei_end) = out_edges(u, g); ei != ei_end; ++ei) {
-      Vertex v = target(*ei, g);
-      vis.examine_edge(*ei, g);
-      ColorValue v_color = get(color, v);
-      if (v_color == Color::white()) {
-        vis.tree_edge(*ei, g);
-        depth_first_visit_impl(g, v, vis, color, func);
-      } else if (v_color == Color::gray())
-        vis.back_edge(*ei, g);
-      else
-        vis.forward_or_cross_edge(*ei, g);
-      call_finish_edge(vis, *ei, g);
-    }
-  put(color, u, Color::black());
-  vis.finish_vertex(u, g);
-}
-
-</pre>
-
-</div>
-
-
-<h2><a href="#toc7" name="tocconclusion" id="tocconclusion">Conclusion</a></h2>
-<p>Creative code formatting does have a place. Generally, though, gofmt gets it right: an automated tool can and should take care of formatting our code base, and the benefits are amplified if the tool is inflexible. With formatting solved we can focus our creative energy where it counts. 
-</p>
-
-</div>
-
-
 <div class="extended">
 <p><a href="/articles/">Visit the Word Aligned archives...</a></p>
 </div>
@@ -1817,7 +1674,7 @@ void depth_first_visit_impl(
 
 <div class="sidebar-node">
 <h3>Top Tags</h3>
-<ul id="categories"><li><a href="/tag/python" rel="tag">Python</a> <em>(118)</em></li>
+<ul id="categories"><li><a href="/tag/python" rel="tag">Python</a> <em>(119)</em></li>
 <li><a href="/tag/c++" rel="tag">C++</a> <em>(71)</em></li>
 <li><a href="/tag/self" rel="tag">Self</a> <em>(62)</em></li>
 <li><a href="/tag/puzzles" rel="tag">Puzzles</a> <em>(35)</em></li>
@@ -1849,7 +1706,7 @@ void depth_first_visit_impl(
 <div class="sidebar-node">
 <h3>Chain</h3>
 <ul>
-<li><a accesskey="p" href="/articles/agile-at-a-distance" title="First article">&raquo; Agile at a distance &#x1f44d;</a></li>
+<li><a accesskey="p" href="/articles/slicing-a-list-evenly-with-python" title="First article">&raquo; Slicing a list evenly with Python</a></li>
 
 </ul>
 

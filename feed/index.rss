@@ -7,6 +7,166 @@
 <dc:creator>tag@wordaligned.org</dc:creator>
 <language>en-gb</language>
 <item>
+<title>Slicing a list evenly with Python</title>
+<description>&lt;img src="http://wordaligned.org/images/sliced-python.jpg" alt="Sliced Python"/&gt;
+
+&lt;p&gt;Here&amp;#8217;s a problem I came up against recently.
+&lt;/p&gt;
+&lt;p&gt;The task was to chop a list into exactly &lt;code&gt;n&lt;/code&gt; evenly slized chunks. To give a little more context, let&amp;#8217;s suppose we want to divide a list of jobs equally between &lt;code&gt;n&lt;/code&gt; workers, where &lt;code&gt;n&lt;/code&gt; might be the number of CPU cores available.
+&lt;/p&gt;
+&lt;p&gt;We can build the result by repeatedly slicing the input:
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;def chunk(xs, n):
+    '''Split the list, xs, into n chunks'''
+    L = len(xs)
+    assert 0 &amp;lt; n &amp;lt;= L
+    s = L//n
+    return [xs[p:p+s] for p in range(0, L, s)]
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;This looks promising
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; chunk('abcdefghi', 3)
+['abc', 'def', 'ghi']
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;but if the size of the list is not an exact multiple of &lt;code&gt;n&lt;/code&gt;, the result won&amp;#8217;t contain &lt;strong&gt;exactly&lt;/strong&gt; &lt;code&gt;n&lt;/code&gt; chunks.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; chunk('abcde', 3)
+['a', 'b', 'c', 'd', 'e']
+&amp;gt;&amp;gt;&amp;gt; chunk('abcdefgh', 3)
+['ab', 'cd', 'ef', 'gh']
+&amp;gt;&amp;gt;&amp;gt; chunk('abcdefghij', 3)
+['abc', 'def', 'ghi', 'j']
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;(By the way, I&amp;#8217;m using strings rather than lists in the examples. The code works equally well for both types, and strings make it slightly easier to see what&amp;#8217;s going on.)
+&lt;/p&gt;
+&lt;p&gt;One way to fix the problem is to group the final chunks together.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;def chunk(xs, n):
+    '''Split the list, xs, into n chunks'''
+    L = len(xs)
+    assert 0 &amp;lt; n &amp;lt;= L
+    s, r = divmod(L, n)
+    chunks = [xs[p:p+s] for p in range(0, L, s)]
+    chunks[n-1:] = [xs[-r-s:]]
+    return chunks
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Now we have exactly &lt;code&gt;n&lt;/code&gt; chunks, but they may not be evenly sized, since the last chunk gets padded with any surplus.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; chunk('abcde', 3)
+['a', 'b', 'cde']
+&amp;gt;&amp;gt;&amp;gt; chunk('abcdefgh', 3)
+['ab', 'cd', 'efgh']
+&amp;gt;&amp;gt;&amp;gt; chunk('abcdefghij', 3)
+['abc', 'def', 'ghij']
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;What does &amp;#8220;evenly sized&amp;#8221; actually mean? Loosely speaking, we want the resulting chunks as closely sized as possible.
+&lt;/p&gt;
+&lt;p&gt;More precisely, if the result of dividing the length of the list &lt;code&gt;L&lt;/code&gt; by the number of chunks &lt;code&gt;n&lt;/code&gt; gives a size &lt;code&gt;s&lt;/code&gt; with remainder &lt;code&gt;r&lt;/code&gt;, then the function should return &lt;code&gt;r&lt;/code&gt; chunks of size &lt;code&gt;s+1&lt;/code&gt; and &lt;code&gt;n-r&lt;/code&gt; chunks of size &lt;code&gt;s&lt;/code&gt;. There are &lt;a href="https://en.wikipedia.org/wiki/Combination"&gt;choose(n, r)&lt;/a&gt; ways of doing this. Here&amp;#8217;s a solution which puts the longer chunks to the front of the results.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;def chunk(xs, n):
+    '''Split the list, xs, into n evenly sized chunks'''
+    L = len(xs)
+    assert 0 &amp;lt; n &amp;lt;= L
+    s, r = divmod(L, n)
+    t = s + 1
+    return ([xs[p:p+t] for p in range(0, r*t, t)] +
+            [xs[p:p+s] for p in range(r*t, L, s)])
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Here&amp;#8217;s a second implementation, this time using &lt;code&gt;itertools&lt;/code&gt;. Chaining &lt;code&gt;r&lt;/code&gt; copies of &lt;code&gt;s+1&lt;/code&gt; and &lt;code&gt;n-r&lt;/code&gt; copies of &lt;code&gt;s&lt;/code&gt; gives us the &lt;code&gt;n&lt;/code&gt; chunk widths. Accumulating the widths gives us the list offsets for slicing &amp;#8212; though note we need to prepend an initial &lt;code&gt;0&lt;/code&gt;. Now we can form a &lt;a href="http://wordaligned.org/articles/zippy-triples-served-with-python"&gt;(this, next) pair of iterators&lt;/a&gt; over the offsets, and the result is the accumulation of repeated &lt;code&gt;(begin, end)&lt;/code&gt; slices taken from the original list.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;from itertools import accumulate, chain, repeat, tee
+
+def chunk(xs, n):
+    assert n &amp;gt; 0
+    L = len(xs)
+    s, r = divmod(L, n)
+    widths = chain(repeat(s+1, r), repeat(s, n-r))
+    offsets = accumulate(chain((0,), widths))
+    b, e = tee(offsets)
+    next(e)
+    return [xs[s] for s in map(slice, b, e)]
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;This version does something sensible in the case when the number of slices, &lt;code&gt;n&lt;/code&gt;, exceeds the length of the list.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; chunk('ab', 5)
+['a', 'b', '', '', '']
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Finally, some tests.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;def test_chunk():
+    assert chunk('', 1) == ['']
+    assert chunk('ab', 2) == ['a', 'b']
+    assert chunk('abc', 2) == ['ab', 'c']
+    
+    xs = list(range(8))
+    assert chunk(xs, 2) == [[0, 1, 2, 3], [4, 5, 6, 7]]
+    assert chunk(xs, 3) == [[0, 1, 2], [3, 4, 5], [6, 7]]
+    assert chunk(xs, 5) == [[0, 1], [2, 3], [4, 5], [6], [7]]
+    
+    rs = range(1000000)
+    assert chunk(rs, 2) == [range(500000), range(500000, 1000000)]
+
+&lt;/pre&gt;
+
+&lt;/div&gt;</description>
+<dc:date>2017-05-14</dc:date>
+<guid>http://wordaligned.org/articles/slicing-a-list-evenly-with-python</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/slicing-a-list-evenly-with-python</link>
+<category>Python</category>
+</item>
+
+<item>
 <title>Agile at a distance &#x1f44d;</title>
 <description>&lt;div class="toc"&gt;
 &lt;h2&gt;Contents&lt;/h2&gt;
@@ -2053,99 +2213,6 @@ turn off 991,989 through 994,998
 <category>Self</category>
 <category>Emacs</category>
 <category>Design</category>
-</item>
-
-<item>
-<title>Jokey Code?</title>
-<description>&lt;h3&gt;Choose Talks&lt;/h3&gt;
-&lt;p&gt;I usually leave it as late as possible before deciding which sessions to attend at the &lt;a href="http://accu.org/index.php/conferences/accu_conference_2015"&gt;ACCU conference&lt;/a&gt;. There&amp;#8217;s ample time to study the &lt;a href="http://accu.org/index.php/conferences/accu_conference_2015/accu2015_schedule"&gt;schedule&lt;/a&gt; when you&amp;#8217;re there and anyway, it&amp;#8217;s subject to change.
-&lt;/p&gt;
-&lt;p&gt;This year I stuck with this policy with a couple of notable exceptions. First, there was &lt;a href="http://wordaligned.org/docs/oulipo/"&gt;my own talk&lt;/a&gt;, where I noted that computer programmers are writers who impose formal constraints on their texts, and who can learn from other writers who practice the same discipline. Second, there was Peter Hilton&amp;#8217;s talk, &lt;a href="http://accu.org/index.php/conferences/accu_conference_2015/accu2015_sessions#how_to_name_things_-_the_hardest_problem_in_programming"&gt;&amp;#8220;How to name things &amp;#8212; the hardest problem in programming&amp;#8221;&lt;/a&gt;, in which he argued more generally that programmers had much to learn from writers.
-&lt;/p&gt;
-&lt;p&gt;I &lt;strong&gt;had&lt;/strong&gt; to see Peter Hilton&amp;#8217;s talk and it did not disappoint. It engaged me at the time, in discussions afterwards, and it continues to make me think. I won&amp;#8217;t post a full response here but I do want to consider one aspect: humour.
-&lt;/p&gt;
-&lt;div&gt;&lt;iframe src="http://wordaligned.org//www.slideshare.net/slideshow/embed_code/key/qnND7jVVQOmWCS" width="425" height="355" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" allowfullscreen&gt;&lt;/iframe&gt;&lt;/div&gt;
-
-
-&lt;h3&gt;Tell Jokes&lt;/h3&gt;
-&lt;p&gt;Peter Hilton argued we should pay attention to tips from the likes of George Orwell and Stephen King because their advice is better written and also because it&amp;#8217;s &lt;strong&gt;funnier&lt;/strong&gt;. Why does this humourous aspect matter? Well, perhaps we&amp;#8217;re more likely to listen to someone who makes us laugh. Witty advice sounds less pompous.
-&lt;/p&gt;
-&lt;p&gt;It goes deeper than this, though. Another point from the talk:
-&lt;/p&gt;
-&lt;blockquote&gt;&lt;p&gt;Improve your general vocabulary. Read books, especially funny novels.
-&lt;/p&gt;
-&lt;/blockquote&gt;&lt;p&gt;Why &lt;strong&gt;funny novels&lt;/strong&gt;? At this point in the talk Peter Hilton disingenously suggested such books were easier to read. A point he made later goes deeper:
-&lt;/p&gt;
-&lt;blockquote&gt;&lt;p&gt;Tell jokes &amp;#8230; Puns are important for naming, because they rely on double-meanings. Spotting double-meanings is the essential skill for avoiding ambiguous names.
-&lt;/p&gt;
-&lt;/blockquote&gt;&lt;p&gt;Interesting! I agree that word play and word power are linked: but do you need to be a punster to avoid ambiguity? I&amp;#8217;m not sure. In the words of &lt;a href="http://chrisoldwood.blogspot.co.uk/2015/04/the-daily-stand-up.html"&gt;Chris Oldwood&lt;/a&gt;:
-&lt;/p&gt;
-&lt;blockquote&gt;&lt;p&gt;I&amp;#8217;ve been writing more functional code lately. I recently tried a few numerical recipes with currying functions, but all I got was a NaN.
-&lt;/p&gt;
-&lt;/blockquote&gt;&lt;p&gt;&lt;a href="http://en.wikipedia.org/wiki/Naan"&gt;&lt;img src="http://wordaligned.org/images/naan.jpg" alt="all I got was a NaN"/&gt;&lt;/a&gt;
-&lt;/p&gt;
-
-&lt;h3&gt;Laughable Code&lt;/h3&gt;
-&lt;p&gt;Is there a place for humour in code? Rarely, I&amp;#8217;d say. Code is read,
-   re-read and then read again: most jokes become tired and then
-   irritating under such scrutiny. Peter Hilton, though, described his
-   amusement on discovering this &lt;a href="http://www.slideshare.net/pirhilton/how-to-name-things-the-hardest-problem-in-programming/55"&gt;function&lt;/a&gt;, which configures
-   and starts &lt;a href="http://camel.apache.org/"&gt;Apache Camel&lt;/a&gt;:
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
-
-&lt;pre class="prettyprint"&gt;/** Configure and start Apache Camel */
-def mountCamel() {
-    Logger.info("Starting Camel...")
-    val context = new DefaultCamelContext()
-    configuredRoutes foreach { route =&amp;gt;
-        context.addRoutes(route)
-    }
-    context.start()
-}
-
-&lt;/pre&gt;
-
-&lt;/div&gt;
-
-&lt;p&gt;The obvious alternative, &lt;code&gt;startCamel()&lt;/code&gt;, just isn&amp;#8217;t funny enough, apparently. I&amp;#8217;m glad the author resisted the temptation to call it &lt;code&gt;humpCamel()&lt;/code&gt;.
-&lt;/p&gt;
-&lt;p&gt;I&amp;#8217;m reminded of a colleague with a fondness for &lt;a href="http://en.wikipedia.org/wiki/Franglais"&gt;franglais&lt;/a&gt; who
-   would, for example, check in a graphics routine called
-   &lt;code&gt;do_le_render()&lt;/code&gt;. Mildly amusing first time round, maybe, but less so
-   each time it got revisited to fix les bugs.
-&lt;/p&gt;
-&lt;p&gt;&lt;a href="https://www.flickr.com/photos/ahmedrabea/7929947448" title="Ark of Desert - Camel by Ahmed Rabea, on Flickr"&gt;&lt;img src="https://farm9.staticflickr.com/8180/7929947448_06dd57700c_z.jpg" width="640" height="427" alt="Ark of Desert - Camel"/&gt;&lt;/a&gt;
-&lt;/p&gt;
-&lt;p&gt;I don&amp;#8217;t see many jokes in the code I read and I don&amp;#8217;t think it&amp;#8217;s
-   because the authors lack a sense of humour. Just as &lt;a href="http://wordaligned.org/articles/entertaining-documentation" title="Entertaining documentation"&gt;good
-documentation should inform rather than entertain&lt;/a&gt;, good code
-   should express complex ideas as plainly as possible: humour doesn&amp;#8217;t
-   get a look in.
-&lt;/p&gt;
-&lt;p&gt;There are exceptions. We&amp;#8217;ve already seen the name &amp;#8220;camel&amp;#8221; used for something which isn&amp;#8217;t a camel: libraries, products and projects can benefit from short, memorable and quirky names. In unit tests, too, code is less complex, which can leave space for quips and in-jokes. When an integer is expected it often turns out to be &lt;a href="https://www.google.co.uk/webhp?q=the%20answer%20to%20life%20the%20universe%20and%20everything"&gt;42&lt;/a&gt;. Binary input data is laid out to form strange messages when viewed as &lt;a href="http://nedbatchelder.com/text/hexwords.html"&gt;hexadecimal&lt;/a&gt;. If some text &amp;#8212; any old text &amp;#8212; is needed, &lt;a href="http://en.wikipedia.org/wiki/Lorem_ipsum"&gt;lorem ipsum&lt;/a&gt; would indicate a lack of imagination. Even so, well-chosen names and values from the domain under test would probably be more helpful when a failing test needs fixing.
-&lt;/p&gt;
-
-&lt;h3&gt;Charming code&lt;/h3&gt;
-&lt;p&gt;I&amp;#8217;m down on jokes in code but I do think code can be a pleasure to read and that well written programs can delight. Whilst I agree with Peter Hilton&amp;#8217;s recommendation to read widely and well, I was surprised he didn&amp;#8217;t recommend reading &lt;strong&gt;code&lt;/strong&gt;, and when I discussed this with him afterwards he asked, where is it? Where is it! That will be the subject of another article, but off the top of my head, &lt;a href="http://www.freetype.org"&gt;freetype&lt;/a&gt;, &lt;a href="https://www.ffmpeg.org/"&gt;ffmpeg&lt;/a&gt;, &lt;a href="http://llvm.org/"&gt;llvm&lt;/a&gt;, the Go and Python standard libraries. If you read through any of these you&amp;#8217;ll enjoy their clarity and internal consistency &amp;#8212; their style; and should you code against them, these same attributes show through their interfaces.
-&lt;/p&gt;
-&lt;p&gt;I haven&amp;#8217;t found any jokes in the &lt;a href="https://www.sqlite.org/"&gt;SQLite&lt;/a&gt; source but if you decide
-   to integrate it in your application, when you check the license you&amp;#8217;ll
-   find, instead, a &lt;a href="https://www.sqlite.org/different.html"&gt;blessing&lt;/a&gt;. This may seem funny &amp;#8212; unusual,
-   certainly &amp;#8212; but it&amp;#8217;s actually quite serious.
-&lt;/p&gt;
-&lt;blockquote&gt;&lt;p&gt;May you do good and not evil&lt;br/&gt;
-May you find forgiveness for yourself and forgive others&lt;br/&gt;
-May you share freely, never taking more than you give.&lt;/p&gt;&lt;/blockquote&gt;
-
-&lt;p&gt;We may not issue blessings with our own code but maybe we can find other ways to surprise and delight.
-&lt;/p&gt;</description>
-<dc:date>2015-05-11</dc:date>
-<guid>http://wordaligned.org/articles/jokey-code</guid>
-<author>tag@wordaligned.org (Thomas Guest)</author>
-<link>http://wordaligned.org/articles/jokey-code</link>
-<category>Documentation</category>
-<category>ACCU</category>
 </item>
 
 </channel>
