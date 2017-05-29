@@ -11,7 +11,7 @@
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
 <meta name="author" content="Thomas Guest" />
 <meta name="description" content="A collection of articles on software development written by Thomas Guest." />
-<meta name="keywords" content="CLRS, Regex, Missiles, Cycling, apple, Agile, Self, Editors, Emacs, Primes, Torvalds, talks, ImageMagick, Hoare, IDE, Decorators, Tests, Shell, PIL, Lcs, Turing, Ruby on Rails, Puzzles, Europython, iphone, Characters, Pictures, Fractals, Crabs, tests, Github, DocBook, Dynamic Languages, lighttpd, Bugs, CVS, Reviews, Steganography, Oulipo, Perec, Content, Markdown, Two Wheels, Conferences, Syntax, Unix, Arc, Go, Web-applications, Chess, Web Applications, Java, Esr, Recursion, Charts, Perl, Subversion, Recommended, Teamwork, Build, ACCU, Knuth, Android, Erlang, Boost, php, OCR, Python, cvs2svn, self, Scrum, SICP, Windows, Books, Awk, Graphics, Disqus, Ruby, openid, C, Zlib, Trac, Lisp, Documentation, C++, Etc, Streams, Bristol, Tesseract, Drawing, Accidents, Google, Apple, Functional Programming, Pi, Haskell, Design, Virtualization, Unicode, Spolsky, Algorithms, Curl, Scheme" />
+<meta name="keywords" content="CLRS, Regex, Missiles, Cycling, Agile, Self, Editors, Emacs, Torvalds, ImageMagick, Hoare, IDE, Decorators, Tests, Shell, PIL, Lcs, Turing, Ruby on Rails, Puzzles, Europython, Characters, Pictures, Fractals, Crabs, Github, DocBook, Dynamic Languages, lighttpd, Bugs, CVS, Reviews, Web-applications, Steganography, Algorithms, Perec, Content, Markdown, Two Wheels, Conferences, Chess, Syntax, Unix, Arc, Go, Primes, Iphone, Web Applications, Java, Esr, Recursion, Charts, Perl, Subversion, Recommended, Teamwork, Build, ACCU, Knuth, Android, Erlang, Boost, php, OCR, Python, cvs2svn, Scrum, SICP, Lisp, Books, Awk, Graphics, Disqus, Ruby, openid, C, Zlib, Talks, Trac, Windows, Documentation, C++, Etc, Streams, Bristol, Tesseract, Drawing, Accidents, Google, Apple, Functional Programming, Pi, Haskell, Design, Virtualization, Unicode, Spolsky, Oulipo, Curl, Scheme" />
 <link rel="alternate" type="application/rss+xml" title="Feed" href="http://feeds.wordaligned.org/wordaligned" />
 </head>
 
@@ -25,7 +25,32 @@
 
   <div id="page">
     <div id="content">
-      <div class="atomentry" id="lazy-sequences-working-hard">
+      <div class="atomentry" id="unleash-the-test-army">
+<h2 class="title"><a href="/articles/unleash-the-test-army">Unleash the test army</a></h2>
+<p class="meta"><abbr class="published" title="2017-05-29">2017-05-29</abbr> &bull; <a href="/tag/tests" rel="tag">Tests</a>, <a href="/tag/python" rel="tag">Python</a> &bull; <a href="/articles/unleash-the-test-army#disqus_thread">Comments</a></p>
+<h2>Are the tests adequate?</h2>
+<p>Recently I described a solution to <a href="/articles/slicing-a-list-evenly-with-python">the problem of dividing a list into evenly sized chunks</a>. It&#8217;s a simple enough problem with just two inputs: the list (or other sliceable container) <code>xs</code> and the number of chunks <code>n</code>. Nonetheless, there are traps to avoid and special cases to consider &#8212; what if <code>n</code> is larger than the list, for example? Must the chunks comprise contiguous elements from the original list?
+</p>
+<p>The tests I came up with are straightforward and uninspiring. They were developed within the context of my own assumptions about the solution and the special cases I could imagine. They were written after the implementation &#8212; which is to say, development wasn&#8217;t driven by tests. They are whitebox tests, designed to cover the various paths through the code based on my insider knowledge.
+</p>
+<p>Are these tests adequate? Certainly they don&#8217;t accurately represent the data which will hit the algorithm in practice. Can we be sure we haven&#8217;t missed anything? Would the tests still cover all paths if the implementation changed?
+</p>
+
+<h2>Property based testing</h2>
+<p>David R MacIver described another, complementary, approach at <a href="https://accu.org/index.php/conferences/accu_conference_2016/accu2016_sessions#The_Plural_of_Anecdote_is_not_Test_Suite">a talk I attended at ACCU 2016</a>. In the talk abstract he characterises the (class of) tests I&#8217;d written as <strong>anecdotal</strong> &#8212; &#8220;let me tell you about this time I called a function &#8230; and then it returned this .. and then it raised an exception &#8230; etc. etc.&#8221;
+</p>
+<p>How about if the test suite instead describes the <strong>properties</strong> required of the system under test, and then conjures up inputs designed to see if these properties hold under stress? So, rather than our test suite being a limited set of input/output pairs, it becomes an executable specification validated by a robot army.
+</p>
+<p><a data-flickr-embed="true"  href="https://www.flickr.com/photos/avatarr8/3819520612" title="China&#x27;s Robot Army"><img src="https://c1.staticflickr.com/3/2431/3819520612_4b32f2b423.jpg" width="500" height="334" alt="China&#x27;s Robot Army"></a><script async src="//embedr.flickr.com/assets/client-code.js" charset="utf-8"></script>
+</p>
+<div class="extended">
+<p><a href="/articles/unleash-the-test-army#continue-reading">Continue reading...</a></p>
+</div>
+
+</div>
+
+
+<div class="atomentry" id="lazy-sequences-working-hard">
 <h2 class="title"><a href="/articles/lazy-sequences-working-hard">Lazy sequences working hard</a></h2>
 <p class="meta"><abbr class="published" title="2017-05-16">2017-05-16</abbr> &bull; <a href="/tag/python" rel="tag">Python</a>, <a href="/tag/streams" rel="tag">Streams</a> &bull; <a href="/articles/lazy-sequences-working-hard#disqus_thread">Comments</a></p>
 <p>I gave a talk <a href="http://www.pydiff.wales/events/2017-05-16.html">@PyDiff</a> this evening in the computer science department at Cardiff University.
@@ -475,7 +500,7 @@ main()
 
 <div class="atomentry" id="unit-tests-questioned">
 <h2 class="title"><a href="/articles/unit-tests-questioned">Unit Tests Questioned</a></h2>
-<p class="meta"><abbr class="published" title="2017-01-21">2017-01-21</abbr> &bull; <a href="/tag/self" rel="tag">self</a>, <a href="/tag/tests" rel="tag">tests</a>, <a href="/tag/talks" rel="tag">talks</a> &bull; <a href="/articles/unit-tests-questioned#disqus_thread">Comments</a></p>
+<p class="meta"><abbr class="published" title="2017-01-21">2017-01-21</abbr> &bull; <a href="/tag/self" rel="tag">Self</a>, <a href="/tag/tests" rel="tag">Tests</a>, <a href="/tag/talks" rel="tag">Talks</a> &bull; <a href="/articles/unit-tests-questioned#disqus_thread">Comments</a></p>
 <p>I&#8217;m looking forward to <a href="http://swanseasdc.co.uk/events/why-service-oriented-architecture/">talking at TechHub Swansea</a> at the end of the month on the subject of unit testing. 
 </p>
 <p>The introduction to the talk is here. 
@@ -1557,38 +1582,6 @@ Qs = (Q for Q in permutations(sqs)
 </div>
 
 
-<div class="atomentry" id="easy-as-py">
-<h2 class="title"><a href="/articles/easy-as-py">Easy as Py</a></h2>
-<p class="meta"><abbr class="published" title="2016-03-23">2016-03-23</abbr> &bull; <a href="/tag/python" rel="tag">Python</a>, <a href="/tag/c++" rel="tag">C++</a>, <a href="/tag/c" rel="tag">C</a> &bull; <a href="/articles/easy-as-py#disqus_thread">Comments</a></p>
-<h2>What makes Python Simple?</h2>
-<p>I consider Python a simple language. Here&#8217;s why.
-</p>
-
-<h2>Easy to Read</h2>
-<p>I can read and understand Python code (unless it&#8217;s <a href="https://benkurtovic.com/2014/06/01/obfuscating-hello-world.html">wilfully perverse</a>). Syntactic whitespace and the associated removal of punctuation results in a regular, open layout. The combination of built in containers, extensive standard libraries and high level constructs allow for clear, compact code: code which fits in your head.
-</p>
-
-<h2>Easy to Write</h2>
-<p>I can write Python code which is free of syntax errors and which does what I want. Of course it helps that I&#8217;ve been actively using the language for 15 years, but I&#8217;ve been using C++ for longer and still make mistakes with it: ask me to declare a pointer to a member function, for example, or to knock up a variadic template function, and I&#8217;ll need a moment or two.
-</p>
-
-<h2>Transparent</h2>
-<p>I also consider C a simple language. C offers a transparent abstraction of a register machine, with a stack, a heap, and addressable memory. If you can imagine the operation of such a machine, you can figure out C. Python is less transparent but reveals its workings if pressed. Dicts form a part of the language seen by users, and under the hood they provide the dynamic context which supports a running program. The <a href="https://en.wikipedia.org/wiki/Read%E2%80%93eval%E2%80%93print_loop">read-eval-print loop</a> makes it easy to poke and reshape your program. You can <a href="https://docs.python.org/3/library/dis.html">disassemble code</a> to see what the virtual machine sees.
-</p>
-
-<h2>Consistent improvement</h2>
-<p>The language has got better since I first started using it. It has also got bigger, and this growth would, at first, seem at odds with simplicity. However, consider &#8212; as an example &#8212; the point when list comprehensions were introduced. Language support for building a list from an iterable results in compact declarative code. Simple code. What&#8217;s more, the square brackets which now delimit list comprehensions are the same square brackets that were previously used to delimit lists. The syntax may have been new but it didn&#8217;t surprise. Now consider the introduction of set and dict comprehensions, which follow logically and naturally from list comprehensions, almost as if they were discovered rather than invented.
-</p>
-<p>There are many other examples where additions to the language have unified and simplified.
-</p>
-
-<h2>Vision</h2>
-<p>I&#8217;m not a Python insider and cannot comment on the exact balance of benevolence and dictatorship which goes into the <a href="https://www.python.org/dev/peps/">language enhancement process</a>. I would say Python doesn&#8217;t suffer from being designed by a committee. It sticks to its strengths and its direction, to its vision.
-</p>
-
-</div>
-
-
 <div class="extended">
 <p><a href="/articles/">Visit the Word Aligned archives...</a></p>
 </div>
@@ -1632,9 +1625,9 @@ Qs = (Q for Q in permutations(sqs)
 
 <div class="sidebar-node">
 <h3>Top Tags</h3>
-<ul id="categories"><li><a href="/tag/python" rel="tag">Python</a> <em>(120)</em></li>
+<ul id="categories"><li><a href="/tag/python" rel="tag">Python</a> <em>(121)</em></li>
 <li><a href="/tag/c++" rel="tag">C++</a> <em>(71)</em></li>
-<li><a href="/tag/self" rel="tag">Self</a> <em>(62)</em></li>
+<li><a href="/tag/self" rel="tag">Self</a> <em>(63)</em></li>
 <li><a href="/tag/puzzles" rel="tag">Puzzles</a> <em>(35)</em></li>
 <li><a href="/tag/accu" rel="tag">ACCU</a> <em>(33)</em></li>
 <li><a href="/tag/web-applications" rel="tag">Web Applications</a> <em>(27)</em></li>
@@ -1647,7 +1640,7 @@ Qs = (Q for Q in permutations(sqs)
 
 <div class="sidebar-node">
 <h3>All Tags</h3>
-<p><a href="/tag/accidents" rel="tag">accidents</a>, <a href="/tag/accu" rel="tag">accu</a>, <a href="/tag/agile" rel="tag">agile</a>, <a href="/tag/algorithms" rel="tag">algorithms</a>, <a href="/tag/android" rel="tag">android</a>, <a href="/tag/apple" rel="tag">apple</a>, <a href="/tag/apple" rel="tag">apple</a>, <a href="/tag/arc" rel="tag">arc</a>, <a href="/tag/awk" rel="tag">awk</a>, <a href="/tag/books" rel="tag">books</a>, <a href="/tag/boost" rel="tag">boost</a>, <a href="/tag/bristol" rel="tag">bristol</a>, <a href="/tag/bugs" rel="tag">bugs</a>, <a href="/tag/build" rel="tag">build</a>, <a href="/tag/c" rel="tag">c</a>, <a href="/tag/c++" rel="tag">c++</a>, <a href="/tag/characters" rel="tag">characters</a>, <a href="/tag/charts" rel="tag">charts</a>, <a href="/tag/chess" rel="tag">chess</a>, <a href="/tag/clrs" rel="tag">clrs</a>, <a href="/tag/conferences" rel="tag">conferences</a>, <a href="/tag/content" rel="tag">content</a>, <a href="/tag/crabs" rel="tag">crabs</a>, <a href="/tag/curl" rel="tag">curl</a>, <a href="/tag/cvs" rel="tag">cvs</a>, <a href="/tag/cvs2svn" rel="tag">cvs2svn</a>, <a href="/tag/cycling" rel="tag">cycling</a>, <a href="/tag/decorators" rel="tag">decorators</a>, <a href="/tag/design" rel="tag">design</a>, <a href="/tag/disqus" rel="tag">disqus</a>, <a href="/tag/docbook" rel="tag">docbook</a>, <a href="/tag/documentation" rel="tag">documentation</a>, <a href="/tag/drawing" rel="tag">drawing</a>, <a href="/tag/dynamic-languages" rel="tag">dynamic-languages</a>, <a href="/tag/editors" rel="tag">editors</a>, <a href="/tag/emacs" rel="tag">emacs</a>, <a href="/tag/erlang" rel="tag">erlang</a>, <a href="/tag/esr" rel="tag">esr</a>, <a href="/tag/etc" rel="tag">etc</a>, <a href="/tag/europython" rel="tag">europython</a>, <a href="/tag/fractals" rel="tag">fractals</a>, <a href="/tag/functional-programming" rel="tag">functional-programming</a>, <a href="/tag/github" rel="tag">github</a>, <a href="/tag/go" rel="tag">go</a>, <a href="/tag/google" rel="tag">google</a>, <a href="/tag/graphics" rel="tag">graphics</a>, <a href="/tag/haskell" rel="tag">haskell</a>, <a href="/tag/hoare" rel="tag">hoare</a>, <a href="/tag/ide" rel="tag">ide</a>, <a href="/tag/imagemagick" rel="tag">imagemagick</a>, <a href="/tag/iphone" rel="tag">iphone</a>, <a href="/tag/java" rel="tag">java</a>, <a href="/tag/knuth" rel="tag">knuth</a>, <a href="/tag/lcs" rel="tag">lcs</a>, <a href="/tag/lighttpd" rel="tag">lighttpd</a>, <a href="/tag/lisp" rel="tag">lisp</a>, <a href="/tag/markdown" rel="tag">markdown</a>, <a href="/tag/missiles" rel="tag">missiles</a>, <a href="/tag/ocr" rel="tag">ocr</a>, <a href="/tag/openid" rel="tag">openid</a>, <a href="/tag/oulipo" rel="tag">oulipo</a>, <a href="/tag/perec" rel="tag">perec</a>, <a href="/tag/perl" rel="tag">perl</a>, <a href="/tag/php" rel="tag">php</a>, <a href="/tag/pi" rel="tag">pi</a>, <a href="/tag/pictures" rel="tag">pictures</a>, <a href="/tag/pil" rel="tag">pil</a>, <a href="/tag/primes" rel="tag">primes</a>, <a href="/tag/puzzles" rel="tag">puzzles</a>, <a href="/tag/python" rel="tag">python</a>, <a href="/tag/recommended" rel="tag">recommended</a>, <a href="/tag/recursion" rel="tag">recursion</a>, <a href="/tag/regex" rel="tag">regex</a>, <a href="/tag/reviews" rel="tag">reviews</a>, <a href="/tag/ruby" rel="tag">ruby</a>, <a href="/tag/ruby-on-rails" rel="tag">ruby-on-rails</a>, <a href="/tag/scheme" rel="tag">scheme</a>, <a href="/tag/scrum" rel="tag">scrum</a>, <a href="/tag/self" rel="tag">self</a>, <a href="/tag/self" rel="tag">self</a>, <a href="/tag/shell" rel="tag">shell</a>, <a href="/tag/sicp" rel="tag">sicp</a>, <a href="/tag/spolsky" rel="tag">spolsky</a>, <a href="/tag/steganography" rel="tag">steganography</a>, <a href="/tag/streams" rel="tag">streams</a>, <a href="/tag/subversion" rel="tag">subversion</a>, <a href="/tag/syntax" rel="tag">syntax</a>, <a href="/tag/talks" rel="tag">talks</a>, <a href="/tag/teamwork" rel="tag">teamwork</a>, <a href="/tag/tesseract" rel="tag">tesseract</a>, <a href="/tag/tests" rel="tag">tests</a>, <a href="/tag/tests" rel="tag">tests</a>, <a href="/tag/torvalds" rel="tag">torvalds</a>, <a href="/tag/trac" rel="tag">trac</a>, <a href="/tag/turing" rel="tag">turing</a>, <a href="/tag/two-wheels" rel="tag">two-wheels</a>, <a href="/tag/unicode" rel="tag">unicode</a>, <a href="/tag/unix" rel="tag">unix</a>, <a href="/tag/virtualization" rel="tag">virtualization</a>, <a href="/tag/web-applications" rel="tag">web-applications</a>, <a href="/tag/webapplications" rel="tag">webapplications</a>, <a href="/tag/windows" rel="tag">windows</a>, <a href="/tag/zlib" rel="tag">zlib</a></p>
+<p><a href="/tag/accidents" rel="tag">accidents</a>, <a href="/tag/accu" rel="tag">accu</a>, <a href="/tag/agile" rel="tag">agile</a>, <a href="/tag/algorithms" rel="tag">algorithms</a>, <a href="/tag/android" rel="tag">android</a>, <a href="/tag/apple" rel="tag">apple</a>, <a href="/tag/arc" rel="tag">arc</a>, <a href="/tag/awk" rel="tag">awk</a>, <a href="/tag/books" rel="tag">books</a>, <a href="/tag/boost" rel="tag">boost</a>, <a href="/tag/bristol" rel="tag">bristol</a>, <a href="/tag/bugs" rel="tag">bugs</a>, <a href="/tag/build" rel="tag">build</a>, <a href="/tag/c" rel="tag">c</a>, <a href="/tag/c++" rel="tag">c++</a>, <a href="/tag/characters" rel="tag">characters</a>, <a href="/tag/charts" rel="tag">charts</a>, <a href="/tag/chess" rel="tag">chess</a>, <a href="/tag/clrs" rel="tag">clrs</a>, <a href="/tag/conferences" rel="tag">conferences</a>, <a href="/tag/content" rel="tag">content</a>, <a href="/tag/crabs" rel="tag">crabs</a>, <a href="/tag/curl" rel="tag">curl</a>, <a href="/tag/cvs" rel="tag">cvs</a>, <a href="/tag/cvs2svn" rel="tag">cvs2svn</a>, <a href="/tag/cycling" rel="tag">cycling</a>, <a href="/tag/decorators" rel="tag">decorators</a>, <a href="/tag/design" rel="tag">design</a>, <a href="/tag/disqus" rel="tag">disqus</a>, <a href="/tag/docbook" rel="tag">docbook</a>, <a href="/tag/documentation" rel="tag">documentation</a>, <a href="/tag/drawing" rel="tag">drawing</a>, <a href="/tag/dynamic-languages" rel="tag">dynamic-languages</a>, <a href="/tag/editors" rel="tag">editors</a>, <a href="/tag/emacs" rel="tag">emacs</a>, <a href="/tag/erlang" rel="tag">erlang</a>, <a href="/tag/esr" rel="tag">esr</a>, <a href="/tag/etc" rel="tag">etc</a>, <a href="/tag/europython" rel="tag">europython</a>, <a href="/tag/fractals" rel="tag">fractals</a>, <a href="/tag/functional-programming" rel="tag">functional-programming</a>, <a href="/tag/github" rel="tag">github</a>, <a href="/tag/go" rel="tag">go</a>, <a href="/tag/google" rel="tag">google</a>, <a href="/tag/graphics" rel="tag">graphics</a>, <a href="/tag/haskell" rel="tag">haskell</a>, <a href="/tag/hoare" rel="tag">hoare</a>, <a href="/tag/ide" rel="tag">ide</a>, <a href="/tag/imagemagick" rel="tag">imagemagick</a>, <a href="/tag/iphone" rel="tag">iphone</a>, <a href="/tag/java" rel="tag">java</a>, <a href="/tag/knuth" rel="tag">knuth</a>, <a href="/tag/lcs" rel="tag">lcs</a>, <a href="/tag/lighttpd" rel="tag">lighttpd</a>, <a href="/tag/lisp" rel="tag">lisp</a>, <a href="/tag/markdown" rel="tag">markdown</a>, <a href="/tag/missiles" rel="tag">missiles</a>, <a href="/tag/ocr" rel="tag">ocr</a>, <a href="/tag/openid" rel="tag">openid</a>, <a href="/tag/oulipo" rel="tag">oulipo</a>, <a href="/tag/perec" rel="tag">perec</a>, <a href="/tag/perl" rel="tag">perl</a>, <a href="/tag/php" rel="tag">php</a>, <a href="/tag/pi" rel="tag">pi</a>, <a href="/tag/pictures" rel="tag">pictures</a>, <a href="/tag/pil" rel="tag">pil</a>, <a href="/tag/primes" rel="tag">primes</a>, <a href="/tag/puzzles" rel="tag">puzzles</a>, <a href="/tag/python" rel="tag">python</a>, <a href="/tag/recommended" rel="tag">recommended</a>, <a href="/tag/recursion" rel="tag">recursion</a>, <a href="/tag/regex" rel="tag">regex</a>, <a href="/tag/reviews" rel="tag">reviews</a>, <a href="/tag/ruby" rel="tag">ruby</a>, <a href="/tag/ruby-on-rails" rel="tag">ruby-on-rails</a>, <a href="/tag/scheme" rel="tag">scheme</a>, <a href="/tag/scrum" rel="tag">scrum</a>, <a href="/tag/self" rel="tag">self</a>, <a href="/tag/shell" rel="tag">shell</a>, <a href="/tag/sicp" rel="tag">sicp</a>, <a href="/tag/spolsky" rel="tag">spolsky</a>, <a href="/tag/steganography" rel="tag">steganography</a>, <a href="/tag/streams" rel="tag">streams</a>, <a href="/tag/subversion" rel="tag">subversion</a>, <a href="/tag/syntax" rel="tag">syntax</a>, <a href="/tag/talks" rel="tag">talks</a>, <a href="/tag/teamwork" rel="tag">teamwork</a>, <a href="/tag/tesseract" rel="tag">tesseract</a>, <a href="/tag/tests" rel="tag">tests</a>, <a href="/tag/torvalds" rel="tag">torvalds</a>, <a href="/tag/trac" rel="tag">trac</a>, <a href="/tag/turing" rel="tag">turing</a>, <a href="/tag/two-wheels" rel="tag">two-wheels</a>, <a href="/tag/unicode" rel="tag">unicode</a>, <a href="/tag/unix" rel="tag">unix</a>, <a href="/tag/virtualization" rel="tag">virtualization</a>, <a href="/tag/web-applications" rel="tag">web-applications</a>, <a href="/tag/webapplications" rel="tag">webapplications</a>, <a href="/tag/windows" rel="tag">windows</a>, <a href="/tag/zlib" rel="tag">zlib</a></p>
 
 </div>
 
@@ -1664,7 +1657,7 @@ Qs = (Q for Q in permutations(sqs)
 <div class="sidebar-node">
 <h3>Chain</h3>
 <ul>
-<li><a accesskey="p" href="/articles/lazy-sequences-working-hard" title="First article">&raquo; Lazy sequences working hard</a></li>
+<li><a accesskey="p" href="/articles/unleash-the-test-army" title="First article">&raquo; Unleash the test army</a></li>
 
 </ul>
 
