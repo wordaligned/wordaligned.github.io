@@ -11,7 +11,7 @@
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
 <meta name="author" content="Thomas Guest" />
 <meta name="description" content="A collection of articles on software development written by Thomas Guest." />
-<meta name="keywords" content="CLRS, Regex, Missiles, Cycling, Agile, Self, Editors, Emacs, Torvalds, ImageMagick, Hoare, IDE, Decorators, Tests, Shell, PIL, Lcs, Turing, Ruby on Rails, Puzzles, Europython, Characters, Pictures, Fractals, Crabs, Github, DocBook, Dynamic Languages, lighttpd, Bugs, CVS, Reviews, Web-applications, Steganography, Algorithms, Perec, Content, Markdown, Two Wheels, Conferences, Chess, Syntax, Unix, Arc, Go, Primes, Iphone, Web Applications, Java, Esr, Recursion, Charts, Perl, Subversion, Recommended, Teamwork, Build, ACCU, Knuth, Android, Erlang, Boost, php, OCR, Python, cvs2svn, Scrum, SICP, Lisp, Books, Awk, Graphics, Disqus, Ruby, openid, C, Zlib, Talks, Trac, Windows, Documentation, C++, Etc, Streams, Bristol, Tesseract, Drawing, Accidents, Google, Apple, Functional Programming, Pi, Haskell, Design, Virtualization, Unicode, Spolsky, Oulipo, Curl, Scheme" />
+<meta name="keywords" content="CLRS, Regex, Missiles, Cycling, Agile, Self, Editors, Emacs, Primes, Torvalds, ImageMagick, Hoare, IDE, Decorators, Tests, Shell, PIL, Lcs, Turing, Javascript, Ruby on Rails, Puzzles, Europython, Characters, Pictures, Fractals, Crabs, Github, DocBook, Dynamic Languages, lighttpd, Bugs, CVS, Reviews, Steganography, Oulipo, Perec, Content, Markdown, Two Wheels, Conferences, Chess, Syntax, Unix, Arc, Go, Web-applications, Iphone, Web Applications, Java, Esr, Recursion, Charts, Perl, Subversion, Recommended, Animation, Teamwork, Build, ACCU, Knuth, Android, Erlang, Boost, php, OCR, Python, cvs2svn, Scrum, SICP, Windows, Books, Awk, Graphics, Disqus, Ruby, openid, C, Zlib, Talks, Trac, Lisp, Documentation, C++, Etc, Streams, Bristol, Tesseract, Drawing, Accidents, Google, Apple, Functional Programming, Pi, Haskell, Design, Virtualization, Unicode, Spolsky, Algorithms, Curl, Scheme" />
 <link rel="alternate" type="application/rss+xml" title="Feed" href="http://feeds.wordaligned.org/wordaligned" />
 </head>
 
@@ -25,7 +25,57 @@
 
   <div id="page">
     <div id="content">
-      <div class="atomentry" id="unleash-the-test-army">
+      <div class="atomentry" id="follow-me-follow-me">
+<h2 class="title"><a href="/articles/follow-me-follow-me">Follow me follow me</a></h2>
+<p class="meta"><abbr class="published" title="2017-07-04">2017-07-04</abbr> &bull; <a href="/tag/animation" rel="tag">Animation</a>, <a href="/tag/javascript" rel="tag">Javascript</a> &bull; <a href="/articles/follow-me-follow-me#disqus_thread">Comments</a></p>
+<h2>Leap</h2>
+<p>There were 12 of us in the room, plus Jim the instructor.
+</p>
+<p>We had moved the tables and chairs to one side. Jim asked us to stand in the space we&#8217;d created. He asked each of us to pick two other people in the room, without telling anyone who we&#8217;d chosen.
+</p>
+<p>The object of this exercise, Jim said, is to move around until each person is at an equal distance from the two people they&#8217;ve chosen.
+</p>
+<p>Jim appointed Jo project manager. 
+</p>
+<p>You&#8217;re the project manager, Jim said. Get your team organised.
+</p>
+<p>Jo had no particular instructions but as a team we instinctively started moving, stepping and turning. I was tracking Mark and Jo &#8212; who I&#8217;d chosen before her appointment as PM. I imagined a straight line on the floor of the room between the two of them and equidistant from both and walked towards it, adjusting my trajectory as they too moved. Ruth and Paul must have been following me: as I moved they turned and moved too.
+</p>
+<p>Quite quickly we slowed down, making fine adjustments, shuffling into a final position. Was everyone happy? Yes? We&#8217;d done it.
+</p>
+<p>Good work Jo!
+</p>
+<p>What had Jo done? She&#8217;d let us get on with it. We were a self-organising team. What had I done? I&#8217;d suppressed my mathematical instinct to think before moving &#8212; I&#8217;d leapt rather than looked.
+</p>
+
+<h2>Look</h2>
+<p>This is a great team training exercise. It encourages exploration and trust. Evidently it works, too &#8212; however people choose who to follow, there will be a solution which can be discovered using a simple and sensible strategy. It made me think of shoal behaviour in animals, where there is no leader and each individual follows the same small set of rules, but the apparently sophisticated resulting behaviour suggests the shoal has a mind of its own.
+</p>
+<p><a href="/followme/" title="Click this snapshot to see the live page"><img src="/images/followme.png" alt="animation"></a>
+</p>
+<p>I experimented with a computer simulation. The picture above is a snap shot &#8212; click it to access the <a href="/followme/">live page</a>.
+</p>
+<p>The room is an 8m x 6m rectangle, modeled as an HTML canvas. Each person is represented by a small black circle with a pair of arrows indicating who they are following.
+</p>
+<p>Each person advances at the same time, each employing the same strategy. In the picture, T is following P and Q. The dotted line indicates all points equidistant from P and Q: that is, the line through M the midpoint of P and Q which is perpendicular to PQ. T moves towards a point on this line, T&#8217;, which is the same distance from M as T.
+</p>
+<p><img src="/images/followme-step.png" alt="followme step"></a>
+</p>
+<p>In my simulation T moves in the direction of T&#8217;, but not all the way. There&#8217;s a magic number controlling the fraction of the distance TT&#8217;, which I&#8217;ll expose as a control later.
+</p>
+<p>Each person contributes towards the displayed error. In the picture, the error contributed by T is the absolute difference between the lengths TP and TQ, measured in millimetres.
+</p>
+<p>Movements are also bounded by the walls of the room. I haven&#8217;t stopped people from bumping into each other or overlapping.
+</p>
+<p>Source code is available at <a href="https://github.com/wordaligned/followme">github.com/wordaligned/followme</a>.
+</p>
+<p>I&#8217;ll keep <a href="/followme/">this page</a> updated with the latest version.
+</p>
+
+</div>
+
+
+<div class="atomentry" id="unleash-the-test-army">
 <h2 class="title"><a href="/articles/unleash-the-test-army">Unleash the test army</a></h2>
 <p class="meta"><abbr class="published" title="2017-05-29">2017-05-29</abbr> &bull; <a href="/tag/tests" rel="tag">Tests</a>, <a href="/tag/python" rel="tag">Python</a> &bull; <a href="/articles/unleash-the-test-army#disqus_thread">Comments</a></p>
 <h2>Are the tests adequate?</h2>
@@ -1516,72 +1566,6 @@ Qs = (Q for Q in itertools.permutations(sqs)
 </div>
 
 
-<div class="atomentry" id="8-queens-puzzle">
-<h2 class="title"><a href="/articles/8-queens-puzzle">8 Queens Puzzle</a></h2>
-<p class="meta"><abbr class="published" title="2016-04-04">2016-04-04</abbr> &bull; <a href="/tag/puzzles" rel="tag">Puzzles</a>, <a href="/tag/python" rel="tag">Python</a> &bull; <a href="/articles/8-queens-puzzle#disqus_thread">Comments</a></p>
-<p style="font-size:4em">&#9819;&#9819;&#9819;&#9819;&#9819;&#9819;&#9819;&#9819;</p>
-
-<p>Here&#8217;s one of my favourite <a href="http://code.activestate.com/recipes/576647-eight-queens-six-lines">recipes, by Raymond Hettinger</a>, lightly adapted for Python 3.
-</p>
-<pre><code>from itertools import permutations
-
-n = width_of_chessboard = 8
-sqs = range(n)
-
-Qs = (Q for Q in permutations(sqs)
-      if n == len({Q[i]+i for i in sqs})
-           == len({Q[i]-i for i in sqs}))
-</code></pre><p>We start by assigning <code>sqs</code> to the range 0 through 7.
-</p>
-<pre><code>&gt;&gt;&gt; sqs = range(8)
-&gt;&gt;&gt; list(sqs)
-[0, 1, 2, 3, 4, 5, 6, 7]
-</code></pre><p>The range has 8 indices. If each index represents a column on a standard 8x8 chessboard and the value at that index represents a row on the same chessboard, then our range represents 8 positions on the board. Using the built-in <a href="https://docs.python.org/3/library/functions.html#enumerate">enumerate</a> function to generate these <code>(index, value)</code> pairs we see that <code>sqs</code> encodes the diagonal <code>(0, 0)</code> to <code>(7, 7)</code>:
-</p>
-<pre><code>&gt;&gt;&gt; list(enumerate(sqs))
-[(0, 0), (1, 1), (2, 2), (3, 3), (4, 4), (5, 5), (6, 6), (7, 7)]
-</code></pre><p>Next, permute the values &#8212; the rows.
-</p>
-<pre><code>&gt;&gt;&gt; from itertools import permutations
-&gt;&gt;&gt; rooks = permutations(sqs)
-&gt;&gt;&gt; next(rooks)
-(0, 1, 2, 3, 4, 5, 6, 7)
-&gt;&gt;&gt; next(rooks)
-(0, 1, 2, 3, 4, 5, 7, 6)
-&gt;&gt;&gt; next(rooks)
-(0, 1, 2, 3, 4, 6, 5, 7)
-&gt;&gt;&gt; list(rooks)[34567]
-(6, 7, 0, 1, 3, 4, 5, 2)
-</code></pre><p><a href="https://docs.python.org/3/library/itertools.html#itertools.permutations">Itertools.permutations</a> generates values lazily. The snippet above shows the first two results, then skips forward 34568 places. <code>Permutations(sqs)</code> generates all possible arrangements of 8 pieces on a chessboard such that each row has exactly one piece on it and so does each column. That is, it generates all possible ways of placing 8 <a href="http://mathworld.wolfram.com/RooksProblem.html">rooks on a chessboard</a> so that no pair attacks each other.
-</p>
-<p>In the final program, we filter these rook positions to generate solutions to the more challenging &#8212; and more interesting &#8212; <a href="https://en.wikipedia.org/wiki/Eight_queens_puzzle">eight Queens puzzle</a>.
-</p>
-<p>Consider our starting point, the diagonal <code>(0, 0)</code> to <code>(7, 7)</code>
-</p>
-<pre><code>&gt;&gt;&gt; diagonal = range(8)
-&gt;&gt;&gt; {r-c for c,r in enumerate(diagonal)}
-{0}
-&gt;&gt;&gt; {r+c for c,r in enumerate(diagonal)}
-{0, 2, 4, 6, 8, 10, 12, 14}
-</code></pre><p>Here, a set comprehension collects the distinct values taken by the difference between the row and column along this diagonal, which in this case gives <code>{0}</code>. That is, if we placed 8 bishops along this &#x2197; diagonal they would all attack each other along this diagonal. The sum of the row and column takes 8 distinct values, however, meaning no pair attacks along a &#x2196; diagonal.
-</p>
-<p><a href="https://docs.python.org/3/reference/expressions.html#comparisons">Comparison operators chain in Python</a>, so the expression:
-</p>
-<pre><code>n == len({Q[i]+i for i in sqs}) == len({Q[i]-i for i in sqs})
-</code></pre><p>is <code>True</code> if both sets have 8 elements, that is, if the squares in <code>Q</code> are on distinct &#x2196; and &#x2197; diagonals; or, equivalently no pair of bishops placed on the squares in <code>Q</code> would attack each other. Since we already know <code>Q</code> positions 8 rooks so that no pair attacks each other, and a chess Queen combines the moves of a rook and a bishop, we can see that <code>Qs</code> generates every possible way of placing 8 Queens on a chessboard so that no pair attacks each other: which is to say, we&#8217;ve solved the <a href="https://en.wikipedia.org/wiki/Eight_queens_puzzle">8 Queens puzzle</a>.
-</p>
-<pre><code>Qs = (Q for Q in permutations(sqs)
-      if n == len({Q[i]+i for i in sqs})
-           == len({Q[i]-i for i in sqs}))
-</code></pre><p>This is beautiful code and there&#8217;s one final twist.
-</p>
-<p><code>Qs</code> is a <a href="https://docs.python.org/3/reference/expressions.html#generator-expressions">generator expression</a> primed to permute squares into neighbourly rooks filtered by amicable bishops yielding unthreatening Queens. Until asked, however, it does nothing.
-</p>
-<p style="font-size:4em">&#9813;&#9813;&#9813;&#9813;&#9813;&#9813;&#9813;&#9813;</p>
-
-</div>
-
-
 <div class="extended">
 <p><a href="/articles/">Visit the Word Aligned archives...</a></p>
 </div>
@@ -1640,7 +1624,7 @@ Qs = (Q for Q in permutations(sqs)
 
 <div class="sidebar-node">
 <h3>All Tags</h3>
-<p><a href="/tag/accidents" rel="tag">accidents</a>, <a href="/tag/accu" rel="tag">accu</a>, <a href="/tag/agile" rel="tag">agile</a>, <a href="/tag/algorithms" rel="tag">algorithms</a>, <a href="/tag/android" rel="tag">android</a>, <a href="/tag/apple" rel="tag">apple</a>, <a href="/tag/arc" rel="tag">arc</a>, <a href="/tag/awk" rel="tag">awk</a>, <a href="/tag/books" rel="tag">books</a>, <a href="/tag/boost" rel="tag">boost</a>, <a href="/tag/bristol" rel="tag">bristol</a>, <a href="/tag/bugs" rel="tag">bugs</a>, <a href="/tag/build" rel="tag">build</a>, <a href="/tag/c" rel="tag">c</a>, <a href="/tag/c++" rel="tag">c++</a>, <a href="/tag/characters" rel="tag">characters</a>, <a href="/tag/charts" rel="tag">charts</a>, <a href="/tag/chess" rel="tag">chess</a>, <a href="/tag/clrs" rel="tag">clrs</a>, <a href="/tag/conferences" rel="tag">conferences</a>, <a href="/tag/content" rel="tag">content</a>, <a href="/tag/crabs" rel="tag">crabs</a>, <a href="/tag/curl" rel="tag">curl</a>, <a href="/tag/cvs" rel="tag">cvs</a>, <a href="/tag/cvs2svn" rel="tag">cvs2svn</a>, <a href="/tag/cycling" rel="tag">cycling</a>, <a href="/tag/decorators" rel="tag">decorators</a>, <a href="/tag/design" rel="tag">design</a>, <a href="/tag/disqus" rel="tag">disqus</a>, <a href="/tag/docbook" rel="tag">docbook</a>, <a href="/tag/documentation" rel="tag">documentation</a>, <a href="/tag/drawing" rel="tag">drawing</a>, <a href="/tag/dynamic-languages" rel="tag">dynamic-languages</a>, <a href="/tag/editors" rel="tag">editors</a>, <a href="/tag/emacs" rel="tag">emacs</a>, <a href="/tag/erlang" rel="tag">erlang</a>, <a href="/tag/esr" rel="tag">esr</a>, <a href="/tag/etc" rel="tag">etc</a>, <a href="/tag/europython" rel="tag">europython</a>, <a href="/tag/fractals" rel="tag">fractals</a>, <a href="/tag/functional-programming" rel="tag">functional-programming</a>, <a href="/tag/github" rel="tag">github</a>, <a href="/tag/go" rel="tag">go</a>, <a href="/tag/google" rel="tag">google</a>, <a href="/tag/graphics" rel="tag">graphics</a>, <a href="/tag/haskell" rel="tag">haskell</a>, <a href="/tag/hoare" rel="tag">hoare</a>, <a href="/tag/ide" rel="tag">ide</a>, <a href="/tag/imagemagick" rel="tag">imagemagick</a>, <a href="/tag/iphone" rel="tag">iphone</a>, <a href="/tag/java" rel="tag">java</a>, <a href="/tag/knuth" rel="tag">knuth</a>, <a href="/tag/lcs" rel="tag">lcs</a>, <a href="/tag/lighttpd" rel="tag">lighttpd</a>, <a href="/tag/lisp" rel="tag">lisp</a>, <a href="/tag/markdown" rel="tag">markdown</a>, <a href="/tag/missiles" rel="tag">missiles</a>, <a href="/tag/ocr" rel="tag">ocr</a>, <a href="/tag/openid" rel="tag">openid</a>, <a href="/tag/oulipo" rel="tag">oulipo</a>, <a href="/tag/perec" rel="tag">perec</a>, <a href="/tag/perl" rel="tag">perl</a>, <a href="/tag/php" rel="tag">php</a>, <a href="/tag/pi" rel="tag">pi</a>, <a href="/tag/pictures" rel="tag">pictures</a>, <a href="/tag/pil" rel="tag">pil</a>, <a href="/tag/primes" rel="tag">primes</a>, <a href="/tag/puzzles" rel="tag">puzzles</a>, <a href="/tag/python" rel="tag">python</a>, <a href="/tag/recommended" rel="tag">recommended</a>, <a href="/tag/recursion" rel="tag">recursion</a>, <a href="/tag/regex" rel="tag">regex</a>, <a href="/tag/reviews" rel="tag">reviews</a>, <a href="/tag/ruby" rel="tag">ruby</a>, <a href="/tag/ruby-on-rails" rel="tag">ruby-on-rails</a>, <a href="/tag/scheme" rel="tag">scheme</a>, <a href="/tag/scrum" rel="tag">scrum</a>, <a href="/tag/self" rel="tag">self</a>, <a href="/tag/shell" rel="tag">shell</a>, <a href="/tag/sicp" rel="tag">sicp</a>, <a href="/tag/spolsky" rel="tag">spolsky</a>, <a href="/tag/steganography" rel="tag">steganography</a>, <a href="/tag/streams" rel="tag">streams</a>, <a href="/tag/subversion" rel="tag">subversion</a>, <a href="/tag/syntax" rel="tag">syntax</a>, <a href="/tag/talks" rel="tag">talks</a>, <a href="/tag/teamwork" rel="tag">teamwork</a>, <a href="/tag/tesseract" rel="tag">tesseract</a>, <a href="/tag/tests" rel="tag">tests</a>, <a href="/tag/torvalds" rel="tag">torvalds</a>, <a href="/tag/trac" rel="tag">trac</a>, <a href="/tag/turing" rel="tag">turing</a>, <a href="/tag/two-wheels" rel="tag">two-wheels</a>, <a href="/tag/unicode" rel="tag">unicode</a>, <a href="/tag/unix" rel="tag">unix</a>, <a href="/tag/virtualization" rel="tag">virtualization</a>, <a href="/tag/web-applications" rel="tag">web-applications</a>, <a href="/tag/webapplications" rel="tag">webapplications</a>, <a href="/tag/windows" rel="tag">windows</a>, <a href="/tag/zlib" rel="tag">zlib</a></p>
+<p><a href="/tag/accidents" rel="tag">accidents</a>, <a href="/tag/accu" rel="tag">accu</a>, <a href="/tag/agile" rel="tag">agile</a>, <a href="/tag/algorithms" rel="tag">algorithms</a>, <a href="/tag/android" rel="tag">android</a>, <a href="/tag/animation" rel="tag">animation</a>, <a href="/tag/apple" rel="tag">apple</a>, <a href="/tag/arc" rel="tag">arc</a>, <a href="/tag/awk" rel="tag">awk</a>, <a href="/tag/books" rel="tag">books</a>, <a href="/tag/boost" rel="tag">boost</a>, <a href="/tag/bristol" rel="tag">bristol</a>, <a href="/tag/bugs" rel="tag">bugs</a>, <a href="/tag/build" rel="tag">build</a>, <a href="/tag/c" rel="tag">c</a>, <a href="/tag/c++" rel="tag">c++</a>, <a href="/tag/characters" rel="tag">characters</a>, <a href="/tag/charts" rel="tag">charts</a>, <a href="/tag/chess" rel="tag">chess</a>, <a href="/tag/clrs" rel="tag">clrs</a>, <a href="/tag/conferences" rel="tag">conferences</a>, <a href="/tag/content" rel="tag">content</a>, <a href="/tag/crabs" rel="tag">crabs</a>, <a href="/tag/curl" rel="tag">curl</a>, <a href="/tag/cvs" rel="tag">cvs</a>, <a href="/tag/cvs2svn" rel="tag">cvs2svn</a>, <a href="/tag/cycling" rel="tag">cycling</a>, <a href="/tag/decorators" rel="tag">decorators</a>, <a href="/tag/design" rel="tag">design</a>, <a href="/tag/disqus" rel="tag">disqus</a>, <a href="/tag/docbook" rel="tag">docbook</a>, <a href="/tag/documentation" rel="tag">documentation</a>, <a href="/tag/drawing" rel="tag">drawing</a>, <a href="/tag/dynamic-languages" rel="tag">dynamic-languages</a>, <a href="/tag/editors" rel="tag">editors</a>, <a href="/tag/emacs" rel="tag">emacs</a>, <a href="/tag/erlang" rel="tag">erlang</a>, <a href="/tag/esr" rel="tag">esr</a>, <a href="/tag/etc" rel="tag">etc</a>, <a href="/tag/europython" rel="tag">europython</a>, <a href="/tag/fractals" rel="tag">fractals</a>, <a href="/tag/functional-programming" rel="tag">functional-programming</a>, <a href="/tag/github" rel="tag">github</a>, <a href="/tag/go" rel="tag">go</a>, <a href="/tag/google" rel="tag">google</a>, <a href="/tag/graphics" rel="tag">graphics</a>, <a href="/tag/haskell" rel="tag">haskell</a>, <a href="/tag/hoare" rel="tag">hoare</a>, <a href="/tag/ide" rel="tag">ide</a>, <a href="/tag/imagemagick" rel="tag">imagemagick</a>, <a href="/tag/iphone" rel="tag">iphone</a>, <a href="/tag/java" rel="tag">java</a>, <a href="/tag/javascript" rel="tag">javascript</a>, <a href="/tag/knuth" rel="tag">knuth</a>, <a href="/tag/lcs" rel="tag">lcs</a>, <a href="/tag/lighttpd" rel="tag">lighttpd</a>, <a href="/tag/lisp" rel="tag">lisp</a>, <a href="/tag/markdown" rel="tag">markdown</a>, <a href="/tag/missiles" rel="tag">missiles</a>, <a href="/tag/ocr" rel="tag">ocr</a>, <a href="/tag/openid" rel="tag">openid</a>, <a href="/tag/oulipo" rel="tag">oulipo</a>, <a href="/tag/perec" rel="tag">perec</a>, <a href="/tag/perl" rel="tag">perl</a>, <a href="/tag/php" rel="tag">php</a>, <a href="/tag/pi" rel="tag">pi</a>, <a href="/tag/pictures" rel="tag">pictures</a>, <a href="/tag/pil" rel="tag">pil</a>, <a href="/tag/primes" rel="tag">primes</a>, <a href="/tag/puzzles" rel="tag">puzzles</a>, <a href="/tag/python" rel="tag">python</a>, <a href="/tag/recommended" rel="tag">recommended</a>, <a href="/tag/recursion" rel="tag">recursion</a>, <a href="/tag/regex" rel="tag">regex</a>, <a href="/tag/reviews" rel="tag">reviews</a>, <a href="/tag/ruby" rel="tag">ruby</a>, <a href="/tag/ruby-on-rails" rel="tag">ruby-on-rails</a>, <a href="/tag/scheme" rel="tag">scheme</a>, <a href="/tag/scrum" rel="tag">scrum</a>, <a href="/tag/self" rel="tag">self</a>, <a href="/tag/shell" rel="tag">shell</a>, <a href="/tag/sicp" rel="tag">sicp</a>, <a href="/tag/spolsky" rel="tag">spolsky</a>, <a href="/tag/steganography" rel="tag">steganography</a>, <a href="/tag/streams" rel="tag">streams</a>, <a href="/tag/subversion" rel="tag">subversion</a>, <a href="/tag/syntax" rel="tag">syntax</a>, <a href="/tag/talks" rel="tag">talks</a>, <a href="/tag/teamwork" rel="tag">teamwork</a>, <a href="/tag/tesseract" rel="tag">tesseract</a>, <a href="/tag/tests" rel="tag">tests</a>, <a href="/tag/torvalds" rel="tag">torvalds</a>, <a href="/tag/trac" rel="tag">trac</a>, <a href="/tag/turing" rel="tag">turing</a>, <a href="/tag/two-wheels" rel="tag">two-wheels</a>, <a href="/tag/unicode" rel="tag">unicode</a>, <a href="/tag/unix" rel="tag">unix</a>, <a href="/tag/virtualization" rel="tag">virtualization</a>, <a href="/tag/web-applications" rel="tag">web-applications</a>, <a href="/tag/webapplications" rel="tag">webapplications</a>, <a href="/tag/windows" rel="tag">windows</a>, <a href="/tag/zlib" rel="tag">zlib</a></p>
 
 </div>
 
@@ -1657,7 +1641,7 @@ Qs = (Q for Q in permutations(sqs)
 <div class="sidebar-node">
 <h3>Chain</h3>
 <ul>
-<li><a accesskey="p" href="/articles/unleash-the-test-army" title="First article">&raquo; Unleash the test army</a></li>
+<li><a accesskey="p" href="/articles/follow-me-follow-me" title="First article">&raquo; Follow me follow me</a></li>
 
 </ul>
 
