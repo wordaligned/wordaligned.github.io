@@ -23,10 +23,10 @@ $(document).ready(function(){
     }
     var pause = function() {
         knight.stop(true).animate(k_pos(sqs[i]), delay_msecs, 0, next);
-        $('#toggle').attr('title', 'Play').off('click').click(play).html('<img src="/images/play_icon.png" />');
+        $('#toggle').attr('title', 'Play').off('click').click(play).html('<img src="./images/play_icon.png" />');
     }
     var play = function() {
-        $('#toggle').attr('title', 'Pause').off('click').click(pause).html('<img src="/images/pause_icon.png" />');
+        $('#toggle').attr('title', 'Pause').off('click').click(pause).html('<img src="./images/pause_icon.png" />');
         k_move();
     }
     var reset = function() {
