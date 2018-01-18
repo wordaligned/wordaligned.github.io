@@ -7,6 +7,31 @@
 <dc:creator>tag@wordaligned.org</dc:creator>
 <language>en-gb</language>
 <item>
+<title>Meetup? Turn Up!</title>
+<description>&lt;p&gt;&lt;a href="https://www.meetup.com/Agile-Bath-Bristol/events/245853715/"&gt;&lt;img alt="Sell out" src="http://wordaligned.org/images/agile-bb-meetup.png"/&gt;&lt;/a&gt;
+&lt;/p&gt;
+&lt;p&gt;Monday&amp;#8217;s &lt;a href="https://www.meetup.com/Agile-Bath-Bristol/events/245853715/"&gt;Agile Bath &amp;amp; Bristol meetup&lt;/a&gt; was a sell out. All 50 available spaces were taken. I myself was lucky to get a place &amp;#8212; I was on the waiting list until a spot opened up at 3pm on the day. And I was the speaker!
+&lt;/p&gt;
+&lt;p&gt;The reality turned out to be different: of the 50 who&amp;#8217;d claimed spaces, roughly one in four actually showed up.
+&lt;/p&gt;
+&lt;p&gt;I know, it was &lt;a href="https://en.wikipedia.org/wiki/Blue_Monday_(date)"&gt;Blue Monday&lt;/a&gt;. I know, there are bugs going round &amp;#8212; my daughter has been running a fever and didn&amp;#8217;t go in to college, and if I hadn&amp;#8217;t been presenting I would have cancelled myself to stay in with her. I know, your work day over-runs, you&amp;#8217;re hungry, something else comes up. I know, it&amp;#8217;s a free event, so it&amp;#8217;s not as though you&amp;#8217;ve &lt;em&gt;lost&lt;/em&gt; anything.
+&lt;/p&gt;
+&lt;p&gt;Despite all these things a 25% turnout reflects badly on us all. It&amp;#8217;s unfair on the sponsors and organisers, especially when refreshments are offered. It&amp;#8217;s impolite to those who turn up at the advertised time, and must then sit waiting in case more people who&amp;#8217;ve said they&amp;#8217;re coming actually show up. It&amp;#8217;s tough on the speakers: planning a session for an audience of 50 is different to one you&amp;#8217;d plan for 12.
+&lt;/p&gt;
+&lt;p&gt;I realise 25% is egregiously low, but &amp;#8212; in my experience &amp;#8212; 50% is far from unusual, and even considered acceptable. I think it&amp;#8217;s shabby. The one excuse noone has is forgetting the event is on &amp;#8212; Meetup etc. integrate with your calendar and issue repeated reminders to attend and requests to cancel if you cannot.
+&lt;/p&gt;
+&lt;p&gt;So, my thanks to those who turned up and participated. I enjoyed it. Smaller numbers allowed for a more collaborative session. Ironically, topics discussed included punctuality, respect, commitment.
+&lt;/p&gt;
+&lt;p&gt;Please, don&amp;#8217;t sign up to a meetup you don&amp;#8217;t plan to attend. If you decide to cancel, release your place so someone else can have it. Otherwise, arrive on time.
+&lt;/p&gt;</description>
+<dc:date>2018-01-18</dc:date>
+<guid>http://wordaligned.org/articles/meetup-turn-up</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/meetup-turn-up</link>
+<category>Talks</category>
+</item>
+
+<item>
 <title>Advent of Code 2017</title>
 <description>&lt;p&gt;A big thanks to &lt;a href="http://was.tl"&gt;Eric Wastl&lt;/a&gt; for another great &lt;a href="http://adventofcode.com/2017"&gt;Advent of Code&lt;/a&gt;. Inspired by &lt;a href="https://github.com/norvig/pytudes/blob/master/ipynb/Advent%20of%20Code.ipynb"&gt;Peter Norvig&lt;/a&gt;, I&amp;#8217;ve published &lt;a href="https://github.com/wordaligned/advent-of-code-2017/blob/master/advent-of-code-2017.ipynb"&gt;my solutions&lt;/a&gt; as a Jupyter notebook.
 &lt;/p&gt;
@@ -2338,75 +2363,6 @@ Qs = (Q for Q in itertools.permutations(sqs)
 <link>http://wordaligned.org/articles/8-queens-puzzle-cpp</link>
 <category>Puzzles</category>
 <category>C++</category>
-</item>
-
-<item>
-<title>8 Queens Puzzle</title>
-<description>&lt;p style="font-size:4em"&gt;&amp;#9819;&amp;#9819;&amp;#9819;&amp;#9819;&amp;#9819;&amp;#9819;&amp;#9819;&amp;#9819;&lt;/p&gt;
-
-&lt;p&gt;Here&amp;#8217;s one of my favourite &lt;a href="http://code.activestate.com/recipes/576647-eight-queens-six-lines"&gt;recipes, by Raymond Hettinger&lt;/a&gt;, lightly adapted for Python 3.
-&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;from itertools import permutations
-
-n = width_of_chessboard = 8
-sqs = range(n)
-
-Qs = (Q for Q in permutations(sqs)
-      if n == len({Q[i]+i for i in sqs})
-           == len({Q[i]-i for i in sqs}))
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;We start by assigning &lt;code&gt;sqs&lt;/code&gt; to the range 0 through 7.
-&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;&amp;gt;&amp;gt;&amp;gt; sqs = range(8)
-&amp;gt;&amp;gt;&amp;gt; list(sqs)
-[0, 1, 2, 3, 4, 5, 6, 7]
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;The range has 8 indices. If each index represents a column on a standard 8x8 chessboard and the value at that index represents a row on the same chessboard, then our range represents 8 positions on the board. Using the built-in &lt;a href="https://docs.python.org/3/library/functions.html#enumerate"&gt;enumerate&lt;/a&gt; function to generate these &lt;code&gt;(index, value)&lt;/code&gt; pairs we see that &lt;code&gt;sqs&lt;/code&gt; encodes the diagonal &lt;code&gt;(0, 0)&lt;/code&gt; to &lt;code&gt;(7, 7)&lt;/code&gt;:
-&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;&amp;gt;&amp;gt;&amp;gt; list(enumerate(sqs))
-[(0, 0), (1, 1), (2, 2), (3, 3), (4, 4), (5, 5), (6, 6), (7, 7)]
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Next, permute the values &amp;#8212; the rows.
-&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;&amp;gt;&amp;gt;&amp;gt; from itertools import permutations
-&amp;gt;&amp;gt;&amp;gt; rooks = permutations(sqs)
-&amp;gt;&amp;gt;&amp;gt; next(rooks)
-(0, 1, 2, 3, 4, 5, 6, 7)
-&amp;gt;&amp;gt;&amp;gt; next(rooks)
-(0, 1, 2, 3, 4, 5, 7, 6)
-&amp;gt;&amp;gt;&amp;gt; next(rooks)
-(0, 1, 2, 3, 4, 6, 5, 7)
-&amp;gt;&amp;gt;&amp;gt; list(rooks)[34567]
-(6, 7, 0, 1, 3, 4, 5, 2)
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;a href="https://docs.python.org/3/library/itertools.html#itertools.permutations"&gt;Itertools.permutations&lt;/a&gt; generates values lazily. The snippet above shows the first two results, then skips forward 34568 places. &lt;code&gt;Permutations(sqs)&lt;/code&gt; generates all possible arrangements of 8 pieces on a chessboard such that each row has exactly one piece on it and so does each column. That is, it generates all possible ways of placing 8 &lt;a href="http://mathworld.wolfram.com/RooksProblem.html"&gt;rooks on a chessboard&lt;/a&gt; so that no pair attacks each other.
-&lt;/p&gt;
-&lt;p&gt;In the final program, we filter these rook positions to generate solutions to the more challenging &amp;#8212; and more interesting &amp;#8212; &lt;a href="https://en.wikipedia.org/wiki/Eight_queens_puzzle"&gt;eight Queens puzzle&lt;/a&gt;.
-&lt;/p&gt;
-&lt;p&gt;Consider our starting point, the diagonal &lt;code&gt;(0, 0)&lt;/code&gt; to &lt;code&gt;(7, 7)&lt;/code&gt;
-&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;&amp;gt;&amp;gt;&amp;gt; diagonal = range(8)
-&amp;gt;&amp;gt;&amp;gt; {r-c for c,r in enumerate(diagonal)}
-{0}
-&amp;gt;&amp;gt;&amp;gt; {r+c for c,r in enumerate(diagonal)}
-{0, 2, 4, 6, 8, 10, 12, 14}
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Here, a set comprehension collects the distinct values taken by the difference between the row and column along this diagonal, which in this case gives &lt;code&gt;{0}&lt;/code&gt;. That is, if we placed 8 bishops along this &amp;#x2197; diagonal they would all attack each other along this diagonal. The sum of the row and column takes 8 distinct values, however, meaning no pair attacks along a &amp;#x2196; diagonal.
-&lt;/p&gt;
-&lt;p&gt;&lt;a href="https://docs.python.org/3/reference/expressions.html#comparisons"&gt;Comparison operators chain in Python&lt;/a&gt;, so the expression:
-&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;n == len({Q[i]+i for i in sqs}) == len({Q[i]-i for i in sqs})
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;is &lt;code&gt;True&lt;/code&gt; if both sets have 8 elements, that is, if the squares in &lt;code&gt;Q&lt;/code&gt; are on distinct &amp;#x2196; and &amp;#x2197; diagonals; or, equivalently no pair of bishops placed on the squares in &lt;code&gt;Q&lt;/code&gt; would attack each other. Since we already know &lt;code&gt;Q&lt;/code&gt; positions 8 rooks so that no pair attacks each other, and a chess Queen combines the moves of a rook and a bishop, we can see that &lt;code&gt;Qs&lt;/code&gt; generates every possible way of placing 8 Queens on a chessboard so that no pair attacks each other: which is to say, we&amp;#8217;ve solved the &lt;a href="https://en.wikipedia.org/wiki/Eight_queens_puzzle"&gt;8 Queens puzzle&lt;/a&gt;.
-&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;Qs = (Q for Q in permutations(sqs)
-      if n == len({Q[i]+i for i in sqs})
-           == len({Q[i]-i for i in sqs}))
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;This is beautiful code and there&amp;#8217;s one final twist.
-&lt;/p&gt;
-&lt;p&gt;&lt;code&gt;Qs&lt;/code&gt; is a &lt;a href="https://docs.python.org/3/reference/expressions.html#generator-expressions"&gt;generator expression&lt;/a&gt; primed to permute squares into neighbourly rooks filtered by amicable bishops yielding unthreatening Queens. Until asked, however, it does nothing.
-&lt;/p&gt;
-&lt;p style="font-size:4em"&gt;&amp;#9813;&amp;#9813;&amp;#9813;&amp;#9813;&amp;#9813;&amp;#9813;&amp;#9813;&amp;#9813;&lt;/p&gt;</description>
-<dc:date>2016-04-04</dc:date>
-<guid>http://wordaligned.org/articles/8-queens-puzzle</guid>
-<author>tag@wordaligned.org (Thomas Guest)</author>
-<link>http://wordaligned.org/articles/8-queens-puzzle</link>
-<category>Puzzles</category>
-<category>Python</category>
 </item>
 
 </channel>
