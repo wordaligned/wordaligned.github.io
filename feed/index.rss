@@ -7,6 +7,27 @@
 <dc:creator>tag@wordaligned.org</dc:creator>
 <language>en-gb</language>
 <item>
+<title>Bugwards Compatible</title>
+<description>&lt;p&gt;&lt;a href="https://twitter.com/chrisoldwood"&gt;Chris Oldwood&lt;/a&gt; recently tweeted about &amp;#8220;TFW you write some tests for a bit of legacy code before making a change and you unearth a bunch of bugs&amp;#8221;
+&lt;/p&gt;
+&lt;div&gt;&lt;blockquote class="twitter-tweet" data-lang="en"&gt;&lt;p lang="en" dir="ltr"&gt;TFW you write some tests for a bit of legacy code before making a change and you unearth a bunch of bugs.&lt;/p&gt;&amp;mdash; Chris Oldwood (@chrisoldwood) &lt;a href="https://twitter.com/chrisoldwood/status/959576034059448321?ref_src=twsrc%5Etfw"&gt;February 2, 2018&lt;/a&gt;&lt;/blockquote&gt;&lt;script async src="https://platform.twitter.com/widgets.js" charset="utf-8"&gt;&lt;/script&gt;&lt;/div&gt;
+
+&lt;p&gt;He doesn&amp;#8217;t elaborate on what exactly &amp;#8220;that feeling&amp;#8221; is, but I&amp;#8217;ll bet it&amp;#8217;s not surprise. Writing tests for code almost invariably shakes something out &amp;#8212; perhaps some undocumented assumptions about the inputs; perhaps a failure to match the documented behaviour; perhaps an access violation which will crash the application.
+&lt;/p&gt;
+&lt;p&gt;&amp;#8220;That feeling&amp;#8221; can include relief: the code is legacy code and evidently the bugs have gone unnoticed or at least unreported. Often, any such relief may be accompanied by a sense of wonder. The bugs may be so severe &amp;#8212; the code so broken &amp;#8212; that the maintainer questions how it &lt;strong&gt;ever&lt;/strong&gt; worked.
+&lt;/p&gt;
+&lt;p&gt;&amp;#8220;That feeling&amp;#8221; may also be dismay, since the legacy code requires changing. If the existing behaviour is buggy but predictable it could well be that clients have adapted to this behaviour and wouldn&amp;#8217;t welcome a fix. In other words, the change will have to be both backwards and &lt;strong&gt;bugwards compatible&lt;/strong&gt;. Chris will have to tread carefully.
+&lt;/p&gt;
+&lt;p&gt;Such delicate decisions are not limited to the code&amp;#8217;s runtime behaviour. It might seem that, once the code is under test, Chris can &lt;a href="http://wiki.c2.com/?RefactorMercilessly"&gt;refactor mercilessly&lt;/a&gt; &amp;#8212; renaming variables, updating idioms, tidying layout. Again, tread carefully! Make sure the code &lt;strong&gt;is&lt;/strong&gt; under test. Be aware of the differences which reviewers must evaluate. Consider the wider context. Respect the original authors.
+&lt;/p&gt;</description>
+<dc:date>2018-02-02</dc:date>
+<guid>http://wordaligned.org/articles/bugwards-compatible</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/bugwards-compatible</link>
+<category>Tests</category>
+</item>
+
+<item>
 <title>Meetup? Turn Up!</title>
 <description>&lt;p&gt;&lt;a href="https://www.meetup.com/Agile-Bath-Bristol/events/245853715/"&gt;&lt;img alt="Sell out" src="http://wordaligned.org/images/agile-bb-meetup.png"/&gt;&lt;/a&gt;
 &lt;/p&gt;
@@ -14,7 +35,7 @@
 &lt;/p&gt;
 &lt;p&gt;The reality turned out to be different: of the 50 who&amp;#8217;d claimed spaces, roughly one in four actually showed up.
 &lt;/p&gt;
-&lt;p&gt;I know, it was &lt;a href="https://en.wikipedia.org/wiki/Blue_Monday_(date)"&gt;Blue Monday&lt;/a&gt;. I know, there are bugs going round &amp;#8212; my daughter has been running a fever and didn&amp;#8217;t go in to college, and if I hadn&amp;#8217;t been presenting I would have cancelled myself to stay in with her. I know, your work day over-runs, you&amp;#8217;re hungry, something else comes up. I know, it&amp;#8217;s a free event, so it&amp;#8217;s not as though you&amp;#8217;ve &lt;em&gt;lost&lt;/em&gt; anything.
+&lt;p&gt;I know, it was &lt;a href="https://en.wikipedia.org/wiki/Blue_Monday_(date)"&gt;Blue Monday&lt;/a&gt;. I know, there are bugs going round &amp;#8212; my daughter has been running a fever and didn&amp;#8217;t go in to college, and if I hadn&amp;#8217;t been presenting I myself would have cancelled to stay in with her. I know, your work day over-runs, you&amp;#8217;re hungry, something else comes up. I know, it&amp;#8217;s a free event, so it&amp;#8217;s not as though you&amp;#8217;ve &lt;em&gt;lost&lt;/em&gt; anything.
 &lt;/p&gt;
 &lt;p&gt;Despite all these things a 25% turnout reflects badly on us all. It&amp;#8217;s unfair on the sponsors and organisers, especially when refreshments are offered. It&amp;#8217;s impolite to those who turn up at the advertised time, and must then sit waiting in case more people who&amp;#8217;ve said they&amp;#8217;re coming actually show up. It&amp;#8217;s tough on the speakers: planning a session for an audience of 50 is different to one you&amp;#8217;d plan for 12.
 &lt;/p&gt;
@@ -2326,43 +2347,6 @@ main = print $ head $ \
 <category>Go</category>
 <category>Self</category>
 <category>ACCU</category>
-</item>
-
-<item>
-<title>8 Queens Puzzle++</title>
-<description>&lt;p&gt;&lt;a href="http://wordaligned.org/articles/8-queens-puzzle"&gt;Yesterday I wrote about&lt;/a&gt; a Python solution to the 8 Queens puzzle.
-&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;n = 8
-sqs = range(n)
-
-Qs = (Q for Q in itertools.permutations(sqs)
-      if n == len({Q[i]+i for i in sqs})
-           == len({Q[i]-i for i in sqs}))
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;It&amp;#8217;s possible to reproduce this strategy in C++:
-&lt;/p&gt;
-&lt;ul&gt;
- &lt;li&gt;
-     range(n) &amp;#8594; &lt;a href="http://en.cppreference.com/w/cpp/algorithm/iota"&gt;std::iota&lt;/a&gt;
- &lt;/li&gt;
-
- &lt;li&gt;
-     itertools.permutations &amp;#8594; &lt;a href="http://wordaligned.org/articles/next-permutation"&gt;std::next_permutation&lt;/a&gt;
- &lt;/li&gt;
-
- &lt;li&gt;
-     set comprehension &amp;#8594; set insertion
- &lt;/li&gt;
-&lt;/ul&gt;
-&lt;script src="https://gist.github.com/wordaligned/c94649d6b37ec08a9bda16e53c43b888.js"&gt;&lt;/script&gt;
-
-&lt;p&gt;The &lt;code&gt;std::next_permutation&lt;/code&gt; algorithm stands alone in the C++ standard library. Used here, it pairs well with the similarly uncommon &lt;code&gt;do ... while&lt;/code&gt; loop. The solution depends on the vector &lt;code&gt;sqs&lt;/code&gt; starting off in sorted order, and by the end of the loop the vector will have been returned to &lt;a href="https://rosettacode.org/wiki/Sorting_algorithms/Permutation_sort"&gt;this state&lt;/a&gt;.
-&lt;/p&gt;</description>
-<dc:date>2016-04-05</dc:date>
-<guid>http://wordaligned.org/articles/8-queens-puzzle-cpp</guid>
-<author>tag@wordaligned.org (Thomas Guest)</author>
-<link>http://wordaligned.org/articles/8-queens-puzzle-cpp</link>
-<category>Puzzles</category>
-<category>C++</category>
 </item>
 
 </channel>

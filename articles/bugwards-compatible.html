@@ -1,0 +1,110 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<link rel="icon" href="/images/favicon.png" type="image/png"/>
+<link href="/styles/application.css" media="all" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="/scripts/prettify.js"></script>
+<script type="text/javascript" src="/scripts/lang-lisp.js"></script>
+<title>Bugwards Compatible</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="author" content="Thomas Guest" />
+<meta name="description" content="A Word Aligned article posted 2018-02-02, tagged Tests." />
+<meta name="keywords" content="Tests" />
+<link rel="alternate" type="application/rss+xml" title="Feed" href="http://feeds.wordaligned.org/wordaligned" />
+</head>
+
+<body onload="prettyPrint()">
+<div id="container">
+  <div id="header">
+<h1><span><a accesskey="h" href="/">Word Aligned</a></span></h1>
+<h2>tales from the code face</h2>
+<a class="button" href="http://feeds.wordaligned.org/wordaligned" title="Subscribe to Word Aligned"><img style="float: right;" src="/images/feed.png" alt="Feed Logo" height="28" width="28"/></a>
+</div>
+
+  <div id="page">
+    <div id="content">
+      <div class="atomentry" id="bugwards-compatible">
+<h2 class="title"><a href="/articles/bugwards-compatible">Bugwards Compatible</a></h2>
+<p class="meta"><abbr class="published" title="2018-02-02">2018-02-02</abbr> &bull; <a href="/tag/tests" rel="tag">Tests</a> &bull; <a href="/articles/bugwards-compatible#disqus_thread">Comments</a></p>
+<p><a href="https://twitter.com/chrisoldwood">Chris Oldwood</a> recently tweeted about &#8220;TFW you write some tests for a bit of legacy code before making a change and you unearth a bunch of bugs&#8221;
+</p>
+<div><blockquote class="twitter-tweet" data-lang="en"><p lang="en" dir="ltr">TFW you write some tests for a bit of legacy code before making a change and you unearth a bunch of bugs.</p>&mdash; Chris Oldwood (@chrisoldwood) <a href="https://twitter.com/chrisoldwood/status/959576034059448321?ref_src=twsrc%5Etfw">February 2, 2018</a></blockquote><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script></div>
+
+<p>He doesn&#8217;t elaborate on what exactly &#8220;that feeling&#8221; is, but I&#8217;ll bet it&#8217;s not surprise. Writing tests for code almost invariably shakes something out &#8212; perhaps some undocumented assumptions about the inputs; perhaps a failure to match the documented behaviour; perhaps an access violation which will crash the application.
+</p>
+<p>&#8220;That feeling&#8221; can include relief: the code is legacy code and evidently the bugs have gone unnoticed or at least unreported. Often, any such relief may be accompanied by a sense of wonder. The bugs may be so severe &#8212; the code so broken &#8212; that the maintainer questions how it <strong>ever</strong> worked.
+</p>
+<p>&#8220;That feeling&#8221; may also be dismay, since the legacy code requires changing. If the existing behaviour is buggy but predictable it could well be that clients have adapted to this behaviour and wouldn&#8217;t welcome a fix. In other words, the change will have to be both backwards and <strong>bugwards compatible</strong>. Chris will have to tread carefully.
+</p>
+<p>Such delicate decisions are not limited to the code&#8217;s runtime behaviour. It might seem that, once the code is under test, Chris can <a href="http://wiki.c2.com/?RefactorMercilessly">refactor mercilessly</a> &#8212; renaming variables, updating idioms, tidying layout. Again, tread carefully! Make sure the code <strong>is</strong> under test. Be aware of the differences which reviewers must evaluate. Consider the wider context. Respect the original authors.
+</p>
+</div>
+
+<div class="comments"><hr/><div id="disqus_thread"></div><script type="text/javascript" src="http://disqus.com/forums/wordaligned/embed.js"></script></div>
+      
+<div id="comments"><script type="text/javascript">
+//<![CDATA[
+(function() {
+    var links = document.getElementsByTagName('a');
+    var query = '?';
+    for(var i = 0; i < links.length; i++) {
+        if(links[i].href.indexOf('#disqus_thread') >= 0) {
+            query += 'url' + i + '=' + encodeURIComponent(links[i].href) + '&amp;';
+        }
+    }
+    document.write('<script type="text/javascript" src="http://disqus.com/forums/wordaligned/get_num_replies.js' + query + '"></' + 'script>');
+})();
+//]]>
+</script></div>
+
+    </div>
+    <div id="sidebar">
+      
+<div class="sidebar-node">
+<h3>Tagged</h3>
+<ul id="categories"><li><a href="/tag/tests" rel="tag">Tests</a></li></ul>
+
+</div>
+
+<div class="sidebar-node">
+<h3>Chain</h3>
+<ul>
+
+<li><a accesskey="p" href="/articles/meetup-turn-up" title="Previous article">&raquo; Meetup? Turn Up!</a></li>
+</ul>
+
+
+</div>
+
+<div class="sidebar-node">
+<h3>Feeds</h3>
+
+<ul>
+<li><a href="http://feeds.wordaligned.org/wordaligned"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Articles</a></li>
+<li><a href="http://feeds.wordaligned.org/wordaligned/comments"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Comments</a></li>
+</ul>
+
+
+</div>
+
+    </div>
+  </div>
+  <div id="footer">
+<hr />
+<p><a href="http://tag.wordaligned.org">Thomas Guest</a></p>
+</div>
+
+</div>
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-3373724-1']);
+  _gaq.push(['_trackPageview']);
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ga);
+  })();
+</script>
+</body>
+
+</html>

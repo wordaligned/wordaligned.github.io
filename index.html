@@ -25,7 +25,26 @@
 
   <div id="page">
     <div id="content">
-      <div class="atomentry" id="meetup-turn-up">
+      <div class="atomentry" id="bugwards-compatible">
+<h2 class="title"><a href="/articles/bugwards-compatible">Bugwards Compatible</a></h2>
+<p class="meta"><abbr class="published" title="2018-02-02">2018-02-02</abbr> &bull; <a href="/tag/tests" rel="tag">Tests</a> &bull; <a href="/articles/bugwards-compatible#disqus_thread">Comments</a></p>
+<p><a href="https://twitter.com/chrisoldwood">Chris Oldwood</a> recently tweeted about &#8220;TFW you write some tests for a bit of legacy code before making a change and you unearth a bunch of bugs&#8221;
+</p>
+<div><blockquote class="twitter-tweet" data-lang="en"><p lang="en" dir="ltr">TFW you write some tests for a bit of legacy code before making a change and you unearth a bunch of bugs.</p>&mdash; Chris Oldwood (@chrisoldwood) <a href="https://twitter.com/chrisoldwood/status/959576034059448321?ref_src=twsrc%5Etfw">February 2, 2018</a></blockquote><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script></div>
+
+<p>He doesn&#8217;t elaborate on what exactly &#8220;that feeling&#8221; is, but I&#8217;ll bet it&#8217;s not surprise. Writing tests for code almost invariably shakes something out &#8212; perhaps some undocumented assumptions about the inputs; perhaps a failure to match the documented behaviour; perhaps an access violation which will crash the application.
+</p>
+<p>&#8220;That feeling&#8221; can include relief: the code is legacy code and evidently the bugs have gone unnoticed or at least unreported. Often, any such relief may be accompanied by a sense of wonder. The bugs may be so severe &#8212; the code so broken &#8212; that the maintainer questions how it <strong>ever</strong> worked.
+</p>
+<p>&#8220;That feeling&#8221; may also be dismay, since the legacy code requires changing. If the existing behaviour is buggy but predictable it could well be that clients have adapted to this behaviour and wouldn&#8217;t welcome a fix. In other words, the change will have to be both backwards and <strong>bugwards compatible</strong>. Chris will have to tread carefully.
+</p>
+<p>Such delicate decisions are not limited to the code&#8217;s runtime behaviour. It might seem that, once the code is under test, Chris can <a href="http://wiki.c2.com/?RefactorMercilessly">refactor mercilessly</a> &#8212; renaming variables, updating idioms, tidying layout. Again, tread carefully! Make sure the code <strong>is</strong> under test. Be aware of the differences which reviewers must evaluate. Consider the wider context. Respect the original authors.
+</p>
+
+</div>
+
+
+<div class="atomentry" id="meetup-turn-up">
 <h2 class="title"><a href="/articles/meetup-turn-up">Meetup? Turn Up!</a></h2>
 <p class="meta"><abbr class="published" title="2018-01-18">2018-01-18</abbr> &bull; <a href="/tag/talks" rel="tag">Talks</a> &bull; <a href="/articles/meetup-turn-up#disqus_thread">Comments</a></p>
 <p><a href="https://www.meetup.com/Agile-Bath-Bristol/events/245853715/"><img alt="Sell out" src="/images/agile-bb-meetup.png"/></a>
@@ -34,7 +53,7 @@
 </p>
 <p>The reality turned out to be different: of the 50 who&#8217;d claimed spaces, roughly one in four actually showed up.
 </p>
-<p>I know, it was <a href="https://en.wikipedia.org/wiki/Blue_Monday_(date)">Blue Monday</a>. I know, there are bugs going round &#8212; my daughter has been running a fever and didn&#8217;t go in to college, and if I hadn&#8217;t been presenting I would have cancelled myself to stay in with her. I know, your work day over-runs, you&#8217;re hungry, something else comes up. I know, it&#8217;s a free event, so it&#8217;s not as though you&#8217;ve <em>lost</em> anything.
+<p>I know, it was <a href="https://en.wikipedia.org/wiki/Blue_Monday_(date)">Blue Monday</a>. I know, there are bugs going round &#8212; my daughter has been running a fever and didn&#8217;t go in to college, and if I hadn&#8217;t been presenting I myself would have cancelled to stay in with her. I know, your work day over-runs, you&#8217;re hungry, something else comes up. I know, it&#8217;s a free event, so it&#8217;s not as though you&#8217;ve <em>lost</em> anything.
 </p>
 <p>Despite all these things a 25% turnout reflects badly on us all. It&#8217;s unfair on the sponsors and organisers, especially when refreshments are offered. It&#8217;s impolite to those who turn up at the advertised time, and must then sit waiting in case more people who&#8217;ve said they&#8217;re coming actually show up. It&#8217;s tough on the speakers: planning a session for an audience of 50 is different to one you&#8217;d plan for 12.
 </p>
@@ -680,48 +699,6 @@ main()
 </div>
 
 
-<div class="atomentry" id="a-language-people-use-and-bitch-about">
-<h2 class="title"><a href="/articles/a-language-people-use-and-bitch-about">A language people use and bitch about</a></h2>
-<p class="meta"><abbr class="published" title="2016-08-24">2016-08-24</abbr> &bull; <a href="/tag/c" rel="tag">C</a>, <a href="/tag/c++" rel="tag">C++</a> &bull; <a href="/articles/a-language-people-use-and-bitch-about#disqus_thread">Comments</a></p>
-<p>Every so often a new essay hits the top of the programming news sites:
-</p>
-<ul>
- <li>
-     why I&#8217;m rewriting <a href="http://250bpm.com/blog:4" title="Why should I have written ZeroMQ in C, not C++">X in C</a> (and abandoning C++)
- </li>
-
- <li>
-     why we will never use C++ for Y (which has always been written in C)
- </li>
-
- <li>
-     why C++ is a <a href="http://thread.gmane.org/gmane.comp.version-control.git/57643/focus=57918" title="Torvalds rants about C++">horrible language</a> (it isn&#8217;t C)
- </li>
-</ul>
-<p>I&#8217;m a sucker for these articles and have some sympathy with them. Every so often I work with C code rather than C++, and find the experience refreshing: rapid compilation, clear build diagnostics, comprehensible APIs, easy debugging, and an agreeable reduction in layering and punctuation.
-</p>
-<p>It&#8217;s always easy to return to C because it hasn&#8217;t really changed. Well, it <strong>has</strong> changed, conservatively, and C programmers seem conservative in adopting new features.
-</p>
-<p>By contrast, C++ <strong>does</strong> change. Sure, C++0X was a long time coming &#8212; finally realised as C++11 &#8212; but since that giant step, smaller improvements continue apace. As a result C++ code soon looks stale. Every time I visit a source file it seems I have to freshen it, using the new way to prevent copying, or return containers, or manage resources, or pass functions, or &#8230; you get the idea.
-</p>
-<p>The truth is, every substantial C++ codebase I&#8217;ve worked on reads like a history of C++. Somewhere low down there&#8217;ll be hand-written intrusive linked lists; then there&#8217;ll be a few layers of classes, some nested for good measure; then templates, <a href="http://www.boost.org/">boost</a>, functions disguised as classes for use in algorithms; and finally the good stuff, in which auto, lambda, move semantics and intialisers allow us to code as we&#8217;ve always wanted.
-</p>
-<p>Bjarne Stroustrup <a href="http://www.stroustrup.com/blast.html">defends C++ on his website</a>:
-</p>
-<blockquote><p>As someone remarked: There are only two kinds of programming languages: those people always bitch about and those nobody uses.
-</p>
-</blockquote><p>If that &#8220;someone&#8221; wasn&#8217;t Stroustrup, it is now &#8212; he has become the source of his own quotation. His point is that C++ is well-used and must therefore be bitched about.
-</p>
-<p>C provides an immediate counter-example, however. It is undeniably used, but its <a href="https://en.wikipedia.org/wiki/C_Traps_and_Pitfalls">traps and pitfalls</a> are known and respected, rather than bitched about.
-</p>
-<p>Ultimately, though, I find C too limited. The lack of standard containers and algorithms combined with the overheads of heap management and ubiquitous error checking make programming in C heavy going.
-</p>
-<p>C++ is hard to learn and hard to keep up with. The language has grown, considerably, but the progression is necessary. It&#8217;s the more recent extensions which fully realise the power of the standard template library, for example. Stick with C++. The reward will be code which is expressive and efficient.
-</p>
-
-</div>
-
-
 <div class="extended">
 <p><a href="/articles/">Visit the Word Aligned archives...</a></p>
 </div>
@@ -797,7 +774,7 @@ main()
 <div class="sidebar-node">
 <h3>Chain</h3>
 <ul>
-<li><a accesskey="p" href="/articles/meetup-turn-up" title="First article">&raquo; Meetup? Turn Up!</a></li>
+<li><a accesskey="p" href="/articles/bugwards-compatible" title="First article">&raquo; Bugwards Compatible</a></li>
 
 </ul>
 
