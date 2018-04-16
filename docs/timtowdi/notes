@@ -1,0 +1,94 @@
+[pl]: https://www.perl.com/pub/1999/03/pm.html/
+[zop]: https://www.python.org/dev/peps/pep-0020/
+[PyPy]: https://pypy.org/
+[jp]: http://jupyter.org/
+[template strings]: https://docs.python.org/3/library/string.html#template-strings
+[pep3101]: https://www.python.org/dev/peps/pep-3101/
+[f-strings]: https://www.python.org/dev/peps/pep-0498/
+[fire]: https://github.com/google/python-fire
+[docopt]: http://docopt.org/
+
+## TIMTOWDI
+
+TIMTOWDI stands for "There is more than one way to do it".
+
+It was popularised by Perl, a language which encourages an eclectic approach. One-liner? Fine! Procedural? Of course! Functional? Why not! OO? Sure!
+
+This mindset gets explored in more detail by the language's creator, Larry Wall, in a talk given in 1999: ["Perl, the first postmodern computer language"][pl]. He attributes the slogan to his daughter, Heidi, who associates it with another phrase: "Tsall Good", which doesn't mean everything is good, or even everything has good bits. It means, overall, things are good. See the big picture.
+
+Tsall good.
+
+I like that.
+
+But do I feel that way about programming?
+
+## TSBO-APOO-OWTDI
+
+A contrasting mantra appears in the [Zen of Python][zop], a list of aphorisms which summarise the guiding principles behind Python's design. Item number 13 states "There should be one -- and preferably only one -- obvious way to do it."
+
+Realising this sounds overly prescriptive, pompous even, this rule is tempered by item 14, "Although that way may not be obvious at first unless you're Dutch."
+
+Guido van Rossum, Python's BDFL -- Benevolent Dictator For Life -- would be the Dutch person who finds things obvious. That's right: **Dictator**. How then has Python become so popular? I don't think programmers like being told what to do any more than toddlers.
+
+I suggest the emphasis falls on **should**. There **should** be only one obvious way to do it: it's just that -- Dutch or otherwise -- we haven't got there yet.
+
+
+## TIMTOP
+
+For example, there is more than one Python. Obviously there's Python 2 and Python 3, but it's less obvious which to use. Don't forget [PyPy][]. Increasingly we don't adopt standard Python, but prefer instead some packaged variant: a [Jupyter notebook][jp] perhaps, where Python comes with enhanced data processing and visualisation extensions.
+
+## TIMTOPOM
+
+There is more than one program options module.
+
+[getopt]: https://docs.python.org/3/library/getopt.html
+[optparse]: https://docs.python.org/3/library/optparse.html
+
+When I started with Python there was [getopt][], the one and only command line handler. Coming from a C/C++ background I was quite happy to use a reskinned GNU getopt. Then [optparse][] appeared. Now optparse is deprecated in favour of [argparse][].
+
+All of these libraries are readily available. Which should I use? Not optparse, that's deprecated, unless I'm already using it and it works, that is. Regarding the other contenders, the [documentation][getopt] archly notes:
+
+> Users who are unfamiliar with the C <a href="http://man7.org/linux/man-pages/man3/getopt.3.html"><code>getopt()</code></a> function or who would like to write less code and get better help and error messages should consider using the <a href="https://docs.python.org/3/library/argparse.html#module-argparse">argparse module</a> instead.
+
+There are other non-standard Python options for parsing a command line too: ones which [generate code from the usage][docopt] notes, or by [inspecting the code you want to expose][fire].
+
+There is more than one way to do it.
+
+## TIMTOUTF
+
+There is more than one unit test framework.
+
+As with program options, the standard Python library borrows its primary [unit testing framework](https://docs.python.org/3/library/unittest.html) from elsewhere, in  this case Java's Junit. I'd suggest:
+
+> Users who are unfamiliar with the JUnit framework, or who would like to write less code and get better feedback from their tests should consider [pytest](https://docs.pytest.org)
+
+There's also a [doctest](https://docs.python.org/3/library/doctest.html) module in the standard library, which treats strings as code (hold that thought!), and there are many other non-standard testing frameworks. PyTest gets my vote, flexing the language itself to deliver test assertions as `assert`s.
+
+There is more than one way to do it.
+
+## TIMTOWOFS
+
+There is more than one way of formatting strings.
+
+So, there's more than one Python. Libraries are always up for reinvention. This is arguably evolution rather than a multiplicity of options. That is, the most recent way to do it should be preferred.
+
+When it comes to string formatting, though, there has **always** been more than one way to do it.
+
+Do you use single or double quotes for a string? TIMTOWDI. Triple quotes. TIMTOWDI. Raw strings? TIMTOWDI.
+
+What if you want to embed the value of a variable in a string? Users familiar with C's `printf()` function might prefer `%` formatting. Fans of $shell $parameter $expansion can use [template strings][].
+
+[Advanced string formatting][pep3101] -- `str.format` -- appeared in Python 3.0, backported to Python 2.6. No doubt it has advantages over `%` formatting, but for me it's a little more obscure and a little less obvious. Python 3.6 introduces [f-strings][] which build on `str.format` and knock down my reservations. The syntax allows you to evaluate expressions in strings: evidently Python is heading in Perl's direction.
+
+## Duct Tape
+
+Let's finish by returning to Perl, and to [Larry Wall's 1999 talk][pl]. 
+
+> How many times have we heard the mantra that a program should do one thing and do it well?
+ 
+Perl is not that program. Perl wants to do everything well. It integrates features and makes no attempt to homogenise.
+
+> You've all heard the saying: If all you have is a hammer, everything starts to look like a nail. That's actually a Modernistic saying. The postmodern version is: If all you have is duct tape, everything starts to look like a duct. Right. When's the last time you used duct tape on a duct?
+
+Python may aspire to a single way to do something. It fails splendidly, being more duct tape than hammer.
+
