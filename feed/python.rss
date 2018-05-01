@@ -7,6 +7,147 @@
 <dc:creator>tag@wordaligned.org</dc:creator>
 <language>en-gb</language>
 <item>
+<title>Creating a dict of lists in Python</title>
+<description>&lt;p&gt;Suppose you have a list of objects which you want to convert into a dict mapping from some object key to the (sub-)list of objects with that key. To provide a simple example, let&amp;#8217;s start with a list of fruits.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;from collections import namedtuple
+
+Fruit = namedtuple('Fruit', 'name colour')
+
+def banana():     return Fruit('banana', 'yellow')
+def grape():      return Fruit('grape', 'green')
+def pear():       return Fruit('pear', 'green')
+def strawberry(): return Fruit('strawberry', 'red')
+def cherry():     return Fruit('cherry', 'red')
+
+fruits = [
+    banana(), pear(), cherry(), cherry(), pear(),
+    grape(), banana(), grape(), cherry(), grape(),
+    strawberry(), pear(), grape(), cherry()]
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;We&amp;#8217;d like to arrange a fruitbowl &amp;#8212; a dict which groups fruits by colour. This can be done by creating an empty bowl, then iterating through the fruits placing each in the correct list.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;fruitbowl = {}
+
+for fruit in fruits:
+    fruitbowl.setdefault(fruit.colour, []).append(fruit)
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;&lt;code&gt;Dict.setdefault&lt;/code&gt; is a bit of an oddity in Python, both doing something and returning a value, but it&amp;#8217;s a convenient shorthand in this case. Despite this convenience it&amp;#8217;s more common to use a &lt;code&gt;defaultdict&lt;/code&gt;.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;from collections import defaultdict
+
+fruitbowl = defaultdict(list)
+
+for fruit in fruits:
+    fruitbowl[fruit.colour].append(fruit)
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Here&amp;#8217;s a function to display the fruitbowl.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;def print_bowl(bowl):
+    print('\n'.join(
+        '{}: {}'.format(colour,
+                        ', '.join(f.name for f in fruits))
+        for colour, fruits in bowl.items()))
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;If we call this function, we see the fruits have indeed been grouped by colour.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; print_bowl(fruitbowl)
+yellow: banana, banana
+green: pear, pear, grape, grape, grape, pear, grape
+red: cherry, cherry, cherry, strawberry, cherry
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;This is all fine and idiomatic Python, but whenever I see an empty dict being created followed by a loop to populate it, I wonder if a comprehension could be used.
+&lt;/p&gt;
+&lt;p&gt;Is there a way to declare and initialise the dict in a single expression? Here&amp;#8217;s the best I came up with.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;from operator import attrgetter
+from itertools import groupby
+
+colour = attrgetter('colour')
+
+fruitbowl = {
+    col: list(fts)
+    for col, fts in groupby(sorted(fruits, key=colour), colour)}
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Is this better than the &lt;code&gt;defaultdict&lt;/code&gt; solution. Probably not, but it&amp;#8217;s a technique worth remembering. Maybe the &lt;code&gt;fruitbowl&lt;/code&gt; isn&amp;#8217;t needed, and what we actually want is to iterate through the fruits grouped by colour. For example, which colour is most popular?
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; max(fruitbowl.items(), key=lambda kv: len(kv[1]))[0]
+'green'
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Using &lt;code&gt;groupby&lt;/code&gt;, we don&amp;#8217;t need the bowl.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; def grouplen(k_gp):
+...     return sum(1 for _ in k_gp[1])
+&amp;gt;&amp;gt;&amp;gt; max(groupby(sorted(fruits, key=colour), colour), key=grouplen)[0]
+&amp;gt;&amp;gt;&amp;gt; 'green'
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;In this case, we don&amp;#8217;t need &lt;code&gt;groupby&lt;/code&gt; either. &lt;a href="./timtowtdi-vs-tsboapooowtdi"&gt;There is more than one way to do it&lt;/a&gt;.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; from collections import Counter
+&amp;gt;&amp;gt;&amp;gt; Counter(map(colour, fruits)).most_common(1)
+[('green', 7)]
+
+&lt;/pre&gt;
+
+&lt;/div&gt;</description>
+<dc:date>2018-04-29</dc:date>
+<guid>http://wordaligned.org/articles/dict-of-lists</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/dict-of-lists</link>
+<category>Python</category>
+</item>
+
+<item>
 <title>TIMTOWTDI vs TSBO-APOO-OWTDI</title>
 <description>&lt;div class="toc"&gt;
 &lt;h2&gt;Contents&lt;/h2&gt;
@@ -2689,596 +2830,6 @@ has no member named 'add'
 <guid>http://wordaligned.org/articles/setinsert-or-setadd</guid>
 <author>tag@wordaligned.org (Thomas Guest)</author>
 <link>http://wordaligned.org/articles/setinsert-or-setadd</link>
-<category>Python</category>
-</item>
-
-<item>
-<title>Hiding iterator boilerplate behind a Boost facade</title>
-<description>&lt;div class="toc"&gt;
-&lt;h2&gt;Contents&lt;/h2&gt;
-&lt;ul&gt;
- &lt;li&gt;&lt;a href="http://wordaligned.org/articles/boost-iterator-facade#tocfilling-in-missing-methods-python" name="toc0" id="toc0"&gt;Filling in missing methods. Python&lt;/a&gt;
- &lt;/li&gt;
-
- &lt;li&gt;&lt;a href="http://wordaligned.org/articles/boost-iterator-facade#tocfilling-in-missing-methods-c" name="toc1" id="toc1"&gt;Filling in missing methods. C++&lt;/a&gt;
- &lt;/li&gt;
-
- &lt;li&gt;&lt;a href="http://wordaligned.org/articles/boost-iterator-facade#tocenter-boost-iterators" name="toc2" id="toc2"&gt;Enter Boost iterators&lt;/a&gt;
- &lt;/li&gt;
-
- &lt;li&gt;&lt;a href="http://wordaligned.org/articles/boost-iterator-facade#tocusing-boostiteratorfacade" name="toc3" id="toc3"&gt;Using boost::iterator_facade&lt;/a&gt;
- &lt;/li&gt;
-
- &lt;li&gt;&lt;a href="http://wordaligned.org/articles/boost-iterator-facade#toctemplates-and-traits" name="toc4" id="toc4"&gt;Templates and Traits&lt;/a&gt;
- &lt;/li&gt;
-
- &lt;li&gt;&lt;a href="http://wordaligned.org/articles/boost-iterator-facade#tocconstructors-destructors-and-operators" name="toc5" id="toc5"&gt;Constructors, destructors and operators&lt;/a&gt;
- &lt;/li&gt;
-
- &lt;li&gt;&lt;a href="http://wordaligned.org/articles/boost-iterator-facade#tocwrinkles" name="toc6" id="toc6"&gt;Wrinkles&lt;/a&gt;
- &lt;/li&gt;
-
- &lt;li&gt;&lt;a href="http://wordaligned.org/articles/boost-iterator-facade#tocless-code-more-software" name="toc7" id="toc7"&gt;Less code, more software&lt;/a&gt;
- &lt;/li&gt;
-
- &lt;li&gt;&lt;a href="http://wordaligned.org/articles/boost-iterator-facade#tocperformance" name="toc8" id="toc8"&gt;Performance&lt;/a&gt;
- &lt;/li&gt;
-&lt;/ul&gt;
-&lt;/div&gt;&lt;p&gt;&lt;a href="http://www.flickr.com/photos/davehamster/2336911145/" title="SS Great Britain by Dave Hamster, on Flickr"&gt;&lt;img src="http://farm3.static.flickr.com/2379/2336911145_5275811ec0_m.jpg" width="240" height="160" alt="SS Great Britain"/&gt;&lt;/a&gt;
-&lt;/p&gt;
-
-&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/boost-iterator-facade#toc0" name="tocfilling-in-missing-methods-python" id="tocfilling-in-missing-methods-python"&gt;Filling in missing methods. Python&lt;/a&gt;&lt;/h3&gt;
-&lt;p&gt;Here&amp;#8217;s another wholesome &lt;a href="http://code.activestate.com/recipes/576685" title="Total ordering class decorator, by Raymond Hettinger"&gt;recipe&lt;/a&gt; served up by Raymond Hettinger.
-&lt;/p&gt;
-&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;Total ordering class decorator&lt;/div&gt;
-
-&lt;pre class="prettyprint"&gt;def total_ordering(cls):
-    'Class decorator that fills-in missing ordering methods'    
-    convert = {
-        '__lt__': [('__gt__', lambda self, other: other &amp;lt; self),
-                   ('__le__', lambda self, other: not other &amp;lt; self),
-                   ('__ge__', lambda self, other: not self &amp;lt; other)],
-        '__le__': [('__ge__', lambda self, other: other &amp;lt;= self),
-                   ('__lt__', lambda self, other: not other &amp;lt;= self),
-                   ('__gt__', lambda self, other: not self &amp;lt;= other)],
-        '__gt__': [('__lt__', lambda self, other: other &amp;gt; self),
-                   ('__ge__', lambda self, other: not other &amp;gt; self),
-                   ('__le__', lambda self, other: not self &amp;gt; other)],
-        '__ge__': [('__le__', lambda self, other: other &amp;gt;= self),
-                   ('__gt__', lambda self, other: not other &amp;gt;= self),
-                   ('__lt__', lambda self, other: not self &amp;gt;= other)]
-    }
-    roots = set(dir(cls)) &amp;amp; set(convert)
-    assert roots, 'must define at least one ordering operation: &amp;lt; &amp;gt; &amp;lt;= &amp;gt;='
-    root = max(roots)       # prefer __lt__ to __le__ to __gt__ to __ge__
-    for opname, opfunc in convert[root]:
-        if opname not in roots:
-            opfunc.__name__ = opname
-            opfunc.__doc__ = getattr(int, opname).__doc__
-            setattr(cls, opname, opfunc)
-    return cls
-
-&lt;/pre&gt;
-
-&lt;/div&gt;
-
-&lt;p&gt;If you have a class, &lt;code&gt;X&lt;/code&gt;, which implements one or more of the ordering operators, &lt;code&gt;&amp;lt;, &amp;lt;=, &amp;gt;, &amp;gt;=&lt;/code&gt; then &lt;code&gt;total_ordering(X)&lt;/code&gt; adapts and returns the class with the missing operators filled-in. Alternatively, use standard decorator syntax to adapt a class. If we apply &lt;code&gt;@total_ordering&lt;/code&gt; to a &lt;code&gt;Point&lt;/code&gt; class
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
-
-&lt;pre class="prettyprint"&gt;@total_ordering
-class Point:
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
-    def __lt__(self, other):
-        return (self.x, self.y) &amp;lt; (other.x, other.y)
-
-&lt;/pre&gt;
-
-&lt;/div&gt;
-
-&lt;p&gt;then we can compare points however we like
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
-
-&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; p = Point(1,2)
-&amp;gt;&amp;gt;&amp;gt; q = Point(1,3)
-&amp;gt;&amp;gt;&amp;gt; p &amp;lt; q, p &amp;gt; q, p &amp;gt;= q, p &amp;lt;= q
-(True, False, False, True)
-
-&lt;/pre&gt;
-
-&lt;/div&gt;
-
-&lt;p&gt;Here&amp;#8217;s a nice touch: the freshly-baked methods even have documentation!
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
-
-&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; help(Point)
-Help on class Point in module __main__:
-
-class Point
- |  Methods defined here:
- |  
- |  __ge__(self, other)
- |      x.__ge__(y) &amp;lt;==&amp;gt; x&amp;gt;=y
- |  
- |  __gt__(self, other)
- |      x.__gt__(y) &amp;lt;==&amp;gt; x&amp;gt;y
- |  
- |  __init__(self, x, y)
- |  
- |  __le__(self, other)
- |      x.__le__(y) &amp;lt;==&amp;gt; x&amp;lt;=y
- |  
- |  __lt__(self, other)
-
-&lt;/pre&gt;
-
-&lt;/div&gt;
-
-&lt;p&gt;Writing class decorators may not be the first thing a new Python programmer attempts, but once you&amp;#8217;ve discovered the relationship between Python&amp;#8217;s special method names and the more familiar operator symbols, I think this recipe is remarkably straightforward.
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
-
-&lt;pre class="prettyprint"&gt;convert = {
-    '__lt__': [('__gt__', lambda self, other: other &amp;lt; self),
-               ('__le__', lambda self, other: not other &amp;lt; self),
-               ('__ge__', lambda self, other: not self &amp;lt; other)],
-    '__le__': [('__ge__', lambda self, other: other &amp;lt;= self),
-               ('__lt__', lambda self, other: not other &amp;lt;= self),
-               ('__gt__', lambda self, other: not self &amp;lt;= other)],
-    '__gt__': [('__lt__', lambda self, other: other &amp;gt; self),
-               ('__ge__', lambda self, other: not other &amp;gt; self),
-               ('__le__', lambda self, other: not self &amp;gt; other)],
-    '__ge__': [('__le__', lambda self, other: other &amp;gt;= self),
-               ('__gt__', lambda self, other: not other &amp;gt;= self),
-               ('__lt__', lambda self, other: not self &amp;gt;= other)]
-}
-
-&lt;/pre&gt;
-
-&lt;/div&gt;
-
-&lt;p&gt;Before moving on to something more challenging, look again at one of the recipe&amp;#8217;s key ingredients, the &lt;code&gt;convert&lt;/code&gt; dict, which helps create the missing ordering functions from existing ones. As you can see, there&amp;#8217;s much repetition here, and plenty of opportunities for cut-and-paste errors.
-&lt;/p&gt;
-&lt;p&gt;This block of code is an example of what programmers term &lt;a href="http://en.wikipedia.org/wiki/Boilerplate_(text)#Boilerplate_code"&gt;boilerplate&lt;/a&gt;. By using the total ordering decorator, we can avoid boilerplating our own code.&lt;a id="fn1link" href="http://wordaligned.org/articles/boost-iterator-facade#fn1"&gt;&lt;sup&gt;[1]&lt;/sup&gt;&lt;/a&gt;
-&lt;/p&gt;
-
-&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/boost-iterator-facade#toc1" name="tocfilling-in-missing-methods-c" id="tocfilling-in-missing-methods-c"&gt;Filling in missing methods. C++&lt;/a&gt;&lt;/h3&gt;
-&lt;p&gt;Python is dynamic and self-aware, happy to expose its internals for this kind of tinkering.  It takes real wizardry to achieve similar results with a &lt;a href="http://sites.google.com/site/steveyegge2/tour-de-babel" title="C++ is the dumbest language on earth ... doesn't know about itself. It is not introspective"&gt;less flexible language, such as C++&lt;/a&gt; &amp;#8212; but it can be done.
-&lt;/p&gt;
-&lt;span id="continue-reading"/&gt;
-
-&lt;p&gt;In a &lt;a href="http://wordaligned.org/articles/binary-search-revisited.html"&gt;previous article&lt;/a&gt; we developed a random access file iterator in C++. At its heart, this iterator simply repositioned itself using file-seeks and dereferenced itself using file-reads. There wasn&amp;#8217;t much to it.
-&lt;/p&gt;
-&lt;p&gt;Unfortunately we had to fill-out the iterator with the various members required to make it comply with the standard random access iterator requirements (which was the whole point, since we wanted something we could use with standard binary search algorithms).
-&lt;/p&gt;
-&lt;p&gt;We had to expose standard typedefs:
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
-
-&lt;pre class="prettyprint"&gt;typedef std::random_access_iterator_tag iterator_category;
-typedef item value_type;
-typedef std::streamoff difference_type;
-typedef item * pointer;
-typedef item &amp;amp; reference;
-
-&lt;/pre&gt;
-
-&lt;/div&gt;
-
-&lt;p&gt;Worse, we had to implement a full set of comparison, iteration, step and access functions. Please, page down past the following code block! I only include it here so you can see how long it goes on for.
-&lt;/p&gt;
-&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;Iterator boilerplate&lt;/div&gt;
-
-&lt;pre class="prettyprint"&gt;public: // Comparison
-    bool operator&amp;lt;(iter const &amp;amp; other) const
-    {
-        return pos &amp;lt; other.pos;
-    }
-    
-    bool operator&amp;gt;(iter const &amp;amp; other) const
-    {
-        return pos &amp;gt; other.pos;
-    }
-    
-    bool operator==(iter const &amp;amp; other) const
-    {
-        return pos == other.pos;
-    }
-    
-    bool operator!=(iter const &amp;amp; other) const
-    {
-        return pos != other.pos;
-    }
-    
-public: // Iteration
-    iter &amp;amp; operator++()
-    {
-        return *this += 1;
-    }
-    
-    iter &amp;amp; operator--()
-    {
-        return *this -= 1;
-    }
-    
-    iter operator++(int)
-    {
-        iter tmp(*this);
-        ++(*this);
-        return tmp;
-    }
-    
-    iter operator--(int)
-    {
-        iter tmp(*this);
-        --(*this);
-        return tmp;
-    }
-    
-public: // Step
-    iter &amp;amp; operator+=(difference_type n)
-    {
-        advance(n);
-        return *this;
-    }
-    
-    iter &amp;amp; operator-=(difference_type n)
-    {
-        advance(-n);
-        return *this;
-    }
-    
-    iter operator+(difference_type n)
-    {
-        iter result(*this);
-        return result += n;
-    }
-    
-    iter operator-(difference_type n)
-    {
-        iter result(*this);
-        return result -= n;
-    }
-    
-public: // Distance
-    difference_type operator-(iter &amp;amp; other)
-    {
-        return pos - other.pos;
-    }
-    
-public: // Access
-    value_type operator*()
-    {
-        return (*this)[0];
-    }
-
-value_type operator[](difference_type n)
-    {
-        std::streampos restore = getpos();
-        advance(n);
-        value_type const result = read();
-        setpos(restore);
-        return result;
-    }
-    ....
-
-&lt;/pre&gt;
-
-&lt;/div&gt;
-
-&lt;p&gt;How tiresome! Most of these member functions are directly and unsurprisingly implemented in a standard way. It would be nice if we could write (and test!) what we actually needed to and have a decorator fill in the rest.
-&lt;/p&gt;
-&lt;p&gt;&lt;a href="http://www.flickr.com/photos/chr1sp/3997724676/" title="Library - Ephesus by Chris. P, on Flickr"&gt;&lt;img src="http://farm3.static.flickr.com/2554/3997724676_bf73106637.jpg" width="500" height="334" alt="Library - Ephesus"/&gt;&lt;/a&gt;
-&lt;/p&gt;
-
-&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/boost-iterator-facade#toc2" name="tocenter-boost-iterators" id="tocenter-boost-iterators"&gt;Enter Boost iterators&lt;/a&gt;&lt;/h3&gt;
-&lt;p&gt;Actually, we can! I&amp;#8217;m grateful to proggitor dzorz for &lt;a href="http://www.reddit.com/r/programming/comments/c8fsk/binary_search_revisited/c0quxr0"&gt;telling me how&lt;/a&gt;.
-&lt;/p&gt;
-&lt;blockquote&gt;&lt;p&gt;A nicer solution would use boost::iterator_facade and just implement dereference, equal, increment, decrement, advance and distance_to.
-&lt;/p&gt;
-&lt;/blockquote&gt;&lt;p&gt;Like many programmers I have mixed feelings about C++ &amp;#8212; when it&amp;#8217;s good it&amp;#8217;s very very good, but when it&amp;#8217;s bad it&amp;#8217;s horrid &amp;#8212; and these feelings are only amplified by the &lt;a href="http://www.boost.org" title="Boost library home page"&gt;Boost&lt;/a&gt; library. Boost is superb, so long as you stick to the good parts.
-&lt;/p&gt;
-&lt;p&gt;So which parts are good? It depends. On you, who you work with, and the platforms you&amp;#8217;re working on.
-&lt;/p&gt;
-&lt;p&gt;In my previous article I used an ingenious iterator adaptor from the &lt;a href="http://www.boost.org/doc/libs/release/libs/spirit/index.html"&gt;Boost.Spirit&lt;/a&gt; parser library to disastrous effect. If only I&amp;#8217;d looked a little more carefully I&amp;#8217;d have discovered something more useful in a more obvious place. &lt;a href="http://www.boost.org/doc/libs/release/libs/iterator/"&gt;Boost.Iterator&lt;/a&gt; could have helped.
-&lt;/p&gt;
-&lt;p&gt;As dzorz points out, &lt;code&gt;boost::iterator_facade&lt;/code&gt; can work with any C++ iterable. Implement whatever subset of 
-&lt;/p&gt;
-&lt;ul&gt;
- &lt;li&gt;
-     dereference
- &lt;/li&gt;
-
- &lt;li&gt;
-     equal
- &lt;/li&gt;
-
- &lt;li&gt;
-     increment 
- &lt;/li&gt;
-
- &lt;li&gt;
-     decrement
- &lt;/li&gt;
-
- &lt;li&gt;
-     advance
- &lt;/li&gt;
-
- &lt;li&gt;
-     distance_to
- &lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;is appropriate and &lt;code&gt;iterator_facade&lt;/code&gt; will fill in the boilerplate required to standardise your iterator.
-&lt;/p&gt;
-&lt;p&gt;In our case, we&amp;#8217;ll need the full set. That&amp;#8217;s because we&amp;#8217;re after a random access iterator. Other iterators need rather less. Here&amp;#8217;s a &lt;a href="http://www.boost.org/doc/libs/1_43_0/libs/iterator/doc/iterator_facade.html#iterator-facade-requirements"&gt;table&lt;/a&gt; showing the relationship between core operations and iterator concepts.
-&lt;/p&gt;
-&lt;p&gt;&lt;a href="http://www.boost.org/doc/libs/1_43_0/libs/iterator/doc/iterator_facade.html#iterator-facade-requirements"&gt;&lt;img src="http://wordaligned.org/images/iterator-facade.png" alt="iterator_facade Core Operations"/&gt;&lt;/a&gt;
-&lt;/p&gt;
-
-&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/boost-iterator-facade#toc3" name="tocusing-boostiteratorfacade" id="tocusing-boostiteratorfacade"&gt;Using boost::iterator_facade&lt;/a&gt;&lt;/h3&gt;
-&lt;p&gt;The &lt;a href="http://www.boost.org/doc/libs/release/libs/iterator/"&gt;Boost.Iterator&lt;/a&gt; documentation is well-written but daunting. Read it from top-to bottom and you&amp;#8217;ll get:
-&lt;/p&gt;
-&lt;ul&gt;
- &lt;li&gt;
-     rationale and theory
- &lt;/li&gt;
-
- &lt;li&gt;
-     plans for standardisation (which don&amp;#8217;t seem correct &lt;a id="fn2link" href="http://wordaligned.org/articles/boost-iterator-facade#fn2"&gt;&lt;sup&gt;[2]&lt;/sup&gt;&lt;/a&gt;)
- &lt;/li&gt;
-
- &lt;li&gt;
-     &lt;strong&gt;usage notes&lt;/strong&gt;
- &lt;/li&gt;
-
- &lt;li&gt;
-     some subtle points on the implementation and its predecessor
- &lt;/li&gt;
-
- &lt;li&gt;
-     a namecheck for the curiously recurring template pattern
- &lt;/li&gt;
-
- &lt;li&gt;
-     a fat reference section detailing the boilerplate which this library allows you to forget
- &lt;/li&gt;
-
- &lt;li&gt;
-     a &lt;strong&gt;tutorial&lt;/strong&gt;
- &lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;If you&amp;#8217;re tempted to skip to the end of the page, you&amp;#8217;ll see this code block.
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
-
-&lt;pre class="prettyprint"&gt;#include &amp;lt;boost/type_traits/is_convertible.hpp&amp;gt;
-#include &amp;lt;boost/utility/enable_if.hpp&amp;gt;
-  
-  ....
-  
-private:
-  struct enabler {};
-  
-public:
-  template &amp;lt;class OtherValue&amp;gt;
-  node_iter(
-      node_iter&amp;lt;OtherValue&amp;gt; const&amp;amp; other
-    , typename boost::enable_if&amp;lt;
-          boost::is_convertible&amp;lt;OtherValue*,Value*&amp;gt;
-        , enabler
-      &amp;gt;::type = enabler()
-  )
-    : m_node(other.m_node) {}
-
-&lt;/pre&gt;
-
-&lt;/div&gt;
-
-&lt;p&gt;According to the surrounding documentation this is &amp;#8220;magic&amp;#8221;. I find it scary.
-&lt;/p&gt;
-&lt;p&gt;Luckily it turns out the library is straightforward to use. What you really want, as a newcomer, are the &lt;a href="http://www.boost.org/doc/libs/1_43_0/libs/iterator/doc/iterator_facade.html#usage"&gt;usage notes&lt;/a&gt; and the &lt;a href="http://www.boost.org/doc/libs/1_43_0/libs/iterator/doc/iterator_facade.html#tutorial-example"&gt;tutorial example&lt;/a&gt;.
-&lt;/p&gt;
-&lt;p&gt;The tutorial walks through the process of skinning a singly-linked list with a forwards iterator facade. This is a different use case to ours: the tutorial shows a basic class which implements what it should, and the facade allows it to be treated as a forwards iterator. In our case we&amp;#8217;ve already created a full-blown random access iterator. We can retrospectively apply &lt;code&gt;iterator_facade&lt;/code&gt; to strip our class back to basics.
-&lt;/p&gt;
-
-&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/boost-iterator-facade#toc4" name="toctemplates-and-traits" id="toctemplates-and-traits"&gt;Templates and Traits&lt;/a&gt;&lt;/h3&gt;
-&lt;p&gt;Where we had:
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
-
-&lt;pre class="prettyprint"&gt;template &amp;lt;typename item&amp;gt;
-class text_file_iter
-{
-public: // Traits typedefs, which make this class usable with
-        // algorithms which need a random access iterator.
-    typedef std::random_access_iterator_tag iterator_category;
-    typedef item value_type;
-    typedef std::streamoff difference_type;
-    typedef item * pointer;
-    typedef item &amp;amp; reference;
-....
-};
-
-&lt;/pre&gt;
-
-&lt;/div&gt;
-
-&lt;p&gt;We now need (my thanks here to Giuseppe for correcting the code I originally posted here):
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
-
-&lt;pre class="prettyprint"&gt;template &amp;lt;typename value&amp;gt;
-class text_file_iter
-    : public boost::iterator_facade&amp;lt;
-      text_file_iter&amp;lt;value&amp;gt;
-    , value
-    , std::random_access_iterator_tag
-    , value
-    , std::streamoff
-    &amp;gt;
-....
-};
-
-&lt;/pre&gt;
-
-&lt;/div&gt;
-
-&lt;p&gt;(Yes, the class accepts itself as a template parameter. That&amp;#8217;s the curious recursion.)
-&lt;/p&gt;
-
-&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/boost-iterator-facade#toc5" name="tocconstructors-destructors-and-operators" id="tocconstructors-destructors-and-operators"&gt;Constructors, destructors and operators&lt;/a&gt;&lt;/h3&gt;
-&lt;p&gt;We still need iterator constructors and destructors &amp;#8212; these are unchanged &amp;#8212; but &lt;strong&gt;we can eliminate every single operator&lt;/strong&gt; shown in the &amp;#8220;Iterator boilerplate&amp;#8221; code block above.
-&lt;/p&gt;
-&lt;p&gt;Here&amp;#8217;s what we need instead, to ensure &lt;code&gt;iterator_facade&lt;/code&gt; can do its job. The &lt;code&gt;read()&lt;/code&gt; member function we had before doesn&amp;#8217;t need changing.
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
-
-&lt;pre class="prettyprint"&gt;    ....
-private: // Everything Boost's iterator facade needs
-    friend class boost::iterator_core_access;
-    
-    value dereference() const
-    {
-        return read();
-    }
-    
-    bool equal(iter const &amp;amp; other) const
-    {
-        return pos == other.pos;
-    }
-    
-    void increment()
-    {
-        advance(1);
-    }
-    
-    void decrement()
-    {
-        advance(-1);
-    }
-    
-    void advance(std::streamoff n)
-    {
-        in.seekg(n, std::ios_base::cur);
-        pos = in.tellg();
-    }
-    
-    std::streamoff distance_to(iter const &amp;amp; other) const
-    {
-        return other.pos - pos;
-    }
-
-&lt;/pre&gt;
-
-&lt;/div&gt;
-
-&lt;p&gt;And that really is all there is to it. I&amp;#8217;m impressed.
-&lt;/p&gt;
-&lt;p&gt;Notice, by the way, that &lt;code&gt;friend&lt;/code&gt; is used to expose the primitive, private member functions for use by the &lt;code&gt;boost::iterator_core_access&lt;/code&gt; class. This follows the example set by the tutorial. I&amp;#8217;ve written enough C and Python to question C++&amp;#8217;s sophisticated access rules &amp;#8212; you have &lt;code&gt;public&lt;/code&gt;, &lt;code&gt;protected&lt;/code&gt; and &lt;code&gt;private&lt;/code&gt;, but that&amp;#8217;s &lt;strong&gt;still&lt;/strong&gt; not enough, so you need &lt;code&gt;friend&lt;/code&gt; declaration to cut through it all &amp;#8212; which tempts me to simply make &lt;code&gt;dereference()&lt;/code&gt;, &lt;code&gt;equal()&lt;/code&gt; etc. public, but then the facade wouldn&amp;#8217;t be a proper facade. Users should treat the final class exactly as they would any other random access iterator, and designating these members as &lt;code&gt;private&lt;/code&gt; means they&amp;#8217;ll have to.
-&lt;/p&gt;
-
-&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/boost-iterator-facade#toc6" name="tocwrinkles" id="tocwrinkles"&gt;Wrinkles&lt;/a&gt;&lt;/h3&gt;
-&lt;p&gt;You&amp;#8217;ll notice the &lt;code&gt;dereference()&lt;/code&gt; member function has a &lt;code&gt;const&lt;/code&gt; signature. However, the &lt;code&gt;read()&lt;/code&gt; member function is non-const.
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
-
-&lt;pre class="prettyprint"&gt;    // Return the item at the current position
-    value_type read()
-    {
-        value_type n = 0;
-        
-        // Reverse till we hit whitespace or the start of the file
-        while (in &amp;amp;&amp;amp; !isspace(in.peek()))
-        {
-            in.unget();
-        }
-        in.clear();
-        
-        in &amp;gt;&amp;gt; n;
-        return n;
-    }
-
-&lt;/pre&gt;
-
-&lt;/div&gt;
-
-&lt;p&gt;Here, &lt;code&gt;in&lt;/code&gt; is a data member of type &lt;code&gt;std::ifstream&lt;/code&gt;, and clearly the read call modifies it. That&amp;#8217;s what this alarming compiler error is trying to tell us.
-&lt;/p&gt;
-&lt;pre&gt;
-boost_binary_search_text_file.cpp: In member function 'value text_file_iter&amp;lt;value&amp;gt;::read() const [with value = long long int]':
-boost_binary_search_text_file.cpp:90:   instantiated from 'value text_file_iter&amp;lt;value&amp;gt;::dereference() const [with value = long long int]'
-/opt/local/include/boost/iterator/iterator_facade.hpp:516:   instantiated from 'static typename Facade::reference boost::iterator_core_access::dereference(const Facade&amp;amp;) [with Facade = text_file_iter&amp;lt;long long int&amp;gt;]'
-/opt/local/include/boost/iterator/iterator_facade.hpp:634:   instantiated from 'Reference boost::iterator_facade&amp;lt;I, V, TC, R, D&amp;gt;::operator*() const [with Derived = text_file_iter&amp;lt;long long int&amp;gt;, Value = long long int, CategoryOrTraversal = boost::random_access_traversal_tag, Reference = long long int, Difference = long long int]'
-/usr/include/c++/4.2.1/bits/stl_algo.h:4240:   instantiated from 'bool std::binary_search(_ForwardIterator, _ForwardIterator, const _Tp&amp;amp;) [with _ForwardIterator = text_file_iter&amp;lt;long long int&amp;gt;, _Tp = main::number]'
-boost_binary_search_text_file.cpp:203:   instantiated from here
-boost_binary_search_text_file.cpp:174: error: passing 'const std::basic_ifstream&amp;lt;char, std::char_traits&amp;lt;char&amp;gt; &amp;gt;' as 'this' argument of 'typename std::basic_istream&amp;lt;_CharT, _Traits&amp;gt;::int_type std::basic_istream&amp;lt;_CharT, _Traits&amp;gt;::peek() [with _CharT = char, _Traits = std::char_traits&amp;lt;char&amp;gt;]' discards qualifiers
-boost_binary_search_text_file.cpp:176: error: passing 'const std::basic_ifstream&amp;lt;char, std::char_traits&amp;lt;char&amp;gt; &amp;gt;' as 'this' argument of 'std::basic_istream&amp;lt;_CharT, _Traits&amp;gt;&amp;amp; std::basic_istream&amp;lt;_CharT, _Traits&amp;gt;::unget() [with _CharT = char, _Traits = std::char_traits&amp;lt;char&amp;gt;]' discards qualifiers
-boost_binary_search_text_file.cpp:178: error: passing 'const std::basic_ifstream&amp;lt;char, std::char_traits&amp;lt;char&amp;gt; &amp;gt;' as 'this' argument of 'void std::basic_ios&amp;lt;_CharT, _Traits&amp;gt;::clear(std::_Ios_Iostate) [with _CharT = char, _Traits = std::char_traits&amp;lt;char&amp;gt;]' discards qualifiers
-boost_binary_search_text_file.cpp:180: error: passing 'const std::basic_ifstream&amp;lt;char, std::char_traits&amp;lt;char&amp;gt; &amp;gt;' as 'this' argument of 'std::basic_istream&amp;lt;_CharT, _Traits&amp;gt;&amp;amp; std::basic_istream&amp;lt;_CharT, _Traits&amp;gt;::operator&amp;gt;&amp;gt;(long long int&amp;amp;) [with _CharT = char, _Traits = std::char_traits&amp;lt;char&amp;gt;]' discards qualifiers
-&lt;/pre&gt;
-
-&lt;p&gt;Related to this, the &lt;code&gt;Reference&lt;/code&gt; template parameter (shown in bold in the listing below) is actually a &lt;code&gt;value&lt;/code&gt;, rather than the (default) &lt;code&gt;value &amp;amp;&lt;/code&gt;. As we originally implemented it, our file iterator reads values lazily, only when clients request them. We have no reference to return.
-&lt;/p&gt;
-&lt;pre&gt;
-template &amp;lt;typename value&amp;gt;
-class text_file_iter
-    : public boost::iterator_facade&amp;lt;
-      text_file_iter&amp;lt;value&amp;gt;
-    , value
-    , std::random_access_iterator_tag
-    , &lt;strong&gt;value&lt;/strong&gt;
-    , std::streamoff
-    &amp;gt;
-};
-&lt;/pre&gt;
-
-&lt;p&gt;I faced a dilemma here. Either I could modify my original file iterator, including a current value data member, which I would take care to update every time we repositioned the file read position. Then our references could be real references and &lt;code&gt;read()&lt;/code&gt; would naturally be &lt;code&gt;const&lt;/code&gt;, simply returning a reference to this member. Or, I could make the &lt;code&gt;in&lt;/code&gt; input stream data member &lt;code&gt;mutable&lt;/code&gt;.
-&lt;/p&gt;
-&lt;p&gt;&lt;code&gt;Mutable&lt;/code&gt; makes me uneasy for the same reason that &lt;code&gt;friend&lt;/code&gt; does &amp;#8212; if you can shake off the rigours of const-correctness so easily, then why bother with it? &amp;#8212; and for this reason the first option appealed. However, a read-only file is an unusual container: we do not change it, but we cannot supply const references to its elements without reading them in, and that will mean changes to the file input stream. The easier option, involving the smallest code change, was to make &lt;code&gt;in&lt;/code&gt; mutable. So that&amp;#8217;s what I did.
-&lt;/p&gt;
-
-&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/boost-iterator-facade#toc7" name="tocless-code-more-software" id="tocless-code-more-software"&gt;Less code, more software&lt;/a&gt;&lt;/h3&gt;
-&lt;p&gt;By employing two of my least favourite C++ keywords I now had a class which provided the functions it should, and, thanks to the magic worked by Boost&amp;#8217;s iterator facade, I also had a class which I could use as a standard random access iterator. Most of the code changes were the deletion of boilerplate &amp;#8212; very satisfying. I added code too, since I decided to invest a little more effort in tests. I didn&amp;#8217;t have any doubts about the Boost library&amp;#8217;s correctness but I thought I might not have been using it correctly. Happily these tests all passed.
-&lt;/p&gt;
-
-&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/boost-iterator-facade#toc8" name="tocperformance" id="tocperformance"&gt;Performance&lt;/a&gt;&lt;/h3&gt;
-&lt;p&gt;Let&amp;#8217;s not forget why we originally wanted a random access file iterator: we had a large sorted file, too large to read into memory, and we wanted to test for the presence of the number in this file.
-&lt;/p&gt;
-&lt;p&gt;For test purposes I created a file just over 4GB in size. A simple linear search through this file took around 180 seconds on my (aging laptop) computer, and was light on memory use. By creating a random access file iterator, boilerplate and all, we took advantage of the standard binary search algorithm and reduced the time to around 4 milliseconds.
-&lt;/p&gt;
-&lt;p&gt;How would our version using Boost iterator facade do? I wasn&amp;#8217;t expecting it to be faster than the original, but I wouldn&amp;#8217;t have been surprised if it gave it a close run: using Boost doesn&amp;#8217;t usually involve compromise. In fact, over repeated runs of my performance tests there was no significant difference between the two iterator versions &amp;#8212; or at least there wasn&amp;#8217;t once a helpful reader had discovered and fixed a bug in my program, which was causing it to run correctly but slowly.
-&lt;/p&gt;
-&lt;p&gt;To trust a facade I guess you need some knowledge of what lies behind it.
-&lt;/p&gt;
-&lt;p style="text-align:center"&gt;&amp;sect;&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;Note&lt;/strong&gt;: During my original performance tests, reported in the first version of this article, the Boost iterator performed woefully, far slower even than a linear search. By this time I&amp;#8217;d lost patience, and it was left up to a reader, Giuseppe, to &lt;a href="http://wordaligned.org/articles/boost-iterator-facade#comment-60988668"&gt;point out my mistake&lt;/a&gt;. I&amp;#8217;d been using a &lt;code&gt;boost::random_access_traversal_tag&lt;/code&gt; template parameter, with the result that &lt;code&gt;std::distance()&lt;/code&gt; was using repeated increments rather than calling &lt;code&gt;distance_to()&lt;/code&gt; to get an immediate result, and consequently ran very slowly. I should have used &lt;code&gt;std::random_access_iterator_tag&lt;/code&gt;. I modified my code accordingly and confirmed that the Boost version does indeed perform on a par with the original version.
-&lt;/p&gt;
-&lt;hr /&gt;
-
-&lt;p&gt;My thanks to &lt;a href="http://www.flickr.com/photos/chr1sp/" title="Chris. P on Flickr"&gt;Chris P&lt;/a&gt; for permission to use his &lt;a href="http://www.flickr.com/photos/chr1sp/3997724676"&gt;photograph&lt;/a&gt; of the &lt;a href="http://en.wikipedia.org/wiki/Library_of_Celsus" title="Library of Celsus, Wikipedia"&gt;Library of Celsus&lt;/a&gt; at Ephesus, or at rather its beautiful facade. Ephesus is famous for the Temple of Artemis, one of the seven wonders of the ancient world, of which only fragments remain. Thanks too to &lt;a href="http://www.flickr.com/photos/davehamster/"&gt;Dave Hamster&lt;/a&gt; for the boilerplate &lt;a href="http://www.flickr.com/photos/davehamster/2336911145/"&gt;photo&lt;/a&gt; &amp;#8212; actually a detail from the hull of the &lt;a href="http://www.ssgreatbritain.org"&gt;SS Great Britain&lt;/a&gt;.
-&lt;/p&gt;
-&lt;p&gt;If you&amp;#8217;d like to continue this experiment the code and the tests I used are available via anonymous SVN access from &lt;a href="http://svn.wordaligned.org/svn/etc/search_text_file"&gt;http://svn.wordaligned.org/svn/etc/search_text_file&lt;/a&gt;.
-&lt;/p&gt;
-&lt;hr /&gt;
-
-&lt;p&gt;&lt;a id="fn1" href="http://wordaligned.org/articles/boost-iterator-facade#fn1link"&gt;[1]&lt;/a&gt;: As of Python 2.7 and 3.2, the standard library will include a version of this recipe. It&amp;#8217;s in the &lt;a href="http://docs.python.org/dev/py3k/library/functools.html#functools.total_ordering" title="functools.total_ordering decorator documentation"&gt;functools module&lt;/a&gt;. For some reason, your class &amp;#8220;should supply an __eq__()&amp;#8221; method.
-&lt;/p&gt;
-&lt;p&gt;&lt;a id="fn2" href="http://wordaligned.org/articles/boost-iterator-facade#fn2link"&gt;[2]&lt;/a&gt;: According to the Boost.Iterator documentation:
-&lt;/p&gt;
-&lt;blockquote&gt;&lt;p&gt;Both &lt;code&gt;iterator_facade&lt;/code&gt; and &lt;code&gt;iterator_adaptor&lt;/code&gt; as well as many of the specialized adaptors mentioned below have been proposed for standardization, and accepted into the first C++ technical report; see our [Standard Proposal For Iterator Facade and Adaptor (PDF)][tr1proposal] for more details.
-&lt;/p&gt;
-&lt;/blockquote&gt;&lt;p&gt;I assumed this meant there&amp;#8217;d be &lt;code&gt;tr1::iterator_(facade|adaptor)&lt;/code&gt; classes, but I don&amp;#8217;t think that&amp;#8217;s the case. Unlike other (good) bits of Boost, the Iterator library doesn&amp;#8217;t seem likely to be part of the next C++ release.
-&lt;/p&gt;</description>
-<dc:date>2010-07-07</dc:date>
-<guid>http://wordaligned.org/articles/boost-iterator-facade</guid>
-<author>tag@wordaligned.org (Thomas Guest)</author>
-<link>http://wordaligned.org/articles/boost-iterator-facade</link>
 <category>Python</category>
 </item>
 

@@ -7,6 +7,147 @@
 <dc:creator>tag@wordaligned.org</dc:creator>
 <language>en-gb</language>
 <item>
+<title>Creating a dict of lists in Python</title>
+<description>&lt;p&gt;Suppose you have a list of objects which you want to convert into a dict mapping from some object key to the (sub-)list of objects with that key. To provide a simple example, let&amp;#8217;s start with a list of fruits.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;from collections import namedtuple
+
+Fruit = namedtuple('Fruit', 'name colour')
+
+def banana():     return Fruit('banana', 'yellow')
+def grape():      return Fruit('grape', 'green')
+def pear():       return Fruit('pear', 'green')
+def strawberry(): return Fruit('strawberry', 'red')
+def cherry():     return Fruit('cherry', 'red')
+
+fruits = [
+    banana(), pear(), cherry(), cherry(), pear(),
+    grape(), banana(), grape(), cherry(), grape(),
+    strawberry(), pear(), grape(), cherry()]
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;We&amp;#8217;d like to arrange a fruitbowl &amp;#8212; a dict which groups fruits by colour. This can be done by creating an empty bowl, then iterating through the fruits placing each in the correct list.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;fruitbowl = {}
+
+for fruit in fruits:
+    fruitbowl.setdefault(fruit.colour, []).append(fruit)
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;&lt;code&gt;Dict.setdefault&lt;/code&gt; is a bit of an oddity in Python, both doing something and returning a value, but it&amp;#8217;s a convenient shorthand in this case. Despite this convenience it&amp;#8217;s more common to use a &lt;code&gt;defaultdict&lt;/code&gt;.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;from collections import defaultdict
+
+fruitbowl = defaultdict(list)
+
+for fruit in fruits:
+    fruitbowl[fruit.colour].append(fruit)
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Here&amp;#8217;s a function to display the fruitbowl.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;def print_bowl(bowl):
+    print('\n'.join(
+        '{}: {}'.format(colour,
+                        ', '.join(f.name for f in fruits))
+        for colour, fruits in bowl.items()))
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;If we call this function, we see the fruits have indeed been grouped by colour.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; print_bowl(fruitbowl)
+yellow: banana, banana
+green: pear, pear, grape, grape, grape, pear, grape
+red: cherry, cherry, cherry, strawberry, cherry
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;This is all fine and idiomatic Python, but whenever I see an empty dict being created followed by a loop to populate it, I wonder if a comprehension could be used.
+&lt;/p&gt;
+&lt;p&gt;Is there a way to declare and initialise the dict in a single expression? Here&amp;#8217;s the best I came up with.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;from operator import attrgetter
+from itertools import groupby
+
+colour = attrgetter('colour')
+
+fruitbowl = {
+    col: list(fts)
+    for col, fts in groupby(sorted(fruits, key=colour), colour)}
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Is this better than the &lt;code&gt;defaultdict&lt;/code&gt; solution. Probably not, but it&amp;#8217;s a technique worth remembering. Maybe the &lt;code&gt;fruitbowl&lt;/code&gt; isn&amp;#8217;t needed, and what we actually want is to iterate through the fruits grouped by colour. For example, which colour is most popular?
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; max(fruitbowl.items(), key=lambda kv: len(kv[1]))[0]
+'green'
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Using &lt;code&gt;groupby&lt;/code&gt;, we don&amp;#8217;t need the bowl.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; def grouplen(k_gp):
+...     return sum(1 for _ in k_gp[1])
+&amp;gt;&amp;gt;&amp;gt; max(groupby(sorted(fruits, key=colour), colour), key=grouplen)[0]
+&amp;gt;&amp;gt;&amp;gt; 'green'
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;In this case, we don&amp;#8217;t need &lt;code&gt;groupby&lt;/code&gt; either. &lt;a href="./timtowtdi-vs-tsboapooowtdi"&gt;There is more than one way to do it&lt;/a&gt;.
+&lt;/p&gt;
+&lt;div class="typocode"&gt;
+
+&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; from collections import Counter
+&amp;gt;&amp;gt;&amp;gt; Counter(map(colour, fruits)).most_common(1)
+[('green', 7)]
+
+&lt;/pre&gt;
+
+&lt;/div&gt;</description>
+<dc:date>2018-04-29</dc:date>
+<guid>http://wordaligned.org/articles/dict-of-lists</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/dict-of-lists</link>
+<category>Streams</category>
+</item>
+
+<item>
 <title>Lazy sequences working hard</title>
 <description>&lt;p&gt;I gave a talk &lt;a href="http://www.pydiff.wales/events/2017-05-16.html"&gt;@PyDiff&lt;/a&gt; this evening in the computer science department at Cardiff University.
 &lt;/p&gt;

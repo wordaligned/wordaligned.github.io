@@ -1,0 +1,231 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<link rel="icon" href="/images/favicon.png" type="image/png"/>
+<link href="/styles/application.css" media="all" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="/scripts/prettify.js"></script>
+<script type="text/javascript" src="/scripts/lang-lisp.js"></script>
+<title>Creating a dict of lists in Python</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="author" content="Thomas Guest" />
+<meta name="description" content="A Word Aligned article posted 2018-04-29, tagged Python, Streams." />
+<meta name="keywords" content="Python, Streams" />
+<link rel="alternate" type="application/rss+xml" title="Feed" href="http://feeds.wordaligned.org/wordaligned" />
+</head>
+
+<body onload="prettyPrint()">
+<div id="container">
+  <div id="header">
+<h1><span><a accesskey="h" href="/">Word Aligned</a></span></h1>
+<h2>space sensitive programming</h2>
+<a class="button" href="http://feeds.wordaligned.org/wordaligned" title="Subscribe to Word Aligned"><img style="float: right;" src="/images/feed.png" alt="Feed Logo" height="28" width="28"/></a>
+</div>
+
+  <div id="page">
+    <div id="content">
+      <div class="atomentry" id="dict-of-lists">
+<h2 class="title"><a href="/articles/dict-of-lists">Creating a dict of lists in Python</a></h2>
+<p class="meta"><abbr class="published" title="2018-04-29">2018-04-29</abbr> &bull; <a href="/tag/python" rel="tag">Python</a>, <a href="/tag/streams" rel="tag">Streams</a> &bull; <a href="/articles/dict-of-lists#disqus_thread">Comments</a></p>
+<p>Suppose you have a list of objects which you want to convert into a dict mapping from some object key to the (sub-)list of objects with that key. To provide a simple example, let&#8217;s start with a list of fruits.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">from collections import namedtuple
+
+Fruit = namedtuple('Fruit', 'name colour')
+
+def banana():     return Fruit('banana', 'yellow')
+def grape():      return Fruit('grape', 'green')
+def pear():       return Fruit('pear', 'green')
+def strawberry(): return Fruit('strawberry', 'red')
+def cherry():     return Fruit('cherry', 'red')
+
+fruits = [
+    banana(), pear(), cherry(), cherry(), pear(),
+    grape(), banana(), grape(), cherry(), grape(),
+    strawberry(), pear(), grape(), cherry()]
+
+</pre>
+
+</div>
+
+<p>We&#8217;d like to arrange a fruitbowl &#8212; a dict which groups fruits by colour. This can be done by creating an empty bowl, then iterating through the fruits placing each in the correct list.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">fruitbowl = {}
+
+for fruit in fruits:
+    fruitbowl.setdefault(fruit.colour, []).append(fruit)
+
+</pre>
+
+</div>
+
+<p><code>Dict.setdefault</code> is a bit of an oddity in Python, both doing something and returning a value, but it&#8217;s a convenient shorthand in this case. Despite this convenience it&#8217;s more common to use a <code>defaultdict</code>.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">from collections import defaultdict
+
+fruitbowl = defaultdict(list)
+
+for fruit in fruits:
+    fruitbowl[fruit.colour].append(fruit)
+
+</pre>
+
+</div>
+
+<p>Here&#8217;s a function to display the fruitbowl.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">def print_bowl(bowl):
+    print('\n'.join(
+        '{}: {}'.format(colour,
+                        ', '.join(f.name for f in fruits))
+        for colour, fruits in bowl.items()))
+
+</pre>
+
+</div>
+
+<p>If we call this function, we see the fruits have indeed been grouped by colour.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">&gt;&gt;&gt; print_bowl(fruitbowl)
+yellow: banana, banana
+green: pear, pear, grape, grape, grape, pear, grape
+red: cherry, cherry, cherry, strawberry, cherry
+
+</pre>
+
+</div>
+
+<p>This is all fine and idiomatic Python, but whenever I see an empty dict being created followed by a loop to populate it, I wonder if a comprehension could be used.
+</p>
+<p>Is there a way to declare and initialise the dict in a single expression? Here&#8217;s the best I came up with.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">from operator import attrgetter
+from itertools import groupby
+
+colour = attrgetter('colour')
+
+fruitbowl = {
+    col: list(fts)
+    for col, fts in groupby(sorted(fruits, key=colour), colour)}
+
+</pre>
+
+</div>
+
+<p>Is this better than the <code>defaultdict</code> solution. Probably not, but it&#8217;s a technique worth remembering. Maybe the <code>fruitbowl</code> isn&#8217;t needed, and what we actually want is to iterate through the fruits grouped by colour. For example, which colour is most popular?
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">&gt;&gt;&gt; max(fruitbowl.items(), key=lambda kv: len(kv[1]))[0]
+'green'
+
+</pre>
+
+</div>
+
+<p>Using <code>groupby</code>, we don&#8217;t need the bowl.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">&gt;&gt;&gt; def grouplen(k_gp):
+...     return sum(1 for _ in k_gp[1])
+&gt;&gt;&gt; max(groupby(sorted(fruits, key=colour), colour), key=grouplen)[0]
+&gt;&gt;&gt; 'green'
+
+</pre>
+
+</div>
+
+<p>In this case, we don&#8217;t need <code>groupby</code> either. <a href="./timtowtdi-vs-tsboapooowtdi">There is more than one way to do it</a>.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">&gt;&gt;&gt; from collections import Counter
+&gt;&gt;&gt; Counter(map(colour, fruits)).most_common(1)
+[('green', 7)]
+
+</pre>
+
+</div>
+</div>
+
+<div class="comments"><hr/><div id="disqus_thread"></div><script type="text/javascript" src="http://disqus.com/forums/wordaligned/embed.js"></script></div>
+      
+<div id="comments"><script type="text/javascript">
+//<![CDATA[
+(function() {
+    var links = document.getElementsByTagName('a');
+    var query = '?';
+    for(var i = 0; i < links.length; i++) {
+        if(links[i].href.indexOf('#disqus_thread') >= 0) {
+            query += 'url' + i + '=' + encodeURIComponent(links[i].href) + '&amp;';
+        }
+    }
+    document.write('<script type="text/javascript" src="http://disqus.com/forums/wordaligned/get_num_replies.js' + query + '"></' + 'script>');
+})();
+//]]>
+</script></div>
+
+    </div>
+    <div id="sidebar">
+      
+<div class="sidebar-node">
+<h3>Tagged</h3>
+<ul id="categories"><li><a href="/tag/python" rel="tag">Python</a></li>
+<li><a href="/tag/streams" rel="tag">Streams</a></li></ul>
+
+</div>
+
+<div class="sidebar-node">
+<h3>Chain</h3>
+<ul>
+
+<li><a accesskey="p" href="/articles/timtowtdi-vs-tsboapooowtdi" title="Previous article">&raquo; TIMTOWTDI vs TSBO-APOO-OWTDI</a></li>
+</ul>
+
+
+</div>
+
+<div class="sidebar-node">
+<h3>Feeds</h3>
+
+<ul>
+<li><a href="http://feeds.wordaligned.org/wordaligned"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Articles</a></li>
+<li><a href="http://feeds.wordaligned.org/wordaligned/comments"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Comments</a></li>
+</ul>
+
+
+</div>
+
+    </div>
+  </div>
+  <div id="footer">
+<hr />
+<p><a href="http://tag.wordaligned.org">Thomas Guest</a></p>
+</div>
+
+</div>
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-3373724-1']);
+  _gaq.push(['_trackPageview']);
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ga);
+  })();
+</script>
+</body>
+
+</html>

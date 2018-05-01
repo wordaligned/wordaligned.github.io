@@ -25,7 +25,146 @@
 
   <div id="page">
     <div id="content">
-      <div class="atomentry" id="timtowtdi-vs-tsboapooowtdi">
+      <div class="atomentry" id="dict-of-lists">
+<h2 class="title"><a href="/articles/dict-of-lists">Creating a dict of lists in Python</a></h2>
+<p class="meta"><abbr class="published" title="2018-04-29">2018-04-29</abbr> &bull; <a href="/tag/python" rel="tag">Python</a>, <a href="/tag/streams" rel="tag">Streams</a> &bull; <a href="/articles/dict-of-lists#disqus_thread">Comments</a></p>
+<p>Suppose you have a list of objects which you want to convert into a dict mapping from some object key to the (sub-)list of objects with that key. To provide a simple example, let&#8217;s start with a list of fruits.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">from collections import namedtuple
+
+Fruit = namedtuple('Fruit', 'name colour')
+
+def banana():     return Fruit('banana', 'yellow')
+def grape():      return Fruit('grape', 'green')
+def pear():       return Fruit('pear', 'green')
+def strawberry(): return Fruit('strawberry', 'red')
+def cherry():     return Fruit('cherry', 'red')
+
+fruits = [
+    banana(), pear(), cherry(), cherry(), pear(),
+    grape(), banana(), grape(), cherry(), grape(),
+    strawberry(), pear(), grape(), cherry()]
+
+</pre>
+
+</div>
+
+<p>We&#8217;d like to arrange a fruitbowl &#8212; a dict which groups fruits by colour. This can be done by creating an empty bowl, then iterating through the fruits placing each in the correct list.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">fruitbowl = {}
+
+for fruit in fruits:
+    fruitbowl.setdefault(fruit.colour, []).append(fruit)
+
+</pre>
+
+</div>
+
+<p><code>Dict.setdefault</code> is a bit of an oddity in Python, both doing something and returning a value, but it&#8217;s a convenient shorthand in this case. Despite this convenience it&#8217;s more common to use a <code>defaultdict</code>.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">from collections import defaultdict
+
+fruitbowl = defaultdict(list)
+
+for fruit in fruits:
+    fruitbowl[fruit.colour].append(fruit)
+
+</pre>
+
+</div>
+
+<p>Here&#8217;s a function to display the fruitbowl.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">def print_bowl(bowl):
+    print('\n'.join(
+        '{}: {}'.format(colour,
+                        ', '.join(f.name for f in fruits))
+        for colour, fruits in bowl.items()))
+
+</pre>
+
+</div>
+
+<p>If we call this function, we see the fruits have indeed been grouped by colour.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">&gt;&gt;&gt; print_bowl(fruitbowl)
+yellow: banana, banana
+green: pear, pear, grape, grape, grape, pear, grape
+red: cherry, cherry, cherry, strawberry, cherry
+
+</pre>
+
+</div>
+
+<p>This is all fine and idiomatic Python, but whenever I see an empty dict being created followed by a loop to populate it, I wonder if a comprehension could be used.
+</p>
+<p>Is there a way to declare and initialise the dict in a single expression? Here&#8217;s the best I came up with.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">from operator import attrgetter
+from itertools import groupby
+
+colour = attrgetter('colour')
+
+fruitbowl = {
+    col: list(fts)
+    for col, fts in groupby(sorted(fruits, key=colour), colour)}
+
+</pre>
+
+</div>
+
+<p>Is this better than the <code>defaultdict</code> solution. Probably not, but it&#8217;s a technique worth remembering. Maybe the <code>fruitbowl</code> isn&#8217;t needed, and what we actually want is to iterate through the fruits grouped by colour. For example, which colour is most popular?
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">&gt;&gt;&gt; max(fruitbowl.items(), key=lambda kv: len(kv[1]))[0]
+'green'
+
+</pre>
+
+</div>
+
+<p>Using <code>groupby</code>, we don&#8217;t need the bowl.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">&gt;&gt;&gt; def grouplen(k_gp):
+...     return sum(1 for _ in k_gp[1])
+&gt;&gt;&gt; max(groupby(sorted(fruits, key=colour), colour), key=grouplen)[0]
+&gt;&gt;&gt; 'green'
+
+</pre>
+
+</div>
+
+<p>In this case, we don&#8217;t need <code>groupby</code> either. <a href="./timtowtdi-vs-tsboapooowtdi">There is more than one way to do it</a>.
+</p>
+<div class="typocode">
+
+<pre class="prettyprint">&gt;&gt;&gt; from collections import Counter
+&gt;&gt;&gt; Counter(map(colour, fruits)).most_common(1)
+[('green', 7)]
+
+</pre>
+
+</div>
+
+</div>
+
+
+<div class="atomentry" id="timtowtdi-vs-tsboapooowtdi">
 <h2 class="title"><a href="/articles/timtowtdi-vs-tsboapooowtdi">TIMTOWTDI vs TSBO-APOO-OWTDI</a></h2>
 <p class="meta"><abbr class="published" title="2018-04-19">2018-04-19</abbr> &bull; <a href="/tag/python" rel="tag">Python</a>, <a href="/tag/perl" rel="tag">Perl</a> &bull; <a href="/articles/timtowtdi-vs-tsboapooowtdi#disqus_thread">Comments</a></p>
 <div class="toc">
@@ -563,95 +702,6 @@ def chunk(xs, n):
 </div>
 
 
-<div class="atomentry" id="from-bytes-to-strings-in-python-and-back-again">
-<h2 class="title"><a href="/articles/from-bytes-to-strings-in-python-and-back-again">From bytes to strings in Python and back again</a></h2>
-<p class="meta"><abbr class="published" title="2017-03-24">2017-03-24</abbr> &bull; <a href="/tag/python" rel="tag">Python</a>, <a href="/tag/unicode" rel="tag">Unicode</a> &bull; <a href="/articles/from-bytes-to-strings-in-python-and-back-again#disqus_thread">Comments</a></p>
-<p>Low level languages like C have little opinion about what goes in a string, which is simply a null-terminated sequence of bytes. Those bytes could be ASCII or UTF-8 encoded text, or they could be raw data &#8212; object code, for example. It&#8217;s quite possible and legal to have a C string with mixed content.
-</p>
-<pre><code>char const * mixed =
-    "EURO SIGN "          // ASCII
-    "UTF-8 \xE2\x82\xAC " // UTF-8 encoded EURO SIGN
-    "Latin-9 \xA4";       // Latin-9 encoded EURO SIGN
-</code></pre><p>This might seem indisciplined and risky but it can be useful. Environment variables are notionally text but actually C strings, for example, meaning they can hold whatever data you want. Similarly filenames and command line parameters are only loosely text.
-</p>
-<p>A higher level language like Python makes a strict distinction between bytes and strings. Bytes objects contain raw data &#8212; a sequence of octets &#8212; whereas strings are Unicode sequences. Conversion between the two types is explicit: you encode a string to get bytes, specifying an encoding (which defaults to UTF-8); and you decode bytes to get a string. Clients of these functions should be aware that such conversions may fail, and should consider how failures are handled.
-</p>
-<p>Simply put, a string in Python is a valid Unicode sequence. Real world text data may not be. Programmers need to take charge of reconciling any discrepancies.
-</p>
-<p>We faced such problems recently <a href="https://clinithink.com">at work</a>. We&#8217;re in the business of extracting meaning from clinical narratives &#8212; text data stored on medical records systems in hospitals, for example. These documents may well have passed through a variety of systems. They may be unclear about their text encoding. They may not be encoded as they claim. So what? They can and do contain abbreviations, mispellings, jargon and colloquialisms. Refining the signal from such noise is our core business: if we can correctly interpret positional and temporal aspects of a sentence such as:
-</p>
-<blockquote><p>Previous fracture of left neck of femur
-</p>
-</blockquote><p>then we can surely deal with text which claims to be UTF-8 encoded but isn&#8217;t really.
-</p>
-<p>Our application stack is server-based: a REST API to a Python application handles document ingest; lower down, a C++ engine does the actual document processing. The problem we faced was supporting a modern API capable of handling real world data.
-</p>
-<p>It&#8217;s both undesirable and unnecessary to require clients to clean their text before submitting it. We want to make the ingest direct and idiomatic. Also, we shouldn&#8217;t penalise clients whose data <strong>is</strong> clean. Thus document upload is an HTTP POST request, and the document content is a JSON string &#8212; rather than, say, base64 encoded binary data. Our server, however, will be permissive about the contents of this string.
-</p>
-<p>So far so good. <a href="http://www.catb.org/jargon/html/P/Postels-Prescription.html" title="Postel's prescription">Postel&#8217;s prescription</a> advises:
-</p>
-<blockquote><p>Be liberal in what you accept, and conservative in what you send.
-</p>
-</blockquote><p>This would suggest accepting messy text data but presenting it in a cleaned up form. In our case, we <strong>do</strong> normalise the input data &#8212; a process which includes detecting and standardising date/time information, expanding abbreviations, fixing typos and so on &#8212; but this normalised form links back to a faithful copy of the original data. What gets presented to the user is their own text annotated with our findings. That is, we subscribe to a <a href="https://en.wikipedia.org/wiki/Garbage_in,_garbage_out">more primitive prescription</a> than Postel&#8217;s:
-</p>
-<blockquote><p>Garbage in, garbage out
-</p>
-</blockquote><p>with the caveat that the garbage shouldn&#8217;t be damaged in transit.
-</p>
-<p>Happily, there is a simple way to pass dodgy strings through Python. It&#8217;s used in the standard library to handle text data which isn&#8217;t guaranteed to be clean &#8212; those environment variables, command line parameters, and filenames for example.
-</p>
-<p>The <code>surrogateescape</code> error handler smuggles non-decodable bytes into the (Unicode) Python string in such a way that the original bytes can be recovered on encode, as described in <a href="https://www.python.org/dev/peps/pep-0383/" title="PEP 383 -- Non-decodable Bytes in System Character Interfaces">PEP 383</a>:
-</p>
-<blockquote><p>On POSIX systems, Python currently applies the locale&#8217;s encoding to convert the byte data to Unicode, failing for characters that cannot be decoded. With <a href="https://www.python.org/dev/peps/pep-0383/" title="PEP 383 -- Non-decodable Bytes in System Character Interfaces">this PEP</a>, non-decodable bytes &gt;= 128 will be represented as lone surrogate codes U+DC80..U+DCFF.
-</p>
-</blockquote><p>This workaround is possible because Unicode surrogates are intended for use in pairs. Quoting the Unicode specification, they <a href="http://www.unicode.org/versions/Unicode9.0.0/ch03.pdf#G2630">&#8220;have no interpretation on their own&#8221;</a>. The lone trailing surrogate code &#8212; the half-a-pair &#8212; can only be the result of a <code>surrogateescape</code> error handler being invoked, and the original bytes can be recovered by using the same error handler on encode.
-</p>
-<p>In conclusion, text data is handled differently in C++ and Python, posing a problem for layered applications. The <code>surrogateescape</code> error handler provides a standard and robust way of closing the gap.
-</p>
-
-<h2>Unicode Surrogate Pairs</h2>
-<p><a href="http://www.unicode.org/versions/Unicode9.0.0/ch03.pdf#G2630"><img src="/images/unicode-surrogates.png" alt="Surrogates"/></a>
-</p>
-
-<h2>Code Listing</h2>
-<pre><code>&gt;&gt;&gt; mixed = b"EURO SIGN \xE2\x82\xAC \xA4"
-&gt;&gt;&gt; mixed
-b'EURO SIGN \xe2\x82\xac \xa4'
-&gt;&gt;&gt; mixed.decode()
-Traceback (most recent call last):
-  File "&lt;stdin&gt;", line 1, in &lt;module&gt;
-UnicodeDecodeError: 'utf-8' codec can't decode byte 0xa4 in position 14:
-  invalid start byte
-&gt;&gt;&gt; help(mixed.decode)
-Help on built-in function decode:
-
-decode(encoding='utf-8', errors='strict') method of builtins.bytes instance
-    Decode the bytes using the codec registered for encoding.
-
-encoding
-      The encoding with which to decode the bytes.
-    errors
-      The error handling scheme to use for the handling of decoding errors.
-      The default is 'strict' meaning that decoding errors raise a
-      UnicodeDecodeError. Other possible values are 'ignore' and 'replace'
-      as well as any other name registered with codecs.register_error that
-      can handle UnicodeDecodeErrors.
-
-&gt;&gt;&gt; mixed.decode(errors='surrogateescape')
-'EURO SIGN &euro; \udca4'
-&gt;&gt;&gt; s = mixed.decode(errors='surrogateescape')
-&gt;&gt;&gt; s.encode()
-Traceback (most recent call last):
-  File "&lt;stdin&gt;", line 1, in &lt;module&gt;
-UnicodeEncodeError: 'utf-8' codec can't encode character '\udca4' in position 12:
-  surrogates not allowed
-&gt;&gt;&gt; s.encode(errors='surrogateescape')
-b'EURO SIGN \xe2\x82\xac \xa4'
-</code></pre>
-
-</div>
-
-
 <div class="extended">
 <p><a href="/articles/">Visit the Word Aligned archives...</a></p>
 </div>
@@ -695,7 +745,7 @@ b'EURO SIGN \xe2\x82\xac \xa4'
 
 <div class="sidebar-node">
 <h3>Top Tags</h3>
-<ul id="categories"><li><a href="/tag/python" rel="tag">Python</a> <em>(123)</em></li>
+<ul id="categories"><li><a href="/tag/python" rel="tag">Python</a> <em>(124)</em></li>
 <li><a href="/tag/c++" rel="tag">C++</a> <em>(71)</em></li>
 <li><a href="/tag/self" rel="tag">Self</a> <em>(68)</em></li>
 <li><a href="/tag/puzzles" rel="tag">Puzzles</a> <em>(36)</em></li>
@@ -704,7 +754,7 @@ b'EURO SIGN \xe2\x82\xac \xa4'
 <li><a href="/tag/subversion" rel="tag">Subversion</a> <em>(27)</em></li>
 <li><a href="/tag/algorithms" rel="tag">Algorithms</a> <em>(25)</em></li>
 <li><a href="/tag/google" rel="tag">Google</a> <em>(19)</em></li>
-<li><a href="/tag/characters" rel="tag">Characters</a> <em>(17)</em></li></ul>
+<li><a href="/tag/streams" rel="tag">Streams</a> <em>(17)</em></li></ul>
 
 </div>
 
@@ -727,7 +777,7 @@ b'EURO SIGN \xe2\x82\xac \xa4'
 <div class="sidebar-node">
 <h3>Chain</h3>
 <ul>
-<li><a accesskey="p" href="/articles/timtowtdi-vs-tsboapooowtdi" title="First article">&raquo; TIMTOWTDI vs TSBO-APOO-OWTDI</a></li>
+<li><a accesskey="p" href="/articles/dict-of-lists" title="First article">&raquo; Creating a dict of lists in Python</a></li>
 
 </ul>
 
