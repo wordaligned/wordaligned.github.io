@@ -22,41 +22,64 @@
 		</script>
 	</head>
 	<body>
-		<div class="reveal">
+	  <div class="reveal">
+        <div class='footer'>
+          <a href="https://twitter.com/thomasguest">@thomasguest</a>
+        </div>
 		  <div class="slides">
 			<section>
               <h1>TIMTOWTDI</h1>
               <p><a href="https://twitter.com/thomasguest">@thomasguest</a>
               <p><a href="http://wordaligned.org">wordaligned.org</a>
+              <p><a href="https://twitter.com/ClinithinkWales">@clinithinkwales</a>
             </section>
 
+            <section data-background-color="#FFD700">
+              <h1>TDF-G-CDF</h1>
+              <h1>&#x1F6B2;</h1>
+            </section>
             <section><h3>There is more than one way to do it</h3>
-              <p><i>&ldquo;Tsall good&rdquo;</i>
-              <p><a href="https://www.perl.com/pub/1999/03/pm.html/">Perl, the first postmodern computer language</a> &mdash; Larry Wall, 1999
+              <p><i>&rsquo;Tsall good</i>
+              <p><a href="https://www.perl.com/pub/1999/03/pm.html/">Perl, the first postmodern computer language</a><i> &mdash; Larry Wall, 1999</i>
             </section>
               
-			<section><h2>ZOP</h2><h2>TSBO-APOO-OWTDI</h2></section>
+			<section><h2>TSBO-APOO-OWTDI</h2><h2 class="fragment">ZOP</h2>
+              <p class="fragment"><a href="https://mail.python.org/pipermail/python-list/1999-June/001951.html">&ldquo;The Python Way&rdquo;</a><i> &mdash; Tim Peters, 1999</i>
+            </section>
+
             <section><h3><a href="https://www.python.org/dev/peps/pep-0020/">Zen of Python</a></h3>
               <ol start="13">
                 <li class="fragment">There should be one—and preferably only one—obvious way to do it.
                 <li class="fragment">Although that way may not be obvious at first unless you're Dutch.
               </ol>
             </section>
-            
+
             <section><h2>TIMTOP</h2></section>
             <section><h2>There is more than one Python</h2></section>
-            <section><h3>Python 2</h3><h3>Python 3</h3><h3>PyPy</h3><h3>Jupyter</h3></section>
-            
+            <section><h3>Python 2</h3><h3>Python 3</h3><div class="fragment"><h3>PyPy</h3><h3>Jupyter</h3></div></section>
+
+            <section><h2>TIMTOWTI</h2></section>
+            <section><h5>There is more than one way to iterate</h5>
+              <pre><code class="python"><div class="fragment">>>> squares = []
+>>> for x in range(42):
+...     squares.append(x*x)</div>
+<div class="fragment">>>> squares = [x*x for x in range(42)]</div>
+<div class="fragment">>>> squares = (x*x for x in range(42))</div>
+<div class="fragment">>>> squares = map(mul, *tee(count())</div></code></pre>
+            </section>
+
             <section><h2>TIMTOPOM</h2></section>
             <section><h3>There is more than one Program Options module</h3></section>
             <section>
               <h3><a href="https://docs.python.org/3/library/getopt.html#module-getopt">getopt</a></h3>
-              <h3><a href="https://docs.python.org/3/library/optparse.html#module-optparse">optparse</a></h3>
-              <h3><a href="https://docs.python.org/3/library/argparse.html#module-argparse">argparse</a>
+              <h3><a href="https://docs.python.org/3/library/optparse.html#module-optparse">optparse</a></h3>              
+              <h3><a href="https://docs.python.org/3/library/argparse.html#module-argparse">argparse</a></h3>
+              <h3 class="fragment"><a href="http://click.pocoo.org">etc.</a> <a href="http://docopt.org/">etc.</a> <a href="https://github.com/google/python-fire">etc...</a></h3>
             </section>
 
             <section>
               <p>Users who are unfamiliar with the C <a href="http://man7.org/linux/man-pages/man3/getopt.3.html"><code>getopt()</code></a> function or who would like to write less code and get better help and error messages should consider using the <a href="https://docs.python.org/3/library/argparse.html#module-argparse">argparse module</a> instead.
+              <p>&mdash; <a href="https://docs.python.org/3/library/unittest.html">docs.python.org</a>
             </section>
 
             <section><h2>TIMTOUTF</h2></section>
@@ -70,42 +93,84 @@
 
             <section>
               <p>The <a href="https://docs.python.org/3/library/unittest.html">unittest unit testing</a> framework was originally inspired by JUnit and has a similar flavor as major unit testing frameworks in other languages.
+              <p>&mdash; <a href="https://docs.python.org/3/library/unittest.html">docs.python.org</a>
             </section>
 
             <section><h2>TIMTOWOFS</h2></section>
             <section><h3>There is more than one way of formatting strings</h3></section>
             <section>
-              <p class="fragment"><code>"double"</code> or <code>'single'</code> quotes
-              <p class="fragment"><code>"""triple"""</code> quotes
-              <p class="fragment"><code>r'raw'</code>
-              <p class="fragment"><code>R"""ROAR!!!"""</code>
+              <p class="fragment"><code>"double quotes"</code>
+              <p class="fragment"><code>'single quotes'</code>
+              <p class="fragment"><code>"""triple quotes"""</code>
+              <p class="fragment"><code>r'\raw'</code>
+              <p class="fragment"><code>R"""\ROAR!!!"""</code>
             </section>
+
             <section>
-                <pre><code>who, what = 'Thomas', 'noodles'
-s = '%s likes %s' % (who, what)
-t = string.Template('$who likes $what')
-s = t.substitute(locals())
-s = '{} likes {}'.format(who, what)
-s = f'{who} likes {what}'</code></pre>
+              <pre><div class="fragment">who, what = 'Thomas', 'noodles'</div>
+<div class="fragment">'%s likes %s' % (who, what)</div>
+<div class="fragment">t = string.Template('$who likes $what')
+t.substitute(locals())</div>
+<div class="fragment">'{} likes {}'.format(who, what)</div>
+<div class="fragment">f'{who} likes {what}'</div></pre>
             </section>
 
             <section><h3>Don’t Do It This Way</h3>
               <pre class="fragment"><code class="python">>>> Ω = 'There is more than one way to do it'</code></pre>
-<pre class="fragment"><code class="python">>>> f'''\
+<pre class="fragment"><code class="python">>>> F'''\
 {   """"""
 .   join(ω[0]
 .   upper() 
-for ω in Ω.split())}\
+    for ω in Ω.split())
+}\
 '''</code></pre>
 <pre class="fragment"><code class="python">'TIMTOWTDI'</code></pre>
             </section>
 
             <section>
-              <blockquote>How many times have we heard the mantra that a program should do one thing and do it well?</blockquote>
+              <p>The Zen of Python, by Tim Peters
+              <ul style="font-size:22px;list-style:none">
+<li>Beautiful is better than ugly.
+<li>Explicit is better than implicit.
+<li>Simple is better than complex.
+<li>Complex is better than complicated.
+<li>Flat is better than nested.
+<li>Sparse is better than dense.
+<li>Readability counts.
+<li>Special cases aren’t special enough to break the rules.
+<li>Although practicality beats purity.
+<li>Errors should never pass silently.
+<li>Unless explicitly silenced.
+<li>In the face of ambiguity, refuse the temptation to guess.
+<li>There should be one&mdash;and preferably only one&mdash;obvious way to do it.
+<li>Although that way may not be obvious at first unless you're Dutch.
+<li>Now is better than never.
+<li>Although never is often better than <i>right</i> now.
+<li>If the implementation is hard to explain, it’s a bad idea.
+<li>If the implementation is easy to explain, it may be a good idea.
+<li>Namespaces are one honking great idea&mdash;let's do more of those!
+            </ul></section>
+
+            <section>
+              <h4><a href="https://www.shlomifish.org/lecture/Perl/Newbies/vhll-slides.pdf">The Taming of the Camel</a></h4>
+              <a href="https://www.shlomifish.org/lecture/Perl/Newbies/vhll-slides.pdf">
+              <img title="The Taming of the Camel, Larry Wall 1994" src="camel-taming.png" alt="Slide from Larry Wall talk on Perl5"/></a>
+              <p><i>&mdash; Larry Wall, 1994</i>
             </section>
 
             <section>
-              <p class="fragment">If all you have is a hammer, everything starts to look like a nail.
+              <blockquote>Now that <a href="https://www.python.org/dev/peps/pep-0572/">PEP 572</a> is done, I don’t ever want to have to <a href="https://lwn.net/Articles/757713/">fight so hard</a> for a PEP and find that so many people despise my decisions.
+              </blockquote>
+              <p>&mdash; <a href="https://mail.python.org/pipermail/python-committers/2018-July/005664.html">Guido van Rossum, Transfer of Power</a>
+            </section>
+
+            <section>
+              <blockquote>How many times have we heard the mantra that a program should do one thing and do it well?</blockquote>
+              <p><a href="https://www.perl.com/pub/1999/03/pm.html/">Perl, the first postmodern computer language</a><i> &mdash; Larry Wall, 1999</i>
+            </section>
+
+            <section>
+              <p>If all you have is a hammer, everything starts to look like a nail.
               <p class="fragment">If all you have is duct tape, everything starts to look like a duct. 
               <p class="fragment"><i>When’s the last time you used duct tape on a duct?</i>
             </section>
@@ -113,7 +178,7 @@ for ω in Ω.split())}\
 			<section>
               <h2>THANKYOU</h2>
               <p><a href="https://twitter.com/thomasguest">@thomasguest</a>
-              <p><a href="http://wordaligned.org">wordaligned.org</a>
+              <p><a href="http://wordaligned.org/docs/timtowtdi">wordaligned.org</a>
             </section>
 		  </div>
 		</div>
