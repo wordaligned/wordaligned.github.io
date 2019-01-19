@@ -7,6 +7,27 @@
 <dc:creator>tag@wordaligned.org</dc:creator>
 <language>en-gb</language>
 <item>
+<title>Python Counters @PyDiff</title>
+<description>&lt;p&gt;On Monday I gave a talk at &lt;a href="http://www.pydiff.wales/"&gt;PyDiff&lt;/a&gt; on the subject of Python Counters. A Counter is a specialised &lt;code&gt;dict&lt;/code&gt; which has much in common with a &lt;code&gt;set&lt;/code&gt;. Of course all dicts are like sets, but with Counters the resemblance is even stronger. The &lt;a href="https://docs.python.org/3/library/collections.html#collections.Counter"&gt;documentation&lt;/a&gt; states:
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;The Counter class is similar to bags or multisets in other languages.
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;Alongside set operations of union, intersection and is-a-subset, Counter also supports addition and subtraction &amp;#8212; natural and unsurprising operations for a container whose job is to keep count of its elements. If you want to unite the contents of two Counters, it&amp;#8217;s probably &lt;code&gt;+&lt;/code&gt; you want rather than &lt;code&gt;|&lt;/code&gt;.
+&lt;/p&gt;
+&lt;p&gt;Counters came to mind as a lightning talk subject since I had a go at the &lt;a href="https://adventofcode.com/2018" title="25 Christmas themed puzzles made available one-per-day as a countdown to Christmas"&gt;Advent of Code&lt;/a&gt; last year and used no fewer than 12 Counters in my &lt;a href="https://github.com/wordaligned/advent-of-code-2018/blob/master/solutions.ipynb"&gt;solutions&lt;/a&gt; to 25 puzzles &amp;#8212; and that total could well increase since I haven&amp;#8217;t finished yet.
+&lt;/p&gt;
+&lt;p&gt;The talk itself is on &lt;a href="https://github.com/wordaligned/python-counters"&gt;github&lt;/a&gt;.
+&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://github.com/wordaligned/python-counters"&gt;&lt;img alt="Coins" src="http://wordaligned.org/images/coins.jpg"&gt;&lt;/a&gt;
+&lt;/p&gt;</description>
+<dc:date>2019-01-19</dc:date>
+<guid>http://wordaligned.org/articles/python-counters-pydiff</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/python-counters-pydiff</link>
+<category>Python</category>
+</item>
+
+<item>
 <title>Creating a dict of lists in Python</title>
 <description>&lt;p&gt;Suppose you have a list of objects which you want to convert into a dict mapping from some object key to the (sub-)list of objects with that key. To provide a simple example, let&amp;#8217;s start with a list of fruits.
 &lt;/p&gt;
@@ -2744,92 +2765,6 @@ for data in iter(chunked_file_reader, ''):
 <guid>http://wordaligned.org/articles/pythons-lesser-known-loop-control</guid>
 <author>tag@wordaligned.org (Thomas Guest)</author>
 <link>http://wordaligned.org/articles/pythons-lesser-known-loop-control</link>
-<category>Python</category>
-</item>
-
-<item>
-<title>Set.insert or set.add?</title>
-<description>&lt;h2&gt;Get set, go!&lt;/h2&gt;
-&lt;p&gt;Suppose you have an element &lt;code&gt;e&lt;/code&gt; to put in a set &lt;code&gt;S&lt;/code&gt;.
-&lt;/p&gt;
-&lt;p&gt;Should you:
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
-
-&lt;pre class="prettyprint"&gt;S.add(e)
-
-&lt;/pre&gt;
-
-&lt;/div&gt;
-
-&lt;p&gt;or:
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
-
-&lt;pre class="prettyprint"&gt;S.insert(e)
-
-&lt;/pre&gt;
-
-&lt;/div&gt;
-
-&lt;p&gt;?
-&lt;/p&gt;
-&lt;p&gt;It depends on which language you&amp;#8217;re using. I use C++ and Python and I usually get it wrong.
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
-
-&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; S.insert(e)
-Traceback (most recent call last):
-  File "&amp;lt;stdin&amp;gt;", line 1, in &amp;lt;module&amp;gt;
-AttributeError: 'set' object has no attribute 'insert'
-
-&lt;/pre&gt;
-
-&lt;/div&gt;
-
-&lt;p&gt;Try again!
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
-
-&lt;pre class="prettyprint"&gt;error: 'class std::set&amp;lt;int, std::less&amp;lt;int&amp;gt;, std::allocator&amp;lt;int&amp;gt; &amp;gt;' 
-has no member named 'add'
-
-&lt;/pre&gt;
-
-&lt;/div&gt;
-
-&lt;p&gt;Maybe my &lt;a href="http://wordaligned.org/articles/accidental-emacs.html" title="Emacs of course!"&gt;IDE&lt;/a&gt; should auto-complete the correct member function but it doesn&amp;#8217;t, or at least I haven&amp;#8217;t configured it to, so instead I&amp;#8217;ve worked out how to remember.
-&lt;/p&gt;
-&lt;p&gt;Now, neither C++ nor Python pins down how a set should be implemented &amp;#8212; read the language standard and reference manual respectively and all you&amp;#8217;ll get is an interface and some hints. Read between the lines of these references, though, or study &lt;a href="http://gcc.gnu.org/onlinedocs/libstdc++/latest-doxygen/a01064_source.html" title="G++ stl_tree.h, on which std::sets and std::multisets are based"&gt;the&lt;/a&gt; &lt;a href="http://svn.python.org/view/python/trunk/Objects/setobject.c?view=markup" title="setobject.c, from CPython"&gt;implementations&lt;/a&gt;, and you&amp;#8217;ll soon realise a Python set is an unordered container designed for fast membership, union, intersection, and differencing operations &amp;#8212; much like the mathematical sets I learned about at school &amp;#8212; whereas a C++ set is an ordered container, featuring logarithmic access times and persistent iterators. 
-&lt;/p&gt;
-&lt;p&gt;Think: C++ set &amp;asymp; binary tree; Python set &amp;asymp; hashed array.
-&lt;/p&gt;
-&lt;p&gt;It&amp;#8217;s apparent which method is correct for which language now. To put something into a binary tree you must recurse down the tree and find where to &lt;strong&gt;insert&lt;/strong&gt; it. Hence &lt;code&gt;std::set::insert()&lt;/code&gt; is correct C++. To put something into a hashed array you hash it and &lt;strong&gt;add&lt;/strong&gt; it right there. Hence &lt;code&gt;set.add()&lt;/code&gt; is proper Python.
-&lt;/p&gt;
-
-&lt;h2&gt;How long is a string?&lt;/h2&gt;
-&lt;p&gt;I&amp;#8217;m suggesting programmers should know at least some of what goes on in their standard language library implementations. Appreciating an API isn&amp;#8217;t always enough. You &lt;strong&gt;insert&lt;/strong&gt; into trees and &lt;strong&gt;add&lt;/strong&gt; to hashes: so if your set is a tree, call &lt;code&gt;S.insert()&lt;/code&gt;, and if it&amp;#8217;s a hash, &lt;code&gt;S.add()&lt;/code&gt;.
-&lt;/p&gt;
-&lt;p&gt;Such logical arguments don&amp;#8217;t always deliver.
-&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;Question:&lt;/strong&gt; Suppose now that &lt;code&gt;S&lt;/code&gt; is a string and you&amp;#8217;re after its length. Should you use &lt;code&gt;S.length()&lt;/code&gt; or &lt;code&gt;S.size()&lt;/code&gt;?
-&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;Answer:&lt;/strong&gt; Neither or both.
-&lt;/p&gt;
-&lt;p&gt;&lt;a href="http://www.flickr.com/photos/the-g-uk/3867089043/" title="string [how long?] by the|G|, on Flickr"&gt;&lt;img src="http://farm3.static.flickr.com/2538/3867089043_2f2b3f5fa6.jpg" width="485" height="149" alt="string [how long?]" /&gt;&lt;/a&gt;
-&lt;/p&gt;
-&lt;p&gt;In Python a string is a standard sequence and as for all other sequences &lt;code&gt;len(S)&lt;/code&gt; does the trick. In C++ a string is a standard container and as for all other containers &lt;code&gt;S.size()&lt;/code&gt; returns the number of elements; &lt;strong&gt;but&lt;/strong&gt;, being &lt;code&gt;std::string&lt;/code&gt;, &lt;code&gt;S.length()&lt;/code&gt; does too.
-&lt;/p&gt;
-&lt;p&gt;Oh, and the next revision of C++ features an &lt;code&gt;unordered_set&lt;/code&gt; (available now as &lt;code&gt;std::tr1::unordered_set&lt;/code&gt;) which is a hashed container. I think &lt;code&gt;unordered_set&lt;/code&gt; is a poor name for something which models a set better than &lt;code&gt;std::set&lt;/code&gt; does but that&amp;#8217;s the price it pays for coming late to the party. And you don&amp;#8217;t &lt;code&gt;std::unordered_set::add&lt;/code&gt; elements to it, you &lt;code&gt;std::unordered_set::insert&lt;/code&gt; them.
-&lt;/p&gt;
-&lt;hr /&gt;
-
-&lt;p&gt;My thanks to &lt;a href="http://www.flickr.com/photos/the-g-uk"&gt;the|G|&amp;trade;&lt;/a&gt; for permission to use his &lt;a href="http://www.flickr.com/photos/the-g-uk/3867089043" title="string [how long?] on Flickr"&gt;string&lt;/a&gt;.
-&lt;/p&gt;</description>
-<dc:date>2010-11-17</dc:date>
-<guid>http://wordaligned.org/articles/setinsert-or-setadd</guid>
-<author>tag@wordaligned.org (Thomas Guest)</author>
-<link>http://wordaligned.org/articles/setinsert-or-setadd</link>
 <category>Python</category>
 </item>
 
