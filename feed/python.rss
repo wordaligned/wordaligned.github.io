@@ -7,6 +7,37 @@
 <dc:creator>tag@wordaligned.org</dc:creator>
 <language>en-gb</language>
 <item>
+<title>Aligning the first line of a triple-quoted string in Python</title>
+<description>&lt;p&gt;Python&amp;#8217;s triple-quoted strings are a convenient syntax for strings where the contents span multiple lines. Unescaped newlines are allowed in triple-quoted strings. So, rather than write:
+&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;song = ("Happy birthday to you\n"
+        "Happy birthday to you\n"
+        "Happy birthday dear Gail\n"
+        "Happy birthday to you\n")
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;you can write:
+&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;song = """Happy birthday to you
+Happy birthday to you
+Happy birthday dear Gail
+Happy birthday to you
+"""
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;The only downside here is that the first line doesn&amp;#8217;t align nicely with the lines which follow. The way around this is to embed a &lt;code&gt;\newline&lt;/code&gt; escape sequence, meaning both &lt;a href="https://docs.python.org/3/reference/lexical_analysis.html#string-and-bytes-literals" title="String and Bytes literals"&gt;backslash and newline are ignored&lt;/a&gt;.
+&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;song = """\
+Happy birthday to you
+Happy birthday to you
+Happy birthday dear Gail
+Happy birthday to you
+"""
+&lt;/code&gt;&lt;/pre&gt;</description>
+<dc:date>2019-02-17</dc:date>
+<guid>http://wordaligned.org/articles/aligning-the-first-line-of-a-triplequoted-string-in-python</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/aligning-the-first-line-of-a-triplequoted-string-in-python</link>
+<category>Python</category>
+</item>
+
+<item>
 <title>Python Counters @PyDiff</title>
 <description>&lt;p&gt;On Monday I gave a talk at &lt;a href="http://www.pydiff.wales/"&gt;PyDiff&lt;/a&gt; on the subject of Python Counters. A Counter is a specialised &lt;code&gt;dict&lt;/code&gt; which has much in common with a &lt;code&gt;set&lt;/code&gt;. Of course all dicts are like sets, but with Counters the resemblance is even stronger. The &lt;a href="https://docs.python.org/3/library/collections.html#collections.Counter"&gt;documentation&lt;/a&gt; states:
 &lt;/p&gt;
@@ -2700,71 +2731,6 @@ bool all_of_(Iter b, Iter e, Pred p)
 <guid>http://wordaligned.org/articles/all-any-none</guid>
 <author>tag@wordaligned.org (Thomas Guest)</author>
 <link>http://wordaligned.org/articles/all-any-none</link>
-<category>Python</category>
-</item>
-
-<item>
-<title>Python&#8217;s lesser known loop control</title>
-<description>&lt;p&gt;I&amp;#8217;ll break out of a loop if I have to but generally prefer to recast code so no &lt;code&gt;break&lt;/code&gt; is needed. It&amp;#8217;s not about avoiding the keyword; but rather that the loop control expression should tell readers when and why the loop exits.
-&lt;/p&gt;
-&lt;p&gt;In C and C++ such recasting is rarely a problem. Python separates statements and expressions which makes things more difficult. You can&amp;#8217;t assign to a variable in a loop control expression, for example. Consider a function which processes a file one chunk at a time, until the file is exhausted.
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
-
-&lt;pre class="prettyprint"&gt;while True:
-    data = fp.read(4096)
-    if not data:
-        break
-    ...
-
-&lt;/pre&gt;
-
-&lt;/div&gt;
-
-&lt;p&gt;The control expression, &lt;code&gt;while True&lt;/code&gt;, suggests an infinite loop, which isn&amp;#8217;t what actually happens, but readers must poke around in the loop body to find the actual termination condition.
-&lt;/p&gt;
-&lt;p&gt;As already mentioned, an assignment statement isn&amp;#8217;t an expression, so we can&amp;#8217;t write this:
-&lt;/p&gt;
-&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;Syntax error!&lt;/div&gt;
-
-&lt;pre class="prettyprint"&gt;while data = fp.read(4096):
-    ...
-
-&lt;/pre&gt;
-
-&lt;/div&gt;
-
-&lt;p&gt;You could implement a file reader &lt;a href="http://docs.python.org/3/howto/functional.html#generators"&gt;generator function&lt;/a&gt; which yields chunks of data, allowing clients to write:
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
-
-&lt;pre class="prettyprint"&gt;for data in chunked_file_reader(fp):
-    ...
-
-&lt;/pre&gt;
-
-&lt;/div&gt;
-
-&lt;p&gt;This at least localises the problem to &lt;code&gt;chunked_file_reader()&lt;/code&gt;.
-&lt;/p&gt;
-&lt;p&gt;Another solution is to use the two argument flavour of &lt;a href="http://docs.python.org/3.3/library/functions.html#iter"&gt;iter&lt;/a&gt;, &lt;code&gt;iter(object, sentinel)&lt;/code&gt;. Here, &lt;code&gt;object&lt;/code&gt; is a callable and &lt;code&gt;sentinel&lt;/code&gt; is a terminal value. &lt;code&gt;Object&lt;/code&gt; is called with no arguments: use &lt;code&gt;&lt;a href="http://docs.python.org/3/library/functools.html#functools.partial"&gt;functools.partial&lt;/a&gt;&lt;/code&gt; to set the chunk size passed to &lt;code&gt;file.read&lt;/code&gt;; and stop when this function returns the empty string.
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
-
-&lt;pre class="prettyprint"&gt;import functools
-
-chunked_file_reader = functools.partial(fp.read, 4096)
-
-for data in iter(chunked_file_reader, ''):
-    ...
-
-&lt;/pre&gt;
-
-&lt;/div&gt;</description>
-<dc:date>2013-01-14</dc:date>
-<guid>http://wordaligned.org/articles/pythons-lesser-known-loop-control</guid>
-<author>tag@wordaligned.org (Thomas Guest)</author>
-<link>http://wordaligned.org/articles/pythons-lesser-known-loop-control</link>
 <category>Python</category>
 </item>
 

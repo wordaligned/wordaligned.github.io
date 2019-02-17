@@ -25,7 +25,36 @@
 
   <div id="page">
     <div id="content">
-      <div class="atomentry" id="python-counters-pydiff">
+      <div class="atomentry" id="aligning-the-first-line-of-a-triplequoted-string-in-python">
+<h2 class="title"><a href="/articles/aligning-the-first-line-of-a-triplequoted-string-in-python">Aligning the first line of a triple-quoted string in Python</a></h2>
+<p class="meta"><abbr class="published" title="2019-02-17">2019-02-17</abbr> &bull; <a href="/tag/python" rel="tag">Python</a> &bull; <a href="/articles/aligning-the-first-line-of-a-triplequoted-string-in-python#disqus_thread">Comments</a></p>
+<p>Python&#8217;s triple-quoted strings are a convenient syntax for strings where the contents span multiple lines. Unescaped newlines are allowed in triple-quoted strings. So, rather than write:
+</p>
+<pre><code>song = ("Happy birthday to you\n"
+        "Happy birthday to you\n"
+        "Happy birthday dear Gail\n"
+        "Happy birthday to you\n")
+</code></pre><p>you can write:
+</p>
+<pre><code>song = """Happy birthday to you
+Happy birthday to you
+Happy birthday dear Gail
+Happy birthday to you
+"""
+</code></pre><p>The only downside here is that the first line doesn&#8217;t align nicely with the lines which follow. The way around this is to embed a <code>\newline</code> escape sequence, meaning both <a href="https://docs.python.org/3/reference/lexical_analysis.html#string-and-bytes-literals" title="String and Bytes literals">backslash and newline are ignored</a>.
+</p>
+<pre><code>song = """\
+Happy birthday to you
+Happy birthday to you
+Happy birthday dear Gail
+Happy birthday to you
+"""
+</code></pre>
+
+</div>
+
+
+<div class="atomentry" id="python-counters-pydiff">
 <h2 class="title"><a href="/articles/python-counters-pydiff">Python Counters @PyDiff</a></h2>
 <p class="meta"><abbr class="published" title="2019-01-19">2019-01-19</abbr> &bull; <a href="/tag/talks" rel="tag">Talks</a>, <a href="/tag/python" rel="tag">Python</a> &bull; <a href="/articles/python-counters-pydiff#disqus_thread">Comments</a></p>
 <p>On Monday I gave a talk at <a href="http://www.pydiff.wales/">PyDiff</a> on the subject of Python Counters. A Counter is a specialised <code>dict</code> which has much in common with a <code>set</code>. Of course all dicts are like sets, but with Counters the resemblance is even stronger. The <a href="https://docs.python.org/3/library/collections.html#collections.Counter">documentation</a> states:
@@ -610,29 +639,6 @@ fruitbowl = {
 </div>
 
 
-<div class="atomentry" id="lazy-sequences-working-hard">
-<h2 class="title"><a href="/articles/lazy-sequences-working-hard">Lazy sequences working hard</a></h2>
-<p class="meta"><abbr class="published" title="2017-05-16">2017-05-16</abbr> &bull; <a href="/tag/python" rel="tag">Python</a>, <a href="/tag/streams" rel="tag">Streams</a> &bull; <a href="/articles/lazy-sequences-working-hard#disqus_thread">Comments</a></p>
-<p>I gave a talk <a href="http://www.pydiff.wales/events/2017-05-16.html">@PyDiff</a> this evening in the computer science department at Cardiff University.
-</p>
-<blockquote><p><h2>Lazy Sequences working hard</h2>
-</p>
-<p>Python has no problem handling large and even infinite streams of data. Just write lazy programs &#8212; code which defers data access until the last minute. This talk examines Python&#8217;s language and library support for such delaying tactics. There will be live coding, and we&#8217;ll draw parallels with similar features in other languages, in particular the Unix shell.
-</p>
-</blockquote><p>Being unsure where to pitch it, I started off easy and kept going until I&#8217;d lost everybody &#8212; including myself.
-</p>
-<p>The room was well set up with a good quality projector and whiteboard, along with a desk to sit down when I wanted to write and run code and plenty of space to move around in otherwise. I did feel a bit like a jack-in-the-box by the end.
-</p>
-<p><a data-flickr-embed="true"  href="https://www.flickr.com/photos/thomasguest/34663534326/in/dateposted-friend/" title="Me @PyDiff"><img src="https://c1.staticflickr.com/5/4164/34663534326_4bf8851eeb.jpg" width="500" height="375" alt="Me @PyDiff"></a><script async src="//embedr.flickr.com/assets/client-code.js" charset="utf-8"></script>
-</p>
-<p>I&#8217;d based the talk on a Jupyter notebook which I replayed with the ingenious <a href="https://github.com/damianavila/RISE">RISE reveal.js extension</a> written by Damian Avila. This worked well, since I got the pretty graphics along with the interactive coding. A static version of the slides is <a href="http://nbviewer.jupyter.org/url/wordaligned.org/docs/lazy-sequences.ipynb">available here</a>.
-</p>
-<p>Thanks to everyone who came. Sorry I had to rush off after. If anyone would <a href="http://swanseasdc.co.uk/">like to talk at Swansea</a>, please let me know: you&#8217;d be most welcome.
-</p>
-
-</div>
-
-
 <div class="extended">
 <p><a href="/articles/">Visit the Word Aligned archives...</a></p>
 </div>
@@ -676,7 +682,7 @@ fruitbowl = {
 
 <div class="sidebar-node">
 <h3>Top Tags</h3>
-<ul id="categories"><li><a href="/tag/python" rel="tag">Python</a> <em>(125)</em></li>
+<ul id="categories"><li><a href="/tag/python" rel="tag">Python</a> <em>(126)</em></li>
 <li><a href="/tag/c++" rel="tag">C++</a> <em>(71)</em></li>
 <li><a href="/tag/self" rel="tag">Self</a> <em>(69)</em></li>
 <li><a href="/tag/puzzles" rel="tag">Puzzles</a> <em>(36)</em></li>
@@ -708,7 +714,7 @@ fruitbowl = {
 <div class="sidebar-node">
 <h3>Chain</h3>
 <ul>
-<li><a accesskey="p" href="/articles/python-counters-pydiff" title="First article">&raquo; Python Counters @PyDiff</a></li>
+<li><a accesskey="p" href="/articles/aligning-the-first-line-of-a-triplequoted-string-in-python" title="First article">&raquo; Aligning the first line of a triple-quoted string in Python</a></li>
 
 </ul>
 

@@ -5,11 +5,11 @@
 <link href="/styles/application.css" media="all" rel="stylesheet" type="text/css" />
 <script type="text/javascript" src="/scripts/prettify.js"></script>
 <script type="text/javascript" src="/scripts/lang-lisp.js"></script>
-<title>Python Counters @PyDiff</title>
+<title>Aligning the first line of a triple-quoted string in Python</title>
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
 <meta name="author" content="Thomas Guest" />
-<meta name="description" content="A Word Aligned article posted 2019-01-19, tagged Talks, Python." />
-<meta name="keywords" content="Talks, Python" />
+<meta name="description" content="A Word Aligned article posted 2019-02-17, tagged Python." />
+<meta name="keywords" content="Python" />
 <link rel="alternate" type="application/rss+xml" title="Feed" href="http://feeds.wordaligned.org/wordaligned" />
 </head>
 
@@ -23,21 +23,31 @@
 
   <div id="page">
     <div id="content">
-      <div class="atomentry" id="python-counters-pydiff">
-<h2 class="title"><a href="/articles/python-counters-pydiff">Python Counters @PyDiff</a></h2>
-<p class="meta"><abbr class="published" title="2019-01-19">2019-01-19</abbr> &bull; <a href="/tag/talks" rel="tag">Talks</a>, <a href="/tag/python" rel="tag">Python</a> &bull; <a href="/articles/python-counters-pydiff#disqus_thread">Comments</a></p>
-<p>On Monday I gave a talk at <a href="http://www.pydiff.wales/">PyDiff</a> on the subject of Python Counters. A Counter is a specialised <code>dict</code> which has much in common with a <code>set</code>. Of course all dicts are like sets, but with Counters the resemblance is even stronger. The <a href="https://docs.python.org/3/library/collections.html#collections.Counter">documentation</a> states:
+      <div class="atomentry" id="aligning-the-first-line-of-a-triplequoted-string-in-python">
+<h2 class="title"><a href="/articles/aligning-the-first-line-of-a-triplequoted-string-in-python">Aligning the first line of a triple-quoted string in Python</a></h2>
+<p class="meta"><abbr class="published" title="2019-02-17">2019-02-17</abbr> &bull; <a href="/tag/python" rel="tag">Python</a> &bull; <a href="/articles/aligning-the-first-line-of-a-triplequoted-string-in-python#disqus_thread">Comments</a></p>
+<p>Python&#8217;s triple-quoted strings are a convenient syntax for strings where the contents span multiple lines. Unescaped newlines are allowed in triple-quoted strings. So, rather than write:
 </p>
-<blockquote><p>The Counter class is similar to bags or multisets in other languages.
+<pre><code>song = ("Happy birthday to you\n"
+        "Happy birthday to you\n"
+        "Happy birthday dear Gail\n"
+        "Happy birthday to you\n")
+</code></pre><p>you can write:
 </p>
-</blockquote><p>Alongside set operations of union, intersection and is-a-subset, Counter also supports addition and subtraction &#8212; natural and unsurprising operations for a container whose job is to keep count of its elements. If you want to unite the contents of two Counters, it&#8217;s probably <code>+</code> you want rather than <code>|</code>.
+<pre><code>song = """Happy birthday to you
+Happy birthday to you
+Happy birthday dear Gail
+Happy birthday to you
+"""
+</code></pre><p>The only downside here is that the first line doesn&#8217;t align nicely with the lines which follow. The way around this is to embed a <code>\newline</code> escape sequence, meaning both <a href="https://docs.python.org/3/reference/lexical_analysis.html#string-and-bytes-literals" title="String and Bytes literals">backslash and newline are ignored</a>.
 </p>
-<p>Counters came to mind as a lightning talk subject since I had a go at the <a href="https://adventofcode.com/2018" title="25 Christmas themed puzzles made available one-per-day as a countdown to Christmas">Advent of Code</a> last year and used no fewer than 12 Counters in my <a href="https://github.com/wordaligned/advent-of-code-2018/blob/master/solutions.ipynb">solutions</a> to 25 puzzles &#8212; and that total could well increase since I haven&#8217;t finished yet.
-</p>
-<p>The talk itself is on <a href="https://github.com/wordaligned/python-counters">github</a>.
-</p>
-<p><a href="https://github.com/wordaligned/python-counters"><img alt="Coins" src="/images/coins.jpg"></a>
-</p>
+<pre><code>song = """\
+Happy birthday to you
+Happy birthday to you
+Happy birthday dear Gail
+Happy birthday to you
+"""
+</code></pre>
 </div>
 
 <div class="comments"><hr/><div id="disqus_thread"></div><script type="text/javascript" src="http://disqus.com/forums/wordaligned/embed.js"></script></div>
@@ -62,16 +72,15 @@
       
 <div class="sidebar-node">
 <h3>Tagged</h3>
-<ul id="categories"><li><a href="/tag/talks" rel="tag">Talks</a></li>
-<li><a href="/tag/python" rel="tag">Python</a></li></ul>
+<ul id="categories"><li><a href="/tag/python" rel="tag">Python</a></li></ul>
 
 </div>
 
 <div class="sidebar-node">
 <h3>Chain</h3>
 <ul>
-<li><a accesskey="n" href="/articles/aligning-the-first-line-of-a-triplequoted-string-in-python" title="Next article">&laquo; Aligning the first line of a triple-quoted string in Python</a></li>
-<li><a accesskey="p" href="/articles/metaphormers" title="Previous article">&raquo; Metaphormers</a></li>
+
+<li><a accesskey="p" href="/articles/python-counters-pydiff" title="Previous article">&raquo; Python Counters @PyDiff</a></li>
 </ul>
 
 
