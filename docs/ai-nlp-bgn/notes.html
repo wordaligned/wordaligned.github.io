@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+
+  <head>
+	<meta charset="utf-8">
+	<title>AI~NLP~BIG DATA~BGN</title>
+	<meta name="author" content="Thomas Guest">
+  </head>
+
+  <body>
+    <h1>AI~NLP~BIG DATA~BGN</h1>
+    <h2>Life Changing Technology</h2>
+
+    <p>I've been working for Clinithink for a couple of years now --
+    and I've been coming here to SSDC for a similar length of time. I
+    thought I should try and explain what we do at Clinithink, because
+    it's interesting and worthwhile. I've had a number of jobs over
+    the years: 3D modelling software used in CAD systems, virtual
+    reality simulators, video codecs, middleware for digital
+    televisions, tools for Playstation games developers. The companies
+    I've worked for have been highly successful and the products I
+    helped develop are out there being used, and I like to think these
+    products are worthwhile -- though I will admit to starting to
+    question my involvement with the games industry when my son became
+    addicted to Call of Duty.</p>
+
+
+    <p>With Clinithink, it's different, it's more important than TV or
+    computer games. The software has the potential to radically
+    improve healthcare. It can quite literally save lives. It can find
+    patients for drugs trials. It can inform the design of the trial,
+    improving the chances of the trial succeeding. It can assist in
+    the diagnosis of rare diseases. It can assist financial
+    controllers in confirming medical procedures have been billed
+    correctly. To fully succeed it needs to be deployed and integrated
+    more widely. It needs to be understood.</p>
+
+    <p>That's why I am here today. To improve understanding. This
+    will be a high-level talk, because I don't have long, but it will
+    also be a low-level talk because that's what interests me, and
+    that's where I personally contribute to Clinithink's software.</p>
+
+    <p>What we do is use computers to process electronic medical
+    records. The input to our system is the narrative data found in
+    medical records -- this could be via integration with a healthcare
+    IT system, or directly via a REST API.</p>
+
+    <p>Clinicians are trained to observe, and to write down what they
+    observe clearly and directly. It's part of their professional
+    discipline, just as programmers use version control, for
+    example. These medical observations are written in free text:
+    paragraphs, sentences, descriptions -- stories. Our software uses
+    natural language processing and search engine techniques to digest
+    these unstructured stories and annotate them with a formal
+    structure. The result is medical records which can be searched,
+    categorised, aggregated -- records whose data is unlocked for
+    further processing.</p>
+
+      
+    <h2>Architecture</h2>
+
+    <p>The engine is written in C++. It's designed to be highly
+    efficient. It's generally stable and mature. Although a number of
+    people have worked on it over the years, it looks very much the
+    work of one man, Pete Johnson, a medical doctor and a brilliant
+    self-trained programmer.</p>
+
+    <p>The engine exports a number of task specific APIs. These can be
+    called by an application - we write ours in Python, though
+    previous versions of the software used C#. End users access the
+     applicaton via a web UI. Integration clients use a REST API.</p>
+    
+    
+    <h2>Inputs</h2>
+
+    <p>The engine is fed clinical narratives. Clinicians are trained
+    to observe and to write down what they see, much as software
+    developers are trained to use version control and follow coding
+    standards. The value in medical records, then, lies in being able
+    to interpret stories -- to convert them into a form which can be
+    processed by a computer, or computers.</p>
+
+    <h3>Snomed</h3>
+
+    <p>As well as documents, the Engine needs an encyclopedia --
+    imagine an enormous book which contains all things medical:
+    clinical findings, symptoms, diagnoses, procedures, body
+    structures, organisms and other etiologies, substances,
+    pharmaceuticals, devices and specimens. Such an encyclopedia
+    exists and is in continual development. It goes by the name of
+    SNOMED</p>
+
+    <p>I use the word encylopedia, but it's much more than
+    that. Wikipedia characterises SNOMED as "a multilingual thesaurus with
+    an ontological foundation". As well as the core concepts, there's a
+    model of how concepts can be combined to make post-coordinated
+    expressions. So you can encode something like "third degree burn of left
+    index finger caused by hot water".</p>
+
+    <h3>Resources</h3>
+
+    <p>Additionally, the engine is fed rules for how to find headings,
+    expand acronyms, and similar. We have a team of medical
+    terminologists who maintain and develop these rules, essentially
+    customising SNOMED to map it to what physicians really
+    write. There's information on word frequencies and parts of
+    speech.</p>
+
+    <p>At its heart, then, the Engine is looking for phrases which map
+    to SNOMED expressions. That's the structured form.</p>
+
+  </body>
+</html>
