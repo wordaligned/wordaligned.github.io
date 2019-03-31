@@ -24,7 +24,7 @@
 			link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
 			document.getElementsByTagName( 'head' )[0].appendChild( link );
 		</script>
-
+        <script src="js/jquery-1.11.1.min.js"></script>
 	</head>
 
 	<body>
@@ -38,18 +38,82 @@
     <p><a href="http://twitter.com/clinithinkwales">@clinithinkwales</a>
   </section>
 
+  <section>
   <section data-background="images/masters-international-stylised.jpg" data-background-size="contain"></section>
 
   <section data-background="images/have-you-used-boost.jpg" data-background-size="contain"></section>
 
-  <section><h2 style="font-size:400px">YES</h2></section>
-  <section><h2 style="font-size:400px">YEAH</h2></section>
+  <section><h2 class="huge">YES</h2></section>
+  <section><h2 class="huge">YEAH</h2></section>
+
+  <section>
+    <h2>Bootstrapped by Boost</h2>
+  </section>
+
+  <section>
+<pre style="font-size:32px;"><span class="hi">
+//! Return the {target =&gt; source} map of prescribed substances
+std::unordered_map&lt;int, int&gt; Graph::ConsumesSources() const
+{
+  std::unordered_map&lt;int, int&gt; target_sources;
+
+  <span class="hi2"><span class="hi1">boost::insert</span>(target_sources,
+     edges_
+     | <span class="hi1">boost::adaptors::filtered</span></span>
+       (std::function&lt;bool(Edge)&gt;
+       <span class="hi2">([](auto const &amp; e){ return e.type_ == Consumes; })</span>)
+     <span class="hi2">| <span class="hi1">boost::adaptors::transformed</span></span>
+       (std::function&lt;std::pair&lt;int, int&gt;(Edge const &amp;)&gt;
+       <span class="hi2">([](auto const &amp; e) { return std::make_pair(e.to_, e.from_); })</span>
+     )<span class="hi2">);</span>
+
+  return target_sources;
+}
+</span></pre>
+  </section>
+
+  <section>
+    <ul>
+      <li><a href="file:///c:/boost64/boost167_py36/include/boost-1_67/boost/range/algorithm_ext/insert.hpp">c:\boost64\boost167_py36\include\boost-1_67\boost\range\algorithm_ext\insert.hpp(42): error C4716: 'boost::range::insert&lt;...&gt;': must return a value</a>
+      <li>(See: <a href="https://www.boost.org/doc/libs/1_69_0/doc/html/container/release_notes.html">release notes</a>)
+    </ul>
+  </section>
+  
+  <section>
+<pre><span class="hi">
+std::unordered_map&lt;int, int&gt;
+Graph::ConsumesSources() const
+{
+  std::unordered_map&lt;int, int&gt; target_sources;
+
+  <span class="hi1">for (auto const &amp; edge : edges_)
+  {
+    if (edge.type_ == Consumes)
+      target_sources.insert({edge.to_, edge.from_});
+  }</span>
+
+  return target_sources;
+}
+</span></pre>
+  </section>
+
+  <section>
+    <pre class="big">
+
+    def ConsumesSources(self):
+        return { edge.to_: edge.from_
+                 for edge in self.edges_
+                 if edge.type_ == Consumes }
+
+</pre>
+  </section>
 
   <section>
     <h2>Bootstrapped by Boost</h2>
     <h2 class="fragment">Boos!!! Trapped by Boost!!</h2>
   </section>
-  
+  </section>
+
   <section>
     <h2>Agenda</h2>
     <ul>
@@ -78,9 +142,8 @@
     <section data-background="images/engine-narrative-to-encodings.jpg" data-background-size="contain"></section>
     <section data-background="images/enrich-exchange.jpg" data-background-size="contain"></section>
    
-    <section><h2>Inputs</h2></section>
-    <section data-background="images/inputs.jpg" data-background-size="contain"></section>
-    <section data-background="images/emr.png"></section>
+    <section><h2 class="huge">Inputs</h2></section>
+    <section data-background="images/emr.png" data-background-size="contain"></section>
 
     <section>
       <h2>Inputs</h2>
@@ -94,7 +157,7 @@
     <section data-background="images/processing-pipeline.jpg" data-background-size="contain"><h2>Processing</h2></section>
 
     <section>
-      <h2><a target="_blank" href="http://localhost:4251">Output</a></h2>
+      <h2 class="huge"><a target="_blank" href="http://localhost:4251">Output</a></h2>
     </section>
   </section>
 
@@ -127,16 +190,25 @@
       </ul>
     </section>
 
+    <section><h2>Boost.Size</h2>
+      <pre class="biggish">
+$ ls -hs boost_1_69_0.7z 
+79M boost_1_69_0.7z
+$ 7z l boost_1_69_0.7z | wc -l
+66850
+      </pre>
+    </section>
+
     <section><h2>Boost off</h2>
-      <pre class="fragment"><span style="font-size:150%">sed -i s/boost/std/g</span></pre>
-      <pre class="fragment"><span style="font-size:150%">sed -i s/boost//g</span></pre>
+      <pre class="bigger">sed s/boost/std/g</pre>
+      <pre class="fragment bigger">sed s/boost//g</pre>
       <img class="fragment" style="height:300px;" alt="Mary Poppins" src="images/mary-poppins.jpg">
     </section>
   
     <section><h2>Boost graduates</h2>
       <p style="font-size:65%">smart_ptr regex unordered_map/set thread
         bind function range tuple optional variant filesystem ...
-      <img class="fragment" style="height:300px;" alt="Graduate celebrations" src="images/graduates.jpg">
+      <p><img class="fragment" style="height:300px;" alt="Graduate celebrations" src="images/graduates.jpg">
     </section>
 
     <section><h2>Boost drop outs</h2>
@@ -146,9 +218,10 @@
     <section><h2>Boost Where</h2>
     <p style="font-size:65%">algorithm any archive asio assign bind
     date_time filesystem foreach format function functional fusion
-    graph <b>interprocess</b> iostreams iterator lambda lexical_cast log
-    mem_fn optional <b>phoenix</b> pool program_options progress property_map
-    property_tree <b>python</b> range regex serialization <b>spirit</b> thread timer
+    graph <b>interprocess</b> iostreams iterator lambda lexical_cast
+    log mem_fn multi-index optional <b>phoenix</b> pool program_options progress
+    property_map property_tree <b>python</b> range regex
+    serialization <b>spirit</b> string-algorithms thread timer
     tokenizer tuple unittest unordered_map unordered_set uuid variant
     </section>
 
@@ -158,18 +231,59 @@
     </section>
 
     <section><h2>Build/Install Boost</h2>
-      <ul>
+      <ul class="bigger">
         <li>use a package manager
-        <li>use Boost.build
+        <li>use Boost.Build
         <li>DiY
       </ul>
     </section>
 
-    <section><h2>Boost.Spirit</h2></section>
+    <section><h2>Boost.Build</h2>
+      <pre style="font-size:40px">
+7z x boost_1_69_0.7z && ^
+cd boost_1_69_0 && bootstrap.bat && ^
+bjam -j8 toolset=msvc-14.1 ^
+-s BZIP2_SOURCE=c:/bzip2/bzip2-1.0.6 ^
+-s ZLIB_SOURCE=c:/zlib/zlib-1.2.11 ^
+---build-type=complete ^
+address-model=64 architecture=x86 threading=multi ^
+--prefix=d:/boost64 install
+      </pre>
+    </section>
+
+    <section>
+      <h2><a href="https://www.boost.org/doc/libs/1_69_0/libs/spirit/doc/html/index.html">Boost.Spirit</a></h2>
+      <ul>
+      <li>Boost Spirit is a parser and output generator.
+      <li>You write grammars and format descriptions using EBNF<sup>&dagger;</sup> directly in C++.
+      <li class="fragment"><span class="tiny">[&dagger;] well, almost</span>
+      </ul>
+    </section>
+
     <section data-background-size="contain" data-background="images/scg-expression.png"></section>
     <section data-background-size="contain" data-background="images/scg-abnf.png"></section>
-    <section><h2 style="font-size:400px">DEMO</h2></section>
+    <section><h2 class="huge">DEMO</h2></section>
 
+    <section>
+      <h2><a href="https://www.boost.org/doc/libs/1_69_0/libs/python/doc/html/index.html">Boost.Python</a></h2>
+      <p>Boost.Python enables seamless interoperability between C++ and Python.
+    </section>
+
+    <section><h2><a href="https://github.com/pybind/pybind11">PyBind11</a></h2>
+      <p><span class="fragment">The main issue with Boost.Python</span><span class="fragment">&mdash;and the reason for creating such a similar project&mdash;</span><span class="fragment"><b>is Boost</b></span>
+      <p>
+      <p class="fragment">See also: <a href="https://github.com/niXman/yas"><b>YAS</b></a>
+    </section>
+
+    <section><h2 class="huge">DEMO</h2></section>
+
+    <section>
+      <h2><a href="https://www.boost.org/doc/libs/1_69_0/doc/html/interprocess.html">Boost.Interprocess</a></h2>
+      <p>Boost.Interprocess simplifies the use of common interprocess communication and synchronization mechanisms. Support includes: shared memory, <b>memory-mapped files</b>, semaphores, mutexes ... message queues.
+    </section>
+
+    <section><h2 class="huge">DEMO</h2></section>
+    
   </section>
   
   <section><h2>Thank you!</h2>
@@ -184,7 +298,7 @@
 
 <script src="lib/js/head.min.js"></script>
 <script src="js/reveal.js"></script>
-
+<script src="js/animate.js"></script>
 <script>
 
 // Full list of configuration options available at:
@@ -194,7 +308,8 @@ controls: false,
 progress: false,
 history: true,
 center: false,
-
+width: 1366,
+height: 768,
 transition: 'slide', // none/fade/slide/convex/concave/zoom
 
 // Optional reveal.js plugins
