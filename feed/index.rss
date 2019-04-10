@@ -7,6 +7,35 @@
 <dc:creator>tag@wordaligned.org</dc:creator>
 <language>en-gb</language>
 <item>
+<title>Dr G&#8217;s Award Winning Puzzles</title>
+<description>&lt;p&gt;A colleague of mine shares my love of puzzles. Whilst I like solving them, he also likes to design and build them. What I hadn&amp;#8217;t realised is that there&amp;#8217;s a community of puzzlers out there, who hold conventions, share designs, and generally celebrate and advance the art of puzzling.
+&lt;/p&gt;
+&lt;p&gt;Dr G &amp;#8212; my colleague &amp;#8212; is part of that community and also owns a 3D printer. He works from home but whenever he visits the office there&amp;#8217;ll be a freshly-printed puzzle for us to play with. I feel as excited as a young hobbit when Gandalf visits the Shire.
+&lt;/p&gt;
+&lt;p&gt;The best puzzles have just a few simple pieces. You can see how the parts must finally align but the geometry conspires to confound. There &lt;em&gt;will&lt;/em&gt; be a sequence of twists and turns. There &lt;em&gt;must&lt;/em&gt; be.
+&lt;/p&gt;
+&lt;img src="http://wordaligned.org/images/casino-unpacked.jpg" alt="Casino"/&gt;
+
+&lt;p&gt;Casino, designed by Dr Volker Latussek, is both mould breaking and an instant classic. You have to slot 6 identical casino chips into a cubic box. The lip which makes the opening to the box rectangular rather than square is the single asymmetry which makes this task almost impossible rather than utterly trivial.
+&lt;/p&gt;
+&lt;p&gt;I fiddled with it, rolling the chips into position, sliding and shunting. After many minutes of manipulation I put it down, the chips loosely arranged in and on top of the box. After a lunch break I picked it up, and to my amazement the chips slid easily and directly into place.
+&lt;/p&gt;
+&lt;img src="http://wordaligned.org/images/casino-solved.jpg" alt="Casino"/&gt;
+
+&lt;img src="http://wordaligned.org/images/packtic-unpacked.jpg" alt="PackTIC"/&gt;
+
+&lt;p&gt;PackTIC, designed by Andrew Crowell is a very different puzzle. The TIC stands for Turning Interlocking Cube. A bit like a 3D version of Tetris, you have to manipulate a 5 very different cubilinear pieces so they fuse into an irregular chassis. I took this one on the train with me. At the end of the journey I had figured out how the pieces would fit, but not how to assemble them. The following morning, as with the Casino puzzle, everything just clicked into place.
+&lt;/p&gt;
+&lt;img src="http://wordaligned.org/images/packtic-solved.jpg" alt="PackTIC"/&gt;</description>
+<dc:date>2019-04-09</dc:date>
+<guid>http://wordaligned.org/articles/dr-gs-award-winning-puzzles</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/dr-gs-award-winning-puzzles</link>
+<category>Self</category>
+<category>Puzzles</category>
+</item>
+
+<item>
 <title>Aligning the first line of a triple-quoted string in Python</title>
 <description>&lt;p&gt;Python&amp;#8217;s triple-quoted strings are a convenient syntax for strings where the contents span multiple lines. Unescaped newlines are allowed in triple-quoted strings. So, rather than write:
 &lt;/p&gt;
@@ -1623,124 +1652,6 @@ b'EURO SIGN \xe2\x82\xac \xa4'
 <link>http://wordaligned.org/articles/from-bytes-to-strings-in-python-and-back-again</link>
 <category>Python</category>
 <category>Unicode</category>
-</item>
-
-<item>
-<title>24 Puzzles</title>
-<description>&lt;p&gt;On &lt;a href="http://blog.plover.com"&gt;The Universe of Discourse&lt;/a&gt; Mark Dominus discusses the classic &lt;a href="http://blog.plover.com/math/24-puzzle.html"&gt;24 Puzzle&lt;/a&gt;:
-&lt;/p&gt;
-&lt;blockquote&gt;&lt;p&gt;You are given a sequence of four digits, say 1, 2, 3, 4, and your job is to combine them with ordinary arithmetic operations (+, -, &amp;times;, and &amp;divide;) in any order to make a target number, typically 24. For example, with 1, 2, 3, 4, you can go with &lt;code&gt;((1+2)+3)&amp;times;4=24&lt;/code&gt; or with &lt;code&gt;4&amp;times;((2&amp;times;3)&amp;times;1)=24&lt;/code&gt;.
-&lt;/p&gt;
-&lt;/blockquote&gt;&lt;p&gt;Here&amp;#8217;s a solver for such puzzles. It uses &lt;code&gt;itertools&lt;/code&gt; to generate possible expressions, &lt;code&gt;fractions&lt;/code&gt; to get the arithmetic right, and &lt;code&gt;eval&lt;/code&gt; to evaluate expressions. It&amp;#8217;s limited to expressions formed from 4 numbers which means I don&amp;#8217;t have to programmatically calculate different ways of parenthesising: there are only 5.
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
-
-&lt;pre class="prettyprint"&gt;# http://blog.plover.com/math/24-puzzle.html
-import re
-import math
-
-# Use fractions for exact calculations
-from fractions import Fraction
-
-# Solve for 4 numbers only!
-N = 4
-
-# So these are the only expression templates
-# where X is a number and @ is an operation
-templates = '''\
-((X @ X) @ X) @ X
-(X @ (X @ X)) @ X
-X @ ((X @ X) @ X)
-X @ (X @ (X @ X))
-(X @ X) @ (X @ X)'''.splitlines()
-
-import itertools as its
-
-def defrac(s):
-    return re.compile(r'Fraction\((\d+)\)').sub(r'\1', s)
-
-def evaluate(nums, ops, template):
-    fracs = ('Fraction(%s)' % n for n in nums)
-    ops = iter(ops)
-    expr = ''.join(next(fracs) if c == 'X' else
-                   next(ops) if c == '@' else c
-                   for c in template)
-    try:
-        return expr, eval(expr)
-    except ZeroDivisionError:
-        return expr, None
-
-def solve(spec, ops):
-    numbers = re.compile(r'\d+').findall(spec)
-    assert len(numbers) == N + 1
-    result = Fraction(numbers.pop())
-    seqs = its.product(its.permutations(numbers),
-                       its.product(ops, repeat=N-1),
-                       templates)
-    print(defrac(next((e for e, v in its.starmap(evaluate, seqs)
-                       if v == result),
-                      'Impossible')))
-
-def main():
-    solve('2,5,6,6 =&amp;gt; 17', '+-/*')
-    solve('3,3,8,8 =&amp;gt; 24', '+-/*')
-
-main()
-
-&lt;/pre&gt;
-
-&lt;/div&gt;
-
-&lt;p&gt;Here&amp;#8217;s a second attempt, which doesn&amp;#8217;t assume there will just be 4 numbers on the left hand side of the equation. Given a sequence of numbers and a set of operators, it repeatedly reduces the sequence length by picking pair of numbers and combining them using one of the operators, iterating over all possible ways of doing this. The first sequence of length 1 which equals the target value gives a solution and terminates the search.
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
-
-&lt;pre class="prettyprint"&gt;# http://blog.plover.com/math/24-puzzle.html
-from fractions import Fraction
-import itertools as its
-import operator
-import re
-
-def pick2(xs):
-    return ((p[:2], p[2:]) for p in its.permutations(xs))
-
-def allow(op, l, r):
-    return op != '/' or eval(r) != 0
-
-def apply(op, l, r):
-    return '(%s%s%s)'%(l, op, r)
-
-def values(xs, ops):
-    L = [xs]
-    while L:
-        xs = L.pop()
-        if len(xs) == 1:
-            yield xs.pop()
-        else:
-            L.extend([apply(op, *lr)] + list(tl)
-                     for op, (lr, tl) in its.product(ops, pick2(xs))
-                     if allow(op, *lr))
-
-def solve(spec, ops):
-    numbers = ['Fraction(%s)'%n for n in re.compile(r'\d+').findall(spec)]
-    target = eval(numbers.pop())
-    print(next((v for v in values(numbers, ops) if eval(v) == target), 'Impossible'))
-
-def main():
-    solve('2,5,6,6 =&amp;gt; 17', '+-/*')
-    solve('3,3,8,8 =&amp;gt; 24', '+-/*')
-
-main()
-
-&lt;/pre&gt;
-
-&lt;/div&gt;</description>
-<dc:date>2017-03-08</dc:date>
-<guid>http://wordaligned.org/articles/24-puzzles</guid>
-<author>tag@wordaligned.org (Thomas Guest)</author>
-<link>http://wordaligned.org/articles/24-puzzles</link>
-<category>Puzzles</category>
-<category>Python</category>
 </item>
 
 </channel>
