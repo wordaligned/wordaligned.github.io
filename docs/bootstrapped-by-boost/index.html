@@ -39,7 +39,7 @@
   </section>
 
   <section>
-  <section data-background="images/masters-international-stylised.jpg" data-background-size="contain"></section>
+  <section data-background="images/masters-international-finish.jpg" data-background-size="contain"></section>
 
   <section data-background="images/have-you-used-boost.jpg" data-background-size="contain"></section>
 
@@ -109,6 +109,11 @@ Graph::ConsumesSources() const
   </section>
 
   <section>
+    <blockquote class="big">I know how complex that looks and to be honest I haven’t used it in real code yet but I think it’s interesting to at least know what’s in there [...] to get inspiration.</blockquote>
+    <p>&mdash; Jonathan Boccara, <a href="https://youtu.be/o6uc6-OodsE?t=345">Learning C++ Boost: Boost Karma</a>
+  </section>
+  
+  <section>
     <h2>Bootstrapped by Boost</h2>
     <h2 class="fragment">Boos!!! Trapped by Boost!!</h2>
   </section>
@@ -129,7 +134,8 @@ Graph::ConsumesSources() const
     <section>
       <p style="font-size:100%;"><a href="https://conference.accu.org/2019/presenters.html#XThomasGuest">Thomas</a>
         works <a href="http://twitter.com/clinithinkwales">@ClinithinkWales</a> wrestling
-        meaning from medical records 📝. He likes puzzles, running and noodles. 🧩🏃🍜</p>
+        meaning from medical records 📝. He likes <a href="http://wordaligned.org/articles/dr-gs-award-winning-puzzles">puzzles</a>, running and noodles. 🧩🏃🍜</p>
+      <img class="fragment" src="images/casino-solved.jpg" alt="Casino solved"/>
     </section>
   </section>
 
@@ -206,8 +212,7 @@ $ 7z l boost_1_69_0.7z | wc -l
     </section>
   
     <section><h2>Boost graduates</h2>
-      <p style="font-size:65%">smart_ptr regex unordered_map/set thread
-        bind function range tuple optional variant filesystem ...
+      <p>bind ~ filesystem ~ function ~ optional ~ range ~ regex ~ smart_ptr ~ thread ~ unordered_map/set ~ thread ~ tuple ~ variant ~ etc ~ etc
       <p><img class="fragment" style="height:300px;" alt="Graduate celebrations" src="images/graduates.jpg">
     </section>
 
@@ -245,7 +250,7 @@ cd boost_1_69_0 && bootstrap.bat && ^
 bjam -j8 toolset=msvc-14.1 ^
 -s BZIP2_SOURCE=c:/bzip2/bzip2-1.0.6 ^
 -s ZLIB_SOURCE=c:/zlib/zlib-1.2.11 ^
----build-type=complete ^
+--build-type=complete ^
 address-model=64 architecture=x86 threading=multi ^
 --prefix=d:/boost64 install
       </pre>
@@ -255,13 +260,13 @@ address-model=64 architecture=x86 threading=multi ^
       <h2><a href="https://www.boost.org/doc/libs/1_69_0/libs/spirit/doc/html/index.html">Boost.Spirit</a></h2>
       <ul>
       <li>Boost Spirit is a parser and output generator.
-      <li>You write grammars and format descriptions using EBNF<sup>&dagger;</sup> directly in C++.
-      <li class="fragment"><span class="tiny">[&dagger;] well, almost</span>
+      <li>You write grammars and format descriptions using EBNF<sup>&dagger;</sup> directly in C++ ☯️
+      <li class="fragment"><span class="tiny">[&dagger;] well, <a href="file:///C:/boost/boost_1_67_0/libs/spirit/doc/html/spirit/qi/quick_reference/qi_parsers/operator.html">almost</a></span>
       </ul>
     </section>
 
     <section data-background-size="contain" data-background="images/scg-expression.png"></section>
-    <section data-background-size="contain" data-background="images/scg-abnf.png"></section>
+    <section><a href="https://confluence.ihtsdotools.org/display/DOCSCG/5.1+Normative+Specification"><img src="images/scg-abnf.png"></a></section>
     <section><h2 class="huge">DEMO</h2></section>
 
     <section>
@@ -269,8 +274,14 @@ address-model=64 architecture=x86 threading=multi ^
       <p>Boost.Python enables seamless interoperability between C++ and Python.
     </section>
 
+    <section>
+      <h2><a href="https://www.boost.org/doc/libs/1_69_0/libs/python/doc/html/index.html">Boost.Python</a></h2>
+      <p>The library’s use of advanced metaprogramming techniques simplifies its syntax for users, so that wrapping code takes on the look of a kind of declarative interface definition language (IDL).
+      <p class="fragment">🧐🤔😕
+    </section>
+
     <section><h2><a href="https://github.com/pybind/pybind11">PyBind11</a></h2>
-      <p><span class="fragment">The main issue with Boost.Python</span><span class="fragment">&mdash;and the reason for creating such a similar project&mdash;</span><span class="fragment"><b>is Boost</b></span>
+      <p class="big"><span class="fragment">The main issue with Boost.Python&mdash;and the reason for creating such a similar project&mdash;</span><span class="fragment"><b>is Boost</b></span>
       <p>
       <p class="fragment">See also: <a href="https://github.com/niXman/yas"><b>YAS</b></a>
     </section>
@@ -285,7 +296,25 @@ address-model=64 architecture=x86 threading=multi ^
     <section><h2 class="huge">DEMO</h2></section>
     
   </section>
-  
+
+  <section>
+    <section><h2>Boost ~ Next</h2></section>
+    <section><h3>(Some algorithms and containers we’ve either hand-rolled or shopped elsewhere)</h3></section>
+    <section><h3>(Not mentioning graphics libraries, UI toolkits, games engines, web servers ...)</h3></section>
+    <section>
+      <ul>
+        <li><a href="https://en.wikipedia.org/wiki/Levenshtein_distance">Levenshtein distance</a> (&amp; friends)
+        <li><a href="https://en.wikipedia.org/wiki/Ternary_search_tree">Ternary search tree</a>
+        <li>Deduplication
+        <li>Difference
+        <li>Streaming algorithms, Top-K
+        <li>Matrix mathematics
+        <li>Database ORM
+        <li>String templating
+        <li>JSON
+      </ul>
+    </section>
+  </section>
   <section><h2>Thank you!</h2>
     <p><a href="http://twitter.com/thomasguest">@thomasguest</a>
     <p><a href="http://twitter.com/clinithinkwales">@clinithinkwales</a>
