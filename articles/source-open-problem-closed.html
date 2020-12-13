@@ -28,12 +28,9 @@
       <div class="atomentry" id="source-open-problem-closed">
 <h2 class="title"><a href="/articles/source-open-problem-closed">Source open, problem closed</a></h2>
 <p class="meta"><abbr class="published" title="2007-06-27">2007-06-27</abbr> &bull; <a href="/tag/python" rel="tag">Python</a>, <a href="/tag/web-applications" rel="tag">Web Applications</a>, <a href="/tag/subversion" rel="tag">Subversion</a>, <a href="/tag/trac" rel="tag">Trac</a> &bull; <a href="/articles/source-open-problem-closed#disqus_thread">Comments</a></p>
-<p>I <a href="/articles/trac-not-just-a-pretty-interface.html">wrote</a> a while back about <a href="http://trac.edgewall.org">trac</a>. I continued to be impressed by it. Although it was fiddly to install, I notice that this should be improved by the next <a href="http://trac.edgewall.org/wiki/TracDev/ReleaseNotes/0.11">point release</a>, which will be packaged in a <a href="http://peak.telecommunity.com/DevCenter/PythonEggs">python egg</a>. And although the version we&#8217;re using is only 0.10.2, it&#8217;s proven itself remarkably solid. In fact we haven&#8217;t encountered any bugs. Or at least we hadn&#8217;t until today, when someone discovered that attempting to attach a small file to a wiki page resulted in an application error.
-</p>
-<span id="continue-reading"/>
-
-<p>Up until today we&#8217;d been attaching pictures which had always worked just fine. Attempting to upload a small text file resulted in the web browser showing a big red error page filled with the following stack trace.
-</p>
+<p>I <a href="/articles/trac-not-just-a-pretty-interface.html">wrote</a> a while back about <a href="http://trac.edgewall.org">trac</a>. I continued to be impressed by it. Although it was fiddly to install, I notice that this should be improved by the next <a href="http://trac.edgewall.org/wiki/TracDev/ReleaseNotes/0.11">point release</a>, which will be packaged in a <a href="http://peak.telecommunity.com/DevCenter/PythonEggs">python egg</a>. And although the version we&#8217;re using is only 0.10.2, it&#8217;s proven itself remarkably solid. In fact we haven&#8217;t encountered any bugs. Or at least we hadn&#8217;t until today, when someone discovered that attempting to attach a small file to a wiki page resulted in an application error.</p>
+<p><span id="continue-reading"/></p>
+<p>Up until today we&#8217;d been attaching pictures which had always worked just fine. Attempting to upload a small text file resulted in the web browser showing a big red error page filled with the following stack trace.</p>
 <div class="typocode">
 
 <pre class="prettyprint">Traceback (most recent call last):
@@ -45,33 +42,25 @@
     self._do_save(req, attachment)
   File "/usr/local/lib/python2.5/site-packages/trac/attachment.py", line 449, in _do_save
     size = upload.file.len
-AttributeError: 'cStringIO.StringO' object has no attribute 'len'
+AttributeError: &#x27;cStringIO.StringO&#x27; object has no attribute &#x27;len&#x27;
 
 </pre>
 
 </div>
 
-<p><a href="http://trac.edgewall.org">Trac</a> is a popular piece of software, and I had to believe someone else would have run into this bug. Sure enough, googling [<code>AttributeError: 'cStringIO.StringO' object has no attribute 'len'</code>][Q] led me straight to <a href="http://trac.edgewall.org/ticket/4311">trac ticket #4311</a>, and the happy news that this particular problem had been fixed. If you look at the ticket, you&#8217;ll notice that it cross-references the actual <a href="http://trac.edgewall.org/changeset/4459">repository diff</a> of the changes which fixed the problem &#8212; a simple three line change to a single file in this case, and a nice demonstration of how <a href="http://trac.edgewall.org">trac</a> integrates source control, defect tracking and a wiki.
-</p>
-<p>Since I didn&#8217;t want to upgrade our trac installation just yet I applied the patch directly to <code>/usr/local/lib/python2.5/site-packages/trac/attachment.py</code> (the file identified in the traceback), and all was well.
-</p>
-<p>This is of course an every day story from the world of open source software. If you stop and think about it, though, there are several layers of openness.
-</p>
+<p><a href="http://trac.edgewall.org">Trac</a> is a popular piece of software, and I had to believe someone else would have run into this bug. Sure enough, googling <a href="http://www.google.com/search?q=AttributeError%3A+%27cStringIO.StringO%27+object+has+no+attribute+%27len%27"><code>AttributeError: 'cStringIO.StringO' object has no attribute 'len'</code></a> led me straight to <a href="http://trac.edgewall.org/ticket/4311">trac ticket #4311</a>, and the happy news that this particular problem had been fixed. If you look at the ticket, you&#8217;ll notice that it cross-references the actual <a href="http://trac.edgewall.org/changeset/4459">repository diff</a> of the changes which fixed the problem &#8212; a simple three line change to a single file in this case, and a nice demonstration of how <a href="http://trac.edgewall.org">trac</a> integrates source control, defect tracking and a wiki.</p>
+<p>Since I didn&#8217;t want to upgrade our trac installation just yet I applied the patch directly to <code>/usr/local/lib/python2.5/site-packages/trac/attachment.py</code> (the file identified in the traceback), and all was well.</p>
+<p>This is of course an every day story from the world of open source software. If you stop and think about it, though, there are several layers of openness.</p>
 <ol>
- <li><p>The error message was open and obvious. I didn&#8217;t have to search through a server log. Application developers are usually taught hide tracebacks from end users &#8212; they&#8217;re deemed too frightening.  In this case, though, I didn&#8217;t even have to leave my web browser to diagnose and find a fix to the problem.
-</p>
-
- </li>
-
- <li><p>Trac opens up its own defect database for public access. As we&#8217;ve seen, this provides a great example of trac in action. <span id="excerpt0"/>Many closed source projects would regard it as a sign of weakness to publish this kind of information, though I do think (perhaps due to the influence of the open source movement) this attitude is changing.
-</p>
-
- </li>
-
- <li><p>The source files behind the application were open. All I had to do was tweak one of them using a text editor. No rebuild required.
-</p>
-
- </li>
+<li>
+<p>The error message was open and obvious. I didn&#8217;t have to search through a server log. Application developers are usually taught hide tracebacks from end users &#8212; they&#8217;re deemed too frightening.  In this case, though, I didn&#8217;t even have to leave my web browser to diagnose and find a fix to the problem.</p>
+</li>
+<li>
+<p>Trac opens up its own defect database for public access. As we&#8217;ve seen, this provides a great example of trac in action. <span id="excerpt0"/>Many closed source projects would regard it as a sign of weakness to publish this kind of information, though I do think (perhaps due to the influence of the open source movement) this attitude is changing.</p>
+</li>
+<li>
+<p>The source files behind the application were open. All I had to do was tweak one of them using a text editor. No rebuild required.</p>
+</li>
 </ol>
 </div>
 

@@ -28,18 +28,12 @@
       <div class="atomentry" id="ever-wish-youd-branched-first">
 <h2 class="title"><a href="/articles/ever-wish-youd-branched-first">Ever wish you&#8217;d branched first?</a></h2>
 <p class="meta"><abbr class="published" title="2007-11-27">2007-11-27</abbr> &bull; <a href="/tag/subversion" rel="tag">Subversion</a> &bull; <a href="/articles/ever-wish-youd-branched-first#disqus_thread">Comments</a></p>
-<p>So you&#8217;re hacking away at a working copy and you want to check things in. <span id="excerpt0"/>The problem is, your working copy is based on the trunk and your changes don&#8217;t really belong on the trunk.
-</p>
-<p>Maybe the development trunk has been locked down for a customer release; maybe you&#8217;ve started work on a simple feature which turns out not to be so simple, and you&#8217;d like to phase your changes in on a private branch; maybe you want to share work-in-progress with another team member &#8212; whatever the reason, you wish you&#8217;d branched the code before you&#8217;d started working on it. 
-</p>
-<p>This note describes three ways, ugly, bad and good, to adapt to this situation.
-</p>
-<span id="continue-reading"/>
-
-
-<h4>Brute Ignorance</h4>
-<p>Just check the changes in anyway. In this code snippet and the ones that follow, we&#8217;ll assume your working copy reflects a repository URL <code>svn://svnserver/trunk</code> and is located in a subdirectory called <code>trunk</code>.
-</p>
+<p>So you&#8217;re hacking away at a working copy and you want to check things in. <span id="excerpt0"/>The problem is, your working copy is based on the trunk and your changes don&#8217;t really belong on the trunk.</p>
+<p>Maybe the development trunk has been locked down for a customer release; maybe you&#8217;ve started work on a simple feature which turns out not to be so simple, and you&#8217;d like to phase your changes in on a private branch; maybe you want to share work-in-progress with another team member &#8212; whatever the reason, you wish you&#8217;d branched the code before you&#8217;d started working on it. </p>
+<p>This note describes three ways, ugly, bad and good, to adapt to this situation.</p>
+<p><span id="continue-reading"/></p>
+<h4 id="brute-ignorance">Brute Ignorance</h4>
+<p>Just check the changes in anyway. In this code snippet and the ones that follow, we&#8217;ll assume your working copy reflects a repository URL <code>svn://svnserver/trunk</code> and is located in a subdirectory called <code>trunk</code>.</p>
 <div class="typocode">
 
 <pre class="prettyprint">$ svn commit -m "Changes" trunk
@@ -48,14 +42,10 @@
 
 </div>
 
-<p>Yes, I have seen this done. Sometimes developers use the repository trunk a bit like a private fileshare. Get something working on Windows. Check it in. Then login to a Linux machine, update, see if it works there. Someone else will probably fix up Solaris &#8230; 
-</p>
-<p>There has to be a better way. Developers who adopt this technique deserve an <a href="/articles/antisocial-build-orders.html">ASBO</a> slapped on them.
-</p>
-
-<h4>Brute Force</h4>
-<p>Make the branch. Check it out. Patch across changes from your working copy.
-</p>
+<p>Yes, I have seen this done. Sometimes developers use the repository trunk a bit like a private fileshare. Get something working on Windows. Check it in. Then login to a Linux machine, update, see if it works there. Someone else will probably fix up Solaris &#8230; </p>
+<p>There has to be a better way. Developers who adopt this technique deserve an <a href="/articles/antisocial-build-orders.html">ASBO</a> slapped on them.</p>
+<h4 id="brute-force">Brute Force</h4>
+<p>Make the branch. Check it out. Patch across changes from your working copy.</p>
 <div class="typocode">
 
 <pre class="prettyprint">$ svn copy -m "My new branch" trunk svn://svnserver/branches/new-branch
@@ -65,10 +55,8 @@ $ svn checkout svn://svnserver/branches/new-branch
 
 </div>
 
-<p>The code sample uses the working-copy-to-url flavour of <code>svn copy</code>, which means you&#8217;ve correctly branched from the BASE revision you were working on. Depending on circumstances, you might have preferred to update your working copy first, or branch from the tip of the trunk using the url-to-url flavour of <code>svn copy</code>.
-</p>
-<p>Patching changes between your two working copies may not be trivial. Some are happiest using a graphical file browser to drag and drop files from <code>trunk</code> to <code>branch</code>. <code>Svn diff</code> followed by <code>patch</code> <a href="/articles/svn-help-patch.html">does better</a>.
-</p>
+<p>The code sample uses the working-copy-to-url flavour of <code>svn copy</code>, which means you&#8217;ve correctly branched from the BASE revision you were working on. Depending on circumstances, you might have preferred to update your working copy first, or branch from the tip of the trunk using the url-to-url flavour of <code>svn copy</code>.</p>
+<p>Patching changes between your two working copies may not be trivial. Some are happiest using a graphical file browser to drag and drop files from <code>trunk</code> to <code>branch</code>. <code>Svn diff</code> followed by <code>patch</code> <a href="/articles/svn-help-patch.html">does better</a>.</p>
 <div class="typocode">
 
 <pre class="prettyprint">$ svn diff trunk | patch -d new-branch -p1
@@ -77,12 +65,9 @@ $ svn checkout svn://svnserver/branches/new-branch
 
 </div>
 
-<p>Both techniques fail to copy any property changes across though &#8212; and please don&#8217;t try digging into the <code>.svn</code> directories to remedy this. Again, there&#8217;s a better way.
-</p>
-
-<h4>Branch and Switch and Go</h4>
-<p>The best thing to do is simply create the branch and switch to it. Traffic to and from the server is minimised, local disk access is reduced, no changes are lost.
-</p>
+<p>Both techniques fail to copy any property changes across though &#8212; and please don&#8217;t try digging into the <code>.svn</code> directories to remedy this. Again, there&#8217;s a better way.</p>
+<h4 id="branch-and-switch-and-go">Branch and Switch and Go</h4>
+<p>The best thing to do is simply create the branch and switch to it. Traffic to and from the server is minimised, local disk access is reduced, no changes are lost.</p>
 <div class="typocode">
 
 <pre class="prettyprint">$ svn copy -m "My new branch" trunk svn://svnserver/branches/new-branch
@@ -93,10 +78,8 @@ $ mv trunk new-branch
 
 </div>
 
-<p>You&#8217;ll notice that at the final stage we rename our working copy to reflect its new purpose. This isn&#8217;t strictly necessary but may save us from future confusion.
-</p>
-<p>Now you&#8217;re on a new branch and can check your changes in as desired.
-</p>
+<p>You&#8217;ll notice that at the final stage we rename our working copy to reflect its new purpose. This isn&#8217;t strictly necessary but may save us from future confusion.</p>
+<p>Now you&#8217;re on a new branch and can check your changes in as desired.</p>
 </div>
 
 <div class="comments"><hr/><div id="disqus_thread"></div><script type="text/javascript" src="http://disqus.com/forums/wordaligned/embed.js"></script></div>

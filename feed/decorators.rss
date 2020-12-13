@@ -8,115 +8,74 @@
 <language>en-gb</language>
 <item>
 <title>Tracing function calls using Python decorators</title>
-<description>&lt;div class="toc"&gt;
-&lt;h2&gt;Contents&lt;/h2&gt;
-&lt;ul&gt;
- &lt;li&gt;&lt;a href="http://wordaligned.org/articles/echo#tocintroduction" name="toc0" id="toc0"&gt;Introduction&lt;/a&gt;
- &lt;/li&gt;
+<description>&lt;h3 id=&quot;introduction&quot;&gt;Introduction&lt;/h3&gt;
+&lt;p&gt;Let&amp;#8217;s suppose you want to trace calls to a function. That is, every time the function gets called, you want to print out its name and the values of any arguments passed by the caller. To provide a concrete example, here&amp;#8217;s a function which calculates the dot product of two vectors.&lt;/p&gt;
+&lt;div class=&quot;typocode&quot;&gt;
 
- &lt;li&gt;&lt;a href="http://wordaligned.org/articles/echo#toca-less-invasive-way" name="toc1" id="toc1"&gt;A less invasive way&lt;/a&gt;
- &lt;/li&gt;
+&lt;pre class=&quot;prettyprint&quot;&gt;def dot(v, w):
+    &quot;&quot;&quot;Calculate the dot product of two vectors.
 
- &lt;li&gt;&lt;a href="http://wordaligned.org/articles/echo#tocdecorators" name="toc2" id="toc2"&gt;Decorators&lt;/a&gt;
- &lt;/li&gt;
-
- &lt;li&gt;&lt;a href="http://wordaligned.org/articles/echo#tocimproving-echo" name="toc3" id="toc3"&gt;Improving echo&lt;/a&gt;
- &lt;/li&gt;
-
- &lt;li&gt;&lt;a href="http://wordaligned.org/articles/echo#tocwider-application" name="toc4" id="toc4"&gt;Wider application&lt;/a&gt;
- &lt;/li&gt;
-
- &lt;li&gt;&lt;a href="http://wordaligned.org/articles/echo#tocwork-in-progress" name="toc5" id="toc5"&gt;Work in progress&lt;/a&gt;
- &lt;/li&gt;
-
- &lt;li&gt;&lt;a href="http://wordaligned.org/articles/echo#tocsource-code" name="toc6" id="toc6"&gt;Source Code&lt;/a&gt;
- &lt;/li&gt;
-
- &lt;li&gt;&lt;a href="http://wordaligned.org/articles/echo#toccredits" name="toc7" id="toc7"&gt;Credits&lt;/a&gt;
- &lt;/li&gt;
-
- &lt;li&gt;&lt;a href="http://wordaligned.org/articles/echo#toc-end" name="toc8" id="toc8"&gt;@ end&lt;/a&gt;
- &lt;/li&gt;
-&lt;/ul&gt;
-&lt;/div&gt;
-&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/echo#toc0" name="tocintroduction" id="tocintroduction"&gt;Introduction&lt;/a&gt;&lt;/h3&gt;
-&lt;p&gt;Let&amp;#8217;s suppose you want to trace calls to a function. That is, every time the function gets called, you want to print out its name and the values of any arguments passed by the caller. To provide a concrete example, here&amp;#8217;s a function which calculates the dot product of two vectors.
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
-
-&lt;pre class="prettyprint"&gt;def dot(v, w):
-    """Calculate the dot product of two vectors.
-    
     Example:
     &amp;gt;&amp;gt;&amp;gt; dot((1, 2, 3), (3, 2, 1))
     10
-    """
+    &quot;&quot;&quot;
     return sum(vv * ww for vv, ww in zip(v, w))
 
 &lt;/pre&gt;
 
 &lt;/div&gt;
 
-&lt;p&gt;To trace calls to the function you could just edit it and insert a print statement.
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
+&lt;p&gt;To trace calls to the function you could just edit it and insert a print statement.&lt;/p&gt;
+&lt;div class=&quot;typocode&quot;&gt;
 
-&lt;pre class="prettyprint"&gt;def dot(v, w):
-    print "dot(v=%r, w=%r)" % (v, w)
+&lt;pre class=&quot;prettyprint&quot;&gt;def dot(v, w):
+    print &quot;dot(v=%r, w=%r)&quot; % (v, w)
     return sum(vv * ww for vv, ww in zip(v, w))
 
 &lt;/pre&gt;
 
 &lt;/div&gt;
 
-&lt;p&gt;When you no longer want calls traced you can remove the &lt;code&gt;print&lt;/code&gt; statement or even comment it out. This approach works well enough for a while but you soon discover there are more functions you want to trace; and you&amp;#8217;ll eventually end up with lots of functions being traced and lots of commented-out tracing code. You might even end up with &lt;a href="http://wordaligned.org/articles/code-in-comments.html"&gt;broken commented-out code&lt;/a&gt;:
-&lt;/p&gt;
-&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;broken comment&lt;/div&gt;
+&lt;p&gt;When you no longer want calls traced you can remove the &lt;code&gt;print&lt;/code&gt; statement or even comment it out. This approach works well enough for a while but you soon discover there are more functions you want to trace; and you&amp;#8217;ll eventually end up with lots of functions being traced and lots of commented-out tracing code. You might even end up with &lt;a href=&quot;http://wordaligned.org/articles/code-in-comments.html&quot;&gt;broken commented-out code&lt;/a&gt;:&lt;/p&gt;
+&lt;div class=&quot;typocode&quot;&gt;&lt;div class=&quot;codetitle&quot;&gt;broken comment&lt;/div&gt;
 
-&lt;pre class="prettyprint"&gt;def dot(vec1, vec2):
-    # print "dot(v=%r, w=%r)" % (v, w)
+&lt;pre class=&quot;prettyprint&quot;&gt;def dot(vec1, vec2):
+    # print &quot;dot(v=%r, w=%r)&quot; % (v, w)
     return sum(v1 * v2 for v1, v2 in zip(vec1, vec2))
 
 &lt;/pre&gt;
 
 &lt;/div&gt;
 
-&lt;p&gt;At this point, you realise that calling a function and tracing these calls are orthogonal operations. Isn&amp;#8217;t there a less invasive way to do this?
-&lt;/p&gt;
-&lt;span id="continue-reading"/&gt;
+&lt;p&gt;At this point, you realise that calling a function and tracing these calls are orthogonal operations. Isn&amp;#8217;t there a less invasive way to do this?&lt;/p&gt;
+&lt;p&gt;&lt;span id=&quot;continue-reading&quot;/&gt;&lt;/p&gt;
+&lt;h3 id=&quot;a-less-invasive-way&quot;&gt;A less invasive way&lt;/h3&gt;
+&lt;p&gt;Rather than change the original function you can simply wrap it with the code which prints out the inputs.&lt;/p&gt;
+&lt;div class=&quot;typocode&quot;&gt;&lt;div class=&quot;codetitle&quot;&gt;Echo a function, Take 1&lt;/div&gt;
 
-
-&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/echo#toc1" name="toca-less-invasive-way" id="toca-less-invasive-way"&gt;A less invasive way&lt;/a&gt;&lt;/h3&gt;
-&lt;p&gt;Rather than change the original function you can simply wrap it with the code which prints out the inputs.
-&lt;/p&gt;
-&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;Echo a function, Take 1&lt;/div&gt;
-
-&lt;pre class="prettyprint"&gt;def echo_both_args(fn):
-    "Returns a traced version of the input 2-argument function."
+&lt;pre class=&quot;prettyprint&quot;&gt;def echo_both_args(fn):
+    &quot;Returns a traced version of the input 2-argument function.&quot;
     def wrapped(arg1, arg2):
         name = fn.__name__
-        print "%s(%r, %r)" % (name, arg1, arg2)
+        print &quot;%s(%r, %r)&quot; % (name, arg1, arg2)
         return fn(arg1, arg2)
     return wrapped
-    
+
 def dot(vec1, vec2):
     ....
-    
+
 dot = echo_both_args(dot)
 
 &lt;/pre&gt;
 
 &lt;/div&gt;
 
-&lt;p&gt;The &lt;code&gt;echo_both_args&lt;/code&gt; function accepts a single function as a parameter and returns a new function which wraps this original function by adding the desired trace functionality. By the way, I&amp;#8217;ve introduced the term &amp;#8220;echo&amp;#8221; for this action rather than the more conventional &amp;#8220;trace&amp;#8221; since Python already has a &lt;a href="http://docs.python.org/lib/module-trace.html"&gt;trace module&lt;/a&gt; which does something rather different. The idea is that when you call a function, you hear your call repeated &amp;#8212; like an echo.
-&lt;/p&gt;
-&lt;p&gt;C/C++ programmers will have noticed the inner function object, &lt;code&gt;wrapped&lt;/code&gt;, which &lt;code&gt;echo_both_args&lt;/code&gt; returns. Returning inner functions is a common Python idiom, and is the way language implements the closures found in other high-level languages such as Scheme or Ruby. The inner function doesn&amp;#8217;t go out of scope &amp;#8212; in Python, objects persist as long as needed.
-&lt;/p&gt;
-&lt;p&gt;The final line of the code snippet simply rebinds &lt;code&gt;dot&lt;/code&gt; to the echoed version of itself. We don&amp;#8217;t need to pass the name of the function to be traced (&lt;code&gt;dot&lt;/code&gt; in this example) into &lt;code&gt;echo_both_args&lt;/code&gt; since in Python a function object carries its name around with it in a &lt;code&gt;__name__&lt;/code&gt; attribute. If we now call &lt;code&gt;dot&lt;/code&gt; in an interpreted session, we&amp;#8217;ll see the call echoed:
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
+&lt;p&gt;The &lt;code&gt;echo_both_args&lt;/code&gt; function accepts a single function as a parameter and returns a new function which wraps this original function by adding the desired trace functionality. By the way, I&amp;#8217;ve introduced the term &amp;#8220;echo&amp;#8221; for this action rather than the more conventional &amp;#8220;trace&amp;#8221; since Python already has a &lt;a href=&quot;http://docs.python.org/lib/module-trace.html&quot;&gt;trace module&lt;/a&gt; which does something rather different. The idea is that when you call a function, you hear your call repeated &amp;#8212; like an echo.&lt;/p&gt;
+&lt;p&gt;C/C++ programmers will have noticed the inner function object, &lt;code&gt;wrapped&lt;/code&gt;, which &lt;code&gt;echo_both_args&lt;/code&gt; returns. Returning inner functions is a common Python idiom, and is the way language implements the closures found in other high-level languages such as Scheme or Ruby. The inner function doesn&amp;#8217;t go out of scope &amp;#8212; in Python, objects persist as long as needed.&lt;/p&gt;
+&lt;p&gt;The final line of the code snippet simply rebinds &lt;code&gt;dot&lt;/code&gt; to the echoed version of itself. We don&amp;#8217;t need to pass the name of the function to be traced (&lt;code&gt;dot&lt;/code&gt; in this example) into &lt;code&gt;echo_both_args&lt;/code&gt; since in Python a function object carries its name around with it in a &lt;code&gt;__name__&lt;/code&gt; attribute. If we now call &lt;code&gt;dot&lt;/code&gt; in an interpreted session, we&amp;#8217;ll see the call echoed:&lt;/p&gt;
+&lt;div class=&quot;typocode&quot;&gt;
 
-&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; dot((1, 2, 3), (3, 2, 1))
+&lt;pre class=&quot;prettyprint&quot;&gt;&amp;gt;&amp;gt;&amp;gt; dot((1, 2, 3), (3, 2, 1))
 dot((1, 2, 3), (3, 2, 1))
 10
 
@@ -124,17 +83,16 @@ dot((1, 2, 3), (3, 2, 1))
 
 &lt;/div&gt;
 
-&lt;p&gt;The inner function, &lt;code&gt;wrapped&lt;/code&gt;, should be capable of wrapping any function &amp;#8212; so long as that function accepts just two parameters, that is. (Note the use of the &lt;code&gt;%r&lt;/code&gt; print formatter which converts any Python object into its canonical string representation). If we want a more general purpose &lt;code&gt;echo&lt;/code&gt; which can wrap any function with any signature, we might try something like the following:
-&lt;/p&gt;
-&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;Echo a function, Take 2&lt;/div&gt;
+&lt;p&gt;The inner function, &lt;code&gt;wrapped&lt;/code&gt;, should be capable of wrapping any function &amp;#8212; so long as that function accepts just two parameters, that is. (Note the use of the &lt;code&gt;%r&lt;/code&gt; print formatter which converts any Python object into its canonical string representation). If we want a more general purpose &lt;code&gt;echo&lt;/code&gt; which can wrap any function with any signature, we might try something like the following:&lt;/p&gt;
+&lt;div class=&quot;typocode&quot;&gt;&lt;div class=&quot;codetitle&quot;&gt;Echo a function, Take 2&lt;/div&gt;
 
-&lt;pre class="prettyprint"&gt;def echo(fn):
-    "Returns a traced version of the input function."
+&lt;pre class=&quot;prettyprint&quot;&gt;def echo(fn):
+    &quot;Returns a traced version of the input function.&quot;
     from itertools import chain
     def wrapped(*v, **k):
         name = fn.__name__
-        print "%s(%s)" % (
-            name, ", ".join(map(repr, chain(v, k.values()))))
+        print &quot;%s(%s)&quot; % (
+            name, &quot;, &quot;.join(map(repr, chain(v, k.values()))))
         return fn(*v, **k)
     return wrapped
 
@@ -142,72 +100,62 @@ dot((1, 2, 3), (3, 2, 1))
 
 &lt;/div&gt;
 
-&lt;p&gt;Here, the inner function, &lt;code&gt;wrapped&lt;/code&gt;, has parameters &lt;code&gt;(*v, **k)&lt;/code&gt;, which contain the positional and keyword arguments passed to this function respectively. It doesn&amp;#8217;t really matter how many arguments the function being wrapped has, or indeed if this function itself accepts arbitrary positional and keyword arguments: it just works &amp;#8212; have a look in the Python reference manual for details. We&amp;#8217;ve use &lt;code&gt;chain&lt;/code&gt;, one of the handy iterator tools from the &lt;a href="http://www.python.org/doc/current/lib/module-itertools.html" title="itertools -- Functions creating iterators for efficient looping"&gt;itertools module&lt;/a&gt;, to iterate through all the positional and keyword argument values; then a combination of &lt;code&gt;string.join&lt;/code&gt; and the &lt;code&gt;map&lt;/code&gt; and &lt;code&gt;repr&lt;/code&gt; builtins produce a string representation of these values.
-&lt;/p&gt;
-&lt;p&gt;We can now define, wrap and call some functions with more varied signatures.
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
+&lt;p&gt;Here, the inner function, &lt;code&gt;wrapped&lt;/code&gt;, has parameters &lt;code&gt;(*v, **k)&lt;/code&gt;, which contain the positional and keyword arguments passed to this function respectively. It doesn&amp;#8217;t really matter how many arguments the function being wrapped has, or indeed if this function itself accepts arbitrary positional and keyword arguments: it just works &amp;#8212; have a look in the Python reference manual for details. We&amp;#8217;ve use &lt;code&gt;chain&lt;/code&gt;, one of the handy iterator tools from the &lt;a href=&quot;http://www.python.org/doc/current/lib/module-itertools.html&quot; title=&quot;itertools -- Functions creating iterators for efficient looping&quot;&gt;itertools module&lt;/a&gt;, to iterate through all the positional and keyword argument values; then a combination of &lt;code&gt;string.join&lt;/code&gt; and the &lt;code&gt;map&lt;/code&gt; and &lt;code&gt;repr&lt;/code&gt; builtins produce a string representation of these values.&lt;/p&gt;
+&lt;p&gt;We can now define, wrap and call some functions with more varied signatures.&lt;/p&gt;
+&lt;div class=&quot;typocode&quot;&gt;
 
-&lt;pre class="prettyprint"&gt;def f(x): pass
+&lt;pre class=&quot;prettyprint&quot;&gt;def f(x): pass
 def g(x, y): pass
 def h(x=1, y=2): pass
 def i(x, y, *v): pass
 def j(x, y, *v, **k): pass
-    
+
 f, g, h, i, j = map(echo, (f, g, h, i, j))
-    
+
 f(10)
-g("spam", 42)
-g(y="spam", x=42)
+g(&quot;spam&quot;, 42)
+g(y=&quot;spam&quot;, x=42)
 h()
-i("spam", 42, "extra", "args", 1, 2, 3)
-j(("green", "eggs"), y="spam", z=42)
+i(&quot;spam&quot;, 42, &quot;extra&quot;, &quot;args&quot;, 1, 2, 3)
+j((&quot;green&quot;, &quot;eggs&quot;), y=&quot;spam&quot;, z=42)
 
 &lt;/pre&gt;
 
 &lt;/div&gt;
 
-&lt;p&gt;Running this code produces output:
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
+&lt;p&gt;Running this code produces output:&lt;/p&gt;
+&lt;div class=&quot;typocode&quot;&gt;
 
-&lt;pre class="prettyprint"&gt;f(10)
-g('spam', 42)
-g('spam', 42)
+&lt;pre class=&quot;prettyprint&quot;&gt;f(10)
+g(&amp;#x27;spam&amp;#x27;, 42)
+g(&amp;#x27;spam&amp;#x27;, 42)
 h()
-i('spam', 42, 'extra', 'args', 1, 2, 3)
-j(('green', 'eggs'), 'spam', 42)
+i(&amp;#x27;spam&amp;#x27;, 42, &amp;#x27;extra&amp;#x27;, &amp;#x27;args&amp;#x27;, 1, 2, 3)
+j((&amp;#x27;green&amp;#x27;, &amp;#x27;eggs&amp;#x27;), &amp;#x27;spam&amp;#x27;, 42)
 
 &lt;/pre&gt;
 
 &lt;/div&gt;
 
-&lt;p&gt;This does something like what we want, but note a couple of problems:
-&lt;/p&gt;
+&lt;p&gt;This does something like what we want, but note a couple of problems:&lt;/p&gt;
 &lt;ul&gt;
- &lt;li&gt;
-     the second call to &lt;code&gt;g&lt;/code&gt; uses keyword argument syntax, and the output &lt;code&gt;g('spam', 42)&lt;/code&gt; is exactly what we saw echoed by the previous call to &lt;code&gt;g&lt;/code&gt; even though the arguments have been swapped around. We&amp;#8217;d better try and echo argument names as well as their values (just as we did when we first modified &lt;code&gt;dot&lt;/code&gt; to echo calls).
- &lt;/li&gt;
-
- &lt;li&gt;
-     the output doesn&amp;#8217;t show the (defaulted) arguments passed to &lt;code&gt;h&lt;/code&gt; &lt;a href="http://wordaligned.org/articles/echo#footnote1" id="fn1link"&gt;&lt;sup&gt;[1]&lt;/sup&gt;&lt;/a&gt;.
- &lt;/li&gt;
+&lt;li&gt;the second call to &lt;code&gt;g&lt;/code&gt; uses keyword argument syntax, and the output &lt;code&gt;g(&#x27;spam&#x27;, 42)&lt;/code&gt; is exactly what we saw echoed by the previous call to &lt;code&gt;g&lt;/code&gt; even though the arguments have been swapped around. We&amp;#8217;d better try and echo argument names as well as their values (just as we did when we first modified &lt;code&gt;dot&lt;/code&gt; to echo calls).&lt;/li&gt;
+&lt;li&gt;the output doesn&amp;#8217;t show the (defaulted) arguments passed to &lt;code&gt;h&lt;/code&gt; &lt;a href=&quot;http://wordaligned.org/articles/echo#footnote1&quot; id=&quot;fn1link&quot;&gt;&lt;sup&gt;&lt;a href=&quot;https://blog.codeship.com/building-minimal-docker-containers-for-go-applications/&quot;&gt;1&lt;/a&gt;&lt;/sup&gt;&lt;/a&gt;.&lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;There&amp;#8217;s another more subtle problem too.
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
+&lt;p&gt;There&amp;#8217;s another more subtle problem too.&lt;/p&gt;
+&lt;div class=&quot;typocode&quot;&gt;
 
-&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; def f(x):
-...     " I'm a function called f. "
+&lt;pre class=&quot;prettyprint&quot;&gt;&amp;gt;&amp;gt;&amp;gt; def f(x):
+...     &quot; I&amp;#x27;m a function called f. &quot;
 ...     pass
 ...
 &amp;gt;&amp;gt;&amp;gt; f.__name__
-'f'
+&amp;#x27;f&amp;#x27;
 &amp;gt;&amp;gt;&amp;gt; f.func_doc
-" I'm a function called f. "
+&quot; I&amp;#x27;m a function called f. &quot;
 &amp;gt;&amp;gt;&amp;gt; f = echo(f)
 &amp;gt;&amp;gt;&amp;gt; f.__name__
-'wrapped'
+&amp;#x27;wrapped&amp;#x27;
 &amp;gt;&amp;gt;&amp;gt; f.func_doc
 None
 
@@ -215,39 +163,34 @@ None
 
 &lt;/div&gt;
 
-&lt;p&gt;That is, by wrapping &lt;code&gt;f&lt;/code&gt;, we&amp;#8217;ve tinkered with its identity: its name has changed and its documentation has disappeared. This is bad news in a dynamic language, since any code introspecting &lt;code&gt;f&lt;/code&gt; will get the wrong idea about it. We should really have modified &lt;code&gt;wrapper&lt;/code&gt; to copy various attributes from &lt;code&gt;f&lt;/code&gt;.
-&lt;/p&gt;
+&lt;p&gt;That is, by wrapping &lt;code&gt;f&lt;/code&gt;, we&amp;#8217;ve tinkered with its identity: its name has changed and its documentation has disappeared. This is bad news in a dynamic language, since any code introspecting &lt;code&gt;f&lt;/code&gt; will get the wrong idea about it. We should really have modified &lt;code&gt;wrapper&lt;/code&gt; to copy various attributes from &lt;code&gt;f&lt;/code&gt;.&lt;/p&gt;
+&lt;h3 id=&quot;decorators&quot;&gt;Decorators&lt;/h3&gt;
+&lt;p&gt;At Python 2.3, the &lt;code&gt;@&lt;/code&gt; character was pulled out of the bag to provide a special syntax for decorating functions in this way. Rather than retrospectively rebinding a function &lt;code&gt;f&lt;/code&gt; as shown in the examples so far, we can explicitly decorate &lt;code&gt;f&lt;/code&gt; up front with the &lt;code&gt;echo&lt;/code&gt; wrapper like this:&lt;/p&gt;
+&lt;div class=&quot;typocode&quot;&gt;&lt;div class=&quot;codetitle&quot;&gt;using decorator syntax&lt;/div&gt;
 
-&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/echo#toc2" name="tocdecorators" id="tocdecorators"&gt;Decorators&lt;/a&gt;&lt;/h3&gt;
-&lt;p&gt;At Python 2.3, the &lt;code&gt;@&lt;/code&gt; character was pulled out of the bag to provide a special syntax for decorating functions in this way. Rather than retrospectively rebinding a function &lt;code&gt;f&lt;/code&gt; as shown in the examples so far, we can explicitly decorate &lt;code&gt;f&lt;/code&gt; up front with the &lt;code&gt;echo&lt;/code&gt; wrapper like this:
-&lt;/p&gt;
-&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;using decorator syntax&lt;/div&gt;
-
-&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; def echo(fn):
+&lt;pre class=&quot;prettyprint&quot;&gt;&amp;gt;&amp;gt;&amp;gt; def echo(fn):
 ...     from itertools import chain
 ...     def wrapped(*v, **k):
 ...         name = fn.__name__
-...         print "%s(%s)" % (name, ", ".join(map(repr, chain(v, k.values()))))
+...         print &quot;%s(%s)&quot; % (name, &quot;, &quot;.join(map(repr, chain(v, k.values()))))
 ...         return fn(*v, **k)
 ...     return wrapped
 ...
 &amp;gt;&amp;gt;&amp;gt; @echo
 &amp;gt;&amp;gt;&amp;gt; def f(x): pass
 ...
-&amp;gt;&amp;gt;&amp;gt; f('does it work?')
-f('does it work?')
+&amp;gt;&amp;gt;&amp;gt; f(&amp;#x27;does it work?&amp;#x27;)
+f(&amp;#x27;does it work?&amp;#x27;)
 
 &lt;/pre&gt;
 
 &lt;/div&gt;
 
-&lt;p&gt;Of course decoration isn&amp;#8217;t reserved for the particular use case shown in this article: we might decorate functions to time their execution, to protect them against simultaneous access from multiple threads, to check the validity of input arguments, to dynamically analyse code coverage, and so on.
-&lt;/p&gt;
-&lt;p&gt;Note also that there&amp;#8217;s a special decorator in the &lt;a href="http://docs.python.org/lib/module-functools.html" title="functools -- Higher order functions and operations on callable objects"&gt;functools module&lt;/a&gt; which does the job of making a wrapper look like its wrappee.
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
+&lt;p&gt;Of course decoration isn&amp;#8217;t reserved for the particular use case shown in this article: we might decorate functions to time their execution, to protect them against simultaneous access from multiple threads, to check the validity of input arguments, to dynamically analyse code coverage, and so on.&lt;/p&gt;
+&lt;p&gt;Note also that there&amp;#8217;s a special decorator in the &lt;a href=&quot;http://docs.python.org/lib/module-functools.html&quot; title=&quot;functools -- Higher order functions and operations on callable objects&quot;&gt;functools module&lt;/a&gt; which does the job of making a wrapper look like its wrappee.&lt;/p&gt;
+&lt;div class=&quot;typocode&quot;&gt;
 
-&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; import functools
+&lt;pre class=&quot;prettyprint&quot;&gt;&amp;gt;&amp;gt;&amp;gt; import functools
 &amp;gt;&amp;gt;&amp;gt; def echo(fn):
 ...     @functools.wraps(fn)
 ...     def wrapped(*v, **k):
@@ -256,54 +199,51 @@ f('does it work?')
 ...
 &amp;gt;&amp;gt;&amp;gt; @echo
 &amp;gt;&amp;gt;&amp;gt; def f(x):
-...    " I'm f, don't mess with me! "
+...    &quot; I&amp;#x27;m f, don&amp;#x27;t mess with me! &quot;
 ...    pass
 &amp;gt;&amp;gt;&amp;gt; f.__name__
-'f'
+&amp;#x27;f&amp;#x27;
 &amp;gt;&amp;gt;&amp;gt; f.func_doc
-" I'm f, don't mess with me! "
-&amp;gt;&amp;gt;&amp;gt; f(('spam', 'spam', 'spam!'))
-f(('spam', 'spam', 'spam!'))
+&quot; I&amp;#x27;m f, don&amp;#x27;t mess with me! &quot;
+&amp;gt;&amp;gt;&amp;gt; f((&amp;#x27;spam&amp;#x27;, &amp;#x27;spam&amp;#x27;, &amp;#x27;spam!&amp;#x27;))
+f((&amp;#x27;spam&amp;#x27;, &amp;#x27;spam&amp;#x27;, &amp;#x27;spam!&amp;#x27;))
 
 &lt;/pre&gt;
 
 &lt;/div&gt;
 
-
-&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/echo#toc3" name="tocimproving-echo" id="tocimproving-echo"&gt;Improving echo&lt;/a&gt;&lt;/h3&gt;
-&lt;p&gt;Here&amp;#8217;s a version of &lt;code&gt;echo&lt;/code&gt; which fixes the remaining problems: that is, it prints out argument names as well as argument values, and it also prints out any arguments defaulted in the call to the wrapped function. This version is a little longer and considerably more fiddly &lt;a href="http://wordaligned.org/articles/echo#footnote2" id="fn2link"&gt;&lt;sup&gt;[2]&lt;/sup&gt;&lt;/a&gt;, since we need to dig deeper into the function&amp;#8217;s code, but it follows the same basic pattern as its predecessors.
-&lt;/p&gt;
+&lt;h3 id=&quot;improving-echo&quot;&gt;Improving echo&lt;/h3&gt;
+&lt;p&gt;Here&amp;#8217;s a version of &lt;code&gt;echo&lt;/code&gt; which fixes the remaining problems: that is, it prints out argument names as well as argument values, and it also prints out any arguments defaulted in the call to the wrapped function. This version is a little longer and considerably more fiddly &lt;a href=&quot;http://wordaligned.org/articles/echo#footnote2&quot; id=&quot;fn2link&quot;&gt;&lt;sup&gt;&lt;a href=&quot;http://devcenter.wercker.com/docs/quickstarts/advanced/building-minimal-containers-with-go&quot;&gt;2&lt;/a&gt;&lt;/sup&gt;&lt;/a&gt;, since we need to dig deeper into the function&amp;#8217;s code, but it follows the same basic pattern as its predecessors.&lt;/p&gt;
 &lt;p&gt;While we&amp;#8217;re improving things, note that we&amp;#8217;ve also parameterised the
-   &lt;code&gt;write&lt;/code&gt; function, rather than naively hijacking &lt;code&gt;sys.stdout&lt;/code&gt; to print out function calls.
-&lt;/p&gt;
-&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;Echo a function, Take 3&lt;/div&gt;
+&lt;code&gt;write&lt;/code&gt; function, rather than naively hijacking &lt;code&gt;sys.stdout&lt;/code&gt; to print out function calls.&lt;/p&gt;
+&lt;div class=&quot;typocode&quot;&gt;&lt;div class=&quot;codetitle&quot;&gt;Echo a function, Take 3&lt;/div&gt;
 
-&lt;pre class="prettyprint"&gt;import sys
-    
+&lt;pre class=&quot;prettyprint&quot;&gt;import sys
+
 def format_arg_value(arg_val):
-    """ Return a string representing a (name, value) pair.
-    
-    &amp;gt;&amp;gt;&amp;gt; format_arg_value(('x', (1, 2, 3)))
-    'x=(1, 2, 3)'
-    """
+    &quot;&quot;&quot; Return a string representing a (name, value) pair.
+
+    &amp;gt;&amp;gt;&amp;gt; format_arg_value((&amp;#x27;x&amp;#x27;, (1, 2, 3)))
+    &amp;#x27;x=(1, 2, 3)&amp;#x27;
+    &quot;&quot;&quot;
     arg, val = arg_val
-    return "%s=%r" % (arg, val)
-    
+    return &quot;%s=%r&quot; % (arg, val)
+
 def echo(fn, write=sys.stdout.write):
-    """ Echo calls to a function.
-    
-    Returns a decorated version of the input function which "echoes" calls
-    made to it by writing out the function's name and the arguments it was
+    &quot;&quot;&quot; Echo calls to a function.
+
+    Returns a decorated version of the input function which &quot;echoes&quot; calls
+    made to it by writing out the function&amp;#x27;s name and the arguments it was
     called with.
-    """
+    &quot;&quot;&quot;
     import functools
-    # Unpack function's arg count, arg names, arg defaults
+    # Unpack function&amp;#x27;s arg count, arg names, arg defaults
     code = fn.func_code
     argcount = code.co_argcount
     argnames = code.co_varnames[:argcount]
     fn_defaults = fn.func_defaults or list()
     argdefs = dict(zip(argnames[-len(fn_defaults):], fn_defaults))
-    
+
     @functools.wraps(fn)
     def wrapped(*v, **k):
         # Collect function arguments by chaining together positional,
@@ -314,7 +254,7 @@ def echo(fn, write=sys.stdout.write):
         nameless = map(repr, v[argcount:])
         keyword = map(format_arg_value, k.items())
         args = positional + defaulted + nameless + keyword
-        write("%s(%s)\n" % (name(fn), ", ".join(args)))
+        write(&quot;%s(%s)\n&quot; % (name(fn), &quot;, &quot;.join(args)))
         return fn(*v, **k)
     return wrapped
 
@@ -322,11 +262,10 @@ def echo(fn, write=sys.stdout.write):
 
 &lt;/div&gt;
 
-&lt;p&gt;Let&amp;#8217;s give it a try.
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
+&lt;p&gt;Let&amp;#8217;s give it a try.&lt;/p&gt;
+&lt;div class=&quot;typocode&quot;&gt;
 
-&lt;pre class="prettyprint"&gt;@echo
+&lt;pre class=&quot;prettyprint&quot;&gt;@echo
 def f(x): pass
 @echo
 def g(x, y): pass
@@ -342,114 +281,108 @@ class X(object):
     @classmethod
     @echo
     def cm(klass, x): pass
-    
-def reversed_write(s): sys.write(''.join(reversed(s)))
+
+def reversed_write(s): sys.write(&amp;#x27;&amp;#x27;.join(reversed(s)))
 def k(**kw): pass
 k = echo(k, write=reversed_write)
-    
+
 f(10)
-g("spam", 42)
-g(y="spam", x=42)
+g(&quot;spam&quot;, 42)
+g(y=&quot;spam&quot;, x=42)
 h()
-i("spam", 42, "extra", "args", 1, 2, 3)
-j(("green", "eggs"), y="spam", z=42)
-X().m("method call")
-X.cm("classmethod call")
-k(born="Mon", christened="Tues", married="Weds")
+i(&quot;spam&quot;, 42, &quot;extra&quot;, &quot;args&quot;, 1, 2, 3)
+j((&quot;green&quot;, &quot;eggs&quot;), y=&quot;spam&quot;, z=42)
+X().m(&quot;method call&quot;)
+X.cm(&quot;classmethod call&quot;)
+k(born=&quot;Mon&quot;, christened=&quot;Tues&quot;, married=&quot;Weds&quot;)
 
 &lt;/pre&gt;
 
 &lt;/div&gt;
 
-&lt;p&gt;Running the preceding code produces:
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
+&lt;p&gt;Running the preceding code produces:&lt;/p&gt;
+&lt;div class=&quot;typocode&quot;&gt;
 
-&lt;pre class="prettyprint"&gt;f(x=10)
-g(x='spam', y=42)
-g(y='spam', x=42)
+&lt;pre class=&quot;prettyprint&quot;&gt;f(x=10)
+g(x=&amp;#x27;spam&amp;#x27;, y=42)
+g(y=&amp;#x27;spam&amp;#x27;, x=42)
 h(x=1, y=2)
-i(x='spam', y=42, 'extra', 'args', 1, 2, 3)
-j(x=('green', 'eggs'), y='spam', z=42)
-m(self=&amp;lt;__main__.X instance at 0x7837d8&amp;gt;, x='method call')
-cm(klass=&amp;lt;class __main__.X at 0x785840&amp;gt;, x='classmethod call')
-)'seuT'=denetsirhc ,'sdeW'=deirram ,'noM'=nrob(k
+i(x=&amp;#x27;spam&amp;#x27;, y=42, &amp;#x27;extra&amp;#x27;, &amp;#x27;args&amp;#x27;, 1, 2, 3)
+j(x=(&amp;#x27;green&amp;#x27;, &amp;#x27;eggs&amp;#x27;), y=&amp;#x27;spam&amp;#x27;, z=42)
+m(self=&amp;lt;__main__.X instance at 0x7837d8&amp;gt;, x=&amp;#x27;method call&amp;#x27;)
+cm(klass=&amp;lt;class __main__.X at 0x785840&amp;gt;, x=&amp;#x27;classmethod call&amp;#x27;)
+)&amp;#x27;seuT&amp;#x27;=denetsirhc ,&amp;#x27;sdeW&amp;#x27;=deirram ,&amp;#x27;noM&amp;#x27;=nrob(k
 
 &lt;/pre&gt;
 
 &lt;/div&gt;
 
-&lt;p&gt;As you can see, it works on methods and classmethods too. 
-&lt;/p&gt;
-&lt;p&gt;By the way, if you&amp;#8217;re not familiar with classmethods, they&amp;#8217;re created using Python&amp;#8217;s built-in &lt;code&gt;classmethod&lt;/code&gt; function, which transforms functions in the required way; and, as shown in the example above, the decorator syntax is the recommended way of applying this transformation.
-&lt;/p&gt;
+&lt;p&gt;As you can see, it works on methods and classmethods too. &lt;/p&gt;
+&lt;p&gt;By the way, if you&amp;#8217;re not familiar with classmethods, they&amp;#8217;re created using Python&amp;#8217;s built-in &lt;code&gt;classmethod&lt;/code&gt; function, which transforms functions in the required way; and, as shown in the example above, the decorator syntax is the recommended way of applying this transformation.&lt;/p&gt;
+&lt;h3 id=&quot;wider-application&quot;&gt;Wider application&lt;/h3&gt;
+&lt;p&gt;Using this final version of &lt;code&gt;echo&lt;/code&gt; to decorate functions is simple enough. All you have to do is precede the function(s) you want to echo with the echo decorator. What, though, if these functions are in a module you don&amp;#8217;t want to modify &amp;#8212; one of the standard library modules, for example? What if you want to echo an entire class by echoing all of its methods without editing the class itself; or all the classes and functions in a module, again without editing the module itself?&lt;/p&gt;
+&lt;p&gt;A little introspection works the required magic. All we have to do is work our way through all the functions and classes in a module, and all the methods in these classes, rebinding these functions to their echoed versions. Extra attention is needed for class-, static- and private- methods, but otherwise this code contains few surprises.&lt;/p&gt;
+&lt;div class=&quot;typocode&quot;&gt;&lt;div class=&quot;codetitle&quot;&gt;echo, echo, echo!&lt;/div&gt;
 
-&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/echo#toc4" name="tocwider-application" id="tocwider-application"&gt;Wider application&lt;/a&gt;&lt;/h3&gt;
-&lt;p&gt;Using this final version of &lt;code&gt;echo&lt;/code&gt; to decorate functions is simple enough. All you have to do is precede the function(s) you want to echo with the echo decorator. What, though, if these functions are in a module you don&amp;#8217;t want to modify &amp;#8212; one of the standard library modules, for example? What if you want to echo an entire class by echoing all of its methods without editing the class itself; or all the classes and functions in a module, again without editing the module itself?
-&lt;/p&gt;
-&lt;p&gt;A little introspection works the required magic. All we have to do is work our way through all the functions and classes in a module, and all the methods in these classes, rebinding these functions to their echoed versions. Extra attention is needed for class-, static- and private- methods, but otherwise this code contains few surprises.
-&lt;/p&gt;
-&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;echo, echo, echo!&lt;/div&gt;
-
-&lt;pre class="prettyprint"&gt;import inspect
+&lt;pre class=&quot;prettyprint&quot;&gt;import inspect
 import sys
-    
+
 def name(item):
-    " Return an item's name. "
+    &quot; Return an item&amp;#x27;s name. &quot;
     return item.__name__
-    
+
 def is_classmethod(instancemethod):
-    " Determine if an instancemethod is a classmethod. "
+    &quot; Determine if an instancemethod is a classmethod. &quot;
     return instancemethod.im_self is not None
-    
+
 def is_class_private_name(name):
-    " Determine if a name is a class private name. "
+    &quot; Determine if a name is a class private name. &quot;
     # Exclude system defined names such as __init__, __add__ etc
-    return name.startswith("__") and not name.endswith("__")
-    
+    return name.startswith(&quot;__&quot;) and not name.endswith(&quot;__&quot;)
+
 def method_name(method):
-    """ Return a method's name.
-    
+    &quot;&quot;&quot; Return a method&amp;#x27;s name.
+
     This function returns the name the method is accessed by from
-    outside the class (i.e. it prefixes "private" methods appropriately).
-    """
+    outside the class (i.e. it prefixes &quot;private&quot; methods appropriately).
+    &quot;&quot;&quot;
     mname = name(method)
     if is_class_private_name(mname):
-        mname = "_%s%s" % (name(method.im_class), mname)
+        mname = &quot;_%s%s&quot; % (name(method.im_class), mname)
     return mname
-    
+
 def format_args(args):
     ...
-    
+
 def echo(fn, write=sys.stdout.write):
     ...
-    
+
 def echo_instancemethod(klass, method, write=sys.stdout.write):
-    """ Change an instancemethod so that calls to it are echoed.
-    
+    &quot;&quot;&quot; Change an instancemethod so that calls to it are echoed.
+
     Replacing a classmethod is a little more tricky.
     See: http://www.python.org/doc/current/ref/types.html
-    """
+    &quot;&quot;&quot;
     mname = method_name(method)
-    never_echo = "__str__", "__repr__", # Avoid recursion printing method calls
+    never_echo = &quot;__str__&quot;, &quot;__repr__&quot;, # Avoid recursion printing method calls
     if mname in never_echo:
         pass
     elif is_classmethod(method):
         setattr(klass, mname, classmethod(echo(method.im_func, write)))
     else:
         setattr(klass, mname, echo(method, write))
-    
+
 def echo_class(klass, write=sys.stdout.write):
-    """ Echo calls to class methods and static functions
-    """
+    &quot;&quot;&quot; Echo calls to class methods and static functions
+    &quot;&quot;&quot;
     for _, method in inspect.getmembers(klass, inspect.ismethod):
         echo_instancemethod(klass, method, write)
     for _, fn in inspect.getmembers(klass, inspect.isfunction):
         setattr(klass, name(fn), staticmethod(echo(fn, write)))
-    
+
 def echo_module(mod, write=sys.stdout.write):
-    """ Echo calls to functions and methods in a module.
-    """
+    &quot;&quot;&quot; Echo calls to functions and methods in a module.
+    &quot;&quot;&quot;
     for fname, fn in inspect.getmembers(mod, inspect.isfunction):
         setattr(mod, fname, echo(fn, write))
     for _, klass in inspect.getmembers(mod, inspect.isclass):
@@ -459,43 +392,26 @@ def echo_module(mod, write=sys.stdout.write):
 
 &lt;/div&gt;
 
-
-&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/echo#toc5" name="tocwork-in-progress" id="tocwork-in-progress"&gt;Work in progress&lt;/a&gt;&lt;/h3&gt;
-&lt;p&gt;I&amp;#8217;ve used the &lt;code&gt;echo&lt;/code&gt; library successfully on a number of occasions. Usually, I simply want to capture all function calls made to a module. Echoing the module generates a log file which I can then examine offline using the standard &lt;a href="http://wordaligned.org/articles/shell-script-sets.html"&gt;Unix shell tools&lt;/a&gt;.
-&lt;/p&gt;
-&lt;p&gt;I&amp;#8217;ve resisted the urge to add options to fine-tune exactly which functions get echoed, or to control whether or not private methods get echoed &amp;#8212; I prefer to generate a surplus of information then filter it as needed. (Though note that the code, as it stands, &lt;em&gt;doesn&amp;#8217;t&lt;/em&gt; echo nested functions and classes.)
-&lt;/p&gt;
-&lt;p&gt;I discovered that if a class customises the special &lt;code&gt;__repr__&lt;/code&gt; method, then trying to echo calls to this method leads to recursion and a runtime error. As a consequence, &lt;code&gt;echo&lt;/code&gt; avoids echoing &lt;code&gt;__repr__&lt;/code&gt; and, for good measure, &lt;code&gt;__str__&lt;/code&gt; as well. I suspect that &lt;code&gt;echo&lt;/code&gt; would lead to similar problems if applied to another introspective module. Echoing &lt;code&gt;doctest&lt;/code&gt; wouldn&amp;#8217;t be very clever, and echoing echo itself is surely doomed.
-&lt;/p&gt;
-
-&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/echo#toc6" name="tocsource-code" id="tocsource-code"&gt;Source Code&lt;/a&gt;&lt;/h3&gt;
-&lt;p&gt;The code for this article is available using anonymous SVN access at http://svn.wordaligned.org/svn/etc/echo (&lt;a href="http://svn.wordaligned.org/svn/etc/echo"&gt;browse the code online&lt;/a&gt;).
-&lt;/p&gt;
-
-&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/echo#toc7" name="toccredits" id="toccredits"&gt;Credits&lt;/a&gt;&lt;/h3&gt;
-&lt;p&gt;My thanks to Dan Tallis, &lt;a href="http://curbralan.com"&gt;Kevlin Henney&lt;/a&gt;, &lt;a href="http://gedmin.as"&gt;Marius Gedminas&lt;/a&gt; and all at &lt;a href="http://accu.org/index.php/aboutus/aboutjournals"&gt;CVu&lt;/a&gt; for their help with this article.
-&lt;/p&gt;
+&lt;h3 id=&quot;work-in-progress&quot;&gt;Work in progress&lt;/h3&gt;
+&lt;p&gt;I&amp;#8217;ve used the &lt;code&gt;echo&lt;/code&gt; library successfully on a number of occasions. Usually, I simply want to capture all function calls made to a module. Echoing the module generates a log file which I can then examine offline using the standard &lt;a href=&quot;http://wordaligned.org/articles/shell-script-sets.html&quot;&gt;Unix shell tools&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;I&amp;#8217;ve resisted the urge to add options to fine-tune exactly which functions get echoed, or to control whether or not private methods get echoed &amp;#8212; I prefer to generate a surplus of information then filter it as needed. (Though note that the code, as it stands, &lt;em&gt;doesn&amp;#8217;t&lt;/em&gt; echo nested functions and classes.)&lt;/p&gt;
+&lt;p&gt;I discovered that if a class customises the special &lt;code&gt;__repr__&lt;/code&gt; method, then trying to echo calls to this method leads to recursion and a runtime error. As a consequence, &lt;code&gt;echo&lt;/code&gt; avoids echoing &lt;code&gt;__repr__&lt;/code&gt; and, for good measure, &lt;code&gt;__str__&lt;/code&gt; as well. I suspect that &lt;code&gt;echo&lt;/code&gt; would lead to similar problems if applied to another introspective module. Echoing &lt;code&gt;doctest&lt;/code&gt; wouldn&amp;#8217;t be very clever, and echoing echo itself is surely doomed.&lt;/p&gt;
+&lt;h3 id=&quot;source-code&quot;&gt;Source Code&lt;/h3&gt;
+&lt;p&gt;The code for this article is available using anonymous SVN access at http://svn.wordaligned.org/svn/etc/echo (&lt;a href=&quot;http://svn.wordaligned.org/svn/etc/echo&quot;&gt;browse the code online&lt;/a&gt;).&lt;/p&gt;
+&lt;h3 id=&quot;credits&quot;&gt;Credits&lt;/h3&gt;
+&lt;p&gt;My thanks to Dan Tallis, &lt;a href=&quot;http://curbralan.com&quot;&gt;Kevlin Henney&lt;/a&gt;, &lt;a href=&quot;http://gedmin.as&quot;&gt;Marius Gedminas&lt;/a&gt; and all at &lt;a href=&quot;http://accu.org/index.php/aboutus/aboutjournals&quot;&gt;CVu&lt;/a&gt; for their help with this article.&lt;/p&gt;
 &lt;hr /&gt;
-
-
-&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/echo#toc8" name="toc-end" id="toc-end"&gt;@ end&lt;/a&gt;&lt;/h3&gt;
-&lt;p&gt;Other languages also lay claim the to the term &amp;#8220;decorator&amp;#8221;, and indeed use of the &lt;code&gt;@&lt;/code&gt; symbol for this purpose. For example, a statically-typed language such as C++ can utilise the &lt;a href="http://en.wikipedia.org/wiki/Decorator_pattern"&gt;Decorator&lt;/a&gt; pattern to adapt objects at runtime: the classic example would be a window in a graphical user interface, which may be dynamically decorated with (combinations of) borders, scroll-bars, and so on.
-&lt;/p&gt;
-&lt;p&gt;Java makes special use of the &lt;code&gt;@&lt;/code&gt; symbol in its annotations, a language feature related to Python&amp;#8217;s decorators. You&amp;#8217;ll also find the &lt;code&gt;@&lt;/code&gt; symbol  used in Java comments, where it augments the code without changing its runtime-behaviour, enabling the &lt;a href="http://java.sun.com/j2se/javadoc" title="Javadoc is a tool from Sun Microsystems for generating API documentation in HTML format from doc comments in source code"&gt;Javadoc&lt;/a&gt; tool to generate better documentation. I&amp;#8217;ve seen this idea stretched further by the &lt;a href="http://xdoclet.sourceforge.net" title="XDoclet is an open source code generation engine."&gt;XDoclet&lt;/a&gt; family of tools which perform tag-based tricks on Javadoc-style comments in order to generate boiler-plate code &amp;#8212; though in this case my response is closer to bewilderment than wonder.
-&lt;/p&gt;
-&lt;p&gt;Elevating the concept of decoration further brings us to aspect-oriented programming, a paradigm which provides language/framework support for the separation of concerns &amp;#8212; and if that sounds like a collection of buzzwords, it&amp;#8217;s because I don&amp;#8217;t know anything about it!
-&lt;/p&gt;
-&lt;p&gt;For some readers, Python&amp;#8217;s ability to tamper with classes and functions in ways unforeseen by their original implementer may seem dangerous, and I regard this a fair reaction. I&amp;#8217;ve heard it argued that languages like Java and C++ are better suited for large projects, primarily because such languages simply don&amp;#8217;t allow you to write code such as &lt;code&gt;change_everything(world)&lt;/code&gt; &amp;#8212; which is really what &lt;code&gt;echo_module(module)&lt;/code&gt; does.
-&lt;/p&gt;
-&lt;p&gt;Meta-programming techniques like these need taste and restraint. As we&amp;#8217;ve shown, in Python, the &lt;code&gt;@&lt;/code&gt; symbol is pure syntactic sugar; sweet as it may seem, we should use it to improve, not impair.
-&lt;/p&gt;
-&lt;p&gt;&lt;hr /&gt;
-   &lt;a href="http://wordaligned.org/articles/echo#fn1link" id="footnote1"&gt;[1]&lt;/a&gt;
-   Strictly speaking, the default arguments aren&amp;#8217;t &amp;#8220;passed&amp;#8221; to the function; they&amp;#8217;re stored by the function object when the function code is parsed.
-&lt;/p&gt;
-&lt;p&gt;&lt;a href="http://wordaligned.org/articles/echo#fn2link" id="footnote2"&gt;[2]&lt;/a&gt;
-   I suspect that inside this rather contorted function a simpler version is begging to get out. I&amp;#8217;d be pleased to accept any suggestions.
-&lt;/p&gt;</description>
+&lt;h3 id=&quot;end&quot;&gt;@ end&lt;/h3&gt;
+&lt;p&gt;Other languages also lay claim the to the term &amp;#8220;decorator&amp;#8221;, and indeed use of the &lt;code&gt;@&lt;/code&gt; symbol for this purpose. For example, a statically-typed language such as C++ can utilise the &lt;a href=&quot;http://en.wikipedia.org/wiki/Decorator_pattern&quot;&gt;Decorator&lt;/a&gt; pattern to adapt objects at runtime: the classic example would be a window in a graphical user interface, which may be dynamically decorated with (combinations of) borders, scroll-bars, and so on.&lt;/p&gt;
+&lt;p&gt;Java makes special use of the &lt;code&gt;@&lt;/code&gt; symbol in its annotations, a language feature related to Python&amp;#8217;s decorators. You&amp;#8217;ll also find the &lt;code&gt;@&lt;/code&gt; symbol  used in Java comments, where it augments the code without changing its runtime-behaviour, enabling the &lt;a href=&quot;http://java.sun.com/j2se/javadoc&quot; title=&quot;Javadoc is a tool from Sun Microsystems for generating API documentation in HTML format from doc comments in source code&quot;&gt;Javadoc&lt;/a&gt; tool to generate better documentation. I&amp;#8217;ve seen this idea stretched further by the &lt;a href=&quot;http://xdoclet.sourceforge.net&quot; title=&quot;XDoclet is an open source code generation engine.&quot;&gt;XDoclet&lt;/a&gt; family of tools which perform tag-based tricks on Javadoc-style comments in order to generate boiler-plate code &amp;#8212; though in this case my response is closer to bewilderment than wonder.&lt;/p&gt;
+&lt;p&gt;Elevating the concept of decoration further brings us to aspect-oriented programming, a paradigm which provides language/framework support for the separation of concerns &amp;#8212; and if that sounds like a collection of buzzwords, it&amp;#8217;s because I don&amp;#8217;t know anything about it!&lt;/p&gt;
+&lt;p&gt;For some readers, Python&amp;#8217;s ability to tamper with classes and functions in ways unforeseen by their original implementer may seem dangerous, and I regard this a fair reaction. I&amp;#8217;ve heard it argued that languages like Java and C++ are better suited for large projects, primarily because such languages simply don&amp;#8217;t allow you to write code such as &lt;code&gt;change_everything(world)&lt;/code&gt; &amp;#8212; which is really what &lt;code&gt;echo_module(module)&lt;/code&gt; does.&lt;/p&gt;
+&lt;p&gt;Meta-programming techniques like these need taste and restraint. As we&amp;#8217;ve shown, in Python, the &lt;code&gt;@&lt;/code&gt; symbol is pure syntactic sugar; sweet as it may seem, we should use it to improve, not impair.&lt;/p&gt;
+&lt;hr /&gt;
+&lt;p&gt;&lt;a href=&quot;http://wordaligned.org/articles/echo#fn1link&quot; id=&quot;footnote1&quot;&gt;&lt;a href=&quot;https://blog.codeship.com/building-minimal-docker-containers-for-go-applications/&quot;&gt;1&lt;/a&gt;&lt;/a&gt;
+Strictly speaking, the default arguments aren&amp;#8217;t &amp;#8220;passed&amp;#8221; to the function; they&amp;#8217;re stored by the function object when the function code is parsed.&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;http://wordaligned.org/articles/echo#fn2link&quot; id=&quot;footnote2&quot;&gt;&lt;a href=&quot;http://devcenter.wercker.com/docs/quickstarts/advanced/building-minimal-containers-with-go&quot;&gt;2&lt;/a&gt;&lt;/a&gt;
+I suspect that inside this rather contorted function a simpler version is begging to get out. I&amp;#8217;d be pleased to accept any suggestions.&lt;/p&gt;</description>
 <dc:date>2008-03-10</dc:date>
 <guid>http://wordaligned.org/articles/echo</guid>
 <author>tag@wordaligned.org (Thomas Guest)</author>

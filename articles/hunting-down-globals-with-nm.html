@@ -28,8 +28,7 @@
       <div class="atomentry" id="hunting-down-globals-with-nm">
 <h2 class="title"><a href="/articles/hunting-down-globals-with-nm">Hunting down globals with nm</a></h2>
 <p class="meta"><abbr class="published" title="2008-04-08">2008-04-08</abbr> &bull; <a href="/tag/c" rel="tag">C</a>, <a href="/tag/shell" rel="tag">Shell</a> &bull; <a href="/articles/hunting-down-globals-with-nm#disqus_thread">Comments</a></p>
-<p>It was an old library, in need of attention &#8212; we all knew that &#8212; but it worked well, and we saw no reason to change it. Until, that is, we wanted more than one of it. The problem being, it was riddled with globals. A typical file looked something like this:
-</p>
+<p>It was an old library, in need of attention &#8212; we all knew that &#8212; but it worked well, and we saw no reason to change it. Until, that is, we wanted more than one of it. The problem being, it was riddled with globals. A typical file looked something like this:</p>
 <div class="typocode"><div class="codetitle">Too many globals</div>
 
 <pre class="prettyprint">#include &lt;string.h&gt;
@@ -60,16 +59,11 @@ static void clear_message()
 
 </div>
 
-<p>In the snippet above, the <code>g_msg_buf</code> has external linkage. Other files in the library accessed it freely. The local static int, <code>s_initialised</code>, is better contained, but still stood in our way. How could we initialise two library instances?
-</p>
-<p>Don&#8217;t worry, we&#8217;re not about to discuss the evils of globals and singletons. We all know what needs doing here: initialising the library should return clients a handle, and each client would use its returned handle for subsequent access to the library. Internally, the handle would be a pointer to a struct, the details of which would be private to the library, packaging its internal state.
-</p>
-<span id="continue-reading"/>
-
-<p>Sadly no refactoring IDE could cope with this job. Our immediate problem was simply sizing up the task. So we had to count up the <code>s_initialised</code>&#8217;s and <code>g_msg_buf</code>&#8217;s and so on. One obvious way of getting a number would be to browse the code and build a list of these globals. Indeed, this approach has some merit: we&#8217;re building familiarity with the code, code we&#8217;ll ultimately have to change. An exact answer isn&#8217;t really needed at this stage.
-</p>
-<p>Shell hackers might attempt an instant estimate by combining <code>grep</code>, <code>sort</code> and <code>uniq</code> &#8212; if we&#8217;re confident that the <code>s_</code> and <code>g_</code> prefixes are consistently used in the library.
-</p>
+<p>In the snippet above, the <code>g_msg_buf</code> has external linkage. Other files in the library accessed it freely. The local static int, <code>s_initialised</code>, is better contained, but still stood in our way. How could we initialise two library instances?</p>
+<p>Don&#8217;t worry, we&#8217;re not about to discuss the evils of globals and singletons. We all know what needs doing here: initialising the library should return clients a handle, and each client would use its returned handle for subsequent access to the library. Internally, the handle would be a pointer to a struct, the details of which would be private to the library, packaging its internal state.</p>
+<p><span id="continue-reading"/></p>
+<p>Sadly no refactoring IDE could cope with this job. Our immediate problem was simply sizing up the task. So we had to count up the <code>s_initialised</code>&#8217;s and <code>g_msg_buf</code>&#8217;s and so on. One obvious way of getting a number would be to browse the code and build a list of these globals. Indeed, this approach has some merit: we&#8217;re building familiarity with the code, code we&#8217;ll ultimately have to change. An exact answer isn&#8217;t really needed at this stage.</p>
+<p>Shell hackers might attempt an instant estimate by combining <code>grep</code>, <code>sort</code> and <code>uniq</code> &#8212; if we&#8217;re confident that the <code>s_</code> and <code>g_</code> prefixes are consistently used in the library.</p>
 <div class="typocode">
 
 <pre class="prettyprint">$ grep -Eioh "\b[sg]_[[:alnum:]_]*\b" nm.c | sort | uniq
@@ -78,10 +72,8 @@ static void clear_message()
 
 </div>
 
-<p>Such text based approaches are better than nothing. We can review the result for  false hits, inspect the code to see if we&#8217;ve missed anything obvious, adapt the pattern if required, and pipe the result to <code>wc -l</code> for a final count.
-</p>
-<p><span id="excerpt0"/>But the best route to an accurate answer is easier and quicker. The compiler <em>has to know</em> exactly what&#8217;s global, what&#8217;s local, what&#8217;s data and what&#8217;s missing, and that information gets put in the object code it generates. Since reading object code is tough, we&#8217;ll ask <code>nm</code> to do it for us. Here&#8217;s what I get if I compile the snippet above and inspect the output object file with <code>nm</code>. (What you get should be similar, but the details will depend on your platform.)
-</p>
+<p>Such text based approaches are better than nothing. We can review the result for  false hits, inspect the code to see if we&#8217;ve missed anything obvious, adapt the pattern if required, and pipe the result to <code>wc -l</code> for a final count.</p>
+<p><span id="excerpt0"/>But the best route to an accurate answer is easier and quicker. The compiler <em>has to know</em> exactly what&#8217;s global, what&#8217;s local, what&#8217;s data and what&#8217;s missing, and that information gets put in the object code it generates. Since reading object code is tough, we&#8217;ll ask <code>nm</code> to do it for us. Here&#8217;s what I get if I compile the snippet above and inspect the output object file with <code>nm</code>. (What you get should be similar, but the details will depend on your platform.)</p>
 <div class="typocode">
 
 <pre class="prettyprint">$ gcc -c too_many_globals.c &amp;&amp; nm too_many_globals.o
@@ -96,43 +88,23 @@ static void clear_message()
 
 </div>
 
-<p>The <code>nm</code> manual tells us how to interpret the output:
-</p>
-<blockquote><p>Nm displays the name list (symbol table) of each object file in the argument list &#8230; Each symbol name is preceded  by  its  value (blanks if undefined) &#8230; this value is followed by one of the following  characters,  representing  the symbol type: U (undefined), A (absolute), T (text section symbol), D (data section  symbol), B (bss section  symbol), C (common  symbol) &#8230;. If the symbol is local (non-external), the symbol&#8217;s type is instead represented  by  the  corresponding lowercase letter.
-</p>
-</blockquote><p><code>Nm</code> works on object files, libraries (static and dynamic) and executables. You don&#8217;t have to be an expert on object code to correlate the <code>nm</code> output shown above with the source code. It&#8217;s telling us:
-</p>
+<p>The <code>nm</code> manual tells us how to interpret the output:</p>
+<blockquote>
+<p>Nm displays the name list (symbol table) of each object file in the argument list &#8230; Each symbol name is preceded  by  its  value (blanks if undefined) &#8230; this value is followed by one of the following  characters,  representing  the symbol type: U (undefined), A (absolute), T (text section symbol), D (data section  symbol), B (bss section  symbol), C (common  symbol) &#8230;. If the symbol is local (non-external), the symbol&#8217;s type is instead represented  by  the  corresponding lowercase letter.</p>
+</blockquote>
+<p><code>Nm</code> works on object files, libraries (static and dynamic) and executables. You don&#8217;t have to be an expert on object code to correlate the <code>nm</code> output shown above with the source code. It&#8217;s telling us:</p>
 <ul>
- <li>
-     <code>clear_message</code> is a local function
- </li>
-
- <li>
-     <code>g_libname</code> is constant global data 
- </li>
-
- <li>
-     <code>initialise</code> is an external function
- </li>
-
- <li>
-     <code>memset</code> is undefined (it&#8217;s part of the standard C library)
- </li>
-
- <li>
-     <code>g_msg_buf</code> and <code>s_initialised</code> are the bad boys we&#8217;re hunting down
- </li>
+<li><code>clear_message</code> is a local function</li>
+<li><code>g_libname</code> is constant global data </li>
+<li><code>initialise</code> is an external function</li>
+<li><code>memset</code> is undefined (it&#8217;s part of the standard C library)</li>
+<li><code>g_msg_buf</code> and <code>s_initialised</code> are the bad boys we&#8217;re hunting down</li>
 </ul>
-<p>Once we&#8217;ve discovered <code>nm</code> we can pick out the globals accurately and swiftly.  Running <code>nm libtoo_many_globals.a</code> outputs text which we can pipe through standard Unix tools as before to get <em>exact</em> metrics.
-</p>
-<p>The <a href="http://www.gnu.org/software/binutils/manual/html_chapter/binutils_2.html">GNU version of nm</a> has some bells and whistles &#8212; it can demangle C++ symbols, for example. Object code is platform dependent and the details of <code>nm</code>&#8217;s output will similarly vary across platforms, so I suggest you look at the manual, but most of the time <code>nm OBJECTFILE</code> is all you&#8217;ll need.
-</p>
-
-<h3>Global constants</h3>
-<p>Note that <code>nm</code> has nothing to say about the preprocessor definition, MSG_BUF_SIZE, which vanishes well before the object file gets written. Since MSG_BUF_SIZE can&#8217;t be changed at run time or even after compilation, it won&#8217;t stop us from safely using more than one library instance. <code>Nm</code> does tell us about <code>g_libname</code>, a string constant has been placed in the data section of the object file. Like MSG_BUF_SIZE, multiple library instances can safely share this read-only data.
-</p>
-<p>Just because something can be done doesn&#8217;t make it <a href="http://accu.org/index.php/journals/1411">good practice</a>. I don&#8217;t think there&#8217;s enough information here to definitively rule against these two &#8220;safe&#8221; globals, but they certainly look suspect. At the very least, the scope of the library name string should be reduced. It would be better to review use of constant data throughout the library; by passing this data in, perhaps as an initialisation parameter, the library may become more flexible and easier to test.
-</p>
+<p>Once we&#8217;ve discovered <code>nm</code> we can pick out the globals accurately and swiftly.  Running <code>nm libtoo_many_globals.a</code> outputs text which we can pipe through standard Unix tools as before to get <em>exact</em> metrics.</p>
+<p>The <a href="http://www.gnu.org/software/binutils/manual/html_chapter/binutils_2.html">GNU version of nm</a> has some bells and whistles &#8212; it can demangle C++ symbols, for example. Object code is platform dependent and the details of <code>nm</code>&#8217;s output will similarly vary across platforms, so I suggest you look at the manual, but most of the time <code>nm OBJECTFILE</code> is all you&#8217;ll need.</p>
+<h3 id="global-constants">Global constants</h3>
+<p>Note that <code>nm</code> has nothing to say about the preprocessor definition, MSG_BUF_SIZE, which vanishes well before the object file gets written. Since MSG_BUF_SIZE can&#8217;t be changed at run time or even after compilation, it won&#8217;t stop us from safely using more than one library instance. <code>Nm</code> does tell us about <code>g_libname</code>, a string constant has been placed in the data section of the object file. Like MSG_BUF_SIZE, multiple library instances can safely share this read-only data.</p>
+<p>Just because something can be done doesn&#8217;t make it <a href="http://accu.org/index.php/journals/1411">good practice</a>. I don&#8217;t think there&#8217;s enough information here to definitively rule against these two &#8220;safe&#8221; globals, but they certainly look suspect. At the very least, the scope of the library name string should be reduced. It would be better to review use of constant data throughout the library; by passing this data in, perhaps as an initialisation parameter, the library may become more flexible and easier to test.</p>
 </div>
 
 <div class="comments"><hr/><div id="disqus_thread"></div><script type="text/javascript" src="http://disqus.com/forums/wordaligned/embed.js"></script></div>

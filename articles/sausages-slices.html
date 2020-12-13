@@ -26,31 +26,21 @@
       <div class="atomentry" id="sausages-slices">
 <h2 class="title"><a href="/articles/sausages-slices">Sausages, sausages, sausages - slice, slice, slice</a></h2>
 <p class="meta"><abbr class="published" title="2016-03-21">2016-03-21</abbr> &bull; <a href="/tag/puzzles" rel="tag">Puzzles</a>, <a href="/tag/python" rel="tag">Python</a> &bull; <a href="/articles/sausages-slices#disqus_thread">Comments</a></p>
-<p>A friend asked for help reaching the next level of a puzzle game. The test which stalled her involves machine placement in a sausage factory.
-</p>
-<blockquote><p>&#8230; each sausage was branded with a letter for quality control purposes, thus:
-   <strong>ypbtkizfgxptclcoirdsuhjwulqkoszrabfc</strong>
-</p>
-<p>The string was then drawn through seven machines which rearranged the sausages in flavour enhancing ways.
-</p>
-<p><strong>Machine A: The Reversifier</strong>
-</p>
-<p>Reverses the order of the sausages, so they get tastier as you go along.
-</p>
-<p>&#8230;
-</p>
-<p><strong>Machine G: Secondhalffirstifier</strong>
-</p>
-<p>move the second half of the string to the beginning, as the earlier sausages are too spicy to eat early in the morning.
-</p>
-<p>He attached these machines in a certain sequence, though one of them was out for repair so only six were used. He then fed a string of sausages through and was surprised to discover the string that came out at the other end said <strong>lickyourlips</strong>. What order were the machines in?
-</p>
-</blockquote><p>It&#8217;s nicely phrased, but what&#8217;s really wanted is the sequence of simple transformations that takes input &#8220;ypbtkizfgxptclcoirdsuhjwulqkoszrabfc&#8221; and produces output &#8220;lickyourlips&#8221;.
-</p>
-<p>It&#8217;s no doubt possible to work backwards and figure out a solution using no more than logic, pencil and paper. For example, only two of the machines change the length of the string, and &#8212; looking at the before and after lengths &#8212; these must both be used. It&#8217;s rather easier to write a short program to find a solution.
-</p>
-<p>First we must simulate the seven sausage machines, A-G, which perform the following sequence operations.
-</p>
+<p>A friend asked for help reaching the next level of a puzzle game. The test which stalled her involves machine placement in a sausage factory.</p>
+<blockquote>
+<p>&#8230; each sausage was branded with a letter for quality control purposes, thus:
+<strong>ypbtkizfgxptclcoirdsuhjwulqkoszrabfc</strong></p>
+<p>The string was then drawn through seven machines which rearranged the sausages in flavour enhancing ways.</p>
+<p><strong>Machine A: The Reversifier</strong></p>
+<p>Reverses the order of the sausages, so they get tastier as you go along.</p>
+<p>&#8230;</p>
+<p><strong>Machine G: Secondhalffirstifier</strong></p>
+<p>move the second half of the string to the beginning, as the earlier sausages are too spicy to eat early in the morning.</p>
+<p>He attached these machines in a certain sequence, though one of them was out for repair so only six were used. He then fed a string of sausages through and was surprised to discover the string that came out at the other end said <strong>lickyourlips</strong>. What order were the machines in?</p>
+</blockquote>
+<p>It&#8217;s nicely phrased, but what&#8217;s really wanted is the sequence of simple transformations that takes input &#8220;ypbtkizfgxptclcoirdsuhjwulqkoszrabfc&#8221; and produces output &#8220;lickyourlips&#8221;.</p>
+<p>It&#8217;s no doubt possible to work backwards and figure out a solution using no more than logic, pencil and paper. For example, only two of the machines change the length of the string, and &#8212; looking at the before and after lengths &#8212; these must both be used. It&#8217;s rather easier to write a short program to find a solution.</p>
+<p>First we must simulate the seven sausage machines, A-G, which perform the following sequence operations.</p>
 <ol type="A">
 <li>reverse the order of a sequence</li>
 <li>remove every other element of a sequence</li>
@@ -61,28 +51,21 @@
 <li>swap the front and back half of a sequence</li>
 </ol>
 
-<p>None of these is difficult, especially in a high-level language which builds in support for sequence operations. What I found noteworthy is that a solution can be found without any <a href="https://docs.python.org/3/reference/compound_stmts.html">loops or if statements</a>. What&#8217;s more, every operation can handled using nothing more than <a href="https://docs.python.org/3/library/stdtypes.html#sequence-types-list-tuple-range">slice operations</a>.
-</p>
-<p>Here&#8217;s my solution. The machines consist of slice operations, helped by a couple of conditional expressions and recursive calls. The solution can then be brute-forced: there are only 5040 ways of permuting 6 out of 7 machines.
-</p>
+<p>None of these is difficult, especially in a high-level language which builds in support for sequence operations. What I found noteworthy is that a solution can be found without any <a href="https://docs.python.org/3/reference/compound_stmts.html">loops or if statements</a>. What&#8217;s more, every operation can handled using nothing more than <a href="https://docs.python.org/3/library/stdtypes.html#sequence-types-list-tuple-range">slice operations</a>.</p>
+<p>Here&#8217;s my solution. The machines consist of slice operations, helped by a couple of conditional expressions and recursive calls. The solution can then be brute-forced: there are only 5040 ways of permuting 6 out of 7 machines.</p>
 <script src="https://gist.github.com/wordaligned/a04308eac7ee2aa37e01.js"></script>
 
-<p>I&#8217;ve used <code>reduce</code> to apply a chain of functions to a string of sausages &#8212; an explicit loop might be clearer, but I want a loop-free solution. For this same reason I use recursion in the pairwise swapper and the element dropper. Generally in Python, recursion is a poor choice. In this case I know I&#8217;m starting with a string of just 36 elements which cannot get any longer; there&#8217;s no risk of exceeding the <a href="https://docs.python.org/3/library/sys.html#sys.getrecursionlimit">system recursion limit</a>.
-</p>
-<p>The sequence reversal <code>s[::-1]</code> is idiomatic but alarming to the uninitiated. Slices have <code>[start:stop:stride]</code> fields, any of which may be defaulted. Usually <code>start</code> and <code>stop</code> default to the start and end of the sequence, but in this case the negative stride reverses them.
-</p>
-<p>To rotate the last element of a sequence to the front, prefer:
-</p>
+<p>I&#8217;ve used <code>reduce</code> to apply a chain of functions to a string of sausages &#8212; an explicit loop might be clearer, but I want a loop-free solution. For this same reason I use recursion in the pairwise swapper and the element dropper. Generally in Python, recursion is a poor choice. In this case I know I&#8217;m starting with a string of just 36 elements which cannot get any longer; there&#8217;s no risk of exceeding the <a href="https://docs.python.org/3/library/sys.html#sys.getrecursionlimit">system recursion limit</a>.</p>
+<p>The sequence reversal <code>s[::-1]</code> is idiomatic but alarming to the uninitiated. Slices have <code>[start:stop:stride]</code> fields, any of which may be defaulted. Usually <code>start</code> and <code>stop</code> default to the start and end of the sequence, but in this case the negative stride reverses them.</p>
+<p>To rotate the last element of a sequence to the front, prefer:</p>
 <pre><code>return s[-1:] + s[:-1]
-</code></pre><p>to:
-</p>
+</code></pre>
+<p>to:</p>
 <pre><code>return [s[-1]] + s[:-1]
-</code></pre><p>because the latter raises an <code>IndexError</code> for an empty sequence.
-</p>
-<p>Slicing is a formidable tool for sequence manipulation, especially when combined with the option of using negative indices to count back from the end. Slices allow you to reverse, rotate and partition sequences, to pairwise swap elements, and to drop every nth element.
-</p>
-<p>The miniature recipes presented here don&#8217;t even use slice assignment, which gives me an excuse to reproduce this elegant prime sieve function, which does.
-</p>
+</code></pre>
+<p>because the latter raises an <code>IndexError</code> for an empty sequence.</p>
+<p>Slicing is a formidable tool for sequence manipulation, especially when combined with the option of using negative indices to count back from the end. Slices allow you to reverse, rotate and partition sequences, to pairwise swap elements, and to drop every nth element.</p>
+<p>The miniature recipes presented here don&#8217;t even use slice assignment, which gives me an excuse to reproduce this elegant prime sieve function, which does.</p>
 <script src="https://gist.github.com/wordaligned/09c17eaabb6cd4c6bcfb.js"></script>
 </div>
 

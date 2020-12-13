@@ -28,9 +28,8 @@
       <div class="atomentry" id="removing-duplicates-using-itertoolsgroupby">
 <h2 class="title"><a href="/articles/removing-duplicates-using-itertoolsgroupby">Removing duplicates using itertools.groupby</a></h2>
 <p class="meta"><abbr class="published" title="2008-10-07">2008-10-07</abbr> &bull; <a href="/tag/python" rel="tag">Python</a>, <a href="/tag/streams" rel="tag">Streams</a> &bull; <a href="/articles/removing-duplicates-using-itertoolsgroupby#disqus_thread">Comments</a></p>
-<h3>Eliminating duplicates</h3>
-<p><a href="/articles/merging-sorted-streams-in-python.html">Previously</a> I discussed merging sorted streams using Python; a call to a standard library <a href="http://docs.python.org/library/heapq.html#heapq.merge">function</a> for those who&#8217;ve updated to 2.6.
-</p>
+<h3 id="eliminating-duplicates">Eliminating duplicates</h3>
+<p><a href="/articles/merging-sorted-streams-in-python.html">Previously</a> I discussed merging sorted streams using Python; a call to a standard library <a href="http://docs.python.org/library/heapq.html#heapq.merge">function</a> for those who&#8217;ve updated to 2.6.</p>
 <div class="typocode">
 
 <pre class="prettyprint">&gt;&gt;&gt; from heapq import merge
@@ -44,10 +43,8 @@
 
 </div>
 
-<p>Here, we merge positive multiples of 2, 3 and 5 into a single stream. 6 appears twice in the output, being a multiple of both 2 and 3. 10 is similarly duplicated and 30 would feature three times.
-</p>
-<p><a href="http://docs.python.org/library/itertools#itertools.groupby">Itertools.groupby</a> can remove the repeated entries.
-</p>
+<p>Here, we merge positive multiples of 2, 3 and 5 into a single stream. 6 appears twice in the output, being a multiple of both 2 and 3. 10 is similarly duplicated and 30 would feature three times.</p>
+<p><a href="http://docs.python.org/library/itertools#itertools.groupby">Itertools.groupby</a> can remove the repeated entries.</p>
 <div class="typocode">
 
 <pre class="prettyprint">&gt;&gt;&gt; from itertools import groupby
@@ -62,8 +59,7 @@ class groupby(__builtin__.object)
 
 </div>
 
-<p>If the key function is not specified or is <code>None</code> it defaults to an identity function, and <code>groupby</code> partitions an iterable into subiterators over equal valued elements.
-</p>
+<p>If the key function is not specified or is <code>None</code> it defaults to an identity function, and <code>groupby</code> partitions an iterable into subiterators over equal valued elements.</p>
 <div class="typocode">
 
 <pre class="prettyprint">&gt;&gt;&gt; from operator import itemgetter
@@ -77,16 +73,11 @@ class groupby(__builtin__.object)
 
 </div>
 
-<span id="continue-reading"/>
-
-<p>Groupby is very like the Unix <a href="http://www.gnu.org/software/coreutils/manual/html_node/uniq-invocation.html#uniq-invocation">uniq</a> tool.
-</p>
-<p>Generally (the <a href="http://docs.python.org/library/itertools#itertools.groupby">documentation</a> goes on to say) &#8220;the iterable needs to already be sorted on the same key function&#8221; but <code>groupby</code> is perfectly well defined when this isn&#8217;t the case. Here&#8217;s an artificial example showing groupby turning a random sequence into an alternating one.
-</p>
-
-<h3>Random sequence</h3>
-<p>Let&#8217;s toss a coin to generate a random sequence of heads and tails.
-</p>
+<p><span id="continue-reading"/></p>
+<p>Groupby is very like the Unix <a href="http://www.gnu.org/software/coreutils/manual/html_node/uniq-invocation.html#uniq-invocation">uniq</a> tool.</p>
+<p>Generally (the <a href="http://docs.python.org/library/itertools#itertools.groupby">documentation</a> goes on to say) &#8220;the iterable needs to already be sorted on the same key function&#8221; but <code>groupby</code> is perfectly well defined when this isn&#8217;t the case. Here&#8217;s an artificial example showing groupby turning a random sequence into an alternating one.</p>
+<h3 id="random-sequence">Random sequence</h3>
+<p>Let&#8217;s toss a coin to generate a random sequence of heads and tails.</p>
 <div class="typocode">
 
 <pre class="prettyprint">&gt;&gt;&gt; def toss_a_coin():
@@ -98,57 +89,49 @@ class groupby(__builtin__.object)
 ...     return f()
 ...
 &gt;&gt;&gt; tosses = imap(call, repeat(toss_a_coin))
-&gt;&gt;&gt; spacer = ' '.join
+&gt;&gt;&gt; spacer = &#x27; &#x27;.join
 &gt;&gt;&gt; spacer(list(islice(tosses, 7)))
-'T T H T H H H'
+&#x27;T T H T H H H&#x27;
 
 </pre>
 
 </div>
 
-<p><img src="/images/tails.jpg" alt="tails"/><img src="/images/tails.jpg" alt="tails"/><img src="/images/heads.jpg" alt="heads"/><img src="/images/tails.jpg" alt="tails"/><img src="/images/heads.jpg" alt="heads"/><img src="/images/heads.jpg" alt="heads"/><img src="/images/heads.jpg" alt="heads"/>
-</p>
-
-<h3>Alternating sequence</h3>
-<p>We can filter the unique values from this random sequence of coin tosses to generate an alternating sequence.
-</p>
+<p><img src="/images/tails.jpg" alt="tails"/><img src="/images/tails.jpg" alt="tails"/><img src="/images/heads.jpg" alt="heads"/><img src="/images/tails.jpg" alt="tails"/><img src="/images/heads.jpg" alt="heads"/><img src="/images/heads.jpg" alt="heads"/><img src="/images/heads.jpg" alt="heads"/></p>
+<h3 id="alternating-sequence">Alternating sequence</h3>
+<p>We can filter the unique values from this random sequence of coin tosses to generate an alternating sequence.</p>
 <div class="typocode">
 
 <pre class="prettyprint">&gt;&gt;&gt; def uniq(seq):
 ...     return imap(first, groupby(seq))
 ... 
 &gt;&gt;&gt; spacer(list(islice(uniq(tosses), 7)))
-'H T H T H T H'
+&#x27;H T H T H T H&#x27;
 
 </pre>
 
 </div>
 
-<p><img src="/images/heads.jpg" alt="heads"/><img src="/images/tails.jpg" alt="tails"/><img src="/images/heads.jpg" alt="heads"/><img src="/images/tails.jpg" alt="tails"/><img src="/images/heads.jpg" alt="heads"/><img src="/images/tails.jpg" alt="tails"/><img src="/images/heads.jpg" alt="heads"/>
-</p>
-
-<h3>Constant sequence</h3>
-<p>Every other element of this filtered sequence will be the same.
-</p>
+<p><img src="/images/heads.jpg" alt="heads"/><img src="/images/tails.jpg" alt="tails"/><img src="/images/heads.jpg" alt="heads"/><img src="/images/tails.jpg" alt="tails"/><img src="/images/heads.jpg" alt="heads"/><img src="/images/tails.jpg" alt="tails"/><img src="/images/heads.jpg" alt="heads"/></p>
+<h3 id="constant-sequence">Constant sequence</h3>
+<p>Every other element of this filtered sequence will be the same.</p>
 <div class="typocode">
 
 <pre class="prettyprint">&gt;&gt;&gt; tails = islice(uniq(tosses), 0, None, 2)
 &gt;&gt;&gt; spacer(list(islice(tails, 7)))
-'T T T T T T T'
+&#x27;T T T T T T T&#x27;
 
 </pre>
 
 </div>
 
-<p><img src="/images/tails.jpg" alt="tails"/><img src="/images/tails.jpg" alt="tails"/><img src="/images/tails.jpg" alt="tails"/><img src="/images/tails.jpg" alt="tails"/><img src="/images/tails.jpg" alt="tails"/><img src="/images/tails.jpg" alt="tails"/><img src="/images/tails.jpg" alt="tails"/>
-</p>
-<p>Applying <code>uniq</code> again gives a single element infinitely repeated.
-</p>
+<p><img src="/images/tails.jpg" alt="tails"/><img src="/images/tails.jpg" alt="tails"/><img src="/images/tails.jpg" alt="tails"/><img src="/images/tails.jpg" alt="tails"/><img src="/images/tails.jpg" alt="tails"/><img src="/images/tails.jpg" alt="tails"/><img src="/images/tails.jpg" alt="tails"/></p>
+<p>Applying <code>uniq</code> again gives a single element infinitely repeated.</p>
 <div class="typocode">
 
 <pre class="prettyprint">&gt;&gt;&gt; tt = uniq(tails)
 &gt;&gt;&gt; tt.next()
-'T'
+&#x27;T&#x27;
 &gt;&gt;&gt; tt.next()
   C-c C-cTraceback (most recent call last):
   File "&lt;stdin&gt;", line 1, in &lt;module&gt;
@@ -160,12 +143,9 @@ KeyboardInterrupt
 
 </div>
 
-<img src="/images/tails.jpg" alt="tails"/>
-
-
-<h3>Uniq -c</h3>
-<p>Imitating <code>uniq -c</code>, we can yield a repeat count paired to each unique value.
-</p>
+<p><img src="/images/tails.jpg" alt="tails"/></p>
+<h3 id="uniq-c">Uniq -c</h3>
+<p>Imitating <code>uniq -c</code>, we can yield a repeat count paired to each unique value.</p>
 <div class="typocode">
 
 <pre class="prettyprint">&gt;&gt;&gt; def ilen(it):
@@ -176,14 +156,13 @@ KeyboardInterrupt
 ... 
 &gt;&gt;&gt; ht = counted_uniq(tosses)
 &gt;&gt;&gt; list(islice(ht, 5))
-[(1, 'H'), (3, 'T'), (1, 'H'), (3, 'T'), (3, 'H')]
+[(1, &#x27;H&#x27;), (3, &#x27;T&#x27;), (1, &#x27;H&#x27;), (3, &#x27;T&#x27;), (3, &#x27;H&#x27;)]
 
 </pre>
 
 </div>
 
-<p>How long before we see a run of 7 equal throws?
-</p>
+<p>How long before we see a run of 7 equal throws?</p>
 <div class="typocode">
 
 <pre class="prettyprint">&gt;&gt;&gt; from itertools import takewhile
@@ -196,14 +175,10 @@ KeyboardInterrupt
 
 </div>
 
-<p><img src="/images/tails.jpg" alt="tails"/><img src="/images/tails.jpg" alt="tails"/><img src="/images/tails.jpg" alt="tails"/><img src="/images/tails.jpg" alt="tails"/><img src="/images/tails.jpg" alt="tails"/><img src="/images/tails.jpg" alt="tails"/><img src="/images/tails.jpg" alt="tails"/>
-</p>
-
-<h3>Progression</h3>
-<p>The coin illustrating this note is a 1956 <a href="http://24carat.co.uk/farthingstoryframe.html">farthing</a>, a small coin with a value of just &frac14; of a penny dating from a time when there were 240 pence in every pound. The reverse features a wren, the obverse Queen Elizabeth II. The farthing was demonetised in 1960. In 1971 British currency went decimal and now, 37 years later, the 1971 coin designs are <a href="http://news.bbc.co.uk/1/hi/uk/7326491.stm">being revamped</a>. Hiding amongst the loose change in my pocket today I noticed a couple of shiny new 2008 pennies. It&#8217;s about time we got euros.
-</p>
-<p><a href="http://www.royalmint.com/newdesigns/designsRevealed.aspx"><img src="/images/2008-change.jpg" alt="2008 small change"/></a>
-</p>
+<p><img src="/images/tails.jpg" alt="tails"/><img src="/images/tails.jpg" alt="tails"/><img src="/images/tails.jpg" alt="tails"/><img src="/images/tails.jpg" alt="tails"/><img src="/images/tails.jpg" alt="tails"/><img src="/images/tails.jpg" alt="tails"/><img src="/images/tails.jpg" alt="tails"/></p>
+<h3 id="progression">Progression</h3>
+<p>The coin illustrating this note is a 1956 <a href="http://24carat.co.uk/farthingstoryframe.html">farthing</a>, a small coin with a value of just &frac14; of a penny dating from a time when there were 240 pence in every pound. The reverse features a wren, the obverse Queen Elizabeth II. The farthing was demonetised in 1960. In 1971 British currency went decimal and now, 37 years later, the 1971 coin designs are <a href="http://news.bbc.co.uk/1/hi/uk/7326491.stm">being revamped</a>. Hiding amongst the loose change in my pocket today I noticed a couple of shiny new 2008 pennies. It&#8217;s about time we got euros.</p>
+<p><a href="http://www.royalmint.com/newdesigns/designsRevealed.aspx"><img src="/images/2008-change.jpg" alt="2008 small change"/></a></p>
 </div>
 
 <div class="comments"><hr/><div id="disqus_thread"></div><script type="text/javascript" src="http://disqus.com/forums/wordaligned/embed.js"></script></div>

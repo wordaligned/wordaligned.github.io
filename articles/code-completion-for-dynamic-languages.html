@@ -29,94 +29,72 @@
 <h2 class="title"><a href="/articles/code-completion-for-dynamic-languages">Code completion for dynamic languages</a></h2>
 <p class="meta"><abbr class="published" title="2007-02-02">2007-02-02</abbr> &bull; <a href="/tag/python" rel="tag">Python</a>, <a href="/tag/ruby" rel="tag">Ruby</a>, <a href="/tag/emacs" rel="tag">Emacs</a>, <a href="/tag/dynamic-languages" rel="tag">Dynamic Languages</a> &bull; <a href="/articles/code-completion-for-dynamic-languages#disqus_thread">Comments</a></p>
 <p>Here&#8217;s an interesting <a href="http://www.regdeveloper.co.uk/2007/02/01/making_sense_ruby/">article</a> in which Huw Collingbourne describes
-   his frustration with trying to program a smart code completion system
-   for Visual Studio. The problem being, the code in question is
-   <a href="http://www.ruby-lang.org" title="Ruby Website">Ruby</a>. One particularly juicy quotation reads:
-</p>
-<blockquote><p><span id="excerpt0"/>Ruby is a so-called &#8220;dynamic&#8221; language, which is a polite way of saying that it&#8217;s hugely unpredictable.
-</p>
-</blockquote><span id="continue-reading"/>
-
-<p>He goes on to explain:
-</p>
-<blockquote><p>A <a href="http://www.ruby-lang.org" title="Ruby Website">Ruby</a> program is so dynamic that you can never be sure what it is
-   up to from one moment to the next. To take a simple example, when
-   you write some stand-alone functions into the editor, those
-   functions get bound into the base class of the entire Ruby class
-   hierarchy. That means that every single Ruby class automatically
-   &#8220;inherits&#8221; them - and the IntelliSense system is expected to know
-   about it!
-</p>
-</blockquote><p>Despite overtly grumbling about dynamic languages, the author does a
-   good job of promoting them. <span id="excerpt1"/>Software is supposed to be soft and
-   dynamic languages help keep it that way. Everything is
-   open. Everything can be queried. Everything can be adapted.
-</p>
-
-<h4>Emacs Python mode</h4>
+his frustration with trying to program a smart code completion system
+for Visual Studio. The problem being, the code in question is
+<a href="http://www.ruby-lang.org" title="Ruby Website">Ruby</a>. One particularly juicy quotation reads:</p>
+<blockquote>
+<p><span id="excerpt0"/>Ruby is a so-called &#8220;dynamic&#8221; language, which is a polite way of saying that it&#8217;s hugely unpredictable.</p>
+</blockquote>
+<p><span id="continue-reading"/></p>
+<p>He goes on to explain:</p>
+<blockquote>
+<p>A <a href="http://www.ruby-lang.org" title="Ruby Website">Ruby</a> program is so dynamic that you can never be sure what it is
+up to from one moment to the next. To take a simple example, when
+you write some stand-alone functions into the editor, those
+functions get bound into the base class of the entire Ruby class
+hierarchy. That means that every single Ruby class automatically
+&#8220;inherits&#8221; them - and the IntelliSense system is expected to know
+about it!</p>
+</blockquote>
+<p>Despite overtly grumbling about dynamic languages, the author does a
+good job of promoting them. <span id="excerpt1"/>Software is supposed to be soft and
+dynamic languages help keep it that way. Everything is
+open. Everything can be queried. Everything can be adapted.</p>
+<h4 id="emacs-python-mode">Emacs Python mode</h4>
 <p>My preferred IDE is <a href="http://www.gnu.org/software/emacs">emacs</a> &#8212; whatever language I&#8217;m using. It has a
-   particularly nice <a href="http://sourceforge.net/projects/python-mode">Python integration</a>.
-   Here&#8217;s how it works:
-</p>
+particularly nice <a href="http://sourceforge.net/projects/python-mode">Python integration</a>.
+Here&#8217;s how it works:</p>
 <ul>
- <li>
-     Pull up a full-screen window
- </li>
-
- <li>
-     Split the window vertically
- </li>
-
- <li>
-     Use one side for the code you&#8217;re working on
- </li>
-
- <li>
-     Use the other side to run an interpreted <a href="http://python.org">Python</a> session
- </li>
-
- <li>
-     Switch sides as desired
- </li>
+<li>Pull up a full-screen window</li>
+<li>Split the window vertically</li>
+<li>Use one side for the code you&#8217;re working on</li>
+<li>Use the other side to run an interpreted <a href="http://python.org">Python</a> session</li>
+<li>Switch sides as desired</li>
 </ul>
 <p>I continually select regions of code to execute. I continually step
-   into the interpreter and use the <a href="http://python.org">Python</a> <code>help</code> command to get help on
-   modules and functions &#8212; including the ones I&#8217;m creating right now.
-   I rework a function in one window then exercise it in the other. I
-   sketch experimental code, run it, rub it out.
-</p>
-<p>Collingbourne says:
-</p>
-<blockquote><p>Creating real
-   <a href="http://www.sapphiresteel.com/IntelliSense">IntelliSense</a> is much
-   harder. The only way to do it properly is to analyse the code much
-   as the Ruby interpreter itself does. The big difference is that the
-   interpreter only goes into operation when a program is complete &#8230;
-</p>
-</blockquote><p>He spots the answer in one sentence &#8212; <em>to do it properly, you do have
-   to hook into the interpreter and its powers of reflection</em> &#8212; then misses
-   the point in the next. You just have to run the interpreter alongside the code
-   you&#8217;re developing, like emacs Python mode does.
-</p>
-
-<h4>A cheat&#8217;s guide to code-completion</h4>
-<p>Collingbourne also exposes some code-completion systems as &#8220;cheats&#8221;.
-</p>
-<blockquote><p>Some code-completion systems solve this problem in a cunning way -
-   they cheat. Instead of working out what type of object x is at any
-   given moment, taking into account all the difficult stuff such as
-   its scope, inheritance and context, they work alphabetically. If
-   someone enters a dot followed by the letters &#8220;my&#8221;, they drop down a
-   list of names such as &#8220;my_method&#8221;, &#8220;my_othermethod&#8221; and
-   &#8220;my_random_guess&#8221; whether or not those methods have anything to do
-   with the object in question.
-</p>
-</blockquote><p>Well, I&#8217;m happy to cheat using <a href="http://www.gnu.org/software/emacs">emacs</a> in this way. The <em></em><code>ALT-/</code><em></em>
-   combination uses alphabetic completion and I use it more
-   than any other key sequence, whatever document I&#8217;m working on. More
-   often than not, it does the right thing. As usual, simple solutions
-   are better.
-</p>
+into the interpreter and use the <a href="http://python.org">Python</a> <code>help</code> command to get help on
+modules and functions &#8212; including the ones I&#8217;m creating right now.
+I rework a function in one window then exercise it in the other. I
+sketch experimental code, run it, rub it out.</p>
+<p>Collingbourne says:</p>
+<blockquote>
+<p>Creating real
+<a href="http://www.sapphiresteel.com/IntelliSense">IntelliSense</a> is much
+harder. The only way to do it properly is to analyse the code much
+as the Ruby interpreter itself does. The big difference is that the
+interpreter only goes into operation when a program is complete &#8230;</p>
+</blockquote>
+<p>He spots the answer in one sentence &#8212; <em>to do it properly, you do have
+to hook into the interpreter and its powers of reflection</em> &#8212; then misses
+the point in the next. You just have to run the interpreter alongside the code
+you&#8217;re developing, like emacs Python mode does.</p>
+<h4 id="a-cheats-guide-to-code-completion">A cheat&#8217;s guide to code-completion</h4>
+<p>Collingbourne also exposes some code-completion systems as &#8220;cheats&#8221;.</p>
+<blockquote>
+<p>Some code-completion systems solve this problem in a cunning way -
+they cheat. Instead of working out what type of object x is at any
+given moment, taking into account all the difficult stuff such as
+its scope, inheritance and context, they work alphabetically. If
+someone enters a dot followed by the letters &#8220;my&#8221;, they drop down a
+list of names such as &#8220;my_method&#8221;, &#8220;my_othermethod&#8221; and
+&#8220;my_random_guess&#8221; whether or not those methods have anything to do
+with the object in question.</p>
+</blockquote>
+<p>Well, I&#8217;m happy to cheat using <a href="http://www.gnu.org/software/emacs">emacs</a> in this way. The <strong><code>ALT-/</code></strong>
+combination uses alphabetic completion and I use it more
+than any other key sequence, whatever document I&#8217;m working on. More
+often than not, it does the right thing. As usual, simple solutions
+are better.</p>
 </div>
 
 <h5><a name="feedback">Feedback</a></h5>

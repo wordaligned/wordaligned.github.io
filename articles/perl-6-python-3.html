@@ -28,68 +28,31 @@
       <div class="atomentry" id="perl-6-python-3">
 <h2 class="title"><a href="/articles/perl-6-python-3">Perl 6, Python 3</a></h2>
 <p class="meta"><abbr class="published" title="2009-01-01">2009-01-01</abbr> &bull; <a href="/tag/python" rel="tag">Python</a>, <a href="/tag/perl" rel="tag">Perl</a> &bull; <a href="/articles/perl-6-python-3#disqus_thread">Comments</a></p>
-<div class="toc">
-<h2>Contents</h2>
-<ul>
- <li><a href="#tocchristmas-present" name="toc0" id="toc0">Christmas Present</a>
- </li>
-
- <li><a href="#tocpython-30" name="toc1" id="toc1">Python 3.0</a>
- </li>
-
- <li><a href="#tocprint-is-a-function" name="toc2" id="toc2">Print is a function</a>
- </li>
-
- <li><a href="#toc30-is-lazier" name="toc3" id="toc3">3.0 is lazier</a>
- </li>
-
- <li><a href="#tocunicode-support-is-better" name="toc4" id="toc4">Unicode support is better</a>
- </li>
-
- <li><a href="#tocunicode-and-word-aligned" name="toc5" id="toc5">Unicode and Word Aligned</a>
- </li>
-
- <li><a href="#tocword-aligned-and-python-30" name="toc6" id="toc6">Word Aligned and Python 3.0</a>
- </li>
-</ul>
-</div>
-<h3><a href="#toc0" name="tocchristmas-present" id="tocchristmas-present">Christmas Present</a></h3>
-<p>I wish I could find a dedicated feed for Computerworld&#8217;s &#8220;A to Z of Programming Languages&#8221; series &#8212; I&#8217;d subscribe, they&#8217;re great reading. (My second wish is for online magazines to find a better way of generating revenue than all those noisy adverts.) Subscribed or not, I found and read the <a href="http://www.computerworld.com.au/article/270267/-z_programming_languages_perl?pp=1">recent interview with Larry Wall about Perl</a>. Perl 6 gets its first mention in the Q and A on the second page.
-</p>
-<blockquote><p>Would you have done anything differently in the development of Perl if you had the chance?
-</p>
-<p><strong>Either nothing or everything. See Perl 6.</strong>
-</p>
-</blockquote><p>Except you can&#8217;t really see Perl 6 yet. This ambitious new version of the language is, Larry Wall says, scheduled for release on Christmas Day. When pressed further on progress, he adds
-</p>
-<blockquote><p>We&#8217;re certainly well into the second 80 percent.
-</p>
-</blockquote><p>A metric all software developers can relate to!
-</p>
-<p><a title="95% done, just the other 95% to go" href="http://www.programmer-tshirts.com/"><img alt="95% done, just the other 95% to go" src="http://successfulsoftware.files.wordpress.com/2008/12/programmer-tshirt.png?w=400"/></a>
-</p>
-<span id="continue-reading"/>
-
-<p>As a consequence of its protracted emergence, some of Perl 6&#8217;s best features have been backported to Perl 5.10. Larry Wall, again:
-</p>
-<blockquote><p>One of the most popular things is the use of &#8220;say&#8221; instead of &#8220;print&#8221;.
-</p>
-</blockquote><p>I don&#8217;t follow Perl closely enough to know if <code>say</code> and <code>print</code> are synonymous; and even if they are I can see why this change would be popular. Programmers use <code>print</code> frequently, especially when trying to figure out what a program is doing (all of the time, that is!), and <code>say</code> is two characters fewer to type, it&#8217;s chatty, and I&#8217;m all for variety.
-</p>
-
-<h3><a href="#toc1" name="tocpython-30" id="tocpython-30">Python 3.0</a></h3>
-<p>Perl 6 may have slipped another Christmas, but notably, soberly, sensibly, Python recently hit a milestone in its own ambitious trajectory. <a href="http://python.org/news/">Python 3.0 (final) was released on December 3rd 2008</a>. Python 3.0 is, I think, the first version of the language which breaks backwards compatibility: so, for example, a Python 2.2 program should work unchanged in Python 2.6, but a Python 2.6 program is unlikely to work in Python 3.0.
-</p>
-<p>It&#8217;s a bold move, and one which has taken a lot of smart people a lot of hard work. For many others the hard work has just begun: forking the language marks the start, not the end, of a period of transition.
-</p>
-<p>As Perl 5.10 anticipates Perl 6, so Python 2.6 anticipates Python 3.0. Some features, such as <a href="http://docs.python.org/reference/lexical_analysis.html#grammar-token-bininteger" title="0b1011001, for example">binary literals</a>, have been backported from 3.0; the <code>-3</code> flag warns about Python 3.0 incompatibilities in 2.6 code; and a new tool, <code>2to3</code>, converts 2.6 code into 3.0 code.
-</p>
-<p>Despite looking forwards in this way, Python 2.6 is unlikely to mark the end of the Python 2.N line, and even for new users on greenfield projects Python 3.0 may not be a wise choice. For one thing it&#8217;s new, whereas (e.g.) 2.5 is battle-hardened; for another, many popular third-party libraries and frameworks have yet to be released against 3.0. Although the standard documentation for Python 3.0 is complete, the &#8220;current documentation&#8221; linked to from the Python homepage resolves to <a href="http://docs.python.org">Python 2.6.1</a>, and that&#8217;s where you&#8217;re likely to find yourself if you e.g. google for help on <a href="http://www.google.com/search?q=python+complex+numbers">a particular Python topic</a>, or click a link from an online article. If you&#8217;re after a book on Python, the choice for Python 3.0 is limited.
-</p>
-
-<h3><a href="#toc2" name="tocprint-is-a-function" id="tocprint-is-a-function">Print is a function</a></h3>
-<p>As with Perl 6, <code>print</code> has changed: in Python 3.0 <a href="http://docs.python.org/3.0/whatsnew/3.0.html#print-is-a-function">print is a function, not a statement</a>. So while Perl loses a couple of characters, Python gains two (the parentheses required for function application). On the other hand, it would no longer be a syntax error to assign the function <code>print</code> to a variable <code>say</code>.
-</p>
+<h3 id="christmas-present">Christmas Present</h3>
+<p>I wish I could find a dedicated feed for Computerworld&#8217;s &#8220;A to Z of Programming Languages&#8221; series &#8212; I&#8217;d subscribe, they&#8217;re great reading. (My second wish is for online magazines to find a better way of generating revenue than all those noisy adverts.) Subscribed or not, I found and read the <a href="http://www.computerworld.com.au/article/270267/-z_programming_languages_perl?pp=1">recent interview with Larry Wall about Perl</a>. Perl 6 gets its first mention in the Q and A on the second page.</p>
+<blockquote>
+<p>Would you have done anything differently in the development of Perl if you had the chance?</p>
+<p><strong>Either nothing or everything. See Perl 6.</strong></p>
+</blockquote>
+<p>Except you can&#8217;t really see Perl 6 yet. This ambitious new version of the language is, Larry Wall says, scheduled for release on Christmas Day. When pressed further on progress, he adds</p>
+<blockquote>
+<p>We&#8217;re certainly well into the second 80 percent.</p>
+</blockquote>
+<p>A metric all software developers can relate to!</p>
+<p><a title="95% done, just the other 95% to go" href="http://www.programmer-tshirts.com/"><img alt="95% done, just the other 95% to go" src="http://successfulsoftware.files.wordpress.com/2008/12/programmer-tshirt.png?w=400"/></a></p>
+<p><span id="continue-reading"/></p>
+<p>As a consequence of its protracted emergence, some of Perl 6&#8217;s best features have been backported to Perl 5.10. Larry Wall, again:</p>
+<blockquote>
+<p>One of the most popular things is the use of &#8220;say&#8221; instead of &#8220;print&#8221;.</p>
+</blockquote>
+<p>I don&#8217;t follow Perl closely enough to know if <code>say</code> and <code>print</code> are synonymous; and even if they are I can see why this change would be popular. Programmers use <code>print</code> frequently, especially when trying to figure out what a program is doing (all of the time, that is!), and <code>say</code> is two characters fewer to type, it&#8217;s chatty, and I&#8217;m all for variety.</p>
+<h3 id="python-30">Python 3.0</h3>
+<p>Perl 6 may have slipped another Christmas, but notably, soberly, sensibly, Python recently hit a milestone in its own ambitious trajectory. <a href="http://python.org/news/">Python 3.0 (final) was released on December 3rd 2008</a>. Python 3.0 is, I think, the first version of the language which breaks backwards compatibility: so, for example, a Python 2.2 program should work unchanged in Python 2.6, but a Python 2.6 program is unlikely to work in Python 3.0.</p>
+<p>It&#8217;s a bold move, and one which has taken a lot of smart people a lot of hard work. For many others the hard work has just begun: forking the language marks the start, not the end, of a period of transition.</p>
+<p>As Perl 5.10 anticipates Perl 6, so Python 2.6 anticipates Python 3.0. Some features, such as <a href="http://docs.python.org/reference/lexical_analysis.html#grammar-token-bininteger" title="0b1011001, for example">binary literals</a>, have been backported from 3.0; the <code>-3</code> flag warns about Python 3.0 incompatibilities in 2.6 code; and a new tool, <code>2to3</code>, converts 2.6 code into 3.0 code.</p>
+<p>Despite looking forwards in this way, Python 2.6 is unlikely to mark the end of the Python 2.N line, and even for new users on greenfield projects Python 3.0 may not be a wise choice. For one thing it&#8217;s new, whereas (e.g.) 2.5 is battle-hardened; for another, many popular third-party libraries and frameworks have yet to be released against 3.0. Although the standard documentation for Python 3.0 is complete, the &#8220;current documentation&#8221; linked to from the Python homepage resolves to <a href="http://docs.python.org">Python 2.6.1</a>, and that&#8217;s where you&#8217;re likely to find yourself if you e.g. google for help on <a href="http://www.google.com/search?q=python+complex+numbers">a particular Python topic</a>, or click a link from an online article. If you&#8217;re after a book on Python, the choice for Python 3.0 is limited.</p>
+<h3 id="print-is-a-function">Print is a function</h3>
+<p>As with Perl 6, <code>print</code> has changed: in Python 3.0 <a href="http://docs.python.org/3.0/whatsnew/3.0.html#print-is-a-function">print is a function, not a statement</a>. So while Perl loses a couple of characters, Python gains two (the parentheses required for function application). On the other hand, it would no longer be a syntax error to assign the function <code>print</code> to a variable <code>say</code>.</p>
 <pre>
 $ python3.0 -c "say = print"
 $ python2.6 -c "say = print"
@@ -99,40 +62,25 @@ $ python2.6 -c "say = print"
 SyntaxError: invalid syntax
 </pre>
 
-
-<h3><a href="#toc3" name="toc30-is-lazier" id="toc30-is-lazier">3.0 is lazier</a></h3>
-<p>Here&#8217;s a blot on Python 2.6 and its predecessors: the <code>range()</code> builtin function returns a complete list, even if you only want to consume its elements one at a time. <code>Xrange()</code>, which generates numbers on demand, is more efficient and generally what&#8217;s needed. Similarly in 2.6 <code>map()</code> and <code>filter()</code> return complete lists; for elements on demand, use <code>itertools.imap()</code> and <code>itertools.ifilter()</code>. And Python 2.6 provides both lazy and complete ways to access keys, values and items in a dict.
-</p>
-<p>Note the redundancy here: <code>range()</code> is equivalent to <code>list(xrange())</code>, etc.
-</p>
-<p>Python 3.0 simplifies things, letting <code>range()</code> do what <code>xrange()</code> used to, and eliminating the awkwardly named <code>xrange()</code>. Similarly <code>map/filter()</code> replace <code>itertools.imap/ifilter()</code>. <code>Dict.iteritems()</code> etc. have gone; thus <code>dict.items()</code> is lazy, and if you need the complete list of all <code>(key, value)</code> pairs in a dict, <code>list(dict.items())</code> does the job.
-</p>
-<p>These changes add little to the power of the language, and may even seem to wilfully break backwards compatibility. For me, they&#8217;re about consistency, and reducing interfaces to a minimal complete set. I applaud them.
-</p>
-
-<h3><a href="#toc4" name="tocunicode-support-is-better" id="tocunicode-support-is-better">Unicode support is better</a></h3>
-<p><span style="font-size:600%;">&#x2600; &#x2601; &#x2602; &#x2603;</span>
-</p>
-<p>More significantly, Python 3.0 builds in proper support for Unicode, or at least the basis for proper Unicode support. The problem here being, <a href="http://www.cmlenz.net/archives/2008/07/the-truth-about-unicode-in-python">Unicode is <strong>necessarily</strong> complex</a> &#8212; as any system which encompasses so many subtle cultural differences must be &#8212; and however cleverly Python has adapted to the challenge, some of this complexity must rise to the surface of Python 3.0 programs.
-</p>
-<p>Is this complexity really essential? Could a modern language reasonably ignore Unicode, or delegate its support to a standard library? Has Python become less attractive to learners and novices? When Paul Graham <a href="http://www.paulgraham.com/arc0.html" title="Arc's Out, 2008-01-29">launched a new lisp dialect, Arc</a>, at the start of 2008, he noted:
-</p>
-<blockquote><p>I went to a talk last summer by Guido van Rossum about Python, and he seemed to have spent most of the preceding year switching from one representation of characters to another. I never want to blow a year dealing with characters. Why did Guido have to? Because he had to think about compatibility. But though it seems benevolent to worry about breaking existing code, ultimately there&#8217;s a cost: it means you spend a year dealing with character sets instead of making the language more powerful.
-</p>
-<p>Which is why, incidentally, Arc <a href="http://arclanguage.org/item?id=391">only supports Ascii</a>. MzScheme, which the current version of Arc compiles to, has some more advanced plan for dealing with characters. But it would probably have taken me a couple days to figure out how to interact with it, and I don&#8217;t want to spend even one day dealing with character sets.
-</p>
-</blockquote><p>Sad to say, it would take me more than a couple of days to figure out MzScheme&#8217;s advanced character plan, so I&#8217;m not qualified to comment on Paul Graham&#8217;s decision. Many others did, at the time, and if you follow the link in the blockquote above, you&#8217;ll find a few words of explanation which I&#8217;ll paraphrase here: Arc is not about the details of character sets, it&#8217;s a high-level language, for writing short programs.
-</p>
-<p>I class Python as <a href="/articles/pitching-python-in-three-syllables.html">a high-level language</a> too, and regard its power and accessibility as the source of its popularity. Python is also a mainstream language and one increasingly used at the heart of internationalised applications. I agree with James Bennett: <a href="http://www.b-list.org/weblog/2008/dec/05/python-3000/">Unicode support is fundamental and necessary</a>.
-</p>
-
-<h3><a href="#toc5" name="tocunicode-and-word-aligned" id="tocunicode-and-word-aligned">Unicode and Word Aligned</a></h3>
-<p>Anyone who&#8217;s visited <a href="/">Word Aligned</a> before will know that most of the example code here is in Python. I&#8217;m aware that on several occasions I&#8217;ve waved away Unicode issues (an anagram solver which fails to identify &#8220;face&#8221; as an anagram of &#8220;caf&eacute;&#8221;, for example).
-</p>
-<p>Like Paul Graham, I can justify my decision. I want the code presented on this site to work, but not just so you can cut and paste it. I&#8217;m not a library provider. I use Python here primarily because it&#8217;s succinct and accessible. <strong>I want you to read it!</strong> Sometimes blurring the distinction between characters and bytes makes for short and sweet examples.
-</p>
-<p>If I switch to Python 3.0, will I still be able to cut these corners? Or will my code become more fiddly because it must deal more explicitly with character encoding issues? The truth is, I don&#8217;t know yet, I&#8217;ve only written one Python 3.0 program.
-</p>
+<h3 id="30-is-lazier">3.0 is lazier</h3>
+<p>Here&#8217;s a blot on Python 2.6 and its predecessors: the <code>range()</code> builtin function returns a complete list, even if you only want to consume its elements one at a time. <code>Xrange()</code>, which generates numbers on demand, is more efficient and generally what&#8217;s needed. Similarly in 2.6 <code>map()</code> and <code>filter()</code> return complete lists; for elements on demand, use <code>itertools.imap()</code> and <code>itertools.ifilter()</code>. And Python 2.6 provides both lazy and complete ways to access keys, values and items in a dict.</p>
+<p>Note the redundancy here: <code>range()</code> is equivalent to <code>list(xrange())</code>, etc.</p>
+<p>Python 3.0 simplifies things, letting <code>range()</code> do what <code>xrange()</code> used to, and eliminating the awkwardly named <code>xrange()</code>. Similarly <code>map/filter()</code> replace <code>itertools.imap/ifilter()</code>. <code>Dict.iteritems()</code> etc. have gone; thus <code>dict.items()</code> is lazy, and if you need the complete list of all <code>(key, value)</code> pairs in a dict, <code>list(dict.items())</code> does the job.</p>
+<p>These changes add little to the power of the language, and may even seem to wilfully break backwards compatibility. For me, they&#8217;re about consistency, and reducing interfaces to a minimal complete set. I applaud them.</p>
+<h3 id="unicode-support-is-better">Unicode support is better</h3>
+<p><span style="font-size:600%;">&#x2600; &#x2601; &#x2602; &#x2603;</span></p>
+<p>More significantly, Python 3.0 builds in proper support for Unicode, or at least the basis for proper Unicode support. The problem here being, <a href="http://www.cmlenz.net/archives/2008/07/the-truth-about-unicode-in-python">Unicode is <strong>necessarily</strong> complex</a> &#8212; as any system which encompasses so many subtle cultural differences must be &#8212; and however cleverly Python has adapted to the challenge, some of this complexity must rise to the surface of Python 3.0 programs.</p>
+<p>Is this complexity really essential? Could a modern language reasonably ignore Unicode, or delegate its support to a standard library? Has Python become less attractive to learners and novices? When Paul Graham <a href="http://www.paulgraham.com/arc0.html" title="Arc's Out, 2008-01-29">launched a new lisp dialect, Arc</a>, at the start of 2008, he noted:</p>
+<blockquote>
+<p>I went to a talk last summer by Guido van Rossum about Python, and he seemed to have spent most of the preceding year switching from one representation of characters to another. I never want to blow a year dealing with characters. Why did Guido have to? Because he had to think about compatibility. But though it seems benevolent to worry about breaking existing code, ultimately there&#8217;s a cost: it means you spend a year dealing with character sets instead of making the language more powerful.</p>
+<p>Which is why, incidentally, Arc <a href="http://arclanguage.org/item?id=391">only supports Ascii</a>. MzScheme, which the current version of Arc compiles to, has some more advanced plan for dealing with characters. But it would probably have taken me a couple days to figure out how to interact with it, and I don&#8217;t want to spend even one day dealing with character sets.</p>
+</blockquote>
+<p>Sad to say, it would take me more than a couple of days to figure out MzScheme&#8217;s advanced character plan, so I&#8217;m not qualified to comment on Paul Graham&#8217;s decision. Many others did, at the time, and if you follow the link in the blockquote above, you&#8217;ll find a few words of explanation which I&#8217;ll paraphrase here: Arc is not about the details of character sets, it&#8217;s a high-level language, for writing short programs.</p>
+<p>I class Python as <a href="/articles/pitching-python-in-three-syllables.html">a high-level language</a> too, and regard its power and accessibility as the source of its popularity. Python is also a mainstream language and one increasingly used at the heart of internationalised applications. I agree with James Bennett: <a href="http://www.b-list.org/weblog/2008/dec/05/python-3000/">Unicode support is fundamental and necessary</a>.</p>
+<h3 id="unicode-and-word-aligned">Unicode and Word Aligned</h3>
+<p>Anyone who&#8217;s visited <a href="/">Word Aligned</a> before will know that most of the example code here is in Python. I&#8217;m aware that on several occasions I&#8217;ve waved away Unicode issues (an anagram solver which fails to identify &#8220;face&#8221; as an anagram of &#8220;caf&eacute;&#8221;, for example).</p>
+<p>Like Paul Graham, I can justify my decision. I want the code presented on this site to work, but not just so you can cut and paste it. I&#8217;m not a library provider. I use Python here primarily because it&#8217;s succinct and accessible. <strong>I want you to read it!</strong> Sometimes blurring the distinction between characters and bytes makes for short and sweet examples.</p>
+<p>If I switch to Python 3.0, will I still be able to cut these corners? Or will my code become more fiddly because it must deal more explicitly with character encoding issues? The truth is, I don&#8217;t know yet, I&#8217;ve only written one Python 3.0 program.</p>
 <div class="typocode"><div class="codetitle">My first Python 3.0 program</div>
 
 <pre class="prettyprint">import antigravity
@@ -141,15 +89,12 @@ SyntaxError: invalid syntax
 
 </div>
 
-
-<h3><a href="#toc6" name="tocword-aligned-and-python-30" id="tocword-aligned-and-python-30">Word Aligned and Python 3.0</a></h3>
-<p>At work, our choice is obvious. We shall continue to use Python 2.5 for the immediate future. There&#8217;s no advantage to switching even a point revision at this stage in the project I&#8217;m working on, and the third party code we depend on has yet to be released against Python 3.0.
-</p>
-<p>On this website, I can take a complementary and more forward looking approach. Anything published in 2008 and before should work with Python 2.6. Anything published in 2009 and beyond should work with Python 3.0.
-</p>
+<h3 id="word-aligned-and-python-30">Word Aligned and Python 3.0</h3>
+<p>At work, our choice is obvious. We shall continue to use Python 2.5 for the immediate future. There&#8217;s no advantage to switching even a point revision at this stage in the project I&#8217;m working on, and the third party code we depend on has yet to be released against Python 3.0.</p>
+<p>On this website, I can take a complementary and more forward looking approach. Anything published in 2008 and before should work with Python 2.6. Anything published in 2009 and beyond should work with Python 3.0.</p>
 <div class="typocode"><div class="codetitle">My second Python 3.0 program</div>
 
-<pre class="prettyprint">print('Happy new year!')
+<pre class="prettyprint">print(&#x27;Happy new year!&#x27;)
 
 </pre>
 

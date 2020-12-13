@@ -26,19 +26,18 @@
       <div class="atomentry" id="dict-of-lists">
 <h2 class="title"><a href="/articles/dict-of-lists">Creating a dict of lists in Python</a></h2>
 <p class="meta"><abbr class="published" title="2018-04-29">2018-04-29</abbr> &bull; <a href="/tag/python" rel="tag">Python</a>, <a href="/tag/streams" rel="tag">Streams</a> &bull; <a href="/articles/dict-of-lists#disqus_thread">Comments</a></p>
-<p>Suppose you have a list of objects which you want to convert into a dict mapping from some object key to the (sub-)list of objects with that key. To provide a simple example, let&#8217;s start with a list of fruits.
-</p>
+<p>Suppose you have a list of objects which you want to convert into a dict mapping from some object key to the (sub-)list of objects with that key. To provide a simple example, let&#8217;s start with a list of fruits.</p>
 <div class="typocode">
 
 <pre class="prettyprint">from collections import namedtuple
 
-Fruit = namedtuple('Fruit', 'name colour')
+Fruit = namedtuple(&#x27;Fruit&#x27;, &#x27;name colour&#x27;)
 
-def banana():     return Fruit('banana', 'yellow')
-def grape():      return Fruit('grape', 'green')
-def pear():       return Fruit('pear', 'green')
-def strawberry(): return Fruit('strawberry', 'red')
-def cherry():     return Fruit('cherry', 'red')
+def banana():     return Fruit(&#x27;banana&#x27;, &#x27;yellow&#x27;)
+def grape():      return Fruit(&#x27;grape&#x27;, &#x27;green&#x27;)
+def pear():       return Fruit(&#x27;pear&#x27;, &#x27;green&#x27;)
+def strawberry(): return Fruit(&#x27;strawberry&#x27;, &#x27;red&#x27;)
+def cherry():     return Fruit(&#x27;cherry&#x27;, &#x27;red&#x27;)
 
 fruits = [
     banana(), pear(), cherry(), cherry(), pear(),
@@ -49,8 +48,7 @@ fruits = [
 
 </div>
 
-<p>We&#8217;d like to arrange a fruitbowl &#8212; a dict which groups fruits by colour. This can be done by creating an empty bowl, then iterating through the fruits placing each in the correct list.
-</p>
+<p>We&#8217;d like to arrange a fruitbowl &#8212; a dict which groups fruits by colour. This can be done by creating an empty bowl, then iterating through the fruits placing each in the correct list.</p>
 <div class="typocode">
 
 <pre class="prettyprint">fruitbowl = {}
@@ -62,8 +60,7 @@ for fruit in fruits:
 
 </div>
 
-<p><code>Dict.setdefault</code> is a bit of an oddity in Python, both doing something and returning a value, but it&#8217;s a convenient shorthand in this case. Despite this convenience it&#8217;s more common to use a <code>defaultdict</code>.
-</p>
+<p><code>Dict.setdefault</code> is a bit of an oddity in Python, both doing something and returning a value, but it&#8217;s a convenient shorthand in this case. Despite this convenience it&#8217;s more common to use a <code>defaultdict</code>.</p>
 <div class="typocode">
 
 <pre class="prettyprint">from collections import defaultdict
@@ -77,22 +74,20 @@ for fruit in fruits:
 
 </div>
 
-<p>Here&#8217;s a function to display the fruitbowl.
-</p>
+<p>Here&#8217;s a function to display the fruitbowl.</p>
 <div class="typocode">
 
 <pre class="prettyprint">def print_bowl(bowl):
-    print('\n'.join(
-        '{}: {}'.format(colour,
-                        ', '.join(f.name for f in fruits))
+    print(&#x27;\n&#x27;.join(
+        &#x27;{}: {}&#x27;.format(colour,
+                        &#x27;, &#x27;.join(f.name for f in fruits))
         for colour, fruits in bowl.items()))
 
 </pre>
 
 </div>
 
-<p>If we call this function, we see the fruits have indeed been grouped by colour.
-</p>
+<p>If we call this function, we see the fruits have indeed been grouped by colour.</p>
 <div class="typocode">
 
 <pre class="prettyprint">&gt;&gt;&gt; print_bowl(fruitbowl)
@@ -104,16 +99,14 @@ red: cherry, cherry, cherry, strawberry, cherry
 
 </div>
 
-<p>This is all fine and idiomatic Python, but whenever I see an empty dict being created followed by a loop to populate it, I wonder if a comprehension could be used.
-</p>
-<p>Is there a way to declare and initialise the dict in a single expression? Here&#8217;s the best I came up with.
-</p>
+<p>This is all fine and idiomatic Python, but whenever I see an empty dict being created followed by a loop to populate it, I wonder if a comprehension could be used.</p>
+<p>Is there a way to declare and initialise the dict in a single expression? Here&#8217;s the best I came up with.</p>
 <div class="typocode">
 
 <pre class="prettyprint">from operator import attrgetter
 from itertools import groupby
 
-colour = attrgetter('colour')
+colour = attrgetter(&#x27;colour&#x27;)
 
 fruitbowl = {
     col: list(fts)
@@ -123,37 +116,34 @@ fruitbowl = {
 
 </div>
 
-<p>Is this better than the <code>defaultdict</code> solution. Probably not, but it&#8217;s a technique worth remembering. Maybe the <code>fruitbowl</code> isn&#8217;t needed, and we actually just need to iterate through the fruits grouped by colour. For example, which colour is most popular?
-</p>
+<p>Is this better than the <code>defaultdict</code> solution. Probably not, but it&#8217;s a technique worth remembering. Maybe the <code>fruitbowl</code> isn&#8217;t needed, and we actually just need to iterate through the fruits grouped by colour. For example, which colour is most popular?</p>
 <div class="typocode">
 
 <pre class="prettyprint">&gt;&gt;&gt; max(fruitbowl.items(), key=lambda kv: len(kv[1]))[0]
-'green'
+&#x27;green&#x27;
 
 </pre>
 
 </div>
 
-<p>Using <code>groupby</code>, we don&#8217;t need the bowl.
-</p>
+<p>Using <code>groupby</code>, we don&#8217;t need the bowl.</p>
 <div class="typocode">
 
 <pre class="prettyprint">&gt;&gt;&gt; def grouplen(k_gp):
 ...     return sum(1 for _ in k_gp[1])
 &gt;&gt;&gt; max(groupby(sorted(fruits, key=colour), colour), key=grouplen)[0]
-&gt;&gt;&gt; 'green'
+&gt;&gt;&gt; &#x27;green&#x27;
 
 </pre>
 
 </div>
 
-<p>In this case, we don&#8217;t need <code>groupby</code> either. <a href="./timtowtdi-vs-tsboapooowtdi">There is more than one way to do it</a>.
-</p>
+<p>In this case, we don&#8217;t need <code>groupby</code> either. <a href="./timtowtdi-vs-tsboapooowtdi">There is more than one way to do it</a>.</p>
 <div class="typocode">
 
 <pre class="prettyprint">&gt;&gt;&gt; from collections import Counter
 &gt;&gt;&gt; Counter(map(colour, fruits)).most_common(1)
-[('green', 7)]
+[(&#x27;green&#x27;, 7)]
 
 </pre>
 

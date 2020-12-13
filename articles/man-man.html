@@ -26,8 +26,7 @@
       <div class="atomentry" id="man-man">
 <h2 class="title"><a href="/articles/man-man">Man or man(1)?</a></h2>
 <p class="meta"><abbr class="published" title="2010-05-19">2010-05-19</abbr> &bull; <a href="/tag/unix" rel="tag">Unix</a>, <a href="/tag/shell" rel="tag">Shell</a> &bull; <a href="/articles/man-man#disqus_thread">Comments</a></p>
-<p>How careless, we&#8217;d forgotten to configure <a href="http://gd.tuwien.ac.at/linuxcommand.org/man_pages/logrotate8.html">log rotation</a>. So our application had gone with a default designed for a less verbose age, rotating files as soon as they exceeded a megabyte in size, and never throwing any of them away. Oh, and it was putting these log files at the root of the file system where they&#8217;d somehow gone unnoticed for some time. As a consequence, the file system had become clogged up with squillions of files.
-</p>
+<p>How careless, we&#8217;d forgotten to configure <a href="http://gd.tuwien.ac.at/linuxcommand.org/man_pages/logrotate8.html">log rotation</a>. So our application had gone with a default designed for a less verbose age, rotating files as soon as they exceeded a megabyte in size, and never throwing any of them away. Oh, and it was putting these log files at the root of the file system where they&#8217;d somehow gone unnoticed for some time. As a consequence, the file system had become clogged up with squillions of files.</p>
 <pre>
 $ cd /
 $ ls
@@ -39,40 +38,30 @@ server.log.736627
 ...
 </pre>
 
-<p><a href="http://www.flickr.com/photos/fdecomite/2318674303"><img src="http://farm3.static.flickr.com/2206/2318674303_a3c9d8bef4.jpg" alt="20 levels by fdecomit"/></a>
-</p>
-<span id="continue-reading"/>
-
-<p>How many files, exactly?
-</p>
+<p><a href="http://www.flickr.com/photos/fdecomite/2318674303"><img src="http://farm3.static.flickr.com/2206/2318674303_a3c9d8bef4.jpg" alt="20 levels by fdecomit"/></a></p>
+<p><span id="continue-reading"/></p>
+<p>How many files, exactly?</p>
 <pre>
 $ ls | wc -l
 ^C
 </pre>
 
-<p>No time to wait. Too many! We had to act fast.
-</p>
-<p>We changed the log rotate configuration to something more appropriate, restarted the application, and set about cleaning up. Now, this is when you <strong>don&#8217;t</strong> want to open a file browser and drag files into trash can, not unless you like watching egg-timers. The desktop metaphor fails when you have squillions of files on your desk. Alarmingly, the shell complains too.
-</p>
+<p>No time to wait. Too many! We had to act fast.</p>
+<p>We changed the log rotate configuration to something more appropriate, restarted the application, and set about cleaning up. Now, this is when you <strong>don&#8217;t</strong> want to open a file browser and drag files into trash can, not unless you like watching egg-timers. The desktop metaphor fails when you have squillions of files on your desk. Alarmingly, the shell complains too.</p>
 <pre>
 $ rm server.log.*
 -bash: /bin/rm: Argument list too long
 </pre>
 
-<p>At this point, a clear head and a steady hand is needed. I use pathname expansion and <code>rm</code> all the time and I&#8217;m confident the commands I type will have the right effect. But in my current situation &#8212; as root user, in the root directory, on a machine running an unfamiliar flavour of Unix, about to combine <code>find</code> with <code>xargs</code> and <code>rm</code> &#8212; I grow nervous.
-</p>
-<p>How to stop <code>find</code> from descending? <code>-Maxdepth</code>, I think, but level <code>0</code> or <code>1</code>? Is <code>-print</code> required? Should I create a scratch directory and practise.
-</p>
-<p>Enough questions already! Are you a man or a <code>man(1)</code> reader?
-</p>
+<p>At this point, a clear head and a steady hand is needed. I use pathname expansion and <code>rm</code> all the time and I&#8217;m confident the commands I type will have the right effect. But in my current situation &#8212; as root user, in the root directory, on a machine running an unfamiliar flavour of Unix, about to combine <code>find</code> with <code>xargs</code> and <code>rm</code> &#8212; I grow nervous.</p>
+<p>How to stop <code>find</code> from descending? <code>-Maxdepth</code>, I think, but level <code>0</code> or <code>1</code>? Is <code>-print</code> required? Should I create a scratch directory and practise.</p>
+<p>Enough questions already! Are you a man or a <code>man(1)</code> reader?</p>
 <pre>
 $ find / -maxdepth 1 -name 'server.log.*' | xargs rm -f
 </pre>
 
-<p><a href="http://www.flickr.com/photos/sarahandmikeprobably/3356749485/"><img src="http://farm4.static.flickr.com/3660/3356749485_66f532e6c0.jpg" alt="74/365: Falling Cards, by Sarah and Mike ...probably"/></a>
-</p>
-<p>Done!
-</p>
+<p><a href="http://www.flickr.com/photos/sarahandmikeprobably/3356749485/"><img src="http://farm4.static.flickr.com/3660/3356749485_66f532e6c0.jpg" alt="74/365: Falling Cards, by Sarah and Mike ...probably"/></a></p>
+<p>Done!</p>
 </div>
 
 <div class="comments"><hr/><div id="disqus_thread"></div><script type="text/javascript" src="http://disqus.com/forums/wordaligned/embed.js"></script></div>

@@ -28,58 +28,15 @@
       <div class="atomentry" id="string-literals-and-regular-expressions">
 <h2 class="title"><a href="/articles/string-literals-and-regular-expressions">String literals and regular expressions</a></h2>
 <p class="meta"><abbr class="published" title="2006-09-02">2006-09-02</abbr> &bull; <a href="/tag/c++" rel="tag">C++</a>, <a href="/tag/ruby" rel="tag">Ruby</a>, <a href="/tag/puzzles" rel="tag">Puzzles</a>, <a href="/tag/python" rel="tag">Python</a>, <a href="/tag/boost" rel="tag">Boost</a>, <a href="/tag/regex" rel="tag">Regex</a>, <a href="/tag/characters" rel="tag">Characters</a> &bull; <a href="/articles/string-literals-and-regular-expressions#disqus_thread">Comments</a></p>
-<div class="toc">
-<h2>Contents</h2>
-<ul>
- <li><a href="#tocstring-literals" name="toc0" id="toc0">String Literals</a>
- </li>
-
- <li><a href="#tocescape-sequences" name="toc1" id="toc1">Escape Sequences</a>
- </li>
-
- <li><a href="#tocliteral-backslashes" name="toc2" id="toc2">Literal Backslashes</a>
- </li>
-
- <li><a href="#tocregular-expressions" name="toc3" id="toc3">Regular Expressions</a>
- </li>
-
- <li><a href="#tocattempting-to-match-a-c-string-literal" name="toc4" id="toc4">Attempting to Match a C++ String Literal</a>
- </li>
-
- <li><a href="#toccorrectly-matching-a-c-string-literal" name="toc5" id="toc5">Correctly Matching a C++ String Literal</a>
- </li>
-
- <li><a href="#tocnow-lets-do-it-in-c" name="toc6" id="toc6">Now let&#8217;s do it in C++</a>
- </li>
-
- <li><a href="#toca-complete-c-string-literal-matcher" name="toc7" id="toc7">A complete C++ string literal matcher</a>
- </li>
-
- <li><a href="#tocraw-strings-in-python" name="toc8" id="toc8">Raw Strings in Python</a>
- </li>
-
- <li><a href="#tocraw-strings-in-c" name="toc9" id="toc9">Raw Strings in C++?</a>
- </li>
-
- <li><a href="#tocverbatim-strings-in-c" name="toc10" id="toc10">Verbatim Strings in C++?</a>
- </li>
-
- <li><a href="#toctheres-no-escape" name="toc11" id="toc11">There&#8217;s no escape</a>
- </li>
-</ul>
-</div><p>According to the <a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2005/n1836.pdf">&#8220;Draft Technical Report on C++ Library Extensions&#8221;</a>
-   (more commonly known as <a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2005/n1836.pdf">TR1</a>) regular expressions are making their way
-   into the C++ standard library. Actually, <a href="http://boost.org">Boost</a> users have had
-   a <a href="http://www.boost.org/libs/regex/doc/index.html">regular expression library</a> for a while now. The library
-   is well designed and easy to use but is let down by the limitations
-   of string literals.
-</p>
-<span id="continue-reading"/>
-
-
-<h4><a href="#toc0" name="tocstring-literals" id="tocstring-literals">String Literals</a></h4>
-<p>Let&#8217;s go back to basics and examine a C++ string literal:
-</p>
+<p>According to the <a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2005/n1836.pdf">&#8220;Draft Technical Report on C++ Library Extensions&#8221;</a>
+(more commonly known as <a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2005/n1836.pdf">TR1</a>) regular expressions are making their way
+into the C++ standard library. Actually, <a href="http://boost.org">Boost</a> users have had
+a <a href="http://www.boost.org/libs/regex/doc/index.html">regular expression library</a> for a while now. The library
+is well designed and easy to use but is let down by the limitations
+of string literals.</p>
+<p><span id="continue-reading"/></p>
+<h4 id="string-literals">String Literals</h4>
+<p>Let&#8217;s go back to basics and examine a C++ string literal:</p>
 <div class="typocode">
 
 <pre class="prettyprint">char const * s = "string literal";
@@ -89,11 +46,9 @@
 </div>
 
 <p>Here, the string literal comprises the sequence of characters <code>s</code>,
-   <code>t</code>, &#8230; <code>l</code>. The double-quotes <code>"</code> serve to delimit the contents of
-   the string.
-</p>
-<p>All&#8217;s fine until we need a double-quote inside the string:
-</p>
+<code>t</code>, &#8230; <code>l</code>. The double-quotes <code>"</code> serve to delimit the contents of
+the string.</p>
+<p>All&#8217;s fine until we need a double-quote inside the string:</p>
 <div class="typocode"><div class="codetitle">Broken string literal</div>
 
 <pre class="prettyprint">char const * s = "The "x" in C++0x will probably be 9";
@@ -102,25 +57,21 @@
 
 </div>
 
-<p>This line of code gives a compilation error:
-</p>
+<p>This line of code gives a compilation error:</p>
 <div class="typocode">
 
-<pre class="prettyprint">error: expected `,' or `;' before "x"
+<pre class="prettyprint">error: expected `,&#x27; or `;&#x27; before "x"
 
 </pre>
 
 </div>
 
 <p>since the first internal double-quote closed the string. But how can we
-   include a double-quote without closing the string?
-</p>
-
-<h4><a href="#toc1" name="tocescape-sequences" id="tocescape-sequences">Escape Sequences</a></h4>
+include a double-quote without closing the string?</p>
+<h4 id="escape-sequences">Escape Sequences</h4>
 <p>Here&#8217;s how: the backslash, <code>\</code>, is treated as an <em>escape</em>
-   <em>character</em>. That is to say, normal interpretation of the string is suspended
-   for a while &#8212; in this case for a single character &#8212; allowing us to write:
-</p>
+<em>character</em>. That is to say, normal interpretation of the string is suspended
+for a while &#8212; in this case for a single character &#8212; allowing us to write:</p>
 <div class="typocode"><div class="codetitle">Fixed string literal</div>
 
 <pre class="prettyprint">char const * s = "The \"x\" in C++0x will probably be 9";
@@ -130,14 +81,11 @@
 </div>
 
 <p>Here, the internal double-quotes have been <em>escaped</em>, so they don&#8217;t close the
-   string literal but are in fact interpreted as double-quote characters
-   within the string itself. Yes, it&#8217;s confusing.
-</p>
-
-<h4><a href="#toc2" name="tocliteral-backslashes" id="tocliteral-backslashes">Literal Backslashes</a></h4>
+string literal but are in fact interpreted as double-quote characters
+within the string itself. Yes, it&#8217;s confusing.</p>
+<h4 id="literal-backslashes">Literal Backslashes</h4>
 <p>Now, if the backslash takes on a special meaning, how are
-   we to insert a literal backslash into the string? Simple &#8212; we must escape that too:
-</p>
+we to insert a literal backslash into the string? Simple &#8212; we must escape that too:</p>
 <div class="typocode"><div class="codetitle">String literal containing a single backslash</div>
 
 <pre class="prettyprint">char const * s = "A backslash \\ starts an escape sequence";
@@ -147,21 +95,16 @@
 </div>
 
 <p>Here, despite first appearances, the string contains just a <em>single</em>
-   backslash character.  We did say it was confusing! Which leads us on to &#8230;
-</p>
-
-<h3><a href="#toc3" name="tocregular-expressions" id="tocregular-expressions">Regular Expressions</a></h3>
+backslash character.  We did say it was confusing! Which leads us on to &#8230;</p>
+<h3 id="regular-expressions">Regular Expressions</h3>
 <p>Put string literals aside for now. We&#8217;re going to talk about regular
-   expressions (let&#8217;s call them regexes from now on).  Regexes are used
-   to find and match patterns in blocks of text.  Like string literals,
-   regexes are composed of sequences of characters, and, also like
-   string literals, we need to escape the usual meaning of characters in regexes.
-</p>
-<p>Once again, the backslash, <code>\</code>, is used as the escape sequence prefix.
-</p>
+expressions (let&#8217;s call them regexes from now on).  Regexes are used
+to find and match patterns in blocks of text.  Like string literals,
+regexes are composed of sequences of characters, and, also like
+string literals, we need to escape the usual meaning of characters in regexes.</p>
+<p>Once again, the backslash, <code>\</code>, is used as the escape sequence prefix.</p>
 <p><a href="http://www.ruby-lang.org" title="Ruby Website">Ruby</a> embeds a powerful regex engine, so let&#8217;s use Ruby for our regex
-   examples:
-</p>
+examples:</p>
 <div class="typocode"><div class="codetitle">Some Ruby regex patterns</div>
 
 <pre class="prettyprint">/w/
@@ -175,46 +118,27 @@
 </div>
 
 <p>Notice here that the <em>forward</em> slash, <code>/</code>, is used as a delimiter and
-   is not part of the body of the regex pattern &#8212; just like the
-   double-quote, <code>"</code>, was not part of the body our string literals.
-</p>
-<p>What do these regex patterns mean?
-</p>
+is not part of the body of the regex pattern &#8212; just like the
+double-quote, <code>"</code>, was not part of the body our string literals.</p>
+<p>What do these regex patterns mean?</p>
 <ol>
- <li>
-     <code>/w/</code> matches the character <code>w</code>.
- </li>
-
- <li>
-     <code>/w+/</code> matches a sequence of one or more adjacent <code>w</code>&#8217;s.
- </li>
-
- <li>
-     <code>/\w+/</code> matches one or more adjacent &#8220;word&#8221; characters.
- </li>
-
- <li>
-     <code>/"\w*"/</code> matches a double-quote delimited sequence of zero or more &#8220;word&#8221; characters.
- </li>
-
- <li>
-     <code>/\\/</code> matches a <em>single</em> backslash.
- </li>
+<li><code>/w/</code> matches the character <code>w</code>.</li>
+<li><code>/w+/</code> matches a sequence of one or more adjacent <code>w</code>&#8217;s.</li>
+<li><code>/\w+/</code> matches one or more adjacent &#8220;word&#8221; characters.</li>
+<li><code>/"\w*"/</code> matches a double-quote delimited sequence of zero or more &#8220;word&#8221; characters.</li>
+<li><code>/\\/</code> matches a <em>single</em> backslash.</li>
 </ol>
 <p>Did you notice that the backslash, <code>\</code>, gives the succeding <code>w</code> a special
-   meaning? Did you notice that the <code>+</code> has a special meaning within a regex
-   (it means one or more)?  To match a literal <code>+</code>, we&#8217;d need to escape
-   it like this: <code>/\+/</code>. And did you notice that to match a literal backslash
-   we must escape it? Good &#8212; but that was the easy bit!
-</p>
-
-<h4><a href="#toc4" name="tocattempting-to-match-a-c-string-literal" id="tocattempting-to-match-a-c-string-literal">Attempting to Match a C++ String Literal</a></h4>
+meaning? Did you notice that the <code>+</code> has a special meaning within a regex
+(it means one or more)?  To match a literal <code>+</code>, we&#8217;d need to escape
+it like this: <code>/\+/</code>. And did you notice that to match a literal backslash
+we must escape it? Good &#8212; but that was the easy bit!</p>
+<h4 id="attempting-to-match-a-c-string-literal">Attempting to Match a C++ String Literal</h4>
 <p>Let&#8217;s suppose we want to use our regex pattern matching on some C++ code.
-   Now, matching a C++ string literal is going to be tricky. A first attempt,
-   <code>/".*"/</code>, just won&#8217;t do because the <code>.*</code> is <em>greedy</em> and will eat up
-   everything until the final <code>"</code> in the text to be matched. So
-   we might match too much:
-</p>
+Now, matching a C++ string literal is going to be tricky. A first attempt,
+<code>/".*"/</code>, just won&#8217;t do because the <code>.*</code> is <em>greedy</em> and will eat up
+everything until the final <code>"</code> in the text to be matched. So
+we might match too much:</p>
 <div class="typocode">
 
 <pre class="prettyprint">char * s1 = "string", * s2 = "literal";
@@ -225,9 +149,8 @@
 </div>
 
 <p>A non-greedy second attempt, <code>/".*?"/</code>, won&#8217;t do either since it gets
-   confused by an escaped double-quote in a string literal. So
-   we might match too little:
-</p>
+confused by an escaped double-quote in a string literal. So
+we might match too little:</p>
 <div class="typocode">
 
 <pre class="prettyprint">char const * s = "The \"x\" in C++0x will probably be 9";
@@ -237,18 +160,15 @@
 
 </div>
 
-
-<h4><a href="#toc5" name="toccorrectly-matching-a-c-string-literal" id="toccorrectly-matching-a-c-string-literal">Correctly Matching a C++ String Literal</a></h4>
+<h4 id="correctly-matching-a-c-string-literal">Correctly Matching a C++ String Literal</h4>
 <p>To properly match a C++ string literal we need to apply the following
-   pattern: start with a double-quote; continue with a sequence of
-   <em>either</em> characters which aren&#8217;t the double-quote or the backslash
-   <em>or</em> escape sequences; then finish with a double-quote.
-</p>
+pattern: start with a double-quote; continue with a sequence of
+<em>either</em> characters which aren&#8217;t the double-quote or the backslash
+<em>or</em> escape sequences; then finish with a double-quote.</p>
 <p>Precisely what makes up a valid escape sequence is a little fiddly;
-   there are octal and hexadecimal escapes, there are various whitespace
-   characters, and there are unicode values. We can however compose a
-   pattern using a suitable short-cut as follows:
-</p>
+there are octal and hexadecimal escapes, there are various whitespace
+characters, and there are unicode values. We can however compose a
+pattern using a suitable short-cut as follows:</p>
 <div class="typocode"><div class="codetitle">A regex to match a C++ string literal</div>
 
 <pre class="prettyprint">/"([^"\\]|\\.)*"/
@@ -258,30 +178,20 @@
 </div>
 
 <p>We can read this as: a string literal starts with a double quote,
-   followed by any number of items which are:
-</p>
+followed by any number of items which are:</p>
 <ul>
- <li>
-     <em>either</em> not a double-quote or a backslash
- </li>
-
- <li>
-     <em>or</em> are a backslash followed by any single character
- </li>
+<li><em>either</em> not a double-quote or a backslash</li>
+<li><em>or</em> are a backslash followed by any single character</li>
 </ul>
-<p>and then finishes with a closing double-quote.
-</p>
+<p>and then finishes with a closing double-quote.</p>
 <p>As you&#8217;ve probably spotted, we have to double up the backslashes in
-   the regex pattern because the backslash is used as an escape sequence;
-   i.e. a literal backslash is matched by the pattern <code>\\\\</code>.
-</p>
-
-<h4><a href="#toc6" name="tocnow-lets-do-it-in-c" id="tocnow-lets-do-it-in-c">Now let&#8217;s do it in C++</a></h4>
+the regex pattern because the backslash is used as an escape sequence;
+i.e. a literal backslash is matched by the pattern <code>\\\\</code>.</p>
+<h4 id="now-lets-do-it-in-c">Now let&#8217;s do it in C++</h4>
 <p>I&#8217;ll use the <a href="http://www.boost.org/libs/regex/doc/index.html">Boost</a> implementation since the compilers I
-   have available don&#8217;t support <a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2005/n1836.pdf">TR1</a> yet. We&#8217;re going to need to
-   construct a <code>boost::regex</code> using a pattern represented by a string
-   literal. Which is where the problems start.  Of course we can&#8217;t write:
-</p>
+have available don&#8217;t support <a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2005/n1836.pdf">TR1</a> yet. We&#8217;re going to need to
+construct a <code>boost::regex</code> using a pattern represented by a string
+literal. Which is where the problems start.  Of course we can&#8217;t write:</p>
 <div class="typocode"><div class="codetitle">This regex won&#8217;t compile!</div>
 
 <pre class="prettyprint">boost::regex const
@@ -292,10 +202,9 @@
 </div>
 
 <p>because we haven&#8217;t passed a string literal to the <code>boost::regex</code>
-   constructor.  In order to pass a string literal we&#8217;ll need to use
-   double-quotes instead of forward-slashes and we&#8217;ll have to escape
-   the internal double-quotes. Let&#8217;s try again:
-</p>
+constructor.  In order to pass a string literal we&#8217;ll need to use
+double-quotes instead of forward-slashes and we&#8217;ll have to escape
+the internal double-quotes. Let&#8217;s try again:</p>
 <div class="typocode"><div class="codetitle">This regex throws an exception!</div>
 
 <pre class="prettyprint">boost::regex const
@@ -306,11 +215,10 @@
 </div>
 
 <p>Oh dear &#8212; the error moves to run-time. We get an exception:
-   <code>Unmatched [ or [^</code>. This is because the closing square bracket <code>]</code>
-   has been escaped by the time it gets to the regex engine. Unfortunately
-   the <code>\\</code>&#8217;s in the string literal contract to just single backslashes. We need
-   to redouble them.
-</p>
+<code>Unmatched [ or [^</code>. This is because the closing square bracket <code>]</code>
+has been escaped by the time it gets to the regex engine. Unfortunately
+the <code>\\</code>&#8217;s in the string literal contract to just single backslashes. We need
+to redouble them.</p>
 <div class="typocode"><div class="codetitle">This regex is just right!</div>
 
 <pre class="prettyprint">boost::regex const
@@ -321,16 +229,12 @@
 </div>
 
 <p>Here, each pair of backslashes has contracted to a single backslash by the
-   time the regex engine sees it, which &#8212; believe it or not &#8212; is what&#8217;s
-   required.
-</p>
+time the regex engine sees it, which &#8212; believe it or not &#8212; is what&#8217;s
+required.</p>
 <p>This <code>string_matcher</code> works, but as code it is rather more cryptic
-   than communicative.
-</p>
-
-<h4><a href="#toc7" name="toca-complete-c-string-literal-matcher" id="toca-complete-c-string-literal-matcher">A complete C++ string literal matcher</a></h4>
-<p>Here&#8217;s a complete program for you to try.
-</p>
+than communicative.</p>
+<h4 id="a-complete-c-string-literal-matcher">A complete C++ string literal matcher</h4>
+<p>Here&#8217;s a complete program for you to try.</p>
 <div class="typocode"><div class="codetitle">A C++ string matcher</div>
 
 <pre class="prettyprint">#include &lt;boost/regex.hpp&gt;
@@ -368,34 +272,28 @@ int main(int argc, char * argv[])
 
 </div>
 
-
-<h4><a href="#toc8" name="tocraw-strings-in-python" id="tocraw-strings-in-python">Raw Strings in Python</a></h4>
+<h4 id="raw-strings-in-python">Raw Strings in Python</h4>
 <p>Unlike <a href="http://www.ruby-lang.org" title="Ruby Website">Ruby</a>, <a href="http://python.org">Python</a> doesn&#8217;t include support for regexes in the
-   language itself. Instead, regex support is provided by the standard
-   <a href="http://docs.python.org/lib/module-re.html">regular expression library</a>.
-</p>
+language itself. Instead, regex support is provided by the standard
+<a href="http://docs.python.org/lib/module-re.html">regular expression library</a>.</p>
 <p><a href="http://python.org">Python</a>&#8217;s flexible string literals allow us to simplify the pattern,
-   though. Here, we use a <a href="http://docs.python.org/ref/strings.html">raw string</a>, and we chose to delimit it with
-   single-quotes so we don&#8217;t need to escape the internal double-quotes.
-</p>
+though. Here, we use a <a href="http://docs.python.org/ref/strings.html">raw string</a>, and we chose to delimit it with
+single-quotes so we don&#8217;t need to escape the internal double-quotes.</p>
 <div class="typocode">
 
-<pre class="prettyprint">string_literal_pattern = r'"([^"\\]|\\.)*"'
+<pre class="prettyprint">string_literal_pattern = r&#x27;"([^"\\]|\\.)*"&#x27;
 
 </pre>
 
 </div>
 
 <p>This is nice. Basically, <a href="http://docs.python.org/ref/strings.html">raw strings</a> leave the backslashes
-   unprocessed.  <a href="http://docs.python.org/ref/strings.html">Raw strings</a> aren&#8217;t just restricted to regex patterns,
-   though perhaps that&#8217;s their most common use.
-</p>
-
-<h4><a href="#toc9" name="tocraw-strings-in-c" id="tocraw-strings-in-c">Raw Strings in C++?</a></h4>
+unprocessed.  <a href="http://docs.python.org/ref/strings.html">Raw strings</a> aren&#8217;t just restricted to regex patterns,
+though perhaps that&#8217;s their most common use.</p>
+<h4 id="raw-strings-in-c">Raw Strings in C++?</h4>
 <p>C++ doesn&#8217;t support raw strings (at least, it doesn&#8217;t support them
-   yet, and I haven&#8217;t found them mentioned in <a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2005/n1836.pdf">TR1</a>) &#8212; but it does
-   support wide-strings, indicated by the <code>L</code> prefix.
-</p>
+yet, and I haven&#8217;t found them mentioned in <a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2005/n1836.pdf">TR1</a>) &#8212; but it does
+support wide-strings, indicated by the <code>L</code> prefix.</p>
 <div class="typocode">
 
 <pre class="prettyprint">cpp_wide_string = L"this is a wide string";
@@ -405,28 +303,22 @@ int main(int argc, char * argv[])
 </div>
 
 <p>Maybe if we switched the <code>L</code> for an <code>R</code> we could allow raw strings into
-   C++? It would make regex patterns far more readable.
-</p>
-
-<h4><a href="#toc10" name="tocverbatim-strings-in-c" id="tocverbatim-strings-in-c">Verbatim Strings in C++?</a></h4>
-<p>Alternatively &#8230;
-</p>
+C++? It would make regex patterns far more readable.</p>
+<h4 id="verbatim-strings-in-c">Verbatim Strings in C++?</h4>
+<p>Alternatively &#8230;</p>
 <p>I&#8217;ve never used C# but <a href="http://www.google.co.uk/search?q=c%23%20string%20literals&amp;hl=en&amp;meta=">googling</a>
-   suggests raw strings are supported and rather nicely named
-   &#8220;verbatim string literals&#8221;. C# uses the <code>@</code> prefix to indicate that a
-   string literal is a verbatim string. Now, <code>@</code> isn&#8217;t even part of the C++
-   source character set, so maybe this too would be possible.
-</p>
-
-<h4><a href="#toc11" name="toctheres-no-escape" id="toctheres-no-escape">There&#8217;s no escape</a></h4>
+suggests raw strings are supported and rather nicely named
+&#8220;verbatim string literals&#8221;. C# uses the <code>@</code> prefix to indicate that a
+string literal is a verbatim string. Now, <code>@</code> isn&#8217;t even part of the C++
+source character set, so maybe this too would be possible.</p>
+<h4 id="theres-no-escape">There&#8217;s no escape</h4>
 <p>The proliferation of backslashes when we combine regexes and string
-   literals is unfortunate. <span id="excerpt0"/>It could be worse. What if the backslash key
-   had fallen off our keyboard? Remarkably &ndash; and, as far as I know,
-   uniquely &ndash; C++ caters for this situation. A number source characters
-   can be written as &#8220;trigraphs&#8221; &#8212; sequences of three characters
-   starting <code>??</code>. The backslash is one such character: it can be
-   written as <code>??/</code>.
-</p>
+literals is unfortunate. <span id="excerpt0"/>It could be worse. What if the backslash key
+had fallen off our keyboard? Remarkably &ndash; and, as far as I know,
+uniquely &ndash; C++ caters for this situation. A number source characters
+can be written as &#8220;trigraphs&#8221; &#8212; sequences of three characters
+starting <code>??</code>. The backslash is one such character: it can be
+written as <code>??/</code>.</p>
 <div class="typocode"><div class="codetitle">regex using trigraphs</div>
 
 <pre class="prettyprint">boost::regex const
@@ -436,8 +328,7 @@ int main(int argc, char * argv[])
 
 </div>
 
-<p>For completeness, we could also lose the <code>|</code>, <code>[</code> and <code>]</code> keys.
-</p>
+<p>For completeness, we could also lose the <code>|</code>, <code>[</code> and <code>]</code> keys.</p>
 <div class="typocode"><div class="codetitle">regex using even more trigraphs</div>
 
 <pre class="prettyprint">boost::regex const
@@ -448,9 +339,8 @@ int main(int argc, char * argv[])
 </div>
 
 <p>The string literal used to initialise <code>string_matcher</code> <em>is</em> valid, but
-   the regex wouldn&#8217;t match it properly. I&#8217;ll leave the fix as an exercise
-   for the reader.
-</p>
+the regex wouldn&#8217;t match it properly. I&#8217;ll leave the fix as an exercise
+for the reader.</p>
 </div>
 
 <h5><a name="feedback">Feedback</a></h5>

@@ -26,19 +26,12 @@
       <div class="atomentry" id="a-useful-octal-escape-sequence">
 <h2 class="title"><a href="/articles/a-useful-octal-escape-sequence">A useful octal escape sequence</a></h2>
 <p class="meta"><abbr class="published" title="2009-08-09">2009-08-09</abbr> &bull; <a href="/tag/python" rel="tag">Python</a>, <a href="/tag/c" rel="tag">C</a> &bull; <a href="/articles/a-useful-octal-escape-sequence#disqus_thread">Comments</a></p>
-<p><a href="/articles/integer-literal-values.html">Previously</a> I grumbled about <a href="/articles/octal-literals.html">octal integer literals</a>, suggesting:
-</p>
+<p><a href="/articles/integer-literal-values.html">Previously</a> I grumbled about <a href="/articles/octal-literals.html">octal integer literals</a>, suggesting:</p>
 <ol>
- <li>
-     they aren&#8217;t much use, not when you&#8217;ve got hexademical and binary literals.
- </li>
-
- <li>
-     they&#8217;re risky. As Doug Napoleone noted in a <a href="/articles/integer-literal-values.html#comment-14394465">comment</a>, <code>011</code> is all too easily read as eleven rather than nine.
- </li>
+<li>they aren&#8217;t much use, not when you&#8217;ve got hexademical and binary literals.</li>
+<li>they&#8217;re risky. As Doug Napoleone noted in a <a href="/articles/integer-literal-values.html#comment-14394465">comment</a>, <code>011</code> is all too easily read as eleven rather than nine.</li>
 </ol>
-<p>Python 3 attempts to patch the readability issue: octal nine must be written as <code>0o11</code> or <code>0O11</code>. Choose your fonts with care, <code>O</code> and <code>0</code> look similar!
-</p>
+<p>Python 3 attempts to patch the readability issue: octal nine must be written as <code>0o11</code> or <code>0O11</code>. Choose your fonts with care, <code>O</code> and <code>0</code> look similar!</p>
 <div class="typocode">
 
 <pre class="prettyprint">&gt;&gt;&gt; 0o11, 0O11
@@ -48,17 +41,14 @@
 
 </div>
 
-<p>Octal numbers can also appear in escape sequences embedded in <a href="http://docs.python.org/py3k/reference/lexical_analysis.html#string-and-bytes-literals">string and bytes literals</a>. The syntax hasn&#8217;t changed for Python 3 and the rules are as in C: the escape sequence <code>\OOO</code> embeds a character/byte with octal value <code>OOO</code>. Up to three octal digits are allowed in an octal escape sequence.
-</p>
+<p>Octal numbers can also appear in escape sequences embedded in <a href="http://docs.python.org/py3k/reference/lexical_analysis.html#string-and-bytes-literals">string and bytes literals</a>. The syntax hasn&#8217;t changed for Python 3 and the rules are as in C: the escape sequence <code>\OOO</code> embeds a character/byte with octal value <code>OOO</code>. Up to three octal digits are allowed in an octal escape sequence.</p>
 <p><img src="/images/buttons/octopus-small.jpg" alt="Smart mollusc"/>
-   <img src="/images/buttons/octopus-small.jpg" alt="Smart mollusc"/>
-   <img src="/images/buttons/octopus-small.jpg" alt="Smart mollusc"/>
-</p>
-<p>Like  octal integers, these octal escape sequences may appear to be of limited use &#8212; a syntactic oddity rarely seen in the wild &#8212; but in fact there&#8217;s one particular use case which is so common we don&#8217;t even notice it.
-</p>
+<img src="/images/buttons/octopus-small.jpg" alt="Smart mollusc"/>
+<img src="/images/buttons/octopus-small.jpg" alt="Smart mollusc"/></p>
+<p>Like  octal integers, these octal escape sequences may appear to be of limited use &#8212; a syntactic oddity rarely seen in the wild &#8212; but in fact there&#8217;s one particular use case which is so common we don&#8217;t even notice it.</p>
 <div class="typocode">
 
-<pre class="prettyprint">char const terminator = '\0';
+<pre class="prettyprint">char const terminator = &#x27;\0&#x27;;
 
 </pre>
 

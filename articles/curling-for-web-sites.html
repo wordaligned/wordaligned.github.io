@@ -28,12 +28,9 @@
       <div class="atomentry" id="curling-for-web-sites">
 <h2 class="title"><a href="/articles/curling-for-web-sites">Curling for web sites</a></h2>
 <p class="meta"><abbr class="published" title="2008-05-27">2008-05-27</abbr> &bull; <a href="/tag/shell" rel="tag">Shell</a>, <a href="/tag/curl" rel="tag">Curl</a> &bull; <a href="/articles/curling-for-web-sites#disqus_thread">Comments</a></p>
-<p>I wanted information about ISO 3166-1 alpha-2 country codes. Google found me the definitive link (<a href="http://www.iso.org/iso/country_codes/iso_3166_code_lists.htm" title="ISO 3166 country code lists">http://www.iso.org/iso/country_codes/iso_3166_code_lists.htm</a>) but clicking on it showed the ISO website to be temporarily down for maintenance.
-</p>
-<p><a href="http://www.iso.org/error/sitedown.html" title="ISO site down page"><img style="border: 2px solid orange;" src="/images/iso-down.png" alt="ISO website out of action" /></a>
-</p>
-<p>Rather than check back again every few minutes or hunt for stale information in the google cache, I got <code>curl</code> and <code>bash</code> to notify me when the site went live.
-</p>
+<p>I wanted information about ISO 3166-1 alpha-2 country codes. Google found me the definitive link (<a href="http://www.iso.org/iso/country_codes/iso_3166_code_lists.htm" title="ISO 3166 country code lists">http://www.iso.org/iso/country_codes/iso_3166_code_lists.htm</a>) but clicking on it showed the ISO website to be temporarily down for maintenance.</p>
+<p><a href="http://www.iso.org/error/sitedown.html" title="ISO site down page"><img style="border: 2px solid orange;" src="/images/iso-down.png" alt="ISO website out of action" /></a></p>
+<p>Rather than check back again every few minutes or hunt for stale information in the google cache, I got <code>curl</code> and <code>bash</code> to notify me when the site went live.</p>
 <pre>
 $ url=http://www.iso.org/iso/country_codes/iso_3166_code_lists.htm
 $ curl -I $url
@@ -46,8 +43,7 @@ Connection: close
 Content-Type: text/html
 </pre>
 
-<p><code>Curl -I</code> fetches the page header only, which in this case uses a <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html">302 status code</a> to temporarily redirect clients to the <code>sitedown.html</code> page. Using this information I wrote a simple while loop to ping the site every minute and determine when this status changed.
-</p>
+<p><code>Curl -I</code> fetches the page header only, which in this case uses a <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html">302 status code</a> to temporarily redirect clients to the <code>sitedown.html</code> page. Using this information I wrote a simple while loop to ping the site every minute and determine when this status changed.</p>
 <div class="typocode">
 
 <pre class="prettyprint">$ http_status() { curl -I -s $1 | head -1 | cut -d " " -f 2; }
@@ -57,10 +53,8 @@ $ while [ $(http_status $url) == 302 ]; do sleep 60; done; open $url
 
 </div>
 
-<p><code>Open</code> is an OS X thing: when the loop completes <code>open</code> just opens the web page in a browser tab.
-</p>
-<p>To run this command in the background, <code>&amp;</code> it.
-</p>
+<p><code>Open</code> is an OS X thing: when the loop completes <code>open</code> just opens the web page in a browser tab.</p>
+<p>To run this command in the background, <code>&amp;</code> it.</p>
 <div class="typocode">
 
 <pre class="prettyprint">$ (while [ $(http_status $url) == 302 ]; do sleep 60; done; open $url)&amp;
@@ -70,8 +64,7 @@ $ while [ $(http_status $url) == 302 ]; do sleep 60; done; open $url
 
 </div>
 
-<p>Here, the job has a handle of <code>1</code> and a process id of <code>808</code>. You can recover this information using <code>jobs</code>.
-</p>
+<p>Here, the job has a handle of <code>1</code> and a process id of <code>808</code>. You can recover this information using <code>jobs</code>.</p>
 <div class="typocode">
 
 <pre class="prettyprint">$ jobs
@@ -83,8 +76,7 @@ done; open $url ) &amp;
 
 </div>
 
-<p>If you need to kill the job, <code>kill %1</code> does the trick.
-</p>
+<p>If you need to kill the job, <code>kill %1</code> does the trick.</p>
 </div>
 
 <div class="comments"><hr/><div id="disqus_thread"></div><script type="text/javascript" src="http://disqus.com/forums/wordaligned/embed.js"></script></div>

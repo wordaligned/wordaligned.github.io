@@ -26,74 +26,27 @@
       <div class="atomentry" id="unleash-the-test-army">
 <h2 class="title"><a href="/articles/unleash-the-test-army">Unleash the test army</a></h2>
 <p class="meta"><abbr class="published" title="2017-05-29">2017-05-29</abbr> &bull; <a href="/tag/tests" rel="tag">Tests</a>, <a href="/tag/python" rel="tag">Python</a> &bull; <a href="/articles/unleash-the-test-army#disqus_thread">Comments</a></p>
-<div class="toc">
-<h2>Contents</h2>
-<ul>
- <li><a href="#tocare-the-tests-adequate" name="toc0" id="toc0">Are the tests adequate?</a>
- </li>
-
- <li><a href="#tocproperty-based-testing" name="toc1" id="toc1">Property based testing</a>
- </li>
-
- <li><a href="#tochypothesis" name="toc2" id="toc2">Hypothesis</a>
- </li>
-
- <li><a href="#tocfirst-impressions" name="toc3" id="toc3">First impressions</a>
- </li>
-
- <li><a href="#tocmy-first-test" name="toc4" id="toc4">My first test</a>
- </li>
-
- <li><a href="#tocmy-second-test" name="toc5" id="toc5">My second test</a>
- </li>
-
- <li><a href="#toccomplete-test-suite" name="toc6" id="toc6">Complete test suite</a>
- </li>
-
- <li><a href="#tocquality-of-failure" name="toc7" id="toc7">Quality of failure</a>
- </li>
-
- <li><a href="#tocconclusions" name="toc8" id="toc8">Conclusions</a>
- </li>
-</ul>
-</div>
-<h2><a href="#toc0" name="tocare-the-tests-adequate" id="tocare-the-tests-adequate">Are the tests adequate?</a></h2>
-<p>Recently I described a solution to <a href="/articles/slicing-a-list-evenly-with-python">the problem of dividing a list into evenly sized chunks</a>. It&#8217;s a simple enough problem with just two inputs: the list (or other sliceable container) <code>xs</code> and the number of chunks <code>n</code>. Nonetheless, there are traps to avoid and special cases to consider &#8212; what if <code>n</code> is larger than the list, for example? Must the chunks comprise contiguous elements from the original list?
-</p>
-<p>The tests I came up with are straightforward and uninspiring. They were developed within the context of my own assumptions about the solution and the special cases I could imagine. They were written after the implementation &#8212; which is to say, development wasn&#8217;t driven by tests. They are whitebox tests, designed to cover the various paths through the code based on my insider knowledge.
-</p>
-<p>Are these tests adequate? Certainly they don&#8217;t accurately represent the data which will hit the algorithm in practice. Can we be sure we haven&#8217;t missed anything? Would the tests still cover all paths if the implementation changed?
-</p>
-
-<h2><a href="#toc1" name="tocproperty-based-testing" id="tocproperty-based-testing">Property based testing</a></h2>
-<p>David R MacIver described another, complementary, approach at <a href="https://accu.org/index.php/conferences/accu_conference_2016/accu2016_sessions#The_Plural_of_Anecdote_is_not_Test_Suite">a talk I attended at ACCU 2016</a>. In the talk abstract he characterises the (class of) tests I&#8217;d written as <strong>anecdotal</strong> &#8212; &#8220;let me tell you about this time I called a function &#8230; and then it returned this .. and then it raised an exception &#8230; etc. etc.&#8221;
-</p>
-<p>How about if the test suite instead describes the <strong>properties</strong> required of the system under test, and then conjures up inputs designed to see if these properties hold under stress? So, rather than our test suite being a limited set of input/output pairs, it becomes an executable specification validated by a robot army.
-</p>
-<p><a data-flickr-embed="true"  href="https://www.flickr.com/photos/avatarr8/3819520612" title="China&#x27;s Robot Army"><img src="https://c1.staticflickr.com/3/2431/3819520612_4b32f2b423.jpg" width="500" height="334" alt="China&#x27;s Robot Army"></a><script async src="//embedr.flickr.com/assets/client-code.js" charset="utf-8"></script>
-</p>
-<span id="continue-reading"/>
-
-
-<h2><a href="#toc2" name="tochypothesis" id="tochypothesis">Hypothesis</a></h2>
-<p>This approach sounds compelling but I had my doubts. I also had my doubts about the adequacy of both my code and tests. A perfect opportunity, then, to try out <a href="https://hypothesis.readthedocs.io/en/latest/">Hypothesis</a>, an open source property-based testing library developed by David MacIver.
-</p>
-<p>I used the Python version of the library, which is the primary implementation. The rest of this article describes my experience of using <a href="https://hypothesis.readthedocs.io/en/latest/">hypothesis</a> for the first time: I&#8217;m not claiming expertise.
-</p>
-
-<h2><a href="#toc3" name="tocfirst-impressions" id="tocfirst-impressions">First impressions</a></h2>
-<p>Excellent!
-</p>
-<p>Installation was the usual <code>pip</code> invocation. The <a href="https://hypothesis.readthedocs.io/en/latest/">documentation</a> is written with care. It&#8217;s evident the library is mature, supported and actively developed. It&#8217;s licensed under the <a href="https://www.mozilla.org/en-US/MPL/2.0/">Mozilla Public License</a>.
-</p>
-
-<h2><a href="#toc4" name="tocmy-first-test" id="tocmy-first-test">My first test</a></h2>
-<p>Recall that the code I wanted to test reads:
-</p>
+<h2 id="are-the-tests-adequate">Are the tests adequate?</h2>
+<p>Recently I described a solution to <a href="/articles/slicing-a-list-evenly-with-python">the problem of dividing a list into evenly sized chunks</a>. It&#8217;s a simple enough problem with just two inputs: the list (or other sliceable container) <code>xs</code> and the number of chunks <code>n</code>. Nonetheless, there are traps to avoid and special cases to consider &#8212; what if <code>n</code> is larger than the list, for example? Must the chunks comprise contiguous elements from the original list?</p>
+<p>The tests I came up with are straightforward and uninspiring. They were developed within the context of my own assumptions about the solution and the special cases I could imagine. They were written after the implementation &#8212; which is to say, development wasn&#8217;t driven by tests. They are whitebox tests, designed to cover the various paths through the code based on my insider knowledge.</p>
+<p>Are these tests adequate? Certainly they don&#8217;t accurately represent the data which will hit the algorithm in practice. Can we be sure we haven&#8217;t missed anything? Would the tests still cover all paths if the implementation changed?</p>
+<h2 id="property-based-testing">Property based testing</h2>
+<p>David R MacIver described another, complementary, approach at <a href="https://accu.org/index.php/conferences/accu_conference_2016/accu2016_sessions#The_Plural_of_Anecdote_is_not_Test_Suite">a talk I attended at ACCU 2016</a>. In the talk abstract he characterises the (class of) tests I&#8217;d written as <strong>anecdotal</strong> &#8212; &#8220;let me tell you about this time I called a function &#8230; and then it returned this .. and then it raised an exception &#8230; etc. etc.&#8221;</p>
+<p>How about if the test suite instead describes the <strong>properties</strong> required of the system under test, and then conjures up inputs designed to see if these properties hold under stress? So, rather than our test suite being a limited set of input/output pairs, it becomes an executable specification validated by a robot army.</p>
+<p><a data-flickr-embed="true"  href="https://www.flickr.com/photos/avatarr8/3819520612" title="China&#x27;s Robot Army"><img src="https://c1.staticflickr.com/3/2431/3819520612_4b32f2b423.jpg" width="500" height="334" alt="China&#x27;s Robot Army"></a><script async src="//embedr.flickr.com/assets/client-code.js" charset="utf-8"></script></p>
+<p><span id="continue-reading"/></p>
+<h2 id="hypothesis">Hypothesis</h2>
+<p>This approach sounds compelling but I had my doubts. I also had my doubts about the adequacy of both my code and tests. A perfect opportunity, then, to try out <a href="https://hypothesis.readthedocs.io/en/latest/">Hypothesis</a>, an open source property-based testing library developed by David MacIver.</p>
+<p>I used the Python version of the library, which is the primary implementation. The rest of this article describes my experience of using <a href="https://hypothesis.readthedocs.io/en/latest/">hypothesis</a> for the first time: I&#8217;m not claiming expertise.</p>
+<h2 id="first-impressions">First impressions</h2>
+<p>Excellent!</p>
+<p>Installation was the usual <code>pip</code> invocation. The <a href="https://hypothesis.readthedocs.io/en/latest/">documentation</a> is written with care. It&#8217;s evident the library is mature, supported and actively developed. It&#8217;s licensed under the <a href="https://www.mozilla.org/en-US/MPL/2.0/">Mozilla Public License</a>.</p>
+<h2 id="my-first-test">My first test</h2>
+<p>Recall that the code I wanted to test reads:</p>
 <div class="typocode">
 
 <pre class="prettyprint">def chunk(xs, n):
-    '''Split the list, xs, into n evenly sized chunks'''
+    &#x27;&#x27;&#x27;Split the list, xs, into n evenly sized chunks&#x27;&#x27;&#x27;
     L = len(xs)
     assert 0 &lt; n &lt;= L
     s, r = divmod(L, n)
@@ -105,14 +58,13 @@
 
 </div>
 
-<p>I also proposed a second <code>itertools</code> based version:
-</p>
+<p>I also proposed a second <code>itertools</code> based version:</p>
 <div class="typocode">
 
 <pre class="prettyprint">from itertools import accumulate, chain, repeat, tee
 
 def chunk(xs, n):
-    '''Split the list, xs, into n evenly sized chunks'''
+    &#x27;&#x27;&#x27;Split the list, xs, into n evenly sized chunks&#x27;&#x27;&#x27;
     assert n &gt; 0
     L = len(xs)
     s, r = divmod(L, n)
@@ -126,22 +78,20 @@ def chunk(xs, n):
 
 </div>
 
-<p>The first thing you notice when thinking about a property based test is that the specification &#8212; the function&#8217;s docstring &#8212; doesn&#8217;t describe the exact form of the output. In fact, as a comment on the article pointed out, my own interpretation of the specification is not the only one, and allowing the chunks to be formed from non-contiguous items permits a particularly elegant solution.
-</p>
-<p>Also, if the list doesn&#8217;t divide exactly into <code>n</code> chunks, what should the result be? Well, although I&#8217;d have been happy with any evenly-chunked solution, my conventional unit tests <strong>assumed</strong> an implementation which placed the larger chunks first.
-</p>
+<p>The first thing you notice when thinking about a property based test is that the specification &#8212; the function&#8217;s docstring &#8212; doesn&#8217;t describe the exact form of the output. In fact, as a comment on the article pointed out, my own interpretation of the specification is not the only one, and allowing the chunks to be formed from non-contiguous items permits a particularly elegant solution.</p>
+<p>Also, if the list doesn&#8217;t divide exactly into <code>n</code> chunks, what should the result be? Well, although I&#8217;d have been happy with any evenly-chunked solution, my conventional unit tests <strong>assumed</strong> an implementation which placed the larger chunks first.</p>
 <div class="typocode">
 
 <pre class="prettyprint">def test_chunk():
-    assert chunk('', 1) == ['']
-    assert chunk('ab', 2) == ['a', 'b']
-    assert chunk('abc', 2) == ['ab', 'c']
-    
+    assert chunk(&#x27;&#x27;, 1) == [&#x27;&#x27;]
+    assert chunk(&#x27;ab&#x27;, 2) == [&#x27;a&#x27;, &#x27;b&#x27;]
+    assert chunk(&#x27;abc&#x27;, 2) == [&#x27;ab&#x27;, &#x27;c&#x27;]
+
     xs = list(range(8))
     assert chunk(xs, 2) == [[0, 1, 2, 3], [4, 5, 6, 7]]
     assert chunk(xs, 3) == [[0, 1, 2], [3, 4, 5], [6, 7]]
     assert chunk(xs, 5) == [[0, 1], [2, 3], [4, 5], [6], [7]]
-    
+
     rs = range(1000000)
     assert chunk(rs, 2) == [range(500000), range(500000, 1000000)]
 
@@ -149,10 +99,8 @@ def chunk(xs, n):
 
 </div>
 
-<p>Notice, by the way, that although the docstring only mentions lists, I can&#8217;t resist demonstrating the algorithm also behaves for strings and ranges &#8212; for any sliceable sequence, in fact.
-</p>
-<p>Here&#8217;s what I started with when I tried specifying the &#8220;evenly sized&#8221; property using hypothesis.
-</p>
+<p>Notice, by the way, that although the docstring only mentions lists, I can&#8217;t resist demonstrating the algorithm also behaves for strings and ranges &#8212; for any sliceable sequence, in fact.</p>
+<p>Here&#8217;s what I started with when I tried specifying the &#8220;evenly sized&#8221; property using hypothesis.</p>
 <div class="typocode">
 
 <pre class="prettyprint">def test_evenly_chunked(xs, n):
@@ -166,25 +114,20 @@ def chunk(xs, n):
 
 </div>
 
-<p>This first test case defines &#8220;evenly sized&#8221;, stating that the result comprises <code>n</code> chunks, that the set of the lengths of these chunks is either 1 (all chunks the same size) or 2, and the maximum chunk length is equal to or one more than the minumum chunk length.
-</p>
-<p>This doesn&#8217;t fully specify the function. We also need assertions which confirm that recombining the chunks produces the original sequence.
-</p>
+<p>This first test case defines &#8220;evenly sized&#8221;, stating that the result comprises <code>n</code> chunks, that the set of the lengths of these chunks is either 1 (all chunks the same size) or 2, and the maximum chunk length is equal to or one more than the minumum chunk length.</p>
+<p>This doesn&#8217;t fully specify the function. We also need assertions which confirm that recombining the chunks produces the original sequence.</p>
 <div class="typocode">
 
 <pre class="prettyprint">def test_combining_chunks(xs_n):
-    pass # We'll come back to this!
+    pass # We&#x27;ll come back to this!
 
 </pre>
 
 </div>
 
-<p>We&#8217;ll come back to this later!
-</p>
-<p>Now, <code>test_evenly_chunked()</code> looks quite like a conventional test function. It just needs some input values. Rather than poke the function with some hand-chosen values, we can let hypothesis have a go.
-</p>
-<p>Based on a read of the <a href="https://hypothesis.readthedocs.io/en/latest/quickstart.html">Quick start guide</a> I tried this:
-</p>
+<p>We&#8217;ll come back to this later!</p>
+<p>Now, <code>test_evenly_chunked()</code> looks quite like a conventional test function. It just needs some input values. Rather than poke the function with some hand-chosen values, we can let hypothesis have a go.</p>
+<p>Based on a read of the <a href="https://hypothesis.readthedocs.io/en/latest/quickstart.html">Quick start guide</a> I tried this:</p>
 <div class="typocode">
 
 <pre class="prettyprint">import hypothesis as ht
@@ -202,10 +145,8 @@ def test_evenly_chunked(xs, n):
 
 </div>
 
-<p>As you can see, the test function pre-conditions are encapsulated in a <code>hypothesis.given</code> decorator, which specifies the use of <code>hypothesis.strategies.lists()</code> and <code>hypothesis.strategies.integers()</code> to generate test values for <code>xs</code> and <code>n</code> respectively.
-</p>
-<p>The result was a lengthy but helpful failure, which printed out the documentation of the <code>lists()</code> strategy and the usage error:
-</p>
+<p>As you can see, the test function pre-conditions are encapsulated in a <code>hypothesis.given</code> decorator, which specifies the use of <code>hypothesis.strategies.lists()</code> and <code>hypothesis.strategies.integers()</code> to generate test values for <code>xs</code> and <code>n</code> respectively.</p>
+<p>The result was a lengthy but helpful failure, which printed out the documentation of the <code>lists()</code> strategy and the usage error:</p>
 <div class="typocode">
 
 <pre class="prettyprint">hypothesis.errors.InvalidArgument: Cannot create non-empty lists without an element type
@@ -214,8 +155,7 @@ def test_evenly_chunked(xs, n):
 
 </div>
 
-<p>OK then. The function doesn&#8217;t really care about the element type. Integers will do.
-</p>
+<p>OK then. The function doesn&#8217;t really care about the element type. Integers will do.</p>
 <div class="typocode">
 
 <pre class="prettyprint">@ht.given(xs=st.lists(st.integers()), n=st.integers())
@@ -226,14 +166,13 @@ def test_evenly_chunked(xs, n):
 
 </div>
 
-<p>This gave me an error, along with a minimal test case which produces it.
-</p>
+<p>This gave me an error, along with a minimal test case which produces it.</p>
 <div class="typocode">
 
 <pre class="prettyprint">xs = [], n = 0
 
-def chunk(xs, n):
-        '''Split the list, xs, into n evenly sized chunks'''
+    def chunk(xs, n):
+        &#x27;&#x27;&#x27;Split the list, xs, into n evenly sized chunks&#x27;&#x27;&#x27;
         L = len(xs)
 &gt;       assert 0 &lt; n &lt;= L
 E       AssertionError
@@ -242,42 +181,21 @@ E       AssertionError
 
 </div>
 
-<p>Our function, <code>chunk()</code> requires the value <code>n</code> to be in the closed range <code>(0, len(xs)]</code>. Looking more closely at the failure, we can see that the function under test, <code>chunk()</code>, isn&#8217;t great, since we won&#8217;t be able to split an empty list into <strong>any</strong> number of chunks since, in this case, <code>L</code> is zero and no value of <code>n</code> satisfies <code>0 &lt; n &lt;= L</code>. 
-</p>
-<p>At this point I had to makes some choices:
-</p>
+<p>Our function, <code>chunk()</code> requires the value <code>n</code> to be in the closed range <code>(0, len(xs)]</code>. Looking more closely at the failure, we can see that the function under test, <code>chunk()</code>, isn&#8217;t great, since we won&#8217;t be able to split an empty list into <strong>any</strong> number of chunks since, in this case, <code>L</code> is zero and no value of <code>n</code> satisfies <code>0 &lt; n &lt;= L</code>. </p>
+<p>At this point I had to makes some choices:</p>
 <ul>
- <li>
-     should my tests confirm <code>chunk()</code> was checking pre-conditions (by catching the <code>AssertionError</code>)?
- </li>
-
- <li>
-     should my function handle the case when <code>n &gt; L</code>? It&#8217;s not the intended use of the function, but it can be handled.
- </li>
-
- <li>
-     what about when <code>n == 0</code>? Splitting a non-empty list into <code>0</code> chunks is impossible, but I guess an empty list can be split into <code>0</code> chunks.
- </li>
+<li>should my tests confirm <code>chunk()</code> was checking pre-conditions (by catching the <code>AssertionError</code>)?</li>
+<li>should my function handle the case when <code>n &gt; L</code>? It&#8217;s not the intended use of the function, but it can be handled.</li>
+<li>what about when <code>n == 0</code>? Splitting a non-empty list into <code>0</code> chunks is impossible, but I guess an empty list can be split into <code>0</code> chunks.</li>
 </ul>
-
-<h2><a href="#toc5" name="tocmy-second-test" id="tocmy-second-test">My second test</a></h2>
-<p>I made some decisions.
-</p>
+<h2 id="my-second-test">My second test</h2>
+<p>I made some decisions.</p>
 <ul>
- <li>
-     I decided not to test the pre-condition assertions. Instead, I&#8217;d modify the test strategy to pass in valid inputs.
- </li>
-
- <li>
-     I decided I&#8217;d go with the <code>itertools</code> chunk function which naturally handles <code>n &gt; L</code>.
- </li>
-
- <li>
-     I decided my function needn&#8217;t handle <code>n == 0</code>, even when <code>xs == []</code>.
- </li>
+<li>I decided not to test the pre-condition assertions. Instead, I&#8217;d modify the test strategy to pass in valid inputs.</li>
+<li>I decided I&#8217;d go with the <code>itertools</code> chunk function which naturally handles <code>n &gt; L</code>.</li>
+<li>I decided my function needn&#8217;t handle <code>n == 0</code>, even when <code>xs == []</code>.</li>
 </ul>
-<p>Here&#8217;s the modified test code
-</p>
+<p>Here&#8217;s the modified test code</p>
 <div class="typocode">
 
 <pre class="prettyprint">@ht.given(xs=st.lists(st.integers()),
@@ -294,8 +212,7 @@ def test_evenly_chunked(xs, n):
 
 </div>
 
-<p>When I tried running the tests again, they appeared to hang until I interrupted them.
-</p>
+<p>When I tried running the tests again, they appeared to hang until I interrupted them.</p>
 <div class="typocode">
 
 <pre class="prettyprint">&gt; py.test
@@ -314,8 +231,7 @@ to show a full traceback on KeyboardInterrupt use --fulltrace
 
 </div>
 
-<p>Now, I had a suspicion that <code>chunk()</code> couldn&#8217;t really handle <strong>any</strong> input integers &#8212; it was designed for a value of <code>n</code> equal to <code>multiprocessing.cpu_count()</code> &#8212; but I wanted to see what would happen with no upper limits. Here was my answer. Running and interrupting again with <code>--fulltrace</code> set, I got several pages of output ending with the test inputs:
-</p>
+<p>Now, I had a suspicion that <code>chunk()</code> couldn&#8217;t really handle <strong>any</strong> input integers &#8212; it was designed for a value of <code>n</code> equal to <code>multiprocessing.cpu_count()</code> &#8212; but I wanted to see what would happen with no upper limits. Here was my answer. Running and interrupting again with <code>--fulltrace</code> set, I got several pages of output ending with the test inputs:</p>
 <div class="typocode">
 
 <pre class="prettyprint">xs = [50], n = 67108865
@@ -324,12 +240,9 @@ to show a full traceback on KeyboardInterrupt use --fulltrace
 
 </div>
 
-<p>Evidently my code was taking a while to create a list comprising a single list <code>[50]</code> and over 67 million empty lists <code>[], [], [], ...</code>.
-</p>
-<p>Once again, I had a decision to make. Perhaps unsurprisingly, it&#8217;s a decision I&#8217;d already faced. I could make <code>chunk()</code> a generator function, yielding the chunks one at a time &#8212; a trivial and natural change to the <code>itertools</code> based implementation &#8212; or I could constrain the tests to more suitable values of <code>n</code>.
-</p>
-<p>In this case I decided to stick with what I had: my function would accept a list and return a list (of lists). In an attempt to get some passing tests, I set a maximum value on <code>n</code>.
-</p>
+<p>Evidently my code was taking a while to create a list comprising a single list <code>[50]</code> and over 67 million empty lists <code>[], [], [], ...</code>.</p>
+<p>Once again, I had a decision to make. Perhaps unsurprisingly, it&#8217;s a decision I&#8217;d already faced. I could make <code>chunk()</code> a generator function, yielding the chunks one at a time &#8212; a trivial and natural change to the <code>itertools</code> based implementation &#8212; or I could constrain the tests to more suitable values of <code>n</code>.</p>
+<p>In this case I decided to stick with what I had: my function would accept a list and return a list (of lists). In an attempt to get some passing tests, I set a maximum value on <code>n</code>.</p>
 <div class="typocode">
 
 <pre class="prettyprint">@ht.given(xs=st.lists(st.integers()),
@@ -341,8 +254,7 @@ def test_evenly_chunked(xs, n):
 
 </div>
 
-<p>At last, I had a passing test.
-</p>
+<p>At last, I had a passing test.</p>
 <div class="typocode">
 
 <pre class="prettyprint">py.test 
@@ -360,8 +272,7 @@ test_chunk.py .
 
 </div>
 
-<p>Building on this success, I wanted to confirm the function also handled other sliceable types &#8212; strings and bytes specifically. Hypothesis provides a <code>one_of</code> strategy for combining other strategies.
-</p>
+<p>Building on this success, I wanted to confirm the function also handled other sliceable types &#8212; strings and bytes specifically. Hypothesis provides a <code>one_of</code> strategy for combining other strategies.</p>
 <div class="typocode">
 
 <pre class="prettyprint">@ht.given(xs=st.one_of(st.text(),
@@ -379,8 +290,7 @@ def test_evenly_chunked(xs, n):
 
 </div>
 
-<p>Again, the test passes.
-</p>
+<p>Again, the test passes.</p>
 <div class="typocode">
 
 <pre class="prettyprint">py.test
@@ -398,10 +308,8 @@ test_chunk.py .
 
 </div>
 
-<p>This output is rather inscrutable. Generally, passing tests shouldn&#8217;t draw attention to themselves, but what inputs had my test strategies generated? Were they sufficient?
-</p>
-<p>A commandline switch provides a little more detail.
-</p>
+<p>This output is rather inscrutable. Generally, passing tests shouldn&#8217;t draw attention to themselves, but what inputs had my test strategies generated? Were they sufficient?</p>
+<p>A commandline switch provides a little more detail.</p>
 <div class="typocode">
 
 <pre class="prettyprint">py.test --hypothesis-show-statistics
@@ -410,7 +318,7 @@ test_chunk.py .
 
 test_chunk.py::test_evenly_chunked:
 
-- 200 passing examples, 0 failing examples, 0 invalid examples
+  - 200 passing examples, 0 failing examples, 0 invalid examples
   - Typical runtimes: &lt; 1ms
   - Stopped because settings.max_examples=200
 
@@ -418,8 +326,7 @@ test_chunk.py::test_evenly_chunked:
 
 </div>
 
-<p>It&#8217;s also possible to peek at examples produced by the test strategy.
-</p>
+<p>It&#8217;s also possible to peek at examples produced by the test strategy.</p>
 <pre>
 &gt;&gt;&gt; s=st.one_of(st.text(), st.binary(), st.lists(st.integers()))
 &gt;&gt;&gt; s.example()
@@ -436,10 +343,8 @@ b'\xe7z'
 [184, 36, -205, 1486638017]
 </pre>
 
-
-<h2><a href="#toc6" name="toccomplete-test-suite" id="toccomplete-test-suite">Complete test suite</a></h2>
-<p>Here&#8217;s my final test suite. Rather than hard code a maximum value for <code>n</code>, I used a <a href="https://hypothesis.readthedocs.io/en/latest/data.html#composite-strategies">composite strategy</a> which adapts <code>n</code> to the size of <code>xs</code>. I&#8217;ve also added a test which confirms the result does comprise chunks of the input sequence.
-</p>
+<h2 id="complete-test-suite">Complete test suite</h2>
+<p>Here&#8217;s my final test suite. Rather than hard code a maximum value for <code>n</code>, I used a <a href="https://hypothesis.readthedocs.io/en/latest/data.html#composite-strategies">composite strategy</a> which adapts <code>n</code> to the size of <code>xs</code>. I&#8217;ve also added a test which confirms the result does comprise chunks of the input sequence.</p>
 <div class="typocode">
 
 <pre class="prettyprint">import functools
@@ -456,9 +361,10 @@ def items_and_chunk_count(draw):
                          max_value=max(1, len(xs))))
     return xs, n
 
+
 @ht.given(xs_n=items_and_chunk_count())
 def test_evenly_chunked(xs_n):
-    '''Verify there are n evenly sized chunks'''
+    &#x27;&#x27;&#x27;Verify there are n evenly sized chunks&#x27;&#x27;&#x27;
     xs, n = xs_n
     chunks = chunk(xs, n)
     assert len(chunks) == n
@@ -466,9 +372,10 @@ def test_evenly_chunked(xs_n):
     assert len(chunk_lens) in {1, 2}
     assert max(chunk_lens) - min(chunk_lens) in {0, 1}
 
+
 @ht.given(xs_n=items_and_chunk_count())
 def test_combining_chunks(xs_n):
-    '''Verify recombining the chunks reproduces the original sequence.'''
+    &#x27;&#x27;&#x27;Verify recombining the chunks reproduces the original sequence.&#x27;&#x27;&#x27;
     xs, n = xs_n
     chunks = chunk(xs, n)
     assert functools.reduce(lambda x, y: x+y, chunks) == xs
@@ -477,10 +384,8 @@ def test_combining_chunks(xs_n):
 
 </div>
 
-
-<h2><a href="#toc7" name="tocquality-of-failure" id="tocquality-of-failure">Quality of failure</a></h2>
-<p>In the comments to my original article Mike Edey put forward an elegant solution to the original problem of evenly subdividing a sequence into an exact number of chunks:
-</p>
+<h2 id="quality-of-failure">Quality of failure</h2>
+<p>In the comments to my original article Mike Edey put forward an elegant solution to the original problem of evenly subdividing a sequence into an exact number of chunks:</p>
 <div class="typocode">
 
 <pre class="prettyprint">def chunk(xs, n):
@@ -490,10 +395,8 @@ def test_combining_chunks(xs_n):
 
 </div>
 
-<p>This is a delightful piece piece of code, and an approach I simply hadn&#8217;t considered. If the input list <code>xs</code> represents a number of tasks to be distributed amongst <code>n</code> workers, this does the job evenly. In my actual motivating example, though, however, the input sequence was a document which caused a problem, and what I wanted to do was split that document up into a number of sections and see which of these exhibited the same problem: that is, I needed the chunks to be contiguous blocks of text from the original document. This is the property which <code>test_combining_chunks()</code> checks.
-</p>
-<p>Running Mike Edey&#8217;s implementation through the test suite, we get:
-</p>
+<p>This is a delightful piece piece of code, and an approach I simply hadn&#8217;t considered. If the input list <code>xs</code> represents a number of tasks to be distributed amongst <code>n</code> workers, this does the job evenly. In my actual motivating example, though, however, the input sequence was a document which caused a problem, and what I wanted to do was split that document up into a number of sections and see which of these exhibited the same problem: that is, I needed the chunks to be contiguous blocks of text from the original document. This is the property which <code>test_combining_chunks()</code> checks.</p>
+<p>Running Mike Edey&#8217;s implementation through the test suite, we get:</p>
 <div class="typocode">
 
 <pre class="prettyprint">py.test
@@ -508,7 +411,7 @@ test_chunk.py .F
 ================================== FAILURES ===================================
 ____________________________ test_combining_chunks ____________________________
 
-@ht.given(xs_n=items_and_chunk_count())
+    @ht.given(xs_n=items_and_chunk_count())
 &gt;   def test_combining_chunks(xs_n):
 
 test_chunk.py:29: 
@@ -523,66 +426,45 @@ d:\venvs\slackbot\lib\site-packages\hypothesis\core.py:113: in run
     return test(*args, **kwargs)
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
-xs_n = ('001', 2)
+xs_n = (&#x27;001&#x27;, 2)
 
-@ht.given(xs_n=items_and_chunk_count())
+    @ht.given(xs_n=items_and_chunk_count())
     def test_combining_chunks(xs_n):
-        '''Verify recombining the chunks reproduces the original sequence.'''
+        &#x27;&#x27;&#x27;Verify recombining the chunks reproduces the original sequence.&#x27;&#x27;&#x27;
         xs, n = xs_n
         chunks = chunk(xs, n)
 &gt;       assert functools.reduce(lambda x, y: x+y, chunks) == xs
-E       AssertionError: assert '010' == '001'
+E       AssertionError: assert &#x27;010&#x27; == &#x27;001&#x27;
 E         - 010
 E         + 001
 
 test_chunk.py:33: AssertionError
 --------------------------------- Hypothesis ----------------------------------
-Falsifying example: test_combining_chunks(xs_n=('001', 2))
+Falsifying example: test_combining_chunks(xs_n=(&#x27;001&#x27;, 2))
 ===================== 1 failed, 1 passed in 0.52 seconds ======================
 
 </pre>
 
 </div>
 
-<p>Hypothesis has discovered a minimal failing example: the string <code>001</code> splits into <code>2</code> chunks as <code>01</code>, <code>0</code>.
-</p>
-
-<h2><a href="#toc8" name="tocconclusions" id="tocconclusions">Conclusions</a></h2>
-<p>Hypothesis worked well for this particular example.
-</p>
+<p>Hypothesis has discovered a minimal failing example: the string <code>001</code> splits into <code>2</code> chunks as <code>01</code>, <code>0</code>.</p>
+<h2 id="conclusions">Conclusions</h2>
+<p>Hypothesis worked well for this particular example.</p>
 <ul>
- <li>
-     it forced me to pin down the function specification
- </li>
-
- <li>
-     I had to consider the special cases: would the function behave in the face of logically permissable inputs, and not just the ones I had in mind when I wrote it
- </li>
-
- <li>
-     it increased my confidence the function was correct
- </li>
-
- <li>
-     and particularly appealing, in this case &#8212; the tests were not tied to a detail of the implementation, and would continue to work if, for example, the larger chunks were to appear at the end of the results.
- </li>
+<li>it forced me to pin down the function specification</li>
+<li>I had to consider the special cases: would the function behave in the face of logically permissable inputs, and not just the ones I had in mind when I wrote it</li>
+<li>it increased my confidence the function was correct</li>
+<li>and particularly appealing, in this case &#8212; the tests were not tied to a detail of the implementation, and would continue to work if, for example, the larger chunks were to appear at the end of the results.</li>
 </ul>
-<p>More generally, I found the hypothesis library solid. It&#8217;s well designed and documented, as well as being a fine example of how to use Python decorators.
-</p>
-<p>I&#8217;d say property based testing complements example based testing. Example based unit tests show you how a function is used, for instance; with hypothesis, this useful demonstration happens behind the scenes (though note that your hypothesis tests <strong>can</strong> include explicit <a href="https://hypothesis.readthedocs.io/en/latest/details.html#providing-explicit-examples">@examples</a>). Example based unit tests are typically one or two orders of magnitude quicker to execute. It&#8217;s not a problem if a couple of tests take half a second to run, but what if you have a couple of thousand tests?
-</p>
-<p>In my case the built-in strategies were good enough to generate inputs to my function. I can imagine that&#8217;s not the case for functions higher up a software stack. Test setup functions can be hard work and I suspect test setup strategies would be harder.
-</p>
-<p>In closing, I&#8217;d like to quote from the section of the <a href="https://hypothesis.readthedocs.io/en/latest/manifesto.html">Hypothesis documentation</a> which describes its purpose.
-</p>
-<blockquote><p>Software is, as they say, eating the world. Software is also <a href="https://www.youtube.com/watch?v=csyL9EC0S0c">terrible</a>. It&#8217;s buggy, insecure and generally poorly thought out. This combination is clearly a recipe for disaster.
-</p>
-<p>And the state of software testing is even worse. Although it&#8217;s fairly uncontroversial at this point that you should be testing your code, can you really say with a straight face that most projects you&#8217;ve worked on are adequately tested?
-</p>
-<p>A lot of the problem here is that it&#8217;s too hard to write good tests. Your tests encode exactly the same assumptions and fallacies that you had when you wrote the code, so they miss exactly the same bugs that you missed when you wrote the code.
-</p>
-<p>&#8212; <a href="https://hypothesis.readthedocs.io/en/latest/manifesto.html">The Purpose of Hypothesis</a>
-</p>
+<p>More generally, I found the hypothesis library solid. It&#8217;s well designed and documented, as well as being a fine example of how to use Python decorators.</p>
+<p>I&#8217;d say property based testing complements example based testing. Example based unit tests show you how a function is used, for instance; with hypothesis, this useful demonstration happens behind the scenes (though note that your hypothesis tests <strong>can</strong> include explicit <a href="https://hypothesis.readthedocs.io/en/latest/details.html#providing-explicit-examples">@examples</a>). Example based unit tests are typically one or two orders of magnitude quicker to execute. It&#8217;s not a problem if a couple of tests take half a second to run, but what if you have a couple of thousand tests?</p>
+<p>In my case the built-in strategies were good enough to generate inputs to my function. I can imagine that&#8217;s not the case for functions higher up a software stack. Test setup functions can be hard work and I suspect test setup strategies would be harder.</p>
+<p>In closing, I&#8217;d like to quote from the section of the <a href="https://hypothesis.readthedocs.io/en/latest/manifesto.html">Hypothesis documentation</a> which describes its purpose.</p>
+<blockquote>
+<p>Software is, as they say, eating the world. Software is also <a href="https://www.youtube.com/watch?v=csyL9EC0S0c">terrible</a>. It&#8217;s buggy, insecure and generally poorly thought out. This combination is clearly a recipe for disaster.</p>
+<p>And the state of software testing is even worse. Although it&#8217;s fairly uncontroversial at this point that you should be testing your code, can you really say with a straight face that most projects you&#8217;ve worked on are adequately tested?</p>
+<p>A lot of the problem here is that it&#8217;s too hard to write good tests. Your tests encode exactly the same assumptions and fallacies that you had when you wrote the code, so they miss exactly the same bugs that you missed when you wrote the code.</p>
+<p>&#8212; <a href="https://hypothesis.readthedocs.io/en/latest/manifesto.html">The Purpose of Hypothesis</a></p>
 </blockquote>
 </div>
 

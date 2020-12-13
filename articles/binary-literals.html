@@ -29,22 +29,18 @@
 <h2 class="title"><a href="/articles/binary-literals">Binary Literals</a></h2>
 <p class="meta"><abbr class="published" title="2006-08-06">2006-08-06</abbr> &bull; <a href="/tag/c++" rel="tag">C++</a>, <a href="/tag/ruby" rel="tag">Ruby</a> &bull; <a href="/articles/binary-literals#disqus_thread">Comments</a></p>
 <p>When I <a href="/articles/my-test-first-ruby-program.html" title="my (test) first Ruby program">examined Ruby&#8217;s syntax</a> for integral literals I found the usual
-   suspects &#8212; decimal, octal, and hexadecimal numbers. There were also a couple
-   of pleasant surprises.
-</p>
-<span id="continue-reading"/>
-
-
-<h4>Binary Literals</h4>
+suspects &#8212; decimal, octal, and hexadecimal numbers. There were also a couple
+of pleasant surprises.</p>
+<p><span id="continue-reading"/></p>
+<h4 id="binary-literals">Binary Literals</h4>
 <p><span id="excerpt0"/>Ruby supports binary literals. It&#8217;s always been mystery to me why
-   other languages don&#8217;t support these &ndash; you always need them when you
-   need to pack and unpack binary data. Many of us old C/C++ hackers
-   probably use hexadecimal numbers for this purpose, to the extent that
-   we probably <em>know</em> the binary values of the first sixteen hex numbers
-   &#8212; but they still don&#8217;t <a href="/articles/readable-code.html" title="Readable code">read</a> well. For example, here, in
-   different languages, are bitmasks to get at bits 2 to 5 (inclusive) of
-   a number. I&#8217;m counting the least significant bit as bit 0 here.
-</p>
+other languages don&#8217;t support these &ndash; you always need them when you
+need to pack and unpack binary data. Many of us old C/C++ hackers
+probably use hexadecimal numbers for this purpose, to the extent that
+we probably <em>know</em> the binary values of the first sixteen hex numbers
+&#8212; but they still don&#8217;t <a href="/articles/readable-code.html" title="Readable code">read</a> well. For example, here, in
+different languages, are bitmasks to get at bits 2 to 5 (inclusive) of
+a number. I&#8217;m counting the least significant bit as bit 0 here.</p>
 <div class="typocode">
 
 <pre class="prettyprint">mask = 0b111100    # Ruby, binary literal
@@ -56,11 +52,9 @@ unsigned long const mask
 
 </div>
 
-<p>It&#8217;s clear that the Ruby literal is easiest to interpret as a bit mask.
-</p>
+<p>It&#8217;s clear that the Ruby literal is easiest to interpret as a bit mask.</p>
 <p>In C++ &#8212; and other C-family languages &#8212; we could equally try
-   and express our intent of extracting bits 2, 3, 4, 5 more directly:
-</p>
+and express our intent of extracting bits 2, 3, 4, 5 more directly:</p>
 <div class="typocode">
 
 <pre class="prettyprint"> unsigned long const mask
@@ -71,15 +65,12 @@ unsigned long const mask
 </div>
 
 <p>With a bit of squinting, we read this as: &#8220;set bits in the half open range
-   from bits 2 to 6&#8221;.
-</p>
+from bits 2 to 6&#8221;.</p>
 <p>Note in passing that the subtraction operator, <code>-</code>, binds more tightly
-   than the left shift operator, <code>&lt;&lt;</code>, <a href="/articles/brackets_off.html" title="Brackets off!">despite what you might expect</a>,
-   so we are in fact left shifting <code>~0u</code> by <code>4</code>.
-</p>
+than the left shift operator, <code>&lt;&lt;</code>, <a href="/articles/brackets_off.html" title="Brackets off!">despite what you might expect</a>,
+so we are in fact left shifting <code>~0u</code> by <code>4</code>.</p>
 <p>In C++ we might even consider working around the lack of binary
-   literals using a <a href="http://www.sgi.com/tech/stl/bitset.html">bitset</a>.
-</p>
+literals using a <a href="http://www.sgi.com/tech/stl/bitset.html">bitset</a>.</p>
 <div class="typocode">
 
 <pre class="prettyprint">unsigned long const mask
@@ -90,14 +81,11 @@ unsigned long const mask
 </div>
 
 <p>This is, however, non-idiomatic and inefficient, and really just exposes the
-   language&#8217;s lack of binary literals.
-</p>
-
-<h4>Underscore as Separators</h4>
+language&#8217;s lack of binary literals.</p>
+<h4 id="underscore-as-separators">Underscore as Separators</h4>
 <p>Binary literals soon get tricky to read. Runs of 1&#8217;s and 0&#8217;s can be
-   hard on the eye.  How readable, for example, would our <a href="http://www.ruby-lang.org" title="Ruby home">Ruby</a>
-   literal be if we wanted to mask out bits 9, 10, 11?
-</p>
+hard on the eye.  How readable, for example, would our <a href="http://www.ruby-lang.org" title="Ruby home">Ruby</a>
+literal be if we wanted to mask out bits 9, 10, 11?</p>
 <div class="typocode">
 
 <pre class="prettyprint">mask = 0b111000000000
@@ -107,8 +95,7 @@ unsigned long const mask
 </div>
 
 <p>Fortunately, <a href="http://www.ruby-lang.org" title="Ruby home">Ruby</a> allows us to place underscores in numeric
-   literals, which, gives us an equivalent number:
-</p>
+literals, which, gives us an equivalent number:</p>
 <div class="typocode">
 
 <pre class="prettyprint">mask = 0b1110_0000_0000
@@ -118,8 +105,7 @@ unsigned long const mask
 </div>
 
 <p>Here, I&#8217;ve inserted the underscores every <code>4</code> bits &#8212; that is, at the
-   boundaries of nibbles. Nice one <a href="http://www.ruby-lang.org" title="Ruby home">Ruby</a>!
-</p>
+boundaries of nibbles. Nice one <a href="http://www.ruby-lang.org" title="Ruby home">Ruby</a>!</p>
 </div>
 
 <div class="comments"><hr/><div id="disqus_thread"></div><script type="text/javascript" src="http://disqus.com/forums/wordaligned/embed.js"></script></div>

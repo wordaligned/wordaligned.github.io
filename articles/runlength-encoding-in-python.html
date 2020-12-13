@@ -26,62 +26,58 @@
       <div class="atomentry" id="runlength-encoding-in-python">
 <h2 class="title"><a href="/articles/runlength-encoding-in-python">Run-length encoding in Python</a></h2>
 <p class="meta"><abbr class="published" title="2009-06-01">2009-06-01</abbr> &bull; <a href="/tag/python" rel="tag">Python</a>, <a href="/tag/streams" rel="tag">Streams</a> &bull; <a href="/articles/runlength-encoding-in-python#disqus_thread">Comments</a></p>
-<p>Recently I discussed <a href="/articles/deflate-runlength-encoding-but-better.html" title="DEFLATE: run-length encoding, but better">run-length encoding and DEFLATE</a> compression. I never actually showed a Python implementation of a run-length encoder, so here&#8217;s one now.
-</p>
+<p>Recently I discussed <a href="/articles/deflate-runlength-encoding-but-better.html" title="DEFLATE: run-length encoding, but better">run-length encoding and DEFLATE</a> compression. I never actually showed a Python implementation of a run-length encoder, so here&#8217;s one now.</p>
 <div class="typocode">
 
 <pre class="prettyprint">import itertools as its
 
 def ilen(it):
-    '''Return the length of an iterable.
-    
+    &#x27;&#x27;&#x27;Return the length of an iterable.
+
     &gt;&gt;&gt; ilen(range(7))
     7
-    '''
+    &#x27;&#x27;&#x27;
     return sum(1 for _ in it)
 
 def runlength_enc(xs):
-    '''Return a run-length encoded version of the stream, xs.
-    
+    &#x27;&#x27;&#x27;Return a run-length encoded version of the stream, xs.
+
     The resulting stream consists of (count, x) pairs.
-    
-    &gt;&gt;&gt; ys = runlength_enc('AAABBCCC')
+
+    &gt;&gt;&gt; ys = runlength_enc(&#x27;AAABBCCC&#x27;)
     &gt;&gt;&gt; next(ys)
-    (3, 'A')
+    (3, &#x27;A&#x27;)
     &gt;&gt;&gt; list(ys)
-    [(2, 'B'), (3, 'C')]
-    '''
+    [(2, &#x27;B&#x27;), (3, &#x27;C&#x27;)]
+    &#x27;&#x27;&#x27;
     return ((ilen(gp), x) for x, gp in its.groupby(xs))
 
 </pre>
 
 </div>
 
-<p>The decoder is equally simple. <code>Itertools.repeat</code> expands a <code>(count, value)</code> pair into an iterable which will generate <code>count</code> elements. <code>Itertools.chain</code> flattens these iterables into a single stream.
-</p>
-<span id="continue-reading"/>
-
+<p>The decoder is equally simple. <code>Itertools.repeat</code> expands a <code>(count, value)</code> pair into an iterable which will generate <code>count</code> elements. <code>Itertools.chain</code> flattens these iterables into a single stream.</p>
+<p><span id="continue-reading"/></p>
 <div class="typocode">
 
 <pre class="prettyprint">def runlength_dec(xs):
-    '''Expand a run-length encoded stream.
-    
+    &#x27;&#x27;&#x27;Expand a run-length encoded stream.
+
     Each element of xs is a pair, (count, x).
-    
-    &gt;&gt;&gt; ys = runlength_dec(((3, 'A'), (2, 'B')))
+
+    &gt;&gt;&gt; ys = runlength_dec(((3, &#x27;A&#x27;), (2, &#x27;B&#x27;)))
     &gt;&gt;&gt; next(ys)
-    'A'
-    &gt;&gt;&gt; ''.join(ys)
-    'AABB'
-    '''
+    &#x27;A&#x27;
+    &gt;&gt;&gt; &#x27;&#x27;.join(ys)
+    &#x27;AABB&#x27;
+    &#x27;&#x27;&#x27;
     return its.chain.from_iterable(its.repeat(x, n) for n, x in xs)
 
 </pre>
 
 </div>
 
-<p>If you haven&#8217;t seen <code><a href="http://docs.python.org/library/itertools.html#itertools.itertools.chain.from_iterable">itertools.chain.from_iterable()</a></code> yet, it was introduced at Python 3.0/2.6. The important feature here is that it lazily works its way through a single iterable argument. If instead we&#8217;d written:
-</p>
+<p>If you haven&#8217;t seen <code><a href="http://docs.python.org/library/itertools.html#itertools.itertools.chain.from_iterable">itertools.chain.from_iterable()</a></code> yet, it was introduced at Python 3.0/2.6. The important feature here is that it lazily works its way through a single iterable argument. If instead we&#8217;d written:</p>
 <div class="typocode">
 
 <pre class="prettyprint">def runlength_dec(xs):
@@ -92,11 +88,10 @@ def runlength_enc(xs):
 
 </div>
 
-<p>then our run-length decoder would need to consume all of <code>xs</code> before yielding results (which is why we must interrupt the interpreter&#8217;s execution below).
-</p>
+<p>then our run-length decoder would need to consume all of <code>xs</code> before yielding results (which is why we must interrupt the interpreter&#8217;s execution below).</p>
 <div class="typocode">
 
-<pre class="prettyprint">&gt;&gt;&gt; xs = its.cycle((3, 'A'), (2, 'B'))
+<pre class="prettyprint">&gt;&gt;&gt; xs = its.cycle((3, &#x27;A&#x27;), (2, &#x27;B&#x27;))
 &gt;&gt;&gt; runlength_dec(xs)
   C-c C-cTraceback (most recent call last):
   File "&lt;stdin&gt;", line 1, in &lt;module&gt;
@@ -108,16 +103,13 @@ KeyboardInterrupt
 
 </div>
 
-
-<h3>Named tuples for clarity</h3>
-<p>Streams of pairs (as shown above) are perfectly Pythonic. If we run-length encode a stream of numbers, clients will just have to read the manual and remember that <code>item[0]</code> is a repeat count and <code>item[1]</code> is a value.
-</p>
-<p>If this seems fragile, a new-ish member of the <a href="http://docs.python.org/dev/library/collections.html">collections module</a> can give the pair more structure.
-</p>
+<h3 id="named-tuples-for-clarity">Named tuples for clarity</h3>
+<p>Streams of pairs (as shown above) are perfectly Pythonic. If we run-length encode a stream of numbers, clients will just have to read the manual and remember that <code>item[0]</code> is a repeat count and <code>item[1]</code> is a value.</p>
+<p>If this seems fragile, a new-ish member of the <a href="http://docs.python.org/dev/library/collections.html">collections module</a> can give the pair more structure.</p>
 <div class="typocode">
 
 <pre class="prettyprint">&gt;&gt;&gt; from collections import namedtuple
-&gt;&gt;&gt; Run = namedtuple('Run', 'count value') 
+&gt;&gt;&gt; Run = namedtuple(&#x27;Run&#x27;, &#x27;count value&#x27;) 
 &gt;&gt;&gt; run1 = Run(count=10, value=2)
 &gt;&gt;&gt; run2 = Run(value=2, count=10)
 &gt;&gt;&gt; run1
@@ -133,19 +125,18 @@ Run(count=10, value=2)
 
 </div>
 
-<p>Here&#8217;s how we&#8217;d change <code>runlength_enc()</code> to use the new type.
-</p>
+<p>Here&#8217;s how we&#8217;d change <code>runlength_enc()</code> to use the new type.</p>
 <div class="typocode">
 
 <pre class="prettyprint">def runlength_enc(xs):
-    '''Return a run-length encoded version of the stream, xs.
-    
-    &gt;&gt;&gt; ys = runlength_enc('AAABBCCC')
+    &#x27;&#x27;&#x27;Return a run-length encoded version of the stream, xs.
+
+    &gt;&gt;&gt; ys = runlength_enc(&#x27;AAABBCCC&#x27;)
     &gt;&gt;&gt; next(ys)
-    Run(count=3, value='A')
+    Run(count=3, value=&#x27;A&#x27;)
     &gt;&gt;&gt; list(ys)
-    [Run(count=2, value='B'), Run(count=3, value='C')]
-    '''
+    [Run(count=2, value=&#x27;B&#x27;), Run(count=3, value=&#x27;C&#x27;)]
+    &#x27;&#x27;&#x27;
     return (Run(ilen(gp), x) for x, gp in its.groupby(xs))
 
 </pre>

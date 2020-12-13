@@ -26,16 +26,15 @@
       <div class="atomentry" id="python-surprise-me">
 <h2 class="title"><a href="/articles/python-surprise-me">Python, Surprise me!</a></h2>
 <p class="meta"><abbr class="published" title="2009-12-15">2009-12-15</abbr> &bull; <a href="/tag/python" rel="tag">Python</a> &bull; <a href="/articles/python-surprise-me#disqus_thread">Comments</a></p>
-<h3>A Simple Function</h3>
-<p>Here&#8217;s a simple function which converts the third item of a list into an integer and returns it, returning -1 if the list has fewer than three entries or if the third entry fails to convert.
-</p>
+<h3 id="a-simple-function">A Simple Function</h3>
+<p>Here&#8217;s a simple function which converts the third item of a list into an integer and returns it, returning -1 if the list has fewer than three entries or if the third entry fails to convert.</p>
 <div class="typocode">
 
 <pre class="prettyprint">def third_int(xs):
-    '''Convert the third item of xs into an int and return it.
-        
+    &#x27;&#x27;&#x27;Convert the third item of xs into an int and return it.
+
     Returns -1 on failure.
-    '''    
+    &#x27;&#x27;&#x27;    
     try:
         return int(xs[2])
     except IndexError, ValueError:
@@ -45,45 +44,36 @@
 
 </div>
 
-<p>Unfortunately this simple function is simply wrong. Evidently some exceptions aren&#8217;t being caught.
-</p>
+<p>Unfortunately this simple function is simply wrong. Evidently some exceptions aren&#8217;t being caught.</p>
 <div class="typocode">
 
 <pre class="prettyprint">&gt;&gt;&gt; third_int([1, 2, 3, 4])
 3
 &gt;&gt;&gt; third_int([1])
 -1
-&gt;&gt;&gt; third_int(('1', '2', '3', '4',))
+&gt;&gt;&gt; third_int((&#x27;1&#x27;, &#x27;2&#x27;, &#x27;3&#x27;, &#x27;4&#x27;,))
 3
-&gt;&gt;&gt; third_int(['one', 'two', 'three', 'four'])
+&gt;&gt;&gt; third_int([&#x27;one&#x27;, &#x27;two&#x27;, &#x27;three&#x27;, &#x27;four&#x27;])
 Traceback (most recent call last):
     ....
-ValueError: invalid literal for int() with base 10: 'three'
+ValueError: invalid literal for int() with base 10: &#x27;three&#x27;
 
 </pre>
 
 </div>
 
-<p>How ever did a <code>ValueError</code> sneak past the <code>except</code> clause?
-</p>
-<span id="continue-reading"/>
-
-
-<h3>The Real Surprise</h3>
-<p>There&#8217;s nothing mysterious or surprising going on here, but I&#8217;ll delay answering this question for a moment. For me, the real surprise about Python is that, generally, I get it right first time. Python similarly <a href="http://www.python.org/about/success/esr" title="Why Python? by Eric S. Raymond">caught Eric S. Raymond by surprise</a>. His first surprise was that it took him just 20 minutes to get used to syntactically significant whitespace. And just 100 minutes later &#8230;
-</p>
-<blockquote><p>My second [surprise] came a couple of hours into the project, when I noticed (allowing for pauses needed to look up new features in <em>Programming Python</em>) I was generating working code nearly as fast as I could type. When I realized this, I was quite startled. An important measure of effort in coding is the frequency with which you write something that doesn&#8217;t actually match your mental representation of the problem, and have to backtrack on realizing that what you just typed won&#8217;t actually tell the language to do what you&#8217;re thinking. An important measure of good language design is how rapidly the percentage of missteps of this kind falls as you gain experience with the language.
-</p>
-<p>&#8212; Eric S. Raymond, <a href="http://www.python.org/about/success/esr" title="Why Python? by Eric S. Raymond">Why Python?</a>
-</p>
-</blockquote><p>I certainly don&#8217;t generate working code as fast as I can type, and I&#8217;m not even a particularly <a href="http://steve-yegge.blogspot.com/2008/09/programmings-dirtiest-little-secret.html" title="Learn to type, Yegge says">quick typist</a>, but I rarely make syntactic errors when writing Python &#8212; and I don&#8217;t often need to consult the documentation on such matters. As Chuck Allison memorably puts it: <a href="http://www.artima.com/cppsource/simple.html">&#8220;the syntax is so clean it squeaks&#8221;</a>.
-</p>
-
-<h3>Parentheses Required(?)</h3>
-<p>There are some oddities and gotchas though. I don&#8217;t object to the <a href="http://effbot.org/pyfaq/why-must-self-be-used-explicitly-in-method-definitions-and-calls.htm">explicit <code>self</code></a> in methods, but I do sometimes forget to write it &#8212; especially if I&#8217;ve just switched over from C++. 
-</p>
-<p>A side-effect of the whitespace thing is that you can&#8217;t just wrap a long line. The <a href="http://docs.python.org/reference/lexical_analysis.html#explicit-line-joining">line ending</a> needs to be escaped.
-</p>
+<p>How ever did a <code>ValueError</code> sneak past the <code>except</code> clause?</p>
+<p><span id="continue-reading"/></p>
+<h3 id="the-real-surprise">The Real Surprise</h3>
+<p>There&#8217;s nothing mysterious or surprising going on here, but I&#8217;ll delay answering this question for a moment. For me, the real surprise about Python is that, generally, I get it right first time. Python similarly <a href="http://www.python.org/about/success/esr" title="Why Python? by Eric S. Raymond">caught Eric S. Raymond by surprise</a>. His first surprise was that it took him just 20 minutes to get used to syntactically significant whitespace. And just 100 minutes later &#8230;</p>
+<blockquote>
+<p>My second [surprise] came a couple of hours into the project, when I noticed (allowing for pauses needed to look up new features in <em>Programming Python</em>) I was generating working code nearly as fast as I could type. When I realized this, I was quite startled. An important measure of effort in coding is the frequency with which you write something that doesn&#8217;t actually match your mental representation of the problem, and have to backtrack on realizing that what you just typed won&#8217;t actually tell the language to do what you&#8217;re thinking. An important measure of good language design is how rapidly the percentage of missteps of this kind falls as you gain experience with the language.</p>
+<p>&#8212; Eric S. Raymond, <a href="http://www.python.org/about/success/esr" title="Why Python? by Eric S. Raymond">Why Python?</a></p>
+</blockquote>
+<p>I certainly don&#8217;t generate working code as fast as I can type, and I&#8217;m not even a particularly <a href="http://steve-yegge.blogspot.com/2008/09/programmings-dirtiest-little-secret.html" title="Learn to type, Yegge says">quick typist</a>, but I rarely make syntactic errors when writing Python &#8212; and I don&#8217;t often need to consult the documentation on such matters. As Chuck Allison memorably puts it: <a href="http://www.artima.com/cppsource/simple.html">&#8220;the syntax is so clean it squeaks&#8221;</a>.</p>
+<h3 id="parentheses-required">Parentheses Required(?)</h3>
+<p>There are some oddities and gotchas though. I don&#8217;t object to the <a href="http://effbot.org/pyfaq/why-must-self-be-used-explicitly-in-method-definitions-and-calls.htm">explicit <code>self</code></a> in methods, but I do sometimes forget to write it &#8212; especially if I&#8217;ve just switched over from C++. </p>
+<p>A side-effect of the whitespace thing is that you can&#8217;t just wrap a long line. The <a href="http://docs.python.org/reference/lexical_analysis.html#explicit-line-joining">line ending</a> needs to be escaped.</p>
 <div class="typocode">
 
 <pre class="prettyprint">if 1900 &lt; year &lt; 2100 and 1 &lt;= month &lt;= 12 \
@@ -95,8 +85,7 @@ ValueError: invalid literal for int() with base 10: 'three'
 
 </div>
 
-<p>Alternatively, parenthesize.
-</p>
+<p>Alternatively, parenthesize.</p>
 <div class="typocode">
 
 <pre class="prettyprint">if (1900 &lt; year &lt; 2100 and 1 &lt;= month &lt;= 12
@@ -108,12 +97,9 @@ ValueError: invalid literal for int() with base 10: 'three'
 
 </div>
 
-<p>In the above, the parentheses aren&#8217;t required to group terms, but instead serve to implicitly continue the line of code past a couple of newline characters.
-</p>
-<p><a href="http://en.wikipedia.org/wiki/Tree_%28data_structure%29"><img width="360px" src="http://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Binary_tree.svg/500px-Binary_tree.svg.png" alt="Wikipedia Tree"/></a>
-</p>
-<p>Parentheses serve more than one role in Python&#8217;s syntax. As in all C-family languages, they can group expressions. They also get involved building tuples, <code>(1, 2, 3)</code> or <code>('red', 0xff0000)</code> for example. Beware the special case: a one-tuple needs a trailing comma, <code>("singleton",)</code>. This isn&#8217;t something I forget or accidentally omit, but it can make things fiddly. Here&#8217;s a tuple-tised <a href="http://en.wikipedia.org/wiki/Tree_%28data_structure%29">tree</a>, where we represent a tree as a tuple whose first element is a node value, and any subsequent elements are sub-trees. Careful with those commas!
-</p>
+<p>In the above, the parentheses aren&#8217;t required to group terms, but instead serve to implicitly continue the line of code past a couple of newline characters.</p>
+<p><a href="http://en.wikipedia.org/wiki/Tree_%28data_structure%29"><img width="360px" src="http://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Binary_tree.svg/500px-Binary_tree.svg.png" alt="Wikipedia Tree"/></a></p>
+<p>Parentheses serve more than one role in Python&#8217;s syntax. As in all C-family languages, they can group expressions. They also get involved building tuples, <code>(1, 2, 3)</code> or <code>('red', 0xff0000)</code> for example. Beware the special case: a one-tuple needs a trailing comma, <code>("singleton",)</code>. This isn&#8217;t something I forget or accidentally omit, but it can make things fiddly. Here&#8217;s a tuple-tised <a href="http://en.wikipedia.org/wiki/Tree_%28data_structure%29">tree</a>, where we represent a tree as a tuple whose first element is a node value, and any subsequent elements are sub-trees. Careful with those commas!</p>
 <div class="typocode">
 
 <pre class="prettyprint">tree = (2, (7, (2,), (6, (5,), (11,))), (5, (9, (4,))))
@@ -122,8 +108,7 @@ ValueError: invalid literal for int() with base 10: 'three'
 
 </div>
 
-<p>Actually, tuples are just comma-separated lists of expressions &#8212; no parentheses required &#8212; so we might equally well have written.
-</p>
+<p>Actually, tuples are just comma-separated lists of expressions &#8212; no parentheses required &#8212; so we might equally well have written.</p>
 <div class="typocode">
 
 <pre class="prettyprint">tree = 2, (7, (2,), (6, (5,), (11,))), (5, (9, (4,)))
@@ -132,10 +117,8 @@ ValueError: invalid literal for int() with base 10: 'three'
 
 </div>
 
-<p>Here, the superfluous outermost parentheses have been omitted; the inner ones are still required for grouping.
-</p>
-<p>How about we always append a trailing comma to our tuples so the one-tuple no longer looks different?
-</p>
+<p>Here, the superfluous outermost parentheses have been omitted; the inner ones are still required for grouping.</p>
+<p>How about we always append a trailing comma to our tuples so the one-tuple no longer looks different?</p>
 <div class="typocode">
 
 <pre class="prettyprint">tree = 2, (7, (2,), (6, (5,), (11,))), (5, (9, (4,))),
@@ -144,8 +127,7 @@ ValueError: invalid literal for int() with base 10: 'three'
 
 </div>
 
-<p>That&#8217;s allowed and fine. Unless we need an empty tuple, that is, in which case the parentheses <strong>are</strong> required. And a comma would be wrong.
-</p>
+<p>That&#8217;s allowed and fine. Unless we need an empty tuple, that is, in which case the parentheses <strong>are</strong> required. And a comma would be wrong.</p>
 <div class="typocode">
 
 <pre class="prettyprint">&gt;&gt;&gt; ()
@@ -165,8 +147,7 @@ SyntaxError: invalid syntax
 
 </div>
 
-<p>Python 3 introduces a nice new syntax for <code>set</code> literals, reusing the braces which traditionally enclose <code>dict</code>s.
-</p>
+<p>Python 3 introduces a nice new syntax for <code>set</code> literals, reusing the braces which traditionally enclose <code>dict</code>s.</p>
 <div class="typocode">
 
 <pre class="prettyprint">&gt;&gt;&gt; ls = { 1, 11, 21, 1211, 111221, 312211 }
@@ -175,31 +156,28 @@ SyntaxError: invalid syntax
 
 </div>
 
-<p>Again, beware the edge case: <code>{}</code> is an empty <code>dict</code>, not an empty set.
-</p>
+<p>Again, beware the edge case: <code>{}</code> is an empty <code>dict</code>, not an empty set.</p>
 <div class="typocode">
 
 <pre class="prettyprint">&gt;&gt;&gt; zs = {}
 &gt;&gt;&gt; type(zs)
-&lt;class 'dict'&gt;
+&lt;class &#x27;dict&#x27;&gt;
 &gt;&gt;&gt; zs = set()
 &gt;&gt;&gt; type(zs)
-&lt;class 'set'&gt;
+&lt;class &#x27;set&#x27;&gt;
 
 </pre>
 
 </div>
 
-<p>Python 3 allows non-ascii characters in identifiers, but not any old character, so we <strong>cannot</strong> get away with
-</p>
+<p>Python 3 allows non-ascii characters in identifiers, but not any old character, so we <strong>cannot</strong> get away with</p>
 <pre>
 >>> &empty; = set()
       ^
 SyntaxError: invalid character in identifier
 </pre>
 
-<p>Parentheses are used for function calls too, and also for generator expressions. Here&#8217;s a lazy list of squares of numbers less than a million.
-</p>
+<p>Parentheses are used for function calls too, and also for generator expressions. Here&#8217;s a lazy list of squares of numbers less than a million.</p>
 <div class="typocode">
 
 <pre class="prettyprint">&gt;&gt;&gt; sqs = (x * x for x in range(1000000))
@@ -208,8 +186,7 @@ SyntaxError: invalid character in identifier
 
 </div>
 
-<p>Here&#8217;s the sum of these numbers.
-</p>
+<p>Here&#8217;s the sum of these numbers.</p>
 <div class="typocode">
 
 <pre class="prettyprint">&gt;&gt;&gt; sum((x * x for x in range(1000000)))
@@ -219,8 +196,7 @@ SyntaxError: invalid character in identifier
 
 </div>
 
-<p>Actually, we can omit the generator-expression parentheses in the sum. The function call parentheses magically turn the enclosed <code>x * x for x in range(1000000)</code> into a generator expression. As usual, Python does what we want.
-</p>
+<p>Actually, we can omit the generator-expression parentheses in the sum. The function call parentheses magically turn the enclosed <code>x * x for x in range(1000000)</code> into a generator expression. As usual, Python does what we want.</p>
 <div class="typocode">
 
 <pre class="prettyprint">&gt;&gt;&gt; sum(x * x for x in range(1000000))
@@ -230,14 +206,10 @@ SyntaxError: invalid character in identifier
 
 </div>
 
-
-<h3>Serious about Syntax</h3>
-<p>If you&#8217;ve read this far you may well be thinking: &#8220;So what?&#8221; I haven&#8217;t shown any gotchas, merely a few quirks and corner cases. As already mentioned, the real surprise is that Python fails to surprise. Part of this, as I hope I&#8217;ve shown here, can be attributed to the interpreter, which positively invites you to experiment; but mainly <span id="excerpt0"/>Python&#8217;s clean and transparent design takes the credit. Repeating Eric S. Raymond: you don&#8217;t have to &#8220;actually tell the language to do what you&#8217;re thinking&#8221;.
-</p>
-<p>Since I first started using Python the syntax has grown considerably, yet the extensions and additions seem almost as if they&#8217;d been planned from the start<a id="fn1link" href="#fn1"><sup>[1]</sup></a>. Generator expressions complement list comprehensions. The yield statement fits nicely with iteration.
-</p>
-<p>Even more remarkably, Python 3 has chosen to break backwards compatibility, so it can undo those few early choices which now seem mistakes. Which brings us back to the broken function at the top of this article. Here it is again, docstring omitted for brevity.
-</p>
+<h3 id="serious-about-syntax">Serious about Syntax</h3>
+<p>If you&#8217;ve read this far you may well be thinking: &#8220;So what?&#8221; I haven&#8217;t shown any gotchas, merely a few quirks and corner cases. As already mentioned, the real surprise is that Python fails to surprise. Part of this, as I hope I&#8217;ve shown here, can be attributed to the interpreter, which positively invites you to experiment; but mainly <span id="excerpt0"/>Python&#8217;s clean and transparent design takes the credit. Repeating Eric S. Raymond: you don&#8217;t have to &#8220;actually tell the language to do what you&#8217;re thinking&#8221;.</p>
+<p>Since I first started using Python the syntax has grown considerably, yet the extensions and additions seem almost as if they&#8217;d been planned from the start<a id="fn1link" href="#fn1"><sup><a href="https://blog.codeship.com/building-minimal-docker-containers-for-go-applications/">1</a></sup></a>. Generator expressions complement list comprehensions. The yield statement fits nicely with iteration.</p>
+<p>Even more remarkably, Python 3 has chosen to break backwards compatibility, so it can undo those few early choices which now seem mistakes. Which brings us back to the broken function at the top of this article. Here it is again, docstring omitted for brevity.</p>
 <div class="typocode">
 
 <pre class="prettyprint">def third_int(xs):
@@ -250,8 +222,7 @@ SyntaxError: invalid character in identifier
 
 </div>
 
-<p>I really did write a function like this, and I really did get it wrong in just this way. The code is syntactically valid, but I should have written
-</p>
+<p>I really did write a function like this, and I really did get it wrong in just this way. The code is syntactically valid, but I should have written</p>
 <div class="typocode">
 
 <pre class="prettyprint">def third_int(xs):
@@ -264,8 +235,7 @@ SyntaxError: invalid character in identifier
 
 </div>
 
-<p>The parentheses in the <code>except</code> clause are crucial. The formal syntax of this form of <a href="http://docs.python.org/reference/compound_stmts.html#the-try-statement">try statement</a> is
-</p>
+<p>The parentheses in the <code>except</code> clause are crucial. The formal syntax of this form of <a href="http://docs.python.org/reference/compound_stmts.html#the-try-statement">try statement</a> is</p>
 <pre>
 try1_stmt ::=  "try" ":" suite
                ("except" [expression [("as" | ",") target]] ":" suite)+
@@ -273,8 +243,7 @@ try1_stmt ::=  "try" ":" suite
                ["finally" ":" suite]
 </pre>
 
-<p>In the corrected version of <code>third_int()</code>, the parentheses group <code>IndexError, ValueError</code> into a single expression, a tuple, and the except clause matches any object with class (or base class) <code>IndexError</code> or <code>ValueError</code>. The broken version is very different, as becomes clear if we use the alternative <code>"as"</code> form.
-</p>
+<p>In the corrected version of <code>third_int()</code>, the parentheses group <code>IndexError, ValueError</code> into a single expression, a tuple, and the except clause matches any object with class (or base class) <code>IndexError</code> or <code>ValueError</code>. The broken version is very different, as becomes clear if we use the alternative <code>"as"</code> form.</p>
 <div class="typocode">
 
 <pre class="prettyprint">def third_int(xs):
@@ -287,14 +256,10 @@ try1_stmt ::=  "try" ":" suite
 
 </div>
 
-<p>Here, the except clause will match an object with class or base class <code>IndexError</code>, and assigns that object to the target, which is called <code>ValueError</code> (and which shadows the &#8220;real&#8221; ValueError in the rest of the function definition). If <code>int()</code> raises a <code>ValueError</code>, it will not be matched.
-</p>
-
-<h3>Won&#8217;t Get Fooled Again</h3>
-<p>Oh, I get it, now. It <strong>is</strong> a bit subtle, but I won&#8217;t make that mistake again.
-</p>
-<p>Wait, there&#8217;s more! In Python 3k, my broken implementation is properly broken &#8212; a syntax error.
-</p>
+<p>Here, the except clause will match an object with class or base class <code>IndexError</code>, and assigns that object to the target, which is called <code>ValueError</code> (and which shadows the &#8220;real&#8221; ValueError in the rest of the function definition). If <code>int()</code> raises a <code>ValueError</code>, it will not be matched.</p>
+<h3 id="wont-get-fooled-again">Won&#8217;t Get Fooled Again</h3>
+<p>Oh, I get it, now. It <strong>is</strong> a bit subtle, but I won&#8217;t make that mistake again.</p>
+<p>Wait, there&#8217;s more! In Python 3k, my broken implementation is properly broken &#8212; a syntax error.</p>
 <div class="typocode">
 
 <pre class="prettyprint">Python 3.1
@@ -311,8 +276,7 @@ SyntaxError: invalid syntax
 
 </div>
 
-<p>The Python 3k syntax of this form of <a href="http://docs.python.org/py3k/reference/compound_stmts.html#the-try-statement">try statement</a> reads.
-</p>
+<p>The Python 3k syntax of this form of <a href="http://docs.python.org/py3k/reference/compound_stmts.html#the-try-statement">try statement</a> reads.</p>
 <pre>
 try1_stmt ::=  "try" ":" suite
                ("except" [expression "as" target]] ":" suite)+
@@ -320,12 +284,9 @@ try1_stmt ::=  "try" ":" suite
                ["finally" ":" suite]
 </pre>
 
-<p>You can&#8217;t use a comma to capture the target any more. It&#8217;s an advance and a simplification. Why am I not surprised?
-</p>
+<p>You can&#8217;t use a comma to capture the target any more. It&#8217;s an advance and a simplification. Why am I not surprised?</p>
 <hr />
-
-<p><a id="fn1" href="#fn1link">[1]</a>: With the possible exception of <a href="http://docs.python.org/reference/expressions.html#boolean-operations">conditional expressions</a>, that is.
-</p>
+<p><a id="fn1" href="#fn1link"><a href="https://blog.codeship.com/building-minimal-docker-containers-for-go-applications/">1</a></a>: With the possible exception of <a href="http://docs.python.org/reference/expressions.html#boolean-operations">conditional expressions</a>, that is.</p>
 </div>
 
 <div class="comments"><hr/><div id="disqus_thread"></div><script type="text/javascript" src="http://disqus.com/forums/wordaligned/embed.js"></script></div>

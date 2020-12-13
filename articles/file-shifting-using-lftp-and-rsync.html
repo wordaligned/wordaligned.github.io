@@ -28,46 +28,34 @@
       <div class="atomentry" id="file-shifting-using-lftp-and-rsync">
 <h2 class="title"><a href="/articles/file-shifting-using-lftp-and-rsync">File shifting using lftp and rsync</a></h2>
 <p class="meta"><abbr class="published" title="2008-01-06">2008-01-06</abbr> &bull; <a href="/tag/shell" rel="tag">Shell</a>, <a href="/tag/emacs" rel="tag">Emacs</a>, <a href="/tag/subversion" rel="tag">Subversion</a> &bull; <a href="/articles/file-shifting-using-lftp-and-rsync#disqus_thread">Comments</a></p>
-<p>On a daily basis I work on at least three different platforms, hosted locally, virtually, remotely. Shifting files from place to place is a problem I need to resolve every day, and I have more than one solution.
-</p>
-<p>I&#8217;m not a fan of file browsers, graphical ftp clients and similar. They clutter the desktop, vary from platform to platform, take ages to drive &#8212; especially with a touch pad &#8212; and prompt for input at all the wrong times. It&#8217;s hard to undo an operation when your pointer slips. By contrast, using simple commands in a shell window puts the power back at your fingertips, whatever platform you&#8217;re on. Recovering from mistakes is as easy as recalling your command history.
-</p>
-<span id="continue-reading"/>
-
-
-<h3>Local File Systems</h3>
-<p>For simple operations on a local file system, I tend to use <code>cp</code> or Emacs dired mode simply because my immediate context is usually Emacs or a shell window, and often both. For bulky and recursive directory operations, a good starting point is:
-</p>
+<p>On a daily basis I work on at least three different platforms, hosted locally, virtually, remotely. Shifting files from place to place is a problem I need to resolve every day, and I have more than one solution.</p>
+<p>I&#8217;m not a fan of file browsers, graphical ftp clients and similar. They clutter the desktop, vary from platform to platform, take ages to drive &#8212; especially with a touch pad &#8212; and prompt for input at all the wrong times. It&#8217;s hard to undo an operation when your pointer slips. By contrast, using simple commands in a shell window puts the power back at your fingertips, whatever platform you&#8217;re on. Recovering from mistakes is as easy as recalling your command history.</p>
+<p><span id="continue-reading"/></p>
+<h3 id="local-file-systems">Local File Systems</h3>
+<p>For simple operations on a local file system, I tend to use <code>cp</code> or Emacs dired mode simply because my immediate context is usually Emacs or a shell window, and often both. For bulky and recursive directory operations, a good starting point is:</p>
 <div class="typocode">
 
-<pre class="prettyprint">$ tar c SRC | tar x -C DST
+<pre class="prettyprint">$ tar c SRC | tar x -C DST 
 
 </pre>
 
 </div>
 
-<p>You can vary this command line to reorganise file systems, though sometimes sprinkling a few soft links around may be worth considering.
-</p>
-
-<h3>Remote File Systems</h3>
-<p>Things can get tricky for remote file systems. Preserving permissions and ownership causes problems, as does the security layer. NFS and Samba may seem like the right solutions for a private network but I&#8217;ve grown to regard them as troublesome; they work best on stable networks with well known machines at well-known addresses, and, as usual, I prefer a dynamic model to a static one.
-</p>
-<p>Again, command line tools can do the job. To save the overhead of re-entering your username/password credentials, you&#8217;ll want to <a href="http://www.linuxproblem.org/art_9.html">store SSH keys</a> on the machines you frequent. The most basic remote copy command is <code>scp</code>. Use it much like <code>cp</code>, but specify a destination machine on the command line.
-</p>
-
-<h4>Extended Tar</h4>
-<p>For more complex filesystems, we can extend our <code>tar</code> command using <code>ssh</code> on the far side of the pipeline. The following command tars up the local SRC directory then extracts the archive on the REMOTE machine in directory DST.
-</p>
+<p>You can vary this command line to reorganise file systems, though sometimes sprinkling a few soft links around may be worth considering.</p>
+<h3 id="remote-file-systems">Remote File Systems</h3>
+<p>Things can get tricky for remote file systems. Preserving permissions and ownership causes problems, as does the security layer. NFS and Samba may seem like the right solutions for a private network but I&#8217;ve grown to regard them as troublesome; they work best on stable networks with well known machines at well-known addresses, and, as usual, I prefer a dynamic model to a static one.</p>
+<p>Again, command line tools can do the job. To save the overhead of re-entering your username/password credentials, you&#8217;ll want to <a href="http://www.linuxproblem.org/art_9.html">store SSH keys</a> on the machines you frequent. The most basic remote copy command is <code>scp</code>. Use it much like <code>cp</code>, but specify a destination machine on the command line.</p>
+<h4 id="extended-tar">Extended Tar</h4>
+<p>For more complex filesystems, we can extend our <code>tar</code> command using <code>ssh</code> on the far side of the pipeline. The following command tars up the local SRC directory then extracts the archive on the REMOTE machine in directory DST.</p>
 <div class="typocode">
 
-<pre class="prettyprint">$ tar c SRC | ssh REMOTE tar x -C DST
+<pre class="prettyprint">$ tar c SRC | ssh REMOTE tar x -C DST 
 
 </pre>
 
 </div>
 
-<p>If this isn&#8217;t possible, I sometimes use <code>netcat</code> to listen at a port on the remote machine:
-</p>
+<p>If this isn&#8217;t possible, I sometimes use <code>netcat</code> to listen at a port on the remote machine:</p>
 <div class="typocode"><div class="codetitle">Listen to port 2345</div>
 
 <pre class="prettyprint">nc -l -p 2345 | tar x -C DST
@@ -76,8 +64,7 @@
 
 </div>
 
-<p>Then, on the source machine, kick off the <code>tar</code> process:
-</p>
+<p>Then, on the source machine, kick off the <code>tar</code> process:</p>
 <div class="typocode">
 
 <pre class="prettyprint">tar c SRC &gt; /dev/tcp/DOTTED.IP.OF.MIRROR/2345
@@ -86,16 +73,11 @@
 
 </div>
 
-
-<h4>Lftp</h4>
-<p>Suppose you want or need to transfer files using the venerable FTP protocol. If you haven&#8217;t already discovered <a href="http://lftp.yar.ru/">lftp</a>, then it&#8217;s time to investigate. When you connect to a remote machine using <code>lftp</code> it&#8217;s rather like having a shell session open on that machine: you can navigate using tab completion and the usual shell tools relating to file and directory operations are there, as well as extra goodies like <code>mirror</code> and a decent help system.
-</p>
-
-<h4>Rsync</h4>
-<p>Rsync is another great command-line file-system shifter. It&#8217;s designed to keep two directory structures in sync, and to do so efficiently by just transmitting deltas between the two. Typically the source and destination directories reside on separate machines, and <code>rsync</code> is often invoked automatically as a scheduled job. <code>Rsync</code> forms the backbone of many a backup system. I&#8217;ve often used it to complement more heavy-weight coporate backup systems which would require me to ask an administrator to restore my own files.
-</p>
-<p>I use <code>rsync</code> to post updates to this website, and indeed to mirror this website to other machines I use. My publish script is as simple as:
-</p>
+<h4 id="lftp">Lftp</h4>
+<p>Suppose you want or need to transfer files using the venerable FTP protocol. If you haven&#8217;t already discovered <a href="http://lftp.yar.ru/">lftp</a>, then it&#8217;s time to investigate. When you connect to a remote machine using <code>lftp</code> it&#8217;s rather like having a shell session open on that machine: you can navigate using tab completion and the usual shell tools relating to file and directory operations are there, as well as extra goodies like <code>mirror</code> and a decent help system.</p>
+<h4 id="rsync">Rsync</h4>
+<p>Rsync is another great command-line file-system shifter. It&#8217;s designed to keep two directory structures in sync, and to do so efficiently by just transmitting deltas between the two. Typically the source and destination directories reside on separate machines, and <code>rsync</code> is often invoked automatically as a scheduled job. <code>Rsync</code> forms the backbone of many a backup system. I&#8217;ve often used it to complement more heavy-weight coporate backup systems which would require me to ask an administrator to restore my own files.</p>
+<p>I use <code>rsync</code> to post updates to this website, and indeed to mirror this website to other machines I use. My publish script is as simple as:</p>
 <div class="typocode"><div class="codetitle">publish.sh</div>
 
 <pre class="prettyprint">#! /bin/sh
@@ -105,20 +87,13 @@ rsync -avz www wordaligned@wordaligned.org:~
 
 </div>
 
-<p>Here, local directory structure <code>www</code> will be mirrored to <code>~wordaligned/www</code> on remote machine <code>wordaligned.org</code>. I supply the remote username <code>wordaligned</code> explicitly since it differs from my local username <code>tag</code>. The <code>-v</code> <em>verbose</em> option gives me a warm fuzzy feeling that the updates I want to post are indeed being posted, the <code>-z</code> <em>compress</em> option reduces network traffic by compressing file data, and the <code>-a</code> <em>archive</em> shorthand option recurses and preserves permissions and ownerships.
-</p>
-<p>By the way, I&#8217;m implicitly using <code>ssh</code> (the <code>rsync</code> default) to access the remote machine. No password is required for user <code>tag</code> to copy files to user <code>wordaligned</code>&#8217;s home directory since I&#8217;ve <a href="http://www.linuxproblem.org/art_9.html">configured SSH</a> to allow this.
-</p>
-<p><code>Rsync</code> comes with many more options, but they&#8217;re all well documented. A simple <code>-a</code> is usually all that&#8217;s required.
-</p>
-
-<h4>More Thoughts on File Shifting</h4>
-<p>At the start of this note I unfairly dismissed GUI driven file system tools. The truth is that I do often use them. <span id="excerpt0"/>I&#8217;m generally unprincipled and promiscuous when it comes to tool selection: whatever works and is to hand will do. Thus, while both <code>lftp</code> and <code>rsync</code> come with a plethora of options &#8212; <code>lftp</code> does everything any GUI driven FTP client can do, and probably more, and <code>rsync</code> similarly defeats graphical file browsers &#8212; <span id="excerpt1"/>the irony is that I only use them for basic stuff, and may well resort to something with a GUI when attempting something out of the ordinary. A bit of interactive pointing and clicking often appeals more than paging through a rather dry manual.
-</p>
-<p>What <code>scp</code> and <code>rsync</code> won&#8217;t do is find a directory on a remote file system; you can&#8217;t use TAB completion at the far end <a href="#footnote1"><sup>[1]</sup></a>. An interactive <code>lftp</code> session <em>does</em> support basic TAB completion on a remote filesystem, but not more powerful tools like <code>find</code> or <code>locate</code>.
-</p>
-<p>In general you can reduce this problem by adopting a disciplined approach to structuring your workspace on whatever platforms you use. If you find yourself typing a command-line like:
-</p>
+<p>Here, local directory structure <code>www</code> will be mirrored to <code>~wordaligned/www</code> on remote machine <code>wordaligned.org</code>. I supply the remote username <code>wordaligned</code> explicitly since it differs from my local username <code>tag</code>. The <code>-v</code> <em>verbose</em> option gives me a warm fuzzy feeling that the updates I want to post are indeed being posted, the <code>-z</code> <em>compress</em> option reduces network traffic by compressing file data, and the <code>-a</code> <em>archive</em> shorthand option recurses and preserves permissions and ownerships.</p>
+<p>By the way, I&#8217;m implicitly using <code>ssh</code> (the <code>rsync</code> default) to access the remote machine. No password is required for user <code>tag</code> to copy files to user <code>wordaligned</code>&#8217;s home directory since I&#8217;ve <a href="http://www.linuxproblem.org/art_9.html">configured SSH</a> to allow this.</p>
+<p><code>Rsync</code> comes with many more options, but they&#8217;re all well documented. A simple <code>-a</code> is usually all that&#8217;s required.</p>
+<h4 id="more-thoughts-on-file-shifting">More Thoughts on File Shifting</h4>
+<p>At the start of this note I unfairly dismissed GUI driven file system tools. The truth is that I do often use them. <span id="excerpt0"/>I&#8217;m generally unprincipled and promiscuous when it comes to tool selection: whatever works and is to hand will do. Thus, while both <code>lftp</code> and <code>rsync</code> come with a plethora of options &#8212; <code>lftp</code> does everything any GUI driven FTP client can do, and probably more, and <code>rsync</code> similarly defeats graphical file browsers &#8212; <span id="excerpt1"/>the irony is that I only use them for basic stuff, and may well resort to something with a GUI when attempting something out of the ordinary. A bit of interactive pointing and clicking often appeals more than paging through a rather dry manual.</p>
+<p>What <code>scp</code> and <code>rsync</code> won&#8217;t do is find a directory on a remote file system; you can&#8217;t use TAB completion at the far end <a href="#footnote1"><sup><a href="https://blog.codeship.com/building-minimal-docker-containers-for-go-applications/">1</a></sup></a>. An interactive <code>lftp</code> session <em>does</em> support basic TAB completion on a remote filesystem, but not more powerful tools like <code>find</code> or <code>locate</code>.</p>
+<p>In general you can reduce this problem by adopting a disciplined approach to structuring your workspace on whatever platforms you use. If you find yourself typing a command-line like:</p>
 <div class="typocode">
 
 <pre class="prettyprint">$ scp -r ~/tmp/dev-2008-01-06 cromarty:~/scratch/work-copy2
@@ -127,18 +102,14 @@ rsync -avz www wordaligned@wordaligned.org:~
 
 </div>
 
-<p>then I&#8217;d suggest something has gone wrong.
-</p>
-<p>One way to combat this disorganisation is to place your <a href="/articles/personal-version-control.html">home directory under version control</a>. Make sure the version control system you use for this is flexible enough to allow you to rename entries, though. If you do adopt this model, your version control system becomes the home for all your files, and transfers between machines become a matter of check-in, check-out.
-</p>
-<p>I use <a href="http://subversion.tigris.org">Subversion</a> in this way, to a degree. There are plenty of files, though, which I don&#8217;t version control &#8212; in general, large files or files which only make sense on certain platforms. I&#8217;ve often found it useful to make these available for access via a webserver, either somewhere on a Wiki, or just served by a <a href="http://www.lighttpd.net">lighttpd</a> instance with <a href="http://trac.lighttpd.net/trac/wiki/Docs%3AModDirlisting">directory listing enabled</a>.
-</p>
-<p><hr />
-   <a id="footnote1">[1]</a>
-   I had a suspicion when I wrote this I&#8217;d turn out to be wrong! <a href="http://here.the.ycros.be/">Michael Kedzierski</a> emailled me:
-</p>
-<blockquote><p>I&#8217;m actually using bash completion on Ubuntu and I get remote-side tab completion with scp, it&#8217;s great.
-</p>
+<p>then I&#8217;d suggest something has gone wrong.</p>
+<p>One way to combat this disorganisation is to place your <a href="/articles/personal-version-control.html">home directory under version control</a>. Make sure the version control system you use for this is flexible enough to allow you to rename entries, though. If you do adopt this model, your version control system becomes the home for all your files, and transfers between machines become a matter of check-in, check-out.</p>
+<p>I use <a href="http://subversion.tigris.org">Subversion</a> in this way, to a degree. There are plenty of files, though, which I don&#8217;t version control &#8212; in general, large files or files which only make sense on certain platforms. I&#8217;ve often found it useful to make these available for access via a webserver, either somewhere on a Wiki, or just served by a <a href="http://www.lighttpd.net">lighttpd</a> instance with <a href="http://trac.lighttpd.net/trac/wiki/Docs%3AModDirlisting">directory listing enabled</a>.</p>
+<hr />
+<p><a id="footnote1"><a href="https://blog.codeship.com/building-minimal-docker-containers-for-go-applications/">1</a></a>
+I had a suspicion when I wrote this I&#8217;d turn out to be wrong! <a href="http://here.the.ycros.be/">Michael Kedzierski</a> emailled me:</p>
+<blockquote>
+<p>I&#8217;m actually using bash completion on Ubuntu and I get remote-side tab completion with scp, it&#8217;s great.</p>
 </blockquote>
 </div>
 

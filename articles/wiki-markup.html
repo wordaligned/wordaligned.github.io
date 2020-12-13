@@ -29,86 +29,57 @@
 <h2 class="title"><a href="/articles/wiki-markup">Wiki Markup</a></h2>
 <p class="meta"><abbr class="published" title="2006-12-03">2006-12-03</abbr> &bull; <a href="/tag/web-applications" rel="tag">Web Applications</a>, <a href="/tag/trac" rel="tag">Trac</a>, <a href="/tag/markdown" rel="tag">Markdown</a>, <a href="/tag/emacs" rel="tag">Emacs</a>, <a href="/tag/documentation" rel="tag">Documentation</a>, <a href="/tag/boost" rel="tag">Boost</a> &bull; <a href="/articles/wiki-markup#disqus_thread">Comments</a></p>
 <p>I&#8217;m a big fan of wikis but one irritation is that they all have their
-   own markup syntax. I guess that&#8217;s because the wiki is one of those sweet
-   web applications that every programmer wants to reinvent.
-</p>
-<p>On a fairly regular basis, and in order of personal preference, I use:
-</p>
+own markup syntax. I guess that&#8217;s because the wiki is one of those sweet
+web applications that every programmer wants to reinvent.</p>
+<p>On a fairly regular basis, and in order of personal preference, I use:</p>
 <ul>
- <li>
-     <a href="http://daringfireball.net/projects/markdown/">Markdown</a>
- </li>
-
- <li>
-     <a href="http://boost.org/tools/quickbook">QuickBook</a>
- </li>
-
- <li>
-     <a href="http://trac.edgewall.org/wiki/TracWiki">TracWiki</a>
- </li>
-
- <li>
-     <a href="http://www.textism.com/tools/textile/">Textile</a>
- </li>
-
- <li>
-     <a href="http://www.mediawiki.org/">MediaWiki</a>
- </li>
+<li><a href="http://daringfireball.net/projects/markdown/">Markdown</a></li>
+<li><a href="http://boost.org/tools/quickbook">QuickBook</a></li>
+<li><a href="http://trac.edgewall.org/wiki/TracWiki">TracWiki</a></li>
+<li><a href="http://www.textism.com/tools/textile/">Textile</a></li>
+<li><a href="http://www.mediawiki.org/">MediaWiki</a></li>
 </ul>
 <p>There&#8217;s some convergence between these mini-languages, but not a whole
-   lot. Ampersands and angle brackets are of course converted into
-   HTML-safe equivalents. Paragraphs and bulleted lists usually work as
-   you&#8217;d expect. The other primary ingredients &#8212; headings, links, images
-   &#8212; vary between implementations.
-</p>
+lot. Ampersands and angle brackets are of course converted into
+HTML-safe equivalents. Paragraphs and bulleted lists usually work as
+you&#8217;d expect. The other primary ingredients &#8212; headings, links, images
+&#8212; vary between implementations.</p>
 <p>This post describes what I think makes a good wiki markup syntax and why
-   I rate <a href="http://daringfireball.net/projects/markdown/">Markdown</a> so highly.
-</p>
-<span id="continue-reading"/>
-
-
-<h3>Bigger != Better</h3>
+I rate <a href="http://daringfireball.net/projects/markdown/">Markdown</a> so highly.</p>
+<p><span id="continue-reading"/></p>
+<h3 id="bigger-better">Bigger != Better</h3>
 <p>Given the number of wiki variants out there, most users are unlikely
-   to remember even the basics of any single wiki markup
-   syntax.  Ideally, then, the wiki markup rules should be simple &#8212;
-   simple enough to fit on a post-it note (or a post-it note sized
-   block of pixels on a screen) which the user can refer to.
-</p>
+to remember even the basics of any single wiki markup
+syntax.  Ideally, then, the wiki markup rules should be simple &#8212;
+simple enough to fit on a post-it note (or a post-it note sized
+block of pixels on a screen) which the user can refer to.</p>
 <p>I wouldn&#8217;t use this criterion to rule out a more complex markup
-   syntax. <a href="http://www.mediawiki.org/">MediaWiki</a> is probably about as complex a markup as there
-   is but it still manages to keep the simple things simple.
-</p>
-<p>All things being equal, though, I prefer a compact set of markup rules.
-</p>
-
-<h3>Well Documented</h3>
+syntax. <a href="http://www.mediawiki.org/">MediaWiki</a> is probably about as complex a markup as there
+is but it still manages to keep the simple things simple.</p>
+<p>All things being equal, though, I prefer a compact set of markup rules.</p>
+<h3 id="well-documented">Well Documented</h3>
 <p>It goes without saying that the wiki markup rules should be well
-   documented. How else is an end user to work out what to do?
-</p>
+documented. How else is an end user to work out what to do?</p>
 <p>I think it&#8217;s also plain that a wiki markup should be self-documented,
-   by which I mean the
-   <a href="http://daringfireball.net/projects/markdown/syntax">documentation</a>
-   should be written using
-   <a href="http://daringfireball.net/projects/markdown/syntax.text">itself</a>.
-</p>
-
-<h3>Escape to (X)HTML</h3>
+by which I mean the
+<a href="http://daringfireball.net/projects/markdown/syntax">documentation</a>
+should be written using
+<a href="http://daringfireball.net/projects/markdown/syntax.text">itself</a>.</p>
+<h3 id="escape-to-xhtml">Escape to (X)HTML</h3>
 <p>Noone expects a wiki syntax to do everything HTML can, so there&#8217;d
-   better be a way of escaping the normal wiki markup rules to include
-   raw HTML in a document.  For example, there have been a number of
-   attempts to provide a wiki syntax for tables, but none works quite as well
-   as an HTML table &#8212; so a wiki should simply provide a way for HTML
-   tables to be introduced into a document.
-</p>
+better be a way of escaping the normal wiki markup rules to include
+raw HTML in a document.  For example, there have been a number of
+attempts to provide a wiki syntax for tables, but none works quite as well
+as an HTML table &#8212; so a wiki should simply provide a way for HTML
+tables to be introduced into a document.</p>
 <p>There&#8217;s another side to this. Sometimes we simply want to stop normal
-   wiki processing from happening. If the underscore is normally used to
-   emphasize words <em>like this</em>, then we&#8217;d better be able to escape this
-   behaviour when we want to see the underscores _like this_.
-</p>
+wiki processing from happening. If the underscore is normally used to
+emphasize words <em>like this</em>, then we&#8217;d better be able to escape this
+behaviour when we want to see the underscores _like this_.</p>
 <div class="typocode"><div class="codetitle">escaping underscores with Markdown</div>
 
 <pre class="prettyprint">If the underscore is normally used to emphasize
-words _like this_, then we'd better be able to
+words _like this_, then we&#x27;d better be able to
 escape this behaviour when we want to see
 the underscores \_like this\_.
 
@@ -116,64 +87,51 @@ the underscores \_like this\_.
 
 </div>
 
-
-<h3>Conformance Tests</h3>
+<h3 id="conformance-tests">Conformance Tests</h3>
 <p>A good wiki markup syntax may well have a life outside its native wiki
-   implementation. It could be used in other wikis or blogs. It could become a
-   general purpose HTML templating application.
-</p>
+implementation. It could be used in other wikis or blogs. It could become a
+general purpose HTML templating application.</p>
 <p>If it&#8217;s to have any hope of standing on its own like this, it had
-   better come with a decent set of conformance tests: that is, a set of
-   test inputs and expected outputs.
-</p>
+better come with a decent set of conformance tests: that is, a set of
+test inputs and expected outputs.</p>
 <p>The existence of such a suite helps explain why you can find
-   trustworthy <a href="http://daringfireball.net/projects/markdown/">Markdown</a> implementations in a variety of popular
-   high-level languages (Perl, PHP, Python, Ruby &#8230;).
-</p>
-
-<h3>Suck it and See</h3>
+trustworthy <a href="http://daringfireball.net/projects/markdown/">Markdown</a> implementations in a variety of popular
+high-level languages (Perl, PHP, Python, Ruby &#8230;).</p>
+<h3 id="suck-it-and-see">Suck it and See</h3>
 <p>Most wikis provide a page to be used for experimentation &#8212; it&#8217;s often
-   called something like &#8220;SandBox&#8221;. A superior better wiki markup syntax
-   will also host such a facility online. You can try out Markdown
-   <a href="http://daringfireball.net/projects/markdown/dingus">here</a> and
-   Textile <a href="http://www.textism.com/tools/textile/">here</a>.
-</p>
-
-<h3>And the Winner is &#8230;</h3>
+called something like &#8220;SandBox&#8221;. A superior better wiki markup syntax
+will also host such a facility online. You can try out Markdown
+<a href="http://daringfireball.net/projects/markdown/dingus">here</a> and
+Textile <a href="http://www.textism.com/tools/textile/">here</a>.</p>
+<h3 id="and-the-winner-is">And the Winner is &#8230;</h3>
 <p>No suprises here: I said at the outset that <a href="http://daringfireball.net/projects/markdown/">Markdown</a> is my favourite. It
-   more than meets all the criteria mentioned above which already puts
-   it one step ahead of most alternatives. It also wins points for:
-</p>
+more than meets all the criteria mentioned above which already puts
+it one step ahead of most alternatives. It also wins points for:</p>
 <ol>
- <li><p>Explaining its design goals so clearly:
-</p>
-<blockquote><p>Readability, however, is emphasized above all else. A
-   Markdown-formatted document should be publishable as-is, as plain
-   text, without looking like it&#8217;s been marked up with tags or formatting
-   instructions.
-</p>
+<li>
+<p>Explaining its design goals so clearly:</p>
+<blockquote>
+<p>Readability, however, is emphasized above all else. A
+Markdown-formatted document should be publishable as-is, as plain
+text, without looking like it&#8217;s been marked up with tags or formatting
+instructions.</p>
 </blockquote>
- </li>
-
- <li><p>Working so well with an &#8220;aware&#8221; text editor. I write the content for
-      my <a href="http://www.wordaligned.org">web site</a> in Markdown using
-      <a href="http://www.gnu.org/software/emacs/">emacs</a>, and the emacs text mode
-      does the right thing when I&#8217;m writing lists, blockquotes etc.
-</p>
-
- </li>
-
- <li><p>Providing superior support for
-      <a href="http://daringfireball.net/projects/markdown/syntax#link">links</a>.
-</p>
-
- </li>
+</li>
+<li>
+<p>Working so well with an &#8220;aware&#8221; text editor. I write the content for
+   my <a href="http://www.wordaligned.org">web site</a> in Markdown using
+   <a href="http://www.gnu.org/software/emacs/">emacs</a>, and the emacs text mode
+   does the right thing when I&#8217;m writing lists, blockquotes etc.</p>
+</li>
+<li>
+<p>Providing superior support for
+   <a href="http://daringfireball.net/projects/markdown/syntax#link">links</a>.</p>
+</li>
 </ol>
 <p><a href="http://boost.org/tools/quickbook">Quickbook</a> deserves a special mention too, since it generates not HTML
-   but <a href="http://docbook.org">DocBook XML</a>, and hence can be used as a starting point for both
-   <a href="/docs/softdoc_overload/index.html">online and printed</a>
-   versions of a document.
-</p>
+but <a href="http://docbook.org">DocBook XML</a>, and hence can be used as a starting point for both
+<a href="/docs/softdoc_overload/index.html">online and printed</a>
+versions of a document.</p>
 </div>
 
 <h5><a name="feedback">Feedback</a></h5>

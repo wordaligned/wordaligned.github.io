@@ -28,54 +28,17 @@
       <div class="atomentry" id="how-to-mirror-a-subversion-repository">
 <h2 class="title"><a href="/articles/how-to-mirror-a-subversion-repository">How to Mirror a Subversion Repository</a></h2>
 <p class="meta"><abbr class="published" title="2006-08-12">2006-08-12</abbr> &bull; <a href="/tag/subversion" rel="tag">Subversion</a> &bull; <a href="/articles/how-to-mirror-a-subversion-repository#disqus_thread">Comments</a></p>
-<div class="toc">
-<h2>Contents</h2>
-<ul>
- <li><a href="#toctreating-the-repository-as-a-filesystem" name="toc0" id="toc0">Treating the Repository as a Filesystem</a>
- </li>
-
- <li><a href="#tocusing-svnadmin-dump-and-load" name="toc1" id="toc1">Using Svnadmin Dump and Load</a>
- </li>
-
- <li><a href="#tocusing-svnadmin-hotcopy" name="toc2" id="toc2">Using Svnadmin Hotcopy</a>
- </li>
-
- <li><a href="#tocsummary" name="toc3" id="toc3">Summary</a>
- </li>
-
- <li><a href="#tocchecking-the-mirror" name="toc4" id="toc4">Checking the mirror</a>
- </li>
-
- <li><a href="#tocmirroring" name="toc5" id="toc5">Mirroring</a>
- </li>
-
- <li><a href="#tocreference-information" name="toc6" id="toc6">Reference Information</a>
- </li>
-</ul>
-</div><p>Here are three ways to create a full mirror of a <a href="http://subversion.tigris.org">Subversion</a> repository:
-</p>
+<p>Here are three ways to create a full mirror of a <a href="http://subversion.tigris.org">Subversion</a> repository:</p>
 <ol>
- <li>
-     Treat the repository like any other filesystem and recursively
-        copy it to the mirror location.
- </li>
-
- <li>
-     Use <a href="http://svnbook.red-bean.com/en/1.2/svn.ref.svnadmin.c.dump.html">svnadmin dump</a> and <a href="http://svnbook.red-bean.com/en/1.2/svn.ref.svnadmin.c.load.html">svnadmin load</a>.
- </li>
-
- <li>
-     Use <a href="http://svnbook.red-bean.com/en/1.2/svn.ref.svnadmin.c.hotcopy.html">svnadmin hotcopy</a>.
- </li>
+<li>Treat the repository like any other filesystem and recursively
+   copy it to the mirror location.</li>
+<li>Use <a href="http://svnbook.red-bean.com/en/1.2/svn.ref.svnadmin.c.dump.html">svnadmin dump</a> and <a href="http://svnbook.red-bean.com/en/1.2/svn.ref.svnadmin.c.load.html">svnadmin load</a>.</li>
+<li>Use <a href="http://svnbook.red-bean.com/en/1.2/svn.ref.svnadmin.c.hotcopy.html">svnadmin hotcopy</a>.</li>
 </ol>
-<p>There are important differences between these three strategies.
-</p>
-<span id="continue-reading"/>
-
-
-<h4><a href="#toc0" name="toctreating-the-repository-as-a-filesystem" id="toctreating-the-repository-as-a-filesystem">Treating the Repository as a Filesystem</a></h4>
-<p>You can of course:
-</p>
+<p>There are important differences between these three strategies.</p>
+<p><span id="continue-reading"/></p>
+<h4 id="treating-the-repository-as-a-filesystem">Treating the Repository as a Filesystem</h4>
+<p>You can of course:</p>
 <div class="typocode">
 
 <pre class="prettyprint">cp -R PATH_TO_REPOS PATH_TO_MIRROR
@@ -84,8 +47,7 @@
 
 </div>
 
-<p>This is a bad idea if the repository is in use &#8212; you&#8217;re copying a moving target &#8212; so you&#8217;ll have to take down the <a href="http://subversion.tigris.org">Subversion</a> server while making the mirror. If you&#8217;re prepared to accept this downtime, netcat, <code>nc</code>, combined with <code>tar</code> is a neat way to recursively copy a directory across a network connection using TCP/IP.
-</p>
+<p>This is a bad idea if the repository is in use &#8212; you&#8217;re copying a moving target &#8212; so you&#8217;ll have to take down the <a href="http://subversion.tigris.org">Subversion</a> server while making the mirror. If you&#8217;re prepared to accept this downtime, netcat, <code>nc</code>, combined with <code>tar</code> is a neat way to recursively copy a directory across a network connection using TCP/IP.</p>
 <div class="typocode">
 
 <pre class="prettyprint"># On the destination "mirror" machine
@@ -97,13 +59,10 @@ tar c PATH_TO_REPOS &gt; /dev/tcp/DOTTED.IP.OF.MIRROR/2345
 
 </div>
 
-<p>Here, <code>2345</code> has been chosen as a suitable port for the data transfer.
-</p>
-
-<h4><a href="#toc1" name="tocusing-svnadmin-dump-and-load" id="tocusing-svnadmin-dump-and-load">Using Svnadmin Dump and Load</a></h4>
+<p>Here, <code>2345</code> has been chosen as a suitable port for the data transfer.</p>
+<h4 id="using-svnadmin-dump-and-load">Using Svnadmin Dump and Load</h4>
 <p>Perhaps the most obvious way to mirror a <a href="http://subversion.tigris.org">Subversion</a> repository is to
-   combine <code>svnadmin dump</code> with <code>svadmin load</code>.
-</p>
+combine <code>svnadmin dump</code> with <code>svadmin load</code>.</p>
 <div class="typocode">
 
 <pre class="prettyprint">svnadmin dump PATH_TO_REPOS | svnadmin load PATH_TO_MIRROR
@@ -113,36 +72,30 @@ tar c PATH_TO_REPOS &gt; /dev/tcp/DOTTED.IP.OF.MIRROR/2345
 </div>
 
 <p>Run on its own, <code>svnadmin dump</code> is designed to create a portable
-   repository dump. The resulting dumpfile can be loaded into a new
-   <a href="http://subversion.tigris.org">Subversion</a> repository &#8212; even if the new repository is using a different
-   database backend, or even a different revision of <a href="http://subversion.tigris.org">Subversion</a>. <code>Svnadmin dump</code>
-   will happily run on a live repository (no need to take the server down).
-</p>
+repository dump. The resulting dumpfile can be loaded into a new
+<a href="http://subversion.tigris.org">Subversion</a> repository &#8212; even if the new repository is using a different
+database backend, or even a different revision of <a href="http://subversion.tigris.org">Subversion</a>. <code>Svnadmin dump</code>
+will happily run on a live repository (no need to take the server down).</p>
 <p>In short, combining <code>svnadmin dump</code> with <code>svnadmin load</code> is probably
-   more powerful than we need if we just want to mirror our repository to
-   a new location. <code>Svnadmin dump</code> &#8212; on its own &#8212; is the best way to
-   fully backup a repository, since the dumpfile it creates is portable
-   (as described above). If we replicate a repository by piping
-   <code>svnadmin dump</code> to <code>svnadmin load</code>, we lose the dumpfile in the pipeline and do
-   far more work than we need to.
-</p>
+more powerful than we need if we just want to mirror our repository to
+a new location. <code>Svnadmin dump</code> &#8212; on its own &#8212; is the best way to
+fully backup a repository, since the dumpfile it creates is portable
+(as described above). If we replicate a repository by piping
+<code>svnadmin dump</code> to <code>svnadmin load</code>, we lose the dumpfile in the pipeline and do
+far more work than we need to.</p>
 <p>Actually, it&#8217;s the computer which does the work &#8212; we just type a
-   command and let it run. As a rough guideline, I have worked on a
-   repository which occupies about 10Gb on disk, contains ~50K files and
-   maybe a hundred branches. To dump and load this repository takes about
-   4 hours. A recursive copy completes in a few minutes.
-</p>
+command and let it run. As a rough guideline, I have worked on a
+repository which occupies about 10Gb on disk, contains ~50K files and
+maybe a hundred branches. To dump and load this repository takes about
+4 hours. A recursive copy completes in a few minutes.</p>
 <p>One more point: <code>svnadmin dump</code> does not dump your repository
-   configuration files and hook scripts. If your backup strategy is based
-   around these commands, you will need separate arrangements for backing
-   up hook scripts and configuration files.
-</p>
-
-<h4><a href="#toc2" name="tocusing-svnadmin-hotcopy" id="tocusing-svnadmin-hotcopy">Using Svnadmin Hotcopy</a></h4>
+configuration files and hook scripts. If your backup strategy is based
+around these commands, you will need separate arrangements for backing
+up hook scripts and configuration files.</p>
+<h4 id="using-svnadmin-hotcopy">Using Svnadmin Hotcopy</h4>
 <p>The third option combines the best features of the previous two. Using
-   <code>svnadmin hotcopy</code> doesn&#8217;t require any server downtime, completes in minutes,
-   and replicates server configuration and hook scripts.
-</p>
+<code>svnadmin hotcopy</code> doesn&#8217;t require any server downtime, completes in minutes,
+and replicates server configuration and hook scripts.</p>
 <div class="typocode">
 
 <pre class="prettyprint">svnadmin hotcopy PATH_TO_REPOS PATH_TO_MIRROR
@@ -152,9 +105,8 @@ tar c PATH_TO_REPOS &gt; /dev/tcp/DOTTED.IP.OF.MIRROR/2345
 </div>
 
 <p>The command is disconcertingly silent &#8212; no indication of progress, no
-   verbose option. As is usual in UNIX-world, however, no news is good
-   news. I just ran:
-</p>
+verbose option. As is usual in UNIX-world, however, no news is good
+news. I just ran:</p>
 <div class="typocode">
 
 <pre class="prettyprint">du -sh PATH_TO_REPOS PATH_TO_MIRROR
@@ -163,10 +115,8 @@ tar c PATH_TO_REPOS &gt; /dev/tcp/DOTTED.IP.OF.MIRROR/2345
 
 </div>
 
-<p>to confirm the hotcopy was running and to check on its progress.
-</p>
-
-<h4><a href="#toc3" name="tocsummary" id="tocsummary">Summary</a></h4>
+<p>to confirm the hotcopy was running and to check on its progress.</p>
+<h4 id="summary">Summary</h4>
 <table>
 <thead><tr>
 <th>Method</th><th>Server<br/>Downtime?</th><th>Replicates<br/>Config?</th><th>Speed</th>
@@ -179,13 +129,11 @@ tar c PATH_TO_REPOS &gt; /dev/tcp/DOTTED.IP.OF.MIRROR/2345
 <tr>
 </table>
 
-
-<h4><a href="#toc4" name="tocchecking-the-mirror" id="tocchecking-the-mirror">Checking the mirror</a></h4>
+<h4 id="checking-the-mirror">Checking the mirror</h4>
 <p>Svnadmin provides another option, <code>svnadmin verify</code> to check a
-   repository.  This basically iterates through all revisions in the
-   repository by internally dumping all revisions and discarding the
-   output &#8212; so it takes a while.
-</p>
+repository.  This basically iterates through all revisions in the
+repository by internally dumping all revisions and discarding the
+output &#8212; so it takes a while.</p>
 <div class="typocode">
 
 <pre class="prettyprint">svnadmin verify PATH_TO_MIRROR
@@ -194,36 +142,23 @@ tar c PATH_TO_REPOS &gt; /dev/tcp/DOTTED.IP.OF.MIRROR/2345
 
 </div>
 
-
-<h4><a href="#toc5" name="tocmirroring" id="tocmirroring">Mirroring</a></h4>
+<h4 id="mirroring">Mirroring</h4>
 <p><span id="excerpt0"/>Software developers don&#8217;t feel secure unless their source repository
-   is safely backed up &ndash; or at least they shouldn&#8217;t &ndash; and they are
-   reluctant to suffer repository downtime or excessive maintenance
-   overheads. Live <a href="http://subversion.tigris.org">Subversion</a> repositories can be mirrored quickly and
-   safely using a simple command. With a little extra effort,
-   this command can be scheduled to run automatically, every week, say.
-</p>
+is safely backed up &ndash; or at least they shouldn&#8217;t &ndash; and they are
+reluctant to suffer repository downtime or excessive maintenance
+overheads. Live <a href="http://subversion.tigris.org">Subversion</a> repositories can be mirrored quickly and
+safely using a simple command. With a little extra effort,
+this command can be scheduled to run automatically, every week, say.</p>
 <p>As a next step, by using the Subversion <a href="http://svnbook.red-bean.com/en/1.2/svn.reposadmin.create.html#svn.reposadmin.create.hooks">post-commit</a> hook every
-   check-in to the repository can instantly and incrementally be copied
-   to the repository mirror. I&#8217;ll provide details of how to do this in my
-   next post.
-</p>
-
-<h4><a href="#toc6" name="tocreference-information" id="tocreference-information">Reference Information</a></h4>
-<p>For more information see:
-</p>
+check-in to the repository can instantly and incrementally be copied
+to the repository mirror. I&#8217;ll provide details of how to do this in my
+next post.</p>
+<h4 id="reference-information">Reference Information</h4>
+<p>For more information see:</p>
 <ul>
- <li>
-     <a href="http://svnbook.red-bean.com/en/1.2/svn.ref.svnadmin.c.dump.html">svnadmin dump reference</a>
- </li>
-
- <li>
-     <a href="http://svnbook.red-bean.com/en/1.2/svn.ref.svnadmin.c.load.html">svnadmin load reference</a>
- </li>
-
- <li>
-     <a href="http://svnbook.red-bean.com/en/1.2/svn.ref.svnadmin.c.hotcopy.html">svnadmin hotcopy reference</a>
- </li>
+<li><a href="http://svnbook.red-bean.com/en/1.2/svn.ref.svnadmin.c.dump.html">svnadmin dump reference</a></li>
+<li><a href="http://svnbook.red-bean.com/en/1.2/svn.ref.svnadmin.c.load.html">svnadmin load reference</a></li>
+<li><a href="http://svnbook.red-bean.com/en/1.2/svn.ref.svnadmin.c.hotcopy.html">svnadmin hotcopy reference</a></li>
 </ul>
 </div>
 

@@ -28,22 +28,16 @@
       <div class="atomentry" id="why-python-programmers-should-learn-python">
 <h2 class="title"><a href="/articles/why-python-programmers-should-learn-python">Why Python programmers should learn Python</a></h2>
 <p class="meta"><abbr class="published" title="2007-07-01">2007-07-01</abbr> &bull; <a href="/tag/python" rel="tag">Python</a>, <a href="/tag/java" rel="tag">Java</a>, <a href="/tag/puzzles" rel="tag">Puzzles</a> &bull; <a href="/articles/why-python-programmers-should-learn-python#disqus_thread">Comments</a></p>
-<p>I recently clicked upon Keith Braithwaite and Ivan Moore&#8217;s presentation, <a href="http://www.keithbraithwaite.demon.co.uk/professional/presentations/#python">&#8220;Why Java Programmers Should Learn Python&#8221;</a>. It starts off well with an expert discussion of three different axes of type systems, placing various programming languages in the resulting 3-space. It then poses a programming problem, the kind of problem which Python excels at:
-</p>
-<blockquote><p>Given the supplied library classes write some code in &#8220;quickSilver&#8221; to convert between word and decimal digits representations of positive integers less than 1001.
-</p>
-<p>e.g. &#8220;five seven three&#8221; &rarr; 573
-</p>
-<p>e.g. 672 &rarr; &#8220;six seven two&#8221;
-</p>
-</blockquote><p>The Java programmers attending the presentation don&#8217;t know it yet, but &#8220;quickSilver&#8221; turns out to be Python, or at least a subset of it sufficient to solve the problem, and the final slides of the presentation contain a model  solution to this problem.
-</p>
-<span id="continue-reading"/>
-
-
-<h3>A &#8220;model&#8221; solution?</h3>
-<p>Here is that solution.
-</p>
+<p>I recently clicked upon Keith Braithwaite and Ivan Moore&#8217;s presentation, <a href="http://www.keithbraithwaite.demon.co.uk/professional/presentations/#python">&#8220;Why Java Programmers Should Learn Python&#8221;</a>. It starts off well with an expert discussion of three different axes of type systems, placing various programming languages in the resulting 3-space. It then poses a programming problem, the kind of problem which Python excels at:</p>
+<blockquote>
+<p>Given the supplied library classes write some code in &#8220;quickSilver&#8221; to convert between word and decimal digits representations of positive integers less than 1001.</p>
+<p>e.g. &#8220;five seven three&#8221; &rarr; 573</p>
+<p>e.g. 672 &rarr; &#8220;six seven two&#8221;</p>
+</blockquote>
+<p>The Java programmers attending the presentation don&#8217;t know it yet, but &#8220;quickSilver&#8221; turns out to be Python, or at least a subset of it sufficient to solve the problem, and the final slides of the presentation contain a model  solution to this problem.</p>
+<p><span id="continue-reading"/></p>
+<h3 id="a-model-solution">A &#8220;model&#8221; solution?</h3>
+<p>Here is that solution.</p>
 <div class="typocode">
 
 <pre class="prettyprint">class WordsFromNumber:
@@ -58,9 +52,10 @@
             return WordsFromNumber(msds).wordsOf() + " " + \
                    self.wordFor(lsd)
 
-def wordFor(self,numeral):
+    def wordFor(self,numeral):
         return ["zero", "one", "two", "three", "four",
                 "five", "six", "seven", "eight", "nine"][numeral]
+
 
 class NumberFromWords:
     def __init__(self,words):
@@ -85,23 +80,21 @@ class NumberFromWords:
 
 </div>
 
-<p>I don&#8217;t know what point the presenters were trying to make. I wasn&#8217;t in their audience but if I were, <span id="excerpt0"/>this code wouldn&#8217;t go any way towards persuading me I should bother with Python. It&#8217;s got two classes where none is needed, it uses recursion when container operations would do, it&#8217;s longer than it needs to be, and (putting myself in a Java programmer&#8217;s shoes) are all those <code>self</code>s really needed?
-</p>
-<p>In other words this, to me, looks like Java written in Python. I&#8217;ll assume this is the point the presenters are trying to make, but if they revise the presentation, I&#8217;d like to suggest extending it to add an alternative ending, which I think shows off Python&#8217;s advantages.
-</p>
+<p>I don&#8217;t know what point the presenters were trying to make. I wasn&#8217;t in their audience but if I were, <span id="excerpt0"/>this code wouldn&#8217;t go any way towards persuading me I should bother with Python. It&#8217;s got two classes where none is needed, it uses recursion when container operations would do, it&#8217;s longer than it needs to be, and (putting myself in a Java programmer&#8217;s shoes) are all those <code>self</code>s really needed?</p>
+<p>In other words this, to me, looks like Java written in Python. I&#8217;ll assume this is the point the presenters are trying to make, but if they revise the presentation, I&#8217;d like to suggest extending it to add an alternative ending, which I think shows off Python&#8217;s advantages.</p>
 <div class="typocode"><div class="codetitle">An alternative ending</div>
 
 <pre class="prettyprint">number_to_word = {
-    '0' : 'zero', '1' : 'one', '2' : 'two', '3' : 'three', '4' : 'four',
-    '5' : 'five', '6' : 'six', '7' : 'seven', '8': 'eight', '9' : 'nine'
+    &#x27;0&#x27; : &#x27;zero&#x27;, &#x27;1&#x27; : &#x27;one&#x27;, &#x27;2&#x27; : &#x27;two&#x27;, &#x27;3&#x27; : &#x27;three&#x27;, &#x27;4&#x27; : &#x27;four&#x27;,
+    &#x27;5&#x27; : &#x27;five&#x27;, &#x27;6&#x27; : &#x27;six&#x27;, &#x27;7&#x27; : &#x27;seven&#x27;, &#x27;8&#x27;: &#x27;eight&#x27;, &#x27;9&#x27; : &#x27;nine&#x27;
     }
 word_to_number = {
-    'zero' : 0, 'one' : 1, 'two' : 2, 'three' : 3, 'four' : 4,
-    'five' : 5, 'six' : 6, 'seven' : 7, 'eight' : 8, 'nine' : 9
+    &#x27;zero&#x27; : 0, &#x27;one&#x27; : 1, &#x27;two&#x27; : 2, &#x27;three&#x27; : 3, &#x27;four&#x27; : 4,
+    &#x27;five&#x27; : 5, &#x27;six&#x27; : 6, &#x27;seven&#x27; : 7, &#x27;eight&#x27; : 8, &#x27;nine&#x27; : 9
 }
 
 def number_to_words(number):
-    return ' '.join(number_to_word[c] for c in str(number))
+    return &#x27; &#x27;.join(number_to_word[c] for c in str(number))
 
 def words_to_number(words):
     def dec_shift_add(x, y):
@@ -113,14 +106,10 @@ def words_to_number(words):
 
 </div>
 
-<p>I&#8217;ve omitted documentation in order to squeeze the encode-decode functions on to a single slide. If I had time and space, though, I&#8217;d show how to document and test this function in one go using <code>doctest</code>, taking care to cover what happens with invalid inputs.
-</p>
-<p>By the way, you&#8217;ll see I&#8217;m using <code>reduce</code> <a href="http://www.artima.com/weblogs/viewpost.jsp?thread=98196">while I can</a>! I think this example is one of those rare cases where it works well.
-</p>
-
-<h3>Dictionary initialisation</h3>
-<p>The explicit dictionaries are fine and good and almost certainly what should be presented to an audience of Python virgins, but in my own code I&#8217;d be tempted to remove a little replication. (My thanks to Ashwin for tactfully pointing out a howling bug in the code originally posted here).
-</p>
+<p>I&#8217;ve omitted documentation in order to squeeze the encode-decode functions on to a single slide. If I had time and space, though, I&#8217;d show how to document and test this function in one go using <code>doctest</code>, taking care to cover what happens with invalid inputs.</p>
+<p>By the way, you&#8217;ll see I&#8217;m using <code>reduce</code> <a href="http://www.artima.com/weblogs/viewpost.jsp?thread=98196">while I can</a>! I think this example is one of those rare cases where it works well.</p>
+<h3 id="dictionary-initialisation">Dictionary initialisation</h3>
+<p>The explicit dictionaries are fine and good and almost certainly what should be presented to an audience of Python virgins, but in my own code I&#8217;d be tempted to remove a little replication. (My thanks to Ashwin for tactfully pointing out a howling bug in the code originally posted here).</p>
 <div class="typocode"><div class="codetitle">Zippy dicts</div>
 
 <pre class="prettyprint">import string
@@ -132,51 +121,49 @@ word_to_number = dict(zip(words, range(10)))
 
 </div>
 
-
-<h3>Living by the Sword</h3>
-<p>A recent (2008-03-07) wave of hits from <a href="http://reddit.com/r/programming/info/6b511/comments/">Reddit</a> has prompted me to revisit this note and, cough, refactor my code. There&#8217;s no need for any mathematics, nested functions or <code>reduce</code>: this problem is better handled by string conversions. And the goal of squeezing functions on a single slide is misguided. This code <strong>needs</strong> doctesting. Java programmers are used to good test frameworks with great tool support, but Python excels at this too.
-</p>
+<h3 id="living-by-the-sword">Living by the Sword</h3>
+<p>A recent (2008-03-07) wave of hits from <a href="http://reddit.com/r/programming/info/6b511/comments/">Reddit</a> has prompted me to revisit this note and, cough, refactor my code. There&#8217;s no need for any mathematics, nested functions or <code>reduce</code>: this problem is better handled by string conversions. And the goal of squeezing functions on a single slide is misguided. This code <strong>needs</strong> doctesting. Java programmers are used to good test frameworks with great tool support, but Python excels at this too.</p>
 <div class="typocode">
 
 <pre class="prettyprint">from string import digits
 
-words = 'zero one two three four five six seven eight nine'.split()
+words = &#x27;zero one two three four five six seven eight nine&#x27;.split()
 number_to_word = dict(zip(digits, words))
 word_to_number = dict(zip(words, digits))
 
 def number_to_words(number):
-    '''Converts a positive integer into a string of digit names.
-    
+    &#x27;&#x27;&#x27;Converts a positive integer into a string of digit names.
+
     Examples:
     &gt;&gt;&gt; number_to_words(123)
-    'one two three'
+    &#x27;one two three&#x27;
     &gt;&gt;&gt; number_to_words(-1)
     Traceback (most recent call last):
     ...
-    KeyError: '-'
-    '''
-    return ' '.join(number_to_word[c] for c in str(number))
-    
+    KeyError: &#x27;-&#x27;
+    &#x27;&#x27;&#x27;
+    return &#x27; &#x27;.join(number_to_word[c] for c in str(number))
+
 def words_to_number(words):
-    '''Converts a string of digit names into an integer.
-    
+    &#x27;&#x27;&#x27;Converts a string of digit names into an integer.
+
     Examples:
-    &gt;&gt;&gt; words_to_number('one two three')
+    &gt;&gt;&gt; words_to_number(&#x27;one two three&#x27;)
     123
-    &gt;&gt;&gt; words_to_number('One tWo thrEE')
+    &gt;&gt;&gt; words_to_number(&#x27;One tWo thrEE&#x27;)
     123
-    &gt;&gt;&gt; words_to_number('zero one two')
+    &gt;&gt;&gt; words_to_number(&#x27;zero one two&#x27;)
     12
-    &gt;&gt;&gt; words_to_number('minus one')
+    &gt;&gt;&gt; words_to_number(&#x27;minus one&#x27;)
     Traceback (most recent call last):
     ...
-    KeyError: 'minus'
+    KeyError: &#x27;minus&#x27;
     &gt;&gt;&gt; all(words_to_number(number_to_words(x)) == x for x in range(100))
     True
-    '''
-    return int(''.join(word_to_number[w]
+    &#x27;&#x27;&#x27;
+    return int(&#x27;&#x27;.join(word_to_number[w]
                        for w in words.lower().split()))
-    
+
 if __name__ == "__main__":
     import doctest
     doctest.testmod()

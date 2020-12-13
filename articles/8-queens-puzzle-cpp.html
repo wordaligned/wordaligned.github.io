@@ -26,33 +26,23 @@
       <div class="atomentry" id="8-queens-puzzle-cpp">
 <h2 class="title"><a href="/articles/8-queens-puzzle-cpp">8 Queens Puzzle++</a></h2>
 <p class="meta"><abbr class="published" title="2016-04-05">2016-04-05</abbr> &bull; <a href="/tag/puzzles" rel="tag">Puzzles</a>, <a href="/tag/c++" rel="tag">C++</a> &bull; <a href="/articles/8-queens-puzzle-cpp#disqus_thread">Comments</a></p>
-<p><a href="/articles/8-queens-puzzle">Yesterday I wrote about</a> a Python solution to the 8 Queens puzzle.
-</p>
+<p><a href="/articles/8-queens-puzzle">Yesterday I wrote about</a> a Python solution to the 8 Queens puzzle.</p>
 <pre><code>n = 8
 sqs = range(n)
 
 Qs = (Q for Q in itertools.permutations(sqs)
       if n == len({Q[i]+i for i in sqs})
            == len({Q[i]-i for i in sqs}))
-</code></pre><p>It&#8217;s possible to reproduce this strategy in C++:
-</p>
+</code></pre>
+<p>It&#8217;s possible to reproduce this strategy in C++:</p>
 <ul>
- <li>
-     range(n) &#8594; <a href="http://en.cppreference.com/w/cpp/algorithm/iota">std::iota</a>
- </li>
-
- <li>
-     itertools.permutations &#8594; <a href="/articles/next-permutation">std::next_permutation</a>
- </li>
-
- <li>
-     set comprehension &#8594; set insertion
- </li>
+<li>range(n) &#8594; <a href="http://en.cppreference.com/w/cpp/algorithm/iota">std::iota</a></li>
+<li>itertools.permutations &#8594; <a href="/articles/next-permutation">std::next_permutation</a></li>
+<li>set comprehension &#8594; set insertion</li>
 </ul>
 <script src="https://gist.github.com/wordaligned/c94649d6b37ec08a9bda16e53c43b888.js"></script>
 
-<p>The <code>std::next_permutation</code> algorithm stands alone in the C++ standard library. Used here, it pairs well with the similarly uncommon <code>do ... while</code> loop. The solution depends on the vector <code>sqs</code> starting off in sorted order, and by the end of the loop the vector will have been returned to <a href="https://rosettacode.org/wiki/Sorting_algorithms/Permutation_sort">this state</a>.
-</p>
+<p>The <code>std::next_permutation</code> algorithm stands alone in the C++ standard library. Used here, it pairs well with the similarly uncommon <code>do ... while</code> loop. The solution depends on the vector <code>sqs</code> starting off in sorted order, and by the end of the loop the vector will have been returned to <a href="https://rosettacode.org/wiki/Sorting_algorithms/Permutation_sort">this state</a>.</p>
 </div>
 
 <div class="comments"><hr/><div id="disqus_thread"></div><script type="text/javascript" src="http://disqus.com/forums/wordaligned/embed.js"></script></div>

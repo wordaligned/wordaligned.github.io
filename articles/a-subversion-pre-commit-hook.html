@@ -29,24 +29,19 @@
 <h2 class="title"><a href="/articles/a-subversion-pre-commit-hook">A Subversion Pre-Commit Hook</a></h2>
 <p class="meta"><abbr class="published" title="2006-08-09">2006-08-09</abbr> &bull; <a href="/tag/subversion" rel="tag">Subversion</a>, <a href="/tag/python" rel="tag">Python</a>, <a href="/tag/c++" rel="tag">C++</a>, <a href="/tag/shell" rel="tag">Shell</a> &bull; <a href="/articles/a-subversion-pre-commit-hook#disqus_thread">Comments</a></p>
 <p>Subversion&#8217;s <a href="http://svnbook.red-bean.com/en/1.2/svn.reposadmin.create.html#svn.reposadmin.create.hooks">hook scripts</a> provide a powerful and
-   flexible way to associate actions with repository events. For example,
-   the <a href="http://svnbook.red-bean.com/en/1.2/svn.reposadmin.create.html#svn.reposadmin.create.hooks">pre-commit</a> hook allows you to check &#8212; and possibly abort &#8212; a
-   transaction before it actually gets committed. This entry describes
-   how to install and test a simple <a href="http://python.org">Python</a> hook script to prohibit
-   tabs from C++ files.
-</p>
-<span id="continue-reading"/>
-
-
-<h4>Creating and Installing a Hook Script</h4>
+flexible way to associate actions with repository events. For example,
+the <a href="http://svnbook.red-bean.com/en/1.2/svn.reposadmin.create.html#svn.reposadmin.create.hooks">pre-commit</a> hook allows you to check &#8212; and possibly abort &#8212; a
+transaction before it actually gets committed. This entry describes
+how to install and test a simple <a href="http://python.org">Python</a> hook script to prohibit
+tabs from C++ files.</p>
+<p><span id="continue-reading"/></p>
+<h4 id="creating-and-installing-a-hook-script">Creating and Installing a Hook Script</h4>
 <p>Your <a href="http://subversion.tigris.org">Subversion</a> repository already has some template hook scripts. For
-   example, the <a href="http://svnbook.red-bean.com/en/1.2/svn.reposadmin.create.html#svn.reposadmin.create.hooks">pre-commit</a> template is in
-   <code>PATH_TO_REPOS/hooks/pre-commit.tmpl</code>. These templates contain
-   instructions on what the hook script does and what parameters it can expect.
-</p>
+example, the <a href="http://svnbook.red-bean.com/en/1.2/svn.reposadmin.create.html#svn.reposadmin.create.hooks">pre-commit</a> template is in
+<code>PATH_TO_REPOS/hooks/pre-commit.tmpl</code>. These templates contain
+instructions on what the hook script does and what parameters it can expect.</p>
 <p>Here, then, is the most direct route to creating and activating a
-   <a href="http://svnbook.red-bean.com/en/1.2/svn.reposadmin.create.html#svn.reposadmin.create.hooks">pre-commit</a> hook:
-</p>
+<a href="http://svnbook.red-bean.com/en/1.2/svn.reposadmin.create.html#svn.reposadmin.create.hooks">pre-commit</a> hook:</p>
 <div class="typocode">
 
 <pre class="prettyprint">su - svn                      # As user svn
@@ -59,48 +54,35 @@ chmod u+x pre-commit          # It needs to be executable
 
 </div>
 
-<p>And that&#8217;s it.
-</p>
+<p>And that&#8217;s it.</p>
 <p><span id="excerpt0"/>You haven&#8217;t actually tested your new hook script so it probably
-   doesn&#8217;t do what you meant it to. Either you can sit back and wait for
-   users to complain or you can think of a way to test your hook before
-   you install it.
-</p>
-
-<h4>System Testing a Hook Script</h4>
-<p>I&#8217;ve used a couple of strategies:
-</p>
+doesn&#8217;t do what you meant it to. Either you can sit back and wait for
+users to complain or you can think of a way to test your hook before
+you install it.</p>
+<h4 id="system-testing-a-hook-script">System Testing a Hook Script</h4>
+<p>I&#8217;ve used a couple of strategies:</p>
 <ol>
- <li>
-     Set up a throw away <a href="/articles/creating-a-temporary-subversion-repository.html">temporary repository</a> and use this as a
+<li>Set up a throw away <a href="/articles/creating-a-temporary-subversion-repository.html">temporary repository</a> and use this as a
   <a href="http://en.wikipedia.org/wiki/Sandbox_%28software_development%29">sandbox</a> in which
-  to develop your hook script.
- </li>
-
- <li>
-     Find a way to test your <a href="http://svnbook.red-bean.com/en/1.2/svn.reposadmin.create.html#svn.reposadmin.create.hooks">hook script</a> on the live
-  repository <em>before</em> you actually install it.
- </li>
+  to develop your hook script.</li>
+<li>Find a way to test your <a href="http://svnbook.red-bean.com/en/1.2/svn.reposadmin.create.html#svn.reposadmin.create.hooks">hook script</a> on the live
+  repository <em>before</em> you actually install it.</li>
 </ol>
 <p>In the case of a pre-commit hook the second strategy is quite
-   attractive. Pre-commit hooks are typically used to enforce checks on a
-   transaction before it gets committed and becomes a new
-   repository revision. They are often introduced when a faulty revision gets
-   into the repository and someone says: &#8220;Couldn&#8217;t Subversion have stopped this
-   from happening?&#8221;
-</p>
+attractive. Pre-commit hooks are typically used to enforce checks on a
+transaction before it gets committed and becomes a new
+repository revision. They are often introduced when a faulty revision gets
+into the repository and someone says: &#8220;Couldn&#8217;t Subversion have stopped this
+from happening?&#8221;</p>
 <p><span id="excerpt1"/>With a little ingenuity you can test how the pre-commit hook would have
-   responded to such a faulty transaction which, in future, we would like
-   to prohibit.
-</p>
-
-<h4>Svnlook</h4>
+responded to such a faulty transaction which, in future, we would like
+to prohibit.</p>
+<h4 id="svnlook">Svnlook</h4>
 <p><code>Svnlook</code> is the <a href="http://subversion.tigris.org">Subversion</a> administrator&#8217;s friend. It can be used
-   on the Subversion server to examine the repository without changing
-   it. A hook script typically uses <code>svnlook</code> to examine a repository
-   event and take appropriate action. Thus, for example, to see what
-   files were changed by revision 1234, we run:
-</p>
+on the Subversion server to examine the repository without changing
+it. A hook script typically uses <code>svnlook</code> to examine a repository
+event and take appropriate action. Thus, for example, to see what
+files were changed by revision 1234, we run:</p>
 <div class="typocode">
 
 <pre class="prettyprint">svnlook changed PATH_TO_REPOS --revision 1234
@@ -110,8 +92,7 @@ chmod u+x pre-commit          # It needs to be executable
 </div>
 
 <p>To find what files <em>might</em> be changed by transaction 1234-1 (if
-   nothing goes wrong) the command is similar:
-</p>
+nothing goes wrong) the command is similar:</p>
 <div class="typocode">
 
 <pre class="prettyprint">svnlook changed PATH_TO_REPOS --transaction 1234-1
@@ -121,34 +102,24 @@ chmod u+x pre-commit          # It needs to be executable
 </div>
 
 <p>Examining transactions using <code>svnlook</code> is tricky since transactions
-   are transient. When a transaction becomes a revision you can no longer
-   look at it.
-</p>
-
-<h4>The Pre-commit Hook</h4>
+are transient. When a transaction becomes a revision you can no longer
+look at it.</p>
+<h4 id="the-pre-commit-hook">The Pre-commit Hook</h4>
 <p>The <code>pre-commit</code> hook gives you an opportunity to catch the
-   transaction just before it becomes a revision. <a href="http://subversion.tigris.org">Subversion</a>
-   passes this hook two parameters:
-</p>
+transaction just before it becomes a revision. <a href="http://subversion.tigris.org">Subversion</a>
+passes this hook two parameters:</p>
 <ol>
- <li>
-     the path to the root of the repository
- </li>
-
- <li>
-     the transaction identifier
- </li>
+<li>the path to the root of the repository</li>
+<li>the transaction identifier</li>
 </ol>
 <p>The pre-commit can fail the transaction by printing an informative
-   message to standard error and returning non-zero. A return code of
-   zero allows the transaction to complete successfully.
-</p>
+message to standard error and returning non-zero. A return code of
+zero allows the transaction to complete successfully.</p>
 <p>For testing we can add an extra switch, <code>--revision</code>, to our test
-   pre-commit hook. This switch is to indicate that the second parameter
-   is in fact a revision number. Now we can system-test our hook script
-   on <em>exisiting</em> repository revisions, and confirm that it does indeed
-   return non-zero for the bad ones and zero for the good ones.
-</p>
+pre-commit hook. This switch is to indicate that the second parameter
+is in fact a revision number. Now we can system-test our hook script
+on <em>exisiting</em> repository revisions, and confirm that it does indeed
+return non-zero for the bad ones and zero for the good ones.</p>
 <div class="typocode">
 
 <pre class="prettyprint">test-pre-commit PATH_TO_REPOS --revision 1234
@@ -157,22 +128,14 @@ chmod u+x pre-commit          # It needs to be executable
 
 </div>
 
-
-<h4>An Example Pre-commit Hook</h4>
+<h4 id="an-example-pre-commit-hook">An Example Pre-commit Hook</h4>
 <p>Here, then, is a pre-commit hook to ban the TAB character from C++
-   source files. Test it using the <code>--revision</code> option. Command line
-   help is available using <code>--help</code>.
-</p>
-<p>It uses two different flavours of <code>svnlook</code> to examine the repository:
-</p>
+source files. Test it using the <code>--revision</code> option. Command line
+help is available using <code>--help</code>.</p>
+<p>It uses two different flavours of <code>svnlook</code> to examine the repository:</p>
 <ol>
- <li>
-     <code>svnlook changed</code> &#8212; to find which files were changed by a transaction/revision
- </li>
-
- <li>
-     <code>svnlook cat</code> &#8212; to find the contents of a file in a transaction/revision
- </li>
+<li><code>svnlook changed</code> &#8212; to find which files were changed by a transaction/revision</li>
+<li><code>svnlook cat</code> &#8212; to find the contents of a file in a transaction/revision</li>
 </ol>
 <div class="typocode"><div class="codetitle">pre-commit</div>
 
@@ -180,7 +143,7 @@ chmod u+x pre-commit          # It needs to be executable
 " Example Subversion pre-commit hook. "
 
 def command_output(cmd):
-  " Capture a command's standard output. "
+  " Capture a command&#x27;s standard output. "
   import subprocess
   return subprocess.Popen(
       cmd.split(), stdout=subprocess.PIPE).communicate()[0]
@@ -188,7 +151,7 @@ def command_output(cmd):
 def files_changed(look_cmd):
   """ List the files added or updated by this transaction.
 
-"svnlook changed" gives output like:
+  "svnlook changed" gives output like:
   U   trunk/file1.cpp
   A   trunk/file2.cpp
   """
@@ -202,7 +165,7 @@ def files_changed(look_cmd):
       if added_or_updated(line)]
 
 def file_contents(filename, look_cmd):
-  " Return a file's contents for this transaction. "
+  " Return a file&#x27;s contents for this transaction. "
   return command_output(
      "%s %s" % (look_cmd % "cat", filename))
 
@@ -226,7 +189,7 @@ def check_cpp_files_for_tabs(look_cmd):
 def main():
   usage = """usage: %prog REPOS TXN
 
-Run pre-commit options on a repository transaction."""
+  Run pre-commit options on a repository transaction."""
   from optparse import OptionParser
   parser = OptionParser(usage=usage)
   parser.add_option("-r", "--revision",

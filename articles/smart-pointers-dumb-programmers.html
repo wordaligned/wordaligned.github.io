@@ -29,15 +29,11 @@
 <h2 class="title"><a href="/articles/smart-pointers-dumb-programmers">Smart Pointers, Dumb Programmers</a></h2>
 <p class="meta"><abbr class="published" title="2006-11-09">2006-11-09</abbr> &bull; <a href="/tag/c++" rel="tag">C++</a> &bull; <a href="/articles/smart-pointers-dumb-programmers#disqus_thread">Comments</a></p>
 <p><span id="excerpt0"/>The class I&#8217;d just written seemed to be working just fine. But when I ran
-   my unit tests I realised I&#8217;d made a silly mistake.
-</p>
-<span id="continue-reading"/>
-
-
-<h4>Failure to Reset</h4>
+my unit tests I realised I&#8217;d made a silly mistake.</p>
+<p><span id="continue-reading"/></p>
+<h4 id="failure-to-reset">Failure to Reset</h4>
 <p>The <code>test_reset()</code> unit test was failing. This test exercised the following
-   function:
-</p>
+function:</p>
 <div class="typocode">
 
 <pre class="prettyprint">void
@@ -52,13 +48,11 @@ Source::reset()
 </div>
 
 <p>Here, <code>sink</code> points to a <code>Sink</code> instance which should be reset every
-   time the <code>Source</code> instance gets reset. My test showed that
-   <code>Sink::reset()</code> wasn&#8217;t getting called.
-</p>
+time the <code>Source</code> instance gets reset. My test showed that
+<code>Sink::reset()</code> wasn&#8217;t getting called.</p>
 <p>Obviously it wasn&#8217;t getting called because <code>sink</code> is a <em>pointer</em> and
-   I hadn&#8217;t dereferenced it. Once the defect had been found, the fix was
-   trivial:
-</p>
+I hadn&#8217;t dereferenced it. Once the defect had been found, the fix was
+trivial:</p>
 <div class="typocode">
 
 <pre class="prettyprint">void
@@ -72,16 +66,12 @@ Source::reset()
 
 </div>
 
-
-<h4>However did it compile?</h4>
+<h4 id="however-did-it-compile">However did it compile?</h4>
 <p>Surely this bug should have been caught at compile time? You can&#8217;t use
-   member access syntax on a pointer. Even if the test now passed,
-   further investigation was needed.
-</p>
-
-<h4>Further Investigation</h4>
-<p>Here&#8217;s the declaration of <code>sink</code>:
-</p>
+member access syntax on a pointer. Even if the test now passed,
+further investigation was needed.</p>
+<h4 id="further-investigation">Further Investigation</h4>
+<p>Here&#8217;s the declaration of <code>sink</code>:</p>
 <div class="typocode">
 
 <pre class="prettyprint">class Source
@@ -96,40 +86,22 @@ private:
 </div>
 
 <p>Look! It&#8217;s a smart pointer, not a raw one &#8212; in this case a
-   <code>std::auto_ptr</code> which owns the dynamically allocated <code>Sink</code> instance and
-   deletes it when we&#8217;re done.
-</p>
+<code>std::auto_ptr</code> which owns the dynamically allocated <code>Sink</code> instance and
+deletes it when we&#8217;re done.</p>
 <p>So, <code>sink.reset()</code> <em>should</em> compile: it calls <code>std::auto_ptr&lt;Sink&gt;::reset()</code>
-   instead of <code>Sink::reset()</code>
-   and destroys our owned <code>sink</code> instance prematurely. (You can view the <code>auto_ptr</code>
-   documentation
-   <a href="http://gcc.gnu.org/onlinedocs/libstdc++/latest-doxygen/memory-source.html">here</a>.)
-</p>
+instead of <code>Sink::reset()</code>
+and destroys our owned <code>sink</code> instance prematurely. (You can view the <code>auto_ptr</code>
+documentation
+<a href="http://gcc.gnu.org/onlinedocs/libstdc++/latest-doxygen/memory-source.html">here</a>.)</p>
 <p>This is a nasty defect which might well have caused considerable
-   trouble if it hadn&#8217;t been exposed early by a unit test.
-</p>
-
-<h4>Lessons Learned</h4>
+trouble if it hadn&#8217;t been exposed early by a unit test.</p>
+<h4 id="lessons-learned">Lessons Learned</h4>
 <ol>
- <li>
-     Simple tests can expose nasty bugs.
- </li>
-
- <li>
-     Compilers don&#8217;t catch all defects.
- </li>
-
- <li>
-     Namespaces don&#8217;t stop you calling the wrong function.
- </li>
-
- <li>
-     Smart pointers can be subtle.
- </li>
-
- <li>
-     Smart programmers write unit tests.
- </li>
+<li>Simple tests can expose nasty bugs.</li>
+<li>Compilers don&#8217;t catch all defects.</li>
+<li>Namespaces don&#8217;t stop you calling the wrong function.</li>
+<li>Smart pointers can be subtle.</li>
+<li>Smart programmers write unit tests.</li>
 </ol>
 </div>
 

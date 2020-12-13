@@ -28,10 +28,8 @@
       <div class="atomentry" id="macros-with-halos">
 <h2 class="title"><a href="/articles/macros-with-halos">Macros with halos</a></h2>
 <p class="meta"><abbr class="published" title="2008-09-02">2008-09-02</abbr> &bull; <a href="/tag/c" rel="tag">C</a>, <a href="/tag/c++" rel="tag">C++</a>, <a href="/tag/characters" rel="tag">Characters</a> &bull; <a href="/articles/macros-with-halos#disqus_thread">Comments</a></p>
-<p><a href="http://www.flickr.com/photos/thomasguest/2814425692/" title="A slippery beast"><img src="http://farm4.static.flickr.com/3200/2814425692_79d1d1bba3_m.jpg" width="240" height="180" alt="Slippery beast" /></a>
-</p>
-<p>The C preprocessor is a notoriously primitive and slippery creature. Included and occasionally <a href="http://svn.boost.org/trac/boost/browser/trunk/boost/preprocessor/selection/min.hpp">embraced</a> by C++, it may eventually prove to be the downfall of the newer language. How much trouble has been caused by seemingly innocuous definitions?
-</p>
+<p><a href="http://www.flickr.com/photos/thomasguest/2814425692/" title="A slippery beast"><img src="http://farm4.static.flickr.com/3200/2814425692_79d1d1bba3_m.jpg" width="240" height="180" alt="Slippery beast" /></a></p>
+<p>The C preprocessor is a notoriously primitive and slippery creature. Included and occasionally <a href="http://svn.boost.org/trac/boost/browser/trunk/boost/preprocessor/selection/min.hpp">embraced</a> by C++, it may eventually prove to be the downfall of the newer language. How much trouble has been caused by seemingly innocuous definitions?</p>
 <div class="typocode">
 
 <pre class="prettyprint">#define min(a, b) (((a) &lt; (b)) ? (a) : (b))
@@ -40,10 +38,8 @@
 
 </div>
 
-<p>This macro <a href="http://www.gotw.ca/gotw/077.htm">hobbles any attempt</a> to use the standard C++ algorithm, <code>std::min()</code>, and since it&#8217;s a preprocessor thing the compiler warnings may not alert you immediately to what&#8217;s going on. You don&#8217;t have to include <code>&lt;algorithm&gt;</code> directly to trigger the problem.
-</p>
-<p>Try compiling this stripped down source file using GCC 3.4.6:
-</p>
+<p>This macro <a href="http://www.gotw.ca/gotw/077.htm">hobbles any attempt</a> to use the standard C++ algorithm, <code>std::min()</code>, and since it&#8217;s a preprocessor thing the compiler warnings may not alert you immediately to what&#8217;s going on. You don&#8217;t have to include <code>&lt;algorithm&gt;</code> directly to trigger the problem.</p>
+<p>Try compiling this stripped down source file using GCC 3.4.6:</p>
 <div class="typocode"><div class="codetitle">macro.cpp</div>
 
 <pre class="prettyprint">#include &lt;string&gt;
@@ -54,8 +50,7 @@
 
 </div>
 
-<p>and you&#8217;ll see something like:
-</p>
+<p>and you&#8217;ll see something like:</p>
 <div class="typocode">
 
 <pre class="prettyprint">In file included from /usr/lib/gcc/i386-redhat-linux/3.4.6/../../../../include/c++/3.4.6/streambuf:781,
@@ -63,22 +58,19 @@
                  from /usr/lib/gcc/i386-redhat-linux/3.4.6/../../../../include/c++/3.4.6/istream:45,
                  from /usr/lib/gcc/i386-redhat-linux/3.4.6/../../../../include/c++/3.4.6/sstream:45,
                  from macros.cpp:3:
-/usr/lib/gcc/i386-redhat-linux/3.4.6/../../../../include/c++/3.4.6/bits/streambuf.tcc: In member function `virtual std::streamsize std::basic_streambuf&lt;_CharT, _Traits&gt;::xsgetn(_CharT*, std::streamsize)':
-/usr/lib/gcc/i386-redhat-linux/3.4.6/../../../../include/c++/3.4.6/bits/streambuf.tcc:54: error: expected unqualified-id before '(' token
-/usr/lib/gcc/i386-redhat-linux/3.4.6/../../../../include/c++/3.4.6/bits/streambuf.tcc: In member function `virtual std::streamsize std::basic_streambuf&lt;_CharT, _Traits&gt;::xsputn(const _CharT*, std::streamsize)':
-/usr/lib/gcc/i386-redhat-linux/3.4.6/../../../../include/c++/3.4.6/bits/streambuf.tcc:88: error: expected unqualified-id before '(' token
+/usr/lib/gcc/i386-redhat-linux/3.4.6/../../../../include/c++/3.4.6/bits/streambuf.tcc: In member function `virtual std::streamsize std::basic_streambuf&lt;_CharT, _Traits&gt;::xsgetn(_CharT*, std::streamsize)&#x27;:
+/usr/lib/gcc/i386-redhat-linux/3.4.6/../../../../include/c++/3.4.6/bits/streambuf.tcc:54: error: expected unqualified-id before &#x27;(&#x27; token
+/usr/lib/gcc/i386-redhat-linux/3.4.6/../../../../include/c++/3.4.6/bits/streambuf.tcc: In member function `virtual std::streamsize std::basic_streambuf&lt;_CharT, _Traits&gt;::xsputn(const _CharT*, std::streamsize)&#x27;:
+/usr/lib/gcc/i386-redhat-linux/3.4.6/../../../../include/c++/3.4.6/bits/streambuf.tcc:88: error: expected unqualified-id before &#x27;(&#x27; token
 
 </pre>
 
 </div>
 
-<p>I spent a while tracking down a similar problem today (needless to say, the offending macro was hiding several #includes away from the file which triggered the error<a id="fn1link" href="#fn1"><sup>[1]</sup></a>). Once I&#8217;d exposed the source, I naturally wanted to grumble to someone, so I pasted the code into an instant message to a colleague. Look, my <a href="http://www.adiumx.com">messaging client</a> sanctified the macro by adding halos to the <code>a</code>&#8217;s!
-</p>
-<img src="/images/saint-a.png" alt="Macros with Halos"/>
-
-<p><hr />
-   <a id="fn1" href="#fn1link">[1]</a> One tip for tracking down such problems is to run the preprocessing phase of compilation on its own: with GCC, for example, supply the <code>-E</code> flag.
-</p>
+<p>I spent a while tracking down a similar problem today (needless to say, the offending macro was hiding several #includes away from the file which triggered the error<a id="fn1link" href="#fn1"><sup><a href="https://blog.codeship.com/building-minimal-docker-containers-for-go-applications/">1</a></sup></a>). Once I&#8217;d exposed the source, I naturally wanted to grumble to someone, so I pasted the code into an instant message to a colleague. Look, my <a href="http://www.adiumx.com">messaging client</a> sanctified the macro by adding halos to the <code>a</code>&#8217;s!</p>
+<p><img src="/images/saint-a.png" alt="Macros with Halos"/></p>
+<hr />
+<p><a id="fn1" href="#fn1link"><a href="https://blog.codeship.com/building-minimal-docker-containers-for-go-applications/">1</a></a> One tip for tracking down such problems is to run the preprocessing phase of compilation on its own: with GCC, for example, supply the <code>-E</code> flag.</p>
 </div>
 
 <div class="comments"><hr/><div id="disqus_thread"></div><script type="text/javascript" src="http://disqus.com/forums/wordaligned/embed.js"></script></div>

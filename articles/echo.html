@@ -28,45 +28,13 @@
       <div class="atomentry" id="echo">
 <h2 class="title"><a href="/articles/echo">Tracing function calls using Python decorators</a></h2>
 <p class="meta"><abbr class="published" title="2008-03-10">2008-03-10</abbr> &bull; <a href="/tag/python" rel="tag">Python</a>, <a href="/tag/decorators" rel="tag">Decorators</a>, <a href="/tag/accu" rel="tag">ACCU</a> &bull; <a href="/articles/echo#disqus_thread">Comments</a></p>
-<div class="toc">
-<h2>Contents</h2>
-<ul>
- <li><a href="#tocintroduction" name="toc0" id="toc0">Introduction</a>
- </li>
-
- <li><a href="#toca-less-invasive-way" name="toc1" id="toc1">A less invasive way</a>
- </li>
-
- <li><a href="#tocdecorators" name="toc2" id="toc2">Decorators</a>
- </li>
-
- <li><a href="#tocimproving-echo" name="toc3" id="toc3">Improving echo</a>
- </li>
-
- <li><a href="#tocwider-application" name="toc4" id="toc4">Wider application</a>
- </li>
-
- <li><a href="#tocwork-in-progress" name="toc5" id="toc5">Work in progress</a>
- </li>
-
- <li><a href="#tocsource-code" name="toc6" id="toc6">Source Code</a>
- </li>
-
- <li><a href="#toccredits" name="toc7" id="toc7">Credits</a>
- </li>
-
- <li><a href="#toc-end" name="toc8" id="toc8">@ end</a>
- </li>
-</ul>
-</div>
-<h3><a href="#toc0" name="tocintroduction" id="tocintroduction">Introduction</a></h3>
-<p>Let&#8217;s suppose you want to trace calls to a function. That is, every time the function gets called, you want to print out its name and the values of any arguments passed by the caller. To provide a concrete example, here&#8217;s a function which calculates the dot product of two vectors.
-</p>
+<h3 id="introduction">Introduction</h3>
+<p>Let&#8217;s suppose you want to trace calls to a function. That is, every time the function gets called, you want to print out its name and the values of any arguments passed by the caller. To provide a concrete example, here&#8217;s a function which calculates the dot product of two vectors.</p>
 <div class="typocode">
 
 <pre class="prettyprint">def dot(v, w):
     """Calculate the dot product of two vectors.
-    
+
     Example:
     &gt;&gt;&gt; dot((1, 2, 3), (3, 2, 1))
     10
@@ -77,8 +45,7 @@
 
 </div>
 
-<p>To trace calls to the function you could just edit it and insert a print statement.
-</p>
+<p>To trace calls to the function you could just edit it and insert a print statement.</p>
 <div class="typocode">
 
 <pre class="prettyprint">def dot(v, w):
@@ -89,8 +56,7 @@
 
 </div>
 
-<p>When you no longer want calls traced you can remove the <code>print</code> statement or even comment it out. This approach works well enough for a while but you soon discover there are more functions you want to trace; and you&#8217;ll eventually end up with lots of functions being traced and lots of commented-out tracing code. You might even end up with <a href="/articles/code-in-comments.html">broken commented-out code</a>:
-</p>
+<p>When you no longer want calls traced you can remove the <code>print</code> statement or even comment it out. This approach works well enough for a while but you soon discover there are more functions you want to trace; and you&#8217;ll eventually end up with lots of functions being traced and lots of commented-out tracing code. You might even end up with <a href="/articles/code-in-comments.html">broken commented-out code</a>:</p>
 <div class="typocode"><div class="codetitle">broken comment</div>
 
 <pre class="prettyprint">def dot(vec1, vec2):
@@ -101,14 +67,10 @@
 
 </div>
 
-<p>At this point, you realise that calling a function and tracing these calls are orthogonal operations. Isn&#8217;t there a less invasive way to do this?
-</p>
-<span id="continue-reading"/>
-
-
-<h3><a href="#toc1" name="toca-less-invasive-way" id="toca-less-invasive-way">A less invasive way</a></h3>
-<p>Rather than change the original function you can simply wrap it with the code which prints out the inputs.
-</p>
+<p>At this point, you realise that calling a function and tracing these calls are orthogonal operations. Isn&#8217;t there a less invasive way to do this?</p>
+<p><span id="continue-reading"/></p>
+<h3 id="a-less-invasive-way">A less invasive way</h3>
+<p>Rather than change the original function you can simply wrap it with the code which prints out the inputs.</p>
 <div class="typocode"><div class="codetitle">Echo a function, Take 1</div>
 
 <pre class="prettyprint">def echo_both_args(fn):
@@ -118,22 +80,19 @@
         print "%s(%r, %r)" % (name, arg1, arg2)
         return fn(arg1, arg2)
     return wrapped
-    
+
 def dot(vec1, vec2):
     ....
-    
+
 dot = echo_both_args(dot)
 
 </pre>
 
 </div>
 
-<p>The <code>echo_both_args</code> function accepts a single function as a parameter and returns a new function which wraps this original function by adding the desired trace functionality. By the way, I&#8217;ve introduced the term &#8220;echo&#8221; for this action rather than the more conventional &#8220;trace&#8221; since Python already has a <a href="http://docs.python.org/lib/module-trace.html">trace module</a> which does something rather different. The idea is that when you call a function, you hear your call repeated &#8212; like an echo.
-</p>
-<p>C/C++ programmers will have noticed the inner function object, <code>wrapped</code>, which <code>echo_both_args</code> returns. Returning inner functions is a common Python idiom, and is the way language implements the closures found in other high-level languages such as Scheme or Ruby. The inner function doesn&#8217;t go out of scope &#8212; in Python, objects persist as long as needed.
-</p>
-<p>The final line of the code snippet simply rebinds <code>dot</code> to the echoed version of itself. We don&#8217;t need to pass the name of the function to be traced (<code>dot</code> in this example) into <code>echo_both_args</code> since in Python a function object carries its name around with it in a <code>__name__</code> attribute. If we now call <code>dot</code> in an interpreted session, we&#8217;ll see the call echoed:
-</p>
+<p>The <code>echo_both_args</code> function accepts a single function as a parameter and returns a new function which wraps this original function by adding the desired trace functionality. By the way, I&#8217;ve introduced the term &#8220;echo&#8221; for this action rather than the more conventional &#8220;trace&#8221; since Python already has a <a href="http://docs.python.org/lib/module-trace.html">trace module</a> which does something rather different. The idea is that when you call a function, you hear your call repeated &#8212; like an echo.</p>
+<p>C/C++ programmers will have noticed the inner function object, <code>wrapped</code>, which <code>echo_both_args</code> returns. Returning inner functions is a common Python idiom, and is the way language implements the closures found in other high-level languages such as Scheme or Ruby. The inner function doesn&#8217;t go out of scope &#8212; in Python, objects persist as long as needed.</p>
+<p>The final line of the code snippet simply rebinds <code>dot</code> to the echoed version of itself. We don&#8217;t need to pass the name of the function to be traced (<code>dot</code> in this example) into <code>echo_both_args</code> since in Python a function object carries its name around with it in a <code>__name__</code> attribute. If we now call <code>dot</code> in an interpreted session, we&#8217;ll see the call echoed:</p>
 <div class="typocode">
 
 <pre class="prettyprint">&gt;&gt;&gt; dot((1, 2, 3), (3, 2, 1))
@@ -144,8 +103,7 @@ dot((1, 2, 3), (3, 2, 1))
 
 </div>
 
-<p>The inner function, <code>wrapped</code>, should be capable of wrapping any function &#8212; so long as that function accepts just two parameters, that is. (Note the use of the <code>%r</code> print formatter which converts any Python object into its canonical string representation). If we want a more general purpose <code>echo</code> which can wrap any function with any signature, we might try something like the following:
-</p>
+<p>The inner function, <code>wrapped</code>, should be capable of wrapping any function &#8212; so long as that function accepts just two parameters, that is. (Note the use of the <code>%r</code> print formatter which converts any Python object into its canonical string representation). If we want a more general purpose <code>echo</code> which can wrap any function with any signature, we might try something like the following:</p>
 <div class="typocode"><div class="codetitle">Echo a function, Take 2</div>
 
 <pre class="prettyprint">def echo(fn):
@@ -162,10 +120,8 @@ dot((1, 2, 3), (3, 2, 1))
 
 </div>
 
-<p>Here, the inner function, <code>wrapped</code>, has parameters <code>(*v, **k)</code>, which contain the positional and keyword arguments passed to this function respectively. It doesn&#8217;t really matter how many arguments the function being wrapped has, or indeed if this function itself accepts arbitrary positional and keyword arguments: it just works &#8212; have a look in the Python reference manual for details. We&#8217;ve use <code>chain</code>, one of the handy iterator tools from the <a href="http://www.python.org/doc/current/lib/module-itertools.html" title="itertools -- Functions creating iterators for efficient looping">itertools module</a>, to iterate through all the positional and keyword argument values; then a combination of <code>string.join</code> and the <code>map</code> and <code>repr</code> builtins produce a string representation of these values.
-</p>
-<p>We can now define, wrap and call some functions with more varied signatures.
-</p>
+<p>Here, the inner function, <code>wrapped</code>, has parameters <code>(*v, **k)</code>, which contain the positional and keyword arguments passed to this function respectively. It doesn&#8217;t really matter how many arguments the function being wrapped has, or indeed if this function itself accepts arbitrary positional and keyword arguments: it just works &#8212; have a look in the Python reference manual for details. We&#8217;ve use <code>chain</code>, one of the handy iterator tools from the <a href="http://www.python.org/doc/current/lib/module-itertools.html" title="itertools -- Functions creating iterators for efficient looping">itertools module</a>, to iterate through all the positional and keyword argument values; then a combination of <code>string.join</code> and the <code>map</code> and <code>repr</code> builtins produce a string representation of these values.</p>
+<p>We can now define, wrap and call some functions with more varied signatures.</p>
 <div class="typocode">
 
 <pre class="prettyprint">def f(x): pass
@@ -173,9 +129,9 @@ def g(x, y): pass
 def h(x=1, y=2): pass
 def i(x, y, *v): pass
 def j(x, y, *v, **k): pass
-    
+
 f, g, h, i, j = map(echo, (f, g, h, i, j))
-    
+
 f(10)
 g("spam", 42)
 g(y="spam", x=42)
@@ -187,47 +143,39 @@ j(("green", "eggs"), y="spam", z=42)
 
 </div>
 
-<p>Running this code produces output:
-</p>
+<p>Running this code produces output:</p>
 <div class="typocode">
 
 <pre class="prettyprint">f(10)
-g('spam', 42)
-g('spam', 42)
+g(&#x27;spam&#x27;, 42)
+g(&#x27;spam&#x27;, 42)
 h()
-i('spam', 42, 'extra', 'args', 1, 2, 3)
-j(('green', 'eggs'), 'spam', 42)
+i(&#x27;spam&#x27;, 42, &#x27;extra&#x27;, &#x27;args&#x27;, 1, 2, 3)
+j((&#x27;green&#x27;, &#x27;eggs&#x27;), &#x27;spam&#x27;, 42)
 
 </pre>
 
 </div>
 
-<p>This does something like what we want, but note a couple of problems:
-</p>
+<p>This does something like what we want, but note a couple of problems:</p>
 <ul>
- <li>
-     the second call to <code>g</code> uses keyword argument syntax, and the output <code>g('spam', 42)</code> is exactly what we saw echoed by the previous call to <code>g</code> even though the arguments have been swapped around. We&#8217;d better try and echo argument names as well as their values (just as we did when we first modified <code>dot</code> to echo calls).
- </li>
-
- <li>
-     the output doesn&#8217;t show the (defaulted) arguments passed to <code>h</code> <a href="#footnote1" id="fn1link"><sup>[1]</sup></a>.
- </li>
+<li>the second call to <code>g</code> uses keyword argument syntax, and the output <code>g('spam', 42)</code> is exactly what we saw echoed by the previous call to <code>g</code> even though the arguments have been swapped around. We&#8217;d better try and echo argument names as well as their values (just as we did when we first modified <code>dot</code> to echo calls).</li>
+<li>the output doesn&#8217;t show the (defaulted) arguments passed to <code>h</code> <a href="#footnote1" id="fn1link"><sup><a href="https://blog.codeship.com/building-minimal-docker-containers-for-go-applications/">1</a></sup></a>.</li>
 </ul>
-<p>There&#8217;s another more subtle problem too.
-</p>
+<p>There&#8217;s another more subtle problem too.</p>
 <div class="typocode">
 
 <pre class="prettyprint">&gt;&gt;&gt; def f(x):
-...     " I'm a function called f. "
+...     " I&#x27;m a function called f. "
 ...     pass
 ...
 &gt;&gt;&gt; f.__name__
-'f'
+&#x27;f&#x27;
 &gt;&gt;&gt; f.func_doc
-" I'm a function called f. "
+" I&#x27;m a function called f. "
 &gt;&gt;&gt; f = echo(f)
 &gt;&gt;&gt; f.__name__
-'wrapped'
+&#x27;wrapped&#x27;
 &gt;&gt;&gt; f.func_doc
 None
 
@@ -235,12 +183,9 @@ None
 
 </div>
 
-<p>That is, by wrapping <code>f</code>, we&#8217;ve tinkered with its identity: its name has changed and its documentation has disappeared. This is bad news in a dynamic language, since any code introspecting <code>f</code> will get the wrong idea about it. We should really have modified <code>wrapper</code> to copy various attributes from <code>f</code>.
-</p>
-
-<h3><a href="#toc2" name="tocdecorators" id="tocdecorators">Decorators</a></h3>
-<p>At Python 2.3, the <code>@</code> character was pulled out of the bag to provide a special syntax for decorating functions in this way. Rather than retrospectively rebinding a function <code>f</code> as shown in the examples so far, we can explicitly decorate <code>f</code> up front with the <code>echo</code> wrapper like this:
-</p>
+<p>That is, by wrapping <code>f</code>, we&#8217;ve tinkered with its identity: its name has changed and its documentation has disappeared. This is bad news in a dynamic language, since any code introspecting <code>f</code> will get the wrong idea about it. We should really have modified <code>wrapper</code> to copy various attributes from <code>f</code>.</p>
+<h3 id="decorators">Decorators</h3>
+<p>At Python 2.3, the <code>@</code> character was pulled out of the bag to provide a special syntax for decorating functions in this way. Rather than retrospectively rebinding a function <code>f</code> as shown in the examples so far, we can explicitly decorate <code>f</code> up front with the <code>echo</code> wrapper like this:</p>
 <div class="typocode"><div class="codetitle">using decorator syntax</div>
 
 <pre class="prettyprint">&gt;&gt;&gt; def echo(fn):
@@ -254,17 +199,15 @@ None
 &gt;&gt;&gt; @echo
 &gt;&gt;&gt; def f(x): pass
 ...
-&gt;&gt;&gt; f('does it work?')
-f('does it work?')
+&gt;&gt;&gt; f(&#x27;does it work?&#x27;)
+f(&#x27;does it work?&#x27;)
 
 </pre>
 
 </div>
 
-<p>Of course decoration isn&#8217;t reserved for the particular use case shown in this article: we might decorate functions to time their execution, to protect them against simultaneous access from multiple threads, to check the validity of input arguments, to dynamically analyse code coverage, and so on.
-</p>
-<p>Note also that there&#8217;s a special decorator in the <a href="http://docs.python.org/lib/module-functools.html" title="functools -- Higher order functions and operations on callable objects">functools module</a> which does the job of making a wrapper look like its wrappee.
-</p>
+<p>Of course decoration isn&#8217;t reserved for the particular use case shown in this article: we might decorate functions to time their execution, to protect them against simultaneous access from multiple threads, to check the validity of input arguments, to dynamically analyse code coverage, and so on.</p>
+<p>Note also that there&#8217;s a special decorator in the <a href="http://docs.python.org/lib/module-functools.html" title="functools -- Higher order functions and operations on callable objects">functools module</a> which does the job of making a wrapper look like its wrappee.</p>
 <div class="typocode">
 
 <pre class="prettyprint">&gt;&gt;&gt; import functools
@@ -276,54 +219,51 @@ f('does it work?')
 ...
 &gt;&gt;&gt; @echo
 &gt;&gt;&gt; def f(x):
-...    " I'm f, don't mess with me! "
+...    " I&#x27;m f, don&#x27;t mess with me! "
 ...    pass
 &gt;&gt;&gt; f.__name__
-'f'
+&#x27;f&#x27;
 &gt;&gt;&gt; f.func_doc
-" I'm f, don't mess with me! "
-&gt;&gt;&gt; f(('spam', 'spam', 'spam!'))
-f(('spam', 'spam', 'spam!'))
+" I&#x27;m f, don&#x27;t mess with me! "
+&gt;&gt;&gt; f((&#x27;spam&#x27;, &#x27;spam&#x27;, &#x27;spam!&#x27;))
+f((&#x27;spam&#x27;, &#x27;spam&#x27;, &#x27;spam!&#x27;))
 
 </pre>
 
 </div>
 
-
-<h3><a href="#toc3" name="tocimproving-echo" id="tocimproving-echo">Improving echo</a></h3>
-<p>Here&#8217;s a version of <code>echo</code> which fixes the remaining problems: that is, it prints out argument names as well as argument values, and it also prints out any arguments defaulted in the call to the wrapped function. This version is a little longer and considerably more fiddly <a href="#footnote2" id="fn2link"><sup>[2]</sup></a>, since we need to dig deeper into the function&#8217;s code, but it follows the same basic pattern as its predecessors.
-</p>
+<h3 id="improving-echo">Improving echo</h3>
+<p>Here&#8217;s a version of <code>echo</code> which fixes the remaining problems: that is, it prints out argument names as well as argument values, and it also prints out any arguments defaulted in the call to the wrapped function. This version is a little longer and considerably more fiddly <a href="#footnote2" id="fn2link"><sup><a href="http://devcenter.wercker.com/docs/quickstarts/advanced/building-minimal-containers-with-go">2</a></sup></a>, since we need to dig deeper into the function&#8217;s code, but it follows the same basic pattern as its predecessors.</p>
 <p>While we&#8217;re improving things, note that we&#8217;ve also parameterised the
-   <code>write</code> function, rather than naively hijacking <code>sys.stdout</code> to print out function calls.
-</p>
+<code>write</code> function, rather than naively hijacking <code>sys.stdout</code> to print out function calls.</p>
 <div class="typocode"><div class="codetitle">Echo a function, Take 3</div>
 
 <pre class="prettyprint">import sys
-    
+
 def format_arg_value(arg_val):
     """ Return a string representing a (name, value) pair.
-    
-    &gt;&gt;&gt; format_arg_value(('x', (1, 2, 3)))
-    'x=(1, 2, 3)'
+
+    &gt;&gt;&gt; format_arg_value((&#x27;x&#x27;, (1, 2, 3)))
+    &#x27;x=(1, 2, 3)&#x27;
     """
     arg, val = arg_val
     return "%s=%r" % (arg, val)
-    
+
 def echo(fn, write=sys.stdout.write):
     """ Echo calls to a function.
-    
+
     Returns a decorated version of the input function which "echoes" calls
-    made to it by writing out the function's name and the arguments it was
+    made to it by writing out the function&#x27;s name and the arguments it was
     called with.
     """
     import functools
-    # Unpack function's arg count, arg names, arg defaults
+    # Unpack function&#x27;s arg count, arg names, arg defaults
     code = fn.func_code
     argcount = code.co_argcount
     argnames = code.co_varnames[:argcount]
     fn_defaults = fn.func_defaults or list()
     argdefs = dict(zip(argnames[-len(fn_defaults):], fn_defaults))
-    
+
     @functools.wraps(fn)
     def wrapped(*v, **k):
         # Collect function arguments by chaining together positional,
@@ -342,8 +282,7 @@ def echo(fn, write=sys.stdout.write):
 
 </div>
 
-<p>Let&#8217;s give it a try.
-</p>
+<p>Let&#8217;s give it a try.</p>
 <div class="typocode">
 
 <pre class="prettyprint">@echo
@@ -362,11 +301,11 @@ class X(object):
     @classmethod
     @echo
     def cm(klass, x): pass
-    
-def reversed_write(s): sys.write(''.join(reversed(s)))
+
+def reversed_write(s): sys.write(&#x27;&#x27;.join(reversed(s)))
 def k(**kw): pass
 k = echo(k, write=reversed_write)
-    
+
 f(10)
 g("spam", 42)
 g(y="spam", x=42)
@@ -381,55 +320,49 @@ k(born="Mon", christened="Tues", married="Weds")
 
 </div>
 
-<p>Running the preceding code produces:
-</p>
+<p>Running the preceding code produces:</p>
 <div class="typocode">
 
 <pre class="prettyprint">f(x=10)
-g(x='spam', y=42)
-g(y='spam', x=42)
+g(x=&#x27;spam&#x27;, y=42)
+g(y=&#x27;spam&#x27;, x=42)
 h(x=1, y=2)
-i(x='spam', y=42, 'extra', 'args', 1, 2, 3)
-j(x=('green', 'eggs'), y='spam', z=42)
-m(self=&lt;__main__.X instance at 0x7837d8&gt;, x='method call')
-cm(klass=&lt;class __main__.X at 0x785840&gt;, x='classmethod call')
-)'seuT'=denetsirhc ,'sdeW'=deirram ,'noM'=nrob(k
+i(x=&#x27;spam&#x27;, y=42, &#x27;extra&#x27;, &#x27;args&#x27;, 1, 2, 3)
+j(x=(&#x27;green&#x27;, &#x27;eggs&#x27;), y=&#x27;spam&#x27;, z=42)
+m(self=&lt;__main__.X instance at 0x7837d8&gt;, x=&#x27;method call&#x27;)
+cm(klass=&lt;class __main__.X at 0x785840&gt;, x=&#x27;classmethod call&#x27;)
+)&#x27;seuT&#x27;=denetsirhc ,&#x27;sdeW&#x27;=deirram ,&#x27;noM&#x27;=nrob(k
 
 </pre>
 
 </div>
 
-<p>As you can see, it works on methods and classmethods too. 
-</p>
-<p>By the way, if you&#8217;re not familiar with classmethods, they&#8217;re created using Python&#8217;s built-in <code>classmethod</code> function, which transforms functions in the required way; and, as shown in the example above, the decorator syntax is the recommended way of applying this transformation.
-</p>
-
-<h3><a href="#toc4" name="tocwider-application" id="tocwider-application">Wider application</a></h3>
-<p>Using this final version of <code>echo</code> to decorate functions is simple enough. All you have to do is precede the function(s) you want to echo with the echo decorator. What, though, if these functions are in a module you don&#8217;t want to modify &#8212; one of the standard library modules, for example? What if you want to echo an entire class by echoing all of its methods without editing the class itself; or all the classes and functions in a module, again without editing the module itself?
-</p>
-<p>A little introspection works the required magic. All we have to do is work our way through all the functions and classes in a module, and all the methods in these classes, rebinding these functions to their echoed versions. Extra attention is needed for class-, static- and private- methods, but otherwise this code contains few surprises.
-</p>
+<p>As you can see, it works on methods and classmethods too. </p>
+<p>By the way, if you&#8217;re not familiar with classmethods, they&#8217;re created using Python&#8217;s built-in <code>classmethod</code> function, which transforms functions in the required way; and, as shown in the example above, the decorator syntax is the recommended way of applying this transformation.</p>
+<h3 id="wider-application">Wider application</h3>
+<p>Using this final version of <code>echo</code> to decorate functions is simple enough. All you have to do is precede the function(s) you want to echo with the echo decorator. What, though, if these functions are in a module you don&#8217;t want to modify &#8212; one of the standard library modules, for example? What if you want to echo an entire class by echoing all of its methods without editing the class itself; or all the classes and functions in a module, again without editing the module itself?</p>
+<p>A little introspection works the required magic. All we have to do is work our way through all the functions and classes in a module, and all the methods in these classes, rebinding these functions to their echoed versions. Extra attention is needed for class-, static- and private- methods, but otherwise this code contains few surprises.</p>
 <div class="typocode"><div class="codetitle">echo, echo, echo!</div>
 
 <pre class="prettyprint">import inspect
 import sys
-    
+
 def name(item):
-    " Return an item's name. "
+    " Return an item&#x27;s name. "
     return item.__name__
-    
+
 def is_classmethod(instancemethod):
     " Determine if an instancemethod is a classmethod. "
     return instancemethod.im_self is not None
-    
+
 def is_class_private_name(name):
     " Determine if a name is a class private name. "
     # Exclude system defined names such as __init__, __add__ etc
     return name.startswith("__") and not name.endswith("__")
-    
+
 def method_name(method):
-    """ Return a method's name.
-    
+    """ Return a method&#x27;s name.
+
     This function returns the name the method is accessed by from
     outside the class (i.e. it prefixes "private" methods appropriately).
     """
@@ -437,16 +370,16 @@ def method_name(method):
     if is_class_private_name(mname):
         mname = "_%s%s" % (name(method.im_class), mname)
     return mname
-    
+
 def format_args(args):
     ...
-    
+
 def echo(fn, write=sys.stdout.write):
     ...
-    
+
 def echo_instancemethod(klass, method, write=sys.stdout.write):
     """ Change an instancemethod so that calls to it are echoed.
-    
+
     Replacing a classmethod is a little more tricky.
     See: http://www.python.org/doc/current/ref/types.html
     """
@@ -458,7 +391,7 @@ def echo_instancemethod(klass, method, write=sys.stdout.write):
         setattr(klass, mname, classmethod(echo(method.im_func, write)))
     else:
         setattr(klass, mname, echo(method, write))
-    
+
 def echo_class(klass, write=sys.stdout.write):
     """ Echo calls to class methods and static functions
     """
@@ -466,7 +399,7 @@ def echo_class(klass, write=sys.stdout.write):
         echo_instancemethod(klass, method, write)
     for _, fn in inspect.getmembers(klass, inspect.isfunction):
         setattr(klass, name(fn), staticmethod(echo(fn, write)))
-    
+
 def echo_module(mod, write=sys.stdout.write):
     """ Echo calls to functions and methods in a module.
     """
@@ -479,43 +412,26 @@ def echo_module(mod, write=sys.stdout.write):
 
 </div>
 
-
-<h3><a href="#toc5" name="tocwork-in-progress" id="tocwork-in-progress">Work in progress</a></h3>
-<p>I&#8217;ve used the <code>echo</code> library successfully on a number of occasions. Usually, I simply want to capture all function calls made to a module. Echoing the module generates a log file which I can then examine offline using the standard <a href="/articles/shell-script-sets.html">Unix shell tools</a>.
-</p>
-<p>I&#8217;ve resisted the urge to add options to fine-tune exactly which functions get echoed, or to control whether or not private methods get echoed &#8212; I prefer to generate a surplus of information then filter it as needed. (Though note that the code, as it stands, <em>doesn&#8217;t</em> echo nested functions and classes.)
-</p>
-<p>I discovered that if a class customises the special <code>__repr__</code> method, then trying to echo calls to this method leads to recursion and a runtime error. As a consequence, <code>echo</code> avoids echoing <code>__repr__</code> and, for good measure, <code>__str__</code> as well. I suspect that <code>echo</code> would lead to similar problems if applied to another introspective module. Echoing <code>doctest</code> wouldn&#8217;t be very clever, and echoing echo itself is surely doomed.
-</p>
-
-<h3><a href="#toc6" name="tocsource-code" id="tocsource-code">Source Code</a></h3>
-<p>The code for this article is available using anonymous SVN access at http://svn.wordaligned.org/svn/etc/echo (<a href="http://svn.wordaligned.org/svn/etc/echo">browse the code online</a>).
-</p>
-
-<h3><a href="#toc7" name="toccredits" id="toccredits">Credits</a></h3>
-<p>My thanks to Dan Tallis, <a href="http://curbralan.com">Kevlin Henney</a>, <a href="http://gedmin.as">Marius Gedminas</a> and all at <a href="http://accu.org/index.php/aboutus/aboutjournals">CVu</a> for their help with this article.
-</p>
+<h3 id="work-in-progress">Work in progress</h3>
+<p>I&#8217;ve used the <code>echo</code> library successfully on a number of occasions. Usually, I simply want to capture all function calls made to a module. Echoing the module generates a log file which I can then examine offline using the standard <a href="/articles/shell-script-sets.html">Unix shell tools</a>.</p>
+<p>I&#8217;ve resisted the urge to add options to fine-tune exactly which functions get echoed, or to control whether or not private methods get echoed &#8212; I prefer to generate a surplus of information then filter it as needed. (Though note that the code, as it stands, <em>doesn&#8217;t</em> echo nested functions and classes.)</p>
+<p>I discovered that if a class customises the special <code>__repr__</code> method, then trying to echo calls to this method leads to recursion and a runtime error. As a consequence, <code>echo</code> avoids echoing <code>__repr__</code> and, for good measure, <code>__str__</code> as well. I suspect that <code>echo</code> would lead to similar problems if applied to another introspective module. Echoing <code>doctest</code> wouldn&#8217;t be very clever, and echoing echo itself is surely doomed.</p>
+<h3 id="source-code">Source Code</h3>
+<p>The code for this article is available using anonymous SVN access at http://svn.wordaligned.org/svn/etc/echo (<a href="http://svn.wordaligned.org/svn/etc/echo">browse the code online</a>).</p>
+<h3 id="credits">Credits</h3>
+<p>My thanks to Dan Tallis, <a href="http://curbralan.com">Kevlin Henney</a>, <a href="http://gedmin.as">Marius Gedminas</a> and all at <a href="http://accu.org/index.php/aboutus/aboutjournals">CVu</a> for their help with this article.</p>
 <hr />
-
-
-<h3><a href="#toc8" name="toc-end" id="toc-end">@ end</a></h3>
-<p>Other languages also lay claim the to the term &#8220;decorator&#8221;, and indeed use of the <code>@</code> symbol for this purpose. For example, a statically-typed language such as C++ can utilise the <a href="http://en.wikipedia.org/wiki/Decorator_pattern">Decorator</a> pattern to adapt objects at runtime: the classic example would be a window in a graphical user interface, which may be dynamically decorated with (combinations of) borders, scroll-bars, and so on.
-</p>
-<p>Java makes special use of the <code>@</code> symbol in its annotations, a language feature related to Python&#8217;s decorators. You&#8217;ll also find the <code>@</code> symbol  used in Java comments, where it augments the code without changing its runtime-behaviour, enabling the <a href="http://java.sun.com/j2se/javadoc" title="Javadoc is a tool from Sun Microsystems for generating API documentation in HTML format from doc comments in source code">Javadoc</a> tool to generate better documentation. I&#8217;ve seen this idea stretched further by the <a href="http://xdoclet.sourceforge.net" title="XDoclet is an open source code generation engine.">XDoclet</a> family of tools which perform tag-based tricks on Javadoc-style comments in order to generate boiler-plate code &#8212; though in this case my response is closer to bewilderment than wonder.
-</p>
-<p>Elevating the concept of decoration further brings us to aspect-oriented programming, a paradigm which provides language/framework support for the separation of concerns &#8212; and if that sounds like a collection of buzzwords, it&#8217;s because I don&#8217;t know anything about it!
-</p>
-<p>For some readers, Python&#8217;s ability to tamper with classes and functions in ways unforeseen by their original implementer may seem dangerous, and I regard this a fair reaction. I&#8217;ve heard it argued that languages like Java and C++ are better suited for large projects, primarily because such languages simply don&#8217;t allow you to write code such as <code>change_everything(world)</code> &#8212; which is really what <code>echo_module(module)</code> does.
-</p>
-<p>Meta-programming techniques like these need taste and restraint. As we&#8217;ve shown, in Python, the <code>@</code> symbol is pure syntactic sugar; sweet as it may seem, we should use it to improve, not impair.
-</p>
-<p><hr />
-   <a href="#fn1link" id="footnote1">[1]</a>
-   Strictly speaking, the default arguments aren&#8217;t &#8220;passed&#8221; to the function; they&#8217;re stored by the function object when the function code is parsed.
-</p>
-<p><a href="#fn2link" id="footnote2">[2]</a>
-   I suspect that inside this rather contorted function a simpler version is begging to get out. I&#8217;d be pleased to accept any suggestions.
-</p>
+<h3 id="end">@ end</h3>
+<p>Other languages also lay claim the to the term &#8220;decorator&#8221;, and indeed use of the <code>@</code> symbol for this purpose. For example, a statically-typed language such as C++ can utilise the <a href="http://en.wikipedia.org/wiki/Decorator_pattern">Decorator</a> pattern to adapt objects at runtime: the classic example would be a window in a graphical user interface, which may be dynamically decorated with (combinations of) borders, scroll-bars, and so on.</p>
+<p>Java makes special use of the <code>@</code> symbol in its annotations, a language feature related to Python&#8217;s decorators. You&#8217;ll also find the <code>@</code> symbol  used in Java comments, where it augments the code without changing its runtime-behaviour, enabling the <a href="http://java.sun.com/j2se/javadoc" title="Javadoc is a tool from Sun Microsystems for generating API documentation in HTML format from doc comments in source code">Javadoc</a> tool to generate better documentation. I&#8217;ve seen this idea stretched further by the <a href="http://xdoclet.sourceforge.net" title="XDoclet is an open source code generation engine.">XDoclet</a> family of tools which perform tag-based tricks on Javadoc-style comments in order to generate boiler-plate code &#8212; though in this case my response is closer to bewilderment than wonder.</p>
+<p>Elevating the concept of decoration further brings us to aspect-oriented programming, a paradigm which provides language/framework support for the separation of concerns &#8212; and if that sounds like a collection of buzzwords, it&#8217;s because I don&#8217;t know anything about it!</p>
+<p>For some readers, Python&#8217;s ability to tamper with classes and functions in ways unforeseen by their original implementer may seem dangerous, and I regard this a fair reaction. I&#8217;ve heard it argued that languages like Java and C++ are better suited for large projects, primarily because such languages simply don&#8217;t allow you to write code such as <code>change_everything(world)</code> &#8212; which is really what <code>echo_module(module)</code> does.</p>
+<p>Meta-programming techniques like these need taste and restraint. As we&#8217;ve shown, in Python, the <code>@</code> symbol is pure syntactic sugar; sweet as it may seem, we should use it to improve, not impair.</p>
+<hr />
+<p><a href="#fn1link" id="footnote1"><a href="https://blog.codeship.com/building-minimal-docker-containers-for-go-applications/">1</a></a>
+Strictly speaking, the default arguments aren&#8217;t &#8220;passed&#8221; to the function; they&#8217;re stored by the function object when the function code is parsed.</p>
+<p><a href="#fn2link" id="footnote2"><a href="http://devcenter.wercker.com/docs/quickstarts/advanced/building-minimal-containers-with-go">2</a></a>
+I suspect that inside this rather contorted function a simpler version is begging to get out. I&#8217;d be pleased to accept any suggestions.</p>
 </div>
 
 <div class="comments"><hr/><div id="disqus_thread"></div><script type="text/javascript" src="http://disqus.com/forums/wordaligned/embed.js"></script></div>

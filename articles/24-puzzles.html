@@ -26,12 +26,11 @@
       <div class="atomentry" id="24-puzzles">
 <h2 class="title"><a href="/articles/24-puzzles">24 Puzzles</a></h2>
 <p class="meta"><abbr class="published" title="2017-03-08">2017-03-08</abbr> &bull; <a href="/tag/puzzles" rel="tag">Puzzles</a>, <a href="/tag/python" rel="tag">Python</a> &bull; <a href="/articles/24-puzzles#disqus_thread">Comments</a></p>
-<p>On <a href="http://blog.plover.com">The Universe of Discourse</a> Mark Dominus discusses the classic <a href="http://blog.plover.com/math/24-puzzle.html">24 Puzzle</a>:
-</p>
-<blockquote><p>You are given a sequence of four digits, say 1, 2, 3, 4, and your job is to combine them with ordinary arithmetic operations (+, -, &times;, and &divide;) in any order to make a target number, typically 24. For example, with 1, 2, 3, 4, you can go with <code>((1+2)+3)&times;4=24</code> or with <code>4&times;((2&times;3)&times;1)=24</code>.
-</p>
-</blockquote><p>Here&#8217;s a solver for such puzzles. It uses <code>itertools</code> to generate possible expressions, <code>fractions</code> to get the arithmetic right, and <code>eval</code> to evaluate expressions. It&#8217;s limited to expressions formed from 4 numbers which means I don&#8217;t have to programmatically calculate different ways of parenthesising: there are only 5.
-</p>
+<p>On <a href="http://blog.plover.com">The Universe of Discourse</a> Mark Dominus discusses the classic <a href="http://blog.plover.com/math/24-puzzle.html">24 Puzzle</a>:</p>
+<blockquote>
+<p>You are given a sequence of four digits, say 1, 2, 3, 4, and your job is to combine them with ordinary arithmetic operations (+, -, &times;, and &divide;) in any order to make a target number, typically 24. For example, with 1, 2, 3, 4, you can go with <code>((1+2)+3)&times;4=24</code> or with <code>4&times;((2&times;3)&times;1)=24</code>.</p>
+</blockquote>
+<p>Here&#8217;s a solver for such puzzles. It uses <code>itertools</code> to generate possible expressions, <code>fractions</code> to get the arithmetic right, and <code>eval</code> to evaluate expressions. It&#8217;s limited to expressions formed from 4 numbers which means I don&#8217;t have to programmatically calculate different ways of parenthesising: there are only 5.</p>
 <div class="typocode">
 
 <pre class="prettyprint"># http://blog.plover.com/math/24-puzzle.html
@@ -42,35 +41,35 @@ import math
 from fractions import Fraction
 
 # Solve for 4 numbers only!
-N = 4
+N = 4 
 
 # So these are the only expression templates
 # where X is a number and @ is an operation
-templates = '''\
+templates = &#x27;&#x27;&#x27;\
 ((X @ X) @ X) @ X
 (X @ (X @ X)) @ X
 X @ ((X @ X) @ X)
 X @ (X @ (X @ X))
-(X @ X) @ (X @ X)'''.splitlines()
+(X @ X) @ (X @ X)&#x27;&#x27;&#x27;.splitlines()
 
 import itertools as its
 
 def defrac(s):
-    return re.compile(r'Fraction\((\d+)\)').sub(r'\1', s)
+    return re.compile(r&#x27;Fraction\((\d+)\)&#x27;).sub(r&#x27;\1&#x27;, s)
 
 def evaluate(nums, ops, template):
-    fracs = ('Fraction(%s)' % n for n in nums)
+    fracs = (&#x27;Fraction(%s)&#x27; % n for n in nums)
     ops = iter(ops)
-    expr = ''.join(next(fracs) if c == 'X' else
-                   next(ops) if c == '@' else c
+    expr = &#x27;&#x27;.join(next(fracs) if c == &#x27;X&#x27; else
+                   next(ops) if c == &#x27;@&#x27; else c
                    for c in template)
     try:
         return expr, eval(expr)
     except ZeroDivisionError:
-        return expr, None
+        return expr, None        
 
 def solve(spec, ops):
-    numbers = re.compile(r'\d+').findall(spec)
+    numbers = re.compile(r&#x27;\d+&#x27;).findall(spec)
     assert len(numbers) == N + 1
     result = Fraction(numbers.pop())
     seqs = its.product(its.permutations(numbers),
@@ -78,11 +77,11 @@ def solve(spec, ops):
                        templates)
     print(defrac(next((e for e, v in its.starmap(evaluate, seqs)
                        if v == result),
-                      'Impossible')))
+                      &#x27;Impossible&#x27;)))
 
 def main():
-    solve('2,5,6,6 =&gt; 17', '+-/*')
-    solve('3,3,8,8 =&gt; 24', '+-/*')
+    solve(&#x27;2,5,6,6 =&gt; 17&#x27;, &#x27;+-/*&#x27;)
+    solve(&#x27;3,3,8,8 =&gt; 24&#x27;, &#x27;+-/*&#x27;)
 
 main()
 
@@ -90,8 +89,7 @@ main()
 
 </div>
 
-<p>Here&#8217;s a second attempt, which doesn&#8217;t assume there will just be 4 numbers on the left hand side of the equation. Given a sequence of numbers and a set of operators, it repeatedly reduces the sequence length by picking pair of numbers and combining them using one of the operators, iterating over all possible ways of doing this. The first sequence of length 1 which equals the target value gives a solution and terminates the search.
-</p>
+<p>Here&#8217;s a second attempt, which doesn&#8217;t assume there will just be 4 numbers on the left hand side of the equation. Given a sequence of numbers and a set of operators, it repeatedly reduces the sequence length by picking pair of numbers and combining them using one of the operators, iterating over all possible ways of doing this. The first sequence of length 1 which equals the target value gives a solution and terminates the search.</p>
 <div class="typocode">
 
 <pre class="prettyprint"># http://blog.plover.com/math/24-puzzle.html
@@ -104,10 +102,10 @@ def pick2(xs):
     return ((p[:2], p[2:]) for p in its.permutations(xs))
 
 def allow(op, l, r):
-    return op != '/' or eval(r) != 0
+    return op != &#x27;/&#x27; or eval(r) != 0
 
 def apply(op, l, r):
-    return '(%s%s%s)'%(l, op, r)
+    return &#x27;(%s%s%s)&#x27;%(l, op, r)
 
 def values(xs, ops):
     L = [xs]
@@ -121,13 +119,13 @@ def values(xs, ops):
                      if allow(op, *lr))
 
 def solve(spec, ops):
-    numbers = ['Fraction(%s)'%n for n in re.compile(r'\d+').findall(spec)]
+    numbers = [&#x27;Fraction(%s)&#x27;%n for n in re.compile(r&#x27;\d+&#x27;).findall(spec)]
     target = eval(numbers.pop())
-    print(next((v for v in values(numbers, ops) if eval(v) == target), 'Impossible'))
+    print(next((v for v in values(numbers, ops) if eval(v) == target), &#x27;Impossible&#x27;))
 
 def main():
-    solve('2,5,6,6 =&gt; 17', '+-/*')
-    solve('3,3,8,8 =&gt; 24', '+-/*')
+    solve(&#x27;2,5,6,6 =&gt; 17&#x27;, &#x27;+-/*&#x27;)
+    solve(&#x27;3,3,8,8 =&gt; 24&#x27;, &#x27;+-/*&#x27;)
 
 main()
 

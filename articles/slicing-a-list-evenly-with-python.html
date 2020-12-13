@@ -26,18 +26,14 @@
       <div class="atomentry" id="slicing-a-list-evenly-with-python">
 <h2 class="title"><a href="/articles/slicing-a-list-evenly-with-python">Slicing a list evenly with Python</a></h2>
 <p class="meta"><abbr class="published" title="2017-05-14">2017-05-14</abbr> &bull; <a href="/tag/python" rel="tag">Python</a> &bull; <a href="/articles/slicing-a-list-evenly-with-python#disqus_thread">Comments</a></p>
-<img src="/images/sliced-python.jpg" alt="Sliced Python"/>
-
-<p>Here&#8217;s a problem I came up against recently.
-</p>
-<p>The task was to chop a list into exactly <code>n</code> evenly slized chunks. To give a little more context, let&#8217;s suppose we want to divide a list of jobs equally between <code>n</code> workers, where <code>n</code> might be the number of CPU cores available.
-</p>
-<p>We can build the result by repeatedly slicing the input:
-</p>
+<p><img src="/images/sliced-python.jpg" alt="Sliced Python"/></p>
+<p>Here&#8217;s a problem I came up against recently.</p>
+<p>The task was to chop a list into exactly <code>n</code> evenly slized chunks. To give a little more context, let&#8217;s suppose we want to divide a list of jobs equally between <code>n</code> workers, where <code>n</code> might be the number of CPU cores available.</p>
+<p>We can build the result by repeatedly slicing the input:</p>
 <div class="typocode">
 
 <pre class="prettyprint">def chunk(xs, n):
-    '''Split the list, xs, into n chunks'''
+    &#x27;&#x27;&#x27;Split the list, xs, into n chunks&#x27;&#x27;&#x27;
     L = len(xs)
     assert 0 &lt; n &lt;= L
     s = L//n
@@ -47,40 +43,36 @@
 
 </div>
 
-<p>This looks promising
-</p>
+<p>This looks promising</p>
 <div class="typocode">
 
-<pre class="prettyprint">&gt;&gt;&gt; chunk('abcdefghi', 3)
-['abc', 'def', 'ghi']
+<pre class="prettyprint">&gt;&gt;&gt; chunk(&#x27;abcdefghi&#x27;, 3)
+[&#x27;abc&#x27;, &#x27;def&#x27;, &#x27;ghi&#x27;]
 
 </pre>
 
 </div>
 
-<p>but if the size of the list is not an exact multiple of <code>n</code>, the result won&#8217;t contain <strong>exactly</strong> <code>n</code> chunks.
-</p>
+<p>but if the size of the list is not an exact multiple of <code>n</code>, the result won&#8217;t contain <strong>exactly</strong> <code>n</code> chunks.</p>
 <div class="typocode">
 
-<pre class="prettyprint">&gt;&gt;&gt; chunk('abcde', 3)
-['a', 'b', 'c', 'd', 'e']
-&gt;&gt;&gt; chunk('abcdefgh', 3)
-['ab', 'cd', 'ef', 'gh']
-&gt;&gt;&gt; chunk('abcdefghij', 3)
-['abc', 'def', 'ghi', 'j']
+<pre class="prettyprint">&gt;&gt;&gt; chunk(&#x27;abcde&#x27;, 3)
+[&#x27;a&#x27;, &#x27;b&#x27;, &#x27;c&#x27;, &#x27;d&#x27;, &#x27;e&#x27;]
+&gt;&gt;&gt; chunk(&#x27;abcdefgh&#x27;, 3)
+[&#x27;ab&#x27;, &#x27;cd&#x27;, &#x27;ef&#x27;, &#x27;gh&#x27;]
+&gt;&gt;&gt; chunk(&#x27;abcdefghij&#x27;, 3)
+[&#x27;abc&#x27;, &#x27;def&#x27;, &#x27;ghi&#x27;, &#x27;j&#x27;]
 
 </pre>
 
 </div>
 
-<p>(By the way, I&#8217;m using strings rather than lists in the examples. The code works equally well for both types, and strings make it slightly easier to see what&#8217;s going on.)
-</p>
-<p>One way to fix the problem is to group the final chunks together.
-</p>
+<p>(By the way, I&#8217;m using strings rather than lists in the examples. The code works equally well for both types, and strings make it slightly easier to see what&#8217;s going on.)</p>
+<p>One way to fix the problem is to group the final chunks together.</p>
 <div class="typocode">
 
 <pre class="prettyprint">def chunk(xs, n):
-    '''Split the list, xs, into n chunks'''
+    &#x27;&#x27;&#x27;Split the list, xs, into n chunks&#x27;&#x27;&#x27;
     L = len(xs)
     assert 0 &lt; n &lt;= L
     s, r = divmod(L, n)
@@ -92,29 +84,26 @@
 
 </div>
 
-<p>Now we have exactly <code>n</code> chunks, but they may not be evenly sized, since the last chunk gets padded with any surplus.
-</p>
+<p>Now we have exactly <code>n</code> chunks, but they may not be evenly sized, since the last chunk gets padded with any surplus.</p>
 <div class="typocode">
 
-<pre class="prettyprint">&gt;&gt;&gt; chunk('abcde', 3)
-['a', 'b', 'cde']
-&gt;&gt;&gt; chunk('abcdefgh', 3)
-['ab', 'cd', 'efgh']
-&gt;&gt;&gt; chunk('abcdefghij', 3)
-['abc', 'def', 'ghij']
+<pre class="prettyprint">&gt;&gt;&gt; chunk(&#x27;abcde&#x27;, 3)
+[&#x27;a&#x27;, &#x27;b&#x27;, &#x27;cde&#x27;]
+&gt;&gt;&gt; chunk(&#x27;abcdefgh&#x27;, 3)
+[&#x27;ab&#x27;, &#x27;cd&#x27;, &#x27;efgh&#x27;]
+&gt;&gt;&gt; chunk(&#x27;abcdefghij&#x27;, 3)
+[&#x27;abc&#x27;, &#x27;def&#x27;, &#x27;ghij&#x27;]
 
 </pre>
 
 </div>
 
-<p>What does &#8220;evenly sized&#8221; actually mean? Loosely speaking, we want the resulting chunks as closely sized as possible.
-</p>
-<p>More precisely, if the result of dividing the length of the list <code>L</code> by the number of chunks <code>n</code> gives a size <code>s</code> with remainder <code>r</code>, then the function should return <code>r</code> chunks of size <code>s+1</code> and <code>n-r</code> chunks of size <code>s</code>. There are <a href="https://en.wikipedia.org/wiki/Combination">choose(n, r)</a> ways of doing this. Here&#8217;s a solution which puts the longer chunks to the front of the results.
-</p>
+<p>What does &#8220;evenly sized&#8221; actually mean? Loosely speaking, we want the resulting chunks as closely sized as possible.</p>
+<p>More precisely, if the result of dividing the length of the list <code>L</code> by the number of chunks <code>n</code> gives a size <code>s</code> with remainder <code>r</code>, then the function should return <code>r</code> chunks of size <code>s+1</code> and <code>n-r</code> chunks of size <code>s</code>. There are <a href="https://en.wikipedia.org/wiki/Combination">choose(n, r)</a> ways of doing this. Here&#8217;s a solution which puts the longer chunks to the front of the results.</p>
 <div class="typocode">
 
 <pre class="prettyprint">def chunk(xs, n):
-    '''Split the list, xs, into n evenly sized chunks'''
+    &#x27;&#x27;&#x27;Split the list, xs, into n evenly sized chunks&#x27;&#x27;&#x27;
     L = len(xs)
     assert 0 &lt; n &lt;= L
     s, r = divmod(L, n)
@@ -126,8 +115,7 @@
 
 </div>
 
-<p>Here&#8217;s a second implementation, this time using <code>itertools</code>. Chaining <code>r</code> copies of <code>s+1</code> and <code>n-r</code> copies of <code>s</code> gives us the <code>n</code> chunk widths. Accumulating the widths gives us the list offsets for slicing &#8212; though note we need to prepend an initial <code>0</code>. Now we can form a <a href="/articles/zippy-triples-served-with-python">(this, next) pair of iterators</a> over the offsets, and the result is the accumulation of repeated <code>(begin, end)</code> slices taken from the original list.
-</p>
+<p>Here&#8217;s a second implementation, this time using <code>itertools</code>. Chaining <code>r</code> copies of <code>s+1</code> and <code>n-r</code> copies of <code>s</code> gives us the <code>n</code> chunk widths. Accumulating the widths gives us the list offsets for slicing &#8212; though note we need to prepend an initial <code>0</code>. Now we can form a <a href="/articles/zippy-triples-served-with-python">(this, next) pair of iterators</a> over the offsets, and the result is the accumulation of repeated <code>(begin, end)</code> slices taken from the original list.</p>
 <div class="typocode">
 
 <pre class="prettyprint">from itertools import accumulate, chain, repeat, tee
@@ -146,31 +134,29 @@ def chunk(xs, n):
 
 </div>
 
-<p>This version does something sensible in the case when the number of slices, <code>n</code>, exceeds the length of the list.
-</p>
+<p>This version does something sensible in the case when the number of slices, <code>n</code>, exceeds the length of the list.</p>
 <div class="typocode">
 
-<pre class="prettyprint">&gt;&gt;&gt; chunk('ab', 5)
-['a', 'b', '', '', '']
+<pre class="prettyprint">&gt;&gt;&gt; chunk(&#x27;ab&#x27;, 5)
+[&#x27;a&#x27;, &#x27;b&#x27;, &#x27;&#x27;, &#x27;&#x27;, &#x27;&#x27;]
 
 </pre>
 
 </div>
 
-<p>Finally, some tests.
-</p>
+<p>Finally, some tests.</p>
 <div class="typocode">
 
 <pre class="prettyprint">def test_chunk():
-    assert chunk('', 1) == ['']
-    assert chunk('ab', 2) == ['a', 'b']
-    assert chunk('abc', 2) == ['ab', 'c']
-    
+    assert chunk(&#x27;&#x27;, 1) == [&#x27;&#x27;]
+    assert chunk(&#x27;ab&#x27;, 2) == [&#x27;a&#x27;, &#x27;b&#x27;]
+    assert chunk(&#x27;abc&#x27;, 2) == [&#x27;ab&#x27;, &#x27;c&#x27;]
+
     xs = list(range(8))
     assert chunk(xs, 2) == [[0, 1, 2, 3], [4, 5, 6, 7]]
     assert chunk(xs, 3) == [[0, 1, 2], [3, 4, 5], [6, 7]]
     assert chunk(xs, 5) == [[0, 1], [2, 3], [4, 5], [6], [7]]
-    
+
     rs = range(1000000)
     assert chunk(rs, 2) == [range(500000), range(500000, 1000000)]
 

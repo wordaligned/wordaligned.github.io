@@ -28,14 +28,13 @@
       <div class="atomentry" id="sugar-pie">
 <h2 class="title"><a href="/articles/sugar-pie">Sugar Pie</a></h2>
 <p class="meta"><abbr class="published" title="2008-03-06">2008-03-06</abbr> &bull; <a href="/tag/python" rel="tag">Python</a>, <a href="/tag/streams" rel="tag">Streams</a>, <a href="/tag/algorithms" rel="tag">Algorithms</a>, <a href="/tag/puzzles" rel="tag">Puzzles</a> &bull; <a href="/articles/sugar-pie#disqus_thread">Comments</a></p>
-<p><strong>Question:</strong> in the code snippet bleow, what does the result stream, <code>rs</code>, approximate?
-</p>
+<p><strong>Question:</strong> in the code snippet bleow, what does the result stream, <code>rs</code>, approximate?</p>
 <div class="typocode">
 
 <pre class="prettyprint">from itertools import count, ifilter, izip
 from random import random as xy
 from math import hypot
-    
+
 pt = lambda: (xy(), xy())
 on = ifilter(lambda n: hypot(*pt()) &lt; 1., count(1))
 rs = (4. * j / i for i, j in izip(on, count(1)))
@@ -44,17 +43,13 @@ rs = (4. * j / i for i, j in izip(on, count(1)))
 
 </div>
 
-<p>The code isn&#8217;t wilfully obscure but I&#8217;ll admit it&#8217;s unusual. Although written in a functional style, the source of the stream, <code>pt</code>, is utterly impure, generating a sequence of random results: it sprinkles points in a unit square. Despite this random input the results stream always tends to the same value. Well, in theory it should!
-</p>
-<p>Here&#8217;s a picture of a round pie on a square baking tray being dusted with sugar.    <br />
-</p>
-<img alt="Dusting a pie" src="/images/sugar-pie.gif"/>
-
+<p>The code isn&#8217;t wilfully obscure but I&#8217;ll admit it&#8217;s unusual. Although written in a functional style, the source of the stream, <code>pt</code>, is utterly impure, generating a sequence of random results: it sprinkles points in a unit square. Despite this random input the results stream always tends to the same value. Well, in theory it should!</p>
+<p>Here&#8217;s a picture of a round pie on a square baking tray being dusted with sugar.    </p>
+<p><img alt="Dusting a pie" src="/images/sugar-pie.gif"/></p>
 <p>Thanks again to <a href="http://gedmin.as">Marius Gedminas</a> for pointing me at
-   <code>math.hypot</code>, the best way to find the length of a 2D vector. (The
-   previous version of this note used <code>abs(complex(*pt())</code>, which it
-   claimed to be better than <code>math.sqrt(x * x + y * y)</code>).
-</p>
+<code>math.hypot</code>, the best way to find the length of a 2D vector. (The
+previous version of this note used <code>abs(complex(*pt())</code>, which it
+claimed to be better than <code>math.sqrt(x * x + y * y)</code>).</p>
 </div>
 
 <div class="comments"><hr/><div id="disqus_thread"></div><script type="text/javascript" src="http://disqus.com/forums/wordaligned/embed.js"></script></div>

@@ -26,16 +26,11 @@
       <div class="atomentry" id="steady-on-subversion">
 <h2 class="title"><a href="/articles/steady-on-subversion">Steady on Subversion</a></h2>
 <p class="meta"><abbr class="published" title="2009-10-13">2009-10-13</abbr> &bull; <a href="/tag/subversion" rel="tag">Subversion</a> &bull; <a href="/articles/steady-on-subversion#disqus_thread">Comments</a></p>
-<p><a href="http://subversion.tigris.org"><img src="http://subversion.tigris.org/images/subversion_logo_hor-468x64.png" width="468px" height="64px" alt="Subversion banner"/></a>
-</p>
-
-<h3>My secret shame</h3>
-<p>In a world of distributed version control systems I&#8217;m ashamed to confess I still use <a href="http://subversion.tigris.org">Subversion</a>. We use it at work, exclusively. I use it at home, by default. Worse still, in a small way, I help promote and perpetuate this antiquated version control system: if you want to <a href="http://www.google.com/search?q=mirror+subversion+repository">mirror a Subversion repository</a> or set up a <a href="http://www.google.com/search?q=subversion+pre-commit+hook">Subversion pre-commit hook</a>, you may well find some faded notes I wrote on these subjects.
-</p>
-<p>Whisper the words. <span style="font-size:8px">I still like Subversion.</span>
-</p>
-<p>What do I like most? The command to revert a change. Merge it backwards.
-</p>
+<p><a href="http://subversion.tigris.org"><img src="http://subversion.tigris.org/images/subversion_logo_hor-468x64.png" width="468px" height="64px" alt="Subversion banner"/></a></p>
+<h3 id="my-secret-shame">My secret shame</h3>
+<p>In a world of distributed version control systems I&#8217;m ashamed to confess I still use <a href="http://subversion.tigris.org">Subversion</a>. We use it at work, exclusively. I use it at home, by default. Worse still, in a small way, I help promote and perpetuate this antiquated version control system: if you want to <a href="http://www.google.com/search?q=mirror+subversion+repository">mirror a Subversion repository</a> or set up a <a href="http://www.google.com/search?q=subversion+pre-commit+hook">Subversion pre-commit hook</a>, you may well find some faded notes I wrote on these subjects.</p>
+<p>Whisper the words. <span style="font-size:8px">I still like Subversion.</span></p>
+<p>What do I like most? The command to revert a change. Merge it backwards.</p>
 <div class="typocode">
 
 <pre class="prettyprint">$ svn merge --change -666
@@ -44,54 +39,34 @@
 
 </div>
 
-<p>Branches and tags are one and the same. For someone who grew up with <a href="http://www.nongnu.org/cvs/">CVS</a>, that&#8217;s quite a relief. Anyone can grasp the versioned file tree model. No one wants their version control system to surprise them. My boss, who doesn&#8217;t get to program as much as he&#8217;d like, has discovered a <a href="http://versionsapp.com/">shiny Subversion client</a> &#8212; and he doesn&#8217;t even use Windows. The sales team, who do use Windows, can use Subversion to collaborate on their office documents. <a href="http://tortoisesvn.tigris.org/">TortoiseSVN</a> interfaces to the Word diff tool, a nice touch. And software developers can surely find stable Subversion plug-ins for whatever tools they use.
-</p>
-<p>The <a href="http://svnbook.red-bean.com/">Subversion documentation</a> is solid and has been for some while. I&#8217;m surprised anyone ever arrives at my website <a href="/tag/subversion/">seeking tips</a>, but arrive they do, and in ever-increasing numbers.
-</p>
-<p>Subversion does enough. The hard parts of my job are deciding what software to write, writing it, and working as a team. <span id="excerpt0"/>Version control should be frictionless, the easy bit. Which it is.
-</p>
-<span id="continue-reading"/>
-
-<p>Of course Subversion has weak points. It should be faster (whee, see how <a href="http://git-scm.com">git</a> flies!) and merging can be irksome (improving on CVS wasn&#8217;t much of a target). But the biggest annoyance I&#8217;ve had with Subversion is caused by its ubiquity and its continuing upgrade trajectory. Somehow I&#8217;ve ended up accessing 1.4 and 1.5 format repositories on a machine which hosts 1.4, 1.5 and 1.6 clients in <code>/usr/local/bin</code>, <code>/usr/bin</code> and <code>/opt/local/bin</code>, not necessarily in that order. Silly me, I&#8217;m sorted now, I think, but I&#8217;d happily see Subversion go into maintenance mode. <span id="excerpt1"/>For managing change, give me stable software.
-</p>
-
-<h3>Do it the same, but better!</h3>
-<p>As mentioned at the start of this post, though, the world of version control has itself changed. Subversion represents evolution: by being a better CVS, it aimed to supplant its ancestor and become the VCS of choice for open source projects. CVS has indeed been supplanted, but true progress has come from the distributed version control revolution.
-</p>
-<p>We&#8217;ve been talking about a single, central source tree which develops in discrete steps. Everyone has a local working copy of the files in this tree, which they keep up to date, routinely merging changes back to base. Check out, check in. It <strong>is</strong> an easy model to understand, but in practice there can be problems. What happens when you can&#8217;t access the tree? Or when it gets pulled in different directions? Or when you lose track of who merged what where when? Now consider the distributed version control world, where the model extends to multiple trees. Everyone copies the entire repository as needed. Clone, merge.
-</p>
-<p>In this distributed world a project needn&#8217;t have a single, central repository<a id="fn1link" href="#fn1"><sup>[1]</sup></a>. What&#8217;s more, there is no single leading distributed version control system. As a result, open source projects are spoiled for choice.
-</p>
-<p><a href="http://git-scm.com/"><img src="/images/git-logo.png" alt="git logo"/></a><a href="http://bazaar-vcs.org/"><img src="http://bazaar-vcs.org/bzricons/bazaar-logo.png" alt="Bazaar logo"/></a><a href="http://mercurial.selenic.com"><img src="http://www.selenic.com/hg-logo/logo-droplets-100.png" alt="Mercurial logo"/></a><a href="http://www.darcs.net"><img src="http://www.darcs.net/logos/logo.png" alt="Darcs logo"/></a>
-</p>
-<p>The rise of the DVCS is a fascinating history, though one I&#8217;ve yet to directly engage with &#8212; unless you count the growing collection of DVCSes taking root on my hard disk (none of which shipped with my <a href="http://www.apple.com/macosx/" title="Snow Leopard">operating system</a>). I like the feel of <a href="http://git-scm.com">git</a>. Python will <a href="http://python.org/dev/peps/pep-0385/" title="PEP 385. Migrating from svn to Mercurial">migrate to mercurial</a>. For now, I&#8217;m staying put.
-</p>
-
-<h3>Definitive commentary</h3>
-<p><a href="http://www.red-bean.com/sussman/">Ben Collins-Sussman</a> is one of the original designers and developers of Subversion, and co-author of <a href="http://svnbook.red-bean.com/">Version Control with Subversion</a>. His essays on the changing field of version control make fine reading. A couple of years ago he wrote:
-</p>
-<blockquote><p>Today, Subversion has now gone from &#8220;cool subversive product&#8221; to &#8220;the default safe choice&#8221; for both 80% and 20% audiences. The 80% companies who were once using crappy version control (or no version control at all) are now blogging to one another &#8212; web developers giving &#8220;hot tips&#8221; to each other about using version control (and Subversion in particular) to manage their web sites at their small web-development shops. What was once new and hot to 20% people has finally trickled down to everyday-tool status among the 80%.
-</p>
-<p>The great irony here &#8230; is that Subversion was originally intended to subvert the open source world. It&#8217;s done that to a reasonable degree, but it&#8217;s proven far more subversive in the corporate world!
-</p>
-<p>&#8212; Ben Collins-Sussman, <a href="http://blog.red-bean.com/sussman/?p=79" title="Version Control and the 80%">Version Control and &#8220;the 80%&#8221;</a>, October 2007
-</p>
-</blockquote><p>In April last year he followed up with:
-</p>
-<blockquote><p>[&#8230;] we think that [Subversion] will probably be the &#8220;final&#8221; centralized system that gets written in the open source world &#8212; it represents the end-of-the-line for this model of code collaboration. 
-</p>
-<p>It will continue to be used for many years, but specifically it will gain huge mindshare in the corporate world, while (eventually) losing mindshare to distributed systems in the open-source arena &#8230; Subversion isn&#8217;t anywhere near &#8220;fading away&#8221;. Quite the opposite: its adoption is still growing quadratically in the corporate world, with no sign of slowing down. This is happening independently of open source trailblazers losing interest in it. It may end up becoming a mainly &#8220;corporate&#8221; open source project (that is, all development funded by corporations that depend on it), but that&#8217;s a fine way for a piece of mature software to settle down.
-</p>
-<p>&#8212; Ben Collins-Sussman, <a href="http://blog.red-bean.com/sussman/?p=90">Subversion&#8217;s Future</a>, April 2008
-</p>
+<p>Branches and tags are one and the same. For someone who grew up with <a href="http://www.nongnu.org/cvs/">CVS</a>, that&#8217;s quite a relief. Anyone can grasp the versioned file tree model. No one wants their version control system to surprise them. My boss, who doesn&#8217;t get to program as much as he&#8217;d like, has discovered a <a href="http://versionsapp.com/">shiny Subversion client</a> &#8212; and he doesn&#8217;t even use Windows. The sales team, who do use Windows, can use Subversion to collaborate on their office documents. <a href="http://tortoisesvn.tigris.org/">TortoiseSVN</a> interfaces to the Word diff tool, a nice touch. And software developers can surely find stable Subversion plug-ins for whatever tools they use.</p>
+<p>The <a href="http://svnbook.red-bean.com/">Subversion documentation</a> is solid and has been for some while. I&#8217;m surprised anyone ever arrives at my website <a href="/tag/subversion/">seeking tips</a>, but arrive they do, and in ever-increasing numbers.</p>
+<p>Subversion does enough. The hard parts of my job are deciding what software to write, writing it, and working as a team. <span id="excerpt0"/>Version control should be frictionless, the easy bit. Which it is.</p>
+<p><span id="continue-reading"/></p>
+<p>Of course Subversion has weak points. It should be faster (whee, see how <a href="http://git-scm.com">git</a> flies!) and merging can be irksome (improving on CVS wasn&#8217;t much of a target). But the biggest annoyance I&#8217;ve had with Subversion is caused by its ubiquity and its continuing upgrade trajectory. Somehow I&#8217;ve ended up accessing 1.4 and 1.5 format repositories on a machine which hosts 1.4, 1.5 and 1.6 clients in <code>/usr/local/bin</code>, <code>/usr/bin</code> and <code>/opt/local/bin</code>, not necessarily in that order. Silly me, I&#8217;m sorted now, I think, but I&#8217;d happily see Subversion go into maintenance mode. <span id="excerpt1"/>For managing change, give me stable software.</p>
+<h3 id="do-it-the-same-but-better">Do it the same, but better!</h3>
+<p>As mentioned at the start of this post, though, the world of version control has itself changed. Subversion represents evolution: by being a better CVS, it aimed to supplant its ancestor and become the VCS of choice for open source projects. CVS has indeed been supplanted, but true progress has come from the distributed version control revolution.</p>
+<p>We&#8217;ve been talking about a single, central source tree which develops in discrete steps. Everyone has a local working copy of the files in this tree, which they keep up to date, routinely merging changes back to base. Check out, check in. It <strong>is</strong> an easy model to understand, but in practice there can be problems. What happens when you can&#8217;t access the tree? Or when it gets pulled in different directions? Or when you lose track of who merged what where when? Now consider the distributed version control world, where the model extends to multiple trees. Everyone copies the entire repository as needed. Clone, merge.</p>
+<p>In this distributed world a project needn&#8217;t have a single, central repository<a id="fn1link" href="#fn1"><sup><a href="https://blog.codeship.com/building-minimal-docker-containers-for-go-applications/">1</a></sup></a>. What&#8217;s more, there is no single leading distributed version control system. As a result, open source projects are spoiled for choice.</p>
+<p><a href="http://git-scm.com/"><img src="/images/git-logo.png" alt="git logo"/></a><a href="http://bazaar-vcs.org/"><img src="http://bazaar-vcs.org/bzricons/bazaar-logo.png" alt="Bazaar logo"/></a><a href="http://mercurial.selenic.com"><img src="http://www.selenic.com/hg-logo/logo-droplets-100.png" alt="Mercurial logo"/></a><a href="http://www.darcs.net"><img src="http://www.darcs.net/logos/logo.png" alt="Darcs logo"/></a></p>
+<p>The rise of the DVCS is a fascinating history, though one I&#8217;ve yet to directly engage with &#8212; unless you count the growing collection of DVCSes taking root on my hard disk (none of which shipped with my <a href="http://www.apple.com/macosx/" title="Snow Leopard">operating system</a>). I like the feel of <a href="http://git-scm.com">git</a>. Python will <a href="http://python.org/dev/peps/pep-0385/" title="PEP 385. Migrating from svn to Mercurial">migrate to mercurial</a>. For now, I&#8217;m staying put.</p>
+<h3 id="definitive-commentary">Definitive commentary</h3>
+<p><a href="http://www.red-bean.com/sussman/">Ben Collins-Sussman</a> is one of the original designers and developers of Subversion, and co-author of <a href="http://svnbook.red-bean.com/">Version Control with Subversion</a>. His essays on the changing field of version control make fine reading. A couple of years ago he wrote:</p>
+<blockquote>
+<p>Today, Subversion has now gone from &#8220;cool subversive product&#8221; to &#8220;the default safe choice&#8221; for both 80% and 20% audiences. The 80% companies who were once using crappy version control (or no version control at all) are now blogging to one another &#8212; web developers giving &#8220;hot tips&#8221; to each other about using version control (and Subversion in particular) to manage their web sites at their small web-development shops. What was once new and hot to 20% people has finally trickled down to everyday-tool status among the 80%.</p>
+<p>The great irony here &#8230; is that Subversion was originally intended to subvert the open source world. It&#8217;s done that to a reasonable degree, but it&#8217;s proven far more subversive in the corporate world!</p>
+<p>&#8212; Ben Collins-Sussman, <a href="http://blog.red-bean.com/sussman/?p=79" title="Version Control and the 80%">Version Control and &#8220;the 80%&#8221;</a>, October 2007</p>
 </blockquote>
-<h3>Long live Subversion</h3>
-<p>Ben Collins-Sussman backs up his essay with <a href="http://subversion.tigris.org/images/svn-dav-securityspace-survey.png">a graph</a> showing the increasing numbers of Apache Subversion servers discoverable on the internet. His claims square with my personal experience. I&#8217;m a corporate Subversion user and I don&#8217;t see my employer switching version control systems any time soon (it&#8217;s my decision as much as anyone&#8217;s). What&#8217;s more, Subversion is used in most of the companies I know of, where it has supplanted both legacy and proprietary systems. As stated already, version control isn&#8217;t the hard part of my job, but should I ever need to change jobs, Subversion won&#8217;t stand in my way.
-</p>
+<p>In April last year he followed up with:</p>
+<blockquote>
+<p>[&#8230;] we think that [Subversion] will probably be the &#8220;final&#8221; centralized system that gets written in the open source world &#8212; it represents the end-of-the-line for this model of code collaboration. </p>
+<p>It will continue to be used for many years, but specifically it will gain huge mindshare in the corporate world, while (eventually) losing mindshare to distributed systems in the open-source arena &#8230; Subversion isn&#8217;t anywhere near &#8220;fading away&#8221;. Quite the opposite: its adoption is still growing quadratically in the corporate world, with no sign of slowing down. This is happening independently of open source trailblazers losing interest in it. It may end up becoming a mainly &#8220;corporate&#8221; open source project (that is, all development funded by corporations that depend on it), but that&#8217;s a fine way for a piece of mature software to settle down.</p>
+<p>&#8212; Ben Collins-Sussman, <a href="http://blog.red-bean.com/sussman/?p=90">Subversion&#8217;s Future</a>, April 2008</p>
+</blockquote>
+<h3 id="long-live-subversion">Long live Subversion</h3>
+<p>Ben Collins-Sussman backs up his essay with <a href="http://subversion.tigris.org/images/svn-dav-securityspace-survey.png">a graph</a> showing the increasing numbers of Apache Subversion servers discoverable on the internet. His claims square with my personal experience. I&#8217;m a corporate Subversion user and I don&#8217;t see my employer switching version control systems any time soon (it&#8217;s my decision as much as anyone&#8217;s). What&#8217;s more, Subversion is used in most of the companies I know of, where it has supplanted both legacy and proprietary systems. As stated already, version control isn&#8217;t the hard part of my job, but should I ever need to change jobs, Subversion won&#8217;t stand in my way.</p>
 <hr />
-
-<p><a id="fn1" href="#fn1link">[1]</a>: A project may well choose to nominate a single central repository as the &#8220;master&#8221; repository. The functionality offered by distributed version control systems is effectively a superset of that offered by centralised ones.
-</p>
+<p><a id="fn1" href="#fn1link"><a href="https://blog.codeship.com/building-minimal-docker-containers-for-go-applications/">1</a></a>: A project may well choose to nominate a single central repository as the &#8220;master&#8221; repository. The functionality offered by distributed version control systems is effectively a superset of that offered by centralised ones.</p>
 </div>
 
 <div class="comments"><hr/><div id="disqus_thread"></div><script type="text/javascript" src="http://disqus.com/forums/wordaligned/embed.js"></script></div>

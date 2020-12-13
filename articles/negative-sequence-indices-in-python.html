@@ -26,10 +26,8 @@
       <div class="atomentry" id="negative-sequence-indices-in-python">
 <h2 class="title"><a href="/articles/negative-sequence-indices-in-python">Negative Sequence Indices in Python</a></h2>
 <p class="meta"><abbr class="published" title="2016-08-01">2016-08-01</abbr> &bull; <a href="/tag/python" rel="tag">Python</a>, <a href="/tag/c++" rel="tag">C++</a> &bull; <a href="/articles/negative-sequence-indices-in-python#disqus_thread">Comments</a></p>
-<p>Supply a negative index when accessing a sequence and Python counts back from the end. So, for example, <code>my_list[-2]</code> is the penultimate element of <code>my_list</code>, which is much better than <code>my_list[len(my_list)-2]</code> or even <code>*(++my_list.rbegin())</code>.
-</p>
-<p>That final example uses one of C++&#8217;s reverse iterators. It gets the penultimate element of a collection by advancing an iterator from the reversed beginning of that collection. If you&#8217;re addicted to negative indices you <strong>can</strong> use them with C++ arrays, sort of.
-</p>
+<p>Supply a negative index when accessing a sequence and Python counts back from the end. So, for example, <code>my_list[-2]</code> is the penultimate element of <code>my_list</code>, which is much better than <code>my_list[len(my_list)-2]</code> or even <code>*(++my_list.rbegin())</code>.</p>
+<p>That final example uses one of C++&#8217;s reverse iterators. It gets the penultimate element of a collection by advancing an iterator from the reversed beginning of that collection. If you&#8217;re addicted to negative indices you <strong>can</strong> use them with C++ arrays, sort of.</p>
 <div class="typocode"><div class="codetitle">Negative array indices in C++</div>
 
 <pre class="prettyprint">#include &lt;iostream&gt;
@@ -38,7 +36,7 @@ int main()
 {
     char const * domain = "wordaligned.org";
     char const * end = domain + strlen(domain);
-    std::cout &lt;&lt; end[-3] &lt;&lt; end[-2] &lt;&lt; end[-1] &lt;&lt; '\n';
+    std::cout &lt;&lt; end[-3] &lt;&lt; end[-2] &lt;&lt; end[-1] &lt;&lt; &#x27;\n&#x27;;
     return 0;
 }
 
@@ -46,23 +44,20 @@ int main()
 
 </div>
 
-<p>Compiling and running this program outputs the string &#8220;org&#8221;.
-</p>
-<p>Going back to Python, the valid indices into a sequence of length <code>L</code> are <code>-L</code>, <code>-L+1</code>, &#8230; , <code>0</code>, <code>1</code>, &#8230; <code>L-1</code>. Whenever you write code to calculate an index used for accessing a sequence, and especially if you&#8217;re catching any resulting <code>IndexError</code>s, it&#8217;s worth checking if the result of the calculation can be negative, and if &#8212; in this case &#8212; you really do want the from-the-back indexing behaviour.
-</p>
+<p>Compiling and running this program outputs the string &#8220;org&#8221;.</p>
+<p>Going back to Python, the valid indices into a sequence of length <code>L</code> are <code>-L</code>, <code>-L+1</code>, &#8230; , <code>0</code>, <code>1</code>, &#8230; <code>L-1</code>. Whenever you write code to calculate an index used for accessing a sequence, and especially if you&#8217;re catching any resulting <code>IndexError</code>s, it&#8217;s worth checking if the result of the calculation can be negative, and if &#8212; in this case &#8212; you really do want the from-the-back indexing behaviour.</p>
 <div><div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;">&nbsp;</div><div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;">&nbsp;</div><div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;">&nbsp;</div><div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;">&nbsp;</div><div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;">0</div><div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;">1</div><div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;">2</div><div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;">3</div><div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;">4</div><div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;">5</div><div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;">6</div><div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;">7</div><div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;">8</div><div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;">9</div><div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;">10</div><div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;">11</div><div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;">12</div><div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;">13</div><div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;">&hellip;</div></div>
 <div><div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;">&nbsp;</div><div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;">&nbsp;</div><div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;">&nbsp;</div><div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;">&nbsp;</div><div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;">W</div><div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;">O</div><div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;">R</div><div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;">D</div><div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;">A</div><div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;">L</div><div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;">I</div><div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;">G</div><div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;">N</div><div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;">E</div><div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;">D</div><div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;">&nbsp;</div><div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;">&nbsp;</div><div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;">&nbsp;</div><div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;">&nbsp;</div></div>
 <div><div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;">&hellip;</div><div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;">-14</div><div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;">-13</div><div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;">-12</div><div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;">-11</div><div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;">-10</div><div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;">-9</div><div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;">-8</div><div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;">-7</div><div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;">-6</div><div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;">-5</div><div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;">-4</div><div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;">-3</div><div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;">-2</div><div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;">-1</div><div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;">&nbsp;</div><div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;">&nbsp;</div><div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;">&nbsp;</div><div style="line-height: 30px;font-family: monospace;text-align:center;border: 1px solid black;width: 30px;height:30px;display:inline-block;">&nbsp;</div></div>
 
-<p>The power of negative indices increases with slicing. Take a slice of a sequence by supplying begin and end indices.
-</p>
+<p>The power of negative indices increases with slicing. Take a slice of a sequence by supplying begin and end indices.</p>
 <div class="typocode">
 
-<pre class="prettyprint">&gt;&gt;&gt; domain = 'wordaligned.org'
+<pre class="prettyprint">&gt;&gt;&gt; domain = &#x27;wordaligned.org&#x27;
 &gt;&gt;&gt; domain[4:9]
-'align'
+&#x27;align&#x27;
 &gt;&gt;&gt; domain[4:-4]
-'aligned'
+&#x27;aligned&#x27;
 &gt;&gt;&gt; digits = list(range(10))
 &gt;&gt;&gt; digits
 [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
@@ -75,14 +70,13 @@ int main()
 
 </div>
 
-<p>Omitting an index defaults it to the end of the sequence. Omit both indices and both ends of the sequence are defaulted, giving a sliced copy.
-</p>
+<p>Omitting an index defaults it to the end of the sequence. Omit both indices and both ends of the sequence are defaulted, giving a sliced copy.</p>
 <div class="typocode">
 
 <pre class="prettyprint">&gt;&gt;&gt; domain[-3:]
-'org'
+&#x27;org&#x27;
 &gt;&gt;&gt; domain[:4]
-'word'
+&#x27;word&#x27;
 &gt;&gt;&gt; digits[:]
 [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 
@@ -90,10 +84,8 @@ int main()
 
 </div>
 
-<p>I prefer the <code>list(digits)</code> form for copying <code>digits</code> but you should certainly be familiar with the <code>digits[:]</code> version.
-</p>
-<p>You can supply any indices as slice limits, even ones which wouldn&#8217;t be valid for item access. Imagine laying your sequence out on an indexed chopping board, slicing it at the specified points, then taking whatever lies between these points.
-</p>
+<p>I prefer the <code>list(digits)</code> form for copying <code>digits</code> but you should certainly be familiar with the <code>digits[:]</code> version.</p>
+<p>You can supply any indices as slice limits, even ones which wouldn&#8217;t be valid for item access. Imagine laying your sequence out on an indexed chopping board, slicing it at the specified points, then taking whatever lies between these points.</p>
 <div class="typocode">
 
 <pre class="prettyprint">&gt;&gt;&gt; digits[-1000000]
@@ -111,8 +103,7 @@ IndexError: list index out of range
 
 </div>
 
-<p>Sequence slicing also takes a step parameter.
-</p>
+<p>Sequence slicing also takes a step parameter.</p>
 <div class="typocode">
 
 <pre class="prettyprint">&gt;&gt;&gt; digits[::2]
@@ -124,8 +115,7 @@ IndexError: list index out of range
 
 </div>
 
-<p>This parameter too can be negative. The sign of the step affects which limiting values the <code>begin</code> and <code>end</code> slice parameters default to. It&#8217;s subtle behaviour, but you soon get used to it.
-</p>
+<p>This parameter too can be negative. The sign of the step affects which limiting values the <code>begin</code> and <code>end</code> slice parameters default to. It&#8217;s subtle behaviour, but you soon get used to it.</p>
 <div class="typocode">
 
 <pre class="prettyprint">&gt;&gt;&gt; digits[0:10:-2]
@@ -139,21 +129,18 @@ IndexError: list index out of range
 
 </div>
 
-<p>How do you reverse a string? Slice it back to front!
-</p>
+<p>How do you reverse a string? Slice it back to front!</p>
 <div class="typocode">
 
 <pre class="prettyprint">&gt;&gt;&gt; domain[::-1]
-'gro.dengiladrow'
+&#x27;gro.dengiladrow&#x27;
 
 </pre>
 
 </div>
 
-<p>To recap: the default slice limits are the start and end of the sequence, <code>0</code> and <code>-1</code>, or <code>-1</code> and <code>0</code> if the step is negative. The default step is <code>1</code> whichever way round the limits are. When slicing, <code>s[i:j:k]</code>, <code>i</code> and <code>j</code> may take any integer value, and <code>k</code> can take any integer value <strong>except</strong> <code>0</code>.
-</p>
-<p>The zero value creates another interesting edge case. Here&#8217;s a function to return the last <code>n</code> items of a sequence.
-</p>
+<p>To recap: the default slice limits are the start and end of the sequence, <code>0</code> and <code>-1</code>, or <code>-1</code> and <code>0</code> if the step is negative. The default step is <code>1</code> whichever way round the limits are. When slicing, <code>s[i:j:k]</code>, <code>i</code> and <code>j</code> may take any integer value, and <code>k</code> can take any integer value <strong>except</strong> <code>0</code>.</p>
+<p>The zero value creates another interesting edge case. Here&#8217;s a function to return the last <code>n</code> items of a sequence.</p>
 <div class="typocode">
 
 <pre class="prettyprint">&gt;&gt;&gt; def tail(xs, n)
@@ -164,8 +151,7 @@ IndexError: list index out of range
 
 </div>
 
-<p>It fails when <code>n</code> is <code>0</code>.
-</p>
+<p>It fails when <code>n</code> is <code>0</code>.</p>
 <div class="typocode">
 
 <pre class="prettyprint">&gt;&gt;&gt; tail(digits, 3)
@@ -181,8 +167,7 @@ IndexError: list index out of range
 
 </div>
 
-<p>By the way, we&#8217;ve already seen slicing working well with lists and strings. It also works nicely with range objects.
-</p>
+<p>By the way, we&#8217;ve already seen slicing working well with lists and strings. It also works nicely with range objects.</p>
 <div class="typocode">
 
 <pre class="prettyprint">&gt;&gt;&gt; r = range(10)

@@ -29,30 +29,26 @@
 <h2 class="title"><a href="/articles/a-python-syntax-highlighter">A Python syntax highlighter</a></h2>
 <p class="meta"><abbr class="published" title="2006-07-29">2006-07-29</abbr> &bull; <a href="/tag/ruby" rel="tag">Ruby</a>, <a href="/tag/python" rel="tag">Python</a>, <a href="/tag/web-applications" rel="tag">Web Applications</a> &bull; <a href="/articles/a-python-syntax-highlighter#disqus_thread">Comments</a></p>
 <p>In a <a href="/articles/my-test-first-ruby-program.html">recent post</a>
-   I described my first ever <a href="http://www.ruby-lang.org">Ruby</a> program &#8212; which
-   was actually a <a href="http://syntax.rubyforge.org/">syntax highlighter</a> for <a href="http://www.python.org">Python</a> and written
-   in <a href="http://www.ruby-lang.org">Ruby</a>, ready to be used in a <a href="http://www.typosphere.org">Typo web log</a>. Since the post
-   was rather a long one, I decided to post the code itself separately.
-   Here it is, then.
-</p>
-<span id="continue-reading"/>
-
-
-<h4>The Test Code</h4>
+I described my first ever <a href="http://www.ruby-lang.org">Ruby</a> program &#8212; which
+was actually a <a href="http://syntax.rubyforge.org/">syntax highlighter</a> for <a href="http://www.python.org">Python</a> and written
+in <a href="http://www.ruby-lang.org">Ruby</a>, ready to be used in a <a href="http://www.typosphere.org">Typo web log</a>. Since the post
+was rather a long one, I decided to post the code itself separately.
+Here it is, then.</p>
+<p><span id="continue-reading"/></p>
+<h4 id="the-test-code">The Test Code</h4>
 <p>As you can see, currently only comments, single- and triple- quoted
-   strings, keywords and identifiers are recognised. That&#8217;s really all I
-   wanted, for now. For completeness, I may well add support for numeric
-   literals.  Watch this space!
-</p>
+strings, keywords and identifiers are recognised. That&#8217;s really all I
+wanted, for now. For completeness, I may well add support for numeric
+literals.  Watch this space!</p>
 <div class="typocode"><div class="codetitle">typo/vendor/syntax/test/syntax/tc_python.rb</div>
 
 <pre class="prettyprint">require File.dirname(__FILE__) + "/tokenizer_testcase"
 
 class TC_Syntax_Python &lt; TokenizerTestCase
 
-syntax "python"
+  syntax "python"
 
-def test_empty
+  def test_empty
     tokenize ""
     assert_no_next_token
   end
@@ -69,28 +65,28 @@ def test_empty
     assert_next_token :comment, "# second comment"
   end
   def test_string
-    tokenize "'' 'aa' r'raw' u'unicode' UR''"
-    assert_next_token :string, "''"
+    tokenize "&#x27;&#x27; &#x27;aa&#x27; r&#x27;raw&#x27; u&#x27;unicode&#x27; UR&#x27;&#x27;"
+    assert_next_token :string, "&#x27;&#x27;"
     skip_token
-    assert_next_token :string, "'aa'"
+    assert_next_token :string, "&#x27;aa&#x27;"
     skip_token
-    assert_next_token :string, "r'raw'"
+    assert_next_token :string, "r&#x27;raw&#x27;"
     skip_token
-    assert_next_token :string, "u'unicode'"
+    assert_next_token :string, "u&#x27;unicode&#x27;"
     skip_token
-    assert_next_token :string, "UR''"
-    tokenize '"aa\"bb"'
-    assert_next_token :string, '"aa\"bb"'
+    assert_next_token :string, "UR&#x27;&#x27;"
+    tokenize &#x27;"aa\"bb"&#x27;
+    assert_next_token :string, &#x27;"aa\"bb"&#x27;
   end
   def test_triple_quoted_string
-    tokenize "'''\nfoo\n'''"
-    assert_next_token :triple_quoted_string, "'''\nfoo\n'''"
-    tokenize '"""\nfoo\n"""'
-    assert_next_token :triple_quoted_string, '"""\nfoo\n"""'
-    tokenize "uR'''\nfoo\n'''"
-    assert_next_token :triple_quoted_string, "uR'''\nfoo\n'''"
-    tokenize '"""\\'a\\'"b"c"""'
-    assert_next_token  :triple_quoted_string, '"""\\'a\\'"b"c"""'
+    tokenize "&#x27;&#x27;&#x27;\nfoo\n&#x27;&#x27;&#x27;"
+    assert_next_token :triple_quoted_string, "&#x27;&#x27;&#x27;\nfoo\n&#x27;&#x27;&#x27;"
+    tokenize &#x27;"""\nfoo\n"""&#x27;
+    assert_next_token :triple_quoted_string, &#x27;"""\nfoo\n"""&#x27;
+    tokenize "uR&#x27;&#x27;&#x27;\nfoo\n&#x27;&#x27;&#x27;"
+    assert_next_token :triple_quoted_string, "uR&#x27;&#x27;&#x27;\nfoo\n&#x27;&#x27;&#x27;"
+    tokenize &#x27;"""\\&#x27;a\\&#x27;"b"c"""&#x27;
+    assert_next_token  :triple_quoted_string, &#x27;"""\\&#x27;a\\&#x27;"b"c"""&#x27;
   end
   def test_keyword
     Syntax::Python::KEYWORDS.each do |word|
@@ -110,21 +106,20 @@ end
 
 </div>
 
-
-<h4>The Python Tokenizer</h4>
+<h4 id="the-python-tokenizer">The Python Tokenizer</h4>
 <div class="typocode"><div class="codetitle">typo/vendor/syntax/python.rb</div>
 
-<pre class="prettyprint">require 'syntax'
+<pre class="prettyprint">require &#x27;syntax&#x27;
 
 module Syntax
 
-# A basic tokenizer for the Python language. It recognises
+  # A basic tokenizer for the Python language. It recognises
   # comments, keywords and strings.
   class Python &lt; Tokenizer
     # The list of all identifiers recognized as keywords.
     # http://docs.python.org/ref/keywords.html
-    # Strictly speaking, "as" isn't yet a keyword -- but for syntax
-    # highlighting, we'll treat it as such.
+    # Strictly speaking, "as" isn&#x27;t yet a keyword -- but for syntax
+    # highlighting, we&#x27;ll treat it as such.
     KEYWORDS =
       %w{as and del for is raise assert elif from lambda return break
          else global not try class except if or while continue exec
@@ -133,9 +128,9 @@ module Syntax
     def step
       if scan(/#.*$/)
         start_group :comment, matched
-      elsif scan(/u?r?'''.*?'''|""".*?"""/im)
+      elsif scan(/u?r?&#x27;&#x27;&#x27;.*?&#x27;&#x27;&#x27;|""".*?"""/im)
         start_group :triple_quoted_string, matched
-      elsif scan(/u?r?'([^\\']|\\.)*'/i)
+      elsif scan(/u?r?&#x27;([^\\&#x27;]|\\.)*&#x27;/i)
         start_group :string, matched
       elsif scan(/u?r?"([^\\"]|\\.)*"/i)
         start_group :string, matched

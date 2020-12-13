@@ -28,21 +28,15 @@
       <div class="atomentry" id="fixing-header-file-dependencies">
 <h2 class="title"><a href="/articles/fixing-header-file-dependencies">Fixing header file dependencies</a></h2>
 <p class="meta"><abbr class="published" title="2008-07-02">2008-07-02</abbr> &bull; <a href="/tag/c++" rel="tag">C++</a>, <a href="/tag/c" rel="tag">C</a>, <a href="/tag/shell" rel="tag">Shell</a> &bull; <a href="/articles/fixing-header-file-dependencies#disqus_thread">Comments</a></p>
-<h3>DEPENDS</h3>
-<img src="/images/dependencies.png" alt="Dependencies"/>
-
-<p>Without care C++ header files can <a href="http://yosefk.com/c++fqa/defective.html#defect-3" title="Have you read the C++ FQA yet?">deteriorate</a>, so I was interested to find some sensible advice in the <a href="http://google-styleguide.googlecode.com/svn/trunk/cppguide.xml#names_and_Order_of_Includes" title="Google style guide advice on dependencies">Google C++ Style Guide</a>.
-</p>
+<h3 id="depends">DEPENDS</h3>
+<p><img src="/images/dependencies.png" alt="Dependencies"/></p>
+<p>Without care C++ header files can <a href="http://yosefk.com/c++fqa/defective.html#defect-3" title="Have you read the C++ FQA yet?">deteriorate</a>, so I was interested to find some sensible advice in the <a href="http://google-styleguide.googlecode.com/svn/trunk/cppguide.xml#names_and_Order_of_Includes" title="Google style guide advice on dependencies">Google C++ Style Guide</a>.</p>
 <blockquote><h4>Names and Orders of Includes</h4><p>Use standard order for readability and to avoid hidden dependencies: C library, C++ library, other libraries&#8217; <code>.h</code>, your project&#8217;s <code>.h</code>.</p><p>&#8230;</p><p>The preferred ordering reduces hidden dependencies. We want every header file to be compilable on its own. The easiest way to achieve this is to make sure that every one of them is the first <code>.h</code> file #included in some <code>.cc</code>.</p></blockquote>
 
-<p>I agree, hidden dependencies are bad, and I&#8217;m not about to quibble with the &#8220;standard order&#8221; defined by the <a href="http://google-styleguide.googlecode.com/svn/trunk/cppguide.xml">guide</a>, even if I&#8217;m used to a slightly different ordering. Certainly headers should be compilable on their own; but I suggest the easiest way to achieve this is, well, <strong>to compile them on their own</strong>. 
-</p>
-<span id="continue-reading"/>
-
-
-<h3>README</h3>
-<p>You don&#8217;t need a project file or even a makefile if you want to compile something. It&#8217;s easy to create a script which confirms a header has no hidden dependencies by including and compiling it<a id="fn1link" href="#fn1"><sup>[1]</sup></a>. Create a file called <code>check-header</code> and paste in the following:
-</p>
+<p>I agree, hidden dependencies are bad, and I&#8217;m not about to quibble with the &#8220;standard order&#8221; defined by the <a href="http://google-styleguide.googlecode.com/svn/trunk/cppguide.xml">guide</a>, even if I&#8217;m used to a slightly different ordering. Certainly headers should be compilable on their own; but I suggest the easiest way to achieve this is, well, <strong>to compile them on their own</strong>. </p>
+<p><span id="continue-reading"/></p>
+<h3 id="readme">README</h3>
+<p>You don&#8217;t need a project file or even a makefile if you want to compile something. It&#8217;s easy to create a script which confirms a header has no hidden dependencies by including and compiling it<a id="fn1link" href="#fn1"><sup><a href="https://blog.codeship.com/building-minimal-docker-containers-for-go-applications/">1</a></sup></a>. Create a file called <code>check-header</code> and paste in the following:</p>
 <div class="typocode"><div class="codetitle">check-header</div>
 
 <pre class="prettyprint">#!/bin/bash
@@ -55,8 +49,7 @@ EOF
 
 </div>
 
-<p>Make sure <code>check-header</code> is executable. Put it somewhere on your <code>PATH</code>. Export suitable <code>CPPFLAGS</code> for your codebase (here, I&#8217;m choosing to treat warnings as errors).
-</p>
+<p>Make sure <code>check-header</code> is executable. Put it somewhere on your <code>PATH</code>. Export suitable <code>CPPFLAGS</code> for your codebase (here, I&#8217;m choosing to treat warnings as errors).</p>
 <div class="typocode">
 
 <pre class="prettyprint">$ chmod a+x check-header
@@ -67,8 +60,7 @@ $ export CPPFLAGS="-Wall -Werror"
 
 </div>
 
-<p>Given a header file, <code>check-header</code> redirects a <a href="http://www.gnu.org/software/bash/manual/bashref.html#Redirections">here document</a> into a temporary source file. The source file contains a minimal C++ program which does nothing more than include the header. <code>Check-header</code> compiles that program. Compilation diagnostics, if any, appear on standard error. The exit status will be 0 if the header compiles cleanly, non-zero otherwise.
-</p>
+<p>Given a header file, <code>check-header</code> redirects a <a href="http://www.gnu.org/software/bash/manual/bashref.html#Redirections">here document</a> into a temporary source file. The source file contains a minimal C++ program which does nothing more than include the header. <code>Check-header</code> compiles that program. Compilation diagnostics, if any, appear on standard error. The exit status will be 0 if the header compiles cleanly, non-zero otherwise.</p>
 <div class="typocode">
 
 <pre class="prettyprint">$ check-header standalone.h
@@ -77,8 +69,8 @@ $ echo $?
 $ cat &gt; depends_on_x.h
 void f(X x);
 $ check-header depends_on_x.h
-depends_on_x.h:1: error: variable or field 'f' declared void
-depends_on_x.h:1: error: 'X' was not declared in this scope
+depends_on_x.h:1: error: variable or field &#x27;f&#x27; declared void
+depends_on_x.h:1: error: &#x27;X&#x27; was not declared in this scope
 $ echo $?
 1
 
@@ -86,10 +78,8 @@ $ echo $?
 
 </div>
 
-
-<h3>INSTALL</h3>
-<p>It gets tiresome to run this command on one header at a time. Happily we can use it in a compound command to check all the headers in the current directory<a id="fn2link" href="#fn2"><sup>[2]</sup></a>:
-</p>
+<h3 id="install">INSTALL</h3>
+<p>It gets tiresome to run this command on one header at a time. Happily we can use it in a compound command to check all the headers in the current directory<a id="fn2link" href="#fn2"><sup><a href="http://devcenter.wercker.com/docs/quickstarts/advanced/building-minimal-containers-with-go">2</a></sup></a>:</p>
 <div class="typocode">
 
 <pre class="prettyprint">$ for header in *.h; do check-header $header; done
@@ -98,8 +88,7 @@ $ echo $?
 
 </div>
 
-<p>Or on all headers beneath the current directory: 
-</p>
+<p>Or on all headers beneath the current directory: </p>
 <div class="typocode">
 
 <pre class="prettyprint">$ find . -name "*.h" | xargs -L 1 check-header
@@ -108,40 +97,28 @@ $ echo $?
 
 </div>
 
-<p>(The <code>-L 1</code> is required because <code>check-header</code> can only handle one file at a time.)
-</p>
-<p>Make this part of your overnight build, and you&#8217;ve got an easy way to monitor dependencies in header files.
-</p>
+<p>(The <code>-L 1</code> is required because <code>check-header</code> can only handle one file at a time.)</p>
+<p>Make this part of your overnight build, and you&#8217;ve got an easy way to monitor dependencies in header files.</p>
+<h3 id="bugs">BUGS</h3>
+<p>The script shown here is about the simplest thing which could possibly work. Just a single compiler is used, the temporary file name is hard-wired, no clean-up is done, there&#8217;s a dependency on the shell environment, diagnostics are limited, there isn&#8217;t even any command-line help. A grubby header can sneak past this script by using preprocessor defines for conditional compilation, and different (versions of) compilers will disagree on what&#8217;s clean. </p>
+<p>The truth is that I usually recreate this script and variants of it as and when required. My real intention is to demonstrate the rather obvious idea that we should <span id="excerpt0"/>use the compiler to detect compilation problems.</p>
+<h3 id="todo">TODO</h3>
+<p>Once your headers include all they depend on, maybe you&#8217;d like to tackle the flip side of the problem, of determining which includes they don&#8217;t or shouldn&#8217;t depend on. </p>
+<p>Can another <a href="http://google-styleguide.googlecode.com/svn/trunk/cppguide.xml#Header_File_Dependencies" title="Google Style Guide rule on dependency reduction">tip</a> from the Google Style Guide be automated?</p>
+<blockquote>
+<p>Use forward declarations to minimize use of <code>#include</code> in <code>.h</code> files.</p>
+<p>&#8230;</p>
+<p>You can significantly minimize the number of header files you need to include in your own header files by using forward declarations. For example, if your header file uses the <code>File</code> class in ways that do not require access to the declaration of the <code>File</code> class, your header file can just forward declare <code>class File;</code> instead of having to <code>#include "file/base/file.h"</code>.</p>
+</blockquote>
+<div class="amazon"><a href="http://www.amazon.com/gp/product/0321113586?ie=UTF8&amp;tag=wordalig-20"><img  src="/images/books/cpp-coding-standards.jpg" alt="Book cover"/></a></div>
 
-<h3>BUGS</h3>
-<p>The script shown here is about the simplest thing which could possibly work. Just a single compiler is used, the temporary file name is hard-wired, no clean-up is done, there&#8217;s a dependency on the shell environment, diagnostics are limited, there isn&#8217;t even any command-line help. A grubby header can sneak past this script by using preprocessor defines for conditional compilation, and different (versions of) compilers will disagree on what&#8217;s clean. 
-</p>
-<p>The truth is that I usually recreate this script and variants of it as and when required. My real intention is to demonstrate the rather obvious idea that we should <span id="excerpt0"/>use the compiler to detect compilation problems.
-</p>
-
-<h3>TODO</h3>
-<p>Once your headers include all they depend on, maybe you&#8217;d like to tackle the flip side of the problem, of determining which includes they don&#8217;t or shouldn&#8217;t depend on. 
-</p>
-<p>Can another <a href="http://google-styleguide.googlecode.com/svn/trunk/cppguide.xml#Header_File_Dependencies" title="Google Style Guide rule on dependency reduction">tip</a> from the Google Style Guide be automated?
-</p>
-<blockquote><p>Use forward declarations to minimize use of <code>#include</code> in <code>.h</code> files.
-</p>
-<p>&#8230;
-</p>
-<p> You can significantly minimize the number of header files you need to include in your own header files by using forward declarations. For example, if your header file uses the <code>File</code> class in ways that do not require access to the declaration of the <code>File</code> class, your header file can just forward declare <code>class File;</code> instead of having to <code>#include "file/base/file.h"</code>.
-</p>
-</blockquote><div class="amazon"><a href="http://www.amazon.com/gp/product/0321113586?ie=UTF8&amp;tag=wordalig-20"><img  src="/images/books/cpp-coding-standards.jpg" alt="Book cover"/></a></div>
-
-<p>I don&#8217;t think many of us would dispute this advice, though <a href="/articles/retro-fitting-coding-standards.html#tocask-the-experts">I&#8217;m not sure it belongs in a style guide</a> &#8212; it&#8217;s just good C++ practice, the stuff you should be getting <a href="http://www.amazon.com/gp/product/0321113586?ie=UTF8&amp;tag=wordalig-20" title="Amazon affiliates link to C++ Coding Standards by Sutter and Alexandrescu">from a book</a>. What I&#8217;d like is a refactoring tool which does it for me, something like Eclipse&#8217;s <a href="http://help.eclipse.org/ganymede/index.jsp?topic=/org.eclipse.jdt.doc.user/gettingStarted/qs-OrganizeImports.htm">&#8220;organize imports&#8221;</a>. A script might be able to do some of this, but it will have to be considerably more complex than <code>check-header</code>, and without access to the compiler internals it will be limited in power.
-</p>
+<p>I don&#8217;t think many of us would dispute this advice, though <a href="/articles/retro-fitting-coding-standards.html#tocask-the-experts">I&#8217;m not sure it belongs in a style guide</a> &#8212; it&#8217;s just good C++ practice, the stuff you should be getting <a href="http://www.amazon.com/gp/product/0321113586?ie=UTF8&amp;tag=wordalig-20" title="Amazon affiliates link to C++ Coding Standards by Sutter and Alexandrescu">from a book</a>. What I&#8217;d like is a refactoring tool which does it for me, something like Eclipse&#8217;s <a href="http://help.eclipse.org/ganymede/index.jsp?topic=/org.eclipse.jdt.doc.user/gettingStarted/qs-OrganizeImports.htm">&#8220;organize imports&#8221;</a>. A script might be able to do some of this, but it will have to be considerably more complex than <code>check-header</code>, and without access to the compiler internals it will be limited in power.</p>
 <hr />
-
-<p><a id="fn1" href="#fn1link">[1]</a> While writing this article I discovered <a href="http://gcc.gnu.org/">GCC</a> allows you to precompile header files, reducing the need to create even a minimal script like <code>check-header</code>. Running <code>gcc $CPPFLAGS header.h</code> generates <code>header.gch</code> for a valid and self-contained header file, and compiler diagnostics otherwise. As the <a href="http://gcc.gnu.org/onlinedocs/gcc/Precompiled-Headers.html">documentation</a> says:
-</p>
-<blockquote><p>There are many other possibilities, limited only by your imagination, good sense, and the constraints of your build system.
-</p>
-</blockquote><p><a id="fn2" href="#fn2link">[2]</a> It would be better to tweak <code>check-header</code> to work on a list of input files.
-</p>
+<p><a id="fn1" href="#fn1link"><a href="https://blog.codeship.com/building-minimal-docker-containers-for-go-applications/">1</a></a> While writing this article I discovered <a href="http://gcc.gnu.org/">GCC</a> allows you to precompile header files, reducing the need to create even a minimal script like <code>check-header</code>. Running <code>gcc $CPPFLAGS header.h</code> generates <code>header.gch</code> for a valid and self-contained header file, and compiler diagnostics otherwise. As the <a href="http://gcc.gnu.org/onlinedocs/gcc/Precompiled-Headers.html">documentation</a> says:</p>
+<blockquote>
+<p>There are many other possibilities, limited only by your imagination, good sense, and the constraints of your build system.</p>
+</blockquote>
+<p><a id="fn2" href="#fn2link"><a href="http://devcenter.wercker.com/docs/quickstarts/advanced/building-minimal-containers-with-go">2</a></a> It would be better to tweak <code>check-header</code> to work on a list of input files.</p>
 </div>
 
 <div class="comments"><hr/><div id="disqus_thread"></div><script type="text/javascript" src="http://disqus.com/forums/wordaligned/embed.js"></script></div>

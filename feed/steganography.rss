@@ -8,70 +8,65 @@
 <language>en-gb</language>
 <item>
 <title>Steganography made simple</title>
-<description>&lt;p&gt;&lt;a href="http://www.flickr.com/photos/thomasguest/3122529935/" title="What's hidden in this image?"&gt;&lt;img src="http://farm4.static.flickr.com/3264/3122529935_dfe6550cf6_o.png" width="294" height="450" alt="What's hidden in this image?" /&gt;&lt;/a&gt;
-&lt;/p&gt;
-&lt;p&gt;As programmers, our code should be readable, not cryptic; but sometimes it&amp;#8217;s fun to &lt;a href="http://svn.python.org/view/python/trunk/Lib/antigravity.py?rev=66902&amp;amp;view=markup" title="python3.0 -c 'import antigravity'"&gt;surprise&lt;/a&gt;, &lt;a href="http://www.ioccc.org/main.html"&gt;obfuscate&lt;/a&gt; or &lt;a href="http://en.wikipedia.org/wiki/Easter_egg_(media)"&gt;conceal&lt;/a&gt;. &lt;a href="http://en.wikipedia.org/wiki/Steganography"&gt;Wikipedia&lt;/a&gt; says:
-&lt;/p&gt;
-&lt;blockquote&gt;&lt;p&gt;&lt;a href="http://en.wikipedia.org/wiki/Steganography"&gt;Steganography&lt;/a&gt; is the art and science of writing hidden messages in such a way that no-one apart from the sender and intended recipient even realizes there &lt;em&gt;is&lt;/em&gt; a hidden message. By contrast, cryptography obscures the meaning of a message, but it does not conceal the fact that there &lt;em&gt;is&lt;/em&gt; a message.
-&lt;/p&gt;
-&lt;/blockquote&gt;&lt;p&gt;Lemon juice on paper never worked for me, and (as I discovered when I tried to devise a title for &lt;a href="http://wordaligned.org/articles/a-little-teaser.html"&gt;an earlier post&lt;/a&gt;) it&amp;#8217;s hard work hiding a text message as a pattern within a larger text message. Sadly my hair is too fine for Histiaeus&amp;#8217;s inspired shave-a-slave trick.
-&lt;/p&gt;
-&lt;p&gt;In a digital age, steganographers have it easier. The larger the carrier message the easier it is to disguise a payload within it. My mobile phone has a 3 megapixel camera; I could embed the entire text content of &lt;a href="http://wordaligned.org"&gt;this website&lt;/a&gt; (tarred and bzipped) within a single one of its photos without anyone noticing. The &lt;a href="http://en.wikipedia.org/wiki/Steganography"&gt;Wikipedia page on steganography&lt;/a&gt; has a remarkable example of a picture of a tree which, after some bit-shifting, turns into a passable picture of a cat!
-&lt;/p&gt;
-&lt;span id="continue-reading"/&gt;
+<description>&lt;p&gt;&lt;a href=&quot;http://www.flickr.com/photos/thomasguest/3122529935/&quot; title=&quot;What&#x27;s hidden in this image?&quot;&gt;&lt;img src=&quot;http://farm4.static.flickr.com/3264/3122529935_dfe6550cf6_o.png&quot; width=&quot;294&quot; height=&quot;450&quot; alt=&quot;What&#x27;s hidden in this image?&quot; /&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;As programmers, our code should be readable, not cryptic; but sometimes it&amp;#8217;s fun to &lt;a href=&quot;http://svn.python.org/view/python/trunk/Lib/antigravity.py?rev=66902&amp;amp;view=markup&quot; title=&quot;python3.0 -c &#x27;import antigravity&#x27;&quot;&gt;surprise&lt;/a&gt;, &lt;a href=&quot;http://www.ioccc.org/main.html&quot;&gt;obfuscate&lt;/a&gt; or &lt;a href=&quot;http://en.wikipedia.org/wiki/Easter_egg_(media)&quot;&gt;conceal&lt;/a&gt;. &lt;a href=&quot;http://en.wikipedia.org/wiki/Steganography&quot;&gt;Wikipedia&lt;/a&gt; says:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;a href=&quot;http://en.wikipedia.org/wiki/Steganography&quot;&gt;Steganography&lt;/a&gt; is the art and science of writing hidden messages in such a way that no-one apart from the sender and intended recipient even realizes there &lt;em&gt;is&lt;/em&gt; a hidden message. By contrast, cryptography obscures the meaning of a message, but it does not conceal the fact that there &lt;em&gt;is&lt;/em&gt; a message.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;Lemon juice on paper never worked for me, and (as I discovered when I tried to devise a title for &lt;a href=&quot;http://wordaligned.org/articles/a-little-teaser.html&quot;&gt;an earlier post&lt;/a&gt;) it&amp;#8217;s hard work hiding a text message as a pattern within a larger text message. Sadly my hair is too fine for Histiaeus&amp;#8217;s inspired shave-a-slave trick.&lt;/p&gt;
+&lt;p&gt;In a digital age, steganographers have it easier. The larger the carrier message the easier it is to disguise a payload within it. My mobile phone has a 3 megapixel camera; I could embed the entire text content of &lt;a href=&quot;http://wordaligned.org&quot;&gt;this website&lt;/a&gt; (tarred and bzipped) within a single one of its photos without anyone noticing. The &lt;a href=&quot;http://en.wikipedia.org/wiki/Steganography&quot;&gt;Wikipedia page on steganography&lt;/a&gt; has a remarkable example of a picture of a tree which, after some bit-shifting, turns into a passable picture of a cat!&lt;/p&gt;
+&lt;p&gt;&lt;span id=&quot;continue-reading&quot;/&gt;&lt;/p&gt;
+&lt;p&gt;The &lt;a href=&quot;http://www.pythonware.com/products/pil/&quot;&gt;Python Imaging Library (PIL)&lt;/a&gt; makes tinkering with images a snip. Here&amp;#8217;s a short program to hide messages in images, and to reveal such messages. PIL isn&amp;#8217;t ready for Python 3.0 yet, so I&amp;#8217;m using 2.6. Note in passing the use of a couple of recent additions to my favourite module, &lt;a href=&quot;http://docs.python.org/library/itertools.html#itertools.product&quot;&gt;itertools.product&lt;/a&gt; and &lt;a href=&quot;http://docs.python.org/library/itertools.html#itertools.izip_longest&quot;&gt;itertools.izip_longest&lt;/a&gt;. &lt;/p&gt;
+&lt;div class=&quot;typocode&quot;&gt;&lt;div class=&quot;codetitle&quot;&gt;PIL steganography&lt;/div&gt;
 
-&lt;p&gt;The &lt;a href="http://www.pythonware.com/products/pil/"&gt;Python Imaging Library (PIL)&lt;/a&gt; makes tinkering with images a snip. Here&amp;#8217;s a short program to hide messages in images, and to reveal such messages. PIL isn&amp;#8217;t ready for Python 3.0 yet, so I&amp;#8217;m using 2.6. Note in passing the use of a couple of recent additions to my favourite module, &lt;a href="http://docs.python.org/library/itertools.html#itertools.product"&gt;itertools.product&lt;/a&gt; and &lt;a href="http://docs.python.org/library/itertools.html#itertools.izip_longest"&gt;itertools.izip_longest&lt;/a&gt;. 
-&lt;/p&gt;
-&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;PIL steganography&lt;/div&gt;
-
-&lt;pre class="prettyprint"&gt;'''Digital image steganography based on the Python Imaging Library (PIL)
+&lt;pre class=&quot;prettyprint&quot;&gt;&amp;#x27;&amp;#x27;&amp;#x27;Digital image steganography based on the Python Imaging Library (PIL)
 
 Any message can be hidden, provided the image is large enough. The message is
 packed into the least significant bits of the pixel colour bands. A 4 byte
 header (packed in the same way) carries the message payload length.
-'''
+&amp;#x27;&amp;#x27;&amp;#x27;
 import Image
 import itertools as its
 
 def n_at_a_time(items, n, fillvalue):
-    '''Returns an iterator which groups n items at a time.
-    
+    &amp;#x27;&amp;#x27;&amp;#x27;Returns an iterator which groups n items at a time.
+
     Any final partial tuple will be padded with the fillvalue
-    
-    &amp;gt;&amp;gt;&amp;gt; list(n_at_a_time([1, 2, 3, 4, 5], 2, 'X'))
-    [(1, 2), (3, 4), (5, 'X')]
-    '''
+
+    &amp;gt;&amp;gt;&amp;gt; list(n_at_a_time([1, 2, 3, 4, 5], 2, &amp;#x27;X&amp;#x27;))
+    [(1, 2), (3, 4), (5, &amp;#x27;X&amp;#x27;)]
+    &amp;#x27;&amp;#x27;&amp;#x27;
     it = iter(items)
     return its.izip_longest(*[it] * n, fillvalue=fillvalue)
 
 def biterator(data):
-    '''Returns a biterator over the input data.
-    
+    &amp;#x27;&amp;#x27;&amp;#x27;Returns a biterator over the input data.
+
     &amp;gt;&amp;gt;&amp;gt; list(biterator(chr(0b10110101)))
     [1, 0, 1, 1, 0, 1, 0, 1]
-    '''
+    &amp;#x27;&amp;#x27;&amp;#x27;
     return ((ord(ch) &amp;gt;&amp;gt; shift) &amp;amp; 1
-            for ch, shift in its.product(data, range(7, -1, -1)))
+            for ch, shift in its.product(data, range(7, -1, -1))) 
 
 def header(n):
-    '''Return n packed in a 4 byte string.'''
+    &amp;#x27;&amp;#x27;&amp;#x27;Return n packed in a 4 byte string.&amp;#x27;&amp;#x27;&amp;#x27;
     bytes = (chr(n &amp;gt;&amp;gt; s &amp;amp; 0xff) for s in range(24, -8, -8))
-    return ('%s' * 4) % tuple(bytes)
+    return (&amp;#x27;%s&amp;#x27; * 4) % tuple(bytes)
 
 def setlsb(cpt, bit):
-    '''Set least significant bit of a colour component.'''
+    &amp;#x27;&amp;#x27;&amp;#x27;Set least significant bit of a colour component.&amp;#x27;&amp;#x27;&amp;#x27;
     return cpt &amp;amp; ~1 | bit
 
 def hide_bits(pixel, bits):
-    '''Hide a bit in each pixel component, returning the resulting pixel.'''
+    &amp;#x27;&amp;#x27;&amp;#x27;Hide a bit in each pixel component, returning the resulting pixel.&amp;#x27;&amp;#x27;&amp;#x27;
     return tuple(its.starmap(setlsb, zip(pixel, bits)))
 
 def hide_bit(pixel, bit):
-    '''Similar to the above, but for single band images.'''
+    &amp;#x27;&amp;#x27;&amp;#x27;Similar to the above, but for single band images.&amp;#x27;&amp;#x27;&amp;#x27;
     return setlsb(pixel, bit[0])
 
 def unpack_lsbits_from_image(image):
-    '''Unpack least significant bits from image pixels.'''
+    &amp;#x27;&amp;#x27;&amp;#x27;Unpack least significant bits from image pixels.&amp;#x27;&amp;#x27;&amp;#x27;
     # Return depends on number of colour bands. See also hide_bit(s)
     if len(image.getbands()) == 1:
         return (px &amp;amp; 1 for px in image.getdata())
@@ -82,12 +77,12 @@ def call(f): # (Used to defer evaluation of f)
     return f()
 
 def disguise(image, data):
-    '''Disguise data by packing it into an image.
-    
+    &amp;#x27;&amp;#x27;&amp;#x27;Disguise data by packing it into an image.
+
     On success, the image is modified and returned to the caller.
     On failure, None is returned and the image is unchanged.
-    '''
-    payload = '%s%s' % (header(len(data)), data)
+    &amp;#x27;&amp;#x27;&amp;#x27;
+    payload = &amp;#x27;%s%s&amp;#x27; % (header(len(data)), data)
     npixels = image.size[0] * image.size[1]
     nbands = len(image.getbands())
     if len(payload) * 8 &amp;lt;= npixels * nbands:
@@ -99,7 +94,7 @@ def disguise(image, data):
         return image
 
 def reveal(image):
-    '''Returns any message disguised in the supplied image file, or None.'''
+    &amp;#x27;&amp;#x27;&amp;#x27;Returns any message disguised in the supplied image file, or None.&amp;#x27;&amp;#x27;&amp;#x27;
     bits = unpack_lsbits_from_image(image)
     def accum_bits(n):
         return reduce(lambda a, b: a &amp;lt;&amp;lt; 1 | b, its.islice(bits, n), 0)
@@ -109,32 +104,28 @@ def reveal(image):
     nbands = len(image.getbands())
     data_length = accum_bits(32)
     if npixels * nbands &amp;gt; 32 + data_length * 8:
-        return ''.join(its.imap(call, its.repeat(next_ch, data_length)))
+        return &amp;#x27;&amp;#x27;.join(its.imap(call, its.repeat(next_ch, data_length)))
 
-if __name__ == "__main__":
+if __name__ == &quot;__main__&quot;:
     import urllib
-    droste = urllib.urlopen("http://is.gd/cHqT").read()
-    open("droste.png", "wb").write(droste)
-    droste = Image.open("droste.png")
+    droste = urllib.urlopen(&quot;http://is.gd/cHqT&quot;).read()
+    open(&quot;droste.png&quot;, &quot;wb&quot;).write(droste)
+    droste = Image.open(&quot;droste.png&quot;)
     while droste:
         droste.show()
         droste = reveal(droste)
         if droste:
-            open("droste.png", "wb").write(droste)
-            droste = Image.open("droste.png")
+            open(&quot;droste.png&quot;, &quot;wb&quot;).write(droste)
+            droste = Image.open(&quot;droste.png&quot;)
 
 &lt;/pre&gt;
 
 &lt;/div&gt;
 
-&lt;p&gt;The code is available via anonymous SVN access at &lt;a href="http://svn.wordaligned.org/svn/etc/steganography"&gt;http://svn.wordaligned.org/svn/etc/steganography&lt;/a&gt;.
-&lt;/p&gt;
-&lt;p&gt;&amp;#x2621; For brevity, I haven&amp;#8217;t provided a nice user interface to &lt;code&gt;disguise()&lt;/code&gt; and &lt;code&gt;reveal()&lt;/code&gt;. The short main program is (intentionally) lightly obfuscated. &lt;code&gt;Disguise()&lt;/code&gt; modifies the supplied image argument &amp;#8212; use &lt;code&gt;Image.copy()&lt;/code&gt; if this is a problem. You must also choose a lossless format to save the disguised image: I recommend PNG, but please do check &lt;code&gt;reveal()&lt;/code&gt; works on any saved image.
-&lt;/p&gt;
+&lt;p&gt;The code is available via anonymous SVN access at &lt;a href=&quot;http://svn.wordaligned.org/svn/etc/steganography&quot;&gt;http://svn.wordaligned.org/svn/etc/steganography&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;&amp;#x2621; For brevity, I haven&amp;#8217;t provided a nice user interface to &lt;code&gt;disguise()&lt;/code&gt; and &lt;code&gt;reveal()&lt;/code&gt;. The short main program is (intentionally) lightly obfuscated. &lt;code&gt;Disguise()&lt;/code&gt; modifies the supplied image argument &amp;#8212; use &lt;code&gt;Image.copy()&lt;/code&gt; if this is a problem. You must also choose a lossless format to save the disguised image: I recommend PNG, but please do check &lt;code&gt;reveal()&lt;/code&gt; works on any saved image.&lt;/p&gt;
 &lt;hr /&gt;
-
-&lt;p&gt;&lt;a href="http://steike.com/code/useless/zip-file-quine/" title="Your perfect post, perhaps?"&gt;Keen on quines and cocoa?&lt;/a&gt;
-&lt;/p&gt;</description>
+&lt;p&gt;&lt;a href=&quot;http://steike.com/code/useless/zip-file-quine/&quot; title=&quot;Your perfect post, perhaps?&quot;&gt;Keen on quines and cocoa?&lt;/a&gt;&lt;/p&gt;</description>
 <dc:date>2008-12-30</dc:date>
 <guid>http://wordaligned.org/articles/steganography</guid>
 <author>tag@wordaligned.org (Thomas Guest)</author>
@@ -144,24 +135,16 @@ if __name__ == "__main__":
 
 <item>
 <title>What&#8217;s in the box?</title>
-<description>&lt;p&gt;Last week I posted &lt;a href="http://wordaligned.org/articles/a-little-teaser.html"&gt;a little teaser&lt;/a&gt; which hid a series of clues in and around the page&amp;#8217;s HTML and the referenced graphic. Thanks to everyone who joined in. Some of you said you learned something in the process, which is good; and &lt;a href="http://netpbm.sourceforge.net/"&gt;I did too&lt;/a&gt;, which is better!
-&lt;/p&gt;
-&lt;p&gt;Filip Salomonsson completed the treasure hunt first. Extra credits go to Robin Stocker for his &lt;a href="http://www.flickr.com/photos/thomasguest/3106269463/"&gt;Swiss version&lt;/a&gt;, &lt;a href="http://chneukirchen.org/"&gt;Christian Neukirchen&lt;/a&gt; for a solution which requires no programming, and to Shiar who spotted the answer at once but nevertheless followed the clues to the end! 
-&lt;/p&gt;
-&lt;p&gt;A full solution appears below, &lt;a href="http://fliptitle.com"&gt;ROT-180&amp;deg;&lt;/a&gt; encoded.
-&lt;/p&gt;
-&lt;p&gt;&lt;a href="http://wordaligned.org/articles/a-little-teaser.html"&gt;&lt;img src="http://wordaligned.org/images/top-row-flipped.png" alt="What's this? Answer below!"/&gt;&lt;/a&gt;
-&lt;/p&gt;
-&lt;div style="text-align:right;"&gt;&lt;p&gt;&amp;#x02D9;&amp;#x01DD;&amp;#x0279;&amp;#x01DD;&amp;#x0265; p&amp;#x01DD;&amp;#x028C;&amp;#x0131;&amp;#x0279;&amp;#x0279;&amp;#x0250; &amp;#x01DD;&amp;#x028C;,no&amp;#x028E; &amp;#x028D;ou&amp;#x029E; &amp;#x01DD;&amp;#x026F; &amp;#x0287;&amp;#x01DD;l o&amp;#x0287; &amp;#x0183;&amp;#x0279;o&amp;#x02D9;p&amp;#x01DD;u&amp;#x0183;&amp;#x0131;l&amp;#x0250;p&amp;#x0279;o&amp;#x028D;@s&amp;#x028E;&amp;#x01DD;&amp;#x029E;&amp;#x0287;l&amp;#x0250;:o&amp;#x0287;l&amp;#x0131;&amp;#x0250;&amp;#x026F; &amp;#x01DD;s&amp;#x0250;&amp;#x01DD;ld &amp;#x02D9;(-&amp;#x061B; p&amp;#x01DD;u&amp;#x0183;&amp;#x0131;l&amp;#x0250; p&amp;#x0279;o&amp;#x028D; o&amp;#x0287; uo&amp;#x0131;&amp;#x0287;d&amp;#x0131;&amp;#x0279;&amp;#x0254;sqns &amp;#x0183;uol&amp;#x01DD;&amp;#x025F;&amp;#x0131;l &amp;#x01DD;&amp;#x01DD;&amp;#x0279;&amp;#x025F; &amp;#x0250; s&amp;#x0131; &amp;#x01DD;z&amp;#x0131;&amp;#x0279;d &amp;#x0279;no&amp;#x028E; &amp;#x00A1;&amp;#x01DD;uop ll&amp;#x01DD;&amp;#x028D; &amp;#x02D9;&lt;a href="http://www.flickr.com/photos/thomasguest/3104398656/"&gt;&amp;#x01DD;&amp;#x0279;&amp;#x01DD;&amp;#x0265;&lt;/a&gt; s&amp;#x0279;&amp;#x01DD;&amp;#x0287;&amp;#x0254;&amp;#x0250;&amp;#x0279;&amp;#x0250;&amp;#x0265;&amp;#x0254; &amp;#x025F;o s&amp;#x028D;o&amp;#x0279; &amp;#x01DD;&amp;#x01DD;&amp;#x0279;&amp;#x0265;&amp;#x0287; ll&amp;#x0250; &amp;#x01DD;&amp;#x01DD;s u&amp;#x0250;&amp;#x0254; no&amp;#x028E; &amp;#x02D9;&amp;#x028E;&amp;#x01DD;&amp;#x029E; &amp;#x0287;l&amp;#x0250; &amp;#x01DD;&amp;#x0265;&amp;#x0287; u&amp;#x028D;op &amp;#x0183;u&amp;#x0131;plo&amp;#x0265; &amp;#x01DD;l&amp;#x0131;&amp;#x0265;&amp;#x028D; p&amp;#x0279;&amp;#x0250;oq&amp;#x028E;&amp;#x01DD;&amp;#x029E; &amp;#x028E;&amp;#x0287;&amp;#x0279;&amp;#x01DD;&amp;#x028D;b &amp;#x0254;&amp;#x0250;&amp;#x026F; &amp;#x01DD;ldd&amp;#x0250; u&amp;#x0250; uo s&amp;#x0279;&amp;#x01DD;&amp;#x0287;&amp;#x0254;&amp;#x0250;&amp;#x0279;&amp;#x0250;&amp;#x0265;&amp;#x0254; &amp;#x025F;o &amp;#x028D;o&amp;#x0279; do&amp;#x0287; &amp;#x01DD;&amp;#x0265;&amp;#x0287; u&amp;#x0131; &amp;#x01DD;d&amp;#x028E;&amp;#x0287; &amp;#8216;&amp;#x01DD;&amp;#x0183;&amp;#x0250;&amp;#x026F;&amp;#x0131; s&amp;#x0131;&amp;#x0265;&amp;#x0287; &amp;#x01DD;&amp;#x0287;&amp;#x0250;&amp;#x0279;&amp;#x01DD;u&amp;#x01DD;&amp;#x0183; o&amp;#x0287; :uo&amp;#x0131;&amp;#x0287;nlos&lt;/p&gt;&lt;p&gt;&amp;#x02D9;004 &amp;#x0254;- p&amp;#x0250;&amp;#x01DD;&amp;#x0265; | &amp;#x0183;ud&amp;#x02D9;&amp;#x028D;o&amp;#x0279;-do&amp;#x0287; &amp;#x0250;&amp;#x0265;dl&amp;#x0250;- &amp;#x026F;udo&amp;#x0287;&amp;#x0183;ud :&amp;#x0183;u&amp;#x0131;&amp;#x026F;&amp;#x026F;&amp;#x0250;&amp;#x0279;&amp;#x0183;o&amp;#x0279;d &amp;#x028E;u&amp;#x0250; &amp;#x0183;u&amp;#x0131;&amp;#x0279;&amp;#x0131;nb&amp;#x01DD;&amp;#x0279; &amp;#x0287;no&amp;#x0265;&amp;#x0287;&amp;#x0131;&amp;#x028D; &amp;#x0279;&amp;#x01DD;&amp;#x028D;su&amp;#x0250; &amp;#x01DD;&amp;#x0265;&amp;#x0287; s&amp;#x0287;&amp;#x01DD;&amp;#x0183; &amp;#x0265;&amp;#x0254;&amp;#x0131;&amp;#x0265;&amp;#x028D; &amp;#x026F;udo&amp;#x0287;&amp;#x0183;ud &amp;#x0287;&amp;#x0250; &amp;#x01DD;&amp;#x026F; p&amp;#x01DD;&amp;#x0287;u&amp;#x0131;od u&amp;#x01DD;&amp;#x0265;&amp;#x0254;&amp;#x0279;&amp;#x0131;&amp;#x029E;n&amp;#x01DD;u u&amp;#x0250;&amp;#x0131;&amp;#x0287;s&amp;#x0131;&amp;#x0279;&amp;#x0265;&amp;#x0254; &amp;#x02D9;s&amp;#x01DD;nl&amp;#x0250;&amp;#x028C; &amp;#x0250;&amp;#x0265;dl&amp;#x0250; &amp;#x01DD;&amp;#x0265;&amp;#x0287; &amp;#x0287;&amp;#x01DD;&amp;#x0183; o&amp;#x0287; &amp;#x0287;d&amp;#x0131;&amp;#x0279;&amp;#x0254;s &amp;#x01DD;ld&amp;#x026F;&amp;#x0131;s &amp;#x0250; &amp;#x01DD;&amp;#x0287;&amp;#x0131;&amp;#x0279;&amp;#x028D; o&amp;#x0287; &amp;#x028E;&amp;#x0279;&amp;#x0250;&amp;#x0279;q&amp;#x0131;l &amp;#x0183;u&amp;#x0131;&amp;#x0183;&amp;#x0250;&amp;#x026F;&amp;#x0131; uo&amp;#x0265;&amp;#x0287;&amp;#x028E;d &amp;#x01DD;&amp;#x0265;&amp;#x0287; p&amp;#x01DD;sn &amp;#x0131;&lt;/p&gt;&lt;p&gt;&amp;#x02D9;&amp;#x01DD;nl&amp;#x0254; &amp;#x0287;x&amp;#x01DD;u &amp;#x01DD;&amp;#x0265;&amp;#x0287; &amp;#x0287;no ll&amp;#x01DD;ds &amp;#x0183;ud s&amp;#x0131;&amp;#x0265;&amp;#x0287; &amp;#x025F;o &amp;#x028D;o&amp;#x0279; do&amp;#x0287; &amp;#x01DD;&amp;#x0265;&amp;#x0287; u&amp;#x0131; s&amp;#x01DD;nl&amp;#x0250;&amp;#x028C; &amp;#x0250;&amp;#x0265;dl&amp;#x0250; &amp;#x01DD;&amp;#x0265;&amp;#x0287; :s&amp;#x028E;&amp;#x0250;s &amp;#x0265;&amp;#x0254;&amp;#x0131;&amp;#x0265;&amp;#x028D; &amp;#8216;&amp;#x0287;u&amp;#x01DD;&amp;#x026F;&amp;#x026F;o&amp;#x0254; &amp;#x01DD;&amp;#x0265;&amp;#x0287; p&amp;#x0250;&amp;#x01DD;&amp;#x0279; o&amp;#x0287; &amp;#x0183;ud&amp;#x02D9;&amp;#x028D;o&amp;#x0279;-do&amp;#x0287; &amp;#x01DD;soq&amp;#x0279;&amp;#x01DD;&amp;#x028C;- &amp;#x028E;&amp;#x025F;&amp;#x0131;&amp;#x0287;u&amp;#x01DD;p&amp;#x0131; &amp;#x029E;&amp;#x0254;&amp;#x0131;&amp;#x0183;&amp;#x0250;&amp;#x026F;&amp;#x01DD;&amp;#x0183;&amp;#x0250;&amp;#x026F;&amp;#x0131; p&amp;#x01DD;sn &amp;#x0131; &amp;#x02D9;&amp;#x028E;ll&amp;#x0250;&amp;#x0254;ol &amp;#x0183;ud &amp;#x01DD;&amp;#x0265;&amp;#x0287; &amp;#x01DD;&amp;#x028C;&amp;#x0250;s&lt;/p&gt;&lt;p&gt;&amp;#x02D9;&amp;#x0183;ud &amp;#x01DD;&amp;#x0265;&amp;#x0287; &amp;#x025F;o &amp;#x029E;un&amp;#x0265;&amp;#x0254; &amp;#x0287;x&amp;#x0287;z &amp;#x01DD;&amp;#x0265;&amp;#x0287; u&amp;#x0131; &amp;#x0287;u&amp;#x01DD;&amp;#x026F;&amp;#x026F;o&amp;#x0254; &amp;#x01DD;&amp;#x0265;&amp;#x0287; p&amp;#x0250;&amp;#x01DD;&amp;#x0279; &amp;#8216;&amp;#x01DD;nl&amp;#x0254; &amp;#x0287;x&amp;#x01DD;u &amp;#x01DD;&amp;#x0265;&amp;#x0287; &amp;#x0279;o&amp;#x025F; :&amp;#x01DD;&amp;#x01DD;s ll,no&amp;#x028E; &amp;#x02D9;&amp;#x01DD;sno&amp;#x026F; &amp;#x0279;no&amp;#x028E; &amp;#x0183;u&amp;#x0131;sn &amp;#x0279;&amp;#x0250;q&amp;#x01DD;p&amp;#x0131;s &amp;#x01DD;&amp;#x0265;&amp;#x0287; &amp;#x0287;&amp;#x0254;&amp;#x01DD;l&amp;#x01DD;s&lt;/p&gt;&lt;p&gt;&amp;#x02D9;&amp;#x0279;&amp;#x0250;q&amp;#x01DD;p&amp;#x0131;s &amp;#x01DD;&amp;#x0265;&amp;#x0287; u&amp;#x0131; &amp;#x0287;x&amp;#x01DD;&amp;#x0287; &amp;#x01DD;&amp;#x0287;&amp;#x0131;&amp;#x0265;&amp;#x028D; uo &amp;#x01DD;&amp;#x0287;&amp;#x0131;&amp;#x0265;&amp;#x028D; &amp;#x01DD;&amp;#x0265;&amp;#x0287; &amp;#x0287;&amp;#x0265;&amp;#x0183;&amp;#x0131;l&amp;#x0265;&amp;#x0183;&amp;#x0131;&amp;#x0265; &amp;#8216;&amp;#x01DD;nl&amp;#x0254; &amp;#x0287;x&amp;#x01DD;u &amp;#x01DD;&amp;#x0265;&amp;#x0287; &amp;#x01DD;&amp;#x01DD;s o&amp;#x0287; :sp&amp;#x0250;&amp;#x01DD;&amp;#x0279; l&amp;#x026F;&amp;#x0287;&amp;#x0265; &amp;#x01DD;&amp;#x0265;&amp;#x0287; u&amp;#x0131; &amp;#x0287;u&amp;#x01DD;&amp;#x026F;&amp;#x026F;o&amp;#x0254; &amp;#x0250; &amp;#x02D9;xo&amp;#x025F;&amp;#x01DD;&amp;#x0279;&amp;#x0131;&amp;#x025F; uo n+l&amp;#x0279;&amp;#x0287;&amp;#x0254; (&amp;#x02D9;&amp;#x0183;&amp;#x02D9;&amp;#x01DD;) &amp;#x0183;u&amp;#x0131;sn l&amp;#x026F;&amp;#x0287;&amp;#x0265; &amp;#x01DD;&amp;#x0265;&amp;#x0287; &amp;#x028D;&amp;#x01DD;&amp;#x0131;&amp;#x028C;&lt;/p&gt;&lt;/div&gt;
+<description>&lt;p&gt;Last week I posted &lt;a href=&quot;http://wordaligned.org/articles/a-little-teaser.html&quot;&gt;a little teaser&lt;/a&gt; which hid a series of clues in and around the page&amp;#8217;s HTML and the referenced graphic. Thanks to everyone who joined in. Some of you said you learned something in the process, which is good; and &lt;a href=&quot;http://netpbm.sourceforge.net/&quot;&gt;I did too&lt;/a&gt;, which is better!&lt;/p&gt;
+&lt;p&gt;Filip Salomonsson completed the treasure hunt first. Extra credits go to Robin Stocker for his &lt;a href=&quot;http://www.flickr.com/photos/thomasguest/3106269463/&quot;&gt;Swiss version&lt;/a&gt;, &lt;a href=&quot;http://chneukirchen.org/&quot;&gt;Christian Neukirchen&lt;/a&gt; for a solution which requires no programming, and to Shiar who spotted the answer at once but nevertheless followed the clues to the end! &lt;/p&gt;
+&lt;p&gt;A full solution appears below, &lt;a href=&quot;http://fliptitle.com&quot;&gt;ROT-180&amp;deg;&lt;/a&gt; encoded.&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;http://wordaligned.org/articles/a-little-teaser.html&quot;&gt;&lt;img src=&quot;http://wordaligned.org/images/top-row-flipped.png&quot; alt=&quot;What&#x27;s this? Answer below!&quot;/&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;div style=&quot;text-align:right;&quot;&gt;&lt;p&gt;&amp;#x02D9;&amp;#x01DD;&amp;#x0279;&amp;#x01DD;&amp;#x0265; p&amp;#x01DD;&amp;#x028C;&amp;#x0131;&amp;#x0279;&amp;#x0279;&amp;#x0250; &amp;#x01DD;&amp;#x028C;,no&amp;#x028E; &amp;#x028D;ou&amp;#x029E; &amp;#x01DD;&amp;#x026F; &amp;#x0287;&amp;#x01DD;l o&amp;#x0287; &amp;#x0183;&amp;#x0279;o&amp;#x02D9;p&amp;#x01DD;u&amp;#x0183;&amp;#x0131;l&amp;#x0250;p&amp;#x0279;o&amp;#x028D;@s&amp;#x028E;&amp;#x01DD;&amp;#x029E;&amp;#x0287;l&amp;#x0250;:o&amp;#x0287;l&amp;#x0131;&amp;#x0250;&amp;#x026F; &amp;#x01DD;s&amp;#x0250;&amp;#x01DD;ld &amp;#x02D9;(-&amp;#x061B; p&amp;#x01DD;u&amp;#x0183;&amp;#x0131;l&amp;#x0250; p&amp;#x0279;o&amp;#x028D; o&amp;#x0287; uo&amp;#x0131;&amp;#x0287;d&amp;#x0131;&amp;#x0279;&amp;#x0254;sqns &amp;#x0183;uol&amp;#x01DD;&amp;#x025F;&amp;#x0131;l &amp;#x01DD;&amp;#x01DD;&amp;#x0279;&amp;#x025F; &amp;#x0250; s&amp;#x0131; &amp;#x01DD;z&amp;#x0131;&amp;#x0279;d &amp;#x0279;no&amp;#x028E; &amp;#x00A1;&amp;#x01DD;uop ll&amp;#x01DD;&amp;#x028D; &amp;#x02D9;&lt;a href=&quot;http://www.flickr.com/photos/thomasguest/3104398656/&quot;&gt;&amp;#x01DD;&amp;#x0279;&amp;#x01DD;&amp;#x0265;&lt;/a&gt; s&amp;#x0279;&amp;#x01DD;&amp;#x0287;&amp;#x0254;&amp;#x0250;&amp;#x0279;&amp;#x0250;&amp;#x0265;&amp;#x0254; &amp;#x025F;o s&amp;#x028D;o&amp;#x0279; &amp;#x01DD;&amp;#x01DD;&amp;#x0279;&amp;#x0265;&amp;#x0287; ll&amp;#x0250; &amp;#x01DD;&amp;#x01DD;s u&amp;#x0250;&amp;#x0254; no&amp;#x028E; &amp;#x02D9;&amp;#x028E;&amp;#x01DD;&amp;#x029E; &amp;#x0287;l&amp;#x0250; &amp;#x01DD;&amp;#x0265;&amp;#x0287; u&amp;#x028D;op &amp;#x0183;u&amp;#x0131;plo&amp;#x0265; &amp;#x01DD;l&amp;#x0131;&amp;#x0265;&amp;#x028D; p&amp;#x0279;&amp;#x0250;oq&amp;#x028E;&amp;#x01DD;&amp;#x029E; &amp;#x028E;&amp;#x0287;&amp;#x0279;&amp;#x01DD;&amp;#x028D;b &amp;#x0254;&amp;#x0250;&amp;#x026F; &amp;#x01DD;ldd&amp;#x0250; u&amp;#x0250; uo s&amp;#x0279;&amp;#x01DD;&amp;#x0287;&amp;#x0254;&amp;#x0250;&amp;#x0279;&amp;#x0250;&amp;#x0265;&amp;#x0254; &amp;#x025F;o &amp;#x028D;o&amp;#x0279; do&amp;#x0287; &amp;#x01DD;&amp;#x0265;&amp;#x0287; u&amp;#x0131; &amp;#x01DD;d&amp;#x028E;&amp;#x0287; &amp;#8216;&amp;#x01DD;&amp;#x0183;&amp;#x0250;&amp;#x026F;&amp;#x0131; s&amp;#x0131;&amp;#x0265;&amp;#x0287; &amp;#x01DD;&amp;#x0287;&amp;#x0250;&amp;#x0279;&amp;#x01DD;u&amp;#x01DD;&amp;#x0183; o&amp;#x0287; :uo&amp;#x0131;&amp;#x0287;nlos&lt;/p&gt;&lt;p&gt;&amp;#x02D9;004 &amp;#x0254;- p&amp;#x0250;&amp;#x01DD;&amp;#x0265; | &amp;#x0183;ud&amp;#x02D9;&amp;#x028D;o&amp;#x0279;-do&amp;#x0287; &amp;#x0250;&amp;#x0265;dl&amp;#x0250;- &amp;#x026F;udo&amp;#x0287;&amp;#x0183;ud :&amp;#x0183;u&amp;#x0131;&amp;#x026F;&amp;#x026F;&amp;#x0250;&amp;#x0279;&amp;#x0183;o&amp;#x0279;d &amp;#x028E;u&amp;#x0250; &amp;#x0183;u&amp;#x0131;&amp;#x0279;&amp;#x0131;nb&amp;#x01DD;&amp;#x0279; &amp;#x0287;no&amp;#x0265;&amp;#x0287;&amp;#x0131;&amp;#x028D; &amp;#x0279;&amp;#x01DD;&amp;#x028D;su&amp;#x0250; &amp;#x01DD;&amp;#x0265;&amp;#x0287; s&amp;#x0287;&amp;#x01DD;&amp;#x0183; &amp;#x0265;&amp;#x0254;&amp;#x0131;&amp;#x0265;&amp;#x028D; &amp;#x026F;udo&amp;#x0287;&amp;#x0183;ud &amp;#x0287;&amp;#x0250; &amp;#x01DD;&amp;#x026F; p&amp;#x01DD;&amp;#x0287;u&amp;#x0131;od u&amp;#x01DD;&amp;#x0265;&amp;#x0254;&amp;#x0279;&amp;#x0131;&amp;#x029E;n&amp;#x01DD;u u&amp;#x0250;&amp;#x0131;&amp;#x0287;s&amp;#x0131;&amp;#x0279;&amp;#x0265;&amp;#x0254; &amp;#x02D9;s&amp;#x01DD;nl&amp;#x0250;&amp;#x028C; &amp;#x0250;&amp;#x0265;dl&amp;#x0250; &amp;#x01DD;&amp;#x0265;&amp;#x0287; &amp;#x0287;&amp;#x01DD;&amp;#x0183; o&amp;#x0287; &amp;#x0287;d&amp;#x0131;&amp;#x0279;&amp;#x0254;s &amp;#x01DD;ld&amp;#x026F;&amp;#x0131;s &amp;#x0250; &amp;#x01DD;&amp;#x0287;&amp;#x0131;&amp;#x0279;&amp;#x028D; o&amp;#x0287; &amp;#x028E;&amp;#x0279;&amp;#x0250;&amp;#x0279;q&amp;#x0131;l &amp;#x0183;u&amp;#x0131;&amp;#x0183;&amp;#x0250;&amp;#x026F;&amp;#x0131; uo&amp;#x0265;&amp;#x0287;&amp;#x028E;d &amp;#x01DD;&amp;#x0265;&amp;#x0287; p&amp;#x01DD;sn &amp;#x0131;&lt;/p&gt;&lt;p&gt;&amp;#x02D9;&amp;#x01DD;nl&amp;#x0254; &amp;#x0287;x&amp;#x01DD;u &amp;#x01DD;&amp;#x0265;&amp;#x0287; &amp;#x0287;no ll&amp;#x01DD;ds &amp;#x0183;ud s&amp;#x0131;&amp;#x0265;&amp;#x0287; &amp;#x025F;o &amp;#x028D;o&amp;#x0279; do&amp;#x0287; &amp;#x01DD;&amp;#x0265;&amp;#x0287; u&amp;#x0131; s&amp;#x01DD;nl&amp;#x0250;&amp;#x028C; &amp;#x0250;&amp;#x0265;dl&amp;#x0250; &amp;#x01DD;&amp;#x0265;&amp;#x0287; :s&amp;#x028E;&amp;#x0250;s &amp;#x0265;&amp;#x0254;&amp;#x0131;&amp;#x0265;&amp;#x028D; &amp;#8216;&amp;#x0287;u&amp;#x01DD;&amp;#x026F;&amp;#x026F;o&amp;#x0254; &amp;#x01DD;&amp;#x0265;&amp;#x0287; p&amp;#x0250;&amp;#x01DD;&amp;#x0279; o&amp;#x0287; &amp;#x0183;ud&amp;#x02D9;&amp;#x028D;o&amp;#x0279;-do&amp;#x0287; &amp;#x01DD;soq&amp;#x0279;&amp;#x01DD;&amp;#x028C;- &amp;#x028E;&amp;#x025F;&amp;#x0131;&amp;#x0287;u&amp;#x01DD;p&amp;#x0131; &amp;#x029E;&amp;#x0254;&amp;#x0131;&amp;#x0183;&amp;#x0250;&amp;#x026F;&amp;#x01DD;&amp;#x0183;&amp;#x0250;&amp;#x026F;&amp;#x0131; p&amp;#x01DD;sn &amp;#x0131; &amp;#x02D9;&amp;#x028E;ll&amp;#x0250;&amp;#x0254;ol &amp;#x0183;ud &amp;#x01DD;&amp;#x0265;&amp;#x0287; &amp;#x01DD;&amp;#x028C;&amp;#x0250;s&lt;/p&gt;&lt;p&gt;&amp;#x02D9;&amp;#x0183;ud &amp;#x01DD;&amp;#x0265;&amp;#x0287; &amp;#x025F;o &amp;#x029E;un&amp;#x0265;&amp;#x0254; &amp;#x0287;x&amp;#x0287;z &amp;#x01DD;&amp;#x0265;&amp;#x0287; u&amp;#x0131; &amp;#x0287;u&amp;#x01DD;&amp;#x026F;&amp;#x026F;o&amp;#x0254; &amp;#x01DD;&amp;#x0265;&amp;#x0287; p&amp;#x0250;&amp;#x01DD;&amp;#x0279; &amp;#8216;&amp;#x01DD;nl&amp;#x0254; &amp;#x0287;x&amp;#x01DD;u &amp;#x01DD;&amp;#x0265;&amp;#x0287; &amp;#x0279;o&amp;#x025F; :&amp;#x01DD;&amp;#x01DD;s ll,no&amp;#x028E; &amp;#x02D9;&amp;#x01DD;sno&amp;#x026F; &amp;#x0279;no&amp;#x028E; &amp;#x0183;u&amp;#x0131;sn &amp;#x0279;&amp;#x0250;q&amp;#x01DD;p&amp;#x0131;s &amp;#x01DD;&amp;#x0265;&amp;#x0287; &amp;#x0287;&amp;#x0254;&amp;#x01DD;l&amp;#x01DD;s&lt;/p&gt;&lt;p&gt;&amp;#x02D9;&amp;#x0279;&amp;#x0250;q&amp;#x01DD;p&amp;#x0131;s &amp;#x01DD;&amp;#x0265;&amp;#x0287; u&amp;#x0131; &amp;#x0287;x&amp;#x01DD;&amp;#x0287; &amp;#x01DD;&amp;#x0287;&amp;#x0131;&amp;#x0265;&amp;#x028D; uo &amp;#x01DD;&amp;#x0287;&amp;#x0131;&amp;#x0265;&amp;#x028D; &amp;#x01DD;&amp;#x0265;&amp;#x0287; &amp;#x0287;&amp;#x0265;&amp;#x0183;&amp;#x0131;l&amp;#x0265;&amp;#x0183;&amp;#x0131;&amp;#x0265; &amp;#8216;&amp;#x01DD;nl&amp;#x0254; &amp;#x0287;x&amp;#x01DD;u &amp;#x01DD;&amp;#x0265;&amp;#x0287; &amp;#x01DD;&amp;#x01DD;s o&amp;#x0287; :sp&amp;#x0250;&amp;#x01DD;&amp;#x0279; l&amp;#x026F;&amp;#x0287;&amp;#x0265; &amp;#x01DD;&amp;#x0265;&amp;#x0287; u&amp;#x0131; &amp;#x0287;u&amp;#x01DD;&amp;#x026F;&amp;#x026F;o&amp;#x0254; &amp;#x0250; &amp;#x02D9;xo&amp;#x025F;&amp;#x01DD;&amp;#x0279;&amp;#x0131;&amp;#x025F; uo n+l&amp;#x0279;&amp;#x0287;&amp;#x0254; (&amp;#x02D9;&amp;#x0183;&amp;#x02D9;&amp;#x01DD;) &amp;#x0183;u&amp;#x0131;sn l&amp;#x026F;&amp;#x0287;&amp;#x0265; &amp;#x01DD;&amp;#x0265;&amp;#x0287; &amp;#x028D;&amp;#x01DD;&amp;#x0131;&amp;#x028C;&lt;/p&gt;&lt;/div&gt;
 
-&lt;span id="continue-reading"/&gt;
-
-&lt;p&gt;Some found the teaser too easy. Others asked if I&amp;#8217;d be posting a follow up.
-&lt;/p&gt;
-&lt;p&gt;&lt;a href="http://www.flickr.com/photos/thomasguest/3122529935/" title="What's in the box?"&gt;&lt;img src="http://farm4.static.flickr.com/3264/3122529935_dfe6550cf6_o.png" width="294" height="450" alt="What's in the box?" /&gt;&lt;/a&gt;
-&lt;/p&gt;
-&lt;p&gt;Sorry. Maybe.
-&lt;/p&gt;</description>
+&lt;p&gt;&lt;span id=&quot;continue-reading&quot;/&gt;&lt;/p&gt;
+&lt;p&gt;Some found the teaser too easy. Others asked if I&amp;#8217;d be posting a follow up.&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;http://www.flickr.com/photos/thomasguest/3122529935/&quot; title=&quot;What&#x27;s in the box?&quot;&gt;&lt;img src=&quot;http://farm4.static.flickr.com/3264/3122529935_dfe6550cf6_o.png&quot; width=&quot;294&quot; height=&quot;450&quot; alt=&quot;What&#x27;s in the box?&quot; /&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;Sorry. Maybe.&lt;/p&gt;</description>
 <dc:date>2008-12-20</dc:date>
 <guid>http://wordaligned.org/articles/whats-in-the-box</guid>
 <author>tag@wordaligned.org (Thomas Guest)</author>
@@ -171,12 +154,9 @@ if __name__ == "__main__":
 
 <item>
 <title>A Little Teaser. Keen Eyes? You&#8217;ll See!</title>
-<description>&lt;p&gt;This curious document turned up in the lost+found. Can anyone help me &lt;a href="http://www.imagemagick.org/www/identify.html" title="First hint!"&gt;identify&lt;/a&gt; it?
-&lt;/p&gt;
-&lt;img src="http://wordaligned.org/images/top-row.png" alt="What's this?"/&gt;
-
-&lt;p&gt;(View &lt;a href="http://wordaligned.org/articles/a-little-teaser.html"&gt;this page&amp;#8217;s&lt;/a&gt; source for a clue.)
-&lt;/p&gt;
+<description>&lt;p&gt;This curious document turned up in the lost+found. Can anyone help me &lt;a href=&quot;http://www.imagemagick.org/www/identify.html&quot; title=&quot;First hint!&quot;&gt;identify&lt;/a&gt; it?&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;http://wordaligned.org/images/top-row.png&quot; alt=&quot;What&#x27;s this?&quot;/&gt;&lt;/p&gt;
+&lt;p&gt;(View &lt;a href=&quot;http://wordaligned.org/articles/a-little-teaser.html&quot;&gt;this page&amp;#8217;s&lt;/a&gt; source for a clue.)&lt;/p&gt;
 &lt;!-- To see the next clue, highlight the white on white text in the sidebar --&gt;</description>
 <dc:date>2008-12-12</dc:date>
 <guid>http://wordaligned.org/articles/a-little-teaser</guid>

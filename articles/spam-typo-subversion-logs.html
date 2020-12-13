@@ -29,30 +29,26 @@
 <h2 class="title"><a href="/articles/spam-typo-subversion-logs">Spam, Typo, Subversion Logs</a></h2>
 <p class="meta"><abbr class="published" title="2006-11-27">2006-11-27</abbr> &bull; <a href="/tag/python" rel="tag">Python</a>, <a href="/tag/web-applications" rel="tag">Web Applications</a>, <a href="/tag/subversion" rel="tag">Subversion</a>, <a href="/tag/self" rel="tag">Self</a>, <a href="/tag/trac" rel="tag">Trac</a> &bull; <a href="/articles/spam-typo-subversion-logs#disqus_thread">Comments</a></p>
 <p>This <a href="http://blog.wordaligned.org">blog</a> got hit by some spam promoting online gambling sites,
-   even though I&#8217;d cranked up most of the built in anti-spam settings. I
-   went across to the <a href="http://www.typosphere.org">Typo</a> website looking for advice and discovered:
-</p>
-<blockquote><p>The Typo Trac is currently offline because of a high level of
-   spam. It shall return as soon as we&#8217;ve got some more protection
-   added to it.
-</p>
-</blockquote><p>Unfunnily enough, I experimented with an open <a href="http://trac.edgewall.org/">Trac</a> project a while
-   back and it too received spam contributions cunningly hidden
-   where a regular reader wouldn&#8217;t notice.
-</p>
-<span id="continue-reading"/>
-
-
-<h4>Examining the Typo Subversion Logs</h4>
+even though I&#8217;d cranked up most of the built in anti-spam settings. I
+went across to the <a href="http://www.typosphere.org">Typo</a> website looking for advice and discovered:</p>
+<blockquote>
+<p>The Typo Trac is currently offline because of a high level of
+spam. It shall return as soon as we&#8217;ve got some more protection
+added to it.</p>
+</blockquote>
+<p>Unfunnily enough, I experimented with an open <a href="http://trac.edgewall.org/">Trac</a> project a while
+back and it too received spam contributions cunningly hidden
+where a regular reader wouldn&#8217;t notice.</p>
+<p><span id="continue-reading"/></p>
+<h4 id="examining-the-typo-subversion-logs">Examining the Typo Subversion Logs</h4>
 <p>Fortunately the <a href="http://www.typosphere.org">Typo</a> Subversion server remains up and running. I
-   took a look at the log files to see if there were any spam-related
-   improvements since I&#8217;d originally installed Typo and the latest release
-   (4.0.3 at the time of writing). There were a few hits.
-</p>
+took a look at the log files to see if there were any spam-related
+improvements since I&#8217;d originally installed Typo and the latest release
+(4.0.3 at the time of writing). There were a few hits.</p>
 <div class="typocode">
 
 <pre class="prettyprint">$ svn log -r1133:1231 svn://typosphere.org/typo | grep spam
-Add spam setting for Akismet key.  I still need to write the Akismet glue code, but it won't work without a key.
+Add spam setting for Akismet key.  I still need to write the Akismet glue code, but it won&#x27;t work without a key.
 Big spam filtering upgrade.
 Comments (and trackbacks) that fail the spam check are marked as unpublished
 registering of spam/ham classification with akismet). JustPresumedHam
@@ -63,22 +59,18 @@ Use published_at for comment spam checks.  Closes #1089
 
 </div>
 
-
-<h4>A Closer Examination</h4>
+<h4 id="a-closer-examination">A Closer Examination</h4>
 <p>This superficial inspection suggests that, out of 99 changes, 4 relate
-   to spam &#8212; suggesting that the <a href="http://www.typosphere.org">Typo</a> developers spent less than 5%
-   of their effort making anti-spam changes in the period concerned.
-</p>
+to spam &#8212; suggesting that the <a href="http://www.typosphere.org">Typo</a> developers spent less than 5%
+of their effort making anti-spam changes in the period concerned.</p>
 <p>A more useful statistic would be the number of files which were
-   modified for anti-spam purposes. It&#8217;s rather harder to extract this
-   number using simple shell programs such as <code>grep</code> so I wrote a
-   <a href="http://python.org">Python</a> program to analyse the the <a href="http://svnbook.red-bean.com/en/1.2/svn.ref.svn.c.log.html">svn log</a> output. I used the
-   <code>--xml</code> option to the <a href="http://svnbook.red-bean.com/en/1.2/svn.ref.svn.c.log.html">svn log</a> command to provide me with more
-   structured output, and the Python <a href="http://www.python.org/doc/current/lib/module-xml.dom.minidom.html">minidom</a> XML module proved more than
-   up to the task of parsing this output.
-</p>
-<p>Here&#8217;s what this program told me.
-</p>
+modified for anti-spam purposes. It&#8217;s rather harder to extract this
+number using simple shell programs such as <code>grep</code> so I wrote a
+<a href="http://python.org">Python</a> program to analyse the the <a href="http://svnbook.red-bean.com/en/1.2/svn.ref.svn.c.log.html">svn log</a> output. I used the
+<code>--xml</code> option to the <a href="http://svnbook.red-bean.com/en/1.2/svn.ref.svn.c.log.html">svn log</a> command to provide me with more
+structured output, and the Python <a href="http://www.python.org/doc/current/lib/module-xml.dom.minidom.html">minidom</a> XML module proved more than
+up to the task of parsing this output.</p>
+<p>Here&#8217;s what this program told me.</p>
 <div class="typocode">
 
 <pre class="prettyprint">$ svn log -r1133:1231 svn://typosphere.org/typo --xml --verbose | \
@@ -90,24 +82,20 @@ Found /spam|akismet/i in 9/99 changes affecting 72/270 files.
 </div>
 
 <p>Note that I included <a href="http://akismet.com/">Akismet</a> in my pattern match. As I understand
-   it, <a href="http://akismet.com/">Akismet</a> is a service specifically designed to protect blogs
-   against spam.
-</p>
+it, <a href="http://akismet.com/">Akismet</a> is a service specifically designed to protect blogs
+against spam.</p>
 <p>I could dig even deeper and find out how many lines of code were
-   changed, but I don&#8217;t think it&#8217;s worth it. This is a pretty blunt tool,
-   but it does tell us that some smart programmers are having to spend
-   almost as much time fighting dumb spammers as they are writing more
-   useful code.
-</p>
-
-<h4>The svn log processor</h4>
+changed, but I don&#8217;t think it&#8217;s worth it. This is a pretty blunt tool,
+but it does tell us that some smart programmers are having to spend
+almost as much time fighting dumb spammers as they are writing more
+useful code.</p>
+<h4 id="the-svn-log-processor">The svn log processor</h4>
 <p>For the record, here&#8217;s my program. It&#8217;s best suited to the job it
-   actually did but it&#8217;s simple enough that I&#8217;ll be able to adapt it for
-   use elsewhere.
-</p>
+actually did but it&#8217;s simple enough that I&#8217;ll be able to adapt it for
+use elsewhere.</p>
 <div class="typocode"><div class="codetitle">process_svn_log.py</div>
 
-<pre class="prettyprint">""" This program filters 'svn log --xml --verbose' output
+<pre class="prettyprint">""" This program filters &#x27;svn log --xml --verbose&#x27; output
     for log entries which match patterns.
 
 This output has the form:
@@ -129,7 +117,7 @@ This output has the form:
 def usage(program):
     print """\
 Usage: %s PATTERN ...
-Searches the output from 'svn log --xml --verbose' for log entries whose
+Searches the output from &#x27;svn log --xml --verbose&#x27; for log entries whose
 message matches the supplied PATTERN(s) and yields summary statistics.
 Example:
 svn log -r1133:1231 svn://typosphere.org/typo --xml --verbose | %s spam""" % (
@@ -163,7 +151,7 @@ def process(log, patterns):
     paths = count_paths(entries)
     matching_paths = count_paths(matches)
 
-print "Found /%s/i in %d/%d changes affecting %d/%d files." % (
+    print "Found /%s/i in %d/%d changes affecting %d/%d files." % (
         pattern, len(matches), len(entries), matching_paths, paths)
 
 def main(argv):

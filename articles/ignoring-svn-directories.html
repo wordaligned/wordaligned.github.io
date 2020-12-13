@@ -29,52 +29,44 @@
 <h2 class="title"><a href="/articles/ignoring-svn-directories">Ignoring .svn directories</a></h2>
 <p class="meta"><abbr class="published" title="2006-08-14">2006-08-14</abbr> &bull; <a href="/tag/subversion" rel="tag">Subversion</a>, <a href="/tag/shell" rel="tag">Shell</a>, <a href="/tag/emacs" rel="tag">Emacs</a> &bull; <a href="/articles/ignoring-svn-directories#disqus_thread">Comments</a></p>
 <p>Files checked out from a <a href="http://subversion.tigris.org">Subversion</a> server get replicated into
-   hidden <code>.svn</code> directories in your working copy. This behaviour
-   derives from the guiding principle that disk space costs less than
-   network access. It means, for example, you can see what changes you&#8217;ve
-   made to files without needing to visit the server &#8212; and indeed revert
-   these changes without server access.
-</p>
+hidden <code>.svn</code> directories in your working copy. This behaviour
+derives from the guiding principle that disk space costs less than
+network access. It means, for example, you can see what changes you&#8217;ve
+made to files without needing to visit the server &#8212; and indeed revert
+these changes without server access.</p>
 <p>An unwanted side-effect of this is that you may get false hits when
-   you search through a working copy. You match the cached base revisions
-   in the <code>.svn</code> directory as well as the files you&#8217;re really working on.
-</p>
-<span id="continue-reading"/>
-
-
-<h4>Using find&#8217;s -prune option</h4>
-<p>To tell <code>find</code> to exclude <code>.svn</code> directories, use the <code>-prune</code> option:
-</p>
+you search through a working copy. You match the cached base revisions
+in the <code>.svn</code> directory as well as the files you&#8217;re really working on.</p>
+<p><span id="continue-reading"/></p>
+<h4 id="using-finds-prune-option">Using find&#8217;s -prune option</h4>
+<p>To tell <code>find</code> to exclude <code>.svn</code> directories, use the <code>-prune</code> option:</p>
 <div class="typocode">
 
-<pre class="prettyprint">find . -path '*/.svn' -prune -o -type f -print | \
+<pre class="prettyprint">find . -path &#x27;*/.svn&#x27; -prune -o -type f -print | \
       xargs -e grep -I -n -e PATTERN
 
 </pre>
 
 </div>
 
-
-<h4>Customising Emacs</h4>
+<h4 id="customising-emacs">Customising Emacs</h4>
 <p>You probably don&#8217;t want to have to type in that command all of the
-   time. Since I live inside <a href="http://www.gnu.org/software/emacs/">emacs</a> I just added the
-   following lines to my <code>.emacs</code> configuration file:
-</p>
+time. Since I live inside <a href="http://www.gnu.org/software/emacs/">emacs</a> I just added the
+following lines to my <code>.emacs</code> configuration file:</p>
 <div class="typocode">
 
-<pre class="prettyprint">(global-set-key [f3] 'grep-find)
+<pre class="prettyprint">(global-set-key [f3] &#x27;grep-find)
 (setq grep-find-command
-  "find . -path '*/.svn' -prune -o -type f -print | xargs -e grep -I -n -e ")
+  "find . -path &#x27;*/.svn&#x27; -prune -o -type f -print | xargs -e grep -I -n -e ")
 
 </pre>
 
 </div>
 
 <p>Now when I hit F3 my preferred <code>find</code> command appears. I just append the
-   pattern I want to look for and hit return. The <code>-n</code> argument to <code>grep</code>
-   causes line numbers to be generated in the grep-find results, meaning
-   I can jump (<code>CTRL-X-TICK</code>) to the right place in a matching file.
-</p>
+pattern I want to look for and hit return. The <code>-n</code> argument to <code>grep</code>
+causes line numbers to be generated in the grep-find results, meaning
+I can jump (<code>CTRL-X-TICK</code>) to the right place in a matching file.</p>
 </div>
 
 <div class="comments"><hr/><div id="disqus_thread"></div><script type="text/javascript" src="http://disqus.com/forums/wordaligned/embed.js"></script></div>

@@ -28,128 +28,40 @@
       <div class="atomentry" id="elegance-and-efficiency">
 <h2 class="title"><a href="/articles/elegance-and-efficiency">Elegance and Efficiency</a></h2>
 <p class="meta"><abbr class="published" title="2007-12-03">2007-12-03</abbr> &bull; <a href="/tag/c++" rel="tag">C++</a>, <a href="/tag/scheme" rel="tag">Scheme</a>, <a href="/tag/java" rel="tag">Java</a>, <a href="/tag/python" rel="tag">Python</a>, <a href="/tag/algorithms" rel="tag">Algorithms</a>, <a href="/tag/boost" rel="tag">Boost</a> &bull; <a href="/articles/elegance-and-efficiency#disqus_thread">Comments</a></p>
-<div class="toc">
-<h2>Contents</h2>
+<p>Elegant code is often efficient. Think of the heap data structure, for example, which always remains exactly as sorted as it needs to be, making it perfect for modelling priority queues. It&#8217;s both elegant and efficient &mdash; and dazzlingly so.</p>
+<p><img src="http://upload.wikimedia.org/wikipedia/commons/b/bf/Max-heap.png" width="50%" alt="Heap graphic"/></p>
+<p>This article discusses the relationship between elegance and efficiency in more depth, and asks the question: <strong>Can inefficient code ever be elegant?</strong></p>
+<p><span id="continue-reading"/></p>
+<h3 id="what-is-elegant-code">What is Elegant Code?</h3>
+<p>First, we should consider what&#8217;s meant by &#8220;elegant code&#8221;.</p>
+<p>Anthony Williams discusses this very subject in a recent blog <a href="http://www.justsoftwaresolutions.co.uk/design/elegance-in-software.html">post</a> (which is what got me thinking about it in the first place). Up front he admits the search for elegance is subjective and that the factors he lists are all <em>&#8220;my opinion&#8221;</em>. He also points out his list is not exhaustive. Nonetheless, it&#8217;s a good starting point, and I&#8217;d like to build on it. Let&#8217;s start by summarising his list here.</p>
+<blockquote>
+<p>Factors affecting the elegance of software</p>
 <ul>
- <li><a href="#tocwhat-is-elegant-code" name="toc0" id="toc0">What is Elegant Code?</a>
- </li>
-
- <li><a href="#tocappearance" name="toc1" id="toc1">Appearance</a>
- </li>
-
- <li><a href="#tocuse-of-standard-libraries" name="toc2" id="toc2">Use of standard libraries</a>
- </li>
-
- <li><a href="#tocplanar-vectors-in-scheme" name="toc3" id="toc3">Planar vectors in Scheme</a>
- </li>
-
- <li><a href="#tocminimalism-and-simplicity" name="toc4" id="toc4">Minimalism and Simplicity</a>
- </li>
-
- <li><a href="#tocefficiency-and-elegance" name="toc5" id="toc5">Efficiency and Elegance?</a>
- </li>
-
- <li><a href="#tocelegance-and-inefficiency" name="toc6" id="toc6">Elegance and Inefficiency?</a>
- </li>
-
- <li><a href="#tocislipogram1" name="toc7" id="toc7">is_lipogram1</a>
- </li>
-
- <li><a href="#tocislipogram2--3" name="toc8" id="toc8">is_lipogram2 &amp; 3</a>
- </li>
-
- <li><a href="#tocislipogram4" name="toc9" id="toc9">is_lipogram4</a>
- </li>
-
- <li><a href="#tocislipogram5" name="toc10" id="toc10">is_lipogram5</a>
- </li>
-
- <li><a href="#tocislipogram6" name="toc11" id="toc11">is_lipogram6</a>
- </li>
-
- <li><a href="#tocwinding-up" name="toc12" id="toc12">Winding Up</a>
- </li>
-
- <li><a href="#tocc-source-code" name="toc13" id="toc13">C++ Source Code</a>
- </li>
-</ul>
-</div><p>Elegant code is often efficient. Think of the heap data structure, for example, which always remains exactly as sorted as it needs to be, making it perfect for modelling priority queues. It&#8217;s both elegant and efficient &mdash; and dazzlingly so.
-</p>
-<img src="http://upload.wikimedia.org/wikipedia/commons/b/bf/Max-heap.png" width="50%" alt="Heap graphic"/>
-
-<p>This article discusses the relationship between elegance and efficiency in more depth, and asks the question: <strong>Can inefficient code ever be elegant?</strong>
-</p>
-<span id="continue-reading"/>
-
-
-<h3><a href="#toc0" name="tocwhat-is-elegant-code" id="tocwhat-is-elegant-code">What is Elegant Code?</a></h3>
-<p>First, we should consider what&#8217;s meant by &#8220;elegant code&#8221;.
-</p>
-<p>Anthony Williams discusses this very subject in a recent blog <a href="http://www.justsoftwaresolutions.co.uk/design/elegance-in-software.html">post</a> (which is what got me thinking about it in the first place). Up front he admits the search for elegance is subjective and that the factors he lists are all <em>&#8220;my opinion&#8221;</em>. He also points out his list is not exhaustive. Nonetheless, it&#8217;s a good starting point, and I&#8217;d like to build on it. Let&#8217;s start by summarising his list here.
-</p>
-<blockquote><p>Factors affecting the elegance of software
-</p>
-<ul>
- <li>
-     Does it work?
- </li>
-
- <li>
-     Is it easy to understand?
- </li>
-
- <li>
-     Is it efficient?
- </li>
-
- <li>
-     Short functions
- </li>
-
- <li>
-     Good naming
- </li>
-
- <li>
-     Clear division of responsibility
- </li>
-
- <li>
-     High cohesion
- </li>
-
- <li>
-     Low coupling
- </li>
-
- <li>
-     Appropriate use of OO and other techniques
- </li>
-
- <li>
-     Minimal code
- </li>
+<li>Does it work?</li>
+<li>Is it easy to understand?</li>
+<li>Is it efficient?</li>
+<li>Short functions</li>
+<li>Good naming</li>
+<li>Clear division of responsibility</li>
+<li>High cohesion</li>
+<li>Low coupling</li>
+<li>Appropriate use of OO and other techniques</li>
+<li>Minimal code</li>
 </ul>
 </blockquote>
-<h3><a href="#toc1" name="tocappearance" id="tocappearance">Appearance</a></h3>
-<p>I&#8217;m not sure this list completely nails elegance. For a start, there&#8217;s no mention of appearance &mdash; the way the code actually looks, on screen, or in print &#8212; which in my opinion is fundamental. Elegant code looks clean, balanced, self-consistent.
-</p>
-<p><span id="excerpt0"/>That&#8217;s one of the reasons I like Python: it&#8217;s hard to get away with poorly laid out code. Scheme, with its minimal syntax, also wins here. Java stands a good chance of doing well on this front too, thanks to a clearly stated set of coding conventions and excellent IDE support for applying these conventions.
-</p>
-
-<h3><a href="#toc2" name="tocuse-of-standard-libraries" id="tocuse-of-standard-libraries">Use of standard libraries</a></h3>
-<p>I&#8217;d also say that appropriate and even cunning use of the language&#8217;s standard libraries can add to code&#8217;s elegance. Williams hints at this with his mention of <em>Minimal Code</em>, though minimalism covers many other things.
-</p>
-<p>As an example, if you&#8217;re using C++, you should take the time to become familiar with the standard library, and use it whenever possible. <a href="http://www.artima.com/cppsource/lazy_builder.html">It works. It&#8217;s efficient</a>. In fact it embodies pretty much everything Williams lists, with a few notable exceptions (no one could describe <code>std::string</code> as minimal, and <code>std::auto_ptr</code> is notoriously slippery). Use the standard library and you&#8217;ll save yourself code and time, and your own code will be the more elegant for it.
-</p>
-
-<h4><a href="#toc3" name="tocplanar-vectors-in-scheme" id="tocplanar-vectors-in-scheme">Planar vectors in Scheme</a></h4>
-<p>Let&#8217;s return to Scheme to illustrate my point about cunning use of standard libraries and consider <a href="http://mitpress.mit.edu/sicp/full-text/book/book-Z-H-15.html#%_thm_2.46">exercise 2.46</a> from the <a href="http://mitpress.mit.edu/sicp/full-text/book/book.html">Wizard Book</a>.
-</p>
-<blockquote><p><strong>Exercise 2.46.</strong>  A two-dimensional vector v running from the origin to a point can be represented as a pair consisting of an x-coordinate and a y-coordinate. Implement a data abstraction for vectors by giving a constructor make-vect and corresponding selectors xcor-vect and ycor-vect. In terms of your selectors and constructor, implement procedures add-vect, sub-vect, and scale-vect that perform the operations vector addition, vector subtraction, and multiplying a vector by a scalar.
-</p>
-</blockquote><p>An obvious solution would be to model the 2-D vector as a pair.
-</p>
+<h3 id="appearance">Appearance</h3>
+<p>I&#8217;m not sure this list completely nails elegance. For a start, there&#8217;s no mention of appearance &mdash; the way the code actually looks, on screen, or in print &#8212; which in my opinion is fundamental. Elegant code looks clean, balanced, self-consistent.</p>
+<p><span id="excerpt0"/>That&#8217;s one of the reasons I like Python: it&#8217;s hard to get away with poorly laid out code. Scheme, with its minimal syntax, also wins here. Java stands a good chance of doing well on this front too, thanks to a clearly stated set of coding conventions and excellent IDE support for applying these conventions.</p>
+<h3 id="use-of-standard-libraries">Use of standard libraries</h3>
+<p>I&#8217;d also say that appropriate and even cunning use of the language&#8217;s standard libraries can add to code&#8217;s elegance. Williams hints at this with his mention of <em>Minimal Code</em>, though minimalism covers many other things.</p>
+<p>As an example, if you&#8217;re using C++, you should take the time to become familiar with the standard library, and use it whenever possible. <a href="http://www.artima.com/cppsource/lazy_builder.html">It works. It&#8217;s efficient</a>. In fact it embodies pretty much everything Williams lists, with a few notable exceptions (no one could describe <code>std::string</code> as minimal, and <code>std::auto_ptr</code> is notoriously slippery). Use the standard library and you&#8217;ll save yourself code and time, and your own code will be the more elegant for it.</p>
+<h4 id="planar-vectors-in-scheme">Planar vectors in Scheme</h4>
+<p>Let&#8217;s return to Scheme to illustrate my point about cunning use of standard libraries and consider <a href="http://mitpress.mit.edu/sicp/full-text/book/book-Z-H-15.html#%_thm_2.46">exercise 2.46</a> from the <a href="http://mitpress.mit.edu/sicp/full-text/book/book.html">Wizard Book</a>.</p>
+<blockquote>
+<p><strong>Exercise 2.46.</strong>  A two-dimensional vector v running from the origin to a point can be represented as a pair consisting of an x-coordinate and a y-coordinate. Implement a data abstraction for vectors by giving a constructor make-vect and corresponding selectors xcor-vect and ycor-vect. In terms of your selectors and constructor, implement procedures add-vect, sub-vect, and scale-vect that perform the operations vector addition, vector subtraction, and multiplying a vector by a scalar.</p>
+</blockquote>
+<p>An obvious solution would be to model the 2-D vector as a pair.</p>
 <div class="typocode">
 
 <pre class="prettyprint">(define make-vect cons)
@@ -172,8 +84,7 @@
 
 </div>
 
-<p>An elegant alternative builds on Scheme&#8217;s support for complex numbers.
-</p>
+<p>An elegant alternative builds on Scheme&#8217;s support for complex numbers.</p>
 <div class="typocode">
 
 <pre class="prettyprint">;; represent 2-D vect using a complex number
@@ -188,40 +99,28 @@
 ;; some other vector operations come for free
 (define magnitude-vect magnitude)
 (define make-vect-from-polar-coords make-polar)
-(define angle-vect angle)
+(define angle-vect angle) 
 
 </pre>
 
 </div>
 
-
-<h3><a href="#toc4" name="tocminimalism-and-simplicity" id="tocminimalism-and-simplicity">Minimalism and Simplicity</a></h3>
-<p>Elegance and beauty are not the same, though perhaps elegant forms a subset of beautiful. Elegance carries the additional connotation of simplicity, which itself correlates with minimalism. If I were forced to select the single item from Williams&#8217; list most closely aligned to elegance, I&#8217;d go for minimalism: allowed my own choice, it would be simplicity.
-</p>
-<p>Williams notes a couple of ways you can remove to improve:
-</p>
+<h3 id="minimalism-and-simplicity">Minimalism and Simplicity</h3>
+<p>Elegance and beauty are not the same, though perhaps elegant forms a subset of beautiful. Elegance carries the additional connotation of simplicity, which itself correlates with minimalism. If I were forced to select the single item from Williams&#8217; list most closely aligned to elegance, I&#8217;d go for minimalism: allowed my own choice, it would be simplicity.</p>
+<p>Williams notes a couple of ways you can remove to improve:</p>
 <ul>
- <li>
-     avoid unnecessary layering 
- </li>
-
- <li>
-     eliminate duplication
- </li>
+<li>avoid unnecessary layering </li>
+<li>eliminate duplication</li>
 </ul>
-<p>We&#8217;ve already added:
-</p>
+<p>We&#8217;ve already added:</p>
 <ul>
- <li>
-     use standard libraries
- </li>
+<li>use standard libraries</li>
 </ul>
-<p>Kevlin Henney gives minimalism more careful attention in a series of <a href="http://www.two-sdg.demon.co.uk/curbralan/papers.html">articles</a>. <a href="http://www.two-sdg.demon.co.uk/curbralan/papers/minimalism/OmitNeedlessCode.html">Omit Needless Code</a> promotes:
-</p>
-<blockquote><p>Code that is simple and clear, brief and direct.
-</p>
-</blockquote><p>Henney illustrates his points with some elegant examples which reinforce my own claims about the C++ standard library
-</p>
+<p>Kevlin Henney gives minimalism more careful attention in a series of <a href="http://www.two-sdg.demon.co.uk/curbralan/papers.html">articles</a>. <a href="http://www.two-sdg.demon.co.uk/curbralan/papers/minimalism/OmitNeedlessCode.html">Omit Needless Code</a> promotes:</p>
+<blockquote>
+<p>Code that is simple and clear, brief and direct.</p>
+</blockquote>
+<p>Henney illustrates his points with some elegant examples which reinforce my own claims about the C++ standard library</p>
 <blockquote><p>As an example, the common task of counting words in a text file or stream can be reduced to a single statement of executable C++ code <a href="http://www.two-sdg.demon.co.uk/curbralan/papers/IfIHadAHammer.pdf">[Henney2001c]</a> when built on the appropriate abstractions:</p>
 <pre>
 typedef std::istream_iterator&lt;std::string&gt; in;
@@ -239,16 +138,11 @@ std::cout &lt;&lt; std::count(in(std::cin), in(), '\n');
 </pre>
 <p>These fragments are all compact and fluffless, crisp and essential.</p></blockquote>
 
-
-<h3><a href="#toc5" name="tocefficiency-and-elegance" id="tocefficiency-and-elegance">Efficiency and Elegance?</a></h3>
-<p>Efficiency comes high on Williams&#8217; list, right after correctness, which shouldn&#8217;t be a surprise to anyone who writes code for a living. Surely code which doesn&#8217;t run fast enough is about as useful as code which doesn&#8217;t work? You could even note that efficiency is yet another aspect of minimalism: in this case, it&#8217;s the machine&#8217;s resource consumption you&#8217;d like to reduce.
-</p>
-<img src="http://upload.wikimedia.org/wikipedia/commons/6/6a/Sorting_quicksort_anim.gif" alt="Quicksort animation"/>
-
-<p>I&#8217;m not convinced, though. It&#8217;s true, many of the most elegant algorithms happen to be efficient too &mdash; and may even have arisen from the quest for efficiency. Thus the standard quicksort algorithm has virtually no space overhead, and as a general purpose sorting algorithm, really can&#8217;t be beaten. Similarly the <a href="http://en.wikipedia.org/wiki/Heap_(data_structure)">heap</a>, as already mentioned, is a lean clean implementation of a priority queue. But <em></em>I don&#8217;t think elegance implies efficiency<em></em>. I&#8217;d even suggest that something could be elegant but of no practical use, at least not on today&#8217;s hardware.
-</p>
-<p>The downside of efficiency is that it can be at odds with simplicity and minimalism. Consider the sad fate of <code>boost::lexical_cast</code>, a general purpose conversion function. If I go back to early <a href="http://www.boost.org">Boost</a> releases I find code which reads like this.
-</p>
+<h3 id="efficiency-and-elegance">Efficiency and Elegance?</h3>
+<p>Efficiency comes high on Williams&#8217; list, right after correctness, which shouldn&#8217;t be a surprise to anyone who writes code for a living. Surely code which doesn&#8217;t run fast enough is about as useful as code which doesn&#8217;t work? You could even note that efficiency is yet another aspect of minimalism: in this case, it&#8217;s the machine&#8217;s resource consumption you&#8217;d like to reduce.</p>
+<p><img src="http://upload.wikimedia.org/wikipedia/commons/6/6a/Sorting_quicksort_anim.gif" alt="Quicksort animation"/></p>
+<p>I&#8217;m not convinced, though. It&#8217;s true, many of the most elegant algorithms happen to be efficient too &mdash; and may even have arisen from the quest for efficiency. Thus the standard quicksort algorithm has virtually no space overhead, and as a general purpose sorting algorithm, really can&#8217;t be beaten. Similarly the <a href="http://en.wikipedia.org/wiki/Heap_(data_structure)">heap</a>, as already mentioned, is a lean clean implementation of a priority queue. But <strong>I don&#8217;t think elegance implies efficiency</strong>. I&#8217;d even suggest that something could be elegant but of no practical use, at least not on today&#8217;s hardware.</p>
+<p>The downside of efficiency is that it can be at odds with simplicity and minimalism. Consider the sad fate of <code>boost::lexical_cast</code>, a general purpose conversion function. If I go back to early <a href="http://www.boost.org">Boost</a> releases I find code which reads like this.</p>
 <div class="typocode"><div class="codetitle">Excerpt from lexical_cast.hpp, Boost 1.22</div>
 
 <pre class="prettyprint">template&lt;typename Target, typename Source&gt;
@@ -260,7 +154,7 @@ Target lexical_cast(Source arg)
     std::strstream interpreter; // for out-of-the-box g++ 2.95.2
 # endif
     Target result;
-    
+
     if(!(interpreter &lt;&lt; arg) || !(interpreter &gt;&gt; result) ||
        !(interpreter &gt;&gt; std::ws).eof())
         throw bad_lexical_cast();
@@ -271,15 +165,13 @@ Target lexical_cast(Source arg)
 
 </div>
 
-<p>For brevity I&#8217;ve omitted file headers, include guards and the unexceptional definition of <code>boost::bad_lexical_cast</code>. Even with these present, the file runs to just 68 lines long, and provides an elegant example of what generic C++ code can do. The body of <code>lexical_cast</code> itself is a readable one-liner, tainted only by a preprocessor workaround for non-compliant compilers. 
-</p>
-<p>Wind forwards to 2007, and this small stain has spread across the entire <a href="http://boost.cvs.sourceforge.net/boost/boost/boost/lexical_cast.hpp?revision=1.36&amp;view=markup">library</a>, which, after tuning for correctness, portability and <strong>efficiency</strong> now weighs in at well over 1K lines of code. Here&#8217;s a flavour of the latest greatest <code>lexical_cast</code>, which is far too long to include in its entirety.
-</p>
+<p>For brevity I&#8217;ve omitted file headers, include guards and the unexceptional definition of <code>boost::bad_lexical_cast</code>. Even with these present, the file runs to just 68 lines long, and provides an elegant example of what generic C++ code can do. The body of <code>lexical_cast</code> itself is a readable one-liner, tainted only by a preprocessor workaround for non-compliant compilers. </p>
+<p>Wind forwards to 2007, and this small stain has spread across the entire <a href="http://boost.cvs.sourceforge.net/boost/boost/boost/lexical_cast.hpp?revision=1.36&amp;view=markup">library</a>, which, after tuning for correctness, portability and <strong>efficiency</strong> now weighs in at well over 1K lines of code. Here&#8217;s a flavour of the latest greatest <code>lexical_cast</code>, which is far too long to include in its entirety.</p>
 <div class="typocode"><div class="codetitle">Excerpt from lexical_cast.hpp@1.36</div>
 
 <pre class="prettyprint">namespace detail // lcast_put_unsigned
 {
-    // I'd personally put lcast_put_unsigned in .cpp file if not
+    // I&#x27;d personally put lcast_put_unsigned in .cpp file if not
     // boost practice for header-only libraries (Alexander Nasonov).
     template&lt;typename T, typename CharT&gt;
     CharT* lcast_put_unsigned(T n, CharT* finish)
@@ -300,7 +192,7 @@ Target lexical_cast(Source arg)
         std::string::size_type group = 0; // current group number
         char last_grp_size = grouping[0] &lt;= 0 ? CHAR_MAX : grouping[0];
         // a) Since grouping is const, grouping[grouping.size()] returns 0.
-        // b) It's safe to assume here and below that CHAR_MAX
+        // b) It&#x27;s safe to assume here and below that CHAR_MAX
         //    is equivalent to unlimited grouping:
 #ifndef BOOST_NO_LIMITS_COMPILE_TIME_CONSTANTS
         BOOST_STATIC_ASSERT(std::numeric_limits&lt;T&gt;::digits10 &lt; CHAR_MAX);
@@ -327,7 +219,7 @@ Target lexical_cast(Source arg)
             *finish = static_cast&lt;char&gt;(cdigit);
             n /= 10;
         } while(n);
-    
+
         return finish;
     }
 }
@@ -336,28 +228,22 @@ Target lexical_cast(Source arg)
 
 </div>
 
-<p>I&#8217;m not saying that the changes to <code>boost::lexical_cast</code> are <em>bad</em>: after all, users of the library get software which does the right thing more often and more quickly &mdash; all without any client-side changes. That&#8217;s one of the benefits of using a layered software stack. Rather, I present this as an example of the tension between efficiency and elegance. Somewhere along the line, an elegant piece of code got buried.
-</p>
-<p>It&#8217;s also interesting that, in this case, even &#8220;does-it-work&#8221; counteracts elegance. We noted that <code>boost::lexical_cast@v1.22</code> became tainted in its eagerness to work with legacy compilers. The current version makes far greater concessions. It&#8217;s a reminder &mdash; as if any were needed &mdash; that we programmers have to keep our feet on the ground and aim for pragmatic solutions. Perfection is rarely possible, elegance occasional.
-</p>
-
-<h3><a href="#toc6" name="tocelegance-and-inefficiency" id="tocelegance-and-inefficiency">Elegance and Inefficiency?</a></h3>
-<p>We&#8217;ve demonstrated the tension between elegance and efficiency, but could blatantly inefficient code ever claim to be elegant? The original elegant implementation of <code>lexical_cast</code> may not have been optimally tuned for all possible inputs (it&#8217;s meant to be generic code, after all), but it could hardly be described as inefficient.
-</p>
-<p>We&#8217;re going to develop some code which I&#8217;ll claim is elegant despite being inefficient. To get us started, let&#8217;s consider another problem we can skin in more than one way: <strong>how do we determine if a book forms a lipogram?</strong> (A <a href="http://phrontistery.info/lipogram.html">lipogram</a> is a piece of text written avoiding the use of a particular character, the letter E for example, and <a href="http://en.wikipedia.org/wiki/A_Void">full length books</a> really have been written &mdash; and even translated &mdash; which adhere to this constraint.)
-</p>
-<p>We&#8217;ll pose the problem in C++. Here&#8217;s the function prototype.
-</p>
+<p>I&#8217;m not saying that the changes to <code>boost::lexical_cast</code> are <em>bad</em>: after all, users of the library get software which does the right thing more often and more quickly &mdash; all without any client-side changes. That&#8217;s one of the benefits of using a layered software stack. Rather, I present this as an example of the tension between efficiency and elegance. Somewhere along the line, an elegant piece of code got buried.</p>
+<p>It&#8217;s also interesting that, in this case, even &#8220;does-it-work&#8221; counteracts elegance. We noted that <code>boost::lexical_cast@v1.22</code> became tainted in its eagerness to work with legacy compilers. The current version makes far greater concessions. It&#8217;s a reminder &mdash; as if any were needed &mdash; that we programmers have to keep our feet on the ground and aim for pragmatic solutions. Perfection is rarely possible, elegance occasional.</p>
+<h3 id="elegance-and-inefficiency">Elegance and Inefficiency?</h3>
+<p>We&#8217;ve demonstrated the tension between elegance and efficiency, but could blatantly inefficient code ever claim to be elegant? The original elegant implementation of <code>lexical_cast</code> may not have been optimally tuned for all possible inputs (it&#8217;s meant to be generic code, after all), but it could hardly be described as inefficient.</p>
+<p>We&#8217;re going to develop some code which I&#8217;ll claim is elegant despite being inefficient. To get us started, let&#8217;s consider another problem we can skin in more than one way: <strong>how do we determine if a book forms a lipogram?</strong> (A <a href="http://phrontistery.info/lipogram.html">lipogram</a> is a piece of text written avoiding the use of a particular character, the letter E for example, and <a href="http://en.wikipedia.org/wiki/A_Void">full length books</a> really have been written &mdash; and even translated &mdash; which adhere to this constraint.)</p>
+<p>We&#8217;ll pose the problem in C++. Here&#8217;s the function prototype.</p>
 <div class="typocode">
 
 <pre class="prettyprint">#include &lt;string&gt;
 #include &lt;vector&gt;
-    
+
 typedef std::string word;
 typedef std::vector&lt;word&gt; book;
-    
+
 // Return true if the input text avoids using any characters
-// in 'avoid', false otherwise.
+// in &#x27;avoid&#x27;, false otherwise.
 // Example call:
 // bool const lipo = is_lipogram(text, "Ee");
 bool is_lipogram(book const &amp; text, word const &amp; avoid);
@@ -366,17 +252,14 @@ bool is_lipogram(book const &amp; text, word const &amp; avoid);
 
 </div>
 
-<p>What we have here might be seen as a loop within a loop within a loop: for each word in the book, for each character in that word, check against each character in the string of characters to be avoided. A match against an avoided character means we know our book isn&#8217;t a lipogram, and we can return false; but if we reach the end of our book without such a match, we can return true.
-</p>
-
-<h4><a href="#toc7" name="tocislipogram1" id="tocislipogram1">is_lipogram1</a></h4>
-<p>We can code this up:
-</p>
+<p>What we have here might be seen as a loop within a loop within a loop: for each word in the book, for each character in that word, check against each character in the string of characters to be avoided. A match against an avoided character means we know our book isn&#8217;t a lipogram, and we can return false; but if we reach the end of our book without such a match, we can return true.</p>
+<h4 id="is_lipogram1">is_lipogram1</h4>
+<p>We can code this up:</p>
 <div class="typocode">
 
 <pre class="prettyprint">typedef word::const_iterator word_iter;
 typedef book::const_iterator book_iter;
-    
+
 bool is_lipogram(book const &amp; text, word const &amp; avoid)
 {
     // Handle edge case -- empty book
@@ -403,33 +286,21 @@ bool is_lipogram(book const &amp; text, word const &amp; avoid)
         }
     }
     return true;
-}
+}       
 
 </pre>
 
 </div>
 
-<p>This painstaking chunk of code reads like a direct transcription of the way an unfortunate human proof-reader might approach the task, one finger tracking through the text, word by word, character by character, another finger repeatedly working through the characters to be avoided. It fails the elegance test on a number of counts:
-</p>
+<p>This painstaking chunk of code reads like a direct transcription of the way an unfortunate human proof-reader might approach the task, one finger tracking through the text, word by word, character by character, another finger repeatedly working through the characters to be avoided. It fails the elegance test on a number of counts:</p>
 <ul>
- <li>
-     <strong>Not minimal</strong>. The edge cases do not merit special treatment. Normal processing of the (nested) main loop handles empty inputs just fine.
- </li>
-
- <li>
-     <strong>Failure to use the standard library.</strong> The <code>std::string</code> class is big enough to support searches for characters in a string directly, allowing us to remove a couple of layers of nesting.
- </li>
-
- <li>
-     <strong>Clumsy</strong>. The function has <em>four</em> separate exit points.
- </li>
+<li><strong>Not minimal</strong>. The edge cases do not merit special treatment. Normal processing of the (nested) main loop handles empty inputs just fine.</li>
+<li><strong>Failure to use the standard library.</strong> The <code>std::string</code> class is big enough to support searches for characters in a string directly, allowing us to remove a couple of layers of nesting.</li>
+<li><strong>Clumsy</strong>. The function has <em>four</em> separate exit points.</li>
 </ul>
-<p>Perhaps none of these charges seem too bad in such a small function, but small functions have a tendency to grow into larger ones, and <span id="excerpt1"/>flaws, in particular, scale rapidly.
-</p>
-
-<h4><a href="#toc8" name="tocislipogram2--3" id="tocislipogram2--3">is_lipogram2 &amp; 3</a></h4>
-<p>Here&#8217;s a standard-library-aware improvement.
-</p>
+<p>Perhaps none of these charges seem too bad in such a small function, but small functions have a tendency to grow into larger ones, and <span id="excerpt1"/>flaws, in particular, scale rapidly.</p>
+<h4 id="is_lipogram2-3">is_lipogram2 &amp; 3</h4>
+<p>Here&#8217;s a standard-library-aware improvement.</p>
 <div class="typocode">
 
 <pre class="prettyprint">bool is_lipogram(book const &amp; text, word const &amp; avoid)
@@ -448,8 +319,7 @@ bool is_lipogram(book const &amp; text, word const &amp; avoid)
 
 </div>
 
-<p>Many programmers would leave it at that, but I still prefer to re-cast this particular variant as follows:
-</p>
+<p>Many programmers would leave it at that, but I still prefer to re-cast this particular variant as follows:</p>
 <div class="typocode">
 
 <pre class="prettyprint">bool is_lipogram(book const &amp; text, word const &amp; avoid)
@@ -467,16 +337,11 @@ bool is_lipogram(book const &amp; text, word const &amp; avoid)
 
 </div>
 
-<p>Rather than exit as soon as we detect a character in the <code>avoid</code> string, we keep reading as long as there&#8217;s text to read and we&#8217;ve avoided such characters. There&#8217;s not much in it, especially in such a small function, but my preference is to simplify the control flow.
-</p>
-
-<h4><a href="#toc9" name="tocislipogram4" id="tocislipogram4">is_lipogram4</a></h4>
-<p>We can remove the explicit iteration from our code by using the <code>std::find_if</code> algorithm, which accepts a predicate. In this case we want to find the first word which isn&#8217;t itself a lipogram. Combining the <code>std::not1</code> function adaptor with a hand-written class deriving from <code>std::unary_function&lt;std::string const, bool&gt;</code> does the job.
-</p>
-<p>This code demonstrates proper use of the STL predicates and adaptors, but it also reaches the limits of my personal comfort zone for using C++ in a functional programming style. The price paid for avoiding explicit iteration is just too high; clever though this code may be, I don&#8217;t find it elegant. 
-</p>
-<p>When I first coded up <code>lipogram_word_tester</code>, it derived from <code>std::unary_function&lt;word const &amp;, bool&gt;</code>. This turns out to be wrong, or at least, it failed to compile with a typically cryptic diagnostic, and I&#8217;m still not sure why!
-</p>
+<p>Rather than exit as soon as we detect a character in the <code>avoid</code> string, we keep reading as long as there&#8217;s text to read and we&#8217;ve avoided such characters. There&#8217;s not much in it, especially in such a small function, but my preference is to simplify the control flow.</p>
+<h4 id="is_lipogram4">is_lipogram4</h4>
+<p>We can remove the explicit iteration from our code by using the <code>std::find_if</code> algorithm, which accepts a predicate. In this case we want to find the first word which isn&#8217;t itself a lipogram. Combining the <code>std::not1</code> function adaptor with a hand-written class deriving from <code>std::unary_function&lt;std::string const, bool&gt;</code> does the job.</p>
+<p>This code demonstrates proper use of the STL predicates and adaptors, but it also reaches the limits of my personal comfort zone for using C++ in a functional programming style. The price paid for avoiding explicit iteration is just too high; clever though this code may be, I don&#8217;t find it elegant. </p>
+<p>When I first coded up <code>lipogram_word_tester</code>, it derived from <code>std::unary_function&lt;word const &amp;, bool&gt;</code>. This turns out to be wrong, or at least, it failed to compile with a typically cryptic diagnostic, and I&#8217;m still not sure why!</p>
 <div class="typocode">
 
 <pre class="prettyprint">// Simple functor for use in lipogram algorithms
@@ -484,13 +349,13 @@ class lipogram_word_tester:
     public std::unary_function&lt;word const, bool&gt;
 {
 public:
-    // Constructor. Caches a copy of the 'avoid' parameter.
+    // Constructor. Caches a copy of the &#x27;avoid&#x27; parameter.
     lipogram_word_tester(word const &amp; avoid)
         : avoid(avoid)
     {
     }
     // Function operator returns true if the word being tested
-    // omits characters from the 'avoid' string, false otherwise.
+    // omits characters from the &#x27;avoid&#x27; string, false otherwise.
     bool operator()(word const &amp; to_test) const
     {
         return to_test.find_first_of(avoid)
@@ -500,7 +365,7 @@ private:
     // Private cache of characters to avoid.
     word const avoid;
 };
-    
+
 bool is_lipogram(book const &amp; text, word const &amp; avoid)
 {
     lipogram_word_tester const word_test(avoid);
@@ -512,12 +377,9 @@ bool is_lipogram(book const &amp; text, word const &amp; avoid)
 
 </div>
 
-
-<h4><a href="#toc10" name="tocislipogram5" id="tocislipogram5">is_lipogram5</a></h4>
-<p>I would expect all four functions presented so far to be similarly efficient in terms of memory, stack, CPU cycles. 
-</p>
-<p>A recursive solution may require more stack: it depends on the compiler. We&#8217;ve now got two functions, and although each comprises just a single expression, the expression forming the body of the recursive helper function, <code>is_lipo()</code>, is tricky. I wouldn&#8217;t recommend this implementation.
-</p>
+<h4 id="is_lipogram5">is_lipogram5</h4>
+<p>I would expect all four functions presented so far to be similarly efficient in terms of memory, stack, CPU cycles. </p>
+<p>A recursive solution may require more stack: it depends on the compiler. We&#8217;ve now got two functions, and although each comprises just a single expression, the expression forming the body of the recursive helper function, <code>is_lipo()</code>, is tricky. I wouldn&#8217;t recommend this implementation.</p>
 <div class="typocode">
 
 <pre class="prettyprint">bool is_lipo(book_iter wb, book_iter we, word const &amp; avoid)
@@ -526,7 +388,7 @@ bool is_lipogram(book const &amp; text, word const &amp; avoid)
         wb-&gt;find_first_of(avoid) == std::string::npos &amp;&amp;
         is_lipo(++wb, we, avoid);
 }
-    
+
 bool is_lipogram(book const &amp; text, word const &amp; avoid)
 {
     return is_lipo(text.begin(), text.end(), avoid);
@@ -536,10 +398,8 @@ bool is_lipogram(book const &amp; text, word const &amp; avoid)
 
 </div>
 
-
-<h4><a href="#toc11" name="tocislipogram6" id="tocislipogram6">is_lipogram6</a></h4>
-<p>Our final alternative is a clear winner on the three fronts which led us to reject our original implementation: it&#8217;s brief, it leans heavily on the standard library, it has just a single exit point &mdash; in fact, is just a single expression.
-</p>
+<h4 id="is_lipogram6">is_lipogram6</h4>
+<p>Our final alternative is a clear winner on the three fronts which led us to reject our original implementation: it&#8217;s brief, it leans heavily on the standard library, it has just a single exit point &mdash; in fact, is just a single expression.</p>
 <div class="typocode">
 
 <pre class="prettyprint">bool is_lipogram(book const &amp; text, word const &amp; avoid)
@@ -552,20 +412,15 @@ bool is_lipogram(book const &amp; text, word const &amp; avoid)
 
 </div>
 
-<p>Does it qualify as elegant? I&#8217;d say so, yes. Sadly, though, its inefficiency rules it out as a heavy-duty lipogram checker. The <code>std::string</code> class is not designed for repeated addition &mdash; which is what <code>std::accumulate</code> does.
-</p>
-
-<h3><a href="#toc12" name="tocwinding-up" id="tocwinding-up">Winding Up</a></h3>
-<p>Actually none of the C++ lipogram checkers are much use, except in the case when we&#8217;re certain our book is written in 7-bit ASCII. A lipogram which avoids the letter E should also avoid its various accented forms: &eacute;, &egrave;, &ecirc;, &euml;, &Eacute;, &Egrave;, &Ecirc;, &Euml;, &#8230;
-</p>
-<p>A heavy-duty lipogram checker needs to work in Unicode and, for C++ at least, will have to establish some ground rules for input encoding schemes. The current C++ standard (C++98) has little to say about Unicode. We&#8217;d be better off using a more Unicode aware language, such as Java.
-</p>
-<p><a href="http://python.org">Python</a> allows us to create a character stream which accumulates all the characters in all the words, but yields them lazily. The function below uses <code>itertools.chain</code> to flatten the input words (which themselves may be a stream or an in-memory collection) into a character stream. The built-in <code>all</code> function reads exactly as far into this stream as it needs to. In other words, we&#8217;ve got a Python counterpart to our final C++ algorithm which is both efficient (efficient for Python that is!) and equally happy with Unicode and ASCII.
-</p>
+<p>Does it qualify as elegant? I&#8217;d say so, yes. Sadly, though, its inefficiency rules it out as a heavy-duty lipogram checker. The <code>std::string</code> class is not designed for repeated addition &mdash; which is what <code>std::accumulate</code> does.</p>
+<h3 id="winding-up">Winding Up</h3>
+<p>Actually none of the C++ lipogram checkers are much use, except in the case when we&#8217;re certain our book is written in 7-bit ASCII. A lipogram which avoids the letter E should also avoid its various accented forms: &eacute;, &egrave;, &ecirc;, &euml;, &Eacute;, &Egrave;, &Ecirc;, &Euml;, &#8230;</p>
+<p>A heavy-duty lipogram checker needs to work in Unicode and, for C++ at least, will have to establish some ground rules for input encoding schemes. The current C++ standard (C++98) has little to say about Unicode. We&#8217;d be better off using a more Unicode aware language, such as Java.</p>
+<p><a href="http://python.org">Python</a> allows us to create a character stream which accumulates all the characters in all the words, but yields them lazily. The function below uses <code>itertools.chain</code> to flatten the input words (which themselves may be a stream or an in-memory collection) into a character stream. The built-in <code>all</code> function reads exactly as far into this stream as it needs to. In other words, we&#8217;ve got a Python counterpart to our final C++ algorithm which is both efficient (efficient for Python that is!) and equally happy with Unicode and ASCII.</p>
 <div class="typocode">
 
 <pre class="prettyprint">import iterools
-    
+
 def is_lipogram(words, avoid):
     return all(ch not in avoid
                for ch in itertools.chain(*words))
@@ -574,8 +429,7 @@ def is_lipogram(words, avoid):
 
 </div>
 
-
-<h3><a href="#toc13" name="tocc-source-code" id="tocc-source-code">C++ Source Code</a></h3>
+<h3 id="c-source-code">C++ Source Code</h3>
 <div class="typocode">
 
 <pre class="prettyprint">#include &lt;cassert&gt;
@@ -585,7 +439,7 @@ def is_lipogram(words, avoid):
 #include &lt;set&gt;
 #include &lt;string&gt;
 #include &lt;vector&gt;
-    
+
 namespace
 {
 typedef std::string word;
@@ -593,9 +447,9 @@ typedef word::const_iterator word_iter;
 typedef std::vector&lt;word&gt; book;
 typedef book::const_iterator book_iter;
 typedef bool (* lipo_fn)(book const &amp;, word const &amp;);
-    
+
 // Return true if the input text avoids using any characters
-// in 'avoid', false otherwise.
+// in &#x27;avoid&#x27;, false otherwise.
 bool is_lipogram1(book const &amp; text, word const &amp; avoid)
 {
     // Handle edge case -- empty book
@@ -623,7 +477,7 @@ bool is_lipogram1(book const &amp; text, word const &amp; avoid)
     }
     return true;
 }       
-    
+
 bool is_lipogram2(book const &amp; text, word const &amp; avoid)
 {
     for (book_iter w = text.begin(); w != text.end(); ++w)
@@ -635,7 +489,7 @@ bool is_lipogram2(book const &amp; text, word const &amp; avoid)
     }
     return true;
 }
-    
+
 bool is_lipogram3(book const &amp; text, word const &amp; avoid)
 {
     book_iter w = text.begin();
@@ -646,7 +500,7 @@ bool is_lipogram3(book const &amp; text, word const &amp; avoid)
     }
     return w == text.end();
 }
-    
+
 // Simple functor for use in lipogram algorithms
 class lipogram_word_tester:
     public std::unary_function&lt;std::string const, bool&gt;
@@ -658,7 +512,7 @@ public:
     {
     }
     // Function operator returns true if the word being tested
-    // omits characters from the 'avoid' string, false otherwise.
+    // omits characters from the &#x27;avoid&#x27; string, false otherwise.
     bool operator()(word const &amp; to_test) const
     {
         return to_test.find_first_of(avoid)
@@ -668,38 +522,38 @@ private:
     // Private cache of characters to avoid.
     word const avoid;
 };
-    
+
 bool is_lipogram4(book const &amp; text, word const &amp; avoid)
 {
     lipogram_word_tester const word_test(avoid);
     return find_if(text.begin(), text.end(),
                    not1(word_test)) == text.end();
 }
-    
+
 bool is_lipo5(book_iter wb, book_iter we, word const &amp; avoid)
 {
     return wb == we ||
         wb-&gt;find_first_of(avoid) == std::string::npos &amp;&amp;
         is_lipo5(++wb, we, avoid);
 }
-    
+
 bool is_lipogram5(book const &amp; text, word const &amp; avoid)
 {
     return is_lipo5(text.begin(), text.end(), avoid);
 }
-    
+
 bool is_lipogram6(book const &amp; text, word const &amp; avoid)
 {
     return accumulate(text.begin(), text.end(), std::string()
                       ).find_first_of(avoid) == std::string::npos;
 }
-    
+
 void read_book(book &amp; text, std::istream &amp; input) 
 {
     typedef std::istream_iterator&lt;word&gt; in;
     std::copy(in(input), in(), back_inserter(text));
 }
-    
+
 // Function-like class used for lipo_fn evaluation.
 class lipo_functor
 {
@@ -719,7 +573,7 @@ private:
     book const &amp; text;
     word const &amp; avoid;
 };
-    
+
 void check_if_lipogram(std::ostream &amp; report,
                        book const &amp; text, word const &amp; avoid)
 {
@@ -733,17 +587,17 @@ void check_if_lipogram(std::ostream &amp; report,
             is_lipogram5,
             is_lipogram6,
         };
-    
+
     lipo_functor lipo_func(text, avoid);
     answers results;
     lipo_fn const * const end = lipo_fns + sizeof lipo_fns / sizeof *lipo_fns;
     transform(lipo_fns, end, inserter(results, results.end()), lipo_func);
     assert(results.size() == 1);
     report &lt;&lt; "Is " &lt;&lt; (*results.begin() ? "" : "not ")
-           &lt;&lt; "a lipogram" &lt;&lt; '\n';
+           &lt;&lt; "a lipogram" &lt;&lt; &#x27;\n&#x27;;
 }
 } // end anonymous namespace
-    
+
 int main()
 {
     book text;

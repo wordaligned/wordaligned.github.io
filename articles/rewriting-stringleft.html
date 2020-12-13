@@ -28,8 +28,7 @@
       <div class="atomentry" id="rewriting-stringleft">
 <h2 class="title"><a href="/articles/rewriting-stringleft">Rewriting String.Left()</a></h2>
 <p class="meta"><abbr class="published" title="2008-07-13">2008-07-13</abbr> &bull; <a href="/tag/java" rel="tag">Java</a> &bull; <a href="/articles/rewriting-stringleft#disqus_thread">Comments</a></p>
-<p>Over at <a href="http://www.codinghorror.com/blog/archives/001151.html">Coding Horror, Jeff Atwood</a> codes up <code>String.Left()</code> in C#.
-</p>
+<p>Over at <a href="http://www.codinghorror.com/blog/archives/001151.html">Coding Horror, Jeff Atwood</a> codes up <code>String.Left()</code> in C#.</p>
 <blockquote><p>For example, in C#, there is no String.Left() function. Fair enough; we can roll up our sleeves and write our own function lickety-split:</p>
 <pre>
 public static string Left(string s, int len)
@@ -43,10 +42,8 @@ public static string Left(string s, int len)
 }
 </pre></blockquote>
 
-<p>He&#8217;s using this function to introduce <a href="http://msdn.microsoft.com/en-us/library/bb383977.aspx">C# extension-methods</a>, but I&#8217;m more interested in making some sweeping generalisations about Java code.
-</p>
-<p>In the article&#8217;s comments section PRMan points out this function &#8220;blows up&#8221; if the input string is null, and offers a simple fix:
-</p>
+<p>He&#8217;s using this function to introduce <a href="http://msdn.microsoft.com/en-us/library/bb383977.aspx">C# extension-methods</a>, but I&#8217;m more interested in making some sweeping generalisations about Java code.</p>
+<p>In the article&#8217;s comments section PRMan points out this function &#8220;blows up&#8221; if the input string is null, and offers a simple fix:</p>
 <div class="typocode">
 
 <pre class="prettyprint">public static string Left(string s, int len)
@@ -65,20 +62,17 @@ public static string Left(string s, int len)
 
 </div>
 
-<p>Now, I&#8217;ve never written any C#. In fact I don&#8217;t even have a C# compiler to hand. But this code looks like everything which ever bugged me about Java. What&#8217;s the point of writing a string function which accepts a null input? All we&#8217;ve done is force clients of <code>String.Left()</code> to handle null inputs too. Just (implicitly) raise a null pointer exception (which is <strong>not</strong> the same as blowing up) and be done with it.
-</p>
-<p>It&#8217;s unfair to suggest this <a href="http://wordaligned.org/articles/stop-the-clock-squash-the-bug.html#tocdefensive-programming">bogus defensive coding</a> has anything to do with Java &#8212; you can do the same thing in any language &#8212; but in my personal experience lots of Java code gets written this way, to the extent that I used to regard these nervy null checks as being idiomatic. So I was relieved when a Michael Feathers <a href="http://www.artima.com/weblogs/viewpost.jsp?thread=168511">article</a> put me straight:
-</p>
-<blockquote><p>Spurious null checks are a symptom of bad code.
-</p>
-</blockquote><p>Feathers&#8217; examples are coded in Java, so maybe I wasn&#8217;t being unfair after all. If you&#8217;re really concerned about <code>String.Left()</code> handling whatever clients might throw at it, then it&#8217;s more important to deal with negative values of <code>len</code>.
-</p>
-<p>So we&#8217;re back to Atwood&#8217;s original version which reads the way a programmer might think about this problem:
-</p>
-<blockquote><p>The leftmost <code>n</code> characters is just <code>s.Substring(0, len)</code>, but, <em>careful!</em>, what if <code>len</code> is too big, and what about if <code>s</code> is empty, or if <code>len</code> is zero?
-</p>
-</blockquote><p>Hence we end up with a three way conditional with three separate and rather different looking return values, in which the most interesting case appears last. I think this code could be more readable. First (unless I&#8217;m missing something about C#) we can get rid of the special case of <code>(len == 0 || s.Length == 0)</code> since the subsequent clauses do the right thing. (By the way, I&#8217;m switching to Java now since I have no C# compiler to hand.)
-</p>
+<p>Now, I&#8217;ve never written any C#. In fact I don&#8217;t even have a C# compiler to hand. But this code looks like everything which ever bugged me about Java. What&#8217;s the point of writing a string function which accepts a null input? All we&#8217;ve done is force clients of <code>String.Left()</code> to handle null inputs too. Just (implicitly) raise a null pointer exception (which is <strong>not</strong> the same as blowing up) and be done with it.</p>
+<p>It&#8217;s unfair to suggest this <a href="http://wordaligned.org/articles/stop-the-clock-squash-the-bug.html#tocdefensive-programming">bogus defensive coding</a> has anything to do with Java &#8212; you can do the same thing in any language &#8212; but in my personal experience lots of Java code gets written this way, to the extent that I used to regard these nervy null checks as being idiomatic. So I was relieved when a Michael Feathers <a href="http://www.artima.com/weblogs/viewpost.jsp?thread=168511">article</a> put me straight:</p>
+<blockquote>
+<p>Spurious null checks are a symptom of bad code.</p>
+</blockquote>
+<p>Feathers&#8217; examples are coded in Java, so maybe I wasn&#8217;t being unfair after all. If you&#8217;re really concerned about <code>String.Left()</code> handling whatever clients might throw at it, then it&#8217;s more important to deal with negative values of <code>len</code>.</p>
+<p>So we&#8217;re back to Atwood&#8217;s original version which reads the way a programmer might think about this problem:</p>
+<blockquote>
+<p>The leftmost <code>n</code> characters is just <code>s.Substring(0, len)</code>, but, <em>careful!</em>, what if <code>len</code> is too big, and what about if <code>s</code> is empty, or if <code>len</code> is zero?</p>
+</blockquote>
+<p>Hence we end up with a three way conditional with three separate and rather different looking return values, in which the most interesting case appears last. I think this code could be more readable. First (unless I&#8217;m missing something about C#) we can get rid of the special case of <code>(len == 0 || s.Length == 0)</code> since the subsequent clauses do the right thing. (By the way, I&#8217;m switching to Java now since I have no C# compiler to hand.)</p>
 <div class="typocode">
 
 <pre class="prettyprint">    public static String left(String s, int len)
@@ -94,8 +88,7 @@ public static string Left(string s, int len)
 
 </div>
 
-<p>I personally would transform this to:
-</p>
+<p>I personally would transform this to:</p>
 <div class="typocode">
 
 <pre class="prettyprint">    public static String left(String s, int len){
@@ -106,14 +99,10 @@ public static string Left(string s, int len)
 
 </div>
 
-<p>It&#8217;s not that I&#8217;m particularly against multiple returns, and I don&#8217;t claim this tweak is a big improvement: I just prefer a more declarative style, which clearly says we&#8217;re returning a substring of <code>s</code>, starting at index 0, of length <code>len</code> or <code>s.length()</code> if smaller.
-</p>
-<p>In fact, I don&#8217;t think many Java programmers would agree I&#8217;ve improved things. Java seems to favour explicit control flow over even this trivial functional composition. Which is why I don&#8217;t miss <a href="http://wordaligned.org/articles/introducing-java.html#toclanguage-wars">programming in Java</a>, and why I&#8217;m in no hurry to try C#.
-</p>
-<p>I also wonder if Jeff Atwood&#8217;s original version of <code>String.Left()</code> is, in theory, more efficient. Will a return value of <code>""</code> be pooled? Does it make sense to return the original string whenever possible, to avoid creating unnecessary objects? I don&#8217;t know enough about C# or Java say if there&#8217;s any truth in these suggestions. I do know that such savings are extremely unlikely to make any real difference for real strings in real programs, and that sacrificing readability for theoretical efficiency is a <a href="http://en.wikipedia.org/wiki/Optimization_(computer_science)#Quotes">mistake</a>.
-</p>
-<p>On the subject of readability, <code>String.Left()</code> is really just a special case of <a href="http://docs.python.org/lib/typesseq.html">sequence slicing</a> &#8212; a Python feature which I&#8217;d like to monkey-patch into other languages.
-</p>
+<p>It&#8217;s not that I&#8217;m particularly against multiple returns, and I don&#8217;t claim this tweak is a big improvement: I just prefer a more declarative style, which clearly says we&#8217;re returning a substring of <code>s</code>, starting at index 0, of length <code>len</code> or <code>s.length()</code> if smaller.</p>
+<p>In fact, I don&#8217;t think many Java programmers would agree I&#8217;ve improved things. Java seems to favour explicit control flow over even this trivial functional composition. Which is why I don&#8217;t miss <a href="http://wordaligned.org/articles/introducing-java.html#toclanguage-wars">programming in Java</a>, and why I&#8217;m in no hurry to try C#.</p>
+<p>I also wonder if Jeff Atwood&#8217;s original version of <code>String.Left()</code> is, in theory, more efficient. Will a return value of <code>""</code> be pooled? Does it make sense to return the original string whenever possible, to avoid creating unnecessary objects? I don&#8217;t know enough about C# or Java say if there&#8217;s any truth in these suggestions. I do know that such savings are extremely unlikely to make any real difference for real strings in real programs, and that sacrificing readability for theoretical efficiency is a <a href="http://en.wikipedia.org/wiki/Optimization_(computer_science)#Quotes">mistake</a>.</p>
+<p>On the subject of readability, <code>String.Left()</code> is really just a special case of <a href="http://docs.python.org/lib/typesseq.html">sequence slicing</a> &#8212; a Python feature which I&#8217;d like to monkey-patch into other languages.</p>
 </div>
 
 <div class="comments"><hr/><div id="disqus_thread"></div><script type="text/javascript" src="http://disqus.com/forums/wordaligned/embed.js"></script></div>

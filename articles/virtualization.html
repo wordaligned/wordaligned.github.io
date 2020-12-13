@@ -28,190 +28,73 @@
       <div class="atomentry" id="virtualization">
 <h2 class="title"><a href="/articles/virtualization">Tell me about &#8230; Virtualization</a></h2>
 <p class="meta"><abbr class="published" title="2009-01-07">2009-01-07</abbr> &bull; <a href="/tag/unix" rel="tag">Unix</a>, <a href="/tag/windows" rel="tag">Windows</a>, <a href="/tag/apple" rel="tag">Apple</a>, <a href="/tag/virtualization" rel="tag">Virtualization</a>, <a href="/tag/accu" rel="tag">ACCU</a> &bull; <a href="/articles/virtualization#disqus_thread">Comments</a></p>
-<div class="toc">
-<h2>Contents</h2>
+<h3 id="introduction">Introduction</h3>
+<p>Virtualization solves a computing problem by adding a layer of indirection. The problem being: how to run multiple operating systems on a single computer; and the indirection: to slip a software shim between a guest operating system and the hosting platform, which continues to run its native operating system.</p>
+<p><img src="/images/imac-parallels.png" alt="Imac running OS X, Windows XP, Linux"/></p>
+<p>An example makes this clear. I work on an Apple computer which runs OS X, a flavour of BSD Unix. To develop portable code which will build and run on Linux and Windows as well as OS X, I use virtualization software. Using this software enables my Apple computer to run (for example) Windows XP and Linux Fedora Core 7 as guest operating systems alongside its native OS X. Effectively, I have three computers running on the same physical machine with no need for extra power supplies, keyboards, mice, monitors and so on.</p>
+<p><a href="http://www.vmware.com"><img src="/images/vmware.gif" style="float:right" alt="VMware logo"/></a></p>
+<p>The <a href="http://www.parallels.com/">Parallels Desktop</a> virtualization software I use doesn&#8217;t come free but it&#8217;s cheaper and more convenient than buying more hardware. <a href="http://www.vmware.com">VMware</a>, perhaps the single biggest name in virtualization, does offer free entry-level products for doing a similar job on Windows and Linux platforms.</p>
+<p><a href="http://www.parallels.com"><img src="/images/parallels-logo.gif" style="float:right" alt="Parallels logo"/></a></p>
+<p>This article will not provide details on installing and configuring virtualization software, troubleshooting problems, and so on: the products have matured to the extent that these details are hardly needed, and any problems are quickly answered by online forums. We won&#8217;t attempt to explain how exactly virtualization works. Instead, we&#8217;ll talk more about what virtualization is, how we can use it, and why we should be interested it.</p>
+<p><span id="continue-reading"/></p>
+<h3 id="virtualization-in-general">Virtualization in general</h3>
+<p>Before we go further I should explain this article uses the term &#8220;virtualization&#8221; in the specific way described in the introduction. More generally, in computing, virtualization refers to the abstraction in software of the platform on which a program runs. The Java Virtual Machine is a well known example, allowing software developers to build a single executable which should run on any machine. The JVM also isolates the application from the rest of the machine. These advantages, of portability and isolation, also apply to the full  virtualization we&#8217;ll discuss in this article.</p>
+<h3 id="creating-a-virtual-machine">Creating a virtual machine</h3>
+<p>Setting up a virtual machine feels just like setting up a normal machine, except you don&#8217;t need new hardware. All you need is your host machine, the guest operating system media, and a suitable license to use it. With your host up and running, mount the install media, start up the virtualization software, click &#8220;Create new machine&#8221;, and follow the prompts. You&#8217;ll have to specify what resources to grant the machine (disk space, RAM, etc.) but very quickly you&#8217;ll be following the standard install procedure for your guest OS, selecting languages, packages and so on.</p>
+<p>You don&#8217;t need actual physical media: you can create your virtual machine by booting it up from a DVD image on disk or over a network in much the same way.</p>
+<h3 id="heres-one-we-made-earlier">Here&#8217;s one we made earlier</h3>
+<p>Actually, you may not require <em>any</em> install media. Your virtualization software is capable of booting up a pre-built virtual machine. VMware terms such machines <a href="http://www.vmware.com/appliances/">virtual appliances</a>. Running such an appliance is as easy as downloading it (which, at around 300Mb or less, requires far less bandwidth than a typical install image) and clicking on the downloaded file.</p>
+<p>What you&#8217;ll typically be getting is a stripped-down Unix server, pre-built for a specific purpose, with stable, tested, compatible versions of whatever packages it requires for that purpose, and capable of operating within, say, 256Mb of RAM and as much hard disk as you&#8217;re prepared to allow it. You can run this Unix server on a Windows machine. You can reconfigure it. You can even transfer it to a different machine.</p>
+<p>As an example, suppose you want evaluate <a href="http://trac.edgewall.org">Trac</a>, an integrated version control and project management application. Trac may be open-source, popular and free, but I can personally vouch that on a Unix system it takes some setting up, and I can&#8217;t imagine getting it to work natively on a Windows server. Using virtualization, you simply download a virtual machine which has been loaded with the latest stable release of Trac. Boot up this machine using your host virtualisation software and run it on any supported operating system &#8212; Windows included. Do the same with <a href="http://www.redmine.org">Redmine</a>, another web-based project management application, and you can compare it with Trac. Once you&#8217;ve completed your evaluation, delete the one you don&#8217;t like and keep going with the other. As a virtual machine, it&#8217;s easy to move it to a new host, if desired. </p>
+<p><a href="http://www.jumpbox.com"><img style="float:right" src="http://www.jumpbox.com/sites/all/themes/jumpbox/logo-white.gif" alt="JumpBox logo"/></a></p>
+<p>VMware provide instructions for creating appliances and host a <a href="http://www.vmware.com/appliances/">library of such appliances</a> on their website. Organisations like <a href="http://www.jumpbox.com">JumpBox</a> make a business out of providing virtual machines which run on a number of different virtual platforms.</p>
+<h3 id="running-a-virtual-machine">Running a virtual machine</h3>
+<p><img style="float:right" src="/images/win-xp-and-fc7.gif" alt="Virtual machine shortcuts"/></p>
+<p>Parallels Desktop creates shortcuts which I click on to power up the virtual machines. VMware on Windows does something similar. My perception is that these virtual machines boot as quickly as their physical counterparts would, but it could simply be that I&#8217;m using the host system to do something else while they  start up in the background.</p>
+<p>Exactly how the guest operating system integrates with the host varies. Some systems/configurations give you a window within a window; the guest user interface is displayed as a whole within a single window on the host, and you switch focus to this window to use it. More sophisticated systems integrate seamlessly, so you can tab between host and guest applications as if they were all running natively, and guest and host file browsers see both machines&#8217; file systems transparently. The end-user experience is of the host and guest operating in parallel, as a single computer which can run software native to both systems.</p>
+<p>In my experience, the first mode can be awkward to use. I much prefer the second: any friction context-switching between machines, and you find yourself preferring separate machines and a KVM, or using an X server to display X windows presented by a remote machine.</p>
+<h3 id="peripheral-access">Peripheral Access</h3>
+<p>Which peripherals can the guest operating system access? Certainly, the guest wouldn&#8217;t be much use if it couldn&#8217;t make use of monitor, keyboard and mouse &#8212; although you may suffer translation and configuration wrinkles due to the different keyboard layout and mouse button conventions used by different operating systems.</p>
+<p>Access to other peripherals and interfaces will depend on the virtualization software: check the product information. My guest Windows XP can use its host&#8217;s:</p>
 <ul>
- <li><a href="#tocintroduction" name="toc0" id="toc0">Introduction</a>
- </li>
-
- <li><a href="#tocvirtualization-in-general" name="toc1" id="toc1">Virtualization in general</a>
- </li>
-
- <li><a href="#toccreating-a-virtual-machine" name="toc2" id="toc2">Creating a virtual machine</a>
- </li>
-
- <li><a href="#tocheres-one-we-made-earlier" name="toc3" id="toc3">Here&#8217;s one we made earlier</a>
- </li>
-
- <li><a href="#tocrunning-a-virtual-machine" name="toc4" id="toc4">Running a virtual machine</a>
- </li>
-
- <li><a href="#tocperipheral-access" name="toc5" id="toc5">Peripheral Access</a>
- </li>
-
- <li><a href="#tocopportunities" name="toc6" id="toc6">Opportunities</a>
- </li>
-
- <li><a href="#tocconsiderations" name="toc7" id="toc7">Considerations</a>
- </li>
-
- <li><a href="#tocjust-for-fun" name="toc8" id="toc8">Just for fun</a>
- </li>
-
- <li><a href="#tocfurther-reading" name="toc9" id="toc9">Further reading</a>
- </li>
-
- <li><a href="#tocthanks" name="toc10" id="toc10">Thanks</a>
- </li>
+<li>network interfaces</li>
+<li>USB ports</li>
+<li>DVD drive</li>
+<li>speakers</li>
+<li>built-in camera</li>
 </ul>
-</div>
-<h3><a href="#toc0" name="tocintroduction" id="tocintroduction">Introduction</a></h3>
-<p>Virtualization solves a computing problem by adding a layer of indirection. The problem being: how to run multiple operating systems on a single computer; and the indirection: to slip a software shim between a guest operating system and the hosting platform, which continues to run its native operating system.
-</p>
-<img src="/images/imac-parallels.png" alt="Imac running OS X, Windows XP, Linux"/>
-
-<p>An example makes this clear. I work on an Apple computer which runs OS X, a flavour of BSD Unix. To develop portable code which will build and run on Linux and Windows as well as OS X, I use virtualization software. Using this software enables my Apple computer to run (for example) Windows XP and Linux Fedora Core 7 as guest operating systems alongside its native OS X. Effectively, I have three computers running on the same physical machine with no need for extra power supplies, keyboards, mice, monitors and so on.
-</p>
-<p><a href="http://www.vmware.com"><img src="/images/vmware.gif" style="float:right" alt="VMware logo"/></a>
-</p>
-<p>The <a href="http://www.parallels.com/">Parallels Desktop</a> virtualization software I use doesn&#8217;t come free but it&#8217;s cheaper and more convenient than buying more hardware. <a href="http://www.vmware.com">VMware</a>, perhaps the single biggest name in virtualization, does offer free entry-level products for doing a similar job on Windows and Linux platforms.
-</p>
-<p><a href="http://www.parallels.com"><img src="/images/parallels-logo.gif" style="float:right" alt="Parallels logo"/></a>
-</p>
-<p>This article will not provide details on installing and configuring virtualization software, troubleshooting problems, and so on: the products have matured to the extent that these details are hardly needed, and any problems are quickly answered by online forums. We won&#8217;t attempt to explain how exactly virtualization works. Instead, we&#8217;ll talk more about what virtualization is, how we can use it, and why we should be interested it.
-</p>
-<span id="continue-reading"/>
-
-
-<h3><a href="#toc1" name="tocvirtualization-in-general" id="tocvirtualization-in-general">Virtualization in general</a></h3>
-<p>Before we go further I should explain this article uses the term &#8220;virtualization&#8221; in the specific way described in the introduction. More generally, in computing, virtualization refers to the abstraction in software of the platform on which a program runs. The Java Virtual Machine is a well known example, allowing software developers to build a single executable which should run on any machine. The JVM also isolates the application from the rest of the machine. These advantages, of portability and isolation, also apply to the full  virtualization we&#8217;ll discuss in this article.
-</p>
-
-<h3><a href="#toc2" name="toccreating-a-virtual-machine" id="toccreating-a-virtual-machine">Creating a virtual machine</a></h3>
-<p>Setting up a virtual machine feels just like setting up a normal machine, except you don&#8217;t need new hardware. All you need is your host machine, the guest operating system media, and a suitable license to use it. With your host up and running, mount the install media, start up the virtualization software, click &#8220;Create new machine&#8221;, and follow the prompts. You&#8217;ll have to specify what resources to grant the machine (disk space, RAM, etc.) but very quickly you&#8217;ll be following the standard install procedure for your guest OS, selecting languages, packages and so on.
-</p>
-<p>You don&#8217;t need actual physical media: you can create your virtual machine by booting it up from a DVD image on disk or over a network in much the same way.
-</p>
-
-<h3><a href="#toc3" name="tocheres-one-we-made-earlier" id="tocheres-one-we-made-earlier">Here&#8217;s one we made earlier</a></h3>
-<p>Actually, you may not require <em>any</em> install media. Your virtualization software is capable of booting up a pre-built virtual machine. VMware terms such machines <a href="http://www.vmware.com/appliances/">virtual appliances</a>. Running such an appliance is as easy as downloading it (which, at around 300Mb or less, requires far less bandwidth than a typical install image) and clicking on the downloaded file.
-</p>
-<p>What you&#8217;ll typically be getting is a stripped-down Unix server, pre-built for a specific purpose, with stable, tested, compatible versions of whatever packages it requires for that purpose, and capable of operating within, say, 256Mb of RAM and as much hard disk as you&#8217;re prepared to allow it. You can run this Unix server on a Windows machine. You can reconfigure it. You can even transfer it to a different machine.
-</p>
-<p>As an example, suppose you want evaluate <a href="http://trac.edgewall.org">Trac</a>, an integrated version control and project management application. Trac may be open-source, popular and free, but I can personally vouch that on a Unix system it takes some setting up, and I can&#8217;t imagine getting it to work natively on a Windows server. Using virtualization, you simply download a virtual machine which has been loaded with the latest stable release of Trac. Boot up this machine using your host virtualisation software and run it on any supported operating system &#8212; Windows included. Do the same with <a href="http://www.redmine.org">Redmine</a>, another web-based project management application, and you can compare it with Trac. Once you&#8217;ve completed your evaluation, delete the one you don&#8217;t like and keep going with the other. As a virtual machine, it&#8217;s easy to move it to a new host, if desired. 
-</p>
-<p><a href="http://www.jumpbox.com"><img style="float:right" src="http://www.jumpbox.com/sites/all/themes/jumpbox/logo-white.gif" alt="JumpBox logo"/></a>
-</p>
-<p>VMware provide instructions for creating appliances and host a <a href="http://www.vmware.com/appliances/">library of such appliances</a> on their website. Organisations like <a href="http://www.jumpbox.com">JumpBox</a> make a business out of providing virtual machines which run on a number of different virtual platforms.
-</p>
-
-<h3><a href="#toc4" name="tocrunning-a-virtual-machine" id="tocrunning-a-virtual-machine">Running a virtual machine</a></h3>
-<img style="float:right" src="/images/win-xp-and-fc7.gif" alt="Virtual machine shortcuts"/>
-
-<p>Parallels Desktop creates shortcuts which I click on to power up the virtual machines. VMware on Windows does something similar. My perception is that these virtual machines boot as quickly as their physical counterparts would, but it could simply be that I&#8217;m using the host system to do something else while they  start up in the background.
-</p>
-<p>Exactly how the guest operating system integrates with the host varies. Some systems/configurations give you a window within a window; the guest user interface is displayed as a whole within a single window on the host, and you switch focus to this window to use it. More sophisticated systems integrate seamlessly, so you can tab between host and guest applications as if they were all running natively, and guest and host file browsers see both machines&#8217; file systems transparently. The end-user experience is of the host and guest operating in parallel, as a single computer which can run software native to both systems.
-</p>
-<p>In my experience, the first mode can be awkward to use. I much prefer the second: any friction context-switching between machines, and you find yourself preferring separate machines and a KVM, or using an X server to display X windows presented by a remote machine.
-</p>
-
-<h3><a href="#toc5" name="tocperipheral-access" id="tocperipheral-access">Peripheral Access</a></h3>
-<p>Which peripherals can the guest operating system access? Certainly, the guest wouldn&#8217;t be much use if it couldn&#8217;t make use of monitor, keyboard and mouse &#8212; although you may suffer translation and configuration wrinkles due to the different keyboard layout and mouse button conventions used by different operating systems.
-</p>
-<p>Access to other peripherals and interfaces will depend on the virtualization software: check the product information. My guest Windows XP can use its host&#8217;s:
-</p>
+<p>Actually, I didn&#8217;t realise it could use the camera, having never had cause to use the camera from within Windows, but a quick check shows it can. Access to networked printers also just works.</p>
+<h3 id="opportunities">Opportunities</h3>
+<p>I&#8217;ve already mentioned some obvious uses for virtualization, and I&#8217;ll add some more which I&#8217;ve found useful in the past:</p>
 <ul>
- <li>
-     network interfaces
- </li>
-
- <li>
-     USB ports
- </li>
-
- <li>
-     DVD drive
- </li>
-
- <li>
-     speakers
- </li>
-
- <li>
-     built-in camera
- </li>
+<li>you can develop for multiple platforms using a single machine</li>
+<li>you can download pre-built machines designed to run particular applications, saving you from package management headaches</li>
+<li>if you use a laptop, virtualization allows you to carry many machines around with you: a sales person could demonstrate Unix-based software on a Windows machine, for example</li>
+<li>you can script the creation of machines, and test e.g. clustered server configurations, without needing a rack filled with hardware</li>
+<li>you can test on multiple platforms</li>
 </ul>
-<p>Actually, I didn&#8217;t realise it could use the camera, having never had cause to use the camera from within Windows, but a quick check shows it can. Access to networked printers also just works.
-</p>
-
-<h3><a href="#toc6" name="tocopportunities" id="tocopportunities">Opportunities</a></h3>
-<p>I&#8217;ve already mentioned some obvious uses for virtualization, and I&#8217;ll add some more which I&#8217;ve found useful in the past:
-</p>
-<ul>
- <li>
-     you can develop for multiple platforms using a single machine
- </li>
-
- <li>
-     you can download pre-built machines designed to run particular applications, saving you from package management headaches
- </li>
-
- <li>
-     if you use a laptop, virtualization allows you to carry many machines around with you: a sales person could demonstrate Unix-based software on a Windows machine, for example
- </li>
-
- <li>
-     you can script the creation of machines, and test e.g. clustered server configurations, without needing a rack filled with hardware
- </li>
-
- <li>
-     you can test on multiple platforms
- </li>
-</ul>
-<p>Even if your application itself is server-based and only runs on a single platform, virtualization allows you to test its web interface on multiple browsers. And even if your development is tied to a single operating system, virtualization allows you to keep old versions of that operating system alive on new hardware, and indeed to constrain the resources available to these old versions.
-</p>
-<p>Hosting companies often use virtualization to create an indirection between user accounts and the hosting hardware farm. Users have root access to their own virtual machine yet are isolated from other root users on the same hardware (for example, rebooting a virtual machine doesn&#8217;t affect other machines on the same host); and their virtual machine can be transferred between physical hosts without them even realising.
-</p>
-<p>It would even be possible to distribute software as a virtual appliance. Rather than requiring your users to install version X of Python, version Y of SQLite, version Z of the database bindings and so on, you might consider distributing an entire system which runs as a virtual machine.
-</p>
-
-<h3><a href="#toc7" name="tocconsiderations" id="tocconsiderations">Considerations</a></h3>
-<p>Running a virtual machine requires real resources. I deliberately chose Windows XP over Vista for this reason; XP has the smaller footprint and it&#8217;s all I personally need for developing software which ports to Windows.
-</p>
-<p>As already mentioned, your guest operating system needs licensing. You need to pay to use Windows even if you&#8217;re running it on an Apple computer and have already paid for OS X. You&#8217;ll also need to go through the usual activation procedure.
-</p>
-<p>You&#8217;ll need to tend to your virtual machines like any others on your local network. They need naming and backing up. User accounts must be created. Depending on what presence they have on your network, you may want to configure DHCP, or take anti-virus measures. You also need to consider upgrading them.
-</p>
-<p>I have run into wrinkles and irritations with the hardware abstraction side of virtualization. For example, the Apple keyboard I use doesn&#8217;t map exactly to what I&#8217;d want when using Windows. It&#8217;s occasionally taken me some fiddling with X configuration files to get a Linux graphical interface displaying properly. Generally, though, someone else will have found and fixed the problem before you, and searching online forums turns up an answer.
-</p>
-<p>In this article&#8217;s introduction we classed virtualization as yet another computing problem solved by indirection. Indirection has a price. What about the accumulated expense of everything passing through the software shim which abstracts the platform? Surely a guest operating system can&#8217;t be as fast as a native one on equivalent hardware? I have no hard figures to present here but personal experience suggests no perceptible difference: the only thing I have noticed is that my guest Windows XP seems to use only one of its host&#8217;s two CPUs.
-</p>
-
-<h3><a href="#toc8" name="tocjust-for-fun" id="tocjust-for-fun">Just for fun</a></h3>
-<p>We&#8217;ve seen it&#8217;s possible and sensible for a platform to host a guest operating system within its native operating system. How about trying something silly? Could our guest operating system itself use virtualization to become a host for a guest of its own?
-</p>
-<p>I gave it a go. Using Parallels Desktop on my OS X host, running Windows XP as a guest, I installed (the free) VMware Player virtualization software for Windows. So far, so good. Next I downloaded vmTrac, a 113Mb VMware appliance which packages Trac, Subversion, WebMin and Lighttpd on a FreeBSD core. I extracted the archive and opened the appliance using VMware Player. 
-</p>
-<p>The picture shows my desktop. I&#8217;ve used Google Chrome and Internet Explorer to access Trac and WebMin, which are running as web applications on FreeBSD, itself running as a Windows XP guest, and Windows XP is a guest on OS X.
-</p>
-<p><a href="http://www.flickr.com/photos/thomasguest/2851613748/" title="Virtualization by Thomas Guest, on Flickr"><img src="http://farm4.static.flickr.com/3011/2851613748_0d3db38a4a.jpg" width="500" height="313" alt="virtualization" /></a>
-</p>
-
-<h3><a href="#toc9" name="tocfurther-reading" id="tocfurther-reading">Further reading</a></h3>
-<p>Although virtualization products are mature and modern hardware is ready to accommodate them, the options and possibilities still take some explaining. You&#8217;ll find plenty of good material on the <a href="http://www.vmware.com">VMware</a> and <a href="http://www.parallels.com/">Parallels</a> websites. It&#8217;s also worth searching for other virtualization platforms. This is a growing market, there are lots of competitors and good deals to be had.
-</p>
-<p><a href="http://www.justsoftwaresolutions.co.uk/testing/testing-on-multiple-platforms-with-vmware.html">Testing on Multiple Platforms with VMware</a>, by Anthony Williams provides a clear overview of the subject addressed in this article.
-</p>
+<p>Even if your application itself is server-based and only runs on a single platform, virtualization allows you to test its web interface on multiple browsers. And even if your development is tied to a single operating system, virtualization allows you to keep old versions of that operating system alive on new hardware, and indeed to constrain the resources available to these old versions.</p>
+<p>Hosting companies often use virtualization to create an indirection between user accounts and the hosting hardware farm. Users have root access to their own virtual machine yet are isolated from other root users on the same hardware (for example, rebooting a virtual machine doesn&#8217;t affect other machines on the same host); and their virtual machine can be transferred between physical hosts without them even realising.</p>
+<p>It would even be possible to distribute software as a virtual appliance. Rather than requiring your users to install version X of Python, version Y of SQLite, version Z of the database bindings and so on, you might consider distributing an entire system which runs as a virtual machine.</p>
+<h3 id="considerations">Considerations</h3>
+<p>Running a virtual machine requires real resources. I deliberately chose Windows XP over Vista for this reason; XP has the smaller footprint and it&#8217;s all I personally need for developing software which ports to Windows.</p>
+<p>As already mentioned, your guest operating system needs licensing. You need to pay to use Windows even if you&#8217;re running it on an Apple computer and have already paid for OS X. You&#8217;ll also need to go through the usual activation procedure.</p>
+<p>You&#8217;ll need to tend to your virtual machines like any others on your local network. They need naming and backing up. User accounts must be created. Depending on what presence they have on your network, you may want to configure DHCP, or take anti-virus measures. You also need to consider upgrading them.</p>
+<p>I have run into wrinkles and irritations with the hardware abstraction side of virtualization. For example, the Apple keyboard I use doesn&#8217;t map exactly to what I&#8217;d want when using Windows. It&#8217;s occasionally taken me some fiddling with X configuration files to get a Linux graphical interface displaying properly. Generally, though, someone else will have found and fixed the problem before you, and searching online forums turns up an answer.</p>
+<p>In this article&#8217;s introduction we classed virtualization as yet another computing problem solved by indirection. Indirection has a price. What about the accumulated expense of everything passing through the software shim which abstracts the platform? Surely a guest operating system can&#8217;t be as fast as a native one on equivalent hardware? I have no hard figures to present here but personal experience suggests no perceptible difference: the only thing I have noticed is that my guest Windows XP seems to use only one of its host&#8217;s two CPUs.</p>
+<h3 id="just-for-fun">Just for fun</h3>
+<p>We&#8217;ve seen it&#8217;s possible and sensible for a platform to host a guest operating system within its native operating system. How about trying something silly? Could our guest operating system itself use virtualization to become a host for a guest of its own?</p>
+<p>I gave it a go. Using Parallels Desktop on my OS X host, running Windows XP as a guest, I installed (the free) VMware Player virtualization software for Windows. So far, so good. Next I downloaded vmTrac, a 113Mb VMware appliance which packages Trac, Subversion, WebMin and Lighttpd on a FreeBSD core. I extracted the archive and opened the appliance using VMware Player. </p>
+<p>The picture shows my desktop. I&#8217;ve used Google Chrome and Internet Explorer to access Trac and WebMin, which are running as web applications on FreeBSD, itself running as a Windows XP guest, and Windows XP is a guest on OS X.</p>
+<p><a href="http://www.flickr.com/photos/thomasguest/2851613748/" title="Virtualization by Thomas Guest, on Flickr"><img src="http://farm4.static.flickr.com/3011/2851613748_0d3db38a4a.jpg" width="500" height="313" alt="virtualization" /></a></p>
+<h3 id="further-reading">Further reading</h3>
+<p>Although virtualization products are mature and modern hardware is ready to accommodate them, the options and possibilities still take some explaining. You&#8217;ll find plenty of good material on the <a href="http://www.vmware.com">VMware</a> and <a href="http://www.parallels.com/">Parallels</a> websites. It&#8217;s also worth searching for other virtualization platforms. This is a growing market, there are lots of competitors and good deals to be had.</p>
+<p><a href="http://www.justsoftwaresolutions.co.uk/testing/testing-on-multiple-platforms-with-vmware.html">Testing on Multiple Platforms with VMware</a>, by Anthony Williams provides a clear overview of the subject addressed in this article.</p>
 <hr />
-
-
-<h3><a href="#toc10" name="tocthanks" id="tocthanks">Thanks</a></h3>
-<p><a href="http://accu.org/index.php/aboutus/aboutjournals"><img style="float:right;" src="http://accu.org/content/images/journals/CVu205Cover.png" alt="CVu 20.5 cover"/></a>
-</p>
-<p>This article was first published in CVu 20.5, an <a href="http://accu.org/index.php/aboutus/aboutjournals">ACCU journal</a>, and I would like to thank everyone at CVu for their help with it. In particular, I&#8217;d like to thank Gail Ollis, who edited CVu 20.5, and who suggested contributors should try and step back from the details of <strong>how</strong> to do something, and instead explain <strong>what</strong> exactly that something is and <strong>why</strong> it might be of interest.
-</p>
-<p>This remit inspired several authors and CVu 20.5 turned out to be a great read. I particularly enjoyed Matthew Wilson&#8217;s article, &#8220;!(C ^ C++)&#8221;. <a href="http://en.wikipedia.org/wiki/Matthew_Wilson_(author)">Matthew Wilson</a> is known as a C++ expert, but it came as no surprise to find he also knows his way around C. What did surprise me was to discover he prefers to use C in certain situations, and why.
-</p>
+<h3 id="thanks">Thanks</h3>
+<p><a href="http://accu.org/index.php/aboutus/aboutjournals"><img style="float:right;" src="http://accu.org/content/images/journals/CVu205Cover.png" alt="CVu 20.5 cover"/></a></p>
+<p>This article was first published in CVu 20.5, an <a href="http://accu.org/index.php/aboutus/aboutjournals">ACCU journal</a>, and I would like to thank everyone at CVu for their help with it. In particular, I&#8217;d like to thank Gail Ollis, who edited CVu 20.5, and who suggested contributors should try and step back from the details of <strong>how</strong> to do something, and instead explain <strong>what</strong> exactly that something is and <strong>why</strong> it might be of interest.</p>
+<p>This remit inspired several authors and CVu 20.5 turned out to be a great read. I particularly enjoyed Matthew Wilson&#8217;s article, &#8220;!(C ^ C++)&#8221;. <a href="http://en.wikipedia.org/wiki/Matthew_Wilson_(author)">Matthew Wilson</a> is known as a C++ expert, but it came as no surprise to find he also knows his way around C. What did surprise me was to discover he prefers to use C in certain situations, and why.</p>
 </div>
 
 <div class="comments"><hr/><div id="disqus_thread"></div><script type="text/javascript" src="http://disqus.com/forums/wordaligned/embed.js"></script></div>

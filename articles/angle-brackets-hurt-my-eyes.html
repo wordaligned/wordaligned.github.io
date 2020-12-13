@@ -26,14 +26,14 @@
       <div class="atomentry" id="angle-brackets-hurt-my-eyes">
 <h2 class="title"><a href="/articles/angle-brackets-hurt-my-eyes">Angle brackets hurt my eyes</a></h2>
 <p class="meta"><abbr class="published" title="2013-05-01">2013-05-01</abbr> &bull; <a href="/tag/lisp" rel="tag">Lisp</a>, <a href="/tag/syntax" rel="tag">Syntax</a> &bull; <a href="/articles/angle-brackets-hurt-my-eyes#disqus_thread">Comments</a></p>
-<blockquote><p>&#8220;All these angle brackets, they&#8217;re hurting my eyes.&#8221;
-</p>
-</blockquote><p>I&#8217;m quoting a colleague who sits next to me and I sympathise. Perhaps a section from a build file was causing him pain?
-</p>
+<blockquote>
+<p>&#8220;All these angle brackets, they&#8217;re hurting my eyes.&#8221;</p>
+</blockquote>
+<p>I&#8217;m quoting a colleague who sits next to me and I sympathise. Perhaps a section from a build file was causing him pain?</p>
 <div class="typocode">
 
 <pre class="prettyprint">&lt;target name="all" description="Build product."&gt;
-  &lt;mkdir dir="build" if="${not directory::exists('build')}" /&gt;
+  &lt;mkdir dir="build" if="${not directory::exists(&#x27;build&#x27;)}" /&gt;
    ....
 &lt;/target&gt;
 
@@ -41,16 +41,15 @@
 
 </div>
 
-<p>Or maybe it was some XSL to generate XML by applying XML to XML?
-</p>
+<p>Or maybe it was some XSL to generate XML by applying XML to XML?</p>
 <div class="typocode">
 
-<pre class="prettyprint">&lt;xsl:if test="$index-make or @index!='false'"&gt;
+<pre class="prettyprint">&lt;xsl:if test="$index-make or @index!=&#x27;false&#x27;"&gt;
   &lt;xsl:if test="//index"&gt;
     &lt;fo:block text-align-last="justify" space-before="5pt"&gt;
       &lt;fo:basic-link internal-destination="index-page"&gt;
         &lt;xsl:choose&gt;
-          &lt;xsl:when test="(/doc/@lang = 'ja') or (/doc/@lang = '')&lt;/xsl:when&gt;
+          &lt;xsl:when test="(/doc/@lang = &#x27;ja&#x27;) or (/doc/@lang = &#x27;&#x27;)&lt;/xsl:when&gt;
           &lt;xsl:otherwise&gt;INDEX&lt;/xsl:otherwise&gt;
         &lt;/xsl:choose&gt;
       &lt;/fo:basic-link&gt;
@@ -63,18 +62,17 @@
 
 </div>
 
-<p>Or perhaps he was wrestling with a C++ compile error.
-</p>
+<p>Or perhaps he was wrestling with a C++ compile error.</p>
 <div class="typocode">
 
-<pre class="prettyprint">print.cpp: In function 'void print(const
+<pre class="prettyprint">print.cpp: In function &#x27;void print(const
 std::map&lt;std::basic_string&lt;char, std::char_traits&lt;char&gt;,
 std::allocator&lt;char&gt; &gt;, int, std::less&lt;std::basic_string&lt;char,
 std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt; &gt;,
 std::allocator&lt;std::pair&lt;const std::basic_string&lt;char,
-std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt;, int&gt; &gt; &gt;&amp;)':
-print.cpp:7: error: no match for 'operator&lt;&lt;' in 'std::cout &lt;&lt;
-details' /usr/include/c++/4.2.1/ostream:112: note: candidates are:
+std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt;, int&gt; &gt; &gt;&amp;)&#x27;:
+print.cpp:7: error: no match for &#x27;operator&lt;&lt;&#x27; in &#x27;std::cout &lt;&lt;
+details&#x27; /usr/include/c++/4.2.1/ostream:112: note: candidates are:
 std::basic_ostream&lt;_CharT, _Traits&gt;&amp; std::basic_ostream&lt;_CharT,
 _Traits&gt;::operator&lt;&lt;(std::basic_ostream&lt;_CharT, _Traits&gt;&amp;
 (*)(std::basic_ostream&lt;_CharT, _Traits&gt;&amp;)) [with _CharT = char,
@@ -84,17 +82,12 @@ _Traits = std::char_traits&lt;char&gt;]
 
 </div>
 
-<p>What makes angle brackets so vexatious. Could it be their sharp corners?
-</p>
-<p>Lisp is as elegant as XML is prickly, yet it too is famous for brackets, <a href="http://en.wikipedia.org/wiki/S-expression">albeit round ones</a> &#8212; and lots of them.
-</p>
+<p>What makes angle brackets so vexatious. Could it be their sharp corners?</p>
+<p>Lisp is as elegant as XML is prickly, yet it too is famous for brackets, <a href="http://en.wikipedia.org/wiki/S-expression">albeit round ones</a> &#8212; and lots of them.</p>
 <blockquote class="twitter-tweet"><p>It&#8217;s not that Clojure/Lisp has a lot of parentheses. Its just that we removed everything else.</p>&mdash; Alex Miller (@puredanger) <a href="https://twitter.com/puredanger/status/313507982623268865">March 18, 2013</a></blockquote>
 <script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
 
-Imagine a parallel universe with angle-bracket Lisp. I wonder if the language would have proved so enduring?
-
-
-
+<p>Imagine a parallel universe with angle-bracket Lisp. I wonder if the language would have proved so enduring?</p>
 <div class="typocode"><div class="codetitle">Not so pretty now?</div>
 
 <pre class="prettyprint">&lt;define &lt;euler-transform s&gt;
@@ -109,23 +102,16 @@ Imagine a parallel universe with angle-bracket Lisp. I wonder if the language wo
 
 </div>
 
-
-
-Looking more closely at the first code snippet, the section from a build file, we can see the problem isn&#8217;t so much the angle brackets as all the others.
-
-
-
+<p>Looking more closely at the first code snippet, the section from a build file, we can see the problem isn&#8217;t so much the angle brackets as all the others.</p>
 <div class="typocode">
 
-<pre class="prettyprint">&lt;mkdir dir="build" if="${not directory::exists('build')}" /&gt;
+<pre class="prettyprint">&lt;mkdir dir="build" if="${not directory::exists(&#x27;build&#x27;)}" /&gt;
 
 </pre>
 
 </div>
 
-
-
-The braces and parentheses may be embedded in a double quoted string but that only makes things worse. The nested levels hurt my eyes and, if you can bear to look at the code long enough, you&#8217;ll realise there&#8217;s a simpler message trying to get out: <tt>mkdir -p build</tt>.
+<p>The braces and parentheses may be embedded in a double quoted string but that only makes things worse. The nested levels hurt my eyes and, if you can bear to look at the code long enough, you&#8217;ll realise there&#8217;s a simpler message trying to get out: <tt>mkdir -p build</tt>.</p>
 </div>
 
 <div class="comments"><hr/><div id="disqus_thread"></div><script type="text/javascript" src="http://disqus.com/forums/wordaligned/embed.js"></script></div>

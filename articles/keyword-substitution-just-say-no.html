@@ -29,65 +29,50 @@
 <h2 class="title"><a href="/articles/keyword-substitution-just-say-no">Keyword Substitution - Just say No!</a></h2>
 <p class="meta"><abbr class="published" title="2006-08-02">2006-08-02</abbr> &bull; <a href="/tag/subversion" rel="tag">Subversion</a>, <a href="/tag/cvs" rel="tag">CVS</a>, <a href="/tag/cvs2svn" rel="tag">cvs2svn</a> &bull; <a href="/articles/keyword-substitution-just-say-no#disqus_thread">Comments</a></p>
 <p><a href="http://subversion.tigris.org">Subversion</a> supports keyword substitution &#8212; and has to, really, since it
-   claims to be &#8220;a compelling replacement for <a href="http://www.nongnu.org/cvs/">CVS</a>&#8221;.
-</p>
+claims to be &#8220;a compelling replacement for <a href="http://www.nongnu.org/cvs/">CVS</a>&#8221;.</p>
 <p>Now, by default, when you import a text file into <a href="http://www.nongnu.org/cvs/">CVS</a>, keyword
-   substitution is enabled. And by default, when you use
-   <a href="http://cvs2svn.tigris.org"><code>cvs2svn</code></a> to
-   convert your <a href="http://www.nongnu.org/cvs/">CVS</a> repository into a <a href="http://subversion.tigris.org">Subversion</a> repository these
-   particular <a href="http://www.nongnu.org/cvs/">CVS</a> settings are honoured, and keyword substitution properties
-   are enabled. Out of the box, however, <a href="http://subversion.tigris.org">Subversion</a> does not apply
-   keyword substitution to text files. Yes, you can configure it to
-   <a href="http://svnbook.red-bean.com/en/1.2/svn.advanced.props.html#svn.advanced.props.auto">automatically</a>
-   turn keyword substitution on for certain file types, but by
-   default, the file you check out is the same as the file you checked in.
-</p>
+substitution is enabled. And by default, when you use
+<a href="http://cvs2svn.tigris.org"><code>cvs2svn</code></a> to
+convert your <a href="http://www.nongnu.org/cvs/">CVS</a> repository into a <a href="http://subversion.tigris.org">Subversion</a> repository these
+particular <a href="http://www.nongnu.org/cvs/">CVS</a> settings are honoured, and keyword substitution properties
+are enabled. Out of the box, however, <a href="http://subversion.tigris.org">Subversion</a> does not apply
+keyword substitution to text files. Yes, you can configure it to
+<a href="http://svnbook.red-bean.com/en/1.2/svn.advanced.props.html#svn.advanced.props.auto">automatically</a>
+turn keyword substitution on for certain file types, but by
+default, the file you check out is the same as the file you checked in.</p>
 <p><span id="excerpt0"/>Let&#8217;s repeat that: <em>the file you check out is the same as the file you checked in</em>.
-   Surely this is the behaviour we really want from a version control system?
-</p>
+Surely this is the behaviour we really want from a version control system?</p>
 <p>So, while <a href="http://subversion.tigris.org">Subversion</a> does maintain backwards compatability with <a href="http://www.nongnu.org/cvs/">CVS</a>,
-   moving forwards, we should leave keyword substitution disabled. If you
-   are migrating from <a href="http://www.nongnu.org/cvs/">CVS</a> to <a href="http://subversion.tigris.org">Subversion</a>, take the opportunity to use
-   <a href="http://cvs2svn.tigris.org"><code>cvs2svn</code></a>&#8217;s
-   <code>--keywords-off</code> switch.
-</p>
-<span id="continue-reading"/>
-
-
-<h4>What Keyword Substitution Does</h4>
+moving forwards, we should leave keyword substitution disabled. If you
+are migrating from <a href="http://www.nongnu.org/cvs/">CVS</a> to <a href="http://subversion.tigris.org">Subversion</a>, take the opportunity to use
+<a href="http://cvs2svn.tigris.org"><code>cvs2svn</code></a>&#8217;s
+<code>--keywords-off</code> switch.</p>
+<p><span id="continue-reading"/></p>
+<h4 id="what-keyword-substitution-does">What Keyword Substitution Does</h4>
 <p>If a file has keyword substitution enabled, then tags within that file of
-   the form <code>$Id: $</code> will be expanded when the file is checked in. That is to say,
-   they end up reading something like:
-</p>
-<p> $Id: calc.c 148 2002-07-28 21:30:43Z sally $
-</p>
+the form <code>$Id: $</code> will be expanded when the file is checked in. That is to say,
+they end up reading something like:</p>
+<p>$Id: calc.c 148 2002-07-28 21:30:43Z sally $</p>
 <p>which is interpreted to mean that the file <code>calc.c</code> was last changed
-   in revision 148 on the evening of July 28, 2002 by the user <code>sally</code>.
-</p>
-
-<h4>Why Keyword Substitution is a Bad Idea</h4>
+in revision 148 on the evening of July 28, 2002 by the user <code>sally</code>.</p>
+<h4 id="why-keyword-substitution-is-a-bad-idea">Why Keyword Substitution is a Bad Idea</h4>
 <ol>
- <li><p>Clearly, the substituted text duplicates information which properly
-     belongs within the source control system. By enabling it, we
-     introduce unnecessary differences in file comparisons.
-</p>
-
- </li>
-
- <li><p>Keyword substitution modifies the file during check in, leading to a
-     subsequent re-rebuild. Not good if lots of files depend on the file
-     you&#8217;ve modified.
-</p>
-
- </li>
-
- <li><p>When performing a diff/patch between source trees, it often happens
-     that a patch will result in dozens of conflicts over the <code>$Id:$</code>
-     field alone, because the patch tool is not intelligent enough to
-     ignore it.
-</p>
-
- </li>
+<li>
+<p>Clearly, the substituted text duplicates information which properly
+  belongs within the source control system. By enabling it, we
+  introduce unnecessary differences in file comparisons.</p>
+</li>
+<li>
+<p>Keyword substitution modifies the file during check in, leading to a
+  subsequent re-rebuild. Not good if lots of files depend on the file
+  you&#8217;ve modified.</p>
+</li>
+<li>
+<p>When performing a diff/patch between source trees, it often happens
+  that a patch will result in dozens of conflicts over the <code>$Id:$</code>
+  field alone, because the patch tool is not intelligent enough to
+  ignore it.</p>
+</li>
 </ol>
 </div>
 

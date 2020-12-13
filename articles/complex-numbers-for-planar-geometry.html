@@ -1,0 +1,152 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<link rel="icon" href="/images/favicon.png" type="image/png"/>
+<link href="/styles/application.css" media="all" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="/scripts/prettify.js"></script>
+<script type="text/javascript" src="/scripts/lang-lisp.js"></script>
+<title>Complex numbers for planar geometry</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="author" content="Thomas Guest" />
+<meta name="description" content="A Word Aligned article posted 2020-12-12, tagged Python, Puzzles." />
+<meta name="keywords" content="Python, Puzzles" />
+<link rel="alternate" type="application/rss+xml" title="Feed" href="http://feeds.wordaligned.org/wordaligned" />
+</head>
+
+<body onload="prettyPrint()">
+<div id="container">
+  <div id="header">
+<h1><span><a accesskey="h" href="/">Word Aligned</a></span></h1>
+<h2>space sensitive programming</h2>
+<a class="button" href="http://feeds.wordaligned.org/wordaligned" title="Subscribe to Word Aligned"><img style="float: right;" src="/images/feed.png" alt="Feed Logo" height="28" width="28"/></a>
+</div>
+
+  <div id="page">
+    <div id="content">
+      <div class="atomentry" id="complex-numbers-for-planar-geometry">
+<h2 class="title"><a href="/articles/complex-numbers-for-planar-geometry">Complex numbers for planar geometry</a></h2>
+<p class="meta"><abbr class="published" title="2020-12-12">2020-12-12</abbr> &bull; <a href="/tag/python" rel="tag">Python</a>, <a href="/tag/puzzles" rel="tag">Puzzles</a> &bull; <a href="/articles/complex-numbers-for-planar-geometry#disqus_thread">Comments</a></p>
+<p>Once again, I&#8217;m enjoying solving <a href="http://was.tl">Eric Wastl</a>&#8217;s excellent <a href="https://adventofcode.com">Advent of Code</a> puzzles.</p>
+<p>Today, <a href="day12">day 12</a> involved a ship navigating in a 2D plane. The ship follows a series of instructions taking the form of actions and values such as <code>F10 N3 F7 R90 F11 ...</code>, where, for the first part:</p>
+<ul>
+<li>actions N, S, E, W step by the value in the compass directions N, S, E, W</li>
+<li>actions L, R turn the ship left and right by the number of degrees specified by the value</li>
+<li>action F advances the ship in the direction it faces by the given value</li>
+</ul>
+<p>Perhaps the most obvious way to model this is by implementing a <code>Point</code> class, with <code>x</code> and <code>y</code> values, and suitable methods to advance and rotate.</p>
+<p>Another way is to use complex numbers, which are natively supported by Python &#8212; and many other languages. The complex plane <em>is</em> a 2D plane. The point <code>(x, y)</code> is represented by a single complex number <code>p = x + y * j</code>. Stepping in any direction corresponds to addition, and rotation to multiplication.</p>
+<p>So, the instructions <code>N, S, E, W</code> map to adding complex numbers <code>j, -j, 1, -1</code>.</p>
+<p>Quarter turns left and right map to multiplication by <code>j</code> and <code>-j</code>.</p>
+<div class="typocode">
+
+<pre class="prettyprint">def ship_position(instructions):
+    &#x27;&#x27;&#x27;Return the final position of the ship after following the instructions
+
+    Instructions are a series of (action, value) pairs.
+    &#x27;&#x27;&#x27;
+    ship, direction = 0, 1 # Start at the origin facing E
+    step = {&#x27;N&#x27;:1j, &#x27;W&#x27;:-1, &#x27;S&#x27;:-1j, &#x27;E&#x27;: 1}
+    turn = {&#x27;R&#x27;:-1j, &#x27;L&#x27;:1j}
+    for action, value in instructions:
+        if action in &#x27;NSEW&#x27;:
+            ship += value * step[action]
+        elif action in &#x27;LR&#x27;:
+            assert value % 90 == 0 # check rectilinear motion
+            direction *= turn[action] ** (value//90)
+        else:
+            assert action == &#x27;F&#x27;
+            ship += value * direction
+    return ship
+
+</pre>
+
+</div>
+
+<p>It&#8217;s also possible to implement the conditionals above arithmetically. We can think of each instruction advancing the ship (possibly by zero) and turning it (possibly by zero degrees).</p>
+<div class="typocode">
+
+<pre class="prettyprint">def ship_position(instructions):
+    ship, direction = 0, 1
+    step = {&#x27;N&#x27;:1j, &#x27;W&#x27;:-1, &#x27;S&#x27;:-1j, &#x27;E&#x27;: 1}
+    turn = {&#x27;R&#x27;:-1j, &#x27;L&#x27;:1j}
+    for action, value in instructions:
+        ship += value * (step.get(action, 0) + (action==&#x27;F&#x27;) * direction)
+        direction *= turn.get(action, 1) ** (value//90)
+    return ship
+
+</pre>
+
+</div>
+
+<p>More solutions <a href="https://github.com/wordaligned/advent-of-code-2020">here</a>, and thanks again to Eric Wastl.</p>
+</div>
+
+<div class="comments"><hr/><div id="disqus_thread"></div><script type="text/javascript" src="http://disqus.com/forums/wordaligned/embed.js"></script></div>
+      
+<div id="comments"><script type="text/javascript">
+//<![CDATA[
+(function() {
+    var links = document.getElementsByTagName('a');
+    var query = '?';
+    for(var i = 0; i < links.length; i++) {
+        if(links[i].href.indexOf('#disqus_thread') >= 0) {
+            query += 'url' + i + '=' + encodeURIComponent(links[i].href) + '&amp;';
+        }
+    }
+    document.write('<script type="text/javascript" src="http://disqus.com/forums/wordaligned/get_num_replies.js' + query + '"></' + 'script>');
+})();
+//]]>
+</script></div>
+
+    </div>
+    <div id="sidebar">
+      
+<div class="sidebar-node">
+<h3>Tagged</h3>
+<ul id="categories"><li><a href="/tag/python" rel="tag">Python</a></li>
+<li><a href="/tag/puzzles" rel="tag">Puzzles</a></li></ul>
+
+</div>
+
+<div class="sidebar-node">
+<h3>Chain</h3>
+<ul>
+
+<li><a accesskey="p" href="/articles/cryptic-message" title="Previous article">&raquo; Cryptic Message</a></li>
+</ul>
+
+
+</div>
+
+<div class="sidebar-node">
+<h3>Feeds</h3>
+
+<ul>
+<li><a href="http://feeds.wordaligned.org/wordaligned"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Articles</a></li>
+<li><a href="http://feeds.wordaligned.org/wordaligned/comments"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Comments</a></li>
+</ul>
+
+
+</div>
+
+    </div>
+  </div>
+  <div id="footer">
+<hr />
+<p><a href="http://tag.wordaligned.org">Thomas Guest</a></p>
+</div>
+
+</div>
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-3373724-1']);
+  _gaq.push(['_trackPageview']);
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ga);
+  })();
+</script>
+</body>
+
+</html>

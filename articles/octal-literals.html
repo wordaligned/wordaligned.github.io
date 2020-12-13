@@ -29,18 +29,14 @@
 <h2 class="title"><a href="/articles/octal-literals">Octal Literals</a></h2>
 <p class="meta"><abbr class="published" title="2006-08-12">2006-08-12</abbr> &bull; <a href="/tag/ruby" rel="tag">Ruby</a>, <a href="/tag/c++" rel="tag">C++</a>, <a href="/tag/python" rel="tag">Python</a> &bull; <a href="/articles/octal-literals#disqus_thread">Comments</a></p>
 <p>I <a href="/articles/binary-literals.html">recently</a> discovered that you could write binary literals directly
-   using <a href="http://www.ruby-lang.org" title="Ruby home">Ruby</a>, which I thought a good idea. Programming languages
-   have to think in binary so it&#8217;s important that a language should
-   support them naturally. I also spotted that <a href="http://www.ruby-lang.org" title="Ruby home">Ruby</a> extends the usual C
-   convention for octal literals. In this case, I think <a href="http://www.ruby-lang.org" title="Ruby home">Ruby</a> makes the
-   mistake of building on a broken design.
-</p>
-<span id="continue-reading"/>
-
-
-<h4>Octal Integers in Ruby</h4>
-<p>Here&#8217;s an example:
-</p>
+using <a href="http://www.ruby-lang.org" title="Ruby home">Ruby</a>, which I thought a good idea. Programming languages
+have to think in binary so it&#8217;s important that a language should
+support them naturally. I also spotted that <a href="http://www.ruby-lang.org" title="Ruby home">Ruby</a> extends the usual C
+convention for octal literals. In this case, I think <a href="http://www.ruby-lang.org" title="Ruby home">Ruby</a> makes the
+mistake of building on a broken design.</p>
+<p><span id="continue-reading"/></p>
+<h4 id="octal-integers-in-ruby">Octal Integers in Ruby</h4>
+<p>Here&#8217;s an example:</p>
 <div class="typocode">
 
 <pre class="prettyprint">irb(main):001:0&gt; puts 0O377, 0377, 377
@@ -54,8 +50,7 @@
 </div>
 
 <p><span id="excerpt0"/>You did notice the Latin Capital Letter O didn&#8217;t you? The one next
-   to the number 0. You didn&#8217;t! Then let&#8217;s try a variation:
-</p>
+to the number 0. You didn&#8217;t! Then let&#8217;s try a variation:</p>
 <div class="typocode">
 
 <pre class="prettyprint">irb(main):001:0&gt; puts 0o377, 0377, 377
@@ -68,17 +63,13 @@
 
 </div>
 
-<p>Perhaps the Latin Small Letter O was more obvious?
-</p>
-
-<h4>The Problem with Octal Numbers</h4>
+<p>Perhaps the Latin Small Letter O was more obvious?</p>
+<h4 id="the-problem-with-octal-numbers">The Problem with Octal Numbers</h4>
 <p>The optional O (that&#8217;s the <em>letter</em> O) to explicitly indicate the
-   base does make some sort of sense &#8212; it&#8217;s consistent with the X for
-   hexadecimal and indeed the B which Ruby <a href="/articles/binary-literals.html">adds for binary</a>. But really it&#8217;s
-   just adding confusion to an already confusing design.
-</p>
-<p>Consider the following C array of numbers:
-</p>
+base does make some sort of sense &#8212; it&#8217;s consistent with the X for
+hexadecimal and indeed the B which Ruby <a href="/articles/binary-literals.html">adds for binary</a>. But really it&#8217;s
+just adding confusion to an already confusing design.</p>
+<p>Consider the following C array of numbers:</p>
 <div class="typocode">
 
 <pre class="prettyprint">static int const countdown[] = {
@@ -95,10 +86,9 @@
 </div>
 
 <p>Here, a novice programmer has padded the numbers in the countdown
-   with leading zeros to make them line up nicely. Fortunately the
-   <a href="http://gcc.gnu.org/">compiler</a>
-   catches the problem in this case:
-</p>
+with leading zeros to make them line up nicely. Fortunately the
+<a href="http://gcc.gnu.org/">compiler</a>
+catches the problem in this case:</p>
 <div class="typocode">
 
 <pre class="prettyprint">invalid digit "9" in octal constant
@@ -108,8 +98,7 @@
 </div>
 
 <p>We might not have been so lucky, though. Here&#8217;s some dangerously
-   broken <a href="http://python.org" title="Python Website">Python</a>:
-</p>
+broken <a href="http://python.org" title="Python Website">Python</a>:</p>
 <div class="typocode">
 
 <pre class="prettyprint">roman_numerals = {
@@ -125,19 +114,15 @@
 </div>
 
 <p>This runs through the interpreter without raising a
-   <code>SyntaxError</code>. We do have a semantic error, though. <code>"L"</code> and <code>"X"</code> map to
-   <em>octal</em> literals with decimal values 40 and 8 respectively. 0ops!
-</p>
-
-<h4>When are Octal Literals Needed?</h4>
+<code>SyntaxError</code>. We do have a semantic error, though. <code>"L"</code> and <code>"X"</code> map to
+<em>octal</em> literals with decimal values 40 and 8 respectively. 0ops!</p>
+<h4 id="when-are-octal-literals-needed">When are Octal Literals Needed?</h4>
 <p>I&#8217;ve never really needed them. 8 is a power of two, but so is 16: if
-   it&#8217;s a binary number we need, a binary literal would be better; and, in
-   the absence of language support for binary literals, a hexadecimal number
-   is more useful than an octal since two hex numbers make up a byte.
-</p>
+it&#8217;s a binary number we need, a binary literal would be better; and, in
+the absence of language support for binary literals, a hexadecimal number
+is more useful than an octal since two hex numbers make up a byte.</p>
 <p>Occasionally octals are useful ways to insert a non-printable character into
-   a string literal. Here&#8217;s an example:
-</p>
+a string literal. Here&#8217;s an example:</p>
 <div class="typocode"><div class="codetitle">Octal value in a String Literal</div>
 
 <pre class="prettyprint">std::string s = "ABC\177DEF";
@@ -147,8 +132,7 @@
 </div>
 
 <p>Here, the escaped octal value <code>177</code> is embedded into the string. Octal <code>177</code>
-   equals hexadecimal <code>7F</code>, but we run into trouble if we try:
-</p>
+equals hexadecimal <code>7F</code>, but we run into trouble if we try:</p>
 <div class="typocode"><div class="codetitle">Very large Hex value in a String Literal</div>
 
 <pre class="prettyprint">std::string s = "ABC\x7FDEF";
@@ -158,10 +142,9 @@
 </div>
 
 <p>Here, the <code>"DEF"</code> characters are valid hexadecimal and therefore
-   become part of the number we&#8217;re embedding; so we&#8217;ve tried to put the
-   hex number <code>7FDEF</code> into a byte. If we&#8217;re lucky our
-   <a href="http://gcc.gnu.org/">compiler</a> will warn us:
-</p>
+become part of the number we&#8217;re embedding; so we&#8217;ve tried to put the
+hex number <code>7FDEF</code> into a byte. If we&#8217;re lucky our
+<a href="http://gcc.gnu.org/">compiler</a> will warn us:</p>
 <div class="typocode">
 
 <pre class="prettyprint">warning: hex escape sequence out of range
@@ -171,12 +154,10 @@
 </div>
 
 <p>If we&#8217;re unlucky or if we don&#8217;t act on the warning, the result is
-   implementation defined. In any case, it&#8217;s certainly not what we
-   wanted. Of course, embedded octal escape sequences suffer from the
-   exact same problem if succeeded by one of the letters <code>"0" - "7"</code>.
-</p>
-<p>The workaround is simple:
-</p>
+implementation defined. In any case, it&#8217;s certainly not what we
+wanted. Of course, embedded octal escape sequences suffer from the
+exact same problem if succeeded by one of the letters <code>"0" - "7"</code>.</p>
+<p>The workaround is simple:</p>
 <div class="typocode"><div class="codetitle">Hex 7F in a String Literal</div>
 
 <pre class="prettyprint">std::string s = "ABC\x7F" "DEF";
@@ -185,8 +166,7 @@
 
 </div>
 
-<p>or even:
-</p>
+<p>or even:</p>
 <div class="typocode"><div class="codetitle">Hex 7F in a String Literal</div>
 
 <pre class="prettyprint">std::string s = "ABC" "\x7F" "DEF";
@@ -195,26 +175,22 @@
 
 </div>
 
-<p>In other words, even this use of octal values is of limited practical use.
-</p>
-
-<h4>Optional Radices for Integral Literals</h4>
+<p>In other words, even this use of octal values is of limited practical use.</p>
+<h4 id="optional-radices-for-integral-literals">Optional Radices for Integral Literals</h4>
 <p>Octal literals &#8212; as implemented in the C family of languages &#8212; are
-   problematic and not especially useful. However, it <em>is</em> occasionally
-   useful to be able to write numbers using a different radix (and probably
-   <a href="http://www.google.co.uk/search?q=blub%20paradox&amp;hl=en&amp;meta=">more useful than we realise</a>
-    since we&#8217;ve never been able to try it). I&#8217;ve
-   <a href="/articles/binary-literals.html">already said</a> why I think binary numbers are desirable. Hexadecimal
-   numbers, which pack so neatly into bytes, are also of special interest.
-</p>
+problematic and not especially useful. However, it <em>is</em> occasionally
+useful to be able to write numbers using a different radix (and probably
+<a href="http://www.google.co.uk/search?q=blub%20paradox&amp;hl=en&amp;meta=">more useful than we realise</a>
+ since we&#8217;ve never been able to try it). I&#8217;ve
+<a href="/articles/binary-literals.html">already said</a> why I think binary numbers are desirable. Hexadecimal
+numbers, which pack so neatly into bytes, are also of special interest.</p>
 <p>But why restrict ourselves to radices 10, 16, 8 and 2? A bit of
-   <a href="http://www.google.co.uk/search?q=octal%20literals&amp;hl=en&amp;meta=">Googling</a>
-   found this suggestion from Andrew Koenig on a <a href="http://python.org" title="Python Website">Python</a> mail list archive:
-</p>
-<blockquote><p>I am personally partial to allowing an optional radix (in decimal)
-   followed by the letter r at the beginning of a literal, so 19, 8r23,
-   and 16r13 would all represent the same value.
-</p>
+<a href="http://www.google.co.uk/search?q=octal%20literals&amp;hl=en&amp;meta=">Googling</a>
+found this suggestion from Andrew Koenig on a <a href="http://python.org" title="Python Website">Python</a> mail list archive:</p>
+<blockquote>
+<p>I am personally partial to allowing an optional radix (in decimal)
+followed by the letter r at the beginning of a literal, so 19, 8r23,
+and 16r13 would all represent the same value.</p>
 </blockquote>
 </div>
 

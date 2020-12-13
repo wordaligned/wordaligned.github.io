@@ -26,28 +26,17 @@
       <div class="atomentry" id="singly-linked-lists-in-c++">
 <h2 class="title"><a href="/articles/singly-linked-lists-in-c++">Singly Linked Lists in C++</a></h2>
 <p class="meta"><abbr class="published" title="2013-02-07">2013-02-07</abbr> &bull; <a href="/tag/c" rel="tag">C</a>, <a href="/tag/c++" rel="tag">C++</a>, <a href="/tag/algorithms" rel="tag">Algorithms</a> &bull; <a href="/articles/singly-linked-lists-in-c++#disqus_thread">Comments</a></p>
-<p>In a <a href="/articles/two-star-programming.html">recent post</a> I wrote about removing items from a singly linked list. I presented a couple of alternative implementations, and in the comments section readers suggested yet more versions.
-</p>
-<p>My implementations were written in C: the post was inspired by something <a href="http://meta.slashdot.org/story/12/10/11/0030249/linus-torvalds-answers-your-questions">Linus Torvalds had said</a> about low-level programming skills, and I&#8217;m guessing he meant C programming skills. The fact is, C programmers are condemned to reimplement these basic functions on this basic structure because the C standard library has nothing to say about singly linked lists. Until recently the C++ standard library was similarly silent on the subject, only offering a doubly linked list.
-</p>
-
-<h3>C++ introduces &#8230; the linked list!</h3>
-<p>That&#8217;s all changed now with the introduction of <code>std::forward_list</code>. The <a href="http://en.cppreference.com/w/cpp/container/forward_list">class interface</a> doesn&#8217;t mention links or pointers but a quick glance through its contents makes it clear that if you imagine the container to be a templated version of a classic singly-linked list, you won&#8217;t go far wrong.
-</p>
-<p>This gives <code>forward_list</code> some members you won&#8217;t find elsewhere in the <code>std::</code> namespace. For example, <code>std::forward_list::before_begin()</code>, which returns an iterator just before the beginning of the list &#8212; much as the more familiar <code>end()</code> is just past the end.
-</p>
-<p>Why is <code>before_begin()</code> necessary? You can&#8217;t dereference it and you can&#8217;t reverse through a forward list till you get to it. Well, since forward list iterators can only go forwards, instead of the familiar sequence <code>insert()</code>, <code>erase()</code> and <code>emplace()</code> methods we have <code>insert_after()</code>, <code>erase_after()</code> and <code>emplace_after()</code>, not to mention <code>splice_after()</code>. The before-the-beginning iterator allows you to use these operations to modify the node at the head of the list.
-</p>
-<p><strong>Quick question</strong>: what&#8217;s the complexity of <code>std::list::size()</code>?
-</p>
-<p><strong>Trick question</strong>: and how about <code>std::forward_list::size()</code>?
-</p>
-<span id="continue-reading"/>
-
-
-<h3>Remove_if for forward lists</h3>
-<p>Using pointers-to-pointers to modify linked lists gives this elegant and compact C implementation of <code>remove_if()</code>, which de-lists all nodes which match a supplied predicate.
-</p>
+<p>In a <a href="/articles/two-star-programming.html">recent post</a> I wrote about removing items from a singly linked list. I presented a couple of alternative implementations, and in the comments section readers suggested yet more versions.</p>
+<p>My implementations were written in C: the post was inspired by something <a href="http://meta.slashdot.org/story/12/10/11/0030249/linus-torvalds-answers-your-questions">Linus Torvalds had said</a> about low-level programming skills, and I&#8217;m guessing he meant C programming skills. The fact is, C programmers are condemned to reimplement these basic functions on this basic structure because the C standard library has nothing to say about singly linked lists. Until recently the C++ standard library was similarly silent on the subject, only offering a doubly linked list.</p>
+<h3 id="c-introduces-the-linked-list">C++ introduces &#8230; the linked list!</h3>
+<p>That&#8217;s all changed now with the introduction of <code>std::forward_list</code>. The <a href="http://en.cppreference.com/w/cpp/container/forward_list">class interface</a> doesn&#8217;t mention links or pointers but a quick glance through its contents makes it clear that if you imagine the container to be a templated version of a classic singly-linked list, you won&#8217;t go far wrong.</p>
+<p>This gives <code>forward_list</code> some members you won&#8217;t find elsewhere in the <code>std::</code> namespace. For example, <code>std::forward_list::before_begin()</code>, which returns an iterator just before the beginning of the list &#8212; much as the more familiar <code>end()</code> is just past the end.</p>
+<p>Why is <code>before_begin()</code> necessary? You can&#8217;t dereference it and you can&#8217;t reverse through a forward list till you get to it. Well, since forward list iterators can only go forwards, instead of the familiar sequence <code>insert()</code>, <code>erase()</code> and <code>emplace()</code> methods we have <code>insert_after()</code>, <code>erase_after()</code> and <code>emplace_after()</code>, not to mention <code>splice_after()</code>. The before-the-beginning iterator allows you to use these operations to modify the node at the head of the list.</p>
+<p><strong>Quick question</strong>: what&#8217;s the complexity of <code>std::list::size()</code>?</p>
+<p><strong>Trick question</strong>: and how about <code>std::forward_list::size()</code>?</p>
+<p><span id="continue-reading"/></p>
+<h3 id="remove_if-for-forward-lists">Remove_if for forward lists</h3>
+<p>Using pointers-to-pointers to modify linked lists gives this elegant and compact C implementation of <code>remove_if()</code>, which de-lists all nodes which match a supplied predicate.</p>
 <div class="typocode">
 
 <pre class="prettyprint">void remove_if(node ** head, remove_fn rm)
@@ -69,14 +58,10 @@
 
 </div>
 
-<p>How does the C++ standard library support this algorithm?
-</p>
-<p><a href="http://en.cppreference.com/w/cpp/algorithm/remove"><code>Std::remove_if()</code></a> operates on an iterator range, <code>remove_if(first, last, pred)</code>. All it requires is that the iterators are forward iterators so it should just work on a <code>forward_list</code>.
-</p>
-<p>Hang on though: what if <code>pred(*first)</code> is true? How can a node be removed from a linked list without reference to its predecessor? Actually, the node isn&#8217;t removed &#8212; the value it contains gets overwritten by the value in the first node (if any!) for which the predicate returns false. In fact, <code>remove_if</code> <strong>doesn&#8217;t remove anything</strong> from the container! What it does is return an iterator, call it <code>new_last</code>, such that the range <code>(first, new_last)</code> holds the elements which have been kept, and <code>(new_last, last)</code> holds those which have been &#8220;removed&#8221;, which is to say they can still be dereferenced but their value is implementation dependent.
-</p>
-<p><code>Remove_if</code> usually pairs up with erase:
-</p>
+<p>How does the C++ standard library support this algorithm?</p>
+<p><a href="http://en.cppreference.com/w/cpp/algorithm/remove"><code>Std::remove_if()</code></a> operates on an iterator range, <code>remove_if(first, last, pred)</code>. All it requires is that the iterators are forward iterators so it should just work on a <code>forward_list</code>.</p>
+<p>Hang on though: what if <code>pred(*first)</code> is true? How can a node be removed from a linked list without reference to its predecessor? Actually, the node isn&#8217;t removed &#8212; the value it contains gets overwritten by the value in the first node (if any!) for which the predicate returns false. In fact, <code>remove_if</code> <strong>doesn&#8217;t remove anything</strong> from the container! What it does is return an iterator, call it <code>new_last</code>, such that the range <code>(first, new_last)</code> holds the elements which have been kept, and <code>(new_last, last)</code> holds those which have been &#8220;removed&#8221;, which is to say they can still be dereferenced but their value is implementation dependent.</p>
+<p><code>Remove_if</code> usually pairs up with erase:</p>
 <div class="typocode">
 
 <pre class="prettyprint">container.erase(remove_if(first, last, pred), last);
@@ -85,16 +70,11 @@
 
 </div>
 
-<p>There is no <code>std::forward_list::erase(iterator)</code> &#8212; remember, we can only erase <strong>after</strong> &#8212; so the usual remove_if algorithm is of little use for forward lists.
-</p>
-
-<h3>Forward_list::remove_if()</h3>
-<p>As usual, we should <a href="http://www.informit.com/articles/article.aspx?p=21851" title="Scott Meyers, Effective STL">prefer member functions to algorithms with the same names</a>. C++&#8217;s <code>forward_list</code> has its very own <code>remove_if</code> which manipulates pointers rather than moves values, and which really does remove and destroy items.
-</p>
-<p><a href="http://en.cppreference.com/w/cpp/container/forward_list/remove"><code>Forward_list::remove_if()</code></a> operates on the list as a whole, not an iterator range &#8212; as we&#8217;ve seen, an iterator cannot remove itself. I took a look at a couple of implementations of this function to see how it&#8217;s done.
-</p>
-<p>Here&#8217;s LLVM&#8217;s libc++ <a href="http://llvm.org/svn/llvm-project/libcxx/trunk/include/forward_list">implementation</a>:
-</p>
+<p>There is no <code>std::forward_list::erase(iterator)</code> &#8212; remember, we can only erase <strong>after</strong> &#8212; so the usual remove_if algorithm is of little use for forward lists.</p>
+<h3 id="forward_listremove_if">Forward_list::remove_if()</h3>
+<p>As usual, we should <a href="http://www.informit.com/articles/article.aspx?p=21851" title="Scott Meyers, Effective STL">prefer member functions to algorithms with the same names</a>. C++&#8217;s <code>forward_list</code> has its very own <code>remove_if</code> which manipulates pointers rather than moves values, and which really does remove and destroy items.</p>
+<p><a href="http://en.cppreference.com/w/cpp/container/forward_list/remove"><code>Forward_list::remove_if()</code></a> operates on the list as a whole, not an iterator range &#8212; as we&#8217;ve seen, an iterator cannot remove itself. I took a look at a couple of implementations of this function to see how it&#8217;s done.</p>
+<p>Here&#8217;s LLVM&#8217;s libc++ <a href="http://llvm.org/svn/llvm-project/libcxx/trunk/include/forward_list">implementation</a>:</p>
 <div class="typocode">
 
 <pre class="prettyprint">template &lt;class _Tp, class _Alloc&gt;
@@ -124,8 +104,7 @@ forward_list&lt;_Tp, _Alloc&gt;::remove_if(_Predicate __pred)
 
 </div>
 
-<p>There&#8217;s no need for any special treatment of the first list node here, since we have its predecessor, the <code>before_begin()</code> node. The function does double back though, figuring out the next range to erase before going back to erase it &#8212; and the erase function isn&#8217;t pretty.
-</p>
+<p>There&#8217;s no need for any special treatment of the first list node here, since we have its predecessor, the <code>before_begin()</code> node. The function does double back though, figuring out the next range to erase before going back to erase it &#8212; and the erase function isn&#8217;t pretty.</p>
 <div class="typocode">
 
 <pre class="prettyprint">template &lt;class _Tp, class _Alloc&gt;
@@ -157,8 +136,7 @@ forward_list&lt;_Tp, _Alloc&gt;::erase_after(const_iterator __f, const_iterator 
 
 </div>
 
-<p>For comparison, here&#8217;s how GCC&#8217;s <a href="http://gcc.gnu.org/viewcvs/trunk/libstdc%2B%2B-v3/include/bits/forward_list.tcc?view=markup">libstdc++ does the same thing</a>.
-</p>
+<p>For comparison, here&#8217;s how GCC&#8217;s <a href="http://gcc.gnu.org/viewcvs/trunk/libstdc%2B%2B-v3/include/bits/forward_list.tcc?view=markup">libstdc++ does the same thing</a>.</p>
 <div class="typocode">
 
 <pre class="prettyprint">template&lt;typename _Tp, typename _Alloc&gt;
@@ -167,7 +145,7 @@ forward_list&lt;_Tp, _Alloc&gt;::erase_after(const_iterator __f, const_iterator 
       forward_list&lt;_Tp, _Alloc&gt;::
       remove_if(_Pred __pred)
       {
-	_Node* __curr = static_cast&lt;_Node*&gt;(&amp;this-&gt;_M_impl._M_head);
+    _Node* __curr = static_cast&lt;_Node*&gt;(&amp;this-&gt;_M_impl._M_head);
         while (_Node* __tmp = static_cast&lt;_Node*&gt;(__curr-&gt;_M_next))
           {
             if (__pred(*__tmp-&gt;_M_valptr()))
@@ -181,8 +159,7 @@ forward_list&lt;_Tp, _Alloc&gt;::erase_after(const_iterator __f, const_iterator 
 
 </div>
 
-<p>Here, erasing (after a) node reads:
-</p>
+<p>Here, erasing (after a) node reads:</p>
 <div class="typocode">
 
 <pre class="prettyprint">template&lt;typename _Tp, typename _Alloc&gt;
@@ -203,33 +180,17 @@ forward_list&lt;_Tp, _Alloc&gt;::erase_after(const_iterator __f, const_iterator 
 
 </div>
 
-<p>This version walks through the list removing nodes which match the predicate as it finds them. Don&#8217;t be confused by <code>&amp;this-&gt;_M_impl._M_head</code>: it&#8217;s not the node at the head of the list, it&#8217;s the one before.
-</p>
-
-<h3>Lessons from C++</h3>
-<p>Maybe this code wouldn&#8217;t persaude Linus Torvalds to rethink <a href="http://harmful.cat-v.org/software/c++/linus" title="C++ is a horrible language">his opinion of C++</a>, but if you can see past the angle brackets, underscores and allocators, it&#8217;s simple enough.
-</p>
-<p>It&#8217;s also:
-</p>
+<p>This version walks through the list removing nodes which match the predicate as it finds them. Don&#8217;t be confused by <code>&amp;this-&gt;_M_impl._M_head</code>: it&#8217;s not the node at the head of the list, it&#8217;s the one before.</p>
+<h3 id="lessons-from-c">Lessons from C++</h3>
+<p>Maybe this code wouldn&#8217;t persaude Linus Torvalds to rethink <a href="http://harmful.cat-v.org/software/c++/linus" title="C++ is a horrible language">his opinion of C++</a>, but if you can see past the angle brackets, underscores and allocators, it&#8217;s simple enough.</p>
+<p>It&#8217;s also:</p>
 <ul>
- <li>
-     subtle, so I&#8217;m glad someone else has written and checked it
- </li>
-
- <li>
-     generic, so I can put what I want in a list without casting or indirection
- </li>
-
- <li>
-     standard, so I know what to expect
- </li>
-
- <li>
-     supported
- </li>
+<li>subtle, so I&#8217;m glad someone else has written and checked it</li>
+<li>generic, so I can put what I want in a list without casting or indirection</li>
+<li>standard, so I know what to expect</li>
+<li>supported</li>
 </ul>
-<p>The before-begin node idea serves <a href="/articles/two-star-programming.html#comment-760751047">equally well in C</a>, enabling list modifiers which have no need of double indirection or special case code for the list head.
-</p>
+<p>The before-begin node idea serves <a href="/articles/two-star-programming.html#comment-760751047">equally well in C</a>, enabling list modifiers which have no need of double indirection or special case code for the list head.</p>
 <div class="typocode">
 
 <pre class="prettyprint">void remove_after(node * prev, remove_fn rm)
@@ -251,8 +212,7 @@ forward_list&lt;_Tp, _Alloc&gt;::erase_after(const_iterator __f, const_iterator 
 
 </div>
 
-<p>Pass this function the before-begin node to remove all items from the list which match the predicate. 
-</p>
+<p>Pass this function the before-begin node to remove all items from the list which match the predicate. </p>
 </div>
 
 <div class="comments"><hr/><div id="disqus_thread"></div><script type="text/javascript" src="http://disqus.com/forums/wordaligned/embed.js"></script></div>

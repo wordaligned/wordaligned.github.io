@@ -7,14 +7,76 @@
 <dc:creator>tag@wordaligned.org</dc:creator>
 <language>en-gb</language>
 <item>
+<title>Complex numbers for planar geometry</title>
+<description>&lt;p&gt;Once again, I&amp;#8217;m enjoying solving &lt;a href=&quot;http://was.tl&quot;&gt;Eric Wastl&lt;/a&gt;&amp;#8217;s excellent &lt;a href=&quot;https://adventofcode.com&quot;&gt;Advent of Code&lt;/a&gt; puzzles.&lt;/p&gt;
+&lt;p&gt;Today, &lt;a href=&quot;day12&quot;&gt;day 12&lt;/a&gt; involved a ship navigating in a 2D plane. The ship follows a series of instructions taking the form of actions and values such as &lt;code&gt;F10 N3 F7 R90 F11 ...&lt;/code&gt;, where, for the first part:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;actions N, S, E, W step by the value in the compass directions N, S, E, W&lt;/li&gt;
+&lt;li&gt;actions L, R turn the ship left and right by the number of degrees specified by the value&lt;/li&gt;
+&lt;li&gt;action F advances the ship in the direction it faces by the given value&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Perhaps the most obvious way to model this is by implementing a &lt;code&gt;Point&lt;/code&gt; class, with &lt;code&gt;x&lt;/code&gt; and &lt;code&gt;y&lt;/code&gt; values, and suitable methods to advance and rotate.&lt;/p&gt;
+&lt;p&gt;Another way is to use complex numbers, which are natively supported by Python &amp;#8212; and many other languages. The complex plane &lt;em&gt;is&lt;/em&gt; a 2D plane. The point &lt;code&gt;(x, y)&lt;/code&gt; is represented by a single complex number &lt;code&gt;p = x + y * j&lt;/code&gt;. Stepping in any direction corresponds to addition, and rotation to multiplication.&lt;/p&gt;
+&lt;p&gt;So, the instructions &lt;code&gt;N, S, E, W&lt;/code&gt; map to adding complex numbers &lt;code&gt;j, -j, 1, -1&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;Quarter turns left and right map to multiplication by &lt;code&gt;j&lt;/code&gt; and &lt;code&gt;-j&lt;/code&gt;.&lt;/p&gt;
+&lt;div class=&quot;typocode&quot;&gt;
+
+&lt;pre class=&quot;prettyprint&quot;&gt;def ship_position(instructions):
+    &amp;#x27;&amp;#x27;&amp;#x27;Return the final position of the ship after following the instructions
+
+    Instructions are a series of (action, value) pairs.
+    &amp;#x27;&amp;#x27;&amp;#x27;
+    ship, direction = 0, 1 # Start at the origin facing E
+    step = {&amp;#x27;N&amp;#x27;:1j, &amp;#x27;W&amp;#x27;:-1, &amp;#x27;S&amp;#x27;:-1j, &amp;#x27;E&amp;#x27;: 1}
+    turn = {&amp;#x27;R&amp;#x27;:-1j, &amp;#x27;L&amp;#x27;:1j}
+    for action, value in instructions:
+        if action in &amp;#x27;NSEW&amp;#x27;:
+            ship += value * step[action]
+        elif action in &amp;#x27;LR&amp;#x27;:
+            assert value % 90 == 0 # check rectilinear motion
+            direction *= turn[action] ** (value//90)
+        else:
+            assert action == &amp;#x27;F&amp;#x27;
+            ship += value * direction
+    return ship
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;It&amp;#8217;s also possible to implement the conditionals above arithmetically. We can think of each instruction advancing the ship (possibly by zero) and turning it (possibly by zero degrees).&lt;/p&gt;
+&lt;div class=&quot;typocode&quot;&gt;
+
+&lt;pre class=&quot;prettyprint&quot;&gt;def ship_position(instructions):
+    ship, direction = 0, 1
+    step = {&amp;#x27;N&amp;#x27;:1j, &amp;#x27;W&amp;#x27;:-1, &amp;#x27;S&amp;#x27;:-1j, &amp;#x27;E&amp;#x27;: 1}
+    turn = {&amp;#x27;R&amp;#x27;:-1j, &amp;#x27;L&amp;#x27;:1j}
+    for action, value in instructions:
+        ship += value * (step.get(action, 0) + (action==&amp;#x27;F&amp;#x27;) * direction)
+        direction *= turn.get(action, 1) ** (value//90)
+    return ship
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;More solutions &lt;a href=&quot;https://github.com/wordaligned/advent-of-code-2020&quot;&gt;here&lt;/a&gt;, and thanks again to Eric Wastl.&lt;/p&gt;</description>
+<dc:date>2020-12-12</dc:date>
+<guid>http://wordaligned.org/articles/complex-numbers-for-planar-geometry</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/complex-numbers-for-planar-geometry</link>
+<category>Python</category>
+<category>Puzzles</category>
+</item>
+
+<item>
 <title>Cryptic Message</title>
-<description>&lt;p&gt;Anyone able to help make sense of this bizarre tweet which appeared on my timeline?
-&lt;/p&gt;
-&lt;blockquote class="twitter-tweet" data-lang="en"&gt;&lt;p lang="en" dir="ltr"&gt;The challenge is to decipher the message&lt;/p&gt;&amp;mdash; Thomas Guest (@thomasguest) &lt;a href="https://twitter.com/thomasguest/status/1137215876271415297?ref_src=twsrc%5Etfw"&gt;June 8, 2019&lt;/a&gt;&lt;/blockquote&gt;&lt;script async src="https://platform.twitter.com/widgets.js" charset="utf-8"&gt;&lt;/script&gt;
+<description>&lt;p&gt;Anyone able to help make sense of this bizarre tweet which appeared on my timeline?&lt;/p&gt;
+&lt;blockquote class=&quot;twitter-tweet&quot; data-lang=&quot;en&quot;&gt;&lt;p lang=&quot;en&quot; dir=&quot;ltr&quot;&gt;The challenge is to decipher the message&lt;/p&gt;&amp;mdash; Thomas Guest (@thomasguest) &lt;a href=&quot;https://twitter.com/thomasguest/status/1137215876271415297?ref_src=twsrc%5Etfw&quot;&gt;June 8, 2019&lt;/a&gt;&lt;/blockquote&gt;
+&lt;script async src=&quot;https://platform.twitter.com/widgets.js&quot; charset=&quot;utf-8&quot;&gt;&lt;/script&gt;
 
-Please answer using the same style so others can find their own solution. Bonus points for both quality and quantity.
-
-&lt;div&gt;&lt;img src="http://wordaligned.org/images/laboratory.jpg" alt="Laboratory" title="Searching for clues" /&gt;&lt;/div&gt;</description>
+&lt;p&gt;Please answer using the same style so others can find their own solution. Bonus points for both quality and quantity.&lt;/p&gt;
+&lt;div&gt;&lt;img src=&quot;http://wordaligned.org/images/laboratory.jpg&quot; alt=&quot;Laboratory&quot; title=&quot;Searching for clues&quot; /&gt;&lt;/div&gt;</description>
 <dc:date>2019-06-08</dc:date>
 <guid>http://wordaligned.org/articles/cryptic-message</guid>
 <author>tag@wordaligned.org (Thomas Guest)</author>
@@ -24,25 +86,16 @@ Please answer using the same style so others can find their own solution. Bonus 
 
 <item>
 <title>Dr G&#8217;s Award Winning Puzzles</title>
-<description>&lt;p&gt;A colleague of mine shares my love of puzzles. Whilst I like solving them, he also likes to design and build them. What I hadn&amp;#8217;t realised is that there&amp;#8217;s a community of puzzlers out there, who hold conventions, share designs, and generally celebrate and advance the art of puzzling.
-&lt;/p&gt;
-&lt;p&gt;Dr G &amp;#8212; my colleague &amp;#8212; is part of that community and also owns a 3D printer. He works from home but whenever he visits the office there&amp;#8217;ll be a freshly-printed puzzle for us to play with. I feel as excited as a young hobbit when Gandalf visits the Shire.
-&lt;/p&gt;
-&lt;p&gt;The best puzzles have just a few simple pieces. You can see how the parts must finally align but the geometry conspires to confound. There &lt;em&gt;will&lt;/em&gt; be a sequence of twists and turns. There &lt;em&gt;must&lt;/em&gt; be.
-&lt;/p&gt;
-&lt;img src="http://wordaligned.org/images/casino-unpacked.jpg" alt="Casino"/&gt;
-
-&lt;p&gt;Casino, designed by Dr Volker Latussek, is both mould breaking and an instant classic. You have to slot 6 identical casino chips into a cubic box. The lip which makes the opening to the box rectangular rather than square is the single asymmetry which makes this task almost impossible rather than utterly trivial.
-&lt;/p&gt;
-&lt;p&gt;I fiddled with it, rolling the chips into position, sliding and shunting. After many minutes of manipulation I put it down, the chips loosely arranged in and on top of the box. After a lunch break I picked it up, and to my amazement the chips slid easily and directly into place.
-&lt;/p&gt;
-&lt;img src="http://wordaligned.org/images/casino-solved.jpg" alt="Casino"/&gt;
-
-&lt;img src="http://wordaligned.org/images/packtic-unpacked.jpg" alt="PackTIC"/&gt;
-
-&lt;p&gt;PackTIC, designed by Andrew Crowell is a very different puzzle. The TIC stands for Turning Interlocking Cube. A bit like a 3D version of Tetris, you have to manipulate a 5 very different cubilinear pieces so they fuse into an irregular chassis. I took this one on the train with me. At the end of the journey I had figured out how the pieces would fit, but not how to assemble them. The following morning, as with the Casino puzzle, everything just clicked into place.
-&lt;/p&gt;
-&lt;img src="http://wordaligned.org/images/packtic-solved.jpg" alt="PackTIC"/&gt;</description>
+<description>&lt;p&gt;A colleague of mine shares my love of puzzles. Whilst I like solving them, he also likes to design and build them. What I hadn&amp;#8217;t realised is that there&amp;#8217;s a community of puzzlers out there, who hold conventions, share designs, and generally celebrate and advance the art of puzzling.&lt;/p&gt;
+&lt;p&gt;Dr G &amp;#8212; my colleague &amp;#8212; is part of that community and also owns a 3D printer. He works from home but whenever he visits the office there&amp;#8217;ll be a freshly-printed puzzle for us to play with. I feel as excited as a young hobbit when Gandalf visits the Shire.&lt;/p&gt;
+&lt;p&gt;The best puzzles have just a few simple pieces. You can see how the parts must finally align but the geometry conspires to confound. There &lt;em&gt;will&lt;/em&gt; be a sequence of twists and turns. There &lt;em&gt;must&lt;/em&gt; be.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;http://wordaligned.org/images/casino-unpacked.jpg&quot; alt=&quot;Casino&quot;/&gt;&lt;/p&gt;
+&lt;p&gt;Casino, designed by Dr Volker Latussek, is both mould breaking and an instant classic. You have to slot 6 identical casino chips into a cubic box. The lip which makes the opening to the box rectangular rather than square is the single asymmetry which makes this task almost impossible rather than utterly trivial.&lt;/p&gt;
+&lt;p&gt;I fiddled with it, rolling the chips into position, sliding and shunting. After many minutes of manipulation I put it down, the chips loosely arranged in and on top of the box. After a lunch break I picked it up, and to my amazement the chips slid easily and directly into place.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;http://wordaligned.org/images/casino-solved.jpg&quot; alt=&quot;Casino&quot;/&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;http://wordaligned.org/images/packtic-unpacked.jpg&quot; alt=&quot;PackTIC&quot;/&gt;&lt;/p&gt;
+&lt;p&gt;PackTIC, designed by Andrew Crowell is a very different puzzle. The TIC stands for Turning Interlocking Cube. A bit like a 3D version of Tetris, you have to manipulate a 5 very different cubilinear pieces so they fuse into an irregular chassis. I took this one on the train with me. At the end of the journey I had figured out how the pieces would fit, but not how to assemble them. The following morning, as with the Casino puzzle, everything just clicked into place.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;http://wordaligned.org/images/packtic-solved.jpg&quot; alt=&quot;PackTIC&quot;/&gt;&lt;/p&gt;</description>
 <dc:date>2019-04-09</dc:date>
 <guid>http://wordaligned.org/articles/dr-gs-award-winning-puzzles</guid>
 <author>tag@wordaligned.org (Thomas Guest)</author>
@@ -53,27 +106,26 @@ Please answer using the same style so others can find their own solution. Bonus 
 
 <item>
 <title>Aligning the first line of a triple-quoted string in Python</title>
-<description>&lt;p&gt;Python&amp;#8217;s triple-quoted strings are a convenient syntax for strings where the contents span multiple lines. Unescaped newlines are allowed in triple-quoted strings. So, rather than write:
-&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;song = ("Happy birthday to you\n"
-        "Happy birthday to you\n"
-        "Happy birthday dear Gail\n"
-        "Happy birthday to you\n")
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;you can write:
-&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;song = """Happy birthday to you
+<description>&lt;p&gt;Python&amp;#8217;s triple-quoted strings are a convenient syntax for strings where the contents span multiple lines. Unescaped newlines are allowed in triple-quoted strings. So, rather than write:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;song = (&quot;Happy birthday to you\n&quot;
+        &quot;Happy birthday to you\n&quot;
+        &quot;Happy birthday dear Gail\n&quot;
+        &quot;Happy birthday to you\n&quot;)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;you can write:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;song = &quot;&quot;&quot;Happy birthday to you
 Happy birthday to you
 Happy birthday dear Gail
 Happy birthday to you
-"""
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;The only downside here is that the first line doesn&amp;#8217;t align nicely with the lines which follow. The way around this is to embed a &lt;code&gt;\newline&lt;/code&gt; escape sequence, meaning both &lt;a href="https://docs.python.org/3/reference/lexical_analysis.html#string-and-bytes-literals" title="String and Bytes literals"&gt;backslash and newline are ignored&lt;/a&gt;.
-&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;song = """\
+&quot;&quot;&quot;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The only downside here is that the first line doesn&amp;#8217;t align nicely with the lines which follow. The way around this is to embed a &lt;code&gt;\newline&lt;/code&gt; escape sequence, meaning both &lt;a href=&quot;https://docs.python.org/3/reference/lexical_analysis.html#string-and-bytes-literals&quot; title=&quot;String and Bytes literals&quot;&gt;backslash and newline are ignored&lt;/a&gt;.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;song = &quot;&quot;&quot;\
 Happy birthday to you
 Happy birthday to you
 Happy birthday dear Gail
 Happy birthday to you
-"""
+&quot;&quot;&quot;
 &lt;/code&gt;&lt;/pre&gt;</description>
 <dc:date>2019-02-17</dc:date>
 <guid>http://wordaligned.org/articles/aligning-the-first-line-of-a-triplequoted-string-in-python</guid>
@@ -84,18 +136,14 @@ Happy birthday to you
 
 <item>
 <title>Python Counters @PyDiff</title>
-<description>&lt;p&gt;On Monday I gave a talk at &lt;a href="http://www.pydiff.wales/"&gt;PyDiff&lt;/a&gt; on the subject of Python Counters. A Counter is a specialised &lt;code&gt;dict&lt;/code&gt; which has much in common with a &lt;code&gt;set&lt;/code&gt;. Of course all dicts are like sets, but with Counters the resemblance is even stronger. The &lt;a href="https://docs.python.org/3/library/collections.html#collections.Counter"&gt;documentation&lt;/a&gt; states:
-&lt;/p&gt;
-&lt;blockquote&gt;&lt;p&gt;The Counter class is similar to bags or multisets in other languages.
-&lt;/p&gt;
-&lt;/blockquote&gt;&lt;p&gt;Alongside set operations of union, intersection and is-a-subset, Counter also supports addition and subtraction &amp;#8212; natural and unsurprising operations for a container whose job is to keep count of its elements. If you want to unite the contents of two Counters, it&amp;#8217;s probably &lt;code&gt;+&lt;/code&gt; you want rather than &lt;code&gt;|&lt;/code&gt;.
-&lt;/p&gt;
-&lt;p&gt;Counters came to mind as a lightning talk subject since I had a go at the &lt;a href="https://adventofcode.com/2018" title="25 Christmas themed puzzles made available one-per-day as a countdown to Christmas"&gt;Advent of Code&lt;/a&gt; last year and used no fewer than 12 Counters in my &lt;a href="https://github.com/wordaligned/advent-of-code-2018/blob/master/solutions.ipynb"&gt;solutions&lt;/a&gt; to 25 puzzles &amp;#8212; and that total could well increase since I haven&amp;#8217;t finished yet.
-&lt;/p&gt;
-&lt;p&gt;The talk itself is on &lt;a href="https://github.com/wordaligned/python-counters"&gt;github&lt;/a&gt;.
-&lt;/p&gt;
-&lt;p&gt;&lt;a href="https://github.com/wordaligned/python-counters"&gt;&lt;img alt="Coins" src="http://wordaligned.org/images/coins.jpg"&gt;&lt;/a&gt;
-&lt;/p&gt;</description>
+<description>&lt;p&gt;On Monday I gave a talk at &lt;a href=&quot;http://www.pydiff.wales/&quot;&gt;PyDiff&lt;/a&gt; on the subject of Python Counters. A Counter is a specialised &lt;code&gt;dict&lt;/code&gt; which has much in common with a &lt;code&gt;set&lt;/code&gt;. Of course all dicts are like sets, but with Counters the resemblance is even stronger. The &lt;a href=&quot;https://docs.python.org/3/library/collections.html#collections.Counter&quot;&gt;documentation&lt;/a&gt; states:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;The Counter class is similar to bags or multisets in other languages.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;Alongside set operations of union, intersection and is-a-subset, Counter also supports addition and subtraction &amp;#8212; natural and unsurprising operations for a container whose job is to keep count of its elements. If you want to unite the contents of two Counters, it&amp;#8217;s probably &lt;code&gt;+&lt;/code&gt; you want rather than &lt;code&gt;|&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;Counters came to mind as a lightning talk subject since I had a go at the &lt;a href=&quot;https://adventofcode.com/2018&quot; title=&quot;25 Christmas themed puzzles made available one-per-day as a countdown to Christmas&quot;&gt;Advent of Code&lt;/a&gt; last year and used no fewer than 12 Counters in my &lt;a href=&quot;https://github.com/wordaligned/advent-of-code-2018/blob/master/solutions.ipynb&quot;&gt;solutions&lt;/a&gt; to 25 puzzles &amp;#8212; and that total could well increase since I haven&amp;#8217;t finished yet.&lt;/p&gt;
+&lt;p&gt;The talk itself is on &lt;a href=&quot;https://github.com/wordaligned/python-counters&quot;&gt;github&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;https://github.com/wordaligned/python-counters&quot;&gt;&lt;img alt=&quot;Coins&quot; src=&quot;http://wordaligned.org/images/coins.jpg&quot;&gt;&lt;/a&gt;&lt;/p&gt;</description>
 <dc:date>2019-01-19</dc:date>
 <guid>http://wordaligned.org/articles/python-counters-pydiff</guid>
 <author>tag@wordaligned.org (Thomas Guest)</author>
@@ -106,88 +154,61 @@ Happy birthday to you
 
 <item>
 <title>Metaphormers</title>
-<description>&lt;p&gt;&lt;img src="http://wordaligned.org/images/glyphicons/glyphicons-553-firework.png" alt="icon"/&gt;
-   &lt;img src="http://wordaligned.org/images/glyphicons/glyphicons-23-fire.png" alt="icon"/&gt;
-   &lt;img src="http://wordaligned.org/images/glyphicons/glyphicons-242-flash.png" alt="icon"/&gt;
-&lt;/p&gt;
-&lt;p&gt;A metaphor is a figure of speech where you describe something in terms of something else. For example, when Katy Perry sings &amp;#8220;Baby, you&amp;#8217;re a firework&amp;#8221; she doesn&amp;#8217;t mean you&amp;#8217;re an explosive for use on bonfire night &amp;#8212; she&amp;#8217;s saying you&amp;#8217;ve got a spark inside you, you should &amp;#8220;ignite the light&amp;#8221;, &amp;#8220;show &amp;#8216;em what you&amp;#8217;re worth&amp;#8221;, &amp;#8220;shoot across the sky&amp;#8221; and &amp;#8220;make &amp;#8216;em go, Oh, oh, oh!&amp;#8221;.
-&lt;/p&gt;
-&lt;p&gt;You&amp;#8217;re spectacular &amp;#8212; a &lt;strong&gt;firework&lt;/strong&gt;.
-&lt;/p&gt;
-&lt;p&gt;This post considers some metaphors for computer programming. I hope we can gain some insights into what we do by looking at it from a different angle. In other words: what are we like?
-&lt;/p&gt;
-&lt;p&gt;&lt;img src="http://wordaligned.org/images/glyphicons/glyphicons-236-pen.png" alt="icon"/&gt;
-   &lt;img src="http://wordaligned.org/images/glyphicons/glyphicons-108-text-resize.png" alt="icon"/&gt;
-   &lt;img src="http://wordaligned.org/images/glyphicons/glyphicons-111-align-left.png" alt="icon"/&gt;
-&lt;/p&gt;
-&lt;p&gt;We &lt;strong&gt;write&lt;/strong&gt; software. That&amp;#8217;s not a metaphor though. It&amp;#8217;s &lt;strong&gt;literally&lt;/strong&gt; what we do. We write, edit, review and publish texts. In scrum teams we even work on &lt;strong&gt;stories&lt;/strong&gt;. It&amp;#8217;s not particularly helpful.
-&lt;/p&gt;
-&lt;p&gt;It&amp;#8217;s not unhelpful either, unlike the next couple of examples, for which I blame recruitment agents.
-&lt;/p&gt;
-&lt;p&gt;&lt;img src="http://wordaligned.org/images/glyphicons/glyphicons-592-person-running.png" alt="icon"/&gt;
-   &lt;img src="http://wordaligned.org/images/glyphicons/glyphicons-18-music.png" alt="icon"/&gt;
-   &lt;img src="http://wordaligned.org/images/glyphicons/glyphicons-49-star-empty.png" alt="icon"/&gt;
-&lt;/p&gt;
-&lt;p&gt;An advert for a programming &lt;strong&gt;ninja&lt;/strong&gt; isn&amp;#8217;t meant to attract a Japanese mercenary trained in espionage and assassination, must have 2 years PHP experience &amp;#8212; it&amp;#8217;s meant to make a dull job sound exciting. Similarly a &lt;strong&gt;rockstar&lt;/strong&gt; is unwelcome on most software teams. Creativity and even attitude may be useful. Not so the rampant ego and &lt;a href="http://www.thisisinsider.com/van-halen-brown-m-ms-contract-2016-9"&gt;trantrums&lt;/a&gt;.
-&lt;/p&gt;
-&lt;p&gt;&lt;img src="http://wordaligned.org/images/glyphicons/glyphicons-313-rugby.png" alt="icon"/&gt;
-   &lt;img src="http://wordaligned.org/images/glyphicons/glyphicons-330-soccer-ball.png" alt="icon"/&gt;
-   &lt;img src="http://wordaligned.org/images/glyphicons/glyphicons-463-basketball.png" alt="icon"/&gt;
-&lt;/p&gt;
-&lt;p&gt;How about &lt;strong&gt;sports&lt;/strong&gt;? We&amp;#8217;re &lt;strong&gt;agile&lt;/strong&gt;. We work in &lt;strong&gt;teams&lt;/strong&gt; on &lt;strong&gt;sprints&lt;/strong&gt; scoring (story) &lt;strong&gt;points&lt;/strong&gt;. In our &lt;strong&gt;scrum&lt;/strong&gt; meetings we discuss &lt;strong&gt;tactics&lt;/strong&gt;.
-&lt;/p&gt;
-&lt;p&gt;&lt;img src="http://wordaligned.org/images/glyphicons/glyphicons-273-cake.png" alt="icon"/&gt;
-   &lt;img src="http://wordaligned.org/images/glyphicons/glyphicons-274-drink.png" alt="icon"/&gt;
-   &lt;img src="http://wordaligned.org/images/glyphicons/glyphicons-276-fast-food.png" alt="icon"/&gt;
-   &lt;img src="http://wordaligned.org/images/glyphicons/glyphicons-278-pizza.png" alt="icon"/&gt;
-   &lt;img src="http://wordaligned.org/images/glyphicons/glyphicons-277-cutlery.png" alt="icon"/&gt;
-&lt;/p&gt;
-&lt;p&gt;Is coding like &lt;strong&gt;cooking&lt;/strong&gt;? We assemble the right &lt;strong&gt;ingredients&lt;/strong&gt; and follow tried and trusted &lt;strong&gt;recipes&lt;/strong&gt;. Our products are &lt;strong&gt;consumed&lt;/strong&gt; and adjusted to &lt;strong&gt;taste&lt;/strong&gt; based on feedback.
-&lt;/p&gt;
-&lt;p&gt;&lt;img src="http://wordaligned.org/images/glyphicons/glyphicons-263-spade.png" alt="icon"/&gt;
-   &lt;img src="http://wordaligned.org/images/glyphicons/glyphicons-311-flower.png" alt="icon"/&gt;
-   &lt;img src="http://wordaligned.org/images/glyphicons/glyphicons-22-snowflake.png" alt="icon"/&gt;
-   &lt;img src="http://wordaligned.org/images/glyphicons/glyphicons-232-sun.png" alt="icon"/&gt;
-   &lt;img src="http://wordaligned.org/images/glyphicons/glyphicons-2-leaf.png" alt="icon"/&gt;
-   &lt;img src="http://wordaligned.org/images/glyphicons/glyphicons-71-umbrella.png" alt="icon"/&gt;
-   &lt;img src="http://wordaligned.org/images/glyphicons/glyphicons-361-bug.png" alt="icon"/&gt;
-&lt;/p&gt;
-&lt;p&gt;Software grows organically. Tending to a codebase is a form of &lt;strong&gt;gardening&lt;/strong&gt; &amp;#8212; we nurture new features and allow them to &lt;strong&gt;blossom&lt;/strong&gt;, all the while &lt;strong&gt;pruning&lt;/strong&gt; dead code and trying to keep &lt;strong&gt;bugs&lt;/strong&gt; under control. Release cycles are seasonal. Success depends on both weather and climate.
-&lt;/p&gt;
-&lt;p&gt;&lt;img src="http://wordaligned.org/images/glyphicons/glyphicons-535-lab-alt.png" alt="icon"/&gt;
-   &lt;img src="http://wordaligned.org/images/glyphicons/glyphicons-235-brush.png" alt="icon"/&gt;
-   &lt;img src="http://wordaligned.org/images/glyphicons/glyphicons-599-scissors-alt.png" alt="icon"/&gt;
-&lt;/p&gt;
-&lt;p&gt;If Computer &lt;strong&gt;Science&lt;/strong&gt; is the discipline, &lt;a href="https://en.wikipedia.org/wiki/The_Art_of_Computer_Programming"&gt;The &lt;strong&gt;Art&lt;/strong&gt; of Computer Programming&lt;/a&gt;, supplies the detail, and the practice is often described as a &lt;strong&gt;Craft&lt;/strong&gt;. There&amp;#8217;s a progression, &lt;a href="https://en.wikipedia.org/wiki/The_Pragmatic_Programmer"&gt;from journeyman to master&lt;/a&gt;, during which we learn the &lt;strong&gt;tools&lt;/strong&gt; of our &lt;strong&gt;trade&lt;/strong&gt;. Although end users may never see the elegant code which underpins the interface they use, we take pride in our work and like to think they can sense our attention to detail.
-&lt;/p&gt;
-&lt;p&gt;&lt;img src="http://wordaligned.org/images/glyphicons/glyphicons-21-home.png" alt="icon"/&gt;
-   &lt;img src="http://wordaligned.org/images/glyphicons/glyphicons-69-ruler.png" alt="icon"/&gt;
-   &lt;img src="http://wordaligned.org/images/glyphicons/glyphicons-377-hand-saw.png" alt="icon"/&gt;
-   &lt;img src="http://wordaligned.org/images/glyphicons/glyphicons-375-claw-hammer.png" alt="icon"/&gt;
-&lt;/p&gt;
-&lt;p&gt;The most popular metaphor is &lt;a href="https://en.wikipedia.org/wiki/Code_Complete"&gt;&lt;strong&gt;construction&lt;/strong&gt;&lt;/a&gt;. It&amp;#8217;s there in our job titles: &lt;strong&gt;Architect&lt;/strong&gt;, &lt;strong&gt;Project Manager&lt;/strong&gt;, &lt;strong&gt;Engineer&lt;/strong&gt;. We plan, assemble, build, test, deliver. Unfortunately this metaphor fails to recognise the supple, fluid nature of software &amp;#8212; its &lt;strong&gt;softness&lt;/strong&gt;.
-&lt;/p&gt;
-&lt;p&gt;If you&amp;#8217;re building a house you start with foundations and then the walls go up, at which point it becomes impossible to change the foundations. If you&amp;#8217;re building software, you could start with the wiring and then put the roof on. There&amp;#8217;s nothing stopping you swapping the foundations at any point: running on another platform, or switching the memory manager, for example, is no more difficult than changing the user interface styling.
-&lt;/p&gt;
-&lt;p&gt;Or consider a software service, supported by a collaboration of microservices which are continually developed, reconfigured, replaced. That&amp;#8217;s not construction. It&amp;#8217;s communication.
-&lt;/p&gt;
-&lt;p&gt;&lt;img src="http://wordaligned.org/images/glyphicons/glyphicons-371-globe-af.png" alt="icon"/&gt;
-   &lt;img src="http://wordaligned.org/images/glyphicons/glyphicons-51-link.png" alt="icon"/&gt;
-   &lt;img src="http://wordaligned.org/images/glyphicons/glyphicons-33-wifi-alt.png" alt="icon"/&gt;
-   &lt;img src="http://wordaligned.org/images/glyphicons/glyphicons-552-podcast.png" alt="icon"/&gt;
-&lt;/p&gt;
-&lt;p&gt;Communication is the metaphor I&amp;#8217;m going to champion. Code &lt;strong&gt;communicates&lt;/strong&gt;, via compiler or &lt;strong&gt;interpreter&lt;/strong&gt;, with the platform. It communicates with us via editor and browser. We use text, pictures, speech, gestures. We share rooms, screens, thoughts. We listen to our users. We engage with our community.
-&lt;/p&gt;
-&lt;p&gt;At the start of this post I dismissed &amp;#8220;writing&amp;#8221; as too literal. Beyond the literal and beneath the words, it&amp;#8217;s evident we&amp;#8217;re in the &lt;strong&gt;language&lt;/strong&gt; business: not just programming languages, but also the dialect of our APIs and modules, the metaphors which describe and define our designs. Design patterns are simply shared metaphor &amp;#8212; factory, visitor, facade &amp;#8212; and a codebase communicates by shaping and extending its own local metaphors.
-&lt;/p&gt;
-&lt;p&gt;Software is the development of metaphor. We are &lt;strong&gt;metaphormers&lt;/strong&gt;.
-&lt;/p&gt;
-&lt;p&gt;As Katy Perry would say: Oh, oh, oh!
-&lt;/p&gt;
-&lt;p style="text-align:center"&gt;&amp;sect;&lt;/p&gt;
+<description>&lt;p&gt;&lt;img src=&quot;http://wordaligned.org/images/glyphicons/glyphicons-553-firework.png&quot; alt=&quot;icon&quot;/&gt;
+&lt;img src=&quot;http://wordaligned.org/images/glyphicons/glyphicons-23-fire.png&quot; alt=&quot;icon&quot;/&gt;
+&lt;img src=&quot;http://wordaligned.org/images/glyphicons/glyphicons-242-flash.png&quot; alt=&quot;icon&quot;/&gt;&lt;/p&gt;
+&lt;p&gt;A metaphor is a figure of speech where you describe something in terms of something else. For example, when Katy Perry sings &amp;#8220;Baby, you&amp;#8217;re a firework&amp;#8221; she doesn&amp;#8217;t mean you&amp;#8217;re an explosive for use on bonfire night &amp;#8212; she&amp;#8217;s saying you&amp;#8217;ve got a spark inside you, you should &amp;#8220;ignite the light&amp;#8221;, &amp;#8220;show &amp;#8216;em what you&amp;#8217;re worth&amp;#8221;, &amp;#8220;shoot across the sky&amp;#8221; and &amp;#8220;make &amp;#8216;em go, Oh, oh, oh!&amp;#8221;.&lt;/p&gt;
+&lt;p&gt;You&amp;#8217;re spectacular &amp;#8212; a &lt;strong&gt;firework&lt;/strong&gt;.&lt;/p&gt;
+&lt;p&gt;This post considers some metaphors for computer programming. I hope we can gain some insights into what we do by looking at it from a different angle. In other words: what are we like?&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;http://wordaligned.org/images/glyphicons/glyphicons-236-pen.png&quot; alt=&quot;icon&quot;/&gt;
+&lt;img src=&quot;http://wordaligned.org/images/glyphicons/glyphicons-108-text-resize.png&quot; alt=&quot;icon&quot;/&gt;
+&lt;img src=&quot;http://wordaligned.org/images/glyphicons/glyphicons-111-align-left.png&quot; alt=&quot;icon&quot;/&gt;&lt;/p&gt;
+&lt;p&gt;We &lt;strong&gt;write&lt;/strong&gt; software. That&amp;#8217;s not a metaphor though. It&amp;#8217;s &lt;strong&gt;literally&lt;/strong&gt; what we do. We write, edit, review and publish texts. In scrum teams we even work on &lt;strong&gt;stories&lt;/strong&gt;. It&amp;#8217;s not particularly helpful.&lt;/p&gt;
+&lt;p&gt;It&amp;#8217;s not unhelpful either, unlike the next couple of examples, for which I blame recruitment agents.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;http://wordaligned.org/images/glyphicons/glyphicons-592-person-running.png&quot; alt=&quot;icon&quot;/&gt;
+&lt;img src=&quot;http://wordaligned.org/images/glyphicons/glyphicons-18-music.png&quot; alt=&quot;icon&quot;/&gt;
+&lt;img src=&quot;http://wordaligned.org/images/glyphicons/glyphicons-49-star-empty.png&quot; alt=&quot;icon&quot;/&gt;&lt;/p&gt;
+&lt;p&gt;An advert for a programming &lt;strong&gt;ninja&lt;/strong&gt; isn&amp;#8217;t meant to attract a Japanese mercenary trained in espionage and assassination, must have 2 years PHP experience &amp;#8212; it&amp;#8217;s meant to make a dull job sound exciting. Similarly a &lt;strong&gt;rockstar&lt;/strong&gt; is unwelcome on most software teams. Creativity and even attitude may be useful. Not so the rampant ego and &lt;a href=&quot;http://www.thisisinsider.com/van-halen-brown-m-ms-contract-2016-9&quot;&gt;trantrums&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;http://wordaligned.org/images/glyphicons/glyphicons-313-rugby.png&quot; alt=&quot;icon&quot;/&gt;
+&lt;img src=&quot;http://wordaligned.org/images/glyphicons/glyphicons-330-soccer-ball.png&quot; alt=&quot;icon&quot;/&gt;
+&lt;img src=&quot;http://wordaligned.org/images/glyphicons/glyphicons-463-basketball.png&quot; alt=&quot;icon&quot;/&gt;&lt;/p&gt;
+&lt;p&gt;How about &lt;strong&gt;sports&lt;/strong&gt;? We&amp;#8217;re &lt;strong&gt;agile&lt;/strong&gt;. We work in &lt;strong&gt;teams&lt;/strong&gt; on &lt;strong&gt;sprints&lt;/strong&gt; scoring (story) &lt;strong&gt;points&lt;/strong&gt;. In our &lt;strong&gt;scrum&lt;/strong&gt; meetings we discuss &lt;strong&gt;tactics&lt;/strong&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;http://wordaligned.org/images/glyphicons/glyphicons-273-cake.png&quot; alt=&quot;icon&quot;/&gt;
+&lt;img src=&quot;http://wordaligned.org/images/glyphicons/glyphicons-274-drink.png&quot; alt=&quot;icon&quot;/&gt;
+&lt;img src=&quot;http://wordaligned.org/images/glyphicons/glyphicons-276-fast-food.png&quot; alt=&quot;icon&quot;/&gt;
+&lt;img src=&quot;http://wordaligned.org/images/glyphicons/glyphicons-278-pizza.png&quot; alt=&quot;icon&quot;/&gt;
+&lt;img src=&quot;http://wordaligned.org/images/glyphicons/glyphicons-277-cutlery.png&quot; alt=&quot;icon&quot;/&gt;&lt;/p&gt;
+&lt;p&gt;Is coding like &lt;strong&gt;cooking&lt;/strong&gt;? We assemble the right &lt;strong&gt;ingredients&lt;/strong&gt; and follow tried and trusted &lt;strong&gt;recipes&lt;/strong&gt;. Our products are &lt;strong&gt;consumed&lt;/strong&gt; and adjusted to &lt;strong&gt;taste&lt;/strong&gt; based on feedback.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;http://wordaligned.org/images/glyphicons/glyphicons-263-spade.png&quot; alt=&quot;icon&quot;/&gt;
+&lt;img src=&quot;http://wordaligned.org/images/glyphicons/glyphicons-311-flower.png&quot; alt=&quot;icon&quot;/&gt;
+&lt;img src=&quot;http://wordaligned.org/images/glyphicons/glyphicons-22-snowflake.png&quot; alt=&quot;icon&quot;/&gt;
+&lt;img src=&quot;http://wordaligned.org/images/glyphicons/glyphicons-232-sun.png&quot; alt=&quot;icon&quot;/&gt;
+&lt;img src=&quot;http://wordaligned.org/images/glyphicons/glyphicons-2-leaf.png&quot; alt=&quot;icon&quot;/&gt;
+&lt;img src=&quot;http://wordaligned.org/images/glyphicons/glyphicons-71-umbrella.png&quot; alt=&quot;icon&quot;/&gt;
+&lt;img src=&quot;http://wordaligned.org/images/glyphicons/glyphicons-361-bug.png&quot; alt=&quot;icon&quot;/&gt;&lt;/p&gt;
+&lt;p&gt;Software grows organically. Tending to a codebase is a form of &lt;strong&gt;gardening&lt;/strong&gt; &amp;#8212; we nurture new features and allow them to &lt;strong&gt;blossom&lt;/strong&gt;, all the while &lt;strong&gt;pruning&lt;/strong&gt; dead code and trying to keep &lt;strong&gt;bugs&lt;/strong&gt; under control. Release cycles are seasonal. Success depends on both weather and climate.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;http://wordaligned.org/images/glyphicons/glyphicons-535-lab-alt.png&quot; alt=&quot;icon&quot;/&gt;
+&lt;img src=&quot;http://wordaligned.org/images/glyphicons/glyphicons-235-brush.png&quot; alt=&quot;icon&quot;/&gt;
+&lt;img src=&quot;http://wordaligned.org/images/glyphicons/glyphicons-599-scissors-alt.png&quot; alt=&quot;icon&quot;/&gt;&lt;/p&gt;
+&lt;p&gt;If Computer &lt;strong&gt;Science&lt;/strong&gt; is the discipline, &lt;a href=&quot;https://en.wikipedia.org/wiki/The_Art_of_Computer_Programming&quot;&gt;The &lt;strong&gt;Art&lt;/strong&gt; of Computer Programming&lt;/a&gt;, supplies the detail, and the practice is often described as a &lt;strong&gt;Craft&lt;/strong&gt;. There&amp;#8217;s a progression, &lt;a href=&quot;https://en.wikipedia.org/wiki/The_Pragmatic_Programmer&quot;&gt;from journeyman to master&lt;/a&gt;, during which we learn the &lt;strong&gt;tools&lt;/strong&gt; of our &lt;strong&gt;trade&lt;/strong&gt;. Although end users may never see the elegant code which underpins the interface they use, we take pride in our work and like to think they can sense our attention to detail.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;http://wordaligned.org/images/glyphicons/glyphicons-21-home.png&quot; alt=&quot;icon&quot;/&gt;
+&lt;img src=&quot;http://wordaligned.org/images/glyphicons/glyphicons-69-ruler.png&quot; alt=&quot;icon&quot;/&gt;
+&lt;img src=&quot;http://wordaligned.org/images/glyphicons/glyphicons-377-hand-saw.png&quot; alt=&quot;icon&quot;/&gt;
+&lt;img src=&quot;http://wordaligned.org/images/glyphicons/glyphicons-375-claw-hammer.png&quot; alt=&quot;icon&quot;/&gt;&lt;/p&gt;
+&lt;p&gt;The most popular metaphor is &lt;a href=&quot;https://en.wikipedia.org/wiki/Code_Complete&quot;&gt;&lt;strong&gt;construction&lt;/strong&gt;&lt;/a&gt;. It&amp;#8217;s there in our job titles: &lt;strong&gt;Architect&lt;/strong&gt;, &lt;strong&gt;Project Manager&lt;/strong&gt;, &lt;strong&gt;Engineer&lt;/strong&gt;. We plan, assemble, build, test, deliver. Unfortunately this metaphor fails to recognise the supple, fluid nature of software &amp;#8212; its &lt;strong&gt;softness&lt;/strong&gt;.&lt;/p&gt;
+&lt;p&gt;If you&amp;#8217;re building a house you start with foundations and then the walls go up, at which point it becomes impossible to change the foundations. If you&amp;#8217;re building software, you could start with the wiring and then put the roof on. There&amp;#8217;s nothing stopping you swapping the foundations at any point: running on another platform, or switching the memory manager, for example, is no more difficult than changing the user interface styling.&lt;/p&gt;
+&lt;p&gt;Or consider a software service, supported by a collaboration of microservices which are continually developed, reconfigured, replaced. That&amp;#8217;s not construction. It&amp;#8217;s communication.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;http://wordaligned.org/images/glyphicons/glyphicons-371-globe-af.png&quot; alt=&quot;icon&quot;/&gt;
+&lt;img src=&quot;http://wordaligned.org/images/glyphicons/glyphicons-51-link.png&quot; alt=&quot;icon&quot;/&gt;
+&lt;img src=&quot;http://wordaligned.org/images/glyphicons/glyphicons-33-wifi-alt.png&quot; alt=&quot;icon&quot;/&gt;
+&lt;img src=&quot;http://wordaligned.org/images/glyphicons/glyphicons-552-podcast.png&quot; alt=&quot;icon&quot;/&gt;&lt;/p&gt;
+&lt;p&gt;Communication is the metaphor I&amp;#8217;m going to champion. Code &lt;strong&gt;communicates&lt;/strong&gt;, via compiler or &lt;strong&gt;interpreter&lt;/strong&gt;, with the platform. It communicates with us via editor and browser. We use text, pictures, speech, gestures. We share rooms, screens, thoughts. We listen to our users. We engage with our community.&lt;/p&gt;
+&lt;p&gt;At the start of this post I dismissed &amp;#8220;writing&amp;#8221; as too literal. Beyond the literal and beneath the words, it&amp;#8217;s evident we&amp;#8217;re in the &lt;strong&gt;language&lt;/strong&gt; business: not just programming languages, but also the dialect of our APIs and modules, the metaphors which describe and define our designs. Design patterns are simply shared metaphor &amp;#8212; factory, visitor, facade &amp;#8212; and a codebase communicates by shaping and extending its own local metaphors.&lt;/p&gt;
+&lt;p&gt;Software is the development of metaphor. We are &lt;strong&gt;metaphormers&lt;/strong&gt;.&lt;/p&gt;
+&lt;p&gt;As Katy Perry would say: Oh, oh, oh!&lt;/p&gt;
+&lt;p style=&quot;text-align:center&quot;&gt;&amp;sect;&lt;/p&gt;
 
-&lt;p&gt;The icons used on this page were downloaded from &lt;a href="http://glyphicons.com"&gt;http://glyphicons.com&lt;/a&gt; and are licensed under the &lt;a href=http://creativecommons.org/licenses/by/3.0/deed.en&gt;CC BY 3.0&lt;/a&gt; terms.
-&lt;/p&gt;</description>
+&lt;p&gt;The icons used on this page were downloaded from &lt;a href=&quot;http://glyphicons.com&quot;&gt;http://glyphicons.com&lt;/a&gt; and are licensed under the &lt;a href=http://creativecommons.org/licenses/by/3.0/deed.en&gt;CC BY 3.0&lt;/a&gt; terms.&lt;/p&gt;</description>
 <dc:date>2018-05-30</dc:date>
 <guid>http://wordaligned.org/articles/metaphormers</guid>
 <author>tag@wordaligned.org (Thomas Guest)</author>
@@ -198,19 +219,18 @@ Happy birthday to you
 
 <item>
 <title>Creating a dict of lists in Python</title>
-<description>&lt;p&gt;Suppose you have a list of objects which you want to convert into a dict mapping from some object key to the (sub-)list of objects with that key. To provide a simple example, let&amp;#8217;s start with a list of fruits.
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
+<description>&lt;p&gt;Suppose you have a list of objects which you want to convert into a dict mapping from some object key to the (sub-)list of objects with that key. To provide a simple example, let&amp;#8217;s start with a list of fruits.&lt;/p&gt;
+&lt;div class=&quot;typocode&quot;&gt;
 
-&lt;pre class="prettyprint"&gt;from collections import namedtuple
+&lt;pre class=&quot;prettyprint&quot;&gt;from collections import namedtuple
 
-Fruit = namedtuple('Fruit', 'name colour')
+Fruit = namedtuple(&amp;#x27;Fruit&amp;#x27;, &amp;#x27;name colour&amp;#x27;)
 
-def banana():     return Fruit('banana', 'yellow')
-def grape():      return Fruit('grape', 'green')
-def pear():       return Fruit('pear', 'green')
-def strawberry(): return Fruit('strawberry', 'red')
-def cherry():     return Fruit('cherry', 'red')
+def banana():     return Fruit(&amp;#x27;banana&amp;#x27;, &amp;#x27;yellow&amp;#x27;)
+def grape():      return Fruit(&amp;#x27;grape&amp;#x27;, &amp;#x27;green&amp;#x27;)
+def pear():       return Fruit(&amp;#x27;pear&amp;#x27;, &amp;#x27;green&amp;#x27;)
+def strawberry(): return Fruit(&amp;#x27;strawberry&amp;#x27;, &amp;#x27;red&amp;#x27;)
+def cherry():     return Fruit(&amp;#x27;cherry&amp;#x27;, &amp;#x27;red&amp;#x27;)
 
 fruits = [
     banana(), pear(), cherry(), cherry(), pear(),
@@ -221,11 +241,10 @@ fruits = [
 
 &lt;/div&gt;
 
-&lt;p&gt;We&amp;#8217;d like to arrange a fruitbowl &amp;#8212; a dict which groups fruits by colour. This can be done by creating an empty bowl, then iterating through the fruits placing each in the correct list.
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
+&lt;p&gt;We&amp;#8217;d like to arrange a fruitbowl &amp;#8212; a dict which groups fruits by colour. This can be done by creating an empty bowl, then iterating through the fruits placing each in the correct list.&lt;/p&gt;
+&lt;div class=&quot;typocode&quot;&gt;
 
-&lt;pre class="prettyprint"&gt;fruitbowl = {}
+&lt;pre class=&quot;prettyprint&quot;&gt;fruitbowl = {}
 
 for fruit in fruits:
     fruitbowl.setdefault(fruit.colour, []).append(fruit)
@@ -234,11 +253,10 @@ for fruit in fruits:
 
 &lt;/div&gt;
 
-&lt;p&gt;&lt;code&gt;Dict.setdefault&lt;/code&gt; is a bit of an oddity in Python, both doing something and returning a value, but it&amp;#8217;s a convenient shorthand in this case. Despite this convenience it&amp;#8217;s more common to use a &lt;code&gt;defaultdict&lt;/code&gt;.
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
+&lt;p&gt;&lt;code&gt;Dict.setdefault&lt;/code&gt; is a bit of an oddity in Python, both doing something and returning a value, but it&amp;#8217;s a convenient shorthand in this case. Despite this convenience it&amp;#8217;s more common to use a &lt;code&gt;defaultdict&lt;/code&gt;.&lt;/p&gt;
+&lt;div class=&quot;typocode&quot;&gt;
 
-&lt;pre class="prettyprint"&gt;from collections import defaultdict
+&lt;pre class=&quot;prettyprint&quot;&gt;from collections import defaultdict
 
 fruitbowl = defaultdict(list)
 
@@ -249,25 +267,23 @@ for fruit in fruits:
 
 &lt;/div&gt;
 
-&lt;p&gt;Here&amp;#8217;s a function to display the fruitbowl.
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
+&lt;p&gt;Here&amp;#8217;s a function to display the fruitbowl.&lt;/p&gt;
+&lt;div class=&quot;typocode&quot;&gt;
 
-&lt;pre class="prettyprint"&gt;def print_bowl(bowl):
-    print('\n'.join(
-        '{}: {}'.format(colour,
-                        ', '.join(f.name for f in fruits))
+&lt;pre class=&quot;prettyprint&quot;&gt;def print_bowl(bowl):
+    print(&amp;#x27;\n&amp;#x27;.join(
+        &amp;#x27;{}: {}&amp;#x27;.format(colour,
+                        &amp;#x27;, &amp;#x27;.join(f.name for f in fruits))
         for colour, fruits in bowl.items()))
 
 &lt;/pre&gt;
 
 &lt;/div&gt;
 
-&lt;p&gt;If we call this function, we see the fruits have indeed been grouped by colour.
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
+&lt;p&gt;If we call this function, we see the fruits have indeed been grouped by colour.&lt;/p&gt;
+&lt;div class=&quot;typocode&quot;&gt;
 
-&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; print_bowl(fruitbowl)
+&lt;pre class=&quot;prettyprint&quot;&gt;&amp;gt;&amp;gt;&amp;gt; print_bowl(fruitbowl)
 yellow: banana, banana
 green: pear, pear, grape, grape, grape, pear, grape
 red: cherry, cherry, cherry, strawberry, cherry
@@ -276,16 +292,14 @@ red: cherry, cherry, cherry, strawberry, cherry
 
 &lt;/div&gt;
 
-&lt;p&gt;This is all fine and idiomatic Python, but whenever I see an empty dict being created followed by a loop to populate it, I wonder if a comprehension could be used.
-&lt;/p&gt;
-&lt;p&gt;Is there a way to declare and initialise the dict in a single expression? Here&amp;#8217;s the best I came up with.
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
+&lt;p&gt;This is all fine and idiomatic Python, but whenever I see an empty dict being created followed by a loop to populate it, I wonder if a comprehension could be used.&lt;/p&gt;
+&lt;p&gt;Is there a way to declare and initialise the dict in a single expression? Here&amp;#8217;s the best I came up with.&lt;/p&gt;
+&lt;div class=&quot;typocode&quot;&gt;
 
-&lt;pre class="prettyprint"&gt;from operator import attrgetter
+&lt;pre class=&quot;prettyprint&quot;&gt;from operator import attrgetter
 from itertools import groupby
 
-colour = attrgetter('colour')
+colour = attrgetter(&amp;#x27;colour&amp;#x27;)
 
 fruitbowl = {
     col: list(fts)
@@ -295,37 +309,34 @@ fruitbowl = {
 
 &lt;/div&gt;
 
-&lt;p&gt;Is this better than the &lt;code&gt;defaultdict&lt;/code&gt; solution. Probably not, but it&amp;#8217;s a technique worth remembering. Maybe the &lt;code&gt;fruitbowl&lt;/code&gt; isn&amp;#8217;t needed, and we actually just need to iterate through the fruits grouped by colour. For example, which colour is most popular?
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
+&lt;p&gt;Is this better than the &lt;code&gt;defaultdict&lt;/code&gt; solution. Probably not, but it&amp;#8217;s a technique worth remembering. Maybe the &lt;code&gt;fruitbowl&lt;/code&gt; isn&amp;#8217;t needed, and we actually just need to iterate through the fruits grouped by colour. For example, which colour is most popular?&lt;/p&gt;
+&lt;div class=&quot;typocode&quot;&gt;
 
-&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; max(fruitbowl.items(), key=lambda kv: len(kv[1]))[0]
-'green'
+&lt;pre class=&quot;prettyprint&quot;&gt;&amp;gt;&amp;gt;&amp;gt; max(fruitbowl.items(), key=lambda kv: len(kv[1]))[0]
+&amp;#x27;green&amp;#x27;
 
 &lt;/pre&gt;
 
 &lt;/div&gt;
 
-&lt;p&gt;Using &lt;code&gt;groupby&lt;/code&gt;, we don&amp;#8217;t need the bowl.
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
+&lt;p&gt;Using &lt;code&gt;groupby&lt;/code&gt;, we don&amp;#8217;t need the bowl.&lt;/p&gt;
+&lt;div class=&quot;typocode&quot;&gt;
 
-&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; def grouplen(k_gp):
+&lt;pre class=&quot;prettyprint&quot;&gt;&amp;gt;&amp;gt;&amp;gt; def grouplen(k_gp):
 ...     return sum(1 for _ in k_gp[1])
 &amp;gt;&amp;gt;&amp;gt; max(groupby(sorted(fruits, key=colour), colour), key=grouplen)[0]
-&amp;gt;&amp;gt;&amp;gt; 'green'
+&amp;gt;&amp;gt;&amp;gt; &amp;#x27;green&amp;#x27;
 
 &lt;/pre&gt;
 
 &lt;/div&gt;
 
-&lt;p&gt;In this case, we don&amp;#8217;t need &lt;code&gt;groupby&lt;/code&gt; either. &lt;a href="./timtowtdi-vs-tsboapooowtdi"&gt;There is more than one way to do it&lt;/a&gt;.
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
+&lt;p&gt;In this case, we don&amp;#8217;t need &lt;code&gt;groupby&lt;/code&gt; either. &lt;a href=&quot;./timtowtdi-vs-tsboapooowtdi&quot;&gt;There is more than one way to do it&lt;/a&gt;.&lt;/p&gt;
+&lt;div class=&quot;typocode&quot;&gt;
 
-&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; from collections import Counter
+&lt;pre class=&quot;prettyprint&quot;&gt;&amp;gt;&amp;gt;&amp;gt; from collections import Counter
 &amp;gt;&amp;gt;&amp;gt; Counter(map(colour, fruits)).most_common(1)
-[('green', 7)]
+[(&amp;#x27;green&amp;#x27;, 7)]
 
 &lt;/pre&gt;
 
@@ -340,110 +351,54 @@ fruitbowl = {
 
 <item>
 <title>TIMTOWTDI vs TSBO-APOO-OWTDI</title>
-<description>&lt;div class="toc"&gt;
-&lt;h2&gt;Contents&lt;/h2&gt;
-&lt;ul&gt;
- &lt;li&gt;&lt;a href="http://wordaligned.org/articles/timtowtdi-vs-tsboapooowtdi#toctimtowtdi" name="toc0" id="toc0"&gt;TIMTOWTDI&lt;/a&gt;
- &lt;/li&gt;
-
- &lt;li&gt;&lt;a href="http://wordaligned.org/articles/timtowtdi-vs-tsboapooowtdi#toctsboapooowtdi" name="toc1" id="toc1"&gt;TSBO-APOO-OWTDI&lt;/a&gt;
- &lt;/li&gt;
-
- &lt;li&gt;&lt;a href="http://wordaligned.org/articles/timtowtdi-vs-tsboapooowtdi#toctimtop" name="toc2" id="toc2"&gt;TIMTOP&lt;/a&gt;
- &lt;/li&gt;
-
- &lt;li&gt;&lt;a href="http://wordaligned.org/articles/timtowtdi-vs-tsboapooowtdi#toctimtopom" name="toc3" id="toc3"&gt;TIMTOPOM&lt;/a&gt;
- &lt;/li&gt;
-
- &lt;li&gt;&lt;a href="http://wordaligned.org/articles/timtowtdi-vs-tsboapooowtdi#toctimtoutf" name="toc4" id="toc4"&gt;TIMTOUTF&lt;/a&gt;
- &lt;/li&gt;
-
- &lt;li&gt;&lt;a href="http://wordaligned.org/articles/timtowtdi-vs-tsboapooowtdi#toctimtowofs" name="toc5" id="toc5"&gt;TIMTOWOFS&lt;/a&gt;
- &lt;/li&gt;
-
- &lt;li&gt;&lt;a href="http://wordaligned.org/articles/timtowtdi-vs-tsboapooowtdi#tocapsdotadiw" name="toc6" id="toc6"&gt;APSDOTADIW&lt;/a&gt;
- &lt;/li&gt;
-&lt;/ul&gt;
-&lt;/div&gt;
-&lt;h2&gt;&lt;a href="http://wordaligned.org/articles/timtowtdi-vs-tsboapooowtdi#toc0" name="toctimtowtdi" id="toctimtowtdi"&gt;TIMTOWTDI&lt;/a&gt;&lt;/h2&gt;
-&lt;p&gt;TIMTOWTDI stands for &amp;#8220;There is more than one way to do it&amp;#8221;, an approach promoted by the Perl community.
-&lt;/p&gt;
-&lt;p&gt;The mindset behind it gets explored in more detail by the language&amp;#8217;s creator, Larry Wall, in a talk given in 1999: &lt;a href="https://www.perl.com/pub/1999/03/pm.html/"&gt;&amp;#8220;Perl, the first postmodern computer language&amp;#8221;&lt;/a&gt;. He attributes the slogan to his daughter, Heidi, who says it&amp;#8217;s a strategy which works well in her maths class; and &lt;strong&gt;she&lt;/strong&gt; associates it with another saying used at school: &amp;#8220;Tsall Good&amp;#8221;. This doesn&amp;#8217;t mean everything is good, or even everything has good bits. It means, overall, things are good. See the big picture.
-&lt;/p&gt;
-&lt;p&gt;Perl epitomises this. It&amp;#8217;s eclectic and inclusive, supporting a variety of styles. One-liner? Fine! Like a shell script? Sure! Structured programming, object-oriented, functional? Why not! Tsall good.
-&lt;/p&gt;
-&lt;p&gt;I like that.
-&lt;/p&gt;
-&lt;p&gt;But do I feel that way about programming?
-&lt;/p&gt;
-
-&lt;h2&gt;&lt;a href="http://wordaligned.org/articles/timtowtdi-vs-tsboapooowtdi#toc1" name="toctsboapooowtdi" id="toctsboapooowtdi"&gt;TSBO-APOO-OWTDI&lt;/a&gt;&lt;/h2&gt;
-&lt;p&gt;A contrasting mantra appears in the &lt;a href="https://www.python.org/dev/peps/pep-0020/"&gt;Zen of Python&lt;/a&gt;, a list of aphorisms which summarise the guiding principles behind Python&amp;#8217;s design. Item number 13 states &amp;#8220;There should be one &amp;#8212; and preferably only one &amp;#8212; obvious way to do it.&amp;#8221;
-&lt;/p&gt;
-&lt;p&gt;Perhaps realising this sounds overly prescriptive, this rule is tempered by item 14, &amp;#8220;Although that way may not be obvious at first unless you&amp;#8217;re Dutch.&amp;#8221;
-&lt;/p&gt;
-&lt;p&gt;Guido van Rossum, Python&amp;#8217;s BDFL &amp;#8212; Benevolent Dictator For Life &amp;#8212; would be the Dutch person who finds things obvious. That&amp;#8217;s right: &lt;strong&gt;Dictator&lt;/strong&gt;. Programmers don&amp;#8217;t like being told what to do any more than two year olds. How then has Python become so popular? 
-&lt;/p&gt;
-&lt;p&gt;Maybe emphasis falls on &lt;strong&gt;should&lt;/strong&gt;. There &lt;strong&gt;should&lt;/strong&gt; be only one obvious way to do it: it&amp;#8217;s just that &amp;#8212; Dutch or otherwise &amp;#8212; we haven&amp;#8217;t got there yet.
-&lt;/p&gt;
-
-&lt;h2&gt;&lt;a href="http://wordaligned.org/articles/timtowtdi-vs-tsboapooowtdi#toc2" name="toctimtop" id="toctimtop"&gt;TIMTOP&lt;/a&gt;&lt;/h2&gt;
-&lt;p&gt;For example, there is more than one Python. Obviously there&amp;#8217;s Python 2 and Python 3, but it&amp;#8217;s less obvious which to use. Don&amp;#8217;t forget &lt;a href="https://pypy.org/"&gt;PyPy&lt;/a&gt;. Increasingly Python comes packaged with data processing and visualisation extensions, served up as a &lt;a href="http://jupyter.org/"&gt;Jupyter&lt;/a&gt; notebook.
-&lt;/p&gt;
-
-&lt;h2&gt;&lt;a href="http://wordaligned.org/articles/timtowtdi-vs-tsboapooowtdi#toc3" name="toctimtopom" id="toctimtopom"&gt;TIMTOPOM&lt;/a&gt;&lt;/h2&gt;
-&lt;p&gt;There is more than one program options module.
-&lt;/p&gt;
-&lt;p&gt;When I started with Python there was &lt;a href="https://docs.python.org/3/library/getopt.html"&gt;getopt&lt;/a&gt;, the one and only command line handler. Coming from a C/C++ background I was quite happy to use something resembling GNU&amp;#8217;s getopt. Then &lt;a href="https://docs.python.org/3/library/optparse.html"&gt;optparse&lt;/a&gt; appeared. Now there&amp;#8217;s &lt;a href="https://docs.python.org/3/library/argparse.html"&gt;argparse&lt;/a&gt;. All of these libraries are readily available. Which should I use? Not optparse, that&amp;#8217;s deprecated, unless I&amp;#8217;m already using it and it works, that is. Regarding the other contenders, the &lt;a href="https://docs.python.org/3/library/getopt.html"&gt;documentation&lt;/a&gt; archly notes:
-&lt;/p&gt;
-&lt;blockquote&gt;&lt;p&gt;Users who are unfamiliar with the C &lt;a href="http://man7.org/linux/man-pages/man3/getopt.3.html"&gt;&lt;code&gt;getopt()&lt;/code&gt;&lt;/a&gt; function or who would like to write less code and get better help and error messages should consider using the &lt;a href="https://docs.python.org/3/library/argparse.html#module-argparse"&gt;argparse module&lt;/a&gt; instead.
-&lt;/p&gt;
-&lt;/blockquote&gt;&lt;p&gt;There are other non-standard Python options for parsing a command line too: ones which &lt;a href="http://docopt.org/"&gt;generate code from the usage&lt;/a&gt; notes, or by &lt;a href="https://github.com/google/python-fire"&gt;inspecting the code you want to expose&lt;/a&gt;.
-&lt;/p&gt;
-&lt;p&gt;There is more than one way to do it.
-&lt;/p&gt;
-
-&lt;h2&gt;&lt;a href="http://wordaligned.org/articles/timtowtdi-vs-tsboapooowtdi#toc4" name="toctimtoutf" id="toctimtoutf"&gt;TIMTOUTF&lt;/a&gt;&lt;/h2&gt;
-&lt;p&gt;There is more than one unit test framework. The obvious one, &lt;a href="https://docs.python.org/3/library/unittest.html"&gt;unittest&lt;/a&gt;, like getopt, draws inspiration from elsewhere &amp;#8212; in this case Java&amp;#8217;s Junit. Unfortunately the port is too faithful, and you&amp;#8217;ll have to inherit from super classes etc to test something. I much prefer &lt;a href="https://docs.pytest.org"&gt;PyTest&lt;/a&gt;, which flexes the language itself to deliver test assertions as &lt;code&gt;assert&lt;/code&gt;s.
-&lt;/p&gt;
-&lt;p&gt;There&amp;#8217;s also a &lt;a href="https://docs.python.org/3/library/doctest.html"&gt;doctest&lt;/a&gt; module in the standard library which executes and checks code found in strings (hold that thought!), and there are many other non-standard testing frameworks.
-&lt;/p&gt;
-&lt;p&gt;There is more than one way to do it.
-&lt;/p&gt;
-
-&lt;h2&gt;&lt;a href="http://wordaligned.org/articles/timtowtdi-vs-tsboapooowtdi#toc5" name="toctimtowofs" id="toctimtowofs"&gt;TIMTOWOFS&lt;/a&gt;&lt;/h2&gt;
-&lt;p&gt;There is more than one way of formatting strings.
-&lt;/p&gt;
-&lt;p&gt;As we&amp;#8217;ve seen there&amp;#8217;s more than one Python, and libraries are always up for reinvention. This is arguably evolution rather than a multiplicity of options. That is, the most recent way to do it should be preferred.
-&lt;/p&gt;
-&lt;p&gt;When it comes to string formatting, though, there has &lt;strong&gt;always&lt;/strong&gt; been more than one way to do it, and more ways are still being added.
-&lt;/p&gt;
-&lt;p&gt;Do you use &lt;code&gt;'single'&lt;/code&gt; or &lt;code&gt;"double"&lt;/code&gt; quotes for a string? &lt;code&gt;"""Triple"""&lt;/code&gt; quotes. Raw strings? Raw with an &lt;code&gt;r&lt;/code&gt; or Raw with an &lt;code&gt;R&lt;/code&gt;? TIMTOWTDI.
-&lt;/p&gt;
-&lt;p&gt;What if you want to embed the value of a variable in a string? Users familiar with C&amp;#8217;s &lt;code&gt;printf()&lt;/code&gt; function might prefer &lt;code&gt;%&lt;/code&gt; formatting. Fans of $shell $parameter $expansion can use &lt;a href="https://docs.python.org/3/library/string.html#template-strings"&gt;template strings&lt;/a&gt;.
-&lt;/p&gt;
-&lt;p&gt;&lt;a href="https://www.python.org/dev/peps/pep-3101/"&gt;Advanced string formatting&lt;/a&gt; &amp;#8212; &lt;code&gt;str.format&lt;/code&gt; &amp;#8212; appeared in Python 3.0, backported to Python 2.6. No doubt it has advantages over &lt;code&gt;%&lt;/code&gt; formatting, but for me it&amp;#8217;s a little more obscure and a little less obvious. Python 3.6 introduces &lt;a href="https://www.python.org/dev/peps/pep-0498/"&gt;f-strings&lt;/a&gt; which build on &lt;code&gt;str.format&lt;/code&gt; and knock down my reservations. The syntax allows you to evaluate expressions in strings: evidently Python is heading in Perl&amp;#8217;s direction.
-&lt;/p&gt;
-
-&lt;h2&gt;&lt;a href="http://wordaligned.org/articles/timtowtdi-vs-tsboapooowtdi#toc6" name="tocapsdotadiw" id="tocapsdotadiw"&gt;APSDOTADIW&lt;/a&gt;&lt;/h2&gt;
-&lt;p&gt;Let&amp;#8217;s finish by returning to Perl, and to &lt;a href="https://www.perl.com/pub/1999/03/pm.html/"&gt;Larry Wall&amp;#8217;s 1999 talk&lt;/a&gt;. 
-&lt;/p&gt;
-&lt;blockquote&gt;&lt;p&gt;How many times have we heard the mantra that a program should do one thing and do it well?
-&lt;/p&gt;
-&lt;/blockquote&gt;&lt;p&gt;Perl is not that program. Perl wants to do everything well. It integrates features and makes no attempt to homogenise them.
-&lt;/p&gt;
-&lt;blockquote&gt;&lt;p&gt;You&amp;#8217;ve all heard the saying: If all you have is a hammer, everything starts to look like a nail.
-&lt;/p&gt;
-&lt;/blockquote&gt;&lt;p&gt;Perl is no hammer: it has memorably been described as a Swiss army chainsaw, but Larry Wall likens it to a more conventional tool.
-&lt;/p&gt;
-&lt;blockquote&gt;&lt;p&gt;If all you have is duct tape, everything starts to look like a duct. Right. When&amp;#8217;s the last time you used duct tape on a duct?
-&lt;/p&gt;
-&lt;/blockquote&gt;&lt;p&gt;Python may aspire to offer a single obvious way to do something. It fails splendidly, being more duct tape than hammer.
-&lt;/p&gt;
+<description>&lt;h2 id=&quot;timtowtdi&quot;&gt;TIMTOWTDI&lt;/h2&gt;
+&lt;p&gt;TIMTOWTDI stands for &amp;#8220;There is more than one way to do it&amp;#8221;, an approach promoted by the Perl community.&lt;/p&gt;
+&lt;p&gt;The mindset behind it gets explored in more detail by the language&amp;#8217;s creator, Larry Wall, in a talk given in 1999: &lt;a href=&quot;https://www.perl.com/pub/1999/03/pm.html/&quot;&gt;&amp;#8220;Perl, the first postmodern computer language&amp;#8221;&lt;/a&gt;. He attributes the slogan to his daughter, Heidi, who says it&amp;#8217;s a strategy which works well in her maths class; and &lt;strong&gt;she&lt;/strong&gt; associates it with another saying used at school: &amp;#8220;Tsall Good&amp;#8221;. This doesn&amp;#8217;t mean everything is good, or even everything has good bits. It means, overall, things are good. See the big picture.&lt;/p&gt;
+&lt;p&gt;Perl epitomises this. It&amp;#8217;s eclectic and inclusive, supporting a variety of styles. One-liner? Fine! Like a shell script? Sure! Structured programming, object-oriented, functional? Why not! Tsall good.&lt;/p&gt;
+&lt;p&gt;I like that.&lt;/p&gt;
+&lt;p&gt;But do I feel that way about programming?&lt;/p&gt;
+&lt;h2 id=&quot;tsbo-apoo-owtdi&quot;&gt;TSBO-APOO-OWTDI&lt;/h2&gt;
+&lt;p&gt;A contrasting mantra appears in the &lt;a href=&quot;https://www.python.org/dev/peps/pep-0020/&quot;&gt;Zen of Python&lt;/a&gt;, a list of aphorisms which summarise the guiding principles behind Python&amp;#8217;s design. Item number 13 states &amp;#8220;There should be one &amp;#8212; and preferably only one &amp;#8212; obvious way to do it.&amp;#8221;&lt;/p&gt;
+&lt;p&gt;Perhaps realising this sounds overly prescriptive, this rule is tempered by item 14, &amp;#8220;Although that way may not be obvious at first unless you&amp;#8217;re Dutch.&amp;#8221;&lt;/p&gt;
+&lt;p&gt;Guido van Rossum, Python&amp;#8217;s BDFL &amp;#8212; Benevolent Dictator For Life &amp;#8212; would be the Dutch person who finds things obvious. That&amp;#8217;s right: &lt;strong&gt;Dictator&lt;/strong&gt;. Programmers don&amp;#8217;t like being told what to do any more than two year olds. How then has Python become so popular? &lt;/p&gt;
+&lt;p&gt;Maybe emphasis falls on &lt;strong&gt;should&lt;/strong&gt;. There &lt;strong&gt;should&lt;/strong&gt; be only one obvious way to do it: it&amp;#8217;s just that &amp;#8212; Dutch or otherwise &amp;#8212; we haven&amp;#8217;t got there yet.&lt;/p&gt;
+&lt;h2 id=&quot;timtop&quot;&gt;TIMTOP&lt;/h2&gt;
+&lt;p&gt;For example, there is more than one Python. Obviously there&amp;#8217;s Python 2 and Python 3, but it&amp;#8217;s less obvious which to use. Don&amp;#8217;t forget &lt;a href=&quot;https://pypy.org/&quot;&gt;PyPy&lt;/a&gt;. Increasingly Python comes packaged with data processing and visualisation extensions, served up as a &lt;a href=&quot;http://jupyter.org/&quot;&gt;Jupyter&lt;/a&gt; notebook.&lt;/p&gt;
+&lt;h2 id=&quot;timtopom&quot;&gt;TIMTOPOM&lt;/h2&gt;
+&lt;p&gt;There is more than one program options module.&lt;/p&gt;
+&lt;p&gt;When I started with Python there was &lt;a href=&quot;https://docs.python.org/3/library/getopt.html&quot;&gt;getopt&lt;/a&gt;, the one and only command line handler. Coming from a C/C++ background I was quite happy to use something resembling GNU&amp;#8217;s getopt. Then &lt;a href=&quot;https://docs.python.org/3/library/optparse.html&quot;&gt;optparse&lt;/a&gt; appeared. Now there&amp;#8217;s &lt;a href=&quot;https://docs.python.org/3/library/argparse.html&quot;&gt;argparse&lt;/a&gt;. All of these libraries are readily available. Which should I use? Not optparse, that&amp;#8217;s deprecated, unless I&amp;#8217;m already using it and it works, that is. Regarding the other contenders, the &lt;a href=&quot;https://docs.python.org/3/library/getopt.html&quot;&gt;documentation&lt;/a&gt; archly notes:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Users who are unfamiliar with the C &lt;a href=&quot;http://man7.org/linux/man-pages/man3/getopt.3.html&quot;&gt;&lt;code&gt;getopt()&lt;/code&gt;&lt;/a&gt; function or who would like to write less code and get better help and error messages should consider using the &lt;a href=&quot;https://docs.python.org/3/library/argparse.html#module-argparse&quot;&gt;argparse module&lt;/a&gt; instead.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;There are other non-standard Python options for parsing a command line too: ones which &lt;a href=&quot;http://docopt.org/&quot;&gt;generate code from the usage&lt;/a&gt; notes, or by &lt;a href=&quot;https://github.com/google/python-fire&quot;&gt;inspecting the code you want to expose&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;There is more than one way to do it.&lt;/p&gt;
+&lt;h2 id=&quot;timtoutf&quot;&gt;TIMTOUTF&lt;/h2&gt;
+&lt;p&gt;There is more than one unit test framework. The obvious one, &lt;a href=&quot;https://docs.python.org/3/library/unittest.html&quot;&gt;unittest&lt;/a&gt;, like getopt, draws inspiration from elsewhere &amp;#8212; in this case Java&amp;#8217;s Junit. Unfortunately the port is too faithful, and you&amp;#8217;ll have to inherit from super classes etc to test something. I much prefer &lt;a href=&quot;https://docs.pytest.org&quot;&gt;PyTest&lt;/a&gt;, which flexes the language itself to deliver test assertions as &lt;code&gt;assert&lt;/code&gt;s.&lt;/p&gt;
+&lt;p&gt;There&amp;#8217;s also a &lt;a href=&quot;https://docs.python.org/3/library/doctest.html&quot;&gt;doctest&lt;/a&gt; module in the standard library which executes and checks code found in strings (hold that thought!), and there are many other non-standard testing frameworks.&lt;/p&gt;
+&lt;p&gt;There is more than one way to do it.&lt;/p&gt;
+&lt;h2 id=&quot;timtowofs&quot;&gt;TIMTOWOFS&lt;/h2&gt;
+&lt;p&gt;There is more than one way of formatting strings.&lt;/p&gt;
+&lt;p&gt;As we&amp;#8217;ve seen there&amp;#8217;s more than one Python, and libraries are always up for reinvention. This is arguably evolution rather than a multiplicity of options. That is, the most recent way to do it should be preferred.&lt;/p&gt;
+&lt;p&gt;When it comes to string formatting, though, there has &lt;strong&gt;always&lt;/strong&gt; been more than one way to do it, and more ways are still being added.&lt;/p&gt;
+&lt;p&gt;Do you use &lt;code&gt;&#x27;single&#x27;&lt;/code&gt; or &lt;code&gt;&quot;double&quot;&lt;/code&gt; quotes for a string? &lt;code&gt;&quot;&quot;&quot;Triple&quot;&quot;&quot;&lt;/code&gt; quotes. Raw strings? Raw with an &lt;code&gt;r&lt;/code&gt; or Raw with an &lt;code&gt;R&lt;/code&gt;? TIMTOWTDI.&lt;/p&gt;
+&lt;p&gt;What if you want to embed the value of a variable in a string? Users familiar with C&amp;#8217;s &lt;code&gt;printf()&lt;/code&gt; function might prefer &lt;code&gt;%&lt;/code&gt; formatting. Fans of $shell $parameter $expansion can use &lt;a href=&quot;https://docs.python.org/3/library/string.html#template-strings&quot;&gt;template strings&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;https://www.python.org/dev/peps/pep-3101/&quot;&gt;Advanced string formatting&lt;/a&gt; &amp;#8212; &lt;code&gt;str.format&lt;/code&gt; &amp;#8212; appeared in Python 3.0, backported to Python 2.6. No doubt it has advantages over &lt;code&gt;%&lt;/code&gt; formatting, but for me it&amp;#8217;s a little more obscure and a little less obvious. Python 3.6 introduces &lt;a href=&quot;https://www.python.org/dev/peps/pep-0498/&quot;&gt;f-strings&lt;/a&gt; which build on &lt;code&gt;str.format&lt;/code&gt; and knock down my reservations. The syntax allows you to evaluate expressions in strings: evidently Python is heading in Perl&amp;#8217;s direction.&lt;/p&gt;
+&lt;h2 id=&quot;apsdotadiw&quot;&gt;APSDOTADIW&lt;/h2&gt;
+&lt;p&gt;Let&amp;#8217;s finish by returning to Perl, and to &lt;a href=&quot;https://www.perl.com/pub/1999/03/pm.html/&quot;&gt;Larry Wall&amp;#8217;s 1999 talk&lt;/a&gt;. &lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;How many times have we heard the mantra that a program should do one thing and do it well?&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;Perl is not that program. Perl wants to do everything well. It integrates features and makes no attempt to homogenise them.&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;You&amp;#8217;ve all heard the saying: If all you have is a hammer, everything starts to look like a nail.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;Perl is no hammer: it has memorably been described as a Swiss army chainsaw, but Larry Wall likens it to a more conventional tool.&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;If all you have is duct tape, everything starts to look like a duct. Right. When&amp;#8217;s the last time you used duct tape on a duct?&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;Python may aspire to offer a single obvious way to do something. It fails splendidly, being more duct tape than hammer.&lt;/p&gt;
 &lt;hr /&gt;
-
-&lt;p&gt;I presented this blog post as a &lt;a href="https://www.meetup.com/PyDiff/events/249220768"&gt;lightning talk at PyDiff&lt;/a&gt; a couple of days ago. The &lt;a href="http://wordaligned.org/docs/timtowtdi"&gt;slides are here&lt;/a&gt;. The talk was recorded too: &lt;a href="https://cardiff.cloud.panopto.eu/Panopto/Pages/Viewer.aspx?id=324c4015-51ed-4bd7-a1c7-a8c50089e746"&gt;I appear about 24 minutes in&lt;/a&gt;.
-&lt;/p&gt;</description>
+&lt;p&gt;I presented this blog post as a &lt;a href=&quot;https://www.meetup.com/PyDiff/events/249220768&quot;&gt;lightning talk at PyDiff&lt;/a&gt; a couple of days ago. The &lt;a href=&quot;http://wordaligned.org/docs/timtowtdi&quot;&gt;slides are here&lt;/a&gt;. The talk was recorded too: &lt;a href=&quot;https://cardiff.cloud.panopto.eu/Panopto/Pages/Viewer.aspx?id=324c4015-51ed-4bd7-a1c7-a8c50089e746&quot;&gt;I appear about 24 minutes in&lt;/a&gt;.&lt;/p&gt;</description>
 <dc:date>2018-04-19</dc:date>
 <guid>http://wordaligned.org/articles/timtowtdi-vs-tsboapooowtdi</guid>
 <author>tag@wordaligned.org (Thomas Guest)</author>
@@ -454,18 +409,13 @@ fruitbowl = {
 
 <item>
 <title>DDD Wales, 2018</title>
-<description>&lt;p&gt;The first ever &lt;a href="https://www.dddwales.com/"&gt;DDD Wales&lt;/a&gt; was held yesterday at &lt;a href="https://swansea.techhub.com/"&gt;TechHub Swansea&lt;/a&gt;. It was a free-to-attend one day event comprising 5 full one hour sessions split into 3 parallel tracks; that makes 15 sessions to choose from. Additionally, there were lightning talks in the lunch break.
-&lt;/p&gt;
-&lt;div&gt;&lt;blockquote class="twitter-tweet" data-lang="en"&gt;&lt;p lang="en" dir="ltr"&gt;Wow what a day! Time for some rest! Thank you again to all our amazing sponsors, exhibitors, Speakers, attendees and venue. &lt;br&gt;&lt;br&gt;See you next year &lt;a href="https://twitter.com/hashtag/DDDWales?src=hash&amp;amp;ref_src=twsrc%5Etfw"&gt;#DDDWales&lt;/a&gt;&lt;/p&gt;&amp;mdash; DDD Wales (@dddcymru) &lt;a href="https://twitter.com/dddcymru/status/977684471750316032?ref_src=twsrc%5Etfw"&gt;March 24, 2018&lt;/a&gt;&lt;/blockquote&gt;&lt;script async src="https://platform.twitter.com/widgets.js" charset="utf-8"&gt;&lt;/script&gt;&lt;/div&gt;
+<description>&lt;p&gt;The first ever &lt;a href=&quot;https://www.dddwales.com/&quot;&gt;DDD Wales&lt;/a&gt; was held yesterday at &lt;a href=&quot;https://swansea.techhub.com/&quot;&gt;TechHub Swansea&lt;/a&gt;. It was a free-to-attend one day event comprising 5 full one hour sessions split into 3 parallel tracks; that makes 15 sessions to choose from. Additionally, there were lightning talks in the lunch break.&lt;/p&gt;
+&lt;div&gt;&lt;blockquote class=&quot;twitter-tweet&quot; data-lang=&quot;en&quot;&gt;&lt;p lang=&quot;en&quot; dir=&quot;ltr&quot;&gt;Wow what a day! Time for some rest! Thank you again to all our amazing sponsors, exhibitors, Speakers, attendees and venue. &lt;br&gt;&lt;br&gt;See you next year &lt;a href=&quot;https://twitter.com/hashtag/DDDWales?src=hash&amp;amp;ref_src=twsrc%5Etfw&quot;&gt;#DDDWales&lt;/a&gt;&lt;/p&gt;&amp;mdash; DDD Wales (@dddcymru) &lt;a href=&quot;https://twitter.com/dddcymru/status/977684471750316032?ref_src=twsrc%5Etfw&quot;&gt;March 24, 2018&lt;/a&gt;&lt;/blockquote&gt;&lt;script async src=&quot;https://platform.twitter.com/widgets.js&quot; charset=&quot;utf-8&quot;&gt;&lt;/script&gt;&lt;/div&gt;
 
-&lt;p&gt;I enjoyed &lt;a href="https://twitter.com/kevinrjones"&gt;Kevin Jones&lt;/a&gt;&amp;#8217; introduction to Kotlin, the more so since it was almost entirely coded live. Kevin ably demonstrated Kotlin to be &amp;#8220;Java without the ceremony&amp;#8221;. I could see connections with other modern compiled languages &amp;#8212; Swift for example &amp;#8212; languages which aren&amp;#8217;t feature-shy, but which aim for a light, clean syntax; languages which build on existing systems and libraries. It was interesting to see his use of the JetBrains IDE as a teaching aid, and indeed to pick up on audience thoughts on the use of IDEs to flesh out code.
-&lt;/p&gt;
-&lt;p&gt;&lt;a href="https://twitter.com/ChrisCundill"&gt;Chris Cundill&amp;#8217;s&lt;/a&gt; talk on &lt;a href="http://releaseflow.org/#about"&gt;&amp;#8220;release flow&amp;#8221;&lt;/a&gt; was another highlight. You may not have heard of release flow but you&amp;#8217;ll know what it is: a tried and tested strategy for code branching. Chris used his talk to challenge and call out some more recent alternatives &amp;#8212; Gitflow being the prime target. The session got me thinking. One dimension Chris didn&amp;#8217;t cover was people: personalities, roles and permissions. Who can merge to which branch? Which developers work in private then push bulk updates? Git has won the version control system battle. The fight has moved into surrounding areas: branching, merging, reviewing, continuous integration, and the competition is bringing improvements in tooling and best practice.
-&lt;/p&gt;
-&lt;p&gt;The final talk I attended was &lt;a href="https://twitter.com/davidcarboni"&gt;David Carboni&amp;#8217;s&lt;/a&gt; session on creating a minimal Docker container to run a microservice written in &lt;a href="https://golang.org/"&gt;Go&lt;/a&gt;. David started off by explaining why simplicity matters. I agree. I couldn&amp;#8217;t agree more. The rest of the session was, again, live coding, replaying a &lt;a href="https://github.com/davidcarboni/ddd"&gt;demo&lt;/a&gt; which uses the techniques described in &lt;a href="https://blog.codeship.com/building-minimal-docker-containers-for-go-applications/"&gt;a couple&lt;/a&gt; of &lt;a href="http://devcenter.wercker.com/docs/quickstarts/advanced/building-minimal-containers-with-go"&gt;blog posts&lt;/a&gt; to whittle a Docker container down from a base size of ~700MB to a &lt;a href="https://docs.docker.com/develop/develop-images/baseimages/"&gt;scratch&lt;/a&gt; size ~7MB.
-&lt;/p&gt;
-&lt;p&gt;All in all, a great day. The split-level &lt;a href="https://swansea.techhub.com/"&gt;venue&lt;/a&gt; suited the three track conference well. The speakers delivered terrific sessions which the audiences engaged with. I&amp;#8217;d like to thank the organisers, sponsors, speakers, and other attendees.
-&lt;/p&gt;</description>
+&lt;p&gt;I enjoyed &lt;a href=&quot;https://twitter.com/kevinrjones&quot;&gt;Kevin Jones&lt;/a&gt;&amp;#8217; introduction to Kotlin, the more so since it was almost entirely coded live. Kevin ably demonstrated Kotlin to be &amp;#8220;Java without the ceremony&amp;#8221;. I could see connections with other modern compiled languages &amp;#8212; Swift for example &amp;#8212; languages which aren&amp;#8217;t feature-shy, but which aim for a light, clean syntax; languages which build on existing systems and libraries. It was interesting to see his use of the JetBrains IDE as a teaching aid, and indeed to pick up on audience thoughts on the use of IDEs to flesh out code.&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;https://twitter.com/ChrisCundill&quot;&gt;Chris Cundill&amp;#8217;s&lt;/a&gt; talk on &lt;a href=&quot;http://releaseflow.org/#about&quot;&gt;&amp;#8220;release flow&amp;#8221;&lt;/a&gt; was another highlight. You may not have heard of release flow but you&amp;#8217;ll know what it is: a tried and tested strategy for code branching. Chris used his talk to challenge and call out some more recent alternatives &amp;#8212; Gitflow being the prime target. The session got me thinking. One dimension Chris didn&amp;#8217;t cover was people: personalities, roles and permissions. Who can merge to which branch? Which developers work in private then push bulk updates? Git has won the version control system battle. The fight has moved into surrounding areas: branching, merging, reviewing, continuous integration, and the competition is bringing improvements in tooling and best practice.&lt;/p&gt;
+&lt;p&gt;The final talk I attended was &lt;a href=&quot;https://twitter.com/davidcarboni&quot;&gt;David Carboni&amp;#8217;s&lt;/a&gt; session on creating a minimal Docker container to run a microservice written in &lt;a href=&quot;https://golang.org/&quot;&gt;Go&lt;/a&gt;. David started off by explaining why simplicity matters. I agree. I couldn&amp;#8217;t agree more. The rest of the session was, again, live coding, replaying a &lt;a href=&quot;https://github.com/davidcarboni/ddd&quot;&gt;demo&lt;/a&gt; which uses the techniques described in &lt;a href=&quot;https://blog.codeship.com/building-minimal-docker-containers-for-go-applications/&quot;&gt;a couple&lt;/a&gt; of &lt;a href=&quot;http://devcenter.wercker.com/docs/quickstarts/advanced/building-minimal-containers-with-go&quot;&gt;blog posts&lt;/a&gt; to whittle a Docker container down from a base size of ~700MB to a &lt;a href=&quot;https://docs.docker.com/develop/develop-images/baseimages/&quot;&gt;scratch&lt;/a&gt; size ~7MB.&lt;/p&gt;
+&lt;p&gt;All in all, a great day. The split-level &lt;a href=&quot;https://swansea.techhub.com/&quot;&gt;venue&lt;/a&gt; suited the three track conference well. The speakers delivered terrific sessions which the audiences engaged with. I&amp;#8217;d like to thank the organisers, sponsors, speakers, and other attendees.&lt;/p&gt;</description>
 <dc:date>2018-03-25</dc:date>
 <guid>http://wordaligned.org/articles/ddd-wales-2018</guid>
 <author>tag@wordaligned.org (Thomas Guest)</author>
@@ -476,20 +426,16 @@ fruitbowl = {
 
 <item>
 <title>Perec @IgniteSwansea #3</title>
-<description>&lt;img src="http://wordaligned.org/docs/ignite/perec/me-at-ignite.jpg" alt="Puzzle"/&gt;
+<description>&lt;p&gt;&lt;img src=&quot;http://wordaligned.org/docs/ignite/perec/me-at-ignite.jpg&quot; alt=&quot;Puzzle&quot;/&gt;&lt;/p&gt;
+&lt;p&gt;At &lt;a href=&quot;http://www.igniteswansea.co.uk/&quot;&gt;Ignite Swansea #3&lt;/a&gt; I spoke about Georges Perec&amp;#8217;s masterpiece, Life A User&amp;#8217;s Manual. &lt;/p&gt;
+&lt;p&gt;Perec was &amp;#8212; and indeed still is &amp;#8212; a member of OuLiPo, a Parisian literary group interested in exploring the effects of applying mathematical patterns to text. His work seemed an appropriate subject for a presentation constrained to fit the ignite formula:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;20 slides &amp;times; 15 seconds = 5 minutes&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;It&amp;#8217;s material I&amp;#8217;ve spoken about &lt;a href=&quot;http://wordaligned.org/tags/perec&quot;&gt;before&lt;/a&gt; but &lt;a href=&quot;http://wordaligned.org/docs/ignite/perec/&quot;&gt;the slides are new&lt;/a&gt;. The talk was &lt;a href=&quot;https://youtu.be/-y7YOKIa6yQ&quot;&gt;recorded&lt;/a&gt;. I enjoyed attempting &lt;a href=&quot;https://en.wikipedia.org/wiki/Just_a_Minute&quot;&gt;just-a-minute&lt;/a&gt; &amp;times; 5, though on the night I could have sworn I was subject to a cruel powerpoint bug which sped up the playback.&lt;/p&gt;
+&lt;iframe width=&quot;560&quot; height=&quot;315&quot; src=&quot;https://www.youtube.com/embed/-y7YOKIa6yQ?rel=0&amp;amp;showinfo=0&quot; frameborder=&quot;0&quot; allow=&quot;autoplay; encrypted-media&quot; allowfullscreen&gt;&lt;/iframe&gt;
 
-&lt;p&gt;At &lt;a href="http://www.igniteswansea.co.uk/"&gt;Ignite Swansea #3&lt;/a&gt; I spoke about Georges Perec&amp;#8217;s masterpiece, Life A User&amp;#8217;s Manual. 
-&lt;/p&gt;
-&lt;p&gt;Perec was &amp;#8212; and indeed still is &amp;#8212; a member of OuLiPo, a Parisian literary group interested in exploring the effects of applying mathematical patterns to text. His work seemed an appropriate subject for a presentation constrained to fit the ignite formula:
-&lt;/p&gt;
-&lt;blockquote&gt;&lt;p&gt;20 slides &amp;times; 15 seconds = 5 minutes
-&lt;/p&gt;
-&lt;/blockquote&gt;&lt;p&gt;It&amp;#8217;s material I&amp;#8217;ve spoken about &lt;a href="http://wordaligned.org/tags/perec"&gt;before&lt;/a&gt; but &lt;a href="http://wordaligned.org/docs/ignite/perec/"&gt;the slides are new&lt;/a&gt;. The talk was &lt;a href="https://youtu.be/-y7YOKIa6yQ"&gt;recorded&lt;/a&gt;. I enjoyed attempting &lt;a href="https://en.wikipedia.org/wiki/Just_a_Minute"&gt;just-a-minute&lt;/a&gt; &amp;times; 5, though on the night I could have sworn I was subject to a cruel powerpoint bug which sped up the playback.
-&lt;/p&gt;
-&lt;iframe width="560" height="315" src="https://www.youtube.com/embed/-y7YOKIa6yQ?rel=0&amp;amp;showinfo=0" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen&gt;&lt;/iframe&gt;
-
-&lt;p&gt;OuLiPo fans might like to see if they can find the clinamen. The moustache is what happens in the fourth week of &lt;a href="https://uk.movember.com/"&gt;Movember&lt;/a&gt;. My thanks to all &lt;a href="http://www.igniteswansea.co.uk/"&gt;@IgniteSwansea&lt;/a&gt; and &lt;a href="https://www.cinemaco.co.uk/"&gt;Cinema &amp;amp; Co&lt;/a&gt; for putting on such a great evening.
-&lt;/p&gt;</description>
+&lt;p&gt;OuLiPo fans might like to see if they can find the clinamen. The moustache is what happens in the fourth week of &lt;a href=&quot;https://uk.movember.com/&quot;&gt;Movember&lt;/a&gt;. My thanks to all &lt;a href=&quot;http://www.igniteswansea.co.uk/&quot;&gt;@IgniteSwansea&lt;/a&gt; and &lt;a href=&quot;https://www.cinemaco.co.uk/&quot;&gt;Cinema &amp;amp; Co&lt;/a&gt; for putting on such a great evening.&lt;/p&gt;</description>
 <dc:date>2018-02-03</dc:date>
 <guid>http://wordaligned.org/articles/perec-igniteswansea-3</guid>
 <author>tag@wordaligned.org (Thomas Guest)</author>
@@ -502,18 +448,13 @@ fruitbowl = {
 
 <item>
 <title>Bugwards Compatible</title>
-<description>&lt;p&gt;&lt;a href="https://twitter.com/chrisoldwood"&gt;Chris Oldwood&lt;/a&gt; recently tweeted about &amp;#8220;TFW you write some tests for a bit of legacy code before making a change and you unearth a bunch of bugs&amp;#8221;
-&lt;/p&gt;
-&lt;div&gt;&lt;blockquote class="twitter-tweet" data-lang="en"&gt;&lt;p lang="en" dir="ltr"&gt;TFW you write some tests for a bit of legacy code before making a change and you unearth a bunch of bugs.&lt;/p&gt;&amp;mdash; Chris Oldwood (@chrisoldwood) &lt;a href="https://twitter.com/chrisoldwood/status/959576034059448321?ref_src=twsrc%5Etfw"&gt;February 2, 2018&lt;/a&gt;&lt;/blockquote&gt;&lt;script async src="https://platform.twitter.com/widgets.js" charset="utf-8"&gt;&lt;/script&gt;&lt;/div&gt;
+<description>&lt;p&gt;&lt;a href=&quot;https://twitter.com/chrisoldwood&quot;&gt;Chris Oldwood&lt;/a&gt; recently tweeted about &amp;#8220;TFW you write some tests for a bit of legacy code before making a change and you unearth a bunch of bugs&amp;#8221;&lt;/p&gt;
+&lt;div&gt;&lt;blockquote class=&quot;twitter-tweet&quot; data-lang=&quot;en&quot;&gt;&lt;p lang=&quot;en&quot; dir=&quot;ltr&quot;&gt;TFW you write some tests for a bit of legacy code before making a change and you unearth a bunch of bugs.&lt;/p&gt;&amp;mdash; Chris Oldwood (@chrisoldwood) &lt;a href=&quot;https://twitter.com/chrisoldwood/status/959576034059448321?ref_src=twsrc%5Etfw&quot;&gt;February 2, 2018&lt;/a&gt;&lt;/blockquote&gt;&lt;script async src=&quot;https://platform.twitter.com/widgets.js&quot; charset=&quot;utf-8&quot;&gt;&lt;/script&gt;&lt;/div&gt;
 
-&lt;p&gt;He doesn&amp;#8217;t elaborate on what exactly &amp;#8220;that feeling&amp;#8221; is, but I&amp;#8217;ll bet it&amp;#8217;s not surprise. Writing tests for code almost invariably shakes something out &amp;#8212; perhaps some undocumented assumptions about the inputs; perhaps a failure to match the documented behaviour; perhaps an access violation which will crash the application.
-&lt;/p&gt;
-&lt;p&gt;&amp;#8220;That feeling&amp;#8221; can include relief: the code is legacy code and evidently the bugs have gone unnoticed or at least unreported. Often, any such relief may be accompanied by a sense of wonder. The bugs may be so severe &amp;#8212; the code so broken &amp;#8212; that the maintainer questions how it &lt;strong&gt;ever&lt;/strong&gt; worked.
-&lt;/p&gt;
-&lt;p&gt;&amp;#8220;That feeling&amp;#8221; may also be dismay, since the legacy code requires changing. If the existing behaviour is buggy but predictable it could well be that clients have adapted to this behaviour and wouldn&amp;#8217;t welcome a fix. In other words, the change will have to be both backwards and &lt;strong&gt;bugwards compatible&lt;/strong&gt;. Chris will have to tread carefully.
-&lt;/p&gt;
-&lt;p&gt;Such delicate decisions are not limited to the code&amp;#8217;s runtime behaviour. It might seem that, once the code is under test, Chris can &lt;a href="http://wiki.c2.com/?RefactorMercilessly"&gt;refactor mercilessly&lt;/a&gt; &amp;#8212; renaming variables, updating idioms, tidying layout. Again, tread carefully! Make sure the code &lt;strong&gt;is&lt;/strong&gt; under test. Be aware of the differences which reviewers must evaluate. Consider the wider context. Respect the original authors.
-&lt;/p&gt;</description>
+&lt;p&gt;He doesn&amp;#8217;t elaborate on what exactly &amp;#8220;that feeling&amp;#8221; is, but I&amp;#8217;ll bet it&amp;#8217;s not surprise. Writing tests for code almost invariably shakes something out &amp;#8212; perhaps some undocumented assumptions about the inputs; perhaps a failure to match the documented behaviour; perhaps an access violation which will crash the application.&lt;/p&gt;
+&lt;p&gt;&amp;#8220;That feeling&amp;#8221; can include relief: the code is legacy code and evidently the bugs have gone unnoticed or at least unreported. Often, any such relief may be accompanied by a sense of wonder. The bugs may be so severe &amp;#8212; the code so broken &amp;#8212; that the maintainer questions how it &lt;strong&gt;ever&lt;/strong&gt; worked.&lt;/p&gt;
+&lt;p&gt;&amp;#8220;That feeling&amp;#8221; may also be dismay, since the legacy code requires changing. If the existing behaviour is buggy but predictable it could well be that clients have adapted to this behaviour and wouldn&amp;#8217;t welcome a fix. In other words, the change will have to be both backwards and &lt;strong&gt;bugwards compatible&lt;/strong&gt;. Chris will have to tread carefully.&lt;/p&gt;
+&lt;p&gt;Such delicate decisions are not limited to the code&amp;#8217;s runtime behaviour. It might seem that, once the code is under test, Chris can &lt;a href=&quot;http://wiki.c2.com/?RefactorMercilessly&quot;&gt;refactor mercilessly&lt;/a&gt; &amp;#8212; renaming variables, updating idioms, tidying layout. Again, tread carefully! Make sure the code &lt;strong&gt;is&lt;/strong&gt; under test. Be aware of the differences which reviewers must evaluate. Consider the wider context. Respect the original authors.&lt;/p&gt;</description>
 <dc:date>2018-02-02</dc:date>
 <guid>http://wordaligned.org/articles/bugwards-compatible</guid>
 <author>tag@wordaligned.org (Thomas Guest)</author>
@@ -523,22 +464,14 @@ fruitbowl = {
 
 <item>
 <title>Meetup? Turn Up!</title>
-<description>&lt;p&gt;&lt;a href="https://www.meetup.com/Agile-Bath-Bristol/events/245853715/"&gt;&lt;img alt="Sell out" src="http://wordaligned.org/images/agile-bb-meetup.png"/&gt;&lt;/a&gt;
-&lt;/p&gt;
-&lt;p&gt;Monday&amp;#8217;s &lt;a href="https://www.meetup.com/Agile-Bath-Bristol/events/245853715/"&gt;Agile Bath &amp;amp; Bristol meetup&lt;/a&gt; was a sell out. All 50 available spaces were taken. I myself was lucky to get a place &amp;#8212; I was on the waiting list until a spot opened up at 3pm on the day. And I was the speaker!
-&lt;/p&gt;
-&lt;p&gt;The reality turned out to be different: of the 50 who&amp;#8217;d claimed spaces, roughly one in four actually showed up.
-&lt;/p&gt;
-&lt;p&gt;I know, it was &lt;a href="https://en.wikipedia.org/wiki/Blue_Monday_(date)"&gt;Blue Monday&lt;/a&gt;. I know, there are bugs going round &amp;#8212; my daughter has been running a fever and didn&amp;#8217;t go in to college, and if I hadn&amp;#8217;t been presenting I myself would have cancelled to stay in with her. I know, your work day over-runs, you&amp;#8217;re hungry, something else comes up. I know, it&amp;#8217;s a free event, so it&amp;#8217;s not as though you&amp;#8217;ve &lt;em&gt;lost&lt;/em&gt; anything.
-&lt;/p&gt;
-&lt;p&gt;Despite all these things a 25% turnout reflects badly on us all. It&amp;#8217;s unfair on the sponsors and organisers, especially when refreshments are offered. It&amp;#8217;s impolite to those who turn up at the advertised time, and must then sit waiting in case more people who&amp;#8217;ve said they&amp;#8217;re coming actually show up. It&amp;#8217;s tough on the speakers: planning a session for an audience of 50 is different to one you&amp;#8217;d plan for 12.
-&lt;/p&gt;
-&lt;p&gt;I realise 25% is egregiously low, but &amp;#8212; in my experience &amp;#8212; 50% is far from unusual, and even considered acceptable. I think it&amp;#8217;s shabby. The one excuse noone has is forgetting the event is on &amp;#8212; Meetup etc. integrate with your calendar and issue repeated reminders to attend and requests to cancel if you cannot.
-&lt;/p&gt;
-&lt;p&gt;So, my thanks to those who turned up and participated. I enjoyed it. Smaller numbers allowed for a more collaborative session. Ironically, topics discussed included punctuality, respect, commitment.
-&lt;/p&gt;
-&lt;p&gt;Please, don&amp;#8217;t sign up to a meetup you don&amp;#8217;t plan to attend. If you decide to cancel, release your place so someone else can have it. Otherwise, arrive on time.
-&lt;/p&gt;</description>
+<description>&lt;p&gt;&lt;a href=&quot;https://www.meetup.com/Agile-Bath-Bristol/events/245853715/&quot;&gt;&lt;img alt=&quot;Sell out&quot; src=&quot;http://wordaligned.org/images/agile-bb-meetup.png&quot;/&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;Monday&amp;#8217;s &lt;a href=&quot;https://www.meetup.com/Agile-Bath-Bristol/events/245853715/&quot;&gt;Agile Bath &amp;amp; Bristol meetup&lt;/a&gt; was a sell out. All 50 available spaces were taken. I myself was lucky to get a place &amp;#8212; I was on the waiting list until a spot opened up at 3pm on the day. And I was the speaker!&lt;/p&gt;
+&lt;p&gt;The reality turned out to be different: of the 50 who&amp;#8217;d claimed spaces, roughly one in four actually showed up.&lt;/p&gt;
+&lt;p&gt;I know, it was &lt;a href=&quot;https://en.wikipedia.org/wiki/Blue_Monday_(date)&quot;&gt;Blue Monday&lt;/a&gt;. I know, there are bugs going round &amp;#8212; my daughter has been running a fever and didn&amp;#8217;t go in to college, and if I hadn&amp;#8217;t been presenting I myself would have cancelled to stay in with her. I know, your work day over-runs, you&amp;#8217;re hungry, something else comes up. I know, it&amp;#8217;s a free event, so it&amp;#8217;s not as though you&amp;#8217;ve &lt;em&gt;lost&lt;/em&gt; anything.&lt;/p&gt;
+&lt;p&gt;Despite all these things a 25% turnout reflects badly on us all. It&amp;#8217;s unfair on the sponsors and organisers, especially when refreshments are offered. It&amp;#8217;s impolite to those who turn up at the advertised time, and must then sit waiting in case more people who&amp;#8217;ve said they&amp;#8217;re coming actually show up. It&amp;#8217;s tough on the speakers: planning a session for an audience of 50 is different to one you&amp;#8217;d plan for 12.&lt;/p&gt;
+&lt;p&gt;I realise 25% is egregiously low, but &amp;#8212; in my experience &amp;#8212; 50% is far from unusual, and even considered acceptable. I think it&amp;#8217;s shabby. The one excuse noone has is forgetting the event is on &amp;#8212; Meetup etc. integrate with your calendar and issue repeated reminders to attend and requests to cancel if you cannot.&lt;/p&gt;
+&lt;p&gt;So, my thanks to those who turned up and participated. I enjoyed it. Smaller numbers allowed for a more collaborative session. Ironically, topics discussed included punctuality, respect, commitment.&lt;/p&gt;
+&lt;p&gt;Please, don&amp;#8217;t sign up to a meetup you don&amp;#8217;t plan to attend. If you decide to cancel, release your place so someone else can have it. Otherwise, arrive on time.&lt;/p&gt;</description>
 <dc:date>2018-01-18</dc:date>
 <guid>http://wordaligned.org/articles/meetup-turn-up</guid>
 <author>tag@wordaligned.org (Thomas Guest)</author>
@@ -548,10 +481,8 @@ fruitbowl = {
 
 <item>
 <title>Advent of Code 2017</title>
-<description>&lt;p&gt;A big thanks to &lt;a href="http://was.tl"&gt;Eric Wastl&lt;/a&gt; for another great &lt;a href="http://adventofcode.com/2017"&gt;Advent of Code&lt;/a&gt;. Inspired by &lt;a href="https://github.com/norvig/pytudes/blob/master/ipynb/Advent%20of%20Code.ipynb"&gt;Peter Norvig&lt;/a&gt;, I&amp;#8217;ve published &lt;a href="https://github.com/wordaligned/advent-of-code-2017/blob/master/advent-of-code-2017.ipynb"&gt;my solutions&lt;/a&gt; as a Jupyter notebook.
-&lt;/p&gt;
-&lt;p&gt;&lt;a href="https://github.com/wordaligned/advent-of-code-2017/blob/master/advent-of-code-2017.ipynb"&gt;&lt;img src="https://raw.githubusercontent.com/wordaligned/advent-of-code-2017/8e8344b4c5fc00827e42576059f36389dcfa453c/done.png" alt="Done!"/&gt;&lt;/a&gt;
-&lt;/p&gt;</description>
+<description>&lt;p&gt;A big thanks to &lt;a href=&quot;http://was.tl&quot;&gt;Eric Wastl&lt;/a&gt; for another great &lt;a href=&quot;http://adventofcode.com/2017&quot;&gt;Advent of Code&lt;/a&gt;. Inspired by &lt;a href=&quot;https://github.com/norvig/pytudes/blob/master/ipynb/Advent%20of%20Code.ipynb&quot;&gt;Peter Norvig&lt;/a&gt;, I&amp;#8217;ve published &lt;a href=&quot;https://github.com/wordaligned/advent-of-code-2017/blob/master/advent-of-code-2017.ipynb&quot;&gt;my solutions&lt;/a&gt; as a Jupyter notebook.&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;https://github.com/wordaligned/advent-of-code-2017/blob/master/advent-of-code-2017.ipynb&quot;&gt;&lt;img src=&quot;https://raw.githubusercontent.com/wordaligned/advent-of-code-2017/8e8344b4c5fc00827e42576059f36389dcfa453c/done.png&quot; alt=&quot;Done!&quot;/&gt;&lt;/a&gt;&lt;/p&gt;</description>
 <dc:date>2018-01-12</dc:date>
 <guid>http://wordaligned.org/articles/advent-of-code-2017</guid>
 <author>tag@wordaligned.org (Thomas Guest)</author>
@@ -562,20 +493,15 @@ fruitbowl = {
 
 <item>
 <title>Computer World</title>
-<description>&lt;p&gt;&lt;a data-flickr-embed="true"  href="https://www.flickr.com/photos/thomasguest/37406493811/in/dateposted-friend/" title="The Hitchhiker&amp;#x27;s Guide to the Galaxy"&gt;&lt;img src="https://farm5.staticflickr.com/4371/37406493811_0d17fab6cf.jpg" width="401" height="500" alt="The Hitchhiker&amp;#x27;s Guide to the Galaxy"&gt;&lt;/a&gt;&lt;script async src="http://wordaligned.org//embedr.flickr.com/assets/client-code.js" charset="utf-8"&gt;&lt;/script&gt;
-&lt;/p&gt;
-&lt;p&gt;Douglas Adams&amp;#8217; &amp;#8220;Hitchhiker&amp;#8217;s Guide to the Galaxy&amp;#8221; tells the story of the two most powerful computers ever made. The first, Deep Thought, was designed to figure out the meaning of Life the Universe and Everything. After 7,500,000 years of processing it came up with the concise but unedifying Ultimate Answer of 42. It then undertook the task of designing its successor, a computer sophisticated enough to calculate the Ultimate Question:
-&lt;/p&gt;
-&lt;blockquote&gt;&lt;p&gt;&amp;#8220;&amp;#8230; A computer which can calculate the Question to the Ultimate Answer, a computer of such infinite and subtle complexity that organic life itself shall form part of its operational matrix &amp;#8230; Yes! I shall design this computer for you. And I shall name it also unto you. And it shall be called &amp;#8230; The Earth.&amp;#8221;
-&lt;/p&gt;
-&lt;/blockquote&gt;&lt;p&gt;When I first heard this it seemed ridiculous. Now, almost 40 years on, I&amp;#8217;ve realised it&amp;#8217;s true.
-&lt;/p&gt;
-&lt;p&gt;It&amp;#8217;s no longer correct to think of computers as discrete units. Computers have the property that when you connect two of them you get another computer, and so on. The network &lt;strong&gt;is&lt;/strong&gt; the computer. The Apple in your hand, the Echo on your shelf, the chip in your &lt;a href="https://www.amazon.co.uk/Scepticism-Inc-Bo-Fowler/dp/009927468X"&gt;shopping trolley&lt;/a&gt; &amp;#8212; all combine to form a global connected device. And as Adams predicted, we ourselves form part of the operating system, constantly feeding data back in.
-&lt;/p&gt;
-&lt;img src="http://wordaligned.org/images/planet-earth.jpg" alt="Planet Earth"/&gt;
-
-&lt;p&gt;Douglas Adams&amp;#8217; insight puts software development into perspective. True: we no longer print our product on silicon or ship it in boxes, and yes: we accept &lt;a href="http://wordaligned.org/articles/why-software-development-isnt-like-construction"&gt;construction&lt;/a&gt; is not the right metaphor, but: nor is production. &lt;a href="http://swanseacon.co.uk/schedule/#session-27"&gt;Professor Dave Snowden&lt;/a&gt; talks about entanglement &amp;#8212; think of a system growing like brambles in a thicket. He emphasises what&amp;#8217;s natural, evolutionary and human. Object oriented design lost out when it narrowed its focus. Remember, people are objects too. The world is our platform.
-&lt;/p&gt;</description>
+<description>&lt;p&gt;&lt;a data-flickr-embed=&quot;true&quot;  href=&quot;https://www.flickr.com/photos/thomasguest/37406493811/in/dateposted-friend/&quot; title=&quot;The Hitchhiker&amp;#x27;s Guide to the Galaxy&quot;&gt;&lt;img src=&quot;https://farm5.staticflickr.com/4371/37406493811_0d17fab6cf.jpg&quot; width=&quot;401&quot; height=&quot;500&quot; alt=&quot;The Hitchhiker&amp;#x27;s Guide to the Galaxy&quot;&gt;&lt;/a&gt;&lt;script async src=&quot;http://wordaligned.org//embedr.flickr.com/assets/client-code.js&quot; charset=&quot;utf-8&quot;&gt;&lt;/script&gt;&lt;/p&gt;
+&lt;p&gt;Douglas Adams&amp;#8217; &amp;#8220;Hitchhiker&amp;#8217;s Guide to the Galaxy&amp;#8221; tells the story of the two most powerful computers ever made. The first, Deep Thought, was designed to figure out the meaning of Life the Universe and Everything. After 7,500,000 years of processing it came up with the concise but unedifying Ultimate Answer of 42. It then undertook the task of designing its successor, a computer sophisticated enough to calculate the Ultimate Question:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&amp;#8220;&amp;#8230; A computer which can calculate the Question to the Ultimate Answer, a computer of such infinite and subtle complexity that organic life itself shall form part of its operational matrix &amp;#8230; Yes! I shall design this computer for you. And I shall name it also unto you. And it shall be called &amp;#8230; The Earth.&amp;#8221;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;When I first heard this it seemed ridiculous. Now, almost 40 years on, I&amp;#8217;ve realised it&amp;#8217;s true.&lt;/p&gt;
+&lt;p&gt;It&amp;#8217;s no longer correct to think of computers as discrete units. Computers have the property that when you connect two of them you get another computer, and so on. The network &lt;strong&gt;is&lt;/strong&gt; the computer. The Apple in your hand, the Echo on your shelf, the chip in your &lt;a href=&quot;https://www.amazon.co.uk/Scepticism-Inc-Bo-Fowler/dp/009927468X&quot;&gt;shopping trolley&lt;/a&gt; &amp;#8212; all combine to form a global connected device. And as Adams predicted, we ourselves form part of the operating system, constantly feeding data back in.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;http://wordaligned.org/images/planet-earth.jpg&quot; alt=&quot;Planet Earth&quot;/&gt;&lt;/p&gt;
+&lt;p&gt;Douglas Adams&amp;#8217; insight puts software development into perspective. True: we no longer print our product on silicon or ship it in boxes, and yes: we accept &lt;a href=&quot;http://wordaligned.org/articles/why-software-development-isnt-like-construction&quot;&gt;construction&lt;/a&gt; is not the right metaphor, but: nor is production. &lt;a href=&quot;http://swanseacon.co.uk/schedule/#session-27&quot;&gt;Professor Dave Snowden&lt;/a&gt; talks about entanglement &amp;#8212; think of a system growing like brambles in a thicket. He emphasises what&amp;#8217;s natural, evolutionary and human. Object oriented design lost out when it narrowed its focus. Remember, people are objects too. The world is our platform.&lt;/p&gt;</description>
 <dc:date>2017-09-30</dc:date>
 <guid>http://wordaligned.org/articles/computer-world</guid>
 <author>tag@wordaligned.org (Thomas Guest)</author>
@@ -587,37 +513,20 @@ fruitbowl = {
 
 <item>
 <title>SwanseaCon 2017</title>
-<description>&lt;div&gt;&lt;blockquote class="twitter-tweet" data-lang="en"&gt;&lt;p lang="en" dir="ltr"&gt;Unit tests, lets get sceptical &lt;a href="https://twitter.com/thomasguest"&gt;@thomasguest&lt;/a&gt; was a great end to the morning before lunch &lt;a href="https://t.co/EM4RPAs975"&gt;pic.twitter.com/EM4RPAs975&lt;/a&gt;&lt;/p&gt;&amp;mdash; SwanseaCon (@SwanseaCon) &lt;a href="https://twitter.com/SwanseaCon/status/912361247760404480"&gt;September 25, 2017&lt;/a&gt;&lt;/blockquote&gt;&lt;script async src="http://wordaligned.org//platform.twitter.com/widgets.js" charset="utf-8"&gt;&lt;/script&gt;&lt;/div&gt;
+<description>&lt;div&gt;&lt;blockquote class=&quot;twitter-tweet&quot; data-lang=&quot;en&quot;&gt;&lt;p lang=&quot;en&quot; dir=&quot;ltr&quot;&gt;Unit tests, lets get sceptical &lt;a href=&quot;https://twitter.com/thomasguest&quot;&gt;@thomasguest&lt;/a&gt; was a great end to the morning before lunch &lt;a href=&quot;https://t.co/EM4RPAs975&quot;&gt;pic.twitter.com/EM4RPAs975&lt;/a&gt;&lt;/p&gt;&amp;mdash; SwanseaCon (@SwanseaCon) &lt;a href=&quot;https://twitter.com/SwanseaCon/status/912361247760404480&quot;&gt;September 25, 2017&lt;/a&gt;&lt;/blockquote&gt;&lt;script async src=&quot;http://wordaligned.org//platform.twitter.com/widgets.js&quot; charset=&quot;utf-8&quot;&gt;&lt;/script&gt;&lt;/div&gt;
 
-&lt;p&gt;I&amp;#8217;m just back from a packed two days at &lt;a href="http://swanseacon.co.uk"&gt;SwanseaCon&lt;/a&gt; and would like to thank the organisers, speakers and participants for making such a welcoming and diverse conference happen right where I live.
-&lt;/p&gt;
-&lt;p&gt;For me, highlights included:
-&lt;/p&gt;
+&lt;p&gt;I&amp;#8217;m just back from a packed two days at &lt;a href=&quot;http://swanseacon.co.uk&quot;&gt;SwanseaCon&lt;/a&gt; and would like to thank the organisers, speakers and participants for making such a welcoming and diverse conference happen right where I live.&lt;/p&gt;
+&lt;p&gt;For me, highlights included:&lt;/p&gt;
 &lt;ul&gt;
- &lt;li&gt;
-     Professor Dave Snowden&amp;#8217;s erudite and slide-free talk. It was a privilege to listen: although I may not quite have kept up, I will certainly follow up
- &lt;/li&gt;
-
- &lt;li&gt;
-     Irina Tsyganok&amp;#8217;s sensitive and inspirational presentation on pair-programming
- &lt;/li&gt;
-
- &lt;li&gt;
-     Lawrence Weetman&amp;#8217;s dishwashing demo &amp;#8212; with three on-stage helpers, no less
- &lt;/li&gt;
-
- &lt;li&gt;
-     Scott Fulton&amp;#8217;s honest report on some personal agile life lessons
- &lt;/li&gt;
+&lt;li&gt;Professor Dave Snowden&amp;#8217;s erudite and slide-free talk. It was a privilege to listen: although I may not quite have kept up, I will certainly follow up&lt;/li&gt;
+&lt;li&gt;Irina Tsyganok&amp;#8217;s sensitive and inspirational presentation on pair-programming&lt;/li&gt;
+&lt;li&gt;Lawrence Weetman&amp;#8217;s dishwashing demo &amp;#8212; with three on-stage helpers, no less&lt;/li&gt;
+&lt;li&gt;Scott Fulton&amp;#8217;s honest report on some personal agile life lessons&lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;The venue wasn&amp;#8217;t too shabby either.
-&lt;/p&gt;
-&lt;p&gt;&lt;a data-flickr-embed="true"  href="https://www.flickr.com/photos/thomasguest/37286571132/in/photostream/" title="The view from SwanseaCon"&gt;&lt;img src="https://farm5.staticflickr.com/4462/37286571132_a5892fe22c_z.jpg" width="640" height="185" alt="The view from SwanseaCon"&gt;&lt;/a&gt;&lt;script async src="http://wordaligned.org//embedr.flickr.com/assets/client-code.js" charset="utf-8"&gt;&lt;/script&gt;
-&lt;/p&gt;
-&lt;p&gt;Having attended a fair few technical conferences, it felt refreshing and important to be part of something a little softer. Software development is about community, communication and culture, and SwanseaCon scored top marks on all three.
-&lt;/p&gt;
-&lt;p&gt;So, again, thanks!
-&lt;/p&gt;</description>
+&lt;p&gt;The venue wasn&amp;#8217;t too shabby either.&lt;/p&gt;
+&lt;p&gt;&lt;a data-flickr-embed=&quot;true&quot;  href=&quot;https://www.flickr.com/photos/thomasguest/37286571132/in/photostream/&quot; title=&quot;The view from SwanseaCon&quot;&gt;&lt;img src=&quot;https://farm5.staticflickr.com/4462/37286571132_a5892fe22c_z.jpg&quot; width=&quot;640&quot; height=&quot;185&quot; alt=&quot;The view from SwanseaCon&quot;&gt;&lt;/a&gt;&lt;script async src=&quot;http://wordaligned.org//embedr.flickr.com/assets/client-code.js&quot; charset=&quot;utf-8&quot;&gt;&lt;/script&gt;&lt;/p&gt;
+&lt;p&gt;Having attended a fair few technical conferences, it felt refreshing and important to be part of something a little softer. Software development is about community, communication and culture, and SwanseaCon scored top marks on all three.&lt;/p&gt;
+&lt;p&gt;So, again, thanks!&lt;/p&gt;</description>
 <dc:date>2017-09-26</dc:date>
 <guid>http://wordaligned.org/articles/swanseacon-2017</guid>
 <author>tag@wordaligned.org (Thomas Guest)</author>
@@ -629,15 +538,11 @@ fruitbowl = {
 
 <item>
 <title>Pay rise please</title>
-<description>&lt;p&gt;In 1967 Georges Perec wrote a radio play, L&amp;#8217;Augmentation, in which you, the protagonist, make some delicate decisions whilst negotiating a pay rise. Is your boss, Mr X, in a good mood? Did he have fish for lunch? Does one of his daughters have measles?
-&lt;/p&gt;
-&lt;img src="http://wordaligned.org/images/perec-flowchart.jpg" alt="Flowchart"/&gt;
-
-&lt;p&gt;The story takes the form of a &lt;a href="https://en.wikipedia.org/wiki/Flowchart"&gt;flow chart&lt;/a&gt;. It&amp;#8217;s no coincidence it was written when computers were becoming a part of office and laboratory work, and when flow charts became a popular way to represent the algorithms they were programmed with. 1967 is also the year Perec joined Oulipo, a literary organisation whose members seek to create works based around mathematical constraints and structures. The loops and branches of Perec&amp;#8217;s flow chart perfectly embody the frustrating routines of office politics.
-&lt;/p&gt;
-&lt;p&gt;Fifty years on, I&amp;#8217;ve &lt;a href="https://github.com/wordaligned/pay-rise-please" title="Pay rise please, on Github"&gt;created a version&lt;/a&gt; to run on Alexa, which you can &lt;a href="https://www.amazon.co.uk/Mr-Pay-rise-please/dp/B07417SK8N" title="Pay rise please, on Amazon"&gt;download from Amazon&lt;/a&gt;. It may not get me a pay rise, but I should qualify for a &lt;a href="https://developer.amazon.com/alexa-skills-kit"&gt;freebie Echo Dot&lt;/a&gt;.
-&lt;/p&gt;
-&lt;img src="http://wordaligned.org/images/perec512.jpg" alt="Georges Perec"/&gt;</description>
+<description>&lt;p&gt;In 1967 Georges Perec wrote a radio play, L&amp;#8217;Augmentation, in which you, the protagonist, make some delicate decisions whilst negotiating a pay rise. Is your boss, Mr X, in a good mood? Did he have fish for lunch? Does one of his daughters have measles?&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;http://wordaligned.org/images/perec-flowchart.jpg&quot; alt=&quot;Flowchart&quot;/&gt;&lt;/p&gt;
+&lt;p&gt;The story takes the form of a &lt;a href=&quot;https://en.wikipedia.org/wiki/Flowchart&quot;&gt;flow chart&lt;/a&gt;. It&amp;#8217;s no coincidence it was written when computers were becoming a part of office and laboratory work, and when flow charts became a popular way to represent the algorithms they were programmed with. 1967 is also the year Perec joined Oulipo, a literary organisation whose members seek to create works based around mathematical constraints and structures. The loops and branches of Perec&amp;#8217;s flow chart perfectly embody the frustrating routines of office politics.&lt;/p&gt;
+&lt;p&gt;Fifty years on, I&amp;#8217;ve &lt;a href=&quot;https://github.com/wordaligned/pay-rise-please&quot; title=&quot;Pay rise please, on Github&quot;&gt;created a version&lt;/a&gt; to run on Alexa, which you can &lt;a href=&quot;https://www.amazon.co.uk/Mr-Pay-rise-please/dp/B07417SK8N&quot; title=&quot;Pay rise please, on Amazon&quot;&gt;download from Amazon&lt;/a&gt;. It may not get me a pay rise, but I should qualify for a &lt;a href=&quot;https://developer.amazon.com/alexa-skills-kit&quot;&gt;freebie Echo Dot&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;http://wordaligned.org/images/perec512.jpg&quot; alt=&quot;Georges Perec&quot;/&gt;&lt;/p&gt;</description>
 <dc:date>2017-07-25</dc:date>
 <guid>http://wordaligned.org/articles/pay-rise-please</guid>
 <author>tag@wordaligned.org (Thomas Guest)</author>
@@ -650,33 +555,20 @@ fruitbowl = {
 
 <item>
 <title>Follow me follow me</title>
-<description>&lt;h2&gt;Leap&lt;/h2&gt;
-&lt;p&gt;There were 12 of us in the room, plus Jim the instructor.
-&lt;/p&gt;
-&lt;p&gt;We had moved the tables and chairs to one side. Jim asked us to stand in the space we&amp;#8217;d created. He asked each of us to pick two other people in the room, without telling anyone who we&amp;#8217;d chosen.
-&lt;/p&gt;
-&lt;p&gt;The object of this exercise, Jim said, is to move around until each person is at an equal distance from the two people they&amp;#8217;ve chosen.
-&lt;/p&gt;
-&lt;p&gt;Jim appointed Jo project manager. 
-&lt;/p&gt;
-&lt;p&gt;You&amp;#8217;re the project manager, Jim said. Get your team organised.
-&lt;/p&gt;
-&lt;p&gt;Jo had no particular instructions but as a team we instinctively started moving, stepping and turning. I was tracking Mark and Jo &amp;#8212; who I&amp;#8217;d chosen before her appointment as PM. I imagined a straight line on the floor of the room between the two of them and equidistant from both and walked towards it, adjusting my trajectory as they too moved. Ruth and Paul must have been following me: as I moved they turned and moved too.
-&lt;/p&gt;
-&lt;p&gt;Quite quickly we slowed down, making fine adjustments, shuffling into a final position. Was everyone happy? Yes? We&amp;#8217;d done it.
-&lt;/p&gt;
-&lt;p&gt;Good work Jo!
-&lt;/p&gt;
-&lt;p&gt;What had Jo done? She&amp;#8217;d let us get on with it. We were a self-organising team. What had I done? I&amp;#8217;d suppressed my mathematical instinct to think before moving &amp;#8212; I&amp;#8217;d leapt rather than looked.
-&lt;/p&gt;
-
-&lt;h2&gt;Look&lt;/h2&gt;
-&lt;p&gt;This is a great team training exercise. It encourages exploration and trust. Evidently it works, too &amp;#8212; however people choose who to follow, there will be a solution which can be discovered using a simple and sensible strategy. It made me think of shoal behaviour in animals, where there is no leader and each individual follows the same small set of rules, but the apparently sophisticated resulting behaviour suggests the shoal has a mind of its own.
-&lt;/p&gt;
-&lt;p&gt;&lt;a href="http://wordaligned.org/followme/" title="Click this snapshot to see the live page"&gt;&lt;img src="http://wordaligned.org/images/followme.png" alt="animation"&gt;&lt;/a&gt;
-&lt;/p&gt;
-&lt;p&gt;I experimented with a computer simulation. The picture above is a static snap shot &amp;#8212; click it to access the &lt;a href="http://wordaligned.org/followme/"&gt;live page&lt;/a&gt; and explore different configurations. I plan to experiment with different shoaling strategies and to expose more controls. The source code is here &lt;a href="https://github.com/wordaligned/followme"&gt;github.com/wordaligned/followme&lt;/a&gt;.
-&lt;/p&gt;</description>
+<description>&lt;h2 id=&quot;leap&quot;&gt;Leap&lt;/h2&gt;
+&lt;p&gt;There were 12 of us in the room, plus Jim the instructor.&lt;/p&gt;
+&lt;p&gt;We had moved the tables and chairs to one side. Jim asked us to stand in the space we&amp;#8217;d created. He asked each of us to pick two other people in the room, without telling anyone who we&amp;#8217;d chosen.&lt;/p&gt;
+&lt;p&gt;The object of this exercise, Jim said, is to move around until each person is at an equal distance from the two people they&amp;#8217;ve chosen.&lt;/p&gt;
+&lt;p&gt;Jim appointed Jo project manager. &lt;/p&gt;
+&lt;p&gt;You&amp;#8217;re the project manager, Jim said. Get your team organised.&lt;/p&gt;
+&lt;p&gt;Jo had no particular instructions but as a team we instinctively started moving, stepping and turning. I was tracking Mark and Jo &amp;#8212; who I&amp;#8217;d chosen before her appointment as PM. I imagined a straight line on the floor of the room between the two of them and equidistant from both and walked towards it, adjusting my trajectory as they too moved. Ruth and Paul must have been following me: as I moved they turned and moved too.&lt;/p&gt;
+&lt;p&gt;Quite quickly we slowed down, making fine adjustments, shuffling into a final position. Was everyone happy? Yes? We&amp;#8217;d done it.&lt;/p&gt;
+&lt;p&gt;Good work Jo!&lt;/p&gt;
+&lt;p&gt;What had Jo done? She&amp;#8217;d let us get on with it. We were a self-organising team. What had I done? I&amp;#8217;d suppressed my mathematical instinct to think before moving &amp;#8212; I&amp;#8217;d leapt rather than looked.&lt;/p&gt;
+&lt;h2 id=&quot;look&quot;&gt;Look&lt;/h2&gt;
+&lt;p&gt;This is a great team training exercise. It encourages exploration and trust. Evidently it works, too &amp;#8212; however people choose who to follow, there will be a solution which can be discovered using a simple and sensible strategy. It made me think of shoal behaviour in animals, where there is no leader and each individual follows the same small set of rules, but the apparently sophisticated resulting behaviour suggests the shoal has a mind of its own.&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;http://wordaligned.org/followme/&quot; title=&quot;Click this snapshot to see the live page&quot;&gt;&lt;img src=&quot;http://wordaligned.org/images/followme.png&quot; alt=&quot;animation&quot;&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;I experimented with a computer simulation. The picture above is a static snap shot &amp;#8212; click it to access the &lt;a href=&quot;http://wordaligned.org/followme/&quot;&gt;live page&lt;/a&gt; and explore different configurations. I plan to experiment with different shoaling strategies and to expose more controls. The source code is here &lt;a href=&quot;https://github.com/wordaligned/followme&quot;&gt;github.com/wordaligned/followme&lt;/a&gt;.&lt;/p&gt;</description>
 <dc:date>2017-07-04</dc:date>
 <guid>http://wordaligned.org/articles/follow-me-follow-me</guid>
 <author>tag@wordaligned.org (Thomas Guest)</author>
@@ -688,74 +580,27 @@ fruitbowl = {
 
 <item>
 <title>Unleash the test army</title>
-<description>&lt;div class="toc"&gt;
-&lt;h2&gt;Contents&lt;/h2&gt;
-&lt;ul&gt;
- &lt;li&gt;&lt;a href="http://wordaligned.org/articles/unleash-the-test-army#tocare-the-tests-adequate" name="toc0" id="toc0"&gt;Are the tests adequate?&lt;/a&gt;
- &lt;/li&gt;
+<description>&lt;h2 id=&quot;are-the-tests-adequate&quot;&gt;Are the tests adequate?&lt;/h2&gt;
+&lt;p&gt;Recently I described a solution to &lt;a href=&quot;http://wordaligned.org/articles/slicing-a-list-evenly-with-python&quot;&gt;the problem of dividing a list into evenly sized chunks&lt;/a&gt;. It&amp;#8217;s a simple enough problem with just two inputs: the list (or other sliceable container) &lt;code&gt;xs&lt;/code&gt; and the number of chunks &lt;code&gt;n&lt;/code&gt;. Nonetheless, there are traps to avoid and special cases to consider &amp;#8212; what if &lt;code&gt;n&lt;/code&gt; is larger than the list, for example? Must the chunks comprise contiguous elements from the original list?&lt;/p&gt;
+&lt;p&gt;The tests I came up with are straightforward and uninspiring. They were developed within the context of my own assumptions about the solution and the special cases I could imagine. They were written after the implementation &amp;#8212; which is to say, development wasn&amp;#8217;t driven by tests. They are whitebox tests, designed to cover the various paths through the code based on my insider knowledge.&lt;/p&gt;
+&lt;p&gt;Are these tests adequate? Certainly they don&amp;#8217;t accurately represent the data which will hit the algorithm in practice. Can we be sure we haven&amp;#8217;t missed anything? Would the tests still cover all paths if the implementation changed?&lt;/p&gt;
+&lt;h2 id=&quot;property-based-testing&quot;&gt;Property based testing&lt;/h2&gt;
+&lt;p&gt;David R MacIver described another, complementary, approach at &lt;a href=&quot;https://accu.org/index.php/conferences/accu_conference_2016/accu2016_sessions#The_Plural_of_Anecdote_is_not_Test_Suite&quot;&gt;a talk I attended at ACCU 2016&lt;/a&gt;. In the talk abstract he characterises the (class of) tests I&amp;#8217;d written as &lt;strong&gt;anecdotal&lt;/strong&gt; &amp;#8212; &amp;#8220;let me tell you about this time I called a function &amp;#8230; and then it returned this .. and then it raised an exception &amp;#8230; etc. etc.&amp;#8221;&lt;/p&gt;
+&lt;p&gt;How about if the test suite instead describes the &lt;strong&gt;properties&lt;/strong&gt; required of the system under test, and then conjures up inputs designed to see if these properties hold under stress? So, rather than our test suite being a limited set of input/output pairs, it becomes an executable specification validated by a robot army.&lt;/p&gt;
+&lt;p&gt;&lt;a data-flickr-embed=&quot;true&quot;  href=&quot;https://www.flickr.com/photos/avatarr8/3819520612&quot; title=&quot;China&amp;#x27;s Robot Army&quot;&gt;&lt;img src=&quot;https://c1.staticflickr.com/3/2431/3819520612_4b32f2b423.jpg&quot; width=&quot;500&quot; height=&quot;334&quot; alt=&quot;China&amp;#x27;s Robot Army&quot;&gt;&lt;/a&gt;&lt;script async src=&quot;http://wordaligned.org//embedr.flickr.com/assets/client-code.js&quot; charset=&quot;utf-8&quot;&gt;&lt;/script&gt;&lt;/p&gt;
+&lt;p&gt;&lt;span id=&quot;continue-reading&quot;/&gt;&lt;/p&gt;
+&lt;h2 id=&quot;hypothesis&quot;&gt;Hypothesis&lt;/h2&gt;
+&lt;p&gt;This approach sounds compelling but I had my doubts. I also had my doubts about the adequacy of both my code and tests. A perfect opportunity, then, to try out &lt;a href=&quot;https://hypothesis.readthedocs.io/en/latest/&quot;&gt;Hypothesis&lt;/a&gt;, an open source property-based testing library developed by David MacIver.&lt;/p&gt;
+&lt;p&gt;I used the Python version of the library, which is the primary implementation. The rest of this article describes my experience of using &lt;a href=&quot;https://hypothesis.readthedocs.io/en/latest/&quot;&gt;hypothesis&lt;/a&gt; for the first time: I&amp;#8217;m not claiming expertise.&lt;/p&gt;
+&lt;h2 id=&quot;first-impressions&quot;&gt;First impressions&lt;/h2&gt;
+&lt;p&gt;Excellent!&lt;/p&gt;
+&lt;p&gt;Installation was the usual &lt;code&gt;pip&lt;/code&gt; invocation. The &lt;a href=&quot;https://hypothesis.readthedocs.io/en/latest/&quot;&gt;documentation&lt;/a&gt; is written with care. It&amp;#8217;s evident the library is mature, supported and actively developed. It&amp;#8217;s licensed under the &lt;a href=&quot;https://www.mozilla.org/en-US/MPL/2.0/&quot;&gt;Mozilla Public License&lt;/a&gt;.&lt;/p&gt;
+&lt;h2 id=&quot;my-first-test&quot;&gt;My first test&lt;/h2&gt;
+&lt;p&gt;Recall that the code I wanted to test reads:&lt;/p&gt;
+&lt;div class=&quot;typocode&quot;&gt;
 
- &lt;li&gt;&lt;a href="http://wordaligned.org/articles/unleash-the-test-army#tocproperty-based-testing" name="toc1" id="toc1"&gt;Property based testing&lt;/a&gt;
- &lt;/li&gt;
-
- &lt;li&gt;&lt;a href="http://wordaligned.org/articles/unleash-the-test-army#tochypothesis" name="toc2" id="toc2"&gt;Hypothesis&lt;/a&gt;
- &lt;/li&gt;
-
- &lt;li&gt;&lt;a href="http://wordaligned.org/articles/unleash-the-test-army#tocfirst-impressions" name="toc3" id="toc3"&gt;First impressions&lt;/a&gt;
- &lt;/li&gt;
-
- &lt;li&gt;&lt;a href="http://wordaligned.org/articles/unleash-the-test-army#tocmy-first-test" name="toc4" id="toc4"&gt;My first test&lt;/a&gt;
- &lt;/li&gt;
-
- &lt;li&gt;&lt;a href="http://wordaligned.org/articles/unleash-the-test-army#tocmy-second-test" name="toc5" id="toc5"&gt;My second test&lt;/a&gt;
- &lt;/li&gt;
-
- &lt;li&gt;&lt;a href="http://wordaligned.org/articles/unleash-the-test-army#toccomplete-test-suite" name="toc6" id="toc6"&gt;Complete test suite&lt;/a&gt;
- &lt;/li&gt;
-
- &lt;li&gt;&lt;a href="http://wordaligned.org/articles/unleash-the-test-army#tocquality-of-failure" name="toc7" id="toc7"&gt;Quality of failure&lt;/a&gt;
- &lt;/li&gt;
-
- &lt;li&gt;&lt;a href="http://wordaligned.org/articles/unleash-the-test-army#tocconclusions" name="toc8" id="toc8"&gt;Conclusions&lt;/a&gt;
- &lt;/li&gt;
-&lt;/ul&gt;
-&lt;/div&gt;
-&lt;h2&gt;&lt;a href="http://wordaligned.org/articles/unleash-the-test-army#toc0" name="tocare-the-tests-adequate" id="tocare-the-tests-adequate"&gt;Are the tests adequate?&lt;/a&gt;&lt;/h2&gt;
-&lt;p&gt;Recently I described a solution to &lt;a href="http://wordaligned.org/articles/slicing-a-list-evenly-with-python"&gt;the problem of dividing a list into evenly sized chunks&lt;/a&gt;. It&amp;#8217;s a simple enough problem with just two inputs: the list (or other sliceable container) &lt;code&gt;xs&lt;/code&gt; and the number of chunks &lt;code&gt;n&lt;/code&gt;. Nonetheless, there are traps to avoid and special cases to consider &amp;#8212; what if &lt;code&gt;n&lt;/code&gt; is larger than the list, for example? Must the chunks comprise contiguous elements from the original list?
-&lt;/p&gt;
-&lt;p&gt;The tests I came up with are straightforward and uninspiring. They were developed within the context of my own assumptions about the solution and the special cases I could imagine. They were written after the implementation &amp;#8212; which is to say, development wasn&amp;#8217;t driven by tests. They are whitebox tests, designed to cover the various paths through the code based on my insider knowledge.
-&lt;/p&gt;
-&lt;p&gt;Are these tests adequate? Certainly they don&amp;#8217;t accurately represent the data which will hit the algorithm in practice. Can we be sure we haven&amp;#8217;t missed anything? Would the tests still cover all paths if the implementation changed?
-&lt;/p&gt;
-
-&lt;h2&gt;&lt;a href="http://wordaligned.org/articles/unleash-the-test-army#toc1" name="tocproperty-based-testing" id="tocproperty-based-testing"&gt;Property based testing&lt;/a&gt;&lt;/h2&gt;
-&lt;p&gt;David R MacIver described another, complementary, approach at &lt;a href="https://accu.org/index.php/conferences/accu_conference_2016/accu2016_sessions#The_Plural_of_Anecdote_is_not_Test_Suite"&gt;a talk I attended at ACCU 2016&lt;/a&gt;. In the talk abstract he characterises the (class of) tests I&amp;#8217;d written as &lt;strong&gt;anecdotal&lt;/strong&gt; &amp;#8212; &amp;#8220;let me tell you about this time I called a function &amp;#8230; and then it returned this .. and then it raised an exception &amp;#8230; etc. etc.&amp;#8221;
-&lt;/p&gt;
-&lt;p&gt;How about if the test suite instead describes the &lt;strong&gt;properties&lt;/strong&gt; required of the system under test, and then conjures up inputs designed to see if these properties hold under stress? So, rather than our test suite being a limited set of input/output pairs, it becomes an executable specification validated by a robot army.
-&lt;/p&gt;
-&lt;p&gt;&lt;a data-flickr-embed="true"  href="https://www.flickr.com/photos/avatarr8/3819520612" title="China&amp;#x27;s Robot Army"&gt;&lt;img src="https://c1.staticflickr.com/3/2431/3819520612_4b32f2b423.jpg" width="500" height="334" alt="China&amp;#x27;s Robot Army"&gt;&lt;/a&gt;&lt;script async src="http://wordaligned.org//embedr.flickr.com/assets/client-code.js" charset="utf-8"&gt;&lt;/script&gt;
-&lt;/p&gt;
-&lt;span id="continue-reading"/&gt;
-
-
-&lt;h2&gt;&lt;a href="http://wordaligned.org/articles/unleash-the-test-army#toc2" name="tochypothesis" id="tochypothesis"&gt;Hypothesis&lt;/a&gt;&lt;/h2&gt;
-&lt;p&gt;This approach sounds compelling but I had my doubts. I also had my doubts about the adequacy of both my code and tests. A perfect opportunity, then, to try out &lt;a href="https://hypothesis.readthedocs.io/en/latest/"&gt;Hypothesis&lt;/a&gt;, an open source property-based testing library developed by David MacIver.
-&lt;/p&gt;
-&lt;p&gt;I used the Python version of the library, which is the primary implementation. The rest of this article describes my experience of using &lt;a href="https://hypothesis.readthedocs.io/en/latest/"&gt;hypothesis&lt;/a&gt; for the first time: I&amp;#8217;m not claiming expertise.
-&lt;/p&gt;
-
-&lt;h2&gt;&lt;a href="http://wordaligned.org/articles/unleash-the-test-army#toc3" name="tocfirst-impressions" id="tocfirst-impressions"&gt;First impressions&lt;/a&gt;&lt;/h2&gt;
-&lt;p&gt;Excellent!
-&lt;/p&gt;
-&lt;p&gt;Installation was the usual &lt;code&gt;pip&lt;/code&gt; invocation. The &lt;a href="https://hypothesis.readthedocs.io/en/latest/"&gt;documentation&lt;/a&gt; is written with care. It&amp;#8217;s evident the library is mature, supported and actively developed. It&amp;#8217;s licensed under the &lt;a href="https://www.mozilla.org/en-US/MPL/2.0/"&gt;Mozilla Public License&lt;/a&gt;.
-&lt;/p&gt;
-
-&lt;h2&gt;&lt;a href="http://wordaligned.org/articles/unleash-the-test-army#toc4" name="tocmy-first-test" id="tocmy-first-test"&gt;My first test&lt;/a&gt;&lt;/h2&gt;
-&lt;p&gt;Recall that the code I wanted to test reads:
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
-
-&lt;pre class="prettyprint"&gt;def chunk(xs, n):
-    '''Split the list, xs, into n evenly sized chunks'''
+&lt;pre class=&quot;prettyprint&quot;&gt;def chunk(xs, n):
+    &amp;#x27;&amp;#x27;&amp;#x27;Split the list, xs, into n evenly sized chunks&amp;#x27;&amp;#x27;&amp;#x27;
     L = len(xs)
     assert 0 &amp;lt; n &amp;lt;= L
     s, r = divmod(L, n)
@@ -767,14 +612,13 @@ fruitbowl = {
 
 &lt;/div&gt;
 
-&lt;p&gt;I also proposed a second &lt;code&gt;itertools&lt;/code&gt; based version:
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
+&lt;p&gt;I also proposed a second &lt;code&gt;itertools&lt;/code&gt; based version:&lt;/p&gt;
+&lt;div class=&quot;typocode&quot;&gt;
 
-&lt;pre class="prettyprint"&gt;from itertools import accumulate, chain, repeat, tee
+&lt;pre class=&quot;prettyprint&quot;&gt;from itertools import accumulate, chain, repeat, tee
 
 def chunk(xs, n):
-    '''Split the list, xs, into n evenly sized chunks'''
+    &amp;#x27;&amp;#x27;&amp;#x27;Split the list, xs, into n evenly sized chunks&amp;#x27;&amp;#x27;&amp;#x27;
     assert n &amp;gt; 0
     L = len(xs)
     s, r = divmod(L, n)
@@ -788,22 +632,20 @@ def chunk(xs, n):
 
 &lt;/div&gt;
 
-&lt;p&gt;The first thing you notice when thinking about a property based test is that the specification &amp;#8212; the function&amp;#8217;s docstring &amp;#8212; doesn&amp;#8217;t describe the exact form of the output. In fact, as a comment on the article pointed out, my own interpretation of the specification is not the only one, and allowing the chunks to be formed from non-contiguous items permits a particularly elegant solution.
-&lt;/p&gt;
-&lt;p&gt;Also, if the list doesn&amp;#8217;t divide exactly into &lt;code&gt;n&lt;/code&gt; chunks, what should the result be? Well, although I&amp;#8217;d have been happy with any evenly-chunked solution, my conventional unit tests &lt;strong&gt;assumed&lt;/strong&gt; an implementation which placed the larger chunks first.
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
+&lt;p&gt;The first thing you notice when thinking about a property based test is that the specification &amp;#8212; the function&amp;#8217;s docstring &amp;#8212; doesn&amp;#8217;t describe the exact form of the output. In fact, as a comment on the article pointed out, my own interpretation of the specification is not the only one, and allowing the chunks to be formed from non-contiguous items permits a particularly elegant solution.&lt;/p&gt;
+&lt;p&gt;Also, if the list doesn&amp;#8217;t divide exactly into &lt;code&gt;n&lt;/code&gt; chunks, what should the result be? Well, although I&amp;#8217;d have been happy with any evenly-chunked solution, my conventional unit tests &lt;strong&gt;assumed&lt;/strong&gt; an implementation which placed the larger chunks first.&lt;/p&gt;
+&lt;div class=&quot;typocode&quot;&gt;
 
-&lt;pre class="prettyprint"&gt;def test_chunk():
-    assert chunk('', 1) == ['']
-    assert chunk('ab', 2) == ['a', 'b']
-    assert chunk('abc', 2) == ['ab', 'c']
-    
+&lt;pre class=&quot;prettyprint&quot;&gt;def test_chunk():
+    assert chunk(&amp;#x27;&amp;#x27;, 1) == [&amp;#x27;&amp;#x27;]
+    assert chunk(&amp;#x27;ab&amp;#x27;, 2) == [&amp;#x27;a&amp;#x27;, &amp;#x27;b&amp;#x27;]
+    assert chunk(&amp;#x27;abc&amp;#x27;, 2) == [&amp;#x27;ab&amp;#x27;, &amp;#x27;c&amp;#x27;]
+
     xs = list(range(8))
     assert chunk(xs, 2) == [[0, 1, 2, 3], [4, 5, 6, 7]]
     assert chunk(xs, 3) == [[0, 1, 2], [3, 4, 5], [6, 7]]
     assert chunk(xs, 5) == [[0, 1], [2, 3], [4, 5], [6], [7]]
-    
+
     rs = range(1000000)
     assert chunk(rs, 2) == [range(500000), range(500000, 1000000)]
 
@@ -811,13 +653,11 @@ def chunk(xs, n):
 
 &lt;/div&gt;
 
-&lt;p&gt;Notice, by the way, that although the docstring only mentions lists, I can&amp;#8217;t resist demonstrating the algorithm also behaves for strings and ranges &amp;#8212; for any sliceable sequence, in fact.
-&lt;/p&gt;
-&lt;p&gt;Here&amp;#8217;s what I started with when I tried specifying the &amp;#8220;evenly sized&amp;#8221; property using hypothesis.
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
+&lt;p&gt;Notice, by the way, that although the docstring only mentions lists, I can&amp;#8217;t resist demonstrating the algorithm also behaves for strings and ranges &amp;#8212; for any sliceable sequence, in fact.&lt;/p&gt;
+&lt;p&gt;Here&amp;#8217;s what I started with when I tried specifying the &amp;#8220;evenly sized&amp;#8221; property using hypothesis.&lt;/p&gt;
+&lt;div class=&quot;typocode&quot;&gt;
 
-&lt;pre class="prettyprint"&gt;def test_evenly_chunked(xs, n):
+&lt;pre class=&quot;prettyprint&quot;&gt;def test_evenly_chunked(xs, n):
     chunks = chunk(xs, n)
     assert len(chunks) == n
     chunk_lens = {len(c) for c in chunks}
@@ -828,28 +668,23 @@ def chunk(xs, n):
 
 &lt;/div&gt;
 
-&lt;p&gt;This first test case defines &amp;#8220;evenly sized&amp;#8221;, stating that the result comprises &lt;code&gt;n&lt;/code&gt; chunks, that the set of the lengths of these chunks is either 1 (all chunks the same size) or 2, and the maximum chunk length is equal to or one more than the minumum chunk length.
-&lt;/p&gt;
-&lt;p&gt;This doesn&amp;#8217;t fully specify the function. We also need assertions which confirm that recombining the chunks produces the original sequence.
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
+&lt;p&gt;This first test case defines &amp;#8220;evenly sized&amp;#8221;, stating that the result comprises &lt;code&gt;n&lt;/code&gt; chunks, that the set of the lengths of these chunks is either 1 (all chunks the same size) or 2, and the maximum chunk length is equal to or one more than the minumum chunk length.&lt;/p&gt;
+&lt;p&gt;This doesn&amp;#8217;t fully specify the function. We also need assertions which confirm that recombining the chunks produces the original sequence.&lt;/p&gt;
+&lt;div class=&quot;typocode&quot;&gt;
 
-&lt;pre class="prettyprint"&gt;def test_combining_chunks(xs_n):
-    pass # We'll come back to this!
+&lt;pre class=&quot;prettyprint&quot;&gt;def test_combining_chunks(xs_n):
+    pass # We&amp;#x27;ll come back to this!
 
 &lt;/pre&gt;
 
 &lt;/div&gt;
 
-&lt;p&gt;We&amp;#8217;ll come back to this later!
-&lt;/p&gt;
-&lt;p&gt;Now, &lt;code&gt;test_evenly_chunked()&lt;/code&gt; looks quite like a conventional test function. It just needs some input values. Rather than poke the function with some hand-chosen values, we can let hypothesis have a go.
-&lt;/p&gt;
-&lt;p&gt;Based on a read of the &lt;a href="https://hypothesis.readthedocs.io/en/latest/quickstart.html"&gt;Quick start guide&lt;/a&gt; I tried this:
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
+&lt;p&gt;We&amp;#8217;ll come back to this later!&lt;/p&gt;
+&lt;p&gt;Now, &lt;code&gt;test_evenly_chunked()&lt;/code&gt; looks quite like a conventional test function. It just needs some input values. Rather than poke the function with some hand-chosen values, we can let hypothesis have a go.&lt;/p&gt;
+&lt;p&gt;Based on a read of the &lt;a href=&quot;https://hypothesis.readthedocs.io/en/latest/quickstart.html&quot;&gt;Quick start guide&lt;/a&gt; I tried this:&lt;/p&gt;
+&lt;div class=&quot;typocode&quot;&gt;
 
-&lt;pre class="prettyprint"&gt;import hypothesis as ht
+&lt;pre class=&quot;prettyprint&quot;&gt;import hypothesis as ht
 import hypothesis.strategies as st
 
 @ht.given(xs=st.lists(), n=st.integers())
@@ -864,23 +699,20 @@ def test_evenly_chunked(xs, n):
 
 &lt;/div&gt;
 
-&lt;p&gt;As you can see, the test function pre-conditions are encapsulated in a &lt;code&gt;hypothesis.given&lt;/code&gt; decorator, which specifies the use of &lt;code&gt;hypothesis.strategies.lists()&lt;/code&gt; and &lt;code&gt;hypothesis.strategies.integers()&lt;/code&gt; to generate test values for &lt;code&gt;xs&lt;/code&gt; and &lt;code&gt;n&lt;/code&gt; respectively.
-&lt;/p&gt;
-&lt;p&gt;The result was a lengthy but helpful failure, which printed out the documentation of the &lt;code&gt;lists()&lt;/code&gt; strategy and the usage error:
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
+&lt;p&gt;As you can see, the test function pre-conditions are encapsulated in a &lt;code&gt;hypothesis.given&lt;/code&gt; decorator, which specifies the use of &lt;code&gt;hypothesis.strategies.lists()&lt;/code&gt; and &lt;code&gt;hypothesis.strategies.integers()&lt;/code&gt; to generate test values for &lt;code&gt;xs&lt;/code&gt; and &lt;code&gt;n&lt;/code&gt; respectively.&lt;/p&gt;
+&lt;p&gt;The result was a lengthy but helpful failure, which printed out the documentation of the &lt;code&gt;lists()&lt;/code&gt; strategy and the usage error:&lt;/p&gt;
+&lt;div class=&quot;typocode&quot;&gt;
 
-&lt;pre class="prettyprint"&gt;hypothesis.errors.InvalidArgument: Cannot create non-empty lists without an element type
+&lt;pre class=&quot;prettyprint&quot;&gt;hypothesis.errors.InvalidArgument: Cannot create non-empty lists without an element type
 
 &lt;/pre&gt;
 
 &lt;/div&gt;
 
-&lt;p&gt;OK then. The function doesn&amp;#8217;t really care about the element type. Integers will do.
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
+&lt;p&gt;OK then. The function doesn&amp;#8217;t really care about the element type. Integers will do.&lt;/p&gt;
+&lt;div class=&quot;typocode&quot;&gt;
 
-&lt;pre class="prettyprint"&gt;@ht.given(xs=st.lists(st.integers()), n=st.integers())
+&lt;pre class=&quot;prettyprint&quot;&gt;@ht.given(xs=st.lists(st.integers()), n=st.integers())
 def test_evenly_chunked(xs, n):
     ....
 
@@ -888,14 +720,13 @@ def test_evenly_chunked(xs, n):
 
 &lt;/div&gt;
 
-&lt;p&gt;This gave me an error, along with a minimal test case which produces it.
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
+&lt;p&gt;This gave me an error, along with a minimal test case which produces it.&lt;/p&gt;
+&lt;div class=&quot;typocode&quot;&gt;
 
-&lt;pre class="prettyprint"&gt;xs = [], n = 0
+&lt;pre class=&quot;prettyprint&quot;&gt;xs = [], n = 0
 
-def chunk(xs, n):
-        '''Split the list, xs, into n evenly sized chunks'''
+    def chunk(xs, n):
+        &amp;#x27;&amp;#x27;&amp;#x27;Split the list, xs, into n evenly sized chunks&amp;#x27;&amp;#x27;&amp;#x27;
         L = len(xs)
 &amp;gt;       assert 0 &amp;lt; n &amp;lt;= L
 E       AssertionError
@@ -904,45 +735,24 @@ E       AssertionError
 
 &lt;/div&gt;
 
-&lt;p&gt;Our function, &lt;code&gt;chunk()&lt;/code&gt; requires the value &lt;code&gt;n&lt;/code&gt; to be in the closed range &lt;code&gt;(0, len(xs)]&lt;/code&gt;. Looking more closely at the failure, we can see that the function under test, &lt;code&gt;chunk()&lt;/code&gt;, isn&amp;#8217;t great, since we won&amp;#8217;t be able to split an empty list into &lt;strong&gt;any&lt;/strong&gt; number of chunks since, in this case, &lt;code&gt;L&lt;/code&gt; is zero and no value of &lt;code&gt;n&lt;/code&gt; satisfies &lt;code&gt;0 &amp;lt; n &amp;lt;= L&lt;/code&gt;. 
-&lt;/p&gt;
-&lt;p&gt;At this point I had to makes some choices:
-&lt;/p&gt;
+&lt;p&gt;Our function, &lt;code&gt;chunk()&lt;/code&gt; requires the value &lt;code&gt;n&lt;/code&gt; to be in the closed range &lt;code&gt;(0, len(xs)]&lt;/code&gt;. Looking more closely at the failure, we can see that the function under test, &lt;code&gt;chunk()&lt;/code&gt;, isn&amp;#8217;t great, since we won&amp;#8217;t be able to split an empty list into &lt;strong&gt;any&lt;/strong&gt; number of chunks since, in this case, &lt;code&gt;L&lt;/code&gt; is zero and no value of &lt;code&gt;n&lt;/code&gt; satisfies &lt;code&gt;0 &amp;lt; n &amp;lt;= L&lt;/code&gt;. &lt;/p&gt;
+&lt;p&gt;At this point I had to makes some choices:&lt;/p&gt;
 &lt;ul&gt;
- &lt;li&gt;
-     should my tests confirm &lt;code&gt;chunk()&lt;/code&gt; was checking pre-conditions (by catching the &lt;code&gt;AssertionError&lt;/code&gt;)?
- &lt;/li&gt;
-
- &lt;li&gt;
-     should my function handle the case when &lt;code&gt;n &amp;gt; L&lt;/code&gt;? It&amp;#8217;s not the intended use of the function, but it can be handled.
- &lt;/li&gt;
-
- &lt;li&gt;
-     what about when &lt;code&gt;n == 0&lt;/code&gt;? Splitting a non-empty list into &lt;code&gt;0&lt;/code&gt; chunks is impossible, but I guess an empty list can be split into &lt;code&gt;0&lt;/code&gt; chunks.
- &lt;/li&gt;
+&lt;li&gt;should my tests confirm &lt;code&gt;chunk()&lt;/code&gt; was checking pre-conditions (by catching the &lt;code&gt;AssertionError&lt;/code&gt;)?&lt;/li&gt;
+&lt;li&gt;should my function handle the case when &lt;code&gt;n &amp;gt; L&lt;/code&gt;? It&amp;#8217;s not the intended use of the function, but it can be handled.&lt;/li&gt;
+&lt;li&gt;what about when &lt;code&gt;n == 0&lt;/code&gt;? Splitting a non-empty list into &lt;code&gt;0&lt;/code&gt; chunks is impossible, but I guess an empty list can be split into &lt;code&gt;0&lt;/code&gt; chunks.&lt;/li&gt;
 &lt;/ul&gt;
-
-&lt;h2&gt;&lt;a href="http://wordaligned.org/articles/unleash-the-test-army#toc5" name="tocmy-second-test" id="tocmy-second-test"&gt;My second test&lt;/a&gt;&lt;/h2&gt;
-&lt;p&gt;I made some decisions.
-&lt;/p&gt;
+&lt;h2 id=&quot;my-second-test&quot;&gt;My second test&lt;/h2&gt;
+&lt;p&gt;I made some decisions.&lt;/p&gt;
 &lt;ul&gt;
- &lt;li&gt;
-     I decided not to test the pre-condition assertions. Instead, I&amp;#8217;d modify the test strategy to pass in valid inputs.
- &lt;/li&gt;
-
- &lt;li&gt;
-     I decided I&amp;#8217;d go with the &lt;code&gt;itertools&lt;/code&gt; chunk function which naturally handles &lt;code&gt;n &amp;gt; L&lt;/code&gt;.
- &lt;/li&gt;
-
- &lt;li&gt;
-     I decided my function needn&amp;#8217;t handle &lt;code&gt;n == 0&lt;/code&gt;, even when &lt;code&gt;xs == []&lt;/code&gt;.
- &lt;/li&gt;
+&lt;li&gt;I decided not to test the pre-condition assertions. Instead, I&amp;#8217;d modify the test strategy to pass in valid inputs.&lt;/li&gt;
+&lt;li&gt;I decided I&amp;#8217;d go with the &lt;code&gt;itertools&lt;/code&gt; chunk function which naturally handles &lt;code&gt;n &amp;gt; L&lt;/code&gt;.&lt;/li&gt;
+&lt;li&gt;I decided my function needn&amp;#8217;t handle &lt;code&gt;n == 0&lt;/code&gt;, even when &lt;code&gt;xs == []&lt;/code&gt;.&lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;Here&amp;#8217;s the modified test code
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
+&lt;p&gt;Here&amp;#8217;s the modified test code&lt;/p&gt;
+&lt;div class=&quot;typocode&quot;&gt;
 
-&lt;pre class="prettyprint"&gt;@ht.given(xs=st.lists(st.integers()),
+&lt;pre class=&quot;prettyprint&quot;&gt;@ht.given(xs=st.lists(st.integers()),
           n=st.integers(min_value=1))
 def test_evenly_chunked(xs, n):
     chunks = chunk(xs, n)
@@ -956,11 +766,10 @@ def test_evenly_chunked(xs, n):
 
 &lt;/div&gt;
 
-&lt;p&gt;When I tried running the tests again, they appeared to hang until I interrupted them.
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
+&lt;p&gt;When I tried running the tests again, they appeared to hang until I interrupted them.&lt;/p&gt;
+&lt;div class=&quot;typocode&quot;&gt;
 
-&lt;pre class="prettyprint"&gt;&amp;gt; py.test
+&lt;pre class=&quot;prettyprint&quot;&gt;&amp;gt; py.test
 ============================= test session starts =============================
 platform win32 -- Python 3.5.3, pytest-3.0.7, py-1.4.33, pluggy-0.4.0
 ....
@@ -976,25 +785,21 @@ to show a full traceback on KeyboardInterrupt use --fulltrace
 
 &lt;/div&gt;
 
-&lt;p&gt;Now, I had a suspicion that &lt;code&gt;chunk()&lt;/code&gt; couldn&amp;#8217;t really handle &lt;strong&gt;any&lt;/strong&gt; input integers &amp;#8212; it was designed for a value of &lt;code&gt;n&lt;/code&gt; equal to &lt;code&gt;multiprocessing.cpu_count()&lt;/code&gt; &amp;#8212; but I wanted to see what would happen with no upper limits. Here was my answer. Running and interrupting again with &lt;code&gt;--fulltrace&lt;/code&gt; set, I got several pages of output ending with the test inputs:
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
+&lt;p&gt;Now, I had a suspicion that &lt;code&gt;chunk()&lt;/code&gt; couldn&amp;#8217;t really handle &lt;strong&gt;any&lt;/strong&gt; input integers &amp;#8212; it was designed for a value of &lt;code&gt;n&lt;/code&gt; equal to &lt;code&gt;multiprocessing.cpu_count()&lt;/code&gt; &amp;#8212; but I wanted to see what would happen with no upper limits. Here was my answer. Running and interrupting again with &lt;code&gt;--fulltrace&lt;/code&gt; set, I got several pages of output ending with the test inputs:&lt;/p&gt;
+&lt;div class=&quot;typocode&quot;&gt;
 
-&lt;pre class="prettyprint"&gt;xs = [50], n = 67108865
+&lt;pre class=&quot;prettyprint&quot;&gt;xs = [50], n = 67108865
 
 &lt;/pre&gt;
 
 &lt;/div&gt;
 
-&lt;p&gt;Evidently my code was taking a while to create a list comprising a single list &lt;code&gt;[50]&lt;/code&gt; and over 67 million empty lists &lt;code&gt;[], [], [], ...&lt;/code&gt;.
-&lt;/p&gt;
-&lt;p&gt;Once again, I had a decision to make. Perhaps unsurprisingly, it&amp;#8217;s a decision I&amp;#8217;d already faced. I could make &lt;code&gt;chunk()&lt;/code&gt; a generator function, yielding the chunks one at a time &amp;#8212; a trivial and natural change to the &lt;code&gt;itertools&lt;/code&gt; based implementation &amp;#8212; or I could constrain the tests to more suitable values of &lt;code&gt;n&lt;/code&gt;.
-&lt;/p&gt;
-&lt;p&gt;In this case I decided to stick with what I had: my function would accept a list and return a list (of lists). In an attempt to get some passing tests, I set a maximum value on &lt;code&gt;n&lt;/code&gt;.
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
+&lt;p&gt;Evidently my code was taking a while to create a list comprising a single list &lt;code&gt;[50]&lt;/code&gt; and over 67 million empty lists &lt;code&gt;[], [], [], ...&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;Once again, I had a decision to make. Perhaps unsurprisingly, it&amp;#8217;s a decision I&amp;#8217;d already faced. I could make &lt;code&gt;chunk()&lt;/code&gt; a generator function, yielding the chunks one at a time &amp;#8212; a trivial and natural change to the &lt;code&gt;itertools&lt;/code&gt; based implementation &amp;#8212; or I could constrain the tests to more suitable values of &lt;code&gt;n&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;In this case I decided to stick with what I had: my function would accept a list and return a list (of lists). In an attempt to get some passing tests, I set a maximum value on &lt;code&gt;n&lt;/code&gt;.&lt;/p&gt;
+&lt;div class=&quot;typocode&quot;&gt;
 
-&lt;pre class="prettyprint"&gt;@ht.given(xs=st.lists(st.integers()),
+&lt;pre class=&quot;prettyprint&quot;&gt;@ht.given(xs=st.lists(st.integers()),
           n=st.integers(min_value=1, max_value=100))
 def test_evenly_chunked(xs, n):
     ....
@@ -1003,11 +808,10 @@ def test_evenly_chunked(xs, n):
 
 &lt;/div&gt;
 
-&lt;p&gt;At last, I had a passing test.
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
+&lt;p&gt;At last, I had a passing test.&lt;/p&gt;
+&lt;div class=&quot;typocode&quot;&gt;
 
-&lt;pre class="prettyprint"&gt;py.test 
+&lt;pre class=&quot;prettyprint&quot;&gt;py.test 
 ============================= test session starts =============================
 platform win32 -- Python 3.5.3, pytest-3.0.7, py-1.4.33, pluggy-0.4.0
 rootdir: /work/sliced-python, inifile:
@@ -1022,11 +826,10 @@ test_chunk.py .
 
 &lt;/div&gt;
 
-&lt;p&gt;Building on this success, I wanted to confirm the function also handled other sliceable types &amp;#8212; strings and bytes specifically. Hypothesis provides a &lt;code&gt;one_of&lt;/code&gt; strategy for combining other strategies.
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
+&lt;p&gt;Building on this success, I wanted to confirm the function also handled other sliceable types &amp;#8212; strings and bytes specifically. Hypothesis provides a &lt;code&gt;one_of&lt;/code&gt; strategy for combining other strategies.&lt;/p&gt;
+&lt;div class=&quot;typocode&quot;&gt;
 
-&lt;pre class="prettyprint"&gt;@ht.given(xs=st.one_of(st.text(),
+&lt;pre class=&quot;prettyprint&quot;&gt;@ht.given(xs=st.one_of(st.text(),
                        st.binary(),
                        st.lists(st.integers())),
           n=st.integers(min_value=1, max_value=100))
@@ -1041,11 +844,10 @@ def test_evenly_chunked(xs, n):
 
 &lt;/div&gt;
 
-&lt;p&gt;Again, the test passes.
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
+&lt;p&gt;Again, the test passes.&lt;/p&gt;
+&lt;div class=&quot;typocode&quot;&gt;
 
-&lt;pre class="prettyprint"&gt;py.test
+&lt;pre class=&quot;prettyprint&quot;&gt;py.test
 ============================= test session starts =============================
 platform win32 -- Python 3.5.3, pytest-3.0.7, py-1.4.33, pluggy-0.4.0
 rootdir: /work/sliced-python, inifile:
@@ -1060,19 +862,17 @@ test_chunk.py .
 
 &lt;/div&gt;
 
-&lt;p&gt;This output is rather inscrutable. Generally, passing tests shouldn&amp;#8217;t draw attention to themselves, but what inputs had my test strategies generated? Were they sufficient?
-&lt;/p&gt;
-&lt;p&gt;A commandline switch provides a little more detail.
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
+&lt;p&gt;This output is rather inscrutable. Generally, passing tests shouldn&amp;#8217;t draw attention to themselves, but what inputs had my test strategies generated? Were they sufficient?&lt;/p&gt;
+&lt;p&gt;A commandline switch provides a little more detail.&lt;/p&gt;
+&lt;div class=&quot;typocode&quot;&gt;
 
-&lt;pre class="prettyprint"&gt;py.test --hypothesis-show-statistics
+&lt;pre class=&quot;prettyprint&quot;&gt;py.test --hypothesis-show-statistics
 
 ....
 
 test_chunk.py::test_evenly_chunked:
 
-- 200 passing examples, 0 failing examples, 0 invalid examples
+  - 200 passing examples, 0 failing examples, 0 invalid examples
   - Typical runtimes: &amp;lt; 1ms
   - Stopped because settings.max_examples=200
 
@@ -1080,31 +880,28 @@ test_chunk.py::test_evenly_chunked:
 
 &lt;/div&gt;
 
-&lt;p&gt;It&amp;#8217;s also possible to peek at examples produced by the test strategy.
-&lt;/p&gt;
+&lt;p&gt;It&amp;#8217;s also possible to peek at examples produced by the test strategy.&lt;/p&gt;
 &lt;pre&gt;
 &amp;gt;&amp;gt;&amp;gt; s=st.one_of(st.text(), st.binary(), st.lists(st.integers()))
 &amp;gt;&amp;gt;&amp;gt; s.example()
-b''
+b&#x27;&#x27;
 &amp;gt;&amp;gt;&amp;gt; s.example()
-b'\xc2\xfd6['
+b&#x27;\xc2\xfd6[&#x27;
 &amp;gt;&amp;gt;&amp;gt; s.example()
-':\n&amp;uacute;&amp;amp;\U000ea7e8'
+&#x27;:\n&amp;uacute;&amp;amp;\U000ea7e8&#x27;
 &amp;gt;&amp;gt;&amp;gt; s.example()
-b'\xe7z'
+b&#x27;\xe7z&#x27;
 &amp;gt;&amp;gt;&amp;gt; s.example()
-''
+&#x27;&#x27;
 &amp;gt;&amp;gt;&amp;gt; s.example()
 [184, 36, -205, 1486638017]
 &lt;/pre&gt;
 
+&lt;h2 id=&quot;complete-test-suite&quot;&gt;Complete test suite&lt;/h2&gt;
+&lt;p&gt;Here&amp;#8217;s my final test suite. Rather than hard code a maximum value for &lt;code&gt;n&lt;/code&gt;, I used a &lt;a href=&quot;https://hypothesis.readthedocs.io/en/latest/data.html#composite-strategies&quot;&gt;composite strategy&lt;/a&gt; which adapts &lt;code&gt;n&lt;/code&gt; to the size of &lt;code&gt;xs&lt;/code&gt;. I&amp;#8217;ve also added a test which confirms the result does comprise chunks of the input sequence.&lt;/p&gt;
+&lt;div class=&quot;typocode&quot;&gt;
 
-&lt;h2&gt;&lt;a href="http://wordaligned.org/articles/unleash-the-test-army#toc6" name="toccomplete-test-suite" id="toccomplete-test-suite"&gt;Complete test suite&lt;/a&gt;&lt;/h2&gt;
-&lt;p&gt;Here&amp;#8217;s my final test suite. Rather than hard code a maximum value for &lt;code&gt;n&lt;/code&gt;, I used a &lt;a href="https://hypothesis.readthedocs.io/en/latest/data.html#composite-strategies"&gt;composite strategy&lt;/a&gt; which adapts &lt;code&gt;n&lt;/code&gt; to the size of &lt;code&gt;xs&lt;/code&gt;. I&amp;#8217;ve also added a test which confirms the result does comprise chunks of the input sequence.
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
-
-&lt;pre class="prettyprint"&gt;import functools
+&lt;pre class=&quot;prettyprint&quot;&gt;import functools
 
 import hypothesis as ht
 import hypothesis.strategies as st
@@ -1118,9 +915,10 @@ def items_and_chunk_count(draw):
                          max_value=max(1, len(xs))))
     return xs, n
 
+
 @ht.given(xs_n=items_and_chunk_count())
 def test_evenly_chunked(xs_n):
-    '''Verify there are n evenly sized chunks'''
+    &amp;#x27;&amp;#x27;&amp;#x27;Verify there are n evenly sized chunks&amp;#x27;&amp;#x27;&amp;#x27;
     xs, n = xs_n
     chunks = chunk(xs, n)
     assert len(chunks) == n
@@ -1128,9 +926,10 @@ def test_evenly_chunked(xs_n):
     assert len(chunk_lens) in {1, 2}
     assert max(chunk_lens) - min(chunk_lens) in {0, 1}
 
+
 @ht.given(xs_n=items_and_chunk_count())
 def test_combining_chunks(xs_n):
-    '''Verify recombining the chunks reproduces the original sequence.'''
+    &amp;#x27;&amp;#x27;&amp;#x27;Verify recombining the chunks reproduces the original sequence.&amp;#x27;&amp;#x27;&amp;#x27;
     xs, n = xs_n
     chunks = chunk(xs, n)
     assert functools.reduce(lambda x, y: x+y, chunks) == xs
@@ -1139,26 +938,22 @@ def test_combining_chunks(xs_n):
 
 &lt;/div&gt;
 
+&lt;h2 id=&quot;quality-of-failure&quot;&gt;Quality of failure&lt;/h2&gt;
+&lt;p&gt;In the comments to my original article Mike Edey put forward an elegant solution to the original problem of evenly subdividing a sequence into an exact number of chunks:&lt;/p&gt;
+&lt;div class=&quot;typocode&quot;&gt;
 
-&lt;h2&gt;&lt;a href="http://wordaligned.org/articles/unleash-the-test-army#toc7" name="tocquality-of-failure" id="tocquality-of-failure"&gt;Quality of failure&lt;/a&gt;&lt;/h2&gt;
-&lt;p&gt;In the comments to my original article Mike Edey put forward an elegant solution to the original problem of evenly subdividing a sequence into an exact number of chunks:
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
-
-&lt;pre class="prettyprint"&gt;def chunk(xs, n):
+&lt;pre class=&quot;prettyprint&quot;&gt;def chunk(xs, n):
     return [xs[index::n] for index in range(n)]
 
 &lt;/pre&gt;
 
 &lt;/div&gt;
 
-&lt;p&gt;This is a delightful piece piece of code, and an approach I simply hadn&amp;#8217;t considered. If the input list &lt;code&gt;xs&lt;/code&gt; represents a number of tasks to be distributed amongst &lt;code&gt;n&lt;/code&gt; workers, this does the job evenly. In my actual motivating example, though, however, the input sequence was a document which caused a problem, and what I wanted to do was split that document up into a number of sections and see which of these exhibited the same problem: that is, I needed the chunks to be contiguous blocks of text from the original document. This is the property which &lt;code&gt;test_combining_chunks()&lt;/code&gt; checks.
-&lt;/p&gt;
-&lt;p&gt;Running Mike Edey&amp;#8217;s implementation through the test suite, we get:
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
+&lt;p&gt;This is a delightful piece piece of code, and an approach I simply hadn&amp;#8217;t considered. If the input list &lt;code&gt;xs&lt;/code&gt; represents a number of tasks to be distributed amongst &lt;code&gt;n&lt;/code&gt; workers, this does the job evenly. In my actual motivating example, though, however, the input sequence was a document which caused a problem, and what I wanted to do was split that document up into a number of sections and see which of these exhibited the same problem: that is, I needed the chunks to be contiguous blocks of text from the original document. This is the property which &lt;code&gt;test_combining_chunks()&lt;/code&gt; checks.&lt;/p&gt;
+&lt;p&gt;Running Mike Edey&amp;#8217;s implementation through the test suite, we get:&lt;/p&gt;
+&lt;div class=&quot;typocode&quot;&gt;
 
-&lt;pre class="prettyprint"&gt;py.test
+&lt;pre class=&quot;prettyprint&quot;&gt;py.test
 ============================= test session starts =============================
 platform win32 -- Python 3.5.3, pytest-3.0.7, py-1.4.33, pluggy-0.4.0
 rootdir: /work/sliced-python, inifile:
@@ -1170,7 +965,7 @@ test_chunk.py .F
 ================================== FAILURES ===================================
 ____________________________ test_combining_chunks ____________________________
 
-@ht.given(xs_n=items_and_chunk_count())
+    @ht.given(xs_n=items_and_chunk_count())
 &amp;gt;   def test_combining_chunks(xs_n):
 
 test_chunk.py:29: 
@@ -1185,66 +980,45 @@ d:\venvs\slackbot\lib\site-packages\hypothesis\core.py:113: in run
     return test(*args, **kwargs)
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
-xs_n = ('001', 2)
+xs_n = (&amp;#x27;001&amp;#x27;, 2)
 
-@ht.given(xs_n=items_and_chunk_count())
+    @ht.given(xs_n=items_and_chunk_count())
     def test_combining_chunks(xs_n):
-        '''Verify recombining the chunks reproduces the original sequence.'''
+        &amp;#x27;&amp;#x27;&amp;#x27;Verify recombining the chunks reproduces the original sequence.&amp;#x27;&amp;#x27;&amp;#x27;
         xs, n = xs_n
         chunks = chunk(xs, n)
 &amp;gt;       assert functools.reduce(lambda x, y: x+y, chunks) == xs
-E       AssertionError: assert '010' == '001'
+E       AssertionError: assert &amp;#x27;010&amp;#x27; == &amp;#x27;001&amp;#x27;
 E         - 010
 E         + 001
 
 test_chunk.py:33: AssertionError
 --------------------------------- Hypothesis ----------------------------------
-Falsifying example: test_combining_chunks(xs_n=('001', 2))
+Falsifying example: test_combining_chunks(xs_n=(&amp;#x27;001&amp;#x27;, 2))
 ===================== 1 failed, 1 passed in 0.52 seconds ======================
 
 &lt;/pre&gt;
 
 &lt;/div&gt;
 
-&lt;p&gt;Hypothesis has discovered a minimal failing example: the string &lt;code&gt;001&lt;/code&gt; splits into &lt;code&gt;2&lt;/code&gt; chunks as &lt;code&gt;01&lt;/code&gt;, &lt;code&gt;0&lt;/code&gt;.
-&lt;/p&gt;
-
-&lt;h2&gt;&lt;a href="http://wordaligned.org/articles/unleash-the-test-army#toc8" name="tocconclusions" id="tocconclusions"&gt;Conclusions&lt;/a&gt;&lt;/h2&gt;
-&lt;p&gt;Hypothesis worked well for this particular example.
-&lt;/p&gt;
+&lt;p&gt;Hypothesis has discovered a minimal failing example: the string &lt;code&gt;001&lt;/code&gt; splits into &lt;code&gt;2&lt;/code&gt; chunks as &lt;code&gt;01&lt;/code&gt;, &lt;code&gt;0&lt;/code&gt;.&lt;/p&gt;
+&lt;h2 id=&quot;conclusions&quot;&gt;Conclusions&lt;/h2&gt;
+&lt;p&gt;Hypothesis worked well for this particular example.&lt;/p&gt;
 &lt;ul&gt;
- &lt;li&gt;
-     it forced me to pin down the function specification
- &lt;/li&gt;
-
- &lt;li&gt;
-     I had to consider the special cases: would the function behave in the face of logically permissable inputs, and not just the ones I had in mind when I wrote it
- &lt;/li&gt;
-
- &lt;li&gt;
-     it increased my confidence the function was correct
- &lt;/li&gt;
-
- &lt;li&gt;
-     and particularly appealing, in this case &amp;#8212; the tests were not tied to a detail of the implementation, and would continue to work if, for example, the larger chunks were to appear at the end of the results.
- &lt;/li&gt;
+&lt;li&gt;it forced me to pin down the function specification&lt;/li&gt;
+&lt;li&gt;I had to consider the special cases: would the function behave in the face of logically permissable inputs, and not just the ones I had in mind when I wrote it&lt;/li&gt;
+&lt;li&gt;it increased my confidence the function was correct&lt;/li&gt;
+&lt;li&gt;and particularly appealing, in this case &amp;#8212; the tests were not tied to a detail of the implementation, and would continue to work if, for example, the larger chunks were to appear at the end of the results.&lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;More generally, I found the hypothesis library solid. It&amp;#8217;s well designed and documented, as well as being a fine example of how to use Python decorators.
-&lt;/p&gt;
-&lt;p&gt;I&amp;#8217;d say property based testing complements example based testing. Example based unit tests show you how a function is used, for instance; with hypothesis, this useful demonstration happens behind the scenes (though note that your hypothesis tests &lt;strong&gt;can&lt;/strong&gt; include explicit &lt;a href="https://hypothesis.readthedocs.io/en/latest/details.html#providing-explicit-examples"&gt;@examples&lt;/a&gt;). Example based unit tests are typically one or two orders of magnitude quicker to execute. It&amp;#8217;s not a problem if a couple of tests take half a second to run, but what if you have a couple of thousand tests?
-&lt;/p&gt;
-&lt;p&gt;In my case the built-in strategies were good enough to generate inputs to my function. I can imagine that&amp;#8217;s not the case for functions higher up a software stack. Test setup functions can be hard work and I suspect test setup strategies would be harder.
-&lt;/p&gt;
-&lt;p&gt;In closing, I&amp;#8217;d like to quote from the section of the &lt;a href="https://hypothesis.readthedocs.io/en/latest/manifesto.html"&gt;Hypothesis documentation&lt;/a&gt; which describes its purpose.
-&lt;/p&gt;
-&lt;blockquote&gt;&lt;p&gt;Software is, as they say, eating the world. Software is also &lt;a href="https://www.youtube.com/watch?v=csyL9EC0S0c"&gt;terrible&lt;/a&gt;. It&amp;#8217;s buggy, insecure and generally poorly thought out. This combination is clearly a recipe for disaster.
-&lt;/p&gt;
-&lt;p&gt;And the state of software testing is even worse. Although it&amp;#8217;s fairly uncontroversial at this point that you should be testing your code, can you really say with a straight face that most projects you&amp;#8217;ve worked on are adequately tested?
-&lt;/p&gt;
-&lt;p&gt;A lot of the problem here is that it&amp;#8217;s too hard to write good tests. Your tests encode exactly the same assumptions and fallacies that you had when you wrote the code, so they miss exactly the same bugs that you missed when you wrote the code.
-&lt;/p&gt;
-&lt;p&gt;&amp;#8212; &lt;a href="https://hypothesis.readthedocs.io/en/latest/manifesto.html"&gt;The Purpose of Hypothesis&lt;/a&gt;
-&lt;/p&gt;
+&lt;p&gt;More generally, I found the hypothesis library solid. It&amp;#8217;s well designed and documented, as well as being a fine example of how to use Python decorators.&lt;/p&gt;
+&lt;p&gt;I&amp;#8217;d say property based testing complements example based testing. Example based unit tests show you how a function is used, for instance; with hypothesis, this useful demonstration happens behind the scenes (though note that your hypothesis tests &lt;strong&gt;can&lt;/strong&gt; include explicit &lt;a href=&quot;https://hypothesis.readthedocs.io/en/latest/details.html#providing-explicit-examples&quot;&gt;@examples&lt;/a&gt;). Example based unit tests are typically one or two orders of magnitude quicker to execute. It&amp;#8217;s not a problem if a couple of tests take half a second to run, but what if you have a couple of thousand tests?&lt;/p&gt;
+&lt;p&gt;In my case the built-in strategies were good enough to generate inputs to my function. I can imagine that&amp;#8217;s not the case for functions higher up a software stack. Test setup functions can be hard work and I suspect test setup strategies would be harder.&lt;/p&gt;
+&lt;p&gt;In closing, I&amp;#8217;d like to quote from the section of the &lt;a href=&quot;https://hypothesis.readthedocs.io/en/latest/manifesto.html&quot;&gt;Hypothesis documentation&lt;/a&gt; which describes its purpose.&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Software is, as they say, eating the world. Software is also &lt;a href=&quot;https://www.youtube.com/watch?v=csyL9EC0S0c&quot;&gt;terrible&lt;/a&gt;. It&amp;#8217;s buggy, insecure and generally poorly thought out. This combination is clearly a recipe for disaster.&lt;/p&gt;
+&lt;p&gt;And the state of software testing is even worse. Although it&amp;#8217;s fairly uncontroversial at this point that you should be testing your code, can you really say with a straight face that most projects you&amp;#8217;ve worked on are adequately tested?&lt;/p&gt;
+&lt;p&gt;A lot of the problem here is that it&amp;#8217;s too hard to write good tests. Your tests encode exactly the same assumptions and fallacies that you had when you wrote the code, so they miss exactly the same bugs that you missed when you wrote the code.&lt;/p&gt;
+&lt;p&gt;&amp;#8212; &lt;a href=&quot;https://hypothesis.readthedocs.io/en/latest/manifesto.html&quot;&gt;The Purpose of Hypothesis&lt;/a&gt;&lt;/p&gt;
 &lt;/blockquote&gt;</description>
 <dc:date>2017-05-29</dc:date>
 <guid>http://wordaligned.org/articles/unleash-the-test-army</guid>
@@ -1256,22 +1030,16 @@ Falsifying example: test_combining_chunks(xs_n=('001', 2))
 
 <item>
 <title>Lazy sequences working hard</title>
-<description>&lt;p&gt;I gave a talk &lt;a href="http://www.pydiff.wales/events/2017-05-16.html"&gt;@PyDiff&lt;/a&gt; this evening in the computer science department at Cardiff University.
-&lt;/p&gt;
-&lt;blockquote&gt;&lt;p&gt;&lt;h2&gt;Lazy Sequences working hard&lt;/h2&gt;
-&lt;/p&gt;
-&lt;p&gt;Python has no problem handling large and even infinite streams of data. Just write lazy programs &amp;#8212; code which defers data access until the last minute. This talk examines Python&amp;#8217;s language and library support for such delaying tactics. There will be live coding, and we&amp;#8217;ll draw parallels with similar features in other languages, in particular the Unix shell.
-&lt;/p&gt;
-&lt;/blockquote&gt;&lt;p&gt;Being unsure where to pitch it, I started off easy and kept going until I&amp;#8217;d lost everybody &amp;#8212; including myself.
-&lt;/p&gt;
-&lt;p&gt;The room was well set up with a good quality projector and whiteboard, along with a desk to sit down when I wanted to write and run code and plenty of space to move around in otherwise. I did feel a bit like a jack-in-the-box by the end.
-&lt;/p&gt;
-&lt;p&gt;&lt;a data-flickr-embed="true"  href="https://www.flickr.com/photos/thomasguest/34663534326/in/dateposted-friend/" title="Me @PyDiff"&gt;&lt;img src="https://c1.staticflickr.com/5/4164/34663534326_4bf8851eeb.jpg" width="500" height="375" alt="Me @PyDiff"&gt;&lt;/a&gt;&lt;script async src="http://wordaligned.org//embedr.flickr.com/assets/client-code.js" charset="utf-8"&gt;&lt;/script&gt;
-&lt;/p&gt;
-&lt;p&gt;I&amp;#8217;d based the talk on a Jupyter notebook which I replayed with the ingenious &lt;a href="https://github.com/damianavila/RISE"&gt;RISE reveal.js extension&lt;/a&gt; written by Damian Avila. This worked well, since I got the pretty graphics along with the interactive coding. A static version of the slides is &lt;a href="http://nbviewer.jupyter.org/url/wordaligned.org/docs/lazy-sequences.ipynb"&gt;available here&lt;/a&gt;.
-&lt;/p&gt;
-&lt;p&gt;Thanks to everyone who came. Sorry I had to rush off after. If anyone would &lt;a href="http://swanseasdc.co.uk/"&gt;like to talk at Swansea&lt;/a&gt;, please let me know: you&amp;#8217;d be most welcome.
-&lt;/p&gt;</description>
+<description>&lt;p&gt;I gave a talk &lt;a href=&quot;http://www.pydiff.wales/events/2017-05-16.html&quot;&gt;@PyDiff&lt;/a&gt; this evening in the computer science department at Cardiff University.&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;h2&gt;Lazy Sequences working hard&lt;/h2&gt;&lt;/p&gt;
+&lt;p&gt;Python has no problem handling large and even infinite streams of data. Just write lazy programs &amp;#8212; code which defers data access until the last minute. This talk examines Python&amp;#8217;s language and library support for such delaying tactics. There will be live coding, and we&amp;#8217;ll draw parallels with similar features in other languages, in particular the Unix shell.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;Being unsure where to pitch it, I started off easy and kept going until I&amp;#8217;d lost everybody &amp;#8212; including myself.&lt;/p&gt;
+&lt;p&gt;The room was well set up with a good quality projector and whiteboard, along with a desk to sit down when I wanted to write and run code and plenty of space to move around in otherwise. I did feel a bit like a jack-in-the-box by the end.&lt;/p&gt;
+&lt;p&gt;&lt;a data-flickr-embed=&quot;true&quot;  href=&quot;https://www.flickr.com/photos/thomasguest/34663534326/in/dateposted-friend/&quot; title=&quot;Me @PyDiff&quot;&gt;&lt;img src=&quot;https://c1.staticflickr.com/5/4164/34663534326_4bf8851eeb.jpg&quot; width=&quot;500&quot; height=&quot;375&quot; alt=&quot;Me @PyDiff&quot;&gt;&lt;/a&gt;&lt;script async src=&quot;http://wordaligned.org//embedr.flickr.com/assets/client-code.js&quot; charset=&quot;utf-8&quot;&gt;&lt;/script&gt;&lt;/p&gt;
+&lt;p&gt;I&amp;#8217;d based the talk on a Jupyter notebook which I replayed with the ingenious &lt;a href=&quot;https://github.com/damianavila/RISE&quot;&gt;RISE reveal.js extension&lt;/a&gt; written by Damian Avila. This worked well, since I got the pretty graphics along with the interactive coding. A static version of the slides is &lt;a href=&quot;http://nbviewer.jupyter.org/url/wordaligned.org/docs/lazy-sequences.ipynb&quot;&gt;available here&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Thanks to everyone who came. Sorry I had to rush off after. If anyone would &lt;a href=&quot;http://swanseasdc.co.uk/&quot;&gt;like to talk at Swansea&lt;/a&gt;, please let me know: you&amp;#8217;d be most welcome.&lt;/p&gt;</description>
 <dc:date>2017-05-16</dc:date>
 <guid>http://wordaligned.org/articles/lazy-sequences-working-hard</guid>
 <author>tag@wordaligned.org (Thomas Guest)</author>
@@ -1282,18 +1050,14 @@ Falsifying example: test_combining_chunks(xs_n=('001', 2))
 
 <item>
 <title>Slicing a list evenly with Python</title>
-<description>&lt;img src="http://wordaligned.org/images/sliced-python.jpg" alt="Sliced Python"/&gt;
+<description>&lt;p&gt;&lt;img src=&quot;http://wordaligned.org/images/sliced-python.jpg&quot; alt=&quot;Sliced Python&quot;/&gt;&lt;/p&gt;
+&lt;p&gt;Here&amp;#8217;s a problem I came up against recently.&lt;/p&gt;
+&lt;p&gt;The task was to chop a list into exactly &lt;code&gt;n&lt;/code&gt; evenly slized chunks. To give a little more context, let&amp;#8217;s suppose we want to divide a list of jobs equally between &lt;code&gt;n&lt;/code&gt; workers, where &lt;code&gt;n&lt;/code&gt; might be the number of CPU cores available.&lt;/p&gt;
+&lt;p&gt;We can build the result by repeatedly slicing the input:&lt;/p&gt;
+&lt;div class=&quot;typocode&quot;&gt;
 
-&lt;p&gt;Here&amp;#8217;s a problem I came up against recently.
-&lt;/p&gt;
-&lt;p&gt;The task was to chop a list into exactly &lt;code&gt;n&lt;/code&gt; evenly slized chunks. To give a little more context, let&amp;#8217;s suppose we want to divide a list of jobs equally between &lt;code&gt;n&lt;/code&gt; workers, where &lt;code&gt;n&lt;/code&gt; might be the number of CPU cores available.
-&lt;/p&gt;
-&lt;p&gt;We can build the result by repeatedly slicing the input:
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
-
-&lt;pre class="prettyprint"&gt;def chunk(xs, n):
-    '''Split the list, xs, into n chunks'''
+&lt;pre class=&quot;prettyprint&quot;&gt;def chunk(xs, n):
+    &amp;#x27;&amp;#x27;&amp;#x27;Split the list, xs, into n chunks&amp;#x27;&amp;#x27;&amp;#x27;
     L = len(xs)
     assert 0 &amp;lt; n &amp;lt;= L
     s = L//n
@@ -1303,40 +1067,36 @@ Falsifying example: test_combining_chunks(xs_n=('001', 2))
 
 &lt;/div&gt;
 
-&lt;p&gt;This looks promising
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
+&lt;p&gt;This looks promising&lt;/p&gt;
+&lt;div class=&quot;typocode&quot;&gt;
 
-&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; chunk('abcdefghi', 3)
-['abc', 'def', 'ghi']
-
-&lt;/pre&gt;
-
-&lt;/div&gt;
-
-&lt;p&gt;but if the size of the list is not an exact multiple of &lt;code&gt;n&lt;/code&gt;, the result won&amp;#8217;t contain &lt;strong&gt;exactly&lt;/strong&gt; &lt;code&gt;n&lt;/code&gt; chunks.
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
-
-&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; chunk('abcde', 3)
-['a', 'b', 'c', 'd', 'e']
-&amp;gt;&amp;gt;&amp;gt; chunk('abcdefgh', 3)
-['ab', 'cd', 'ef', 'gh']
-&amp;gt;&amp;gt;&amp;gt; chunk('abcdefghij', 3)
-['abc', 'def', 'ghi', 'j']
+&lt;pre class=&quot;prettyprint&quot;&gt;&amp;gt;&amp;gt;&amp;gt; chunk(&amp;#x27;abcdefghi&amp;#x27;, 3)
+[&amp;#x27;abc&amp;#x27;, &amp;#x27;def&amp;#x27;, &amp;#x27;ghi&amp;#x27;]
 
 &lt;/pre&gt;
 
 &lt;/div&gt;
 
-&lt;p&gt;(By the way, I&amp;#8217;m using strings rather than lists in the examples. The code works equally well for both types, and strings make it slightly easier to see what&amp;#8217;s going on.)
-&lt;/p&gt;
-&lt;p&gt;One way to fix the problem is to group the final chunks together.
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
+&lt;p&gt;but if the size of the list is not an exact multiple of &lt;code&gt;n&lt;/code&gt;, the result won&amp;#8217;t contain &lt;strong&gt;exactly&lt;/strong&gt; &lt;code&gt;n&lt;/code&gt; chunks.&lt;/p&gt;
+&lt;div class=&quot;typocode&quot;&gt;
 
-&lt;pre class="prettyprint"&gt;def chunk(xs, n):
-    '''Split the list, xs, into n chunks'''
+&lt;pre class=&quot;prettyprint&quot;&gt;&amp;gt;&amp;gt;&amp;gt; chunk(&amp;#x27;abcde&amp;#x27;, 3)
+[&amp;#x27;a&amp;#x27;, &amp;#x27;b&amp;#x27;, &amp;#x27;c&amp;#x27;, &amp;#x27;d&amp;#x27;, &amp;#x27;e&amp;#x27;]
+&amp;gt;&amp;gt;&amp;gt; chunk(&amp;#x27;abcdefgh&amp;#x27;, 3)
+[&amp;#x27;ab&amp;#x27;, &amp;#x27;cd&amp;#x27;, &amp;#x27;ef&amp;#x27;, &amp;#x27;gh&amp;#x27;]
+&amp;gt;&amp;gt;&amp;gt; chunk(&amp;#x27;abcdefghij&amp;#x27;, 3)
+[&amp;#x27;abc&amp;#x27;, &amp;#x27;def&amp;#x27;, &amp;#x27;ghi&amp;#x27;, &amp;#x27;j&amp;#x27;]
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;(By the way, I&amp;#8217;m using strings rather than lists in the examples. The code works equally well for both types, and strings make it slightly easier to see what&amp;#8217;s going on.)&lt;/p&gt;
+&lt;p&gt;One way to fix the problem is to group the final chunks together.&lt;/p&gt;
+&lt;div class=&quot;typocode&quot;&gt;
+
+&lt;pre class=&quot;prettyprint&quot;&gt;def chunk(xs, n):
+    &amp;#x27;&amp;#x27;&amp;#x27;Split the list, xs, into n chunks&amp;#x27;&amp;#x27;&amp;#x27;
     L = len(xs)
     assert 0 &amp;lt; n &amp;lt;= L
     s, r = divmod(L, n)
@@ -1348,29 +1108,26 @@ Falsifying example: test_combining_chunks(xs_n=('001', 2))
 
 &lt;/div&gt;
 
-&lt;p&gt;Now we have exactly &lt;code&gt;n&lt;/code&gt; chunks, but they may not be evenly sized, since the last chunk gets padded with any surplus.
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
+&lt;p&gt;Now we have exactly &lt;code&gt;n&lt;/code&gt; chunks, but they may not be evenly sized, since the last chunk gets padded with any surplus.&lt;/p&gt;
+&lt;div class=&quot;typocode&quot;&gt;
 
-&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; chunk('abcde', 3)
-['a', 'b', 'cde']
-&amp;gt;&amp;gt;&amp;gt; chunk('abcdefgh', 3)
-['ab', 'cd', 'efgh']
-&amp;gt;&amp;gt;&amp;gt; chunk('abcdefghij', 3)
-['abc', 'def', 'ghij']
+&lt;pre class=&quot;prettyprint&quot;&gt;&amp;gt;&amp;gt;&amp;gt; chunk(&amp;#x27;abcde&amp;#x27;, 3)
+[&amp;#x27;a&amp;#x27;, &amp;#x27;b&amp;#x27;, &amp;#x27;cde&amp;#x27;]
+&amp;gt;&amp;gt;&amp;gt; chunk(&amp;#x27;abcdefgh&amp;#x27;, 3)
+[&amp;#x27;ab&amp;#x27;, &amp;#x27;cd&amp;#x27;, &amp;#x27;efgh&amp;#x27;]
+&amp;gt;&amp;gt;&amp;gt; chunk(&amp;#x27;abcdefghij&amp;#x27;, 3)
+[&amp;#x27;abc&amp;#x27;, &amp;#x27;def&amp;#x27;, &amp;#x27;ghij&amp;#x27;]
 
 &lt;/pre&gt;
 
 &lt;/div&gt;
 
-&lt;p&gt;What does &amp;#8220;evenly sized&amp;#8221; actually mean? Loosely speaking, we want the resulting chunks as closely sized as possible.
-&lt;/p&gt;
-&lt;p&gt;More precisely, if the result of dividing the length of the list &lt;code&gt;L&lt;/code&gt; by the number of chunks &lt;code&gt;n&lt;/code&gt; gives a size &lt;code&gt;s&lt;/code&gt; with remainder &lt;code&gt;r&lt;/code&gt;, then the function should return &lt;code&gt;r&lt;/code&gt; chunks of size &lt;code&gt;s+1&lt;/code&gt; and &lt;code&gt;n-r&lt;/code&gt; chunks of size &lt;code&gt;s&lt;/code&gt;. There are &lt;a href="https://en.wikipedia.org/wiki/Combination"&gt;choose(n, r)&lt;/a&gt; ways of doing this. Here&amp;#8217;s a solution which puts the longer chunks to the front of the results.
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
+&lt;p&gt;What does &amp;#8220;evenly sized&amp;#8221; actually mean? Loosely speaking, we want the resulting chunks as closely sized as possible.&lt;/p&gt;
+&lt;p&gt;More precisely, if the result of dividing the length of the list &lt;code&gt;L&lt;/code&gt; by the number of chunks &lt;code&gt;n&lt;/code&gt; gives a size &lt;code&gt;s&lt;/code&gt; with remainder &lt;code&gt;r&lt;/code&gt;, then the function should return &lt;code&gt;r&lt;/code&gt; chunks of size &lt;code&gt;s+1&lt;/code&gt; and &lt;code&gt;n-r&lt;/code&gt; chunks of size &lt;code&gt;s&lt;/code&gt;. There are &lt;a href=&quot;https://en.wikipedia.org/wiki/Combination&quot;&gt;choose(n, r)&lt;/a&gt; ways of doing this. Here&amp;#8217;s a solution which puts the longer chunks to the front of the results.&lt;/p&gt;
+&lt;div class=&quot;typocode&quot;&gt;
 
-&lt;pre class="prettyprint"&gt;def chunk(xs, n):
-    '''Split the list, xs, into n evenly sized chunks'''
+&lt;pre class=&quot;prettyprint&quot;&gt;def chunk(xs, n):
+    &amp;#x27;&amp;#x27;&amp;#x27;Split the list, xs, into n evenly sized chunks&amp;#x27;&amp;#x27;&amp;#x27;
     L = len(xs)
     assert 0 &amp;lt; n &amp;lt;= L
     s, r = divmod(L, n)
@@ -1382,11 +1139,10 @@ Falsifying example: test_combining_chunks(xs_n=('001', 2))
 
 &lt;/div&gt;
 
-&lt;p&gt;Here&amp;#8217;s a second implementation, this time using &lt;code&gt;itertools&lt;/code&gt;. Chaining &lt;code&gt;r&lt;/code&gt; copies of &lt;code&gt;s+1&lt;/code&gt; and &lt;code&gt;n-r&lt;/code&gt; copies of &lt;code&gt;s&lt;/code&gt; gives us the &lt;code&gt;n&lt;/code&gt; chunk widths. Accumulating the widths gives us the list offsets for slicing &amp;#8212; though note we need to prepend an initial &lt;code&gt;0&lt;/code&gt;. Now we can form a &lt;a href="http://wordaligned.org/articles/zippy-triples-served-with-python"&gt;(this, next) pair of iterators&lt;/a&gt; over the offsets, and the result is the accumulation of repeated &lt;code&gt;(begin, end)&lt;/code&gt; slices taken from the original list.
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
+&lt;p&gt;Here&amp;#8217;s a second implementation, this time using &lt;code&gt;itertools&lt;/code&gt;. Chaining &lt;code&gt;r&lt;/code&gt; copies of &lt;code&gt;s+1&lt;/code&gt; and &lt;code&gt;n-r&lt;/code&gt; copies of &lt;code&gt;s&lt;/code&gt; gives us the &lt;code&gt;n&lt;/code&gt; chunk widths. Accumulating the widths gives us the list offsets for slicing &amp;#8212; though note we need to prepend an initial &lt;code&gt;0&lt;/code&gt;. Now we can form a &lt;a href=&quot;http://wordaligned.org/articles/zippy-triples-served-with-python&quot;&gt;(this, next) pair of iterators&lt;/a&gt; over the offsets, and the result is the accumulation of repeated &lt;code&gt;(begin, end)&lt;/code&gt; slices taken from the original list.&lt;/p&gt;
+&lt;div class=&quot;typocode&quot;&gt;
 
-&lt;pre class="prettyprint"&gt;from itertools import accumulate, chain, repeat, tee
+&lt;pre class=&quot;prettyprint&quot;&gt;from itertools import accumulate, chain, repeat, tee
 
 def chunk(xs, n):
     assert n &amp;gt; 0
@@ -1402,31 +1158,29 @@ def chunk(xs, n):
 
 &lt;/div&gt;
 
-&lt;p&gt;This version does something sensible in the case when the number of slices, &lt;code&gt;n&lt;/code&gt;, exceeds the length of the list.
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
+&lt;p&gt;This version does something sensible in the case when the number of slices, &lt;code&gt;n&lt;/code&gt;, exceeds the length of the list.&lt;/p&gt;
+&lt;div class=&quot;typocode&quot;&gt;
 
-&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; chunk('ab', 5)
-['a', 'b', '', '', '']
+&lt;pre class=&quot;prettyprint&quot;&gt;&amp;gt;&amp;gt;&amp;gt; chunk(&amp;#x27;ab&amp;#x27;, 5)
+[&amp;#x27;a&amp;#x27;, &amp;#x27;b&amp;#x27;, &amp;#x27;&amp;#x27;, &amp;#x27;&amp;#x27;, &amp;#x27;&amp;#x27;]
 
 &lt;/pre&gt;
 
 &lt;/div&gt;
 
-&lt;p&gt;Finally, some tests.
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
+&lt;p&gt;Finally, some tests.&lt;/p&gt;
+&lt;div class=&quot;typocode&quot;&gt;
 
-&lt;pre class="prettyprint"&gt;def test_chunk():
-    assert chunk('', 1) == ['']
-    assert chunk('ab', 2) == ['a', 'b']
-    assert chunk('abc', 2) == ['ab', 'c']
-    
+&lt;pre class=&quot;prettyprint&quot;&gt;def test_chunk():
+    assert chunk(&amp;#x27;&amp;#x27;, 1) == [&amp;#x27;&amp;#x27;]
+    assert chunk(&amp;#x27;ab&amp;#x27;, 2) == [&amp;#x27;a&amp;#x27;, &amp;#x27;b&amp;#x27;]
+    assert chunk(&amp;#x27;abc&amp;#x27;, 2) == [&amp;#x27;ab&amp;#x27;, &amp;#x27;c&amp;#x27;]
+
     xs = list(range(8))
     assert chunk(xs, 2) == [[0, 1, 2, 3], [4, 5, 6, 7]]
     assert chunk(xs, 3) == [[0, 1, 2], [3, 4, 5], [6, 7]]
     assert chunk(xs, 5) == [[0, 1], [2, 3], [4, 5], [6], [7]]
-    
+
     rs = range(1000000)
     assert chunk(rs, 2) == [range(500000), range(500000, 1000000)]
 
@@ -1438,144 +1192,6 @@ def chunk(xs, n):
 <author>tag@wordaligned.org (Thomas Guest)</author>
 <link>http://wordaligned.org/articles/slicing-a-list-evenly-with-python</link>
 <category>Python</category>
-</item>
-
-<item>
-<title>Agile at a distance &#x1f44d;</title>
-<description>&lt;div class="toc"&gt;
-&lt;h2&gt;Contents&lt;/h2&gt;
-&lt;ul&gt;
- &lt;li&gt;&lt;a href="http://wordaligned.org/articles/agile-at-a-distance#tocstand-up-meetings" name="toc0" id="toc0"&gt;Stand Up Meetings&lt;/a&gt;
- &lt;/li&gt;
-
- &lt;li&gt;&lt;a href="http://wordaligned.org/articles/agile-at-a-distance#tockanban-board" name="toc1" id="toc1"&gt;Kanban Board&lt;/a&gt;
- &lt;/li&gt;
-
- &lt;li&gt;&lt;a href="http://wordaligned.org/articles/agile-at-a-distance#tocpair-programming" name="toc2" id="toc2"&gt;Pair Programming&lt;/a&gt;
- &lt;/li&gt;
-
- &lt;li&gt;&lt;a href="http://wordaligned.org/articles/agile-at-a-distance#tocdesign-sessions" name="toc3" id="toc3"&gt;Design Sessions&lt;/a&gt;
- &lt;/li&gt;
-
- &lt;li&gt;&lt;a href="http://wordaligned.org/articles/agile-at-a-distance#tocretrospectives" name="toc4" id="toc4"&gt;Retrospectives&lt;/a&gt;
- &lt;/li&gt;
-
- &lt;li&gt;&lt;a href="http://wordaligned.org/articles/agile-at-a-distance#tocdemonstrations" name="toc5" id="toc5"&gt;Demonstrations&lt;/a&gt;
- &lt;/li&gt;
-
- &lt;li&gt;&lt;a href="http://wordaligned.org/articles/agile-at-a-distance#toctools" name="toc6" id="toc6"&gt;Tools&lt;/a&gt;
- &lt;/li&gt;
-
- &lt;li&gt;&lt;a href="http://wordaligned.org/articles/agile-at-a-distance#tocremote-access-for-all" name="toc7" id="toc7"&gt;Remote access for All&lt;/a&gt;
- &lt;/li&gt;
-
- &lt;li&gt;&lt;a href="http://wordaligned.org/articles/agile-at-a-distance#tocconclusions" name="toc8" id="toc8"&gt;Conclusions&lt;/a&gt;
- &lt;/li&gt;
-&lt;/ul&gt;
-&lt;/div&gt;&lt;img width="540px" src="http://wordaligned.org/docs/agile-at-a-distance/we-are-here.jpg" alt="We are here"/&gt;
-
-&lt;p&gt;I&amp;#8217;m happy to be &lt;a href="https://clinithink.com"&gt;part of a team&lt;/a&gt; which supports remote working. This post collects a few notes on how agile practices fare when people may not be colocated. I don&amp;#8217;t claim what&amp;#8217;s written to be generally true; rather, it&amp;#8217;s specific to me, my team, and how we work.
-&lt;/p&gt;
-&lt;img width="540px" src="http://wordaligned.org/docs/agile-at-a-distance/remote-team.jpg" alt="Remote team"/&gt;
-
-&lt;p&gt;We&amp;#8217;re by no means entirely distributed. There are seven of us in the engineering team, all UK based. We have a dedicated office space and of the seven, four are office-based and three are remote workers. Office-based staff are free to work from home when it suits. I&amp;#8217;m office-based but work from home around 40% of the time, for example. Remote workers typically visit the office every couple of weeks to attend the sprint ceremonies &amp;#8212; review, retrospective, planning. The rest of the company is more distributed and mobile, comprising product and marketing, medical experts, operations engineers, sales and admin.
-&lt;/p&gt;
-&lt;img width="540px" src="http://wordaligned.org/docs/agile-at-a-distance/wfh.jpg" alt="WFH"/&gt;
-
-&lt;span id="continue-reading"/&gt;
-
-
-&lt;h2&gt;&lt;a href="http://wordaligned.org/articles/agile-at-a-distance#toc0" name="tocstand-up-meetings" id="tocstand-up-meetings"&gt;Stand Up Meetings&lt;/a&gt;&lt;/h2&gt;
-&lt;img width="540px" src="http://wordaligned.org/docs/agile-at-a-distance/standup.jpg" alt="Stand up"/&gt;
-
-&lt;p&gt;Stand up meetings work well. We&amp;#8217;re all in the one timezone and our stand up starts promptly at 9:15 and typically lasts 20 minutes. Those in the office gather in a conference room. Remote workers call in. We use GoToMeeting for audio, video and screen share. There&amp;#8217;s a large monitor on the wall and the laptop driving it also functions as a second display. The monitor displays the electronic kanban board showing the current state of the sprint. The laptop screen is for webcam output. A speaker-phone handles audio in the conference room. Those calling in use headsets.
-&lt;/p&gt;
-&lt;p&gt;The meetings work because they&amp;#8217;re short and to the point. Audio in the conference room is adequate at best, but we work around the limitations with a clear protocol, taking it in turns to speak. Not all home workers use webcams, though most do; and the conference webcam doesn&amp;#8217;t fit everyone who&amp;#8217;s in the meeting room. It &lt;strong&gt;is&lt;/strong&gt; better if everyone uses a webcam, but the meeting remains effective even if they don&amp;#8217;t.
-&lt;/p&gt;
-&lt;p&gt;The meetings work equally well &amp;#8212; better even &amp;#8212; if we don&amp;#8217;t use the conference room and everyone joins the meeting from their desk, whether that&amp;#8217;s at home or in the office. As a result the meeting is more punctual and less of an overhead, since there&amp;#8217;s no fiddling with conference room setup: we all connect in advance and the meeting starts when an organiser opens it. Since we all have good headsets audio is clear, meaning interjections and group discussions are possible: it&amp;#8217;s easier to share a joke.
-&lt;/p&gt;
-&lt;p&gt;We call it a &amp;#8220;Daily Share&amp;#8221; rather than &amp;#8220;Stand Up&amp;#8221;, but I still think of it as a stand up meeting and always stand up, whether at home or in the office. It&amp;#8217;s a physical cue I&amp;#8217;m engaged with the meeting and makes a change from sitting down. Other remote workers sit down but are equally engaged.
-&lt;/p&gt;
-
-&lt;h2&gt;&lt;a href="http://wordaligned.org/articles/agile-at-a-distance#toc1" name="tockanban-board" id="tockanban-board"&gt;Kanban Board&lt;/a&gt;&lt;/h2&gt;
-&lt;p&gt;As mentioned we have a digital Kanban board which provides the primary focus for stand up meetings. We use &lt;a href="https://taiga.io"&gt;Taiga&lt;/a&gt;. It&amp;#8217;s OK. You can see stories. Tasks appear, get assigned, move to the right towards completion. Metrics update.
-&lt;/p&gt;
-&lt;img width="540px" src="http://wordaligned.org/docs/agile-at-a-distance/taiga.jpg" alt="Taiga"/&gt;
-
-&lt;p&gt;I miss having an actual, physical Kanban board. There&amp;#8217;s something agreeably tangible about having real cards with stories written on them by hand. Screens are too flat and print is too bland. Having a board you can walk up to and inspect is good. It&amp;#8217;s satisfying to move cards by hand, or cross them off with a marker pen. These physical actions reinforce the sense of progress in a way the online system fails to match. I also like the fact that a physical board very obviously gets cleared down and rebuilt at the end of every sprint. The work that&amp;#8217;s done is done, and the finished cards can be discarded.
-&lt;/p&gt;
-
-&lt;h2&gt;&lt;a href="http://wordaligned.org/articles/agile-at-a-distance#toc2" name="tocpair-programming" id="tocpair-programming"&gt;Pair Programming&lt;/a&gt;&lt;/h2&gt;
-&lt;p&gt;I don&amp;#8217;t do a huge amount of pair programming but, oddly, I find this also works well with a remote partner. Indeed, there are some advantages to pairing remotely.
-&lt;/p&gt;
-&lt;p&gt;First, setting up a pairing session isn&amp;#8217;t intrusive. To pair with someone in the office I&amp;#8217;ll approach them in person, which makes it harder for them to say no, or not yet. To pair with a remote colleague, I&amp;#8217;ll send a message; it&amp;#8217;s easier for them to control the right time.
-&lt;/p&gt;
-&lt;p&gt;When I say remote pairing what I mean is screen-sharing using Skype. There&amp;#8217;s no dual use of the keyboard and mouse. I&amp;#8217;m aware of software which does allow the computer controls to be fully shared: we aren&amp;#8217;t using it &amp;#8230; yet.
-&lt;/p&gt;
-&lt;p&gt;A second advantage to this distributed arrangement is that there&amp;#8217;s no special set up needed to make the desk pair-friendly. You don&amp;#8217;t need a second mouse and keyboard, or any extra space to fit two people round one screen. You don&amp;#8217;t need to shift chairs or mugs. What&amp;#8217;s more, you can include another colleague at any point without fuss.
-&lt;/p&gt;
-&lt;p&gt;Thirdly, for me, it&amp;#8217;s a less intense experience. I&amp;#8217;m in my space, my partner&amp;#8217;s in theirs. We&amp;#8217;re focusing on the screen in front of us and the sound coming through the headset. It&amp;#8217;s concentrated but relaxed. I almost never use the webcam for these sessions &amp;#8212; I find it a distraction. Maybe I&amp;#8217;m saying remote pairing is easier on introverts.
-&lt;/p&gt;
-&lt;img width="540px" src="http://wordaligned.org/docs/agile-at-a-distance/pairing.jpg" alt="Pairing"/&gt;
-
-
-&lt;h2&gt;&lt;a href="http://wordaligned.org/articles/agile-at-a-distance#toc3" name="tocdesign-sessions" id="tocdesign-sessions"&gt;Design Sessions&lt;/a&gt;&lt;/h2&gt;
-&lt;p&gt;I haven&amp;#8217;t found a good way of running design sessions remotely. I miss the interaction and activity of having a group of people working together, and the flexibility of a whiteboard which starts clean and ends up packed with boxes, bubbles and arrows.
-&lt;/p&gt;
-
-&lt;h2&gt;&lt;a href="http://wordaligned.org/articles/agile-at-a-distance#toc4" name="tocretrospectives" id="tocretrospectives"&gt;Retrospectives&lt;/a&gt;&lt;/h2&gt;
-&lt;p&gt;I usually run retrospectives for my team. We try and get everyone in for them, as well as for the other sprint changeover activities.
-&lt;/p&gt;
-&lt;p&gt;It&amp;#8217;s a challenge running this particular activity with remote participants. The foundation of a good retrospective is engagement and interaction (though of course all meetings would benefit from such focus). Retrospectives are also energetic and mobile. Stand up, sit down, switch tables: these are all things I get my team doing. We draw pictures, scribble notes on index cards and post-its, pass things round &amp;#8212; activities which remote attendees find hard to follow, let alone participate in.
-&lt;/p&gt;
-&lt;p&gt;Despite these challenges it has been feasible to include remote attendees in retrospectives. My attitude, though, is that everyone&amp;#8217;s invited in person to the retrospective &amp;#8212; along with the other sprint changeover activities &amp;#8212; and my priority is to make the meeting work for those who are physically present.
-&lt;/p&gt;
-&lt;p&gt;That said, some activities work well with remote attendees. It&amp;#8217;s quite fun to hold pictures up for display to the webcam and see a remote colleague do the same. A &lt;a href="https://en.wikipedia.org/wiki/Fishbowl_(conversation)"&gt;goldfish bowl&lt;/a&gt; discussion works very well with remote attendees. I&amp;#8217;ve also been pleased with the way everyone adapts to the challenge of the distributed meeting.
-&lt;/p&gt;
-&lt;p&gt;One final point: it&amp;#8217;s even more important not to let this meeting overrun when you have remote participants.
-&lt;/p&gt;
-&lt;img width="540px" src="http://wordaligned.org/docs/agile-at-a-distance/retro.jpg" alt="Retrospective"/&gt;
-
-
-&lt;h2&gt;&lt;a href="http://wordaligned.org/articles/agile-at-a-distance#toc5" name="tocdemonstrations" id="tocdemonstrations"&gt;Demonstrations&lt;/a&gt;&lt;/h2&gt;
-&lt;p&gt;On the other hand, product demonstrations work well for local and remote workers. Again, we use GoToMeeting, and again there&amp;#8217;s a clear protocol &amp;#8212; who&amp;#8217;s talking when. A nice benefit of using GoToMeeting is that the demonstration can be recorded for those who can&amp;#8217;t make the meeting, or would like to replay it.
-&lt;/p&gt;
-&lt;img width="540px" src="http://wordaligned.org/docs/agile-at-a-distance/demo.jpg" alt="Demo"/&gt;
-
-
-&lt;h2&gt;&lt;a href="http://wordaligned.org/articles/agile-at-a-distance#toc6" name="toctools" id="toctools"&gt;Tools&lt;/a&gt;&lt;/h2&gt;
-&lt;p&gt;It&amp;#8217;s hardly surprising that a distributed version control system works well for a distributed team. We use &lt;a href="https://about.gitlab.com"&gt;GitLab&lt;/a&gt; as a front-end and it&amp;#8217;s excellent.
-&lt;/p&gt;
-&lt;p&gt;We use &lt;a href="https://slack.com"&gt;slack&lt;/a&gt; for team communications. I&amp;#8217;m surprised how much I like it. I can remember how long it took me to use the most basic emoticons in emails etc, and now I&amp;#8217;m actively searching for the perfect emoji to react with. I&amp;#8217;ve even installed the slack app on my phone.
-&lt;/p&gt;
-&lt;p&gt;I&amp;#8217;m less keen on Skype. It seems both bossy and needy. However, I do use it for phone calls and screen sharing, and it does a fine job of both.
-&lt;/p&gt;
-&lt;p&gt;We don&amp;#8217;t use of cloud technology, docker etc as much as I&amp;#8217;d like, but we are moving in that direction. I have a hefty laptop which weighs me down on my cycle+train commute.
-&lt;/p&gt;
-&lt;img width="540px" src="http://wordaligned.org/docs/agile-at-a-distance/tools.jpg" alt="Tools"/&gt;
-
-
-&lt;h2&gt;&lt;a href="http://wordaligned.org/articles/agile-at-a-distance#toc7" name="tocremote-access-for-all" id="tocremote-access-for-all"&gt;Remote access for All&lt;/a&gt;&lt;/h2&gt;
-&lt;p&gt;Level or ramped access to a building isn&amp;#8217;t just for wheelchair users: parents with baby buggies appreciate it, as do couriers wih trolleys, and people who simply find steps hard going.
-&lt;/p&gt;
-&lt;img width="540px" src="http://wordaligned.org/docs/agile-at-a-distance/access-ramp.jpg" alt="Access"/&gt;
-
-&lt;p&gt;Similarly, a working environment which is designed to be remote-friendly works better for everyone. For example, when your stand-up meeting is a hosted session that participants dial in to, it&amp;#8217;s possible to attend even when you&amp;#8217;re neither working from home nor in the office &amp;#8212; as was the case last week when I had to drop my daughter off somewhere just when the meeting was due to start. It&amp;#8217;s also trivial to open the meeting to observers, who can quietly attend from any location without any change to the setup. As already mentioned, meetings can be recorded, so even if you can&amp;#8217;t attend you can play back, and if you did attend you can replay later.
-&lt;/p&gt;
-&lt;p&gt;Of course you need to regulate access to company confidential material: source code, design documents, slack channels etc., but use a modern, hosted solution, with well-defined roles and permissions. Does &lt;strong&gt;everything&lt;/strong&gt; need to be behind a VPN? Make sure the servers are maximally available with minimal red-tape, whatever the time, wherever the client and and whatever operating system it&amp;#8217;s running. Making remote-friendly decisions with modern infrastructure benefits all.
-&lt;/p&gt;
-&lt;p&gt;You have to trust your employees to actually &lt;em&gt;work&lt;/em&gt; when they&amp;#8217;re working from home, but something&amp;#8217;s wrong if that trust is missing. I worked in one office-based job where the boss &amp;#8212; if he wasn&amp;#8217;t in the office &amp;#8212; would make an excuse to phone in late in the day, ostensibly with a query, but actually just checking we were still there. Years later, it still rankles! If, however, you allow and encourage staff to work from home when it suits, without having to make a formal request, you&amp;#8217;ll find that trust repaid and with interest. I&amp;#8217;m happy to handle a support issue in the evening if I&amp;#8217;m set up to do so at home, especially if my (home) working day has flexed so I can take my son to the dentist.
-&lt;/p&gt;
-
-&lt;h2&gt;&lt;a href="http://wordaligned.org/articles/agile-at-a-distance#toc8" name="tocconclusions" id="tocconclusions"&gt;Conclusions&lt;/a&gt;&lt;/h2&gt;
-&lt;p&gt;I&amp;#8217;m happy to be part of a team which supports remote working. Agile practices adapt well to an environment where not everyone is in the office all of the time, though it certainly helps to get together in person sometimes, especially for design sessions, retrospectives and planning. The tools to support a distributed team are improving all the time. Being remote friendly benefits everyone.
-&lt;/p&gt;</description>
-<dc:date>2017-04-14</dc:date>
-<guid>http://wordaligned.org/articles/agile-at-a-distance</guid>
-<author>tag@wordaligned.org (Thomas Guest)</author>
-<link>http://wordaligned.org/articles/agile-at-a-distance</link>
-<category>Self</category>
-<category>Agile</category>
 </item>
 
 </channel>

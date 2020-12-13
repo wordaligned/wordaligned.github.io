@@ -28,78 +28,29 @@
       <div class="atomentry" id="stop-the-clock-squash-the-bug">
 <h2 class="title"><a href="/articles/stop-the-clock-squash-the-bug">Stop the clock, squash the bug</a></h2>
 <p class="meta"><abbr class="published" title="2008-04-16">2008-04-16</abbr> &bull; <a href="/tag/puzzles" rel="tag">Puzzles</a>, <a href="/tag/bugs" rel="tag">Bugs</a>, <a href="/tag/python" rel="tag">Python</a>, <a href="/tag/sicp" rel="tag">SICP</a>, <a href="/tag/c" rel="tag">C</a>, <a href="/tag/c++" rel="tag">C++</a> &bull; <a href="/articles/stop-the-clock-squash-the-bug#disqus_thread">Comments</a></p>
-<div class="toc">
-<h2>Contents</h2>
-<ul>
- <li><a href="#tocsoftware-bugs" name="toc0" id="toc0">Software Bugs</a>
- </li>
-
- <li><a href="#tocleaks-and-races" name="toc1" id="toc1">Leaks and Races</a>
- </li>
-
- <li><a href="#toc75-correct-vs-50-correct" name="toc2" id="toc2">75% correct vs 50% correct</a>
- </li>
-
- <li><a href="#tocprobabilistic-algorithms" name="toc3" id="toc3">Probabilistic algorithms</a>
- </li>
-
- <li><a href="#tocfixing-isfprime" name="toc4" id="toc4">Fixing is_fprime</a>
- </li>
-
- <li><a href="#tocdefensive-programming" name="toc5" id="toc5">Defensive programming</a>
- </li>
-
- <li><a href="#tocdefect-halflife" name="toc6" id="toc6">Defect halflife</a>
- </li>
-
- <li><a href="#tochow-did-that-code-ever-work" name="toc7" id="toc7">How did that code ever work?</a>
- </li>
-
- <li><a href="#tocconclusions" name="toc8" id="toc8">Conclusions</a>
- </li>
-
- <li><a href="#tocsource-code" name="toc9" id="toc9">Source code</a>
- </li>
-</ul>
-</div><p>Which clock is the best?
-</p>
+<p>Which clock is the best?</p>
 <p><img src="/images/stopped-clock.gif" alt="Stopped clock"/>
-   <img src="/images/slow-clock.gif" alt="Slow clock"/>
-   <img src="/images/fast-clock.gif" alt="Fast clock"/>
-</p>
-<p>We can easily rule the one which has stopped &#8230; 
-</p>
-<p>Or can we? In &#8220;The Rectory Umbrella&#8221; Lewis Carroll <a href="http://www.gavagai.de/themen/HHPT02.htm">argues otherwise</a>.
-</p>
-<blockquote><p>Which is better, a clock that is right only once a year, or a clock that is right twice every day?
-</p>
-<p>&#8220;The latter,&#8221; you reply, &#8220;unquestionably.&#8221;
-</p>
+<img src="/images/slow-clock.gif" alt="Slow clock"/>
+<img src="/images/fast-clock.gif" alt="Fast clock"/></p>
+<p>We can easily rule the one which has stopped &#8230; </p>
+<p>Or can we? In &#8220;The Rectory Umbrella&#8221; Lewis Carroll <a href="http://www.gavagai.de/themen/HHPT02.htm">argues otherwise</a>.</p>
+<blockquote>
+<p>Which is better, a clock that is right only once a year, or a clock that is right twice every day?</p>
+<p>&#8220;The latter,&#8221; you reply, &#8220;unquestionably.&#8221;</p>
 <p>Very good, now attend.
-   I have two clocks: one doesn&#8217;t go at all, and the other loses a minute a day: which would you prefer? &#8220;The losing one,&#8221; you answer, &#8220;without a doubt.&#8221; Now observe: the one which loses a minute a day has to lose twelve hours, or seven hundred and twenty minutes before it is right again, consequently it is only right once in two years, whereas the other is evidently right as often as the time it points to comes round, which happens twice a day. 
-</p>
-</blockquote><span id="continue-reading"/>
-
-<p>It&#8217;s an amusing diversion, but not really that puzzling: <em>of course</em> the clock which loses time is of more practical use, even if, somewhat paradoxically, the less time it loses the less often it tells the right time. A clock which loses just a second a day only tells the right time every 118 years or so.
-</p>
-
-<h3><a href="#toc0" name="tocsoftware-bugs" id="tocsoftware-bugs">Software Bugs</a></h3>
-<img style="float:right;" src="/images/buttons/spider.jpg" alt="Bug"/>
-
-<p>I mention these defective clocks because I&#8217;m thinking about bugs in software and how we go about finding and fixing them. 
-</p>
-<p>Code which is obviously wrong is easier to spot than code which is almost right, and spotting bugs is the precursor to fixing them. This implies &#8212; building on Carroll&#8217;s terminology &#8212; that we&#8217;re unlikely to ship many stopped clocks but if we&#8217;re not careful we may end up delivering a few which lose time. And, in general, code which is obviously wrong is easier to fix than code which is almost right. A badly-broken function clearly needs a rethink; whereas one which <em>almost</em> works may simply get tweaked until it <em>appears</em> to work, often resulting in a more subtle bug.
-</p>
-
-<h3><a href="#toc1" name="tocleaks-and-races" id="tocleaks-and-races">Leaks and Races</a></h3>
-<p>C and C++ provide a good example of what I&#8217;m talking about. Consider a program which misuses memory. An attempt to allocate workspace of 4294967295 bytes fails instantly<a id="fn1link" href="#fn1"><sup>[1]</sup></a>; a slow memory leak, like a slow running clock, may cause no perceptible damage for an extended period.
-</p>
-<p><a href="http://valgrind.org">Decent tools</a> detect memory leaks. Race conditions in multi-threaded code are harder to track and may prove elusive during system testing. More than once I&#8217;ve left a program running under a debugger, being fed random inputs, in the hope some rare and apparently random condition will trigger a break in execution. Give me truly broken code any day!
-</p>
-
-<h3><a href="#toc2" name="toc75-correct-vs-50-correct" id="toc75-correct-vs-50-correct">75% correct vs 50% correct</a></h3>
-<p>Here are two implementations of a C function to find an integer midway between a pair of ordered, positive integer values, truncating downwards. Before reading on, ask yourself which is better.
-</p>
+I have two clocks: one doesn&#8217;t go at all, and the other loses a minute a day: which would you prefer? &#8220;The losing one,&#8221; you answer, &#8220;without a doubt.&#8221; Now observe: the one which loses a minute a day has to lose twelve hours, or seven hundred and twenty minutes before it is right again, consequently it is only right once in two years, whereas the other is evidently right as often as the time it points to comes round, which happens twice a day. </p>
+</blockquote>
+<p><span id="continue-reading"/></p>
+<p>It&#8217;s an amusing diversion, but not really that puzzling: <em>of course</em> the clock which loses time is of more practical use, even if, somewhat paradoxically, the less time it loses the less often it tells the right time. A clock which loses just a second a day only tells the right time every 118 years or so.</p>
+<h3 id="software-bugs">Software Bugs</h3>
+<p><img style="float:right;" src="/images/buttons/spider.jpg" alt="Bug"/></p>
+<p>I mention these defective clocks because I&#8217;m thinking about bugs in software and how we go about finding and fixing them. </p>
+<p>Code which is obviously wrong is easier to spot than code which is almost right, and spotting bugs is the precursor to fixing them. This implies &#8212; building on Carroll&#8217;s terminology &#8212; that we&#8217;re unlikely to ship many stopped clocks but if we&#8217;re not careful we may end up delivering a few which lose time. And, in general, code which is obviously wrong is easier to fix than code which is almost right. A badly-broken function clearly needs a rethink; whereas one which <em>almost</em> works may simply get tweaked until it <em>appears</em> to work, often resulting in a more subtle bug.</p>
+<h3 id="leaks-and-races">Leaks and Races</h3>
+<p>C and C++ provide a good example of what I&#8217;m talking about. Consider a program which misuses memory. An attempt to allocate workspace of 4294967295 bytes fails instantly<a id="fn1link" href="#fn1"><sup><a href="https://blog.codeship.com/building-minimal-docker-containers-for-go-applications/">1</a></sup></a>; a slow memory leak, like a slow running clock, may cause no perceptible damage for an extended period.</p>
+<p><a href="http://valgrind.org">Decent tools</a> detect memory leaks. Race conditions in multi-threaded code are harder to track and may prove elusive during system testing. More than once I&#8217;ve left a program running under a debugger, being fed random inputs, in the hope some rare and apparently random condition will trigger a break in execution. Give me truly broken code any day!</p>
+<h3 id="75-correct-vs-50-correct">75% correct vs 50% correct</h3>
+<p>Here are two implementations of a C function to find an integer midway between a pair of ordered, positive integer values, truncating downwards. Before reading on, ask yourself which is better.</p>
 <div class="typocode">
 
 <pre class="prettyprint">int midpoint1(int low, int high)
@@ -116,37 +67,22 @@ int midpoint2(int low, int high)
 
 </div>
 
-<p><code>Midpoint1</code> is a &#8220;stopped clock&#8221;, returning 3 instead of 4 as the mid-point of 3 and 5, for example. It gets the wrong answer 25% of the time &#8212; fatally wrong were it to be used at the heart of, say, a binary search. I think we&#8217;d quickly detect the problem.
-</p>
-<p>An obvious fix would be the one shown in <code>midpoint2</code> which does indeed return 4 as the mid-point of 3 and 5. 
-</p>
-<p><code>Midpoint2</code> turns out to be a losing clock, though. If the sum <code>low + high</code> overflows then the result is undefined. On my implementation I get a negative value &#8212; a dangerous thing to use as an array index. This is a notorious and very real defect, nicely documented in a <a href="http://googleresearch.blogspot.com/2006/06/extra-extra-read-all-about-it-nearly.html">note by Joshua Bloch</a> subtitled &#8220;Nearly all Binary Searches and Mergesorts are broken&#8221;. 
-</p>
-<p>Bloch offers more than one fix so I&#8217;ll just note here that:
-</p>
+<p><code>Midpoint1</code> is a &#8220;stopped clock&#8221;, returning 3 instead of 4 as the mid-point of 3 and 5, for example. It gets the wrong answer 25% of the time &#8212; fatally wrong were it to be used at the heart of, say, a binary search. I think we&#8217;d quickly detect the problem.</p>
+<p>An obvious fix would be the one shown in <code>midpoint2</code> which does indeed return 4 as the mid-point of 3 and 5. </p>
+<p><code>Midpoint2</code> turns out to be a losing clock, though. If the sum <code>low + high</code> overflows then the result is undefined. On my implementation I get a negative value &#8212; a dangerous thing to use as an array index. This is a notorious and very real defect, nicely documented in a <a href="http://googleresearch.blogspot.com/2006/06/extra-extra-read-all-about-it-nearly.html">note by Joshua Bloch</a> subtitled &#8220;Nearly all Binary Searches and Mergesorts are broken&#8221;. </p>
+<p>Bloch offers more than one fix so I&#8217;ll just note here that:</p>
 <ul>
- <li>
-     this defect simply doesn&#8217;t exist in a high-level language like Python or Haskell, where integers are bounded only by machine resources
- </li>
-
- <li>
-     I think Bloch is unfair to suggest Jon Bentley&#8217;s analysis in chapter 4 of Programming Pearls is wrong. The pseudo-code in this chapter is written in a C-like language somewhere between C and Python, and in fact one of Bentley&#8217;s exercises is to examine what effect word size has on this analysis.
- </li>
-
- <li>
-     in a sense, <code>midpoint2</code> is more broken than <code>midpoint1</code>: over the range of possible low and high inputs, the sum overflows and triggers the defect 50% of the time.
- </li>
+<li>this defect simply doesn&#8217;t exist in a high-level language like Python or Haskell, where integers are bounded only by machine resources</li>
+<li>I think Bloch is unfair to suggest Jon Bentley&#8217;s analysis in chapter 4 of Programming Pearls is wrong. The pseudo-code in this chapter is written in a C-like language somewhere between C and Python, and in fact one of Bentley&#8217;s exercises is to examine what effect word size has on this analysis.</li>
+<li>in a sense, <code>midpoint2</code> is more broken than <code>midpoint1</code>: over the range of possible low and high inputs, the sum overflows and triggers the defect 50% of the time.</li>
 </ul>
-
-<h3><a href="#toc3" name="tocprobabilistic-algorithms" id="tocprobabilistic-algorithms">Probabilistic algorithms</a></h3>
-<p>Computers are supposed to be predictable and we typically aim for correct programs. There&#8217;s no reason why we shouldn&#8217;t consider aiming for programs which are good enough, though, and indeed many programs which are good enough to be useful are also flawed. Google adverts, for example, analyse the contents of web pages and serve up related links. The algorithm used is secret, clever and quick, but often results in <a href="/articles/mistargeted-ads.html">semantic blunders</a> and, on occasion, <a href="http://www.bofh.org.uk/articles/2008/04/15/ads-are-gone">offensive mistakes</a>. Few could deny how useful to Google this program has been, though.
-</p>
-<p>Here&#8217;s a more interesting example of an algorithm which, like a losing clock, is nearly right.
-</p>
+<h3 id="probabilistic-algorithms">Probabilistic algorithms</h3>
+<p>Computers are supposed to be predictable and we typically aim for correct programs. There&#8217;s no reason why we shouldn&#8217;t consider aiming for programs which are good enough, though, and indeed many programs which are good enough to be useful are also flawed. Google adverts, for example, analyse the contents of web pages and serve up related links. The algorithm used is secret, clever and quick, but often results in <a href="/articles/mistargeted-ads.html">semantic blunders</a> and, on occasion, <a href="http://www.bofh.org.uk/articles/2008/04/15/ads-are-gone">offensive mistakes</a>. Few could deny how useful to Google this program has been, though.</p>
+<p>Here&#8217;s a more interesting example of an algorithm which, like a losing clock, is nearly right.</p>
 <div class="typocode">
 
 <pre class="prettyprint">def is_fprime(n):
-    """Use Fermat's little theorem to guess if n is prime.
+    """Use Fermat&#x27;s little theorem to guess if n is prime.
     """
     from random import randrange
     tries = 3
@@ -157,8 +93,7 @@ int midpoint2(int low, int high)
 
 </div>
 
-<p>We won&#8217;t go into the <a href="http://mathworld.wolfram.com/FermatsLittleTheorem.html">mathematics</a> here. A quick play with this function looks promising.
-</p>
+<p>We won&#8217;t go into the <a href="http://mathworld.wolfram.com/FermatsLittleTheorem.html">mathematics</a> here. A quick play with this function looks promising.</p>
 <div class="typocode">
 
 <pre class="prettyprint">&gt;&gt;&gt; all(is_fprime(n) for n in [2, 3, 5, 7, 11, 13, 17, 19])
@@ -170,12 +105,9 @@ False
 
 </div>
 
-<p>In fact, if we give it a real work-out on some large numbers, it does well. I used it to guess which of the numbers between 100000 and 102000 were prime, comparing the answer with the correct result (the code is at the end of this article). It had a better than 99% success rate (in clock terms, it lost around 8 minutes a day) and increasing <code>tries</code> will boost its performance.
-</p>
-
-<h3><a href="#toc4" name="tocfixing-isfprime" id="tocfixing-isfprime">Fixing is_fprime</a></h3>
-<p>The better <code>is_fprime</code> performs, the less likely we are to spot that it&#8217;s wrong. What&#8217;s worse, though, is that <em>it cannot be fixed</em> by simple tweaking. However high we set <code>tries</code> we won&#8217;t have a correct function. We could even take the random probing out of the function and shove every single value of <code>x</code> in the range 1 to n into the predicate:
-</p>
+<p>In fact, if we give it a real work-out on some large numbers, it does well. I used it to guess which of the numbers between 100000 and 102000 were prime, comparing the answer with the correct result (the code is at the end of this article). It had a better than 99% success rate (in clock terms, it lost around 8 minutes a day) and increasing <code>tries</code> will boost its performance.</p>
+<h3 id="fixing-is_fprime">Fixing is_fprime</h3>
+<p>The better <code>is_fprime</code> performs, the less likely we are to spot that it&#8217;s wrong. What&#8217;s worse, though, is that <em>it cannot be fixed</em> by simple tweaking. However high we set <code>tries</code> we won&#8217;t have a correct function. We could even take the random probing out of the function and shove every single value of <code>x</code> in the range 1 to n into the predicate:</p>
 <div class="typocode">
 
 <pre class="prettyprint">def exhaustive_is_fprime(n):
@@ -185,14 +117,10 @@ False
 
 </div>
 
-<p><code>Exhaustive_is_fprime</code> is expensive to run and will (very) occasionally return <code>True</code> for a composite number<a id="fn2link" href="#fn2"><sup>[2]</sup></a>. If you want to know more, <a href="http://www.google.com/search?q=carmichael+numbers">search for Carmichael numbers</a>. 
-</p>
-<p>The point I&#8217;m making is that code which is almost right can be dangerous. We are tempted to fix it by adjusting the existing implementation, even if, as in this case, a complete overhaul is required. By contrast, we all know what needs doing with code which is plainly wrong.
-</p>
-
-<h3><a href="#toc5" name="tocdefensive-programming" id="tocdefensive-programming">Defensive programming</a></h3>
-<p>We&#8217;ve all seen nervous functions which go beyond their stated interface in an attempt to protect themselves from careless users.
-</p>
+<p><code>Exhaustive_is_fprime</code> is expensive to run and will (very) occasionally return <code>True</code> for a composite number<a id="fn2link" href="#fn2"><sup><a href="http://devcenter.wercker.com/docs/quickstarts/advanced/building-minimal-containers-with-go">2</a></sup></a>. If you want to know more, <a href="http://www.google.com/search?q=carmichael+numbers">search for Carmichael numbers</a>. </p>
+<p>The point I&#8217;m making is that code which is almost right can be dangerous. We are tempted to fix it by adjusting the existing implementation, even if, as in this case, a complete overhaul is required. By contrast, we all know what needs doing with code which is plainly wrong.</p>
+<h3 id="defensive-programming">Defensive programming</h3>
+<p>We&#8217;ve all seen nervous functions which go beyond their stated interface in an attempt to protect themselves from careless users.</p>
 <div class="typocode">
 
 <pre class="prettyprint">/**
@@ -202,7 +130,7 @@ False
 int nervy_maximum_value(int const * items, size_t count)
 {
     int M = -INT_MAX;
-    
+
     if (items == NULL || count == 0)
     {
         return M;
@@ -221,15 +149,14 @@ int nervy_maximum_value(int const * items, size_t count)
 
 </div>
 
-<p>What&#8217;s really wanted is both simpler and easier for clients to code against.
-</p>
+<p>What&#8217;s really wanted is both simpler and easier for clients to code against.</p>
 <div class="typocode">
 
 <pre class="prettyprint">int maximum_value(int const * items, size_t count)
 {
     int const * const end = items + count;
     int M = *items++;
-    
+
     for ( ; items != end; ++items)
     {
         if (*items &gt; M)
@@ -244,15 +171,11 @@ int nervy_maximum_value(int const * items, size_t count)
 
 </div>
 
-<p>Did you spot the subtle bug in <code>nervy_maximum_value</code>? It uses <code>-INT_MAX</code> instead of <code>INT_MIN</code> which will cause trouble if clients code against this undocumented behaviour; if <code>nervy_maximum_value</code> is subsequently fixed, this client code back-fires.
-</p>
-<p>Note that I&#8217;m not against the use of assertions to check pre-conditions, and a simple <code>assert(items != NULL &amp;&amp; count != 0)</code> works well in <code>maximum_value</code>; it&#8217;s writing code which swallows these failed pre-conditions I consider wrong.
-</p>
-
-<h3><a href="#toc6" name="tocdefect-halflife" id="tocdefect-halflife">Defect halflife</a></h3>
-<p>The occurrence of defects in complex software systems can be modelled in the same way as radioactive decay. I haven&#8217;t studied this theory and my physics is rusty<a id="fn3link" href="#fn3"><sup>[3]</sup></a>, but the basic idea is that the population of bugs in some software is rather like a population of radioactive particles. Any given bug fires (any given particle decays) at random, so we can&#8217;t predict when this event will happen, but it is equally likely to fire at any particular time. This gives each defect an average lifetime: a small lifetime for howling defects, such as dereferencing NULL pointers, and a longer one for more subtle problems, such as accumulated rounding errors. Assuming we fix a bug once it occurs, the population of defects decays exponentially, and we get the classic tailing-off curve.
-</p>
-<img src="http://chart.apis.google.com/chart?
+<p>Did you spot the subtle bug in <code>nervy_maximum_value</code>? It uses <code>-INT_MAX</code> instead of <code>INT_MIN</code> which will cause trouble if clients code against this undocumented behaviour; if <code>nervy_maximum_value</code> is subsequently fixed, this client code back-fires.</p>
+<p>Note that I&#8217;m not against the use of assertions to check pre-conditions, and a simple <code>assert(items != NULL &amp;&amp; count != 0)</code> works well in <code>maximum_value</code>; it&#8217;s writing code which swallows these failed pre-conditions I consider wrong.</p>
+<h3 id="defect-halflife">Defect halflife</h3>
+<p>The occurrence of defects in complex software systems can be modelled in the same way as radioactive decay. I haven&#8217;t studied this theory and my physics is rusty<a id="fn3link" href="#fn3"><sup>[3]</sup></a>, but the basic idea is that the population of bugs in some software is rather like a population of radioactive particles. Any given bug fires (any given particle decays) at random, so we can&#8217;t predict when this event will happen, but it is equally likely to fire at any particular time. This gives each defect an average lifetime: a small lifetime for howling defects, such as dereferencing NULL pointers, and a longer one for more subtle problems, such as accumulated rounding errors. Assuming we fix a bug once it occurs, the population of defects decays exponentially, and we get the classic tailing-off curve.</p>
+<p><img src="http://chart.apis.google.com/chart?
 cht=lc
 &amp;chtt=Exponential+Defect+Decay
 &amp;chs=500x200
@@ -261,30 +184,21 @@ cht=lc
 &amp;chd=t:95.0,70.3,52.1,38.6,28.6,21.1,15.7,11.6,8.61,6.38
 &amp;chco=ff0000
 &amp;chm=B,dddddd,0,0,0
-&amp;chls=3,1,0" alt="Classic exponential decay curve"/>
-
-<p><span id="excerpt0"/>Anyone who has ever tried to release a software product knows how it feels to slide down the slope of this curve. We system test, find bugs, fix them, repeat. At the start it can be exhilarating as bugs with short half-lives fall out and get squashed, but the end game is demoralising as defects get reported which then cannot be reproduced, and we find ourselves clawing out progress. When we eventually draw the line and ship the product we do so suspecting the worst problems are yet to be found. To put it more succinctly<a id="fn4link" href="#fn4"><sup>[4]</sup></a>.
-</p>
-<blockquote><p>Ship happens!
-</p>
-</blockquote><p>A combination of techniques can help us escape this depressing picture. The most obvious one would be to avoid it: rather than aim for &#8220;big-bang&#8221; releases every few years, we can move towards continual and incremental delivery. A modular, decoupled architecture helps. So does insistence on unit testing. Rather than shake the system and sweep up the bugs which fall off we should develop a suite of automated tests which actively seek the various paths through the code, and exercise edge cases. Within the code-base, as already mentioned, <span id="excerpt1"/>defensive programming can cause defects to become entrenched. Instead, we should adopt a more confident style, where code fails hard and fast.
-</p>
-
-<h3><a href="#toc7" name="tochow-did-that-code-ever-work" id="tochow-did-that-code-ever-work">How did that code ever work?</a></h3>
-<p>Have you ever fixed a defect and wondered how the code ever even appeared to work before your fix? It&#8217;s an important question and one which requires investigation. Perhaps the bug you&#8217;ve fixed is compensated for by defensive programming elsewhere. Or perhaps there are vast routes through the code which have yet to be exercised.
-</p>
-
-<h3><a href="#toc8" name="tocconclusions" id="tocconclusions">Conclusions</a></h3>
+&amp;chls=3,1,0" alt="Classic exponential decay curve"/></p>
+<p><span id="excerpt0"/>Anyone who has ever tried to release a software product knows how it feels to slide down the slope of this curve. We system test, find bugs, fix them, repeat. At the start it can be exhilarating as bugs with short half-lives fall out and get squashed, but the end game is demoralising as defects get reported which then cannot be reproduced, and we find ourselves clawing out progress. When we eventually draw the line and ship the product we do so suspecting the worst problems are yet to be found. To put it more succinctly<a id="fn4link" href="#fn4"><sup>[4]</sup></a>.</p>
+<blockquote>
+<p>Ship happens!</p>
+</blockquote>
+<p>A combination of techniques can help us escape this depressing picture. The most obvious one would be to avoid it: rather than aim for &#8220;big-bang&#8221; releases every few years, we can move towards continual and incremental delivery. A modular, decoupled architecture helps. So does insistence on unit testing. Rather than shake the system and sweep up the bugs which fall off we should develop a suite of automated tests which actively seek the various paths through the code, and exercise edge cases. Within the code-base, as already mentioned, <span id="excerpt1"/>defensive programming can cause defects to become entrenched. Instead, we should adopt a more confident style, where code fails hard and fast.</p>
+<h3 id="how-did-that-code-ever-work">How did that code ever work?</h3>
+<p>Have you ever fixed a defect and wondered how the code ever even appeared to work before your fix? It&#8217;s an important question and one which requires investigation. Perhaps the bug you&#8217;ve fixed is compensated for by defensive programming elsewhere. Or perhaps there are vast routes through the code which have yet to be exercised.</p>
+<h3 id="conclusions">Conclusions</h3>
 <p><img src="/images/stopped-clock.gif" alt="Stopped clock"/>
-   <img src="/images/slow-clock.gif" alt="Slow clock"/>
-   <img src="/images/fast-clock.gif" alt="Fast clock"/>
-</p>
-<p>None of these clocks is much good. The first has stopped, the second loses a second every minute, the third gains a second every minute. At least it&#8217;s easy to see the problem with the first: we won&#8217;t be tempted to patch it.
-</p>
-<p>We should never expect our code to work first time and we should be suspicious if it appears to do so. Defensive programming seems to mean different things to different people. If I&#8217;ve misused the term here, I&#8217;m sorry. Our best defence is to assume code is broken until we&#8217;ve tested it, to assume it will break in future if our tests are not automated, and to fail hard and fast when we detect errors.
-</p>
-
-<h3><a href="#toc9" name="tocsource-code" id="tocsource-code">Source code</a></h3>
+<img src="/images/slow-clock.gif" alt="Slow clock"/>
+<img src="/images/fast-clock.gif" alt="Fast clock"/></p>
+<p>None of these clocks is much good. The first has stopped, the second loses a second every minute, the third gains a second every minute. At least it&#8217;s easy to see the problem with the first: we won&#8217;t be tempted to patch it.</p>
+<p>We should never expect our code to work first time and we should be suspicious if it appears to do so. Defensive programming seems to mean different things to different people. If I&#8217;ve misused the term here, I&#8217;m sorry. Our best defence is to assume code is broken until we&#8217;ve tested it, to assume it will break in future if our tests are not automated, and to fail hard and fast when we detect errors.</p>
+<h3 id="source-code">Source code</h3>
 <div class="typocode">
 
 <pre class="prettyprint">import math
@@ -292,13 +206,13 @@ from itertools import islice, count
 from random import randrange
 
 def primes(lo, hi):
-    '''Return the list of primes in the range [lo, hi).
-    
+    &#x27;&#x27;&#x27;Return the list of primes in the range [lo, hi).
+
     &gt;&gt;&gt; primes(0, 19)
     [2, 3, 5, 7, 11, 13, 17]
     &gt;&gt;&gt; primes(5, 10)
     [5, 7]
-    '''
+    &#x27;&#x27;&#x27;
     sqrt_hi = int(math.sqrt(hi))
     sieve = range(hi)
     zeros = [0] * hi
@@ -310,17 +224,17 @@ def primes(lo, hi):
     return [p for p in sieve[lo:] if p != 0]
 
 def is_fprime(n, tries=3):
-    '''Use Fermat little theorem to guess if n is prime.
-    '''
+    &#x27;&#x27;&#x27;Use Fermat little theorem to guess if n is prime.
+    &#x27;&#x27;&#x27;
     xs = (randrange(1, n) for _ in range(tries))
     return all((x ** n) % n == x for x in xs)
 
 def fprimes(lo, hi, tries=10):
-    '''Alternative implementation of primes.
-    '''
+    &#x27;&#x27;&#x27;Alternative implementation of primes.
+    &#x27;&#x27;&#x27;
     return filter(is_fprime, range(lo, hi))
 
-if __name__ == '__main__':
+if __name__ == &#x27;__main__&#x27;:
     import doctest
     doctest.testmod()
     lo, hi = 100000, 102000
@@ -336,8 +250,7 @@ if __name__ == '__main__':
 
 </div>
 
-<p>Running this program produced output:
-</p>
+<p>Running this program produced output:</p>
 <pre>
 Range [100000, 102000)
 Actual number of primes 174
@@ -347,26 +260,21 @@ False fprimes set([101101])
 </pre>
 
 <hr />
-
-<p><a id="fn1" href="#fn1link">[1]</a> In the first version of this article I wrote that an attempt to allocate 4294967295 bytes would cause the program to crash, which isn&#8217;t quite right. <code>Malloc</code> returns NULL in the event of failure; standard C++ operator new behaviour is to throw a <code>bad_alloc</code> exception. My thanks to R Samuel Klatchko for the <a href="http://www.haloscan.com/comments/wordaligned/stop_the_clock_squash_the_bug/#16928">correction</a>.
-</p>
-<p><a id="fn2" href="#fn2link">[2]</a>
-   <a href="http://mitpress.mit.edu/sicp">&#8220;Structure and Interpretation of Computer Programs&#8221;</a> discusses Carmichael numbers in a <a href="http://mitpress.mit.edu/sicp/full-text/book/book-Z-H-11.html#call_footnote_Temp_80">footnote</a>
-</p>
-<blockquote><p>Numbers that fool the Fermat test are called <em>Carmichael numbers</em>, and little is known about them other than that they are extremely rare. There are 255 Carmichael numbers below 100,000,000. The smallest few are 561, 1105, 1729, 2465, 2821, and 6601. In testing primality of very large numbers chosen at random, the chance of stumbling upon a value that fools the Fermat test is less than the chance that cosmic radiation will cause the computer to make an error in carrying out a &#8220;correct&#8221; algorithm. Considering an algorithm to be inadequate for the first reason but not for the second illustrates the difference between mathematics and engineering.
-</p>
-</blockquote><p><a id="fn3" href="#fn3link">[3]</a>
-   Being lazy and online I thought I&#8217;d search for a nice radioactive decay graphic rather than draw my own. I found a real gem on the <a href="http://www.colorado.edu/physics/2000/isotopes/radioactive_decay3.html">University of Colarado site</a>, where Kyla and Bob discuss radioactive decay.
-</p>
+<p><a id="fn1" href="#fn1link"><a href="https://blog.codeship.com/building-minimal-docker-containers-for-go-applications/">1</a></a> In the first version of this article I wrote that an attempt to allocate 4294967295 bytes would cause the program to crash, which isn&#8217;t quite right. <code>Malloc</code> returns NULL in the event of failure; standard C++ operator new behaviour is to throw a <code>bad_alloc</code> exception. My thanks to R Samuel Klatchko for the <a href="http://www.haloscan.com/comments/wordaligned/stop_the_clock_squash_the_bug/#16928">correction</a>.</p>
+<p><a id="fn2" href="#fn2link"><a href="http://devcenter.wercker.com/docs/quickstarts/advanced/building-minimal-containers-with-go">2</a></a>
+<a href="http://mitpress.mit.edu/sicp">&#8220;Structure and Interpretation of Computer Programs&#8221;</a> discusses Carmichael numbers in a <a href="http://mitpress.mit.edu/sicp/full-text/book/book-Z-H-11.html#call_footnote_Temp_80">footnote</a></p>
+<blockquote>
+<p>Numbers that fool the Fermat test are called <em>Carmichael numbers</em>, and little is known about them other than that they are extremely rare. There are 255 Carmichael numbers below 100,000,000. The smallest few are 561, 1105, 1729, 2465, 2821, and 6601. In testing primality of very large numbers chosen at random, the chance of stumbling upon a value that fools the Fermat test is less than the chance that cosmic radiation will cause the computer to make an error in carrying out a &#8220;correct&#8221; algorithm. Considering an algorithm to be inadequate for the first reason but not for the second illustrates the difference between mathematics and engineering.</p>
+</blockquote>
+<p><a id="fn3" href="#fn3link">[3]</a>
+Being lazy and online I thought I&#8217;d search for a nice radioactive decay graphic rather than draw my own. I found a real gem on the <a href="http://www.colorado.edu/physics/2000/isotopes/radioactive_decay3.html">University of Colarado site</a>, where Kyla and Bob discuss radioactive decay.</p>
 <blockquote><p><img src="http://www.colorado.edu/physics/2000/images/kyla-set/kyla3.jpg" alt="Kyla" style="float:left;"/></p><p>Hmmm&#8230;so a lot of decays happen really fast when there are lots of atoms, and then things slow down when there aren&#8217;t so many. The halflife is always the same, but the <i>half</i> gets smaller and smaller.</p>
 <p><img src="http://www.colorado.edu/physics/2000/images/bob-set/bob2.jpg" alt="Bob" style="float:left;"/></p><p>That&#8217;s exactly right.  Here&#8217;s another applet that illustrates radioactive decay in action.</p>
 </blockquote>
 
-<p><a href="http://www.colorado.edu/physics/2000/isotopes/radioactive_decay3.html">Visit the site</a> to play with the applet Bob mentions. You&#8217;ll find more Kyla and Bob pictures there too.
-</p>
+<p><a href="http://www.colorado.edu/physics/2000/isotopes/radioactive_decay3.html">Visit the site</a> to play with the applet Bob mentions. You&#8217;ll find more Kyla and Bob pictures there too.</p>
 <p><a id="fn4" href="#fn4link">[4]</a>
-   I&#8217;m unable to provide a definitive attribution for the &#8220;Ship happens!&#8221; quotation. I first heard it from <a href="http://erdani.org">Andrei Alexandrescu</a> at an <a href="http://accu.org/index.php/conferences">ACCU conference</a>, who in turn thinks he got it from Erich Gamma. I haven&#8217;t managed to contact Erich Gamma. Matthew B. Doar <a href="http://www.haloscan.com/comments/wordaligned/stop_the_clock_squash_the_bug/#17002">reports</a> using the term back in 2002, and it appears as a <a href="http://www.oreilly.com/catalog/practicalde/toc.html">section heading</a> in his book <a href="http://www.oreilly.com/catalog/practicalde">&#8220;Practical Development Environments&#8221;</a>.
-</p>
+I&#8217;m unable to provide a definitive attribution for the &#8220;Ship happens!&#8221; quotation. I first heard it from <a href="http://erdani.org">Andrei Alexandrescu</a> at an <a href="http://accu.org/index.php/conferences">ACCU conference</a>, who in turn thinks he got it from Erich Gamma. I haven&#8217;t managed to contact Erich Gamma. Matthew B. Doar <a href="http://www.haloscan.com/comments/wordaligned/stop_the_clock_squash_the_bug/#17002">reports</a> using the term back in 2002, and it appears as a <a href="http://www.oreilly.com/catalog/practicalde/toc.html">section heading</a> in his book <a href="http://www.oreilly.com/catalog/practicalde">&#8220;Practical Development Environments&#8221;</a>.</p>
 </div>
 
 <div class="comments"><hr/><div id="disqus_thread"></div><script type="text/javascript" src="http://disqus.com/forums/wordaligned/embed.js"></script></div>

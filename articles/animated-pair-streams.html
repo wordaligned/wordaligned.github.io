@@ -28,53 +28,15 @@
       <div class="atomentry" id="animated-pair-streams">
 <h2 class="title"><a href="/articles/animated-pair-streams">Animated pair streams</a></h2>
 <p class="meta"><abbr class="published" title="2008-01-13">2008-01-13</abbr> &bull; <a href="/tag/algorithms" rel="tag">Algorithms</a>, <a href="/tag/puzzles" rel="tag">Puzzles</a>, <a href="/tag/python" rel="tag">Python</a>, <a href="/tag/scheme" rel="tag">Scheme</a>, <a href="/tag/streams" rel="tag">Streams</a>, <a href="/tag/functional-programming" rel="tag">Functional Programming</a>, <a href="/tag/sicp" rel="tag">SICP</a>, <a href="/tag/pil" rel="tag">PIL</a> &bull; <a href="/articles/animated-pair-streams#disqus_thread">Comments</a></p>
-<div class="toc">
-<h2>Contents</h2>
-<ul>
- <li><a href="#tocname-that-series" name="toc0" id="toc0">Name that Series</a>
- </li>
-
- <li><a href="#tocbounded-pairs" name="toc1" id="toc1">Bounded Pairs</a>
- </li>
-
- <li><a href="#tocstreams-of-pairs" name="toc2" id="toc2">Streams of Pairs</a>
- </li>
-
- <li><a href="#toca-recursive-scheme" name="toc3" id="toc3">A Recursive Scheme</a>
- </li>
-
- <li><a href="#tocinterleaving" name="toc4" id="toc4">Interleaving</a>
- </li>
-
- <li><a href="#tocdouble-trouble" name="toc5" id="toc5">Double Trouble</a>
- </li>
-
- <li><a href="#tocmemory-use" name="toc6" id="toc6">Memory Use</a>
- </li>
-
- <li><a href="#tocproblem-solved" name="toc7" id="toc7">Problem Solved?</a>
- </li>
-
- <li><a href="#toctying-up" name="toc8" id="toc8">Tying up</a>
- </li>
-
- <li><a href="#toccredits" name="toc9" id="toc9">Credits</a>
- </li>
-</ul>
-</div>
-<h3><a href="#toc0" name="tocname-that-series" id="tocname-that-series">Name that Series</a></h3>
-<p>What&#8217;s going on in the animation below?
-</p>
-<img src="/files/animated-pair-stream.gif" alt="Pair stream slideshow"/>
-
-
-<h3><a href="#toc1" name="tocbounded-pairs" id="tocbounded-pairs">Bounded Pairs</a></h3>
-<p>While you&#8217;re waiting for the graphic to load, recall a problem we encountered while hunting for <a href="/articles/the-maximum-subsequence-problem.html#programming-pearl">maximum subsequences</a>:
-</p>
-<blockquote><p>Given a number n, generate all the pairs (i, j) such that i and j are in the range 0 to n and j is greater than i.
-</p>
-</blockquote><p>A Python solution reads:
-</p>
+<h3 id="name-that-series">Name that Series</h3>
+<p>What&#8217;s going on in the animation below?</p>
+<p><img src="/files/animated-pair-stream.gif" alt="Pair stream slideshow"/></p>
+<h3 id="bounded-pairs">Bounded Pairs</h3>
+<p>While you&#8217;re waiting for the graphic to load, recall a problem we encountered while hunting for <a href="/articles/the-maximum-subsequence-problem.html#programming-pearl">maximum subsequences</a>:</p>
+<blockquote>
+<p>Given a number n, generate all the pairs (i, j) such that i and j are in the range 0 to n and j is greater than i.</p>
+</blockquote>
+<p>A Python solution reads:</p>
 <div class="typocode">
 
 <pre class="prettyprint">def generate_pairs(n):
@@ -87,11 +49,11 @@
 
 </div>
 
-<p>We can extend this to solve a more general version of the problem:
-</p>
-<blockquote><p>Given two sequences (S, T), generate all pairs (S<sub>i</sub>, T<sub>j</sub>) such that j is greater than i.
-</p>
-</blockquote><div class="typocode">
+<p>We can extend this to solve a more general version of the problem:</p>
+<blockquote>
+<p>Given two sequences (S, T), generate all pairs (S<sub>i</sub>, T<sub>j</sub>) such that j is greater than i.</p>
+</blockquote>
+<div class="typocode">
 
 <pre class="prettyprint">def generate_pairs(s, t):
     "Generate all pairs s[i], t[j]  such that 0 &lt;= i &lt;= j"
@@ -105,54 +67,42 @@
 
 </div>
 
-<p>Note:
-</p>
+<p>Note:</p>
 <ol>
- <li><p>This function requires complete and bounded collections as inputs since it asks for their lengths and accesses elements by index &#8212; think &#8220;lists&#8221; or &#8220;tuples&#8221;. Yet it generates results lazily, giving clients control over just how many pairs they require. This is why I&#8217;ve chosen <code>xrange</code> in preference to <code>range</code>, since it too generates numbers, rather than returning a complete list. (Python 3000 simplifies things: <code>range</code> becomes <code>xrange</code> and <code>xrange</code> disappears.)
-</p>
-
- </li>
-
- <li><p>There&#8217;s no need for extra logic to handle <code>S</code> being shorter than <code>T</code> or vice-versa: <code>xrange(start, stop)</code> is smart enough to handle the case when <code>stop</code> is less than <code>start</code>. I&#8217;d say adding such extra logic would count as premature optimisation.
-</p>
-
- </li>
+<li>
+<p>This function requires complete and bounded collections as inputs since it asks for their lengths and accesses elements by index &#8212; think &#8220;lists&#8221; or &#8220;tuples&#8221;. Yet it generates results lazily, giving clients control over just how many pairs they require. This is why I&#8217;ve chosen <code>xrange</code> in preference to <code>range</code>, since it too generates numbers, rather than returning a complete list. (Python 3000 simplifies things: <code>range</code> becomes <code>xrange</code> and <code>xrange</code> disappears.)</p>
+</li>
+<li>
+<p>There&#8217;s no need for extra logic to handle <code>S</code> being shorter than <code>T</code> or vice-versa: <code>xrange(start, stop)</code> is smart enough to handle the case when <code>stop</code> is less than <code>start</code>. I&#8217;d say adding such extra logic would count as premature optimisation.</p>
+</li>
 </ol>
-<p>Here&#8217;s an example of this function in action. We run the generator to exhaustion collecting its output in a list.
-</p>
+<p>Here&#8217;s an example of this function in action. We run the generator to exhaustion collecting its output in a list.</p>
 <div class="typocode">
 
-<pre class="prettyprint">&gt;&gt;&gt; pairs = list(generate_pairs('ABC', (1, 2, 3, 4)))
+<pre class="prettyprint">&gt;&gt;&gt; pairs = list(generate_pairs(&#x27;ABC&#x27;, (1, 2, 3, 4)))
 &gt;&gt;&gt; print pairs
-[('A', 1), ('A', 2), ('A', 3), ('A', 4), ('B', 2), ('B', 3), ('B', 4), ('C', 3), ('C', 4)]
+[(&#x27;A&#x27;, 1), (&#x27;A&#x27;, 2), (&#x27;A&#x27;, 3), (&#x27;A&#x27;, 4), (&#x27;B&#x27;, 2), (&#x27;B&#x27;, 3), (&#x27;B&#x27;, 4), (&#x27;C&#x27;, 3), (&#x27;C&#x27;, 4)]
 
 </pre>
 
 </div>
 
-<p>A second example builds a <a href="http://docs.python.org/ref/genexpr.html">generator expression</a> from <code>generate_pairs()</code>. We plug this expression into the built in <code>any</code> function to determine whether the pair <code>('A', 2)</code> is in the pair sequence. Note that <code>any</code> only pulls two elements from the sequence to produce an answer.
-</p>
+<p>A second example builds a <a href="http://docs.python.org/ref/genexpr.html">generator expression</a> from <code>generate_pairs()</code>. We plug this expression into the built in <code>any</code> function to determine whether the pair <code>('A', 2)</code> is in the pair sequence. Note that <code>any</code> only pulls two elements from the sequence to produce an answer.</p>
 <div class="typocode">
 
-<pre class="prettyprint">&gt;&gt;&gt; any((p == 'A', 2) for p in generate_pairs('ABC', (1, 2, 3, 4)))
+<pre class="prettyprint">&gt;&gt;&gt; any((p == &#x27;A&#x27;, 2) for p in generate_pairs(&#x27;ABC&#x27;, (1, 2, 3, 4)))
 True
 
 </pre>
 
 </div>
 
-<p>So far, so what? For the toy examples shown, lazy evaluation isn&#8217;t an important consideration. But what if our input sequences were very large? What if they were infinite?
-</p>
-<span id="continue-reading"/>
-
-
-<h3><a href="#toc2" name="tocstreams-of-pairs" id="tocstreams-of-pairs">Streams of Pairs</a></h3>
-<p><code>Generate_pairs()</code> yields results row by row. Here&#8217;s a slideshow for the case when <code>S</code> and <code>T</code> have 5 and 20 elements respectively. Brightness indicates age, so the white circle represents the current head of the generated sequence, and the greying circles represent previous elements &#8212; the older the greyer. Remember, it&#8217;s up to clients just how many grey pairs to hold: the generator only ever yields a shiny white new pair.
-</p>
-<img src="/files/animated-pair-list.gif" alt="Pair list slideshow"/>
-
-<p>A text representation would be as follows, where, as usual, we read top to bottom, left to right.
-</p>
+<p>So far, so what? For the toy examples shown, lazy evaluation isn&#8217;t an important consideration. But what if our input sequences were very large? What if they were infinite?</p>
+<p><span id="continue-reading"/></p>
+<h3 id="streams-of-pairs">Streams of Pairs</h3>
+<p><code>Generate_pairs()</code> yields results row by row. Here&#8217;s a slideshow for the case when <code>S</code> and <code>T</code> have 5 and 20 elements respectively. Brightness indicates age, so the white circle represents the current head of the generated sequence, and the greying circles represent previous elements &#8212; the older the greyer. Remember, it&#8217;s up to clients just how many grey pairs to hold: the generator only ever yields a shiny white new pair.</p>
+<p><img src="/files/animated-pair-list.gif" alt="Pair list slideshow"/></p>
+<p>A text representation would be as follows, where, as usual, we read top to bottom, left to right.</p>
 <pre>
 S<sub>0</sub>T<sub>0</sub>, S<sub>0</sub>T<sub>1</sub>, S<sub>0</sub>T<sub>2</sub> ...                             S<sub>0</sub>T<sub>20</sub>
       S<sub>1</sub>T<sub>1</sub>, S<sub>1</sub>T<sub>2</sub>, ...                            S<sub>1</sub>T<sub>20</sub>
@@ -160,34 +110,22 @@ S<sub>0</sub>T<sub>0</sub>, S<sub>0</sub>T<sub>1</sub>, S<sub>0</sub>T<sub>2</su
                   ...
 </pre>
 
-<p>It&#8217;s clear this mode of traversal isn&#8217;t suitable for generating pairs from very large inputs: we don&#8217;t advance through S quickly enough. In fact, if T were infinite, we&#8217;d be stuck on the top row, forever generating pairs of the form <code>S<sub>0</sub>T<sub>i</sub></code>.
-</p>
-
-<h3><a href="#toc3" name="toca-recursive-scheme" id="toca-recursive-scheme">A Recursive Scheme</a></h3>
-<p><a href="http://mitpress.mit.edu/sicp/full-text/book/book.html">&#8220;Structure and Interpretation of Computer Programs&#8221;</a> describes an elegant recursive scheme for <a href="http://mitpress.mit.edu/sicp/full-text/book/book-Z-H-24.html#%_sec_Temp_476">generating pairs</a>:
-</p>
-<blockquote><p>Call the general stream of pairs (pairs S T), and consider it to be composed of three parts: the pair (S<sub>0</sub>,T<sub>0</sub>), the rest of the pairs in the first row, and the remaining pairs:<br/><br/>
-   <img src="http://mitpress.mit.edu/sicp/full-text/book/ch3-Z-G-47.gif" alt="Stream of pairs structure"/>
-</p>
-</blockquote><p>Based on this insight, we can generate our stream of pairs:
-</p>
+<p>It&#8217;s clear this mode of traversal isn&#8217;t suitable for generating pairs from very large inputs: we don&#8217;t advance through S quickly enough. In fact, if T were infinite, we&#8217;d be stuck on the top row, forever generating pairs of the form <code>S<sub>0</sub>T<sub>i</sub></code>.</p>
+<h3 id="a-recursive-scheme">A Recursive Scheme</h3>
+<p><a href="http://mitpress.mit.edu/sicp/full-text/book/book.html">&#8220;Structure and Interpretation of Computer Programs&#8221;</a> describes an elegant recursive scheme for <a href="http://mitpress.mit.edu/sicp/full-text/book/book-Z-H-24.html#%_sec_Temp_476">generating pairs</a>:</p>
+<blockquote>
+<p>Call the general stream of pairs (pairs S T), and consider it to be composed of three parts: the pair (S<sub>0</sub>,T<sub>0</sub>), the rest of the pairs in the first row, and the remaining pairs:<br/><br/>
+<img src="http://mitpress.mit.edu/sicp/full-text/book/ch3-Z-G-47.gif" alt="Stream of pairs structure"/></p>
+</blockquote>
+<p>Based on this insight, we can generate our stream of pairs:</p>
 <ol>
- <li>
-     yielding the pair, (S<sub>0</sub>,T<sub>0</sub>)
- </li>
-
- <li>
-     yield pairs from the first row combined with the stream of remaining pairs
- </li>
+<li>yielding the pair, (S<sub>0</sub>,T<sub>0</sub>)</li>
+<li>yield pairs from the first row combined with the stream of remaining pairs</li>
 </ol>
-<p>Note the recursion: the definition of the pairs stream refers to itself. That&#8217;s not a problem so long as we&#8217;re lazy about evaluating the tail of the stream. Since we always know how to pull the first pair from the stream, we can both bootstrap the process and keep going forever.
-</p>
-<p>All we now need is a suitable method of combining two the first row and the remaining pairs.
-</p>
-
-<h3><a href="#toc4" name="tocinterleaving" id="tocinterleaving">Interleaving</a></h3>
-<p>The simplest way to combine the two streams is just to interleave them, pulling elements from each in turn. A simple (too simple!) implementation of <code>interleave()</code> reads:
-</p>
+<p>Note the recursion: the definition of the pairs stream refers to itself. That&#8217;s not a problem so long as we&#8217;re lazy about evaluating the tail of the stream. Since we always know how to pull the first pair from the stream, we can both bootstrap the process and keep going forever.</p>
+<p>All we now need is a suitable method of combining two the first row and the remaining pairs.</p>
+<h3 id="interleaving">Interleaving</h3>
+<p>The simplest way to combine the two streams is just to interleave them, pulling elements from each in turn. A simple (too simple!) implementation of <code>interleave()</code> reads:</p>
 <div class="typocode"><div class="codetitle">Simple interleave</div>
 
 <pre class="prettyprint">def interleave(s, t):
@@ -199,17 +137,15 @@ S<sub>0</sub>T<sub>0</sub>, S<sub>0</sub>T<sub>1</sub>, S<sub>0</sub>T<sub>2</su
 
 </div>
 
-<p>(The problem here is that <code>interleave()</code> stops as soon as either of the the input streams is exhausted, which isn&#8217;t an issue for infinite streams, but isn&#8217;t ideal in the case when either of the inputs are bounded. You get the idea. I&#8217;ll provide better implementation <a href="#tying-up">later</a>.)
-</p>
-<p>We can now code our pairs generator:
-</p>
+<p>(The problem here is that <code>interleave()</code> stops as soon as either of the the input streams is exhausted, which isn&#8217;t an issue for infinite streams, but isn&#8217;t ideal in the case when either of the inputs are bounded. You get the idea. I&#8217;ll provide better implementation <a href="#tying-up">later</a>.)</p>
+<p>We can now code our pairs generator:</p>
 <div class="typocode"><div class="codetitle">Pairs generator</div>
 
 <pre class="prettyprint">import itertools
 
 def pairs(s, t):
     """ Generate a stream of pairs taken from s, t.
-    
+
     Yields a stream of pairs (si, tj) where i &lt;= j.
     The input streams may be finite or bounded, but must be iterable.
     """
@@ -225,17 +161,14 @@ def pairs(s, t):
 
 </div>
 
-<p>Here&#8217;s a slideshow of this algorithm in action.
-</p>
-<img src="/files/animated-pair-stream.gif" alt="Pair stream slideshow"/>
-
-<p>Even though Python (CPython, to be specific) and recursion don&#8217;t generally get along well (unlike in a proper functional programming language), this implementation doesn&#8217;t <em>appear</em> to fall foul of CPython&#8217;s maximum recursion limits <strong>even though pairs() repeatedly calls itself</strong>.
-</p>
+<p>Here&#8217;s a slideshow of this algorithm in action.</p>
+<p><img src="/files/animated-pair-stream.gif" alt="Pair stream slideshow"/></p>
+<p>Even though Python (CPython, to be specific) and recursion don&#8217;t generally get along well (unlike in a proper functional programming language), this implementation doesn&#8217;t <em>appear</em> to fall foul of CPython&#8217;s maximum recursion limits <strong>even though pairs() repeatedly calls itself</strong>.</p>
 <div class="typocode"><div class="codetitle">No maximum recursion depth exceeded error here!</div>
 
 <pre class="prettyprint">&gt;&gt;&gt; integers = itertools.count
 &gt;&gt;&gt; for ij in pairs(integers, integers):
-... 	print ij
+...     print ij
 ... 
 (0, 0)
 (0, 1)
@@ -250,10 +183,8 @@ def pairs(s, t):
 
 </div>
 
-<p>When I dug a little deeper, I started to understand why: the function can&#8217;t run indefinitely since it eats up memory. It continually tees up iterators over <code>t</code> and creates new generator expressions.
-</p>
-<p>That said, I was surprised just how quickly it consumes memory. After all, generator expressions and iterators shouldn&#8217;t take up much space. For the purposes of comparison, I compared how it fared against a Scheme program designed to do the same thing. Both had consumed a gigabyte of memory after running just a few minutes (and, for what it&#8217;s worth, the Python program had generated an order of magnitude more pairs by this point).
-</p>
+<p>When I dug a little deeper, I started to understand why: the function can&#8217;t run indefinitely since it eats up memory. It continually tees up iterators over <code>t</code> and creates new generator expressions.</p>
+<p>That said, I was surprised just how quickly it consumes memory. After all, generator expressions and iterators shouldn&#8217;t take up much space. For the purposes of comparison, I compared how it fared against a Scheme program designed to do the same thing. Both had consumed a gigabyte of memory after running just a few minutes (and, for what it&#8217;s worth, the Python program had generated an order of magnitude more pairs by this point).</p>
 <div class="typocode"><div class="codetitle">Scheme pair generator</div>
 
 <pre class="prettyprint">(require (lib "40.ss" "srfi")) ;; Scheme stream support
@@ -287,16 +218,11 @@ def pairs(s, t):
 
 </div>
 
-
-<h3><a href="#toc5" name="tocdouble-trouble" id="tocdouble-trouble">Double Trouble</a></h3>
-<p>Let&#8217;s look a little further into the stream. Here&#8217;s the genesis of the first 120 pairs.
-</p>
-<img src="/files/animated-pair-stream-120.gif" alt="Pair stream slideshow"/>
-
-<p>Now the pattern becomes clear. Evidently the interleave strategy gives a heavy bias towards advancing rightwards; downwards motion is relatively slow.
-</p>
-<p>Let&#8217;s filter out the <code>i == j</code> diagonal to try and quantify this.
-</p>
+<h3 id="double-trouble">Double Trouble</h3>
+<p>Let&#8217;s look a little further into the stream. Here&#8217;s the genesis of the first 120 pairs.</p>
+<p><img src="/files/animated-pair-stream-120.gif" alt="Pair stream slideshow"/></p>
+<p>Now the pattern becomes clear. Evidently the interleave strategy gives a heavy bias towards advancing rightwards; downwards motion is relatively slow.</p>
+<p>Let&#8217;s filter out the <code>i == j</code> diagonal to try and quantify this.</p>
 <div class="typocode">
 
 <pre class="prettyprint">&gt;&gt;&gt; ints = itertools.count
@@ -322,28 +248,21 @@ def pairs(s, t):
 
 </div>
 
-<p>The output shows that pair (0, 0) is the 1<sup>st</sup> element of the stream, (1, 1) the 3<sup>rd</sup>, (2, 2) the 7<sup>th</sup>, and so on.
-</p>
-<p>Any computer scientist ought to quickly spot the pattern, and any mathematician ought to be able to prove why diagonal advances are exponentially infrequent.
-</p>
-<p>Loosely speaking, if D<sub>i</sub> is the stream of positions in the pairs stream of elements which lie on the diagonal (i.e. the stream 1, 3, 7, 15, &#8230; shown in the interpreted Python session), then the elements of D must satisfy the recurrence relation:
-</p>
+<p>The output shows that pair (0, 0) is the 1<sup>st</sup> element of the stream, (1, 1) the 3<sup>rd</sup>, (2, 2) the 7<sup>th</sup>, and so on.</p>
+<p>Any computer scientist ought to quickly spot the pattern, and any mathematician ought to be able to prove why diagonal advances are exponentially infrequent.</p>
+<p>Loosely speaking, if D<sub>i</sub> is the stream of positions in the pairs stream of elements which lie on the diagonal (i.e. the stream 1, 3, 7, 15, &#8230; shown in the interpreted Python session), then the elements of D must satisfy the recurrence relation:</p>
 <pre>
 D<sub>i+1</sub> = 1 + 2&times;D<sub>i</sub>
 </pre>
 
-<p>This relation derives directly from the recursive definition of <code>pairs()</code>: yield a single element, then alternate the rest of yourself with the generated top row.
-</p>
-<p>Here are some slides showing the points at which the first 5 diagonal elements appear. Watch the recursive pattern emerge.
-</p>
+<p>This relation derives directly from the recursive definition of <code>pairs()</code>: yield a single element, then alternate the rest of yourself with the generated top row.</p>
+<p>Here are some slides showing the points at which the first 5 diagonal elements appear. Watch the recursive pattern emerge.</p>
 <p><img src="/files/pairs-1.png" alt="diagonal pairs image"/>
-   <img src="/files/pairs-3.png" alt="diagonal pairs image"/>
-   <img src="/files/pairs-7.png" alt="diagonal pairs image"/>
-   <img src="/files/pairs-15.png" alt="diagonal pairs image"/>
-   <img src="/files/pairs-31.png" alt="diagonal pairs image"/>
-</p>
-<p>The solution to the recurrence relation is <code>D<sub>i</sub> = 2<sup>i</sup> &minus; 1</code>. These diagonal advances correspond to recursive calls to <code>pairs()</code>. So if our Python session has a recursion limit set to 1000 (try <code>sys.getrecursionlimit()</code>), and our pairs generator were to yield a result every nanosecond, and we had a machine with infinite memory, it would take quite a few millenia before we run into this limit.
-</p>
+<img src="/files/pairs-3.png" alt="diagonal pairs image"/>
+<img src="/files/pairs-7.png" alt="diagonal pairs image"/>
+<img src="/files/pairs-15.png" alt="diagonal pairs image"/>
+<img src="/files/pairs-31.png" alt="diagonal pairs image"/></p>
+<p>The solution to the recurrence relation is <code>D<sub>i</sub> = 2<sup>i</sup> &minus; 1</code>. These diagonal advances correspond to recursive calls to <code>pairs()</code>. So if our Python session has a recursion limit set to 1000 (try <code>sys.getrecursionlimit()</code>), and our pairs generator were to yield a result every nanosecond, and we had a machine with infinite memory, it would take quite a few millenia before we run into this limit.</p>
 <div class="typocode"><div class="codetitle">How many millenia until we hit the recursion limit?</div>
 
 <pre class="prettyprint">&gt;&gt;&gt; (2 ** 1000 - 1)/(1.e9 * 60 * 60 * 24 * 365 * 1000) 
@@ -353,12 +272,9 @@ D<sub>i+1</sub> = 1 + 2&times;D<sub>i</sub>
 
 </div>
 
-
-<h3><a href="#toc6" name="tocmemory-use" id="tocmemory-use">Memory Use</a></h3>
-<p>It should also now be clear why this particular algorithm burns memory. Teeing an iterator doesn&#8217;t magically mean we don&#8217;t have to store any elements we&#8217;ve iterated past. The greater the distance between the teed iterators, the more that need storing.
-</p>
-<p>If that&#8217;s not clear, run the following Python session and keep an eye on memory consumption (and be ready to interrupt the infinite loop!). You&#8217;ll see memory use rapidly increase as <code>i</code> and <code>j</code> diverge, since <code>j</code> needs to remember everything <code>i</code> produces.
-</p>
+<h3 id="memory-use">Memory Use</h3>
+<p>It should also now be clear why this particular algorithm burns memory. Teeing an iterator doesn&#8217;t magically mean we don&#8217;t have to store any elements we&#8217;ve iterated past. The greater the distance between the teed iterators, the more that need storing.</p>
+<p>If that&#8217;s not clear, run the following Python session and keep an eye on memory consumption (and be ready to interrupt the infinite loop!). You&#8217;ll see memory use rapidly increase as <code>i</code> and <code>j</code> diverge, since <code>j</code> needs to remember everything <code>i</code> produces.</p>
 <div class="typocode">
 
 <pre class="prettyprint">&gt;&gt;&gt; from itertools import *
@@ -369,8 +285,7 @@ D<sub>i+1</sub> = 1 + 2&times;D<sub>i</sub>
 
 </div>
 
-<p>By contrast, if we zip through <code>i</code> and <code>j</code> in parallel, memory use is stable.
-</p>
+<p>By contrast, if we zip through <code>i</code> and <code>j</code> in parallel, memory use is stable.</p>
 <div class="typocode">
 
 <pre class="prettyprint">&gt;&gt;&gt; i, j = tee(repeat(0))
@@ -380,8 +295,7 @@ D<sub>i+1</sub> = 1 + 2&times;D<sub>i</sub>
 
 </div>
 
-<p>Our pair generator has to remember more and more elements from the <code>T</code> stream (and also, to a lesser extent, from the <code>S</code> stream). That&#8217;s why it&#8217;s so hungry. Any general purpose infinite pair generator function must suffer this problem, I think, since we <strong>have</strong> to accumulate increasing portions of the streams into memory, but if it&#8217;s just integer pairs we want we can work around the issue:
-</p>
+<p>Our pair generator has to remember more and more elements from the <code>T</code> stream (and also, to a lesser extent, from the <code>S</code> stream). That&#8217;s why it&#8217;s so hungry. Any general purpose infinite pair generator function must suffer this problem, I think, since we <strong>have</strong> to accumulate increasing portions of the streams into memory, but if it&#8217;s just integer pairs we want we can work around the issue:</p>
 <div class="typocode">
 
 <pre class="prettyprint">def integer_pairs(i=0):
@@ -395,25 +309,18 @@ D<sub>i+1</sub> = 1 + 2&times;D<sub>i</sub>
 
 </div>
 
-<p>Here, rather than <code>tee()</code> streams of integers, we use <code>itertools.count()</code> to create new ones as required. This pair generator will run happily for extended periods. It will very gradually ask for more memory, as numbers get bigger and the number of rows increases. As before, it won&#8217;t hit any embarrassing recursion limits in the lifetime of this galaxy.
-</p>
-
-<h3><a href="#toc7" name="tocproblem-solved" id="tocproblem-solved">Problem Solved?</a></h3>
-<p>So, does <code>integer_pairs()</code> solve the problem of generating an infinite stream of pairs for the special case when both input streams are integers? 
-</p>
-<p>Not really, no!
-</p>
-<p>The interleave strategy for combining the top row with the remaining pairs has the great merit of simplicity, but is otherwise far from ideal. I don&#8217;t think a one-size-fits-all strategy for streaming pairs exists, so we should allow clients to supply one. And that will have to be the subject of another article.
-</p>
-
-<h3><a href="#toc8" name="toctying-up" id="toctying-up">Tying up</a></h3>
-<p>It&#8217;s not hard to fix the problem we noticed with <code>interleave()</code>.
-</p>
+<p>Here, rather than <code>tee()</code> streams of integers, we use <code>itertools.count()</code> to create new ones as required. This pair generator will run happily for extended periods. It will very gradually ask for more memory, as numbers get bigger and the number of rows increases. As before, it won&#8217;t hit any embarrassing recursion limits in the lifetime of this galaxy.</p>
+<h3 id="problem-solved">Problem Solved?</h3>
+<p>So, does <code>integer_pairs()</code> solve the problem of generating an infinite stream of pairs for the special case when both input streams are integers? </p>
+<p>Not really, no!</p>
+<p>The interleave strategy for combining the top row with the remaining pairs has the great merit of simplicity, but is otherwise far from ideal. I don&#8217;t think a one-size-fits-all strategy for streaming pairs exists, so we should allow clients to supply one. And that will have to be the subject of another article.</p>
+<h3 id="tying-up">Tying up</h3>
+<p>It&#8217;s not hard to fix the problem we noticed with <code>interleave()</code>.</p>
 <div class="typocode">
 
 <pre class="prettyprint">def interleave(s, t):
     """Generate an interleaved stream of elements from s and t.
-    
+
     If one of the streams finishes, elements continue to be generated
     from the other until it too is finished. 
     """
@@ -427,8 +334,7 @@ D<sub>i+1</sub> = 1 + 2&times;D<sub>i</sub>
 
 </div>
 
-<p>Here&#8217;s the script I used to generate the animated GIFs. Although it&#8217;s very much geared to doing the single job which it was designed to do, it&#8217;s short enough to be used as a basis for similar tasks. I hope this article helps demonstrate the merits of visualising an algorithm in action.
-</p>
+<p>Here&#8217;s the script I used to generate the animated GIFs. Although it&#8217;s very much geared to doing the single job which it was designed to do, it&#8217;s short enough to be used as a basis for similar tasks. I hope this article helps demonstrate the merits of visualising an algorithm in action.</p>
 <div class="typocode"><div class="codetitle">pairs-animation.py</div>
 
 <pre class="prettyprint">#! /usr/bin/env python
@@ -436,7 +342,7 @@ D<sub>i+1</sub> = 1 + 2&times;D<sub>i</sub>
    an animated GIF showing the positions of these pairs.
 
 Example use:
-$ echo '((0, 0) (0, 1) (1, 1) (0, 2) (1, 2) (0, 3) (2, 2)' | pairs-animation.py
+$ echo &#x27;((0, 0) (0, 1) (1, 1) (0, 2) (1, 2) (0, 3) (2, 2)&#x27; | pairs-animation.py
 
 Dependencies:
 - Python Imaging Library (PIL), http://effbot.org/imagingbook/
@@ -458,7 +364,7 @@ def fading_brushes():
     greyscale = itertools.chain(range(255, 0, -16), darkgrey)
     def brush(g):
         "Return a grey brush."
-        return aggdraw.Brush('rgb(%d,%d,%d)' % (g, g, g))
+        return aggdraw.Brush(&#x27;rgb(%d,%d,%d)&#x27; % (g, g, g))
     return itertools.imap(brush, greyscale)
 
 def block_start(i):
@@ -467,15 +373,15 @@ def block_start(i):
 
 def read_ij(data):
     """Return pairs of integers found in the input string.
-    
+
     Note: this function is extremely unfussy about the string format!
-    &gt;&gt;&gt; read_ij('1 2 3 4')
+    &gt;&gt;&gt; read_ij(&#x27;1 2 3 4&#x27;)
     [(1, 2), (3, 4)]
-    &gt;&gt;&gt; read_ij('(1, 2), (3, 4)')
+    &gt;&gt;&gt; read_ij(&#x27;(1, 2), (3, 4)&#x27;)
     [(1, 2), (3, 4)]
     """
     import re
-    ij = itertools.imap(int, re.compile(r'-?\d+').findall(data))
+    ij = itertools.imap(int, re.compile(r&#x27;-?\d+&#x27;).findall(data))
     return zip(ij, ij)
 
 def dimensions(ij):
@@ -496,7 +402,7 @@ def draw_blocks(image, blocks):
     brushes = fading_brushes()
     # Reverse the blocks so the newest are brightest
     for block, brush in itertools.izip(reversed(blocks), brushes):
-        # The 'ellipse' will be circular since the block is square
+        # The &#x27;ellipse&#x27; will be circular since the block is square
         draw.ellipse(block_xy(block), brush)
     draw.flush()
 
@@ -506,17 +412,17 @@ def main(ij_data):
     ij = read_ij(ij_data)
     dims = dimensions(ij)
     # Create the slides
-    slides = ['pairs-%d.gif' % n for n in range(len(ij) + 1)]
+    slides = [&#x27;pairs-%d.gif&#x27; % n for n in range(len(ij) + 1)]
     for n, slide in enumerate(slides):
-        image = Image.new('L', dims)
+        image = Image.new(&#x27;L&#x27;, dims)
         draw_blocks(image, ij[:n])
         image.save(slide)
     # Use ImageMagick to create an animation
     # -loop 0 =&gt; loop forever, -delay units are .01 seconds
-    os.system('convert -delay 100 -loop 0 %s animation.gif'
-              % ' '.join(slides))
+    os.system(&#x27;convert -delay 100 -loop 0 %s animation.gif&#x27;
+              % &#x27; &#x27;.join(slides))
 
-if __name__ == '__main__':
+if __name__ == &#x27;__main__&#x27;:
     import sys
     main(sys.stdin.read())
 
@@ -524,10 +430,8 @@ if __name__ == '__main__':
 
 </div>
 
-
-<h3><a href="#toc9" name="toccredits" id="toccredits">Credits</a></h3>
-<p>The inspiration for this article comes directly from <a href="http://mitpress.mit.edu/sicp/full-text/book/book-Z-H-24.html#%_sec_Temp_476">&#8220;Structure and Interpretation of Computer Programs&#8221;</a>, which presents some great examples of how to develop and use these pair streams.
-</p>
+<h3 id="credits">Credits</h3>
+<p>The inspiration for this article comes directly from <a href="http://mitpress.mit.edu/sicp/full-text/book/book-Z-H-24.html#%_sec_Temp_476">&#8220;Structure and Interpretation of Computer Programs&#8221;</a>, which presents some great examples of how to develop and use these pair streams.</p>
 </div>
 
 <div class="comments"><hr/><div id="disqus_thread"></div><script type="text/javascript" src="http://disqus.com/forums/wordaligned/embed.js"></script></div>

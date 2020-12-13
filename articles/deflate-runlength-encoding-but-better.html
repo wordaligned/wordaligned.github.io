@@ -26,38 +26,19 @@
       <div class="atomentry" id="deflate-runlength-encoding-but-better">
 <h2 class="title"><a href="/articles/deflate-runlength-encoding-but-better">DEFLATE: run-length encoding, but better</a></h2>
 <p class="meta"><abbr class="published" title="2009-05-21">2009-05-21</abbr> &bull; <a href="/tag/zlib" rel="tag">Zlib</a>, <a href="/tag/streams" rel="tag">Streams</a>, <a href="/tag/graphics" rel="tag">Graphics</a>, <a href="/tag/shell" rel="tag">Shell</a>, <a href="/tag/python" rel="tag">Python</a> &bull; <a href="/articles/deflate-runlength-encoding-but-better#disqus_thread">Comments</a></p>
-<h3>Run-length encoding</h3>
-<p><a href="http://en.wikipedia.org/wiki/Run-length_encoding">Run-length encoding</a> is a simple compression scheme in which runs of equal values are represented by the value and a repeat count. For example, a supermarket cashier might process this line of shopping
-</p>
-<img src="/images/fruit-line.png" alt="Fruit salad"/>
-
-<p>as
-</p>
+<h3 id="run-length-encoding">Run-length encoding</h3>
+<p><a href="http://en.wikipedia.org/wiki/Run-length_encoding">Run-length encoding</a> is a simple compression scheme in which runs of equal values are represented by the value and a repeat count. For example, a supermarket cashier might process this line of shopping</p>
+<p><img src="/images/fruit-line.png" alt="Fruit salad"/></p>
+<p>as</p>
 <ul>
- <li>
-     4 bananas
- </li>
-
- <li>
-     3 apples
- </li>
-
- <li>
-     2 bananas
- </li>
-
- <li>
-     1 pineapple
- </li>
-
- <li>
-     3 apples
- </li>
+<li>4 bananas</li>
+<li>3 apples</li>
+<li>2 bananas</li>
+<li>1 pineapple</li>
+<li>3 apples</li>
 </ul>
-<p>Unix packs in its very own run length encoder, <code>uniq -c</code>. It works just fine &#8212; so long as the values you want to encode are newline separated byte strings, that is.
-</p>
-<p>Let&#8217;s use a sequence of coin tosses as an example stream. <code>$RANDOM</code> generates random numbers. We use the least significant bit of these numbers as an index into an array containing the values <code>heads</code>, <code>tails</code>.
-</p>
+<p>Unix packs in its very own run length encoder, <code>uniq -c</code>. It works just fine &#8212; so long as the values you want to encode are newline separated byte strings, that is.</p>
+<p>Let&#8217;s use a sequence of coin tosses as an example stream. <code>$RANDOM</code> generates random numbers. We use the least significant bit of these numbers as an index into an array containing the values <code>heads</code>, <code>tails</code>.</p>
 <div class="typocode">
 
 <pre class="prettyprint">$ HT=(heads tails)
@@ -84,20 +65,17 @@ tails
 </div>
 
 <p><img src="/images/tails.jpg" alt="tails"/>
-   <img src="/images/tails.jpg" alt="tails"/>
-   <img src="/images/tails.jpg" alt="tails"/>
-   <img src="/images/heads.jpg" alt="heads"/>
-   <img src="/images/tails.jpg" alt="tails"/>
-   <img src="/images/heads.jpg" alt="heads"/>
-   <img src="/images/heads.jpg" alt="heads"/>
-   <img src="/images/heads.jpg" alt="heads"/>
-   <img src="/images/tails.jpg" alt="tails"/>
-   <img src="/images/tails.jpg" alt="tails"/>
-</p>
-<span id="continue-reading"/>
-
-<p>Passing a fresh sample from this same stream through our run-length encoder we get:
-</p>
+<img src="/images/tails.jpg" alt="tails"/>
+<img src="/images/tails.jpg" alt="tails"/>
+<img src="/images/heads.jpg" alt="heads"/>
+<img src="/images/tails.jpg" alt="tails"/>
+<img src="/images/heads.jpg" alt="heads"/>
+<img src="/images/heads.jpg" alt="heads"/>
+<img src="/images/heads.jpg" alt="heads"/>
+<img src="/images/tails.jpg" alt="tails"/>
+<img src="/images/tails.jpg" alt="tails"/></p>
+<p><span id="continue-reading"/></p>
+<p>Passing a fresh sample from this same stream through our run-length encoder we get:</p>
 <div class="typocode">
 
 <pre class="prettyprint">$ tosses | uniq -c | head
@@ -116,11 +94,10 @@ tails
 
 </div>
 
-<p>An <code>awk</code> script can be used as a run-length decoder. (There must be a neater way, using <code>sed</code> maybe?)
-</p>
+<p>An <code>awk</code> script can be used as a run-length decoder. (There must be a neater way, using <code>sed</code> maybe?)</p>
 <div class="typocode">
 
-<pre class="prettyprint">$ runlendec() { awk '{ while ($1--) print $2 }'; }
+<pre class="prettyprint">$ runlendec() { awk &#x27;{ while ($1--) print $2 }&#x27;; }
 $ tosses | head | tee orig.log | uniq -c | runlendec | tee encdec.log
 heads
 tails
@@ -138,63 +115,55 @@ $ diff orig.log encdec.log
 
 </div>
 
-<p>Here, we toss a coin 10 times teeing the original sequence to a file. The next two links in the pipeline compress and decompress the sequence, teeing the results to another file. Finally, as a sanity check, we confirm the round trip results are the same.
-</p>
-
-<h3>Run-length encoding in Python</h3>
-<p>This Unix run-length codec is fun, but of limited practical use. One good feature, though, is the way it operates on streams of data (including infinite streams), leaving clients free to decide how best to slice and buffer these streams.
-</p>
-<p>Python has a fine library of high-level <a href="http://docs.python.org/library/itertools.html">stream transformation tools</a> from which we can build a generic and flexible run-length codec in just a few lines. Since I want to progress from run-length coding to something more advanced, I&#8217;ll leave discussing how to implement this codec for now, but if you&#8217;d like to write your own version, here&#8217;s a description suitable for <a href="http://docs.python.org/library/doctest#simple-usage-checking-examples-in-a-text-file">doctesting</a>.
-</p>
+<p>Here, we toss a coin 10 times teeing the original sequence to a file. The next two links in the pipeline compress and decompress the sequence, teeing the results to another file. Finally, as a sanity check, we confirm the round trip results are the same.</p>
+<h3 id="run-length-encoding-in-python">Run-length encoding in Python</h3>
+<p>This Unix run-length codec is fun, but of limited practical use. One good feature, though, is the way it operates on streams of data (including infinite streams), leaving clients free to decide how best to slice and buffer these streams.</p>
+<p>Python has a fine library of high-level <a href="http://docs.python.org/library/itertools.html">stream transformation tools</a> from which we can build a generic and flexible run-length codec in just a few lines. Since I want to progress from run-length coding to something more advanced, I&#8217;ll leave discussing how to implement this codec for now, but if you&#8217;d like to write your own version, here&#8217;s a description suitable for <a href="http://docs.python.org/library/doctest#simple-usage-checking-examples-in-a-text-file">doctesting</a>.</p>
 <div class="typocode">
 
 <pre class="prettyprint">Import the run-length codec functions and compress a short string.
 &gt;&gt;&gt; from runlength import compress, decompress
-&gt;&gt;&gt; comp = compress('AABBBACC')
+&gt;&gt;&gt; comp = compress(&#x27;AABBBACC&#x27;)
 
 The returned compressor is a stream (an iterable).
 &gt;&gt;&gt; next(comp)
-(2, 'A')
+(2, &#x27;A&#x27;)
 
 Pull the rest of the stream into memory.
 &gt;&gt;&gt; rest = list(comp)
 &gt;&gt;&gt; rest
-[(3, 'B'), (1, 'A'), (2, 'C')]
+[(3, &#x27;B&#x27;), (1, &#x27;A&#x27;), (2, &#x27;C&#x27;)]
 
 Simple decompress example.
-&gt;&gt;&gt; concat = ''.join
+&gt;&gt;&gt; concat = &#x27;&#x27;.join
 &gt;&gt;&gt; concat(decompress(rest))
-'BBBACC'
+&#x27;BBBACC&#x27;
 
 Compress, decompress also work with infinite streams, like the 
 a2b3 stream, which repeatedly cycles two pairs. 
 &gt;&gt;&gt; from itertools import cycle, islice
-&gt;&gt;&gt; a2b3 = cycle([(2, 'a'), (3, 'b')])
+&gt;&gt;&gt; a2b3 = cycle([(2, &#x27;a&#x27;), (3, &#x27;b&#x27;)])
 &gt;&gt;&gt; dec = decompress(a2b3)
 
 Pull 8 values from the decompressed stream.
 &gt;&gt;&gt; concat(islice(dec, 8))
-'aabbbaab'
+&#x27;aabbbaab&#x27;
 
 Now compress the decompressed stream, and explore a few items.
 &gt;&gt;&gt; comp = compress(dec)
 &gt;&gt;&gt; next(comp)
-(2, 'b')
+(2, &#x27;b&#x27;)
 &gt;&gt;&gt; list(islice(comp, 2))
-[(2, 'a'), (3, 'b')]
+[(2, &#x27;a&#x27;), (3, &#x27;b&#x27;)]
 
 </pre>
 
 </div>
 
-
-<h3>DEFLATE</h3>
-<img style="border: 2px solid #ccc;" src="/images/chessboard-monochrome.png" alt="Chessboard"/>
-
-<p>The Wikipedia page on <a href="http://en.wikipedia.org/wiki/Run-length_encoding">run-length encoding</a> identifies monochrome images as good candidates for run-length compression. The white and black pixels typically group into long runs. Indeed, any simple image using a limited palette should reduce well using this compression scheme.
-</p>
-<p>The chessboard above is 256&times;256 pixels, each square being 32&times;32 pixels. We <em>could</em> run-length encode this 64K pixel image as 256&times;8 = 2K runs of 32 pixels, a decent saving. (Actually, we should do slightly better, noting that there are runs of length 64 at the chessboard rank boundaries, but  you get the idea.)
-</p>
+<h3 id="deflate">DEFLATE</h3>
+<p><img style="border: 2px solid #ccc;" src="/images/chessboard-monochrome.png" alt="Chessboard"/></p>
+<p>The Wikipedia page on <a href="http://en.wikipedia.org/wiki/Run-length_encoding">run-length encoding</a> identifies monochrome images as good candidates for run-length compression. The white and black pixels typically group into long runs. Indeed, any simple image using a limited palette should reduce well using this compression scheme.</p>
+<p>The chessboard above is 256&times;256 pixels, each square being 32&times;32 pixels. We <em>could</em> run-length encode this 64K pixel image as 256&times;8 = 2K runs of 32 pixels, a decent saving. (Actually, we should do slightly better, noting that there are runs of length 64 at the chessboard rank boundaries, but  you get the idea.)</p>
 <pre>
 (32,W)(32,B)(32,W)(32,B)(32,W)(32,B)(32,W)(32,B),
 (32,W)(32,B)(32,W)(32,B)(32,W)(32,B)(32,W)(32,B),
@@ -202,14 +171,12 @@ Now compress the decompressed stream, and explore a few items.
 (32,B)(32,W)(32,B)(32,W)(32,B)(32,W)(32,B)(32,W)
 </pre>
 
-<p>Like a paletted image, a block of text &#8212; the web page you&#8217;re reading now, for example &#8212; employs a limited alphabet. Although the characters in this text don&#8217;t usually group into long runs there&#8217;s plenty of repetition, especially in the raw HTML: all the occurrences of <code>&lt;div&gt;</code>, <code>&lt;span&gt;</code> and <code>class</code> used for CSS styling, for example. The <a href="http://en.wikipedia.org/wiki/DEFLATE">DEFLATE</a> compression algorithm uses a clever twist on run-length encoding to remove this redundancy:
-</p>
-<blockquote><p>The compressed data consists of a series of elements of two types: literal bytes (of strings that have not been detected as duplicated within the previous 32K input bytes), and pointers to duplicated strings, where a pointer is represented as a pair &lt;length, backward distance&gt;. (<a href="http://tools.ietf.org/html/rfc1951">RFC-1951</a>)
-</p>
-</blockquote><p>(In addition, a multiple-level dynamic Huffman encoding scheme reduces the space needed for the strings, distances and lengths themselves.)
-</p>
-<p>There&#8217;s more to these pointer elements than first appears: the length can exceed the backward distance. Thus the sequence:
-</p>
+<p>Like a paletted image, a block of text &#8212; the web page you&#8217;re reading now, for example &#8212; employs a limited alphabet. Although the characters in this text don&#8217;t usually group into long runs there&#8217;s plenty of repetition, especially in the raw HTML: all the occurrences of <code>&lt;div&gt;</code>, <code>&lt;span&gt;</code> and <code>class</code> used for CSS styling, for example. The <a href="http://en.wikipedia.org/wiki/DEFLATE">DEFLATE</a> compression algorithm uses a clever twist on run-length encoding to remove this redundancy:</p>
+<blockquote>
+<p>The compressed data consists of a series of elements of two types: literal bytes (of strings that have not been detected as duplicated within the previous 32K input bytes), and pointers to duplicated strings, where a pointer is represented as a pair \&lt;length, backward distance>. (<a href="http://tools.ietf.org/html/rfc1951">RFC-1951</a>)</p>
+</blockquote>
+<p>(In addition, a multiple-level dynamic Huffman encoding scheme reduces the space needed for the strings, distances and lengths themselves.)</p>
+<p>There&#8217;s more to these pointer elements than first appears: the length can exceed the backward distance. Thus the sequence:</p>
 <pre>
 heads
 heads
@@ -218,14 +185,10 @@ heads
 heads
 </pre>
 
-<p>can be deflated as the literal type <code>heads\n</code> followed by the pointer type <code>&lt;24, 6&gt;</code>. 
-</p>
-<p>If you&#8217;ve spotted the potential for recursion, good! The inflating stream can reference itself, which can reference itself, which can &#8230; <a href="http://steike.com/code/useless/zip-file-quine/" title="Best ever Quine!">Confusing?</a>
-</p>
-
-<h3>Zipping pixels</h3>
-<p><a href="http://www.libpng.org/pub/png/" title="Check out the graphics on the PNG home page!">PNG</a> images use DEFLATE compression (as implemented by <a href="http://www.zlib.net">zlib</a>) to save on pixel storage space. Here&#8217;s a binary view of the raw data in the chessboard graphic shown above, all <strong>137 bytes</strong> of it. The 64K pixels themselves compress into a 88 byte IDAT chunk, of which the final 8 bytes are a checksum and (I think?) some padding. Maybe the image could be <a href="http://drj11.wordpress.com/2009/02/20/i-crush-optipng/">squeezed harder</a>, but I&#8217;m impressed!
-</p>
+<p>can be deflated as the literal type <code>heads\n</code> followed by the pointer type <code>&lt;24, 6&gt;</code>. </p>
+<p>If you&#8217;ve spotted the potential for recursion, good! The inflating stream can reference itself, which can reference itself, which can &#8230; <a href="http://steike.com/code/useless/zip-file-quine/" title="Best ever Quine!">Confusing?</a></p>
+<h3 id="zipping-pixels">Zipping pixels</h3>
+<p><a href="http://www.libpng.org/pub/png/" title="Check out the graphics on the PNG home page!">PNG</a> images use DEFLATE compression (as implemented by <a href="http://www.zlib.net">zlib</a>) to save on pixel storage space. Here&#8217;s a binary view of the raw data in the chessboard graphic shown above, all <strong>137 bytes</strong> of it. The 64K pixels themselves compress into a 88 byte IDAT chunk, of which the final 8 bytes are a checksum and (I think?) some padding. Maybe the image could be <a href="http://drj11.wordpress.com/2009/02/20/i-crush-optipng/">squeezed harder</a>, but I&#8217;m impressed!</p>
 <pre>
 8950 4e47 0d0a 1a0a 0000 000d 4948 4452  .<b>PNG</b>........<b>IHDR</b>
 0000 0100 0000 0100 0100 0000 0074 0995  .............t..
@@ -238,8 +201,7 @@ cb00 0000 5049 4441 5468 81ed ceb1 0d00  ....P<b>IDAT</b>h......
 0049 454e 44ae 4260 82                   .<b>IEND</b>.B`.
 </pre>
 
-<p>Here&#8217;s a trace of how zlib inflates the compressed pixels in this <a href="http://www.libpng.org/pub/png/spec/1.2/PNG-Chunks.html">IDAT chunk</a>. (Source code available via anonymous SVN at <a href="http://wordaligned.org/svn/etc/zlib_trace">http://wordaligned.org/svn/etc/zlib_trace</a>.)
-</p>
+<p>Here&#8217;s a trace of how zlib inflates the compressed pixels in this <a href="http://www.libpng.org/pub/png/spec/1.2/PNG-Chunks.html">IDAT chunk</a>. (Source code available via anonymous SVN at <a href="http://wordaligned.org/svn/etc/zlib_trace">http://wordaligned.org/svn/etc/zlib_trace</a>.)</p>
 <div class="typocode">
 
 <pre class="prettyprint">inflate: allocated
@@ -268,47 +230,21 @@ inflate:         distance 33
 
 </div>
 
-<p>I&#8217;ve attempted to show the first few stages of the genesis of the uncompressed stream in the picture below. The way the stream recursively inflates itself is quite beautiful.
-</p>
-<img style="border: 2px solid #ccc;" src="/images/inflate.png" alt="Inflating pixels"/>
-
+<p>I&#8217;ve attempted to show the first few stages of the genesis of the uncompressed stream in the picture below. The way the stream recursively inflates itself is quite beautiful.</p>
+<p><img style="border: 2px solid #ccc;" src="/images/inflate.png" alt="Inflating pixels"/></p>
 <ol>
- <li>
-     put 00
- </li>
-
- <li>
-     put ff
- </li>
-
- <li>
-     go back 1 (to ff), put 3
- </li>
-
- <li>
-     put 00
- </li>
-
- <li>
-     go back 1 (to 00), put 3
- </li>
-
- <li>
-     go back 8 (to 00 00 00 00 ff ff ff ff)
- </li>
-
- <li>
-     put 24
- </li>
+<li>put 00</li>
+<li>put ff</li>
+<li>go back 1 (to ff), put 3</li>
+<li>put 00</li>
+<li>go back 1 (to 00), put 3</li>
+<li>go back 8 (to 00 00 00 00 ff ff ff ff)</li>
+<li>put 24</li>
 </ol>
-<p>Two elements later, and the repeat length has grown to 258. In fact, the entire chessboard is generated from just 3 literal and 43 pointer elements.
-</p>
-<p>(Not all graphics have such a regular pattern, of course, so we can&#8217;t always achieve such dramatic compression.)
-</p>
-
-<h3>Deflated HTML</h3>
-<p>Web servers can and do save on band-width by transferring <a href="http://www.gzip.org/">gzip</a> compressed HTML to gzip capable clients. (Gzip is a simple wrapper around DEFLATE.) Any PNG images transferred will also have their pixels DEFLATE compressed.
-</p>
+<p>Two elements later, and the repeat length has grown to 258. In fact, the entire chessboard is generated from just 3 literal and 43 pointer elements.</p>
+<p>(Not all graphics have such a regular pattern, of course, so we can&#8217;t always achieve such dramatic compression.)</p>
+<h3 id="deflated-html">Deflated HTML</h3>
+<p>Web servers can and do save on band-width by transferring <a href="http://www.gzip.org/">gzip</a> compressed HTML to gzip capable clients. (Gzip is a simple wrapper around DEFLATE.) Any PNG images transferred will also have their pixels DEFLATE compressed.</p>
 <pre>
 $ curl http://wordaligned.org --head --compress
 HTTP/1.1 200 OK
@@ -321,8 +257,7 @@ Vary: Accept-Encoding
 Content-Length: 20
 </pre>
 
-<p>The Word Aligned <a href="/">front page</a> contains about 75Kb of HTML, which gzips to just 16Kb &#8212; a decent saving. Relevant lines from the <a href="http://redmine.lighttpd.net/projects/lighttpd/wiki/Docs:ModCompress">lighttpd configuration file</a> read:
-</p>
+<p>The Word Aligned <a href="/">front page</a> contains about 75Kb of HTML, which gzips to just 16Kb &#8212; a decent saving. Relevant lines from the <a href="http://redmine.lighttpd.net/projects/lighttpd/wiki/Docs:ModCompress">lighttpd configuration file</a> read:</p>
 <div class="typocode"><div class="codetitle">lighttpd mod_compress</div>
 
 <pre class="prettyprint">server.modules = (
@@ -336,14 +271,11 @@ compress.filetype  = ("text/plain", "text/html", "text/css")
 
 </div>
 
-<p>I uphold Gzip (built on zlib, which implements DEFLATE) as a hero of the web. As we&#8217;ve seen, it implements a powerful and elegant algorithm, but perhaps the best thing about it is that it&#8217;s free to use, a freedom worth fighting for. Check out this battle report from the <a href="http://www.gzip.org/#faq">FAQ</a>.
-</p>
+<p>I uphold Gzip (built on zlib, which implements DEFLATE) as a hero of the web. As we&#8217;ve seen, it implements a powerful and elegant algorithm, but perhaps the best thing about it is that it&#8217;s free to use, a freedom worth fighting for. Check out this battle report from the <a href="http://www.gzip.org/#faq">FAQ</a>.</p>
 <blockquote>
-<h3>What about patents?</h3>
-<p><em>gzip</em> was developed as a replacement for compress because of the UNISYS and IBM <a href="http://www.faqs.org/faqs/compression-faq/part1/section-6.html">patents</a> covering the <a href="http://www.faqs.org/faqs/compression-faq/part2/section-1.html">LZW</a> algorithm used by compress.
-</p>
-<p>I have probably spent more time studying data compression patents than actually implementing data compression algorithms. I maintain a list of several hundred patents on lossless data compression algorithms, and I made sure that <em>gzip</em> isn&#8217;t covered by any of them. In particular, the <code>--fast</code> option of gzip is not as fast it could, precisely to avoid a patented technique.  &#8212; Jean-Loup Gailly, <a href="http://www.gzip.org/#faq11">Gzip FAQ</a>
-</p>
+<h3 id="what-about-patents">What about patents?</h3>
+<p><em>gzip</em> was developed as a replacement for compress because of the UNISYS and IBM <a href="http://www.faqs.org/faqs/compression-faq/part1/section-6.html">patents</a> covering the <a href="http://www.faqs.org/faqs/compression-faq/part2/section-1.html">LZW</a> algorithm used by compress.</p>
+<p>I have probably spent more time studying data compression patents than actually implementing data compression algorithms. I maintain a list of several hundred patents on lossless data compression algorithms, and I made sure that <em>gzip</em> isn&#8217;t covered by any of them. In particular, the <code>--fast</code> option of gzip is not as fast it could, precisely to avoid a patented technique.  &#8212; Jean-Loup Gailly, <a href="http://www.gzip.org/#faq11">Gzip FAQ</a></p>
 </blockquote>
 </div>
 

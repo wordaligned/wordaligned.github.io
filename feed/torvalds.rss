@@ -8,23 +8,21 @@
 <language>en-gb</language>
 <item>
 <title>Two star programming</title>
-<description>&lt;p&gt;A few weeks ago &lt;a href="http://meta.slashdot.org/story/12/10/11/0030249/linus-torvalds-answers-your-questions"&gt;Linus Torvalds answered some questions&lt;/a&gt; on slashdot. All his responses make good reading but one in particular caught my eye. Asked to describe his favourite kernel hack, Torvalds grumbles he rarely looks at code these days &amp;#8212; unless it&amp;#8217;s to sort out someone else&amp;#8217;s mess. He then pauses to admit he&amp;#8217;s proud of the kernel&amp;#8217;s fiendishly cunning filename lookup cache before continuing to moan about incompetence.
-&lt;/p&gt;
-&lt;blockquote&gt;&lt;p&gt;At the opposite end of the spectrum, I actually wish more people understood the really core low-level kind of coding. Not big, complex stuff like the lockless name lookup, but simply good use of pointers-to-pointers etc. For example, I&amp;#8217;ve seen too many people who delete a singly-linked list entry by keeping track of the &lt;code&gt;prev&lt;/code&gt; entry, and then to delete the entry, doing something like
-&lt;/p&gt;
+<description>&lt;p&gt;A few weeks ago &lt;a href=&quot;http://meta.slashdot.org/story/12/10/11/0030249/linus-torvalds-answers-your-questions&quot;&gt;Linus Torvalds answered some questions&lt;/a&gt; on slashdot. All his responses make good reading but one in particular caught my eye. Asked to describe his favourite kernel hack, Torvalds grumbles he rarely looks at code these days &amp;#8212; unless it&amp;#8217;s to sort out someone else&amp;#8217;s mess. He then pauses to admit he&amp;#8217;s proud of the kernel&amp;#8217;s fiendishly cunning filename lookup cache before continuing to moan about incompetence.&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;At the opposite end of the spectrum, I actually wish more people understood the really core low-level kind of coding. Not big, complex stuff like the lockless name lookup, but simply good use of pointers-to-pointers etc. For example, I&amp;#8217;ve seen too many people who delete a singly-linked list entry by keeping track of the &lt;code&gt;prev&lt;/code&gt; entry, and then to delete the entry, doing something like&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;if (prev)
     prev-&amp;gt;next = entry-&amp;gt;next;
 else
     list_head = entry-&amp;gt;next;
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;and whenever I see code like that, I just go &amp;#8220;This person doesn&amp;#8217;t understand pointers&amp;#8221;. And it&amp;#8217;s sadly quite common.
-&lt;/p&gt;
-&lt;p&gt;People who understand pointers just use a &amp;#8220;pointer to the entry pointer&amp;#8221;, and initialize that with the address of the list_head. And then as they traverse the list, they can remove the entry without using any conditionals, by just doing a &lt;code&gt;*pp = entry-&amp;gt;next&lt;/code&gt;.
-&lt;/p&gt;
-&lt;/blockquote&gt;&lt;p&gt;Well I &lt;em&gt;thought&lt;/em&gt; I understood pointers but, sad to say, if asked to implement a list removal function I too would have kept track of the previous list node. Here&amp;#8217;s a sketch of the code:
-&lt;/p&gt;
-&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;This person doesn&amp;#8217;t understand pointers&lt;/div&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;and whenever I see code like that, I just go &amp;#8220;This person doesn&amp;#8217;t understand pointers&amp;#8221;. And it&amp;#8217;s sadly quite common.&lt;/p&gt;
+&lt;p&gt;People who understand pointers just use a &amp;#8220;pointer to the entry pointer&amp;#8221;, and initialize that with the address of the list_head. And then as they traverse the list, they can remove the entry without using any conditionals, by just doing a &lt;code&gt;*pp = entry-&amp;gt;next&lt;/code&gt;.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;Well I &lt;em&gt;thought&lt;/em&gt; I understood pointers but, sad to say, if asked to implement a list removal function I too would have kept track of the previous list node. Here&amp;#8217;s a sketch of the code:&lt;/p&gt;
+&lt;div class=&quot;typocode&quot;&gt;&lt;div class=&quot;codetitle&quot;&gt;This person doesn&amp;#8217;t understand pointers&lt;/div&gt;
 
-&lt;pre class="prettyprint"&gt;typedef struct node
+&lt;pre class=&quot;prettyprint&quot;&gt;typedef struct node
 {
     struct node * next;
     ....
@@ -59,15 +57,12 @@ node * remove_if(node * head, remove_fn rm)
 
 &lt;/div&gt;
 
-&lt;p&gt;The linked list is a simple but perfectly-formed structure built from nothing more than a pointer-per-node and a sentinel value, but the code to modify such lists can be subtle. No wonder linked lists feature in so many &lt;a href="https://www.google.com/search?q=linked+list+interview+questions" title="Search for linked list interview questions"&gt;interview questions&lt;/a&gt;!
-&lt;/p&gt;
-&lt;p&gt;The subtlety in the implementation shown above is the conditional required to handle any nodes removed from the head of the list.
-&lt;/p&gt;
-&lt;p&gt;Now let&amp;#8217;s look at the implementation Linus Torvalds had in mind. In this case we pass in a pointer to the list head, and the list traversal and modification is done using a pointer to the next pointers.
-&lt;/p&gt;
-&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;Two star programming&lt;/div&gt;
+&lt;p&gt;The linked list is a simple but perfectly-formed structure built from nothing more than a pointer-per-node and a sentinel value, but the code to modify such lists can be subtle. No wonder linked lists feature in so many &lt;a href=&quot;https://www.google.com/search?q=linked+list+interview+questions&quot; title=&quot;Search for linked list interview questions&quot;&gt;interview questions&lt;/a&gt;!&lt;/p&gt;
+&lt;p&gt;The subtlety in the implementation shown above is the conditional required to handle any nodes removed from the head of the list.&lt;/p&gt;
+&lt;p&gt;Now let&amp;#8217;s look at the implementation Linus Torvalds had in mind. In this case we pass in a pointer to the list head, and the list traversal and modification is done using a pointer to the next pointers.&lt;/p&gt;
+&lt;div class=&quot;typocode&quot;&gt;&lt;div class=&quot;codetitle&quot;&gt;Two star programming&lt;/div&gt;
 
-&lt;pre class="prettyprint"&gt;void remove_if(node ** head, remove_fn rm)
+&lt;pre class=&quot;prettyprint&quot;&gt;void remove_if(node ** head, remove_fn rm)
 {
     for (node** curr = head; *curr; )
     {
@@ -86,12 +81,10 @@ node * remove_if(node * head, remove_fn rm)
 
 &lt;/div&gt;
 
-&lt;p&gt;Much better! The key insight is that the links in a linked list are pointers and so &lt;strong&gt;pointers to pointers&lt;/strong&gt; are the prime candidates for modifying such a list.
-&lt;/p&gt;
-&lt;p style="text-align:center"&gt;&amp;sect;&lt;/p&gt;
+&lt;p&gt;Much better! The key insight is that the links in a linked list are pointers and so &lt;strong&gt;pointers to pointers&lt;/strong&gt; are the prime candidates for modifying such a list.&lt;/p&gt;
+&lt;p style=&quot;text-align:center&quot;&gt;&amp;sect;&lt;/p&gt;
 
-&lt;p&gt;The improved version of &lt;code&gt;remove_if()&lt;/code&gt; is an example of two star programming: the doubled-up asterisks indicate two levels of indirection. A &lt;a href="http://c2.com/cgi/wiki?ThreeStarProgrammer"&gt;third star&lt;/a&gt; would be one too many.
-&lt;/p&gt;</description>
+&lt;p&gt;The improved version of &lt;code&gt;remove_if()&lt;/code&gt; is an example of two star programming: the doubled-up asterisks indicate two levels of indirection. A &lt;a href=&quot;http://c2.com/cgi/wiki?ThreeStarProgrammer&quot;&gt;third star&lt;/a&gt; would be one too many.&lt;/p&gt;</description>
 <dc:date>2013-01-08</dc:date>
 <guid>http://wordaligned.org/articles/two-star-programming</guid>
 <author>tag@wordaligned.org (Thomas Guest)</author>

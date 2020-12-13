@@ -26,12 +26,10 @@
       <div class="atomentry" id="group-when">
 <h2 class="title"><a href="/articles/group-when">Group When</a></h2>
 <p class="meta"><abbr class="published" title="2014-07-16">2014-07-16</abbr> &bull; <a href="/tag/python" rel="tag">Python</a>, <a href="/tag/haskell" rel="tag">Haskell</a>, <a href="/tag/streams" rel="tag">Streams</a> &bull; <a href="/articles/group-when#disqus_thread">Comments</a></p>
-<p>Phil Nash&#8217;s recent tweet intrigued me.
-</p>
+<p>Phil Nash&#8217;s recent tweet intrigued me.</p>
 <div><blockquote class="twitter-tweet" lang="en"><p>Functional people: I often (in F#) need to process a seq into a smaller list or seq &ndash; where items from the input are grouped in some way&hellip;</p>&mdash; Phil Nash (@phil_nash) <a href="https://twitter.com/phil_nash/statuses/489167611641724928">July 15, 2014</a></blockquote><blockquote class="twitter-tweet" lang="en"><p>&hellip; the need to group may not be known until after the first item in the group.&#10;I struggle to find a nicely functional way to do this. Ideas?</p>&mdash; Phil Nash (@phil_nash) <a href="https://twitter.com/phil_nash/statuses/489167962931482626">July 15, 2014</a></blockquote><script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script></div>
 
-<p>He later clarified what he was after &#8212; and had now found &#8212; linking to a <a href="http://fssnip.net/6A">solution</a> posted a couple of years ago by <a href="http://tomasp.net">Tomas Petricek</a>. The function <code>groupWhen</code> splits a sequence into groups, starting a new group whenever the predicate returns true.
-</p>
+<p>He later clarified what he was after &#8212; and had now found &#8212; linking to a <a href="http://fssnip.net/6A">solution</a> posted a couple of years ago by <a href="http://tomasp.net">Tomas Petricek</a>. The function <code>groupWhen</code> splits a sequence into groups, starting a new group whenever the predicate returns true.</p>
 <div class="typocode">
 
 <pre class="prettyprint"> module Seq =
@@ -44,15 +42,15 @@
    let groupWhen f (input:seq&lt;_&gt;) = seq {
      use en = input.GetEnumerator()
      let running = ref true
-     
+
      // Generate a group starting with the current element. Stops generating
-     // when it founds element such that 'f en.Current' is 'true'
+     // when it founds element such that &#x27;f en.Current&#x27; is &#x27;true&#x27;
      let rec group() = 
        [ yield en.Current
          if en.MoveNext() then
            if not (f en.Current) then yield! group() 
          else running := false ]
-     
+
      if en.MoveNext() then
        // While there are still elements, start a new group
        while running.Value do
@@ -62,21 +60,19 @@
 
 </div>
 
-<p>Here&#8217;s a nice Haskell version coded up by <a href="https://twitter.com/sdarlington">@sdarlington</a>.
-</p>
+<p>Here&#8217;s a nice Haskell version coded up by <a href="https://twitter.com/sdarlington">@sdarlington</a>.</p>
 <script src="https://gist.github.com/sdarlington/be76048bff124694769d.js"></script>
 
-<p>Maybe <a href="https://docs.python.org/3/library/itertools.html#itertools.takewhile">takewhile</a> and <a href="https://docs.python.org/3/library/itertools.html#itertools.dropwhile">dropwhile</a> could power a Python solution, but my first choice would be <a href="https://docs.python.org/3/library/itertools.html#itertools.groupby">itertools.groupby</a>. <code>Groupby</code> chops a sequence into subsequences, where the elements of each subsequence have the same key value. A suitable key function, in this case, must change its return value every time the sequence yields an element for which the predicate holds. It could toggle between a pair of values, for example. Or it could just count the number of times the predicate holds.
-</p>
+<p>Maybe <a href="https://docs.python.org/3/library/itertools.html#itertools.takewhile">takewhile</a> and <a href="https://docs.python.org/3/library/itertools.html#itertools.dropwhile">dropwhile</a> could power a Python solution, but my first choice would be <a href="https://docs.python.org/3/library/itertools.html#itertools.groupby">itertools.groupby</a>. <code>Groupby</code> chops a sequence into subsequences, where the elements of each subsequence have the same key value. A suitable key function, in this case, must change its return value every time the sequence yields an element for which the predicate holds. It could toggle between a pair of values, for example. Or it could just count the number of times the predicate holds.</p>
 <div class="typocode">
 
 <pre class="prettyprint">class count_p:
-    ''' Return a value which increments every time the predicate holds.
-    '''
+    &#x27;&#x27;&#x27; Return a value which increments every time the predicate holds.
+    &#x27;&#x27;&#x27;
     def __init__(self, pred):
         self._n = 0
         self._pred = pred
-    
+
     def __call__(self, v):
         self._n += self._pred(v)
         return self._n
@@ -88,8 +84,7 @@ def group_when(pred, xs):
 
 </div>
 
-<p>Here, <code>group_when</code> accepts an iterable and returns an iterable sequence of iterable groups. Clients choose how to consume the results.
-</p>
+<p>Here, <code>group_when</code> accepts an iterable and returns an iterable sequence of iterable groups. Clients choose how to consume the results.</p>
 <div class="typocode">
 
 <pre class="prettyprint">&gt;&gt;&gt; def odd(v): return v % 2
@@ -101,8 +96,7 @@ def group_when(pred, xs):
 
 </div>
 
-<p>Note that <code>count_p</code> does something very like <a href="acc">itertools.accumulate</a>. Here&#8217;s another version of <code>group_when</code> which takes advantage of this.
-</p>
+<p>Note that <code>count_p</code> does something very like <a href="acc">itertools.accumulate</a>. Here&#8217;s another version of <code>group_when</code> which takes advantage of this.</p>
 <div class="typocode">
 
 <pre class="prettyprint">def group_when(pred, xs):
@@ -116,12 +110,11 @@ def group_when(pred, xs):
 
 <p style="text-align:center">&sect;</p>
 
-<p>After a short break, here&#8217;s a third version of <code>group_when</code>. This is the first time I&#8217;ve found a use for <code>takewhile</code> and <code>dropwhile</code>. Beware: as the teed streams <code>xs</code> and <code>ys</code> diverge, the amount of backing storage required will grow &#8230; only for the stored values to then be dropped!
-</p>
+<p>After a short break, here&#8217;s a third version of <code>group_when</code>. This is the first time I&#8217;ve found a use for <code>takewhile</code> and <code>dropwhile</code>. Beware: as the teed streams <code>xs</code> and <code>ys</code> diverge, the amount of backing storage required will grow &#8230; only for the stored values to then be dropped!</p>
 <div class="typocode">
 
 <pre class="prettyprint">from itertools import *
- 
+
 def group_when(p, xs):
     def notp(x): return not p(x)
     xs = iter(xs)
@@ -130,10 +123,10 @@ def group_when(p, xs):
         xs, ys = tee(xs)
         yield chain([x], takewhile(notp, xs))
         xs = dropwhile(notp, ys)
- 
+
 def odd(x):
     return x % 2
- 
+
 [list(g) for g in group_when(odd, [3, 3, 2, 4, 1, 2])] # [[3], [3, 2, 4], [1, 2]]
 
 </pre>

@@ -29,62 +29,38 @@
 <h2 class="title"><a href="/articles/narrow-python">Narrow Python</a></h2>
 <p class="meta"><abbr class="published" title="2007-01-03">2007-01-03</abbr> &bull; <a href="/tag/python" rel="tag">Python</a> &bull; <a href="/articles/narrow-python#disqus_thread">Comments</a></p>
 <p>I needed to investigate character code points beyond the <a href="http://unicode.org">Unicode</a>
-   basic multilingual plane. As usual <a href="http://www.python.org">Python</a> was the tool I reached for first
-   &#8212; well, not quite first, since I&#8217;d already leafed through the
-   introductory sections of the <a href="http://www.unicode.org/book/aboutbook.html">Unicode book</a>, in which I noticed the
-   following <a href="http://www.unicode.org/press/quotations.html#rossum">encouraging words</a> from Python&#8217;s inventor:
-</p>
-<blockquote><p>&#8220;Modern programs must handle Unicode &#8212; Python has excellent support
-   for Unicode, and will keep getting better.&#8221; &#8212; Guido van Rossum
-</p>
-</blockquote><p>I&#8217;m not sure I can fully agree with the <em>excellent support</em> bit of
-   this quotation: <span id="excerpt0"/>in this case, I had to put in the batteries myself.
-</p>
-<span id="continue-reading"/>
-
-
-<h4>Legacy Systems</h4>
+basic multilingual plane. As usual <a href="http://www.python.org">Python</a> was the tool I reached for first
+&#8212; well, not quite first, since I&#8217;d already leafed through the
+introductory sections of the <a href="http://www.unicode.org/book/aboutbook.html">Unicode book</a>, in which I noticed the
+following <a href="http://www.unicode.org/press/quotations.html#rossum">encouraging words</a> from Python&#8217;s inventor:</p>
+<blockquote>
+<p>&#8220;Modern programs must handle Unicode &#8212; Python has excellent support
+for Unicode, and will keep getting better.&#8221; &#8212; Guido van Rossum</p>
+</blockquote>
+<p>I&#8217;m not sure I can fully agree with the <em>excellent support</em> bit of
+this quotation: <span id="excerpt0"/>in this case, I had to put in the batteries myself.</p>
+<p><span id="continue-reading"/></p>
+<h4 id="legacy-systems">Legacy Systems</h4>
 <p>Incidentally, I agree with the BDFL and the many others who are
-   <a href="http://www.unicode.org/press/quotations.html">on record</a> as saying that <a href="http://unicode.org">Unicode</a> is both necessary and great. It&#8217;s
-   just a shame it didn&#8217;t happen sooner, because we now have any number
-   of legacy systems which make a poor fist of things &#8212; C++&#8217;s built in
-   <code>wchar_t</code> being a typically half-baked solution.
-</p>
-<p>(Questions:
-</p>
+<a href="http://www.unicode.org/press/quotations.html">on record</a> as saying that <a href="http://unicode.org">Unicode</a> is both necessary and great. It&#8217;s
+just a shame it didn&#8217;t happen sooner, because we now have any number
+of legacy systems which make a poor fist of things &#8212; C++&#8217;s built in
+<code>wchar_t</code> being a typically half-baked solution.</p>
+<p>(Questions:</p>
 <ul>
- <li>
-     Is a <code>wchar_t</code> suitable for Unicode characters?
- </li>
-
- <li>
-     Can a <code>std:wstring</code> help us write international applications in a portable way?
- </li>
-
- <li>
-     What&#8217;s the best way to handle text data in a C++ program?
- </li>
+<li>Is a <code>wchar_t</code> suitable for Unicode characters?</li>
+<li>Can a <code>std:wstring</code> help us write international applications in a portable way?</li>
+<li>What&#8217;s the best way to handle text data in a C++ program?</li>
 </ul>
-<p>Answers:
-</p>
+<p>Answers:</p>
 <ul>
- <li>
-     Maybe.
- </li>
-
- <li>
-     Probably not.
- </li>
-
- <li>
-     Watch this space.)
- </li>
+<li>Maybe.</li>
+<li>Probably not.</li>
+<li>Watch this space.)</li>
 </ul>
-
-<h4>Narrow builds</h4>
+<h4 id="narrow-builds">Narrow builds</h4>
 <p>As I write this, the <a href="http://www.python.org">Python</a> installed on my machine &#8212; and indeed on
-   all the machines I have access to &#8212; behaves as follows:
-</p>
+all the machines I have access to &#8212; behaves as follows:</p>
 <div class="typocode"><div class="codetitle">narrow python problems</div>
 
 <pre class="prettyprint">&gt;&gt;&gt; help(unichr)
@@ -93,7 +69,7 @@ Help on built-in function unichr in module __builtin__:
 unichr(...)
     unichr(i) -&gt; Unicode character
 
-Return a Unicode string of one character with
+    Return a Unicode string of one character with
     ordinal i; 0 &lt;= i &lt;= 0x10ffff.
 
 &gt;&gt;&gt; uc = unichr(0x10000)
@@ -106,18 +82,15 @@ ValueError: unichr() arg not in range(0x10000) (narrow Python build)
 </div>
 
 <p>The error message suggested I&#8217;d need to <em>rebuild</em> Python to make it
-   behave.  I didn&#8217;t really want to do this, so I tried a bit of
-   <a href="http://www.google.com/search?q=python+narrow">googling</a>
-   in case it found me a more favourable answer (it didn&#8217;t). I had a closer
-   look at what <code>python -h</code> had to tell me in case I could supply a <code>-wide</code>
-   option (I couldn&#8217;t). I even wondered if the <code>pythonw</code> which lives alongside
-   <code>python</code> might be just what I wanted (it wasn&#8217;t).
-</p>
-
-<h4>Wide builds</h4>
+behave.  I didn&#8217;t really want to do this, so I tried a bit of
+<a href="http://www.google.com/search?q=python+narrow">googling</a>
+in case it found me a more favourable answer (it didn&#8217;t). I had a closer
+look at what <code>python -h</code> had to tell me in case I could supply a <code>-wide</code>
+option (I couldn&#8217;t). I even wondered if the <code>pythonw</code> which lives alongside
+<code>python</code> might be just what I wanted (it wasn&#8217;t).</p>
+<h4 id="wide-builds">Wide builds</h4>
 <p>Finally, I decided I&#8217;d have to rebuild Python after all. For the
-   record, here&#8217;s what you do:
-</p>
+record, here&#8217;s what you do:</p>
 <div class="typocode"><div class="codetitle">Building a wide version Python</div>
 
 <pre class="prettyprint">$ tar xjf Python-2.5.tar.bz2
@@ -129,38 +102,33 @@ $ ./configure --enable-unicode=ucs4 &amp;&amp; make
 </div>
 
 <p>No, it&#8217;s not that hard, once you&#8217;ve read <a href="http://www.python.org/dev/peps/pep-0261/">PEP 261</a>, which
-   explains the <code>configure</code> options. You&#8217;ll have to work out for yourself
-   if and where you want to install this new and flabby version of Python,
-   which &#8212; <em>shock!, horror!!</em> &#8212; doubles the memory used for most Unicode
-   strings.
-</p>
-
-<h4>Loss of power</h4>
+explains the <code>configure</code> options. You&#8217;ll have to work out for yourself
+if and where you want to install this new and flabby version of Python,
+which &#8212; <em>shock!, horror!!</em> &#8212; doubles the memory used for most Unicode
+strings.</p>
+<h4 id="loss-of-power">Loss of power</h4>
 <p>For once, I&#8217;m disappointed in Python. The
-   default build provides weakened support for Unicode, which in some
-   ways is worse than no support for Unicode. Why? Because the language
-   <em>appears</em> to support Unicode, but is likely to let you down if you
-   ever venture past the safe region of the basic multilingual plane
-   &#8212; the kind of unwelcome surprise which experienced programmers
-   rightly fear.  And because the behaviour you see on a wide build differs from
-   the behaviour you get on a narrow build.  Worse again, Python is
-   perfectly able to support the full Unicode standard, if you&#8217;re
-   prepared to trade in a bit of memory for compliance. This is the kind
-   of trade-off Python users are usually more than happy to accept. If
-   and when they need to get closer to the silicon, they just use C.
-</p>
-
-<h4>Hope</h4>
-<p>Of course Guido van Rossum did say:
-</p>
-<blockquote><p>&#8220;&#8230; Python has excellent support
-   for Unicode, and <em>will keep getting better</em>.&#8221;
-</p>
-</blockquote><p>(Emphasis mine). This looks like one particular area where support could be
-   better. I&#8217;ve seen hints that C++0X (which may well end up becoming
-   C++1X) will place improved Unicode support into the standard language, but
-   I&#8217;d bet Python will stay ahead by a comfortable margin.
-</p>
+default build provides weakened support for Unicode, which in some
+ways is worse than no support for Unicode. Why? Because the language
+<em>appears</em> to support Unicode, but is likely to let you down if you
+ever venture past the safe region of the basic multilingual plane
+&#8212; the kind of unwelcome surprise which experienced programmers
+rightly fear.  And because the behaviour you see on a wide build differs from
+the behaviour you get on a narrow build.  Worse again, Python is
+perfectly able to support the full Unicode standard, if you&#8217;re
+prepared to trade in a bit of memory for compliance. This is the kind
+of trade-off Python users are usually more than happy to accept. If
+and when they need to get closer to the silicon, they just use C.</p>
+<h4 id="hope">Hope</h4>
+<p>Of course Guido van Rossum did say:</p>
+<blockquote>
+<p>&#8220;&#8230; Python has excellent support
+for Unicode, and <em>will keep getting better</em>.&#8221;</p>
+</blockquote>
+<p>(Emphasis mine). This looks like one particular area where support could be
+better. I&#8217;ve seen hints that C++0X (which may well end up becoming
+C++1X) will place improved Unicode support into the standard language, but
+I&#8217;d bet Python will stay ahead by a comfortable margin.</p>
 </div>
 
 <h5><a name="feedback">Feedback</a></h5>

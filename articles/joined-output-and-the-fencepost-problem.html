@@ -29,23 +29,17 @@
 <h2 class="title"><a href="/articles/joined-output-and-the-fencepost-problem">Joined Output and the Fencepost Problem</a></h2>
 <p class="meta"><abbr class="published" title="2006-10-30">2006-10-30</abbr> &bull; <a href="/tag/puzzles" rel="tag">Puzzles</a>, <a href="/tag/c++" rel="tag">C++</a>, <a href="/tag/python" rel="tag">Python</a>, <a href="/tag/algorithms" rel="tag">Algorithms</a> &bull; <a href="/articles/joined-output-and-the-fencepost-problem#disqus_thread">Comments</a></p>
 <p>If fenceposts are placed 10m apart then how long is a row of 10
-   fenceposts?  Quickly now &#8230;
-</p>
+fenceposts?  Quickly now &#8230;</p>
 <p>If you answered 100m you got it wrong. Since the <em>gap</em> between two
-   posts is 10m and there are 9 gaps in a row of 10 posts, the correct
-   answer is 90m.
-</p>
+posts is 10m and there are 9 gaps in a row of 10 posts, the correct
+answer is 90m.</p>
 <p>This is an example of the <a href="http://www.google.com/search?q=fencepost+problem" title="google fencepost problem">fencepost problem</a>. It comes up all the time
-   in computing. In this post, I tackle the example of using C++ to output
-   a range of items.
-</p>
-<span id="continue-reading"/>
-
-
-<h3>C++ Range Output</h3>
+in computing. In this post, I tackle the example of using C++ to output
+a range of items.</p>
+<p><span id="continue-reading"/></p>
+<h3 id="c-range-output">C++ Range Output</h3>
 <p>In <a href="http://www.two-sdg.demon.co.uk/curbralan/papers/minimalism/OmitNeedlessCode.html">Omit Needless Code</a>, <a href="http://curbralan.com">Kevlin Henney</a> develops some concise
-   and expressive code to output a collection of strings separated by newlines:
-</p>
+and expressive code to output a collection of strings separated by newlines:</p>
 <div class="typocode">
 
 <pre class="prettyprint">std::vector&lt;std::string&gt; items;
@@ -58,19 +52,16 @@ std::copy(items.begin(), items.end(), out(std::cout, "\n"));
 </div>
 
 <p>It&#8217;s the <code>"\n"</code> which adds the newlines. We could have used any other
-   string &#8212; a simple space <code>" "</code> or a comma followed by a space
-   <code>", "</code> might be more suitable in some cases.
-</p>
+string &#8212; a simple space <code>" "</code> or a comma followed by a space
+<code>", "</code> might be more suitable in some cases.</p>
 <p>Unfortunately, though, this code adds a newline after each item in the
-   list, including the last item, which is rarely what we want &#8212; just
-   like we didn&#8217;t want the gap after the terminal post in the
-   <a href="http://www.google.com/search?q=fencepost+problem" title="google fencepost problem">fencepost problem</a>. For whitespace, such as a newline, this may not be too
-   upsetting; by happy coincidence, we may even <em>want</em> an extra
-   newline. Usually, though, the extra gap is a nuisance, as the
-   following example shows.
-</p>
-
-<h4>The Full Monty</h4>
+list, including the last item, which is rarely what we want &#8212; just
+like we didn&#8217;t want the gap after the terminal post in the
+<a href="http://www.google.com/search?q=fencepost+problem" title="google fencepost problem">fencepost problem</a>. For whitespace, such as a newline, this may not be too
+upsetting; by happy coincidence, we may even <em>want</em> an extra
+newline. Usually, though, the extra gap is a nuisance, as the
+following example shows.</p>
+<h4 id="the-full-monty">The Full Monty</h4>
 <div class="typocode">
 
 <pre class="prettyprint">#include &lt;iostream&gt;
@@ -112,7 +103,7 @@ main(int argc, char * argv[])
     add_full_monty(my_breakfast);
     std::cout &lt;&lt; "For breakfast I had ";
     output_breakfast(my_breakfast, std::cout);
-    std::cout &lt;&lt; '.' &lt;&lt; std::endl;
+    std::cout &lt;&lt; &#x27;.&#x27; &lt;&lt; std::endl;
     return 0;
 }
 
@@ -120,16 +111,15 @@ main(int argc, char * argv[])
 
 </div>
 
-<p>Running this program produces:
-</p>
-<blockquote><p>For breakfast I had bacon and eggs and beans and toast and
-   sausage and tomatoes and black-pudding and .
-</p>
-</blockquote><p>which isn&#8217;t entirely satisfying. There&#8217;s one <code>" and "</code> too
-   many. Before fixing the problem, did you notice the surplus comma after the
-   <code>"black-pudding"</code> and just before the end of the static array
-   initialiser?
-</p>
+<p>Running this program produces:</p>
+<blockquote>
+<p>For breakfast I had bacon and eggs and beans and toast and
+sausage and tomatoes and black-pudding and .</p>
+</blockquote>
+<p>which isn&#8217;t entirely satisfying. There&#8217;s one <code>" and "</code> too
+many. Before fixing the problem, did you notice the surplus comma after the
+<code>"black-pudding"</code> and just before the end of the static array
+initialiser?</p>
 <div class="typocode">
 
 <pre class="prettyprint">    static char const * items[] = {
@@ -142,17 +132,14 @@ main(int argc, char * argv[])
 </div>
 
 <p>This looks rather like another <a href="http://www.google.com/search?q=fencepost+problem" title="google fencepost problem">fencepost problem</a>; as if a careless
-   cut-and-paste has resulted in one comma too many. In fact, although
-   the comma doesn&#8217;t need to be there, it&#8217;s innocuous, since, <span id="excerpt0"/>in a rare
-   moment of generosity, C++ (and C) specifically allow for it. Permitting
-   this extra separator makes life much easier for code-generators
-   which don&#8217;t have to worry about treating the final item in a
-   collection differently.
-</p>
-
-<h3>Python Joined-Up Output</h3>
-<p>Here&#8217;s some <a href="http://python.org">Python</a> code which does a similar job. Running:
-</p>
+cut-and-paste has resulted in one comma too many. In fact, although
+the comma doesn&#8217;t need to be there, it&#8217;s innocuous, since, <span id="excerpt0"/>in a rare
+moment of generosity, C++ (and C) specifically allow for it. Permitting
+this extra separator makes life much easier for code-generators
+which don&#8217;t have to worry about treating the final item in a
+collection differently.</p>
+<h3 id="python-joined-up-output">Python Joined-Up Output</h3>
+<p>Here&#8217;s some <a href="http://python.org">Python</a> code which does a similar job. Running:</p>
 <div class="typocode">
 
 <pre class="prettyprint">def full_monty():
@@ -164,19 +151,17 @@ print "For breakfast I had %s." % " and ".join(full_monty())
 
 </div>
 
-<p>produces:
-</p>
-<blockquote><p>For breakfast I had spam and spam and eggs and spam.
-</p>
-</blockquote><p>The <a href="http://www.python.org/doc/current/lib/string-methods.html">string join method</a>
-   uses the string <code>" and "</code> to fill the <em>gaps</em> between tuple items, which
-   is just what we wanted.
-</p>
+<p>produces:</p>
+<blockquote>
+<p>For breakfast I had spam and spam and eggs and spam.</p>
+</blockquote>
+<p>The <a href="http://www.python.org/doc/current/lib/string-methods.html">string join method</a>
+uses the string <code>" and "</code> to fill the <em>gaps</em> between tuple items, which
+is just what we wanted.</p>
 <p>Note here the trailing comma after the final <code>"spam"</code> in the return
-   from the <code>full_monty</code> function. Again, it&#8217;s not necessary in this
-   case, but you <em>would</em> need it to return a tuple comprising a single
-   item.
-</p>
+from the <code>full_monty</code> function. Again, it&#8217;s not necessary in this
+case, but you <em>would</em> need it to return a tuple comprising a single
+item.</p>
 <div class="typocode">
 
 <pre class="prettyprint">def healthy_breakfast():
@@ -187,13 +172,10 @@ print "For breakfast I had %s." % " and ".join(full_monty())
 </div>
 
 <p>For consistency, I prefer to include this comma even when it&#8217;s not
-   required.
-</p>
-
-<h3>C++ Joined-Up Output</h3>
+required.</p>
+<h3 id="c-joined-up-output">C++ Joined-Up Output</h3>
 <p>Here&#8217;s some C++ code which will do the job of outputting a range of items,
-   separated by a join string, and which doesn&#8217;t suffer from the <a href="http://www.google.com/search?q=fencepost+problem" title="google fencepost problem">fencepost problem</a>
-</p>
+separated by a join string, and which doesn&#8217;t suffer from the <a href="http://www.google.com/search?q=fencepost+problem" title="google fencepost problem">fencepost problem</a></p>
 <div class="typocode"><div class="codetitle">joined_output.hpp</div>
 
 <pre class="prettyprint">#if !defined JOINED_OUTPUT_HPP_INCLUDED
@@ -226,10 +208,9 @@ joined_output(std::ostream &amp; put_to,
 </div>
 
 <p>It&#8217;s not especially pretty but at least this library code can be
-   tucked away somewhere and used as required rather than replicated
-   everywhere joined-up output is needed. Its use is straightforward, as
-   the following test code demonstrates:
-</p>
+tucked away somewhere and used as required rather than replicated
+everywhere joined-up output is needed. Its use is straightforward, as
+the following test code demonstrates:</p>
 <div class="typocode"><div class="codetitle">test_joined_output.cpp</div>
 
 <pre class="prettyprint">#include "joined_output.hpp"
@@ -246,23 +227,23 @@ test_bidirectional_joined_output()
     int const ii[] = { 0, 1, 2, 3, 4, 5 };
     int const * const end_ii = ii + sizeof ii / sizeof *ii;
     std::list&lt;int&gt; const ll(ii, end_ii);
-    
+
     std::stringstream put_to;
     joined_output(put_to, ii, end_ii, " ");
     joined_output(put_to, ll.begin(), ll.end(), " ");
     assert(put_to.str() == "0 1 2 3 4 5" "0 1 2 3 4 5");
-    
+
     put_to.str(std::string());
     joined_output(put_to, ii, end_ii, "");
     joined_output(put_to, ll.begin(), ll.end(), "");
     assert(put_to.str() == "012345" "012345");
-    
+
     put_to.str(std::string());
     joined_output(put_to, ii, ii, " ");
     joined_output(put_to, ll.begin(), ll.begin(), " ");
     joined_output(put_to, ll.end(), ll.end(), " ");
     assert(put_to.str().empty());
-    
+
     put_to.str(std::string());
     joined_output(put_to, ii + 1, ii + 2, " ");
     assert(put_to.str() == "1");
@@ -292,12 +273,10 @@ main(int argc, char * argv[])
 
 </div>
 
-
-<h3>Specialised C++ Joined-Up Output</h3>
+<h3 id="specialised-c-joined-up-output">Specialised C++ Joined-Up Output</h3>
 <p>If we were dealing with a bi-directional or random access iterator
-   then our implementation of <code>joined_output()</code> could get away without
-   using any local variables:
-</p>
+then our implementation of <code>joined_output()</code> could get away without
+using any local variables:</p>
 <div class="typocode">
 
 <pre class="prettyprint">#include &lt;algorithm&gt;
@@ -326,12 +305,11 @@ joined_output(std::ostream &amp; put_to,
 </div>
 
 <p>This being C++, we probably <i>do</i> fret about such micro-optimisations
-   in library code. So, for completeness, here&#8217;s the file
-   <code>joined_output.hpp</code> reworked to show how <code>joined_output()</code> can be
-   specialised according to iterator type. I prefer the earlier
-   and simpler version but I&#8217;m posting this version in case I ever need
-   to remember how to do this sort of thing again.
-</p>
+in library code. So, for completeness, here&#8217;s the file
+<code>joined_output.hpp</code> reworked to show how <code>joined_output()</code> can be
+specialised according to iterator type. I prefer the earlier
+and simpler version but I&#8217;m posting this version in case I ever need
+to remember how to do this sort of thing again.</p>
 <div class="typocode"><div class="codetitle">joined_output.hpp</div>
 
 <pre class="prettyprint">#if !defined JOINED_OUTPUT_HPP_INCLUDED

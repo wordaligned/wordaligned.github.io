@@ -28,27 +28,26 @@
       <div class="atomentry" id="lexical-dispatch-in-python">
 <h2 class="title"><a href="/articles/lexical-dispatch-in-python">Lexical Dispatch in Python</a></h2>
 <p class="meta"><abbr class="published" title="2008-02-09">2008-02-09</abbr> &bull; <a href="/tag/python" rel="tag">Python</a> &bull; <a href="/articles/lexical-dispatch-in-python#disqus_thread">Comments</a></p>
-<p>A recent <a href="http://eikke.com/how-not-to-write-python-code/">article on Ikke&#8217;s blog</a> shows how to emulate a C switch statement using Python. (I&#8217;ve adapted the code slightly for the purposes of this note).
-</p>
+<p>A recent <a href="http://eikke.com/how-not-to-write-python-code/">article on Ikke&#8217;s blog</a> shows how to emulate a C switch statement using Python. (I&#8217;ve adapted the code slightly for the purposes of this note).</p>
 <div class="typocode">
 
 <pre class="prettyprint">def handle_one():
-    return 'one'
-    
+    return &#x27;one&#x27;
+
 def handle_two():
-    return 'two'
-    
+    return &#x27;two&#x27;
+
 def handle_three():
-    return 'three'
-    
+    return &#x27;three&#x27;
+
 def handle_default():
-    return 'unknown'
-    
+    return &#x27;unknown&#x27;
+
 cases = dict(one=handle_one,
              two=handle_two,
              three=handle_three)
-    
-for i in 'one', 'two', 'three', 'four':
+
+for i in &#x27;one&#x27;, &#x27;two&#x27;, &#x27;three&#x27;, &#x27;four&#x27;:
     handler = cases.get(i, handle_default)
     print handler()
 
@@ -56,8 +55,7 @@ for i in 'one', 'two', 'three', 'four':
 
 </div>
 
-<p>Here the <code>cases</code> dict maps strings to functions and the subsequent switch is a simple matter of looking up and dispatching to the correct function. This is good idiomatic Python code. When run, it outputs:
-</p>
+<p>Here the <code>cases</code> dict maps strings to functions and the subsequent switch is a simple matter of looking up and dispatching to the correct function. This is good idiomatic Python code. When run, it outputs:</p>
 <div class="typocode">
 
 <pre class="prettyprint">one
@@ -69,47 +67,44 @@ unknown
 
 </div>
 
-<p>Here&#8217;s an alternative technique which I&#8217;ve sometimes found useful. Rather than build an explicit <code>cases</code> dict, we can just use one of the dicts lurking behind the scenes &#8212; in this case the one supplied by the built-in <code>globals()</code> function. Leaving the <code>handle_*()</code> functions as before, we could write:
-</p>
+<p>Here&#8217;s an alternative technique which I&#8217;ve sometimes found useful. Rather than build an explicit <code>cases</code> dict, we can just use one of the dicts lurking behind the scenes &#8212; in this case the one supplied by the built-in <code>globals()</code> function. Leaving the <code>handle_*()</code> functions as before, we could write:</p>
 <div class="typocode">
 
-<pre class="prettyprint">for i in 'one', 'two', 'three', 'four':
-    handler = globals().get('handle_%s' % i, handle_default)
+<pre class="prettyprint">for i in &#x27;one&#x27;, &#x27;two&#x27;, &#x27;three&#x27;, &#x27;four&#x27;:
+    handler = globals().get(&#x27;handle_%s&#x27; % i, handle_default)
     print handler()
 
 </pre>
 
 </div>
 
-<p><code>Globals()</code> returns us a <code>dict</code> mapping names in the current scope to their values. Since our handler functions are uniformly named, some string formatting combined with a simple dictionary look-up gets the required function.
-</p>
-<p>A warning: <strong>it&#8217;s unusual to access objects in the global scope in this way</strong>, and in this particular case, the original explicit dictionary dispatch would be better. In other situations though, when the scope narrows to a class or a module, it may well be worth remembering that classes and modules behave rather like dicts which map names to values. The built-in <code>getattr()</code> function can then be used as a function dispatcher. Here&#8217;s a class-based example:
-</p>
+<p><code>Globals()</code> returns us a <code>dict</code> mapping names in the current scope to their values. Since our handler functions are uniformly named, some string formatting combined with a simple dictionary look-up gets the required function.</p>
+<p>A warning: <strong>it&#8217;s unusual to access objects in the global scope in this way</strong>, and in this particular case, the original explicit dictionary dispatch would be better. In other situations though, when the scope narrows to a class or a module, it may well be worth remembering that classes and modules behave rather like dicts which map names to values. The built-in <code>getattr()</code> function can then be used as a function dispatcher. Here&#8217;s a class-based example:</p>
 <div class="typocode"><div class="codetitle">Sketch of an XHTML paragraph formatting class</div>
 
-<pre class="prettyprint">PLAIN, BOLD, LINK, DATE = 'PLAIN BOLD LINK DATE'.split()
+<pre class="prettyprint">PLAIN, BOLD, LINK, DATE = &#x27;PLAIN BOLD LINK DATE&#x27;.split()
 
 class Paragraph(object):
     def __init__(self):
-        self.text_so_far = ''
-    
+        self.text_so_far = &#x27;&#x27;
+
     def __str__(self):
-        return self._do_tag(self.text_so_far, 'p')
-    
+        return self._do_tag(self.text_so_far, &#x27;p&#x27;)
+
     def _do_tag(self, text, tag):
-        return '&lt;%s&gt;%s&lt;/%s&gt;' % (tag, text, tag)
-    
+        return &#x27;&lt;%s&gt;%s&lt;/%s&gt;&#x27; % (tag, text, tag)
+
     def do_bold(self, text):
-        return self._do_tag(text, 'b')
-    
+        return self._do_tag(text, &#x27;b&#x27;)
+
     def do_link(self, text):
-        return '&lt;a href="%s"&gt;%s&lt;/a&gt;' % (text, text)
-    
+        return &#x27;&lt;a href="%s"&gt;%s&lt;/a&gt;&#x27; % (text, text)
+
     def do_plain(self, text):
         return text
-    
+
     def append(self, text, markup=PLAIN):
-        handler = getattr(self, 'do_%s' % markup.lower())
+        handler = getattr(self, &#x27;do_%s&#x27; % markup.lower())
         self.text_so_far += handler(text)
         return self
 
@@ -117,8 +112,7 @@ class Paragraph(object):
 
 </div>
 
-<p>Maybe not the most fully-formed of classes, but I hope you get the idea! Incidentally, <code>append()</code> returns a reference to <code>self</code> so clients can chain calls together.
-</p>
+<p>Maybe not the most fully-formed of classes, but I hope you get the idea! Incidentally, <code>append()</code> returns a reference to <code>self</code> so clients can chain calls together.</p>
 <div class="typocode">
 
 <pre class="prettyprint">&gt;&gt;&gt; print Paragraph().append("Word Aligned", BOLD
@@ -130,8 +124,7 @@ class Paragraph(object):
 
 </div>
 
-<p>By the way, &#8220;Lexical Dispatch&#8221; isn&#8217;t an official term or one I&#8217;ve heard before. It&#8217;s just a fancy way of saying &#8220;call things based on their name&#8221; &#8212; and the term <a href="http://en.wikipedia.org/wiki/Evaluation_strategy#Call_by_name">&#8220;call by name&#8221;</a> has already been taken
-</p>
+<p>By the way, &#8220;Lexical Dispatch&#8221; isn&#8217;t an official term or one I&#8217;ve heard before. It&#8217;s just a fancy way of saying &#8220;call things based on their name&#8221; &#8212; and the term <a href="http://en.wikipedia.org/wiki/Evaluation_strategy#Call_by_name">&#8220;call by name&#8221;</a> has already been taken</p>
 </div>
 
 <div class="comments"><hr/><div id="disqus_thread"></div><script type="text/javascript" src="http://disqus.com/forums/wordaligned/embed.js"></script></div>

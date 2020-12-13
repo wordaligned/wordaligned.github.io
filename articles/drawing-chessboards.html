@@ -28,47 +28,12 @@
       <div class="atomentry" id="drawing-chessboards">
 <h2 class="title"><a href="/articles/drawing-chessboards">Drawing Chessboards</a></h2>
 <p class="meta"><abbr class="published" title="2008-03-18">2008-03-18</abbr> &bull; <a href="/tag/puzzles" rel="tag">Puzzles</a>, <a href="/tag/python" rel="tag">Python</a>, <a href="/tag/drawing" rel="tag">Drawing</a>, <a href="/tag/chess" rel="tag">Chess</a>, <a href="/tag/pil" rel="tag">PIL</a>, <a href="/tag/imagemagick" rel="tag">ImageMagick</a>, <a href="/tag/google" rel="tag">Google</a>, <a href="/tag/characters" rel="tag">Characters</a>, <a href="/tag/charts" rel="tag">Charts</a> &bull; <a href="/articles/drawing-chessboards#disqus_thread">Comments</a></p>
-<div class="toc">
-<h2>Contents</h2>
-<ul>
- <li><a href="#tocthe-python-imaging-library" name="toc0" id="toc0">The Python Imaging Library</a>
- </li>
-
- <li><a href="#tocimagemagick" name="toc1" id="toc1">ImageMagick</a>
- </li>
-
- <li><a href="#tocgoogle-chart-api" name="toc2" id="toc2">Google Chart API</a>
- </li>
-
- <li><a href="#tocascii-text" name="toc3" id="toc3">ASCII Text</a>
- </li>
-
- <li><a href="#tocunicode-block-elements" name="toc4" id="toc4">Unicode Block Elements</a>
- </li>
-
- <li><a href="#tocand-more" name="toc5" id="toc5">And more</a>
- </li>
-
- <li><a href="#tocwhy" name="toc6" id="toc6">Why?</a>
- </li>
-
- <li><a href="#tocteaser" name="toc7" id="toc7">Teaser</a>
- </li>
-
- <li><a href="#tocthanks" name="toc8" id="toc8">Thanks</a>
- </li>
-</ul>
-</div><p>I wanted a picture of a chessboard. Rather than boot up some drawing software and cut and paste black and white squares I decided to write a program to create the picture.
-</p>
-<p>If you&#8217;d like to know <strong>why</strong> anyone would ever create work for themselves in this way, skip to the end of this article, where you&#8217;ll find justification and a more challenging <a href="/articles/drawing-chessboards.html#why">follow-on problem</a>. Otherwise, please read on from top to bottom in the usual way.
-</p>
-
-<h3><a href="#toc0" name="tocthe-python-imaging-library" id="tocthe-python-imaging-library">The Python Imaging Library</a></h3>
-<img style="border-style:double;" src="/images/chessboard-pil.png" alt="Chessboard created by PIL"/>
-
-<p>Fredrik Lundh&#8217;s <a href="http://effbot.org/imagingbook/pil-index.htm">Python Imaging Library</a> (commonly known as <a href="http://effbot.org/imagingbook/pil-index.htm">PIL</a>) must surely rank as one of the most popular Python libraries which doesn&#8217;t come as standard<sup><a id="fn1link" href="/articles/drawing-chessboards.html#fn1">[1]</a></sup>. It&#8217;s a fabulous tool which I&#8217;ve used to create the graphic above (though note that the double border around this graphic and subsequent ones is applied by a CSS style property). Here&#8217;s how.
-   <span id="continue-reading"/>
-</p>
+<p>I wanted a picture of a chessboard. Rather than boot up some drawing software and cut and paste black and white squares I decided to write a program to create the picture.</p>
+<p>If you&#8217;d like to know <strong>why</strong> anyone would ever create work for themselves in this way, skip to the end of this article, where you&#8217;ll find justification and a more challenging <a href="/articles/drawing-chessboards.html#why">follow-on problem</a>. Otherwise, please read on from top to bottom in the usual way.</p>
+<h3 id="the-python-imaging-library">The Python Imaging Library</h3>
+<p><img style="border-style:double;" src="/images/chessboard-pil.png" alt="Chessboard created by PIL"/></p>
+<p>Fredrik Lundh&#8217;s <a href="http://effbot.org/imagingbook/pil-index.htm">Python Imaging Library</a> (commonly known as <a href="http://effbot.org/imagingbook/pil-index.htm">PIL</a>) must surely rank as one of the most popular Python libraries which doesn&#8217;t come as standard<sup><a id="fn1link" href="/articles/drawing-chessboards.html#fn1"><a href="https://blog.codeship.com/building-minimal-docker-containers-for-go-applications/">1</a></a></sup>. It&#8217;s a fabulous tool which I&#8217;ve used to create the graphic above (though note that the double border around this graphic and subsequent ones is applied by a CSS style property). Here&#8217;s how.
+<span id="continue-reading"/></p>
 <div class="typocode"><div class="codetitle">PIL chessboard</div>
 
 <pre class="prettyprint">def draw_chessboard(n=8, pixel_width=200):
@@ -78,89 +43,61 @@
     def sq_start(i):
         "Return the x/y start coord of the square at column/row i."
         return i * pixel_width / n
-    
+
     def square(i, j):
         "Return the square corners, suitable for use in PIL drawings" 
         return map(sq_start, [i, j, i + 1, j + 1])
-    
+
     image = Image.new("L", (pixel_width, pixel_width))
     draw_square = ImageDraw.Draw(image).rectangle
     squares = (square(i, j)
                for i_start, j in zip(cycle((0, 1)), range(n))
                for i in range(i_start, n, 2))
     for sq in squares:
-        draw_square(sq, fill='white')
+        draw_square(sq, fill=&#x27;white&#x27;)
     image.save("chessboard-pil.png")
 
 </pre>
 
 </div>
 
-<p>Note:
-</p>
+<p>Note:</p>
 <ul>
- <li>
-     We don&#8217;t draw any black squares, instead relying on the default image background being black.
- </li>
-
- <li>
-     The &#8220;L&#8221; image type (Luminance?) specifies a greyscale image.
- </li>
-
- <li>
-     PIL adopts the usual raster graphics convention, of the origin being in the top-left corner.
- </li>
-
- <li>
-     As we progress <strong>down</strong> the board row by row, the first white square alternates between being the first and second square of each row. <code>Itertools.cycle((0, 1))</code> achieves this nicely. 
- </li>
-
- <li>
-     A regular 8 x 8 chessboard will, then, have a black square at the bottom left, which is the usual convention. For odd values of n the bottom-left square would be white.
- </li>
-
- <li>
-     There may be rounding problems with this code if the supplied pixel width isn&#8217;t an integral multiple of <code>n</code>. It&#8217;s probably better to guarantee the image size, rather than round down the board size.
- </li>
-
- <li>
-     It would be better to parametrise the output file name, or even return the created image to clients. For now, we&#8217;ll just save to a fixed-name PNG.
- </li>
+<li>We don&#8217;t draw any black squares, instead relying on the default image background being black.</li>
+<li>The &#8220;L&#8221; image type (Luminance?) specifies a greyscale image.</li>
+<li>PIL adopts the usual raster graphics convention, of the origin being in the top-left corner.</li>
+<li>As we progress <strong>down</strong> the board row by row, the first white square alternates between being the first and second square of each row. <code>Itertools.cycle((0, 1))</code> achieves this nicely. </li>
+<li>A regular 8 x 8 chessboard will, then, have a black square at the bottom left, which is the usual convention. For odd values of n the bottom-left square would be white.</li>
+<li>There may be rounding problems with this code if the supplied pixel width isn&#8217;t an integral multiple of <code>n</code>. It&#8217;s probably better to guarantee the image size, rather than round down the board size.</li>
+<li>It would be better to parametrise the output file name, or even return the created image to clients. For now, we&#8217;ll just save to a fixed-name PNG.</li>
 </ul>
-
-<h3><a href="#toc1" name="tocimagemagick" id="tocimagemagick">ImageMagick</a></h3>
-<p>PIL is a general purpose image processing library and it takes a little head-scratching and maths before we can even create something as simple as a chessboard. <a href="http://www.imagemagick.org/script/index.php">ImageMagick</a> provides tools to perform a similar job from the command-line, making the chessboard a one-liner.
-</p>
+<h3 id="imagemagick">ImageMagick</h3>
+<p>PIL is a general purpose image processing library and it takes a little head-scratching and maths before we can even create something as simple as a chessboard. <a href="http://www.imagemagick.org/script/index.php">ImageMagick</a> provides tools to perform a similar job from the command-line, making the chessboard a one-liner.</p>
 <div class="typocode"><div class="codetitle">ImageMagick chessboard</div>
 
 <pre class="prettyprint">$ N=8
 $ PIXEL_WIDTH=200
 $ convert -size $((N*15))x$((N*15)) pattern:checkerboard \
-  -monochrome -resize $PIXEL_WIDTH chessboard-magick.png
+  -monochrome -resize $PIXEL_WIDTH chessboard-magick.png 
 
 </pre>
 
 </div>
 
-<img style="border-style:double;float:right;margin-left:4px;" src="/images/chessboard-magick.png" alt="Chessboard created by ImageMagick"/>
-
-<p>Here, the checkerboard pattern is an ImageMagick built-in which, inspecting its output, happens to generate 15x15 squares (hence the 15&#8217;s in the script above). The <code>-monochrome</code> filter renders the pattern in black and white, rather than its native light- on dark-grey. The <code>-size</code> and <code>-resize</code> parameters should need no further explanation. The ((double parentheses)) perform Bash shell arithmetic.
-</p>
-<p><a href="http://www.imagemagick.org/script/index.php">ImageMagick</a> masquerades as a shell tool but really it&#8217;s a powerful and fully featured programmer&#8217;s imaging tool &#8212; a bit like a command-line version of <a href="http://www.gimp.org">Gimp</a><a id="fn2link" href="#fn2"><sup>[2]</sup></a>. Although well documented, my gut reaction is that it pushes the command-line interface too far. For more advanced image mangling, you&#8217;ll probably need a program to generate the one-liner needed to drive <code>convert</code>. Despite this reservation, it does the simple things simply, and it can do complex things too. Recommended!
-</p>
-
-<h3><a href="#toc2" name="tocgoogle-chart-api" id="tocgoogle-chart-api">Google Chart API</a></h3>
-<p>For a bit of fun, we can persuade Google to render the chessboard for us &#8212; in this case as a scatter plot using a square black markers<a id="fn3link" href="#fn3"><sup>[3]</sup></a>. We flip the PIL processing around, drawing black squares on the (default) white background, and using the usual plotting convention which places the origin at the bottom left.
-</p>
+<p><img style="border-style:double;float:right;margin-left:4px;" src="/images/chessboard-magick.png" alt="Chessboard created by ImageMagick"/></p>
+<p>Here, the checkerboard pattern is an ImageMagick built-in which, inspecting its output, happens to generate 15x15 squares (hence the 15&#8217;s in the script above). The <code>-monochrome</code> filter renders the pattern in black and white, rather than its native light- on dark-grey. The <code>-size</code> and <code>-resize</code> parameters should need no further explanation. The ((double parentheses)) perform Bash shell arithmetic.</p>
+<p><a href="http://www.imagemagick.org/script/index.php">ImageMagick</a> masquerades as a shell tool but really it&#8217;s a powerful and fully featured programmer&#8217;s imaging tool &#8212; a bit like a command-line version of <a href="http://www.gimp.org">Gimp</a><a id="fn2link" href="#fn2"><sup><a href="http://devcenter.wercker.com/docs/quickstarts/advanced/building-minimal-containers-with-go">2</a></sup></a>. Although well documented, my gut reaction is that it pushes the command-line interface too far. For more advanced image mangling, you&#8217;ll probably need a program to generate the one-liner needed to drive <code>convert</code>. Despite this reservation, it does the simple things simply, and it can do complex things too. Recommended!</p>
+<h3 id="google-chart-api">Google Chart API</h3>
+<p>For a bit of fun, we can persuade Google to render the chessboard for us &#8212; in this case as a scatter plot using a square black markers<a id="fn3link" href="#fn3"><sup>[3]</sup></a>. We flip the PIL processing around, drawing black squares on the (default) white background, and using the usual plotting convention which places the origin at the bottom left.</p>
 <div class="typocode"><div class="codetitle">Google chart chessboard</div>
 
 <pre class="prettyprint">def chessboard_url(n=8, pixel_width=200):
     "Returns the URL of a chessboard graphic."
     def sq_midpt(i):
         "Return the x/y midpt of a square in column/row i."
-        # For text encoding, the graphic's logical width is 100
+        # For text encoding, the graphic&#x27;s logical width is 100
         return (0.5 + i) * 100. / n
-    
+
     xys = [(sq_midpt(i), sq_midpt(j))
            for i_start, j in zip(cycle((0, 1)), range(n))
            for i in range(i_start, n, 2)]
@@ -179,12 +116,9 @@ $ convert -size $((N*15))x$((N*15)) pattern:checkerboard \
 
 </div>
 
-<p>Note that we plot our chart on a logical 100 x 100 rectangle, the coordinate space mandated by the encoding we&#8217;ve chosen, then resize it to the physical dimensions supplied by the client.
-</p>
-<p>This function actually returns the URL of a PNG which the <a href="http://code.google.com/apis/chart/">Google chart API</a> serves up. Paste this URL into your browser address bar to see the graphic, or curl it to a local file.
-</p>
-<p><a href="http://chart.apis.google.com/chart?cht=s&amp;chd=t:6.25,31.25,56.25,81.25,18.75,43.75,68.75,93.75,6.25,31.25,56.25,81.25,18.75,43.75,68.75,93.75,6.25,31.25,56.25,81.25,18.75,43.75,68.75,93.75,6.25,31.25,56.25,81.25,18.75,43.75,68.75,93.75|6.25,6.25,6.25,6.25,18.75,18.75,18.75,18.75,31.25,31.25,31.25,31.25,43.75,43.75,43.75,43.75,56.25,56.25,56.25,56.25,68.75,68.75,68.75,68.75,81.25,81.25,81.25,81.25,93.75,93.75,93.75,93.75&amp;chm=s,000000,1,2.0,25.0&amp;chs=200x200">http://chart.apis.google.com/chart?cht=s&amp;chd=t:6.25,31.25&#8230;&amp;chs=200x200</a>
-</p>
+<p>Note that we plot our chart on a logical 100 x 100 rectangle, the coordinate space mandated by the encoding we&#8217;ve chosen, then resize it to the physical dimensions supplied by the client.</p>
+<p>This function actually returns the URL of a PNG which the <a href="http://code.google.com/apis/chart/">Google chart API</a> serves up. Paste this URL into your browser address bar to see the graphic, or curl it to a local file.</p>
+<p><a href="http://chart.apis.google.com/chart?cht=s&amp;chd=t:6.25,31.25,56.25,81.25,18.75,43.75,68.75,93.75,6.25,31.25,56.25,81.25,18.75,43.75,68.75,93.75,6.25,31.25,56.25,81.25,18.75,43.75,68.75,93.75,6.25,31.25,56.25,81.25,18.75,43.75,68.75,93.75|6.25,6.25,6.25,6.25,18.75,18.75,18.75,18.75,31.25,31.25,31.25,31.25,43.75,43.75,43.75,43.75,56.25,56.25,56.25,56.25,68.75,68.75,68.75,68.75,81.25,81.25,81.25,81.25,93.75,93.75,93.75,93.75&amp;chm=s,000000,1,2.0,25.0&amp;chs=200x200">http://chart.apis.google.com/chart?cht=s&amp;chd=t:6.25,31.25&#8230;&amp;chs=200x200</a></p>
 <div class="typocode">
 
 <pre class="prettyprint">$ url=`python chessboard_url.py`
@@ -194,42 +128,36 @@ $ curl $url &gt; chessboard.png
 
 </div>
 
-<p>We could embed the image into HTML using the IMG element, which is how I&#8217;ve embedded the image which you should see below.
-</p>
+<p>We could embed the image into HTML using the IMG element, which is how I&#8217;ve embedded the image which you should see below.</p>
 <div class="typocode">
 
 <pre class="prettyprint">&gt;&gt;&gt; from cgi import escape
-&gt;&gt;&gt; img = '&lt;img src="%s" alt="chessboard graphic"/&gt;'
+&gt;&gt;&gt; img = &#x27;&lt;img src="%s" alt="chessboard graphic"/&gt;&#x27;
 &gt;&gt;&gt; img % escape(chessboard_url())
 
 </pre>
 
 </div>
 
-<img src="http://chart.apis.google.com/chart?cht=s&amp;chd=t:6.25,31.25,56.25,81.25,18.75,43.75,68.75,93.75,6.25,31.25,56.25,81.25,18.75,43.75,68.75,93.75,6.25,31.25,56.25,81.25,18.75,43.75,68.75,93.75,6.25,31.25,56.25,81.25,18.75,43.75,68.75,93.75|6.25,6.25,6.25,6.25,18.75,18.75,18.75,18.75,31.25,31.25,31.25,31.25,43.75,43.75,43.75,43.75,56.25,56.25,56.25,56.25,68.75,68.75,68.75,68.75,81.25,81.25,81.25,81.25,93.75,93.75,93.75,93.75&amp;chm=s,000000,1,2.0,25.0&amp;chs=200x200" alt="Chessboard chart" style="float:right;border-style:double;margin-left:4px;"/>
-
-<p>As you can see, we have plenty of options, but unfortunately the image itself isn&#8217;t suitable. You can&#8217;t get rid of the axes &#8212; or at least, I haven&#8217;t found a way to &#8212; and the rendered chart has some padding to the top and the right. And worse, we&#8217;re pretty much at the end of the line for this hack: if we wanted to do something more interesting, such as place pieces on the board, we&#8217;re out of luck. 
-</p>
-<p>Of course this isn&#8217;t a flaw in the <a href="http://code.google.com/apis/chart/">Google Chart API</a>: we&#8217;ve actually asked it to draw a scatter plot of the centres of black squares on a chessboard, using square black markers, a job it&#8217;s done well enough. Some examples showing the proper use of Google charts can be found in an <a href="/articles/the-maximum-subsequence-problem.html">article I wrote about maximum sum subsequences</a>.
-</p>
-
-<h3><a href="#toc3" name="tocascii-text" id="tocascii-text">ASCII Text</a></h3>
-<p>The chart URL might be considered a text encoding of the image; the actual graphic is returned by a server. There are other, more direct, textual representations.
-</p>
+<p><img src="http://chart.apis.google.com/chart?cht=s&amp;chd=t:6.25,31.25,56.25,81.25,18.75,43.75,68.75,93.75,6.25,31.25,56.25,81.25,18.75,43.75,68.75,93.75,6.25,31.25,56.25,81.25,18.75,43.75,68.75,93.75,6.25,31.25,56.25,81.25,18.75,43.75,68.75,93.75|6.25,6.25,6.25,6.25,18.75,18.75,18.75,18.75,31.25,31.25,31.25,31.25,43.75,43.75,43.75,43.75,56.25,56.25,56.25,56.25,68.75,68.75,68.75,68.75,81.25,81.25,81.25,81.25,93.75,93.75,93.75,93.75&amp;chm=s,000000,1,2.0,25.0&amp;chs=200x200" alt="Chessboard chart" style="float:right;border-style:double;margin-left:4px;"/></p>
+<p>As you can see, we have plenty of options, but unfortunately the image itself isn&#8217;t suitable. You can&#8217;t get rid of the axes &#8212; or at least, I haven&#8217;t found a way to &#8212; and the rendered chart has some padding to the top and the right. And worse, we&#8217;re pretty much at the end of the line for this hack: if we wanted to do something more interesting, such as place pieces on the board, we&#8217;re out of luck. </p>
+<p>Of course this isn&#8217;t a flaw in the <a href="http://code.google.com/apis/chart/">Google Chart API</a>: we&#8217;ve actually asked it to draw a scatter plot of the centres of black squares on a chessboard, using square black markers, a job it&#8217;s done well enough. Some examples showing the proper use of Google charts can be found in an <a href="/articles/the-maximum-subsequence-problem.html">article I wrote about maximum sum subsequences</a>.</p>
+<h3 id="ascii-text">ASCII Text</h3>
+<p>The chart URL might be considered a text encoding of the image; the actual graphic is returned by a server. There are other, more direct, textual representations.</p>
 <div class="typocode"><div class="codetitle">ASCII art chessboard</div>
 
 <pre class="prettyprint">def outer_join(sep, ss):
     """Like string.join, but encloses the result with outer separators.
-    
+
     Example:
-    &gt;&gt;&gt; outer_join('|', ['1', '2', '3'])
-    '|1|2|3|'
+    &gt;&gt;&gt; outer_join(&#x27;|&#x27;, [&#x27;1&#x27;, &#x27;2&#x27;, &#x27;3&#x27;])
+    &#x27;|1|2|3|&#x27;
     """
     return "%s%s%s" % (sep, sep.join(ss), sep)
-    
+
 def ascii_chessboard(n=8):
     """Draws an ASCII art chessboard.
-    
+
     Returns a string representation of an n x n board.
     """
     from itertools import islice, cycle
@@ -242,8 +170,7 @@ def ascii_chessboard(n=8):
 
 </div>
 
-<p>I suspect this code was easier for me to write than it is for you to read! It treats the chessboard as a sequence of alternating rows of alternating squares, which are then joined together for output.
-</p>
+<p>I suspect this code was easier for me to write than it is for you to read! It treats the chessboard as a sequence of alternating rows of alternating squares, which are then joined together for output.</p>
 <div class="typocode">
 
 <pre class="prettyprint">&gt;&gt;&gt; print ascii_chessboard(8)
@@ -269,15 +196,13 @@ def ascii_chessboard(n=8):
 
 </div>
 
-<p>Not pretty, but such graphics may be useful in source code, which is typically viewed in a plain-text editor, and where ASCII art provides a way of embedding pictures right where they&#8217;re needed. 
-</p>
-<p>On which point: if you&#8217;re working through &#8220;Structure and Interpretation of Computer Programs&#8221; you may like to know the book is <a href="http://www.neilvandyke.org/sicp-texi/">available in Texinfo format</a>, with the pictures all rendered in ASCII art. So you can split your editor window and run the code on one side, while browsing the book on the other. Here&#8217;s one of the figures:
-</p>
+<p>Not pretty, but such graphics may be useful in source code, which is typically viewed in a plain-text editor, and where ASCII art provides a way of embedding pictures right where they&#8217;re needed. </p>
+<p>On which point: if you&#8217;re working through &#8220;Structure and Interpretation of Computer Programs&#8221; you may like to know the book is <a href="http://www.neilvandyke.org/sicp-texi/">available in Texinfo format</a>, with the pictures all rendered in ASCII art. So you can split your editor window and run the code on one side, while browsing the book on the other. Here&#8217;s one of the figures:</p>
 <pre>
 *Figure 4.6:* The `or' combination of two queries is produced by
 operating on the stream of frames in parallel and merging the
 results.
-    
+
             +---------------------------+
             |          (or A B)         |
             |    +---+                  |
@@ -298,12 +223,9 @@ results.
                   data base
 </pre>
 
-<p>Even though I own a copy of the book and the <a href="http://mitpress.mit.edu/sicp/full-text/book/book.html">full text is available on-line</a>, this primitive info version has become my preferred format when actually running the code examples and exercises.
-</p>
-
-<h3><a href="#toc4" name="tocunicode-block-elements" id="tocunicode-block-elements">Unicode Block Elements</a></h3>
-<p>Most programming languages may be <a href="/articles/a-yen-for-more-symbols.html">stuck in ASCII</a>, but we needn&#8217;t restict ourselves in this way. I found some block elements in the <a href="http://www.unicode.org/charts/symbols.html">Geometrical Symbols</a> section of the Unicode code charts (<a href="http://www.unicode.org/charts/PDF/U2580.pdf">Unicode Block Elements (PDF)</a>). Here&#8217;s a pre-rendered block of text composed of the light and dark shade block characters, U+2591 LIGHT SHADE and U+2593 DARK SHADE.
-</p>
+<p>Even though I own a copy of the book and the <a href="http://mitpress.mit.edu/sicp/full-text/book/book.html">full text is available on-line</a>, this primitive info version has become my preferred format when actually running the code examples and exercises.</p>
+<h3 id="unicode-block-elements">Unicode Block Elements</h3>
+<p>Most programming languages may be <a href="/articles/a-yen-for-more-symbols.html">stuck in ASCII</a>, but we needn&#8217;t restict ourselves in this way. I found some block elements in the <a href="http://www.unicode.org/charts/symbols.html">Geometrical Symbols</a> section of the Unicode code charts (<a href="http://www.unicode.org/charts/PDF/U2580.pdf">Unicode Block Elements (PDF)</a>). Here&#8217;s a pre-rendered block of text composed of the light and dark shade block characters, U+2591 LIGHT SHADE and U+2593 DARK SHADE.</p>
 <pre>
 &#x2591;&#x2593;&#x2591;&#x2593;&#x2591;&#x2593;&#x2591;&#x2593;
 &#x2593;&#x2591;&#x2593;&#x2591;&#x2593;&#x2591;&#x2593;&#x2591;
@@ -315,70 +237,37 @@ results.
 &#x2593;&#x2591;&#x2593;&#x2591;&#x2593;&#x2591;&#x2593;&#x2591;
 </pre>
 
-
-<h3><a href="#toc5" name="tocand-more" id="tocand-more">And more</a></h3>
-<p>I can think of plenty of other ways to draw a chessboard. My favourite <a href="/articles/drawing-software-design.htmls">drawing</a> environments are the <a href="http://blogoscoped.com/archive/2008-02-11-n78.html">pencil and paper</a>, and the pen and whiteboard; combine the former with a scanner and the latter with a digital camera and you&#8217;ve got an easy route to an electronic version of your design.
-</p>
-<p>For an HTML document I suspect <a href="http://www.w3.org/Graphics/SVG/">SVG</a> would be a good choice, but I don&#8217;t know enough about SVG to state this with confidence. I bet you could go a long way with <a href="http://www.w3.org/Style/CSS/">CSS</a> too. <a href="http://en.wikipedia.org/wiki/Chessboard">Wikipedia&#8217;s chess board</a> is a table built on top of two small images, a light and a dark square, which I guess saves on bandwidth.
-</p>
-
-<h3><a href="#toc6" name="tocwhy" id="tocwhy">Why?</a></h3>
-<p>Why ever bother programming when all we want is a simple graphic?
-</p>
-<p>Well, for one thing, there&#8217;s not <strong>that</strong> much programming. The actual work of pushing pixels around is done by <a href="http://code.google.com/apis/chart/">Google</a>, or <a href="http://effbot.org/imagingbook/pil-index.htm">PIL</a>, or <a href="http://www.imagemagick.org/script/index.php">ImageMagick</a>.
-</p>
-<p>Once we&#8217;ve got a program written, it should be easy to adapt it. We&#8217;ve already put in hooks to specify the number of squares and the image dimensions. It&#8217;s equally easy to, for example, write out a JPEG rather than a PNG, or use different colours.
-</p>
-<p>A programmatic solution is dynamic. Google&#8217;s chart API generates pictures on the fly, based on data points, ranges etc. which clients choose as and when. It&#8217;s rather  like lazy-evaluation: pre-rendering all possibilities isn&#8217;t just expensive, it&#8217;s out of the question.
-</p>
-
-<h3><a href="#toc7" name="tocteaser" id="tocteaser">Teaser</a></h3>
-<img src="http://tbn0.google.com/images?q=tbn:AmRSkxMo-1W5iM:http://web.usna.navy.mil/~wdj/images_chess/chess011.gif" alt="Lurid chessboard" style="float:right;margin-left:4px;"/>
-
-<p>That&#8217;s quite enough pixels and characters for now, so this article will have to appear in two parts. If I&#8217;ve still not convinced you of the merits of creating images programmatically, please consider the following puzzle.
-</p>
-<p><span id="excerpt0"/>How would you draw a position reached in a game of chess, showing both the board and the pieces?
-</p>
-<p>And if I <strong>have</strong> convinced you, this exercise makes for a good workout.
-</p>
-<p>Some Q&amp;A&#8217;s.
-</p>
+<h3 id="and-more">And more</h3>
+<p>I can think of plenty of other ways to draw a chessboard. My favourite <a href="/articles/drawing-software-design.htmls">drawing</a> environments are the <a href="http://blogoscoped.com/archive/2008-02-11-n78.html">pencil and paper</a>, and the pen and whiteboard; combine the former with a scanner and the latter with a digital camera and you&#8217;ve got an easy route to an electronic version of your design.</p>
+<p>For an HTML document I suspect <a href="http://www.w3.org/Graphics/SVG/">SVG</a> would be a good choice, but I don&#8217;t know enough about SVG to state this with confidence. I bet you could go a long way with <a href="http://www.w3.org/Style/CSS/">CSS</a> too. <a href="http://en.wikipedia.org/wiki/Chessboard">Wikipedia&#8217;s chess board</a> is a table built on top of two small images, a light and a dark square, which I guess saves on bandwidth.</p>
+<h3 id="why">Why?</h3>
+<p>Why ever bother programming when all we want is a simple graphic?</p>
+<p>Well, for one thing, there&#8217;s not <strong>that</strong> much programming. The actual work of pushing pixels around is done by <a href="http://code.google.com/apis/chart/">Google</a>, or <a href="http://effbot.org/imagingbook/pil-index.htm">PIL</a>, or <a href="http://www.imagemagick.org/script/index.php">ImageMagick</a>.</p>
+<p>Once we&#8217;ve got a program written, it should be easy to adapt it. We&#8217;ve already put in hooks to specify the number of squares and the image dimensions. It&#8217;s equally easy to, for example, write out a JPEG rather than a PNG, or use different colours.</p>
+<p>A programmatic solution is dynamic. Google&#8217;s chart API generates pictures on the fly, based on data points, ranges etc. which clients choose as and when. It&#8217;s rather  like lazy-evaluation: pre-rendering all possibilities isn&#8217;t just expensive, it&#8217;s out of the question.</p>
+<h3 id="teaser">Teaser</h3>
+<p><img src="http://tbn0.google.com/images?q=tbn:AmRSkxMo-1W5iM:http://web.usna.navy.mil/~wdj/images_chess/chess011.gif" alt="Lurid chessboard" style="float:right;margin-left:4px;"/></p>
+<p>That&#8217;s quite enough pixels and characters for now, so this article will have to appear in two parts. If I&#8217;ve still not convinced you of the merits of creating images programmatically, please consider the following puzzle.</p>
+<p><span id="excerpt0"/>How would you draw a position reached in a game of chess, showing both the board and the pieces?</p>
+<p>And if I <strong>have</strong> convinced you, this exercise makes for a good workout.</p>
+<p>Some Q&amp;A&#8217;s.</p>
 <ul>
- <li>
-     <strong>Q</strong>: What position, exactly?
- </li>
-
- <li>
-     <strong>A</strong>: Any!
- </li>
-
- <li>
-     <strong>Q</strong>: How will the position be described?
- </li>
-
- <li>
-     <strong>A</strong>: Your choice &#8212; it&#8217;s an interesting part of the puzzle.
- </li>
+<li><strong>Q</strong>: What position, exactly?</li>
+<li><strong>A</strong>: Any!</li>
+<li><strong>Q</strong>: How will the position be described?</li>
+<li><strong>A</strong>: Your choice &#8212; it&#8217;s an interesting part of the puzzle.</li>
 </ul>
-<p>A great starting point would be to solve the puzzle using an ASCII art representation.
-</p>
-<p>You can find my solution in <a href="/articles/drawing-chess-positions.html">this follow-up article</a>.
-</p>
-
-<h3><a href="#toc8" name="tocthanks" id="tocthanks">Thanks</a></h3>
-<p>Thanks to <a href="http://gedmin.as">Marius Gedminas</a> and Johannes Hoff for their help bug-fixing this article.
-</p>
+<p>A great starting point would be to solve the puzzle using an ASCII art representation.</p>
+<p>You can find my solution in <a href="/articles/drawing-chess-positions.html">this follow-up article</a>.</p>
+<h3 id="thanks">Thanks</h3>
+<p>Thanks to <a href="http://gedmin.as">Marius Gedminas</a> and Johannes Hoff for their help bug-fixing this article.</p>
 <hr />
-
-<p><a id="fn1" href="#fn1link">[1]</a>
-   I&#8217;m confused about where exactly PIL belongs; the official homepage seems to be on the PythonWare website (<a href="http://www.pythonware.com/library/pil/handbook/">http://www.pythonware.com/library/pil/handbook/</a>), but I usually head for the Effbot site, <a href="http://effbot.org/imagingbook/">http://effbot.org/imagingbook/</a>. I think the sites mirror the same information, so it boils down to whether you prefer a blue or green theme, and how off-putting you find all the ads-by-google.
-</p>
-<p><a id="fn2" href="#fn2link">[2]</a>
-   Actually, you can use <a href="http://www.gimp.org/tutorials/Basic_Batch/">Gimp from the command-line</a>, and it comes with some tools for creating and editing batch files, and indeed for creating a personal suite of image processing scripts. I&#8217;ve never used <a href="http://www.gimp.org">Gimp</a> in this way, so I can&#8217;t say much more about this.
-</p>
+<p><a id="fn1" href="#fn1link"><a href="https://blog.codeship.com/building-minimal-docker-containers-for-go-applications/">1</a></a>
+I&#8217;m confused about where exactly PIL belongs; the official homepage seems to be on the PythonWare website (<a href="http://www.pythonware.com/library/pil/handbook/">http://www.pythonware.com/library/pil/handbook/</a>), but I usually head for the Effbot site, <a href="http://effbot.org/imagingbook/">http://effbot.org/imagingbook/</a>. I think the sites mirror the same information, so it boils down to whether you prefer a blue or green theme, and how off-putting you find all the ads-by-google.</p>
+<p><a id="fn2" href="#fn2link"><a href="http://devcenter.wercker.com/docs/quickstarts/advanced/building-minimal-containers-with-go">2</a></a>
+Actually, you can use <a href="http://www.gimp.org/tutorials/Basic_Batch/">Gimp from the command-line</a>, and it comes with some tools for creating and editing batch files, and indeed for creating a personal suite of image processing scripts. I&#8217;ve never used <a href="http://www.gimp.org">Gimp</a> in this way, so I can&#8217;t say much more about this.</p>
 <p><a id="fn3" href="#fn3link">[3]</a>
-   In theory you could use the Google Chart API to render any image in a pointillist manner: just plot enough pixels in the right places.
-</p>
+In theory you could use the Google Chart API to render any image in a pointillist manner: just plot enough pixels in the right places.</p>
 </div>
 
 <div class="comments"><hr/><div id="disqus_thread"></div><script type="text/javascript" src="http://disqus.com/forums/wordaligned/embed.js"></script></div>

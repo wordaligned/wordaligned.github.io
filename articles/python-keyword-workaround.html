@@ -29,9 +29,8 @@
 <h2 class="title"><a href="/articles/python-keyword-workaround">Python keyword workaround</a></h2>
 <p class="meta"><abbr class="published" title="2007-03-23">2007-03-23</abbr> &bull; <a href="/tag/python" rel="tag">Python</a> &bull; <a href="/articles/python-keyword-workaround#disqus_thread">Comments</a></p>
 <p>I was writing a simple tool and wanted to pass it <code>from</code>
-   and <code>to</code> parameters. As usual, I used the <a href="http://docs.python.org/lib/module-optparse.html">optparse</a> module to extract
-   these parameters from the command line.
-</p>
+and <code>to</code> parameters. As usual, I used the <a href="http://docs.python.org/lib/module-optparse.html">optparse</a> module to extract
+these parameters from the command line.</p>
 <div class="typocode"><div class="codetitle">Spot the syntax error</div>
 
 <pre class="prettyprint">def do_something(from_here, to_here):
@@ -49,8 +48,7 @@ do_something(opts.from, opts.to)
 
 </div>
 
-<p>This code won&#8217;t work because <code>from</code> is a keyword (it&#8217;s used to qualify module imports).
-</p>
+<p>This code won&#8217;t work because <code>from</code> is a keyword (it&#8217;s used to qualify module imports).</p>
 <div class="typocode">
 
 <pre class="prettyprint">    do_something(opts.from, opts.to)
@@ -61,8 +59,7 @@ SyntaxError: invalid syntax
 
 </div>
 
-<p>One pragmatic way round this would be to change the command line parameters.
-</p>
+<p>One pragmatic way round this would be to change the command line parameters.</p>
 <div class="typocode">
 
 <pre class="prettyprint">parser.add_option("--start")
@@ -72,8 +69,7 @@ parser.add_option("--finish")
 
 </div>
 
-<p>I didn&#8217;t want to do that, so here&#8217;s another.
-</p>
+<p>I didn&#8217;t want to do that, so here&#8217;s another.</p>
 <div class="typocode">
 
 <pre class="prettyprint">do_something(getattr(opts, "from"), opts.to)

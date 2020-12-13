@@ -28,41 +28,13 @@
       <div class="atomentry" id="code-in-comments">
 <h2 class="title"><a href="/articles/code-in-comments">Code in Comments</a></h2>
 <p class="meta"><abbr class="published" title="2004-06-07">2004-06-07</abbr> &bull; <a href="/tag/c++" rel="tag">C++</a>, <a href="/tag/accu" rel="tag">ACCU</a> &bull; <a href="/articles/code-in-comments#disqus_thread">Comments</a></p>
-<div class="toc">
-<h2>Contents</h2>
-<ul>
- <li><a href="#tocintroduction" name="toc0" id="toc0">Introduction</a>
- </li>
-
- <li><a href="#tochow-to-commentout-code" name="toc1" id="toc1">How to Comment-Out Code</a>
- </li>
-
- <li><a href="#tocmore-examples" name="toc2" id="toc2">More Examples</a>
- </li>
-
- <li><a href="#tocwhy-commentout-code" name="toc3" id="toc3">Why Comment-Out code?</a>
- </li>
-
- <li><a href="#tocwhy-commenting-out-code-is-a-bad-idea" name="toc4" id="toc4">Why Commenting Out Code is a Bad Idea</a>
- </li>
-
- <li><a href="#tocwhat-to-do-instead" name="toc5" id="toc5">What to do Instead</a>
- </li>
-
- <li><a href="#tocconclusions" name="toc6" id="toc6">Conclusions</a>
- </li>
-</ul>
-</div>
-<h3><a href="#toc0" name="tocintroduction" id="tocintroduction">Introduction</a></h3>
+<h3 id="introduction">Introduction</h3>
 <p>We have all seen comments in source files which look more like executable code
-   than documentation.
-</p>
+than documentation.</p>
 <p>The first line in the body of the <code>for</code> loop below is such a comment: you might
-   expect to be able to remove the leading slashes and have code which compiles
-   and runs but functions slightly differently.
-</p>
-<p>What did the author of this comment intend?
-</p>
+expect to be able to remove the leading slashes and have code which compiles
+and runs but functions slightly differently.</p>
+<p>What did the author of this comment intend?</p>
 <div class="typocode"><div class="codetitle">Example 0</div>
 
 <pre class="prettyprint">for (Surfaces::iterator sf = surfaces.begin();
@@ -77,28 +49,22 @@
 </div>
 
 <p>OK, I&#8217;m being disingenuous. I&#8217;m aware that the comment isn&#8217;t really a comment,
-   it&#8217;s commented-out code. And, like any tolerant and capable programmer, by
-   examining the surrounding context I can guess why this code has been commented
-   out.
-</p>
+it&#8217;s commented-out code. And, like any tolerant and capable programmer, by
+examining the surrounding context I can guess why this code has been commented
+out.</p>
 <p>This article examines how to comment-out code, then describes various problems
-   which lead to code being commented out, before finally arguing that there&#8217;s
-   often a better solution to these problems.
-</p>
-
-<h3><a href="#toc1" name="tochow-to-commentout-code" id="tochow-to-commentout-code">How to Comment-Out Code</a></h3>
+which lead to code being commented out, before finally arguing that there&#8217;s
+often a better solution to these problems.</p>
+<h3 id="how-to-comment-out-code">How to Comment-Out Code</h3>
 <p>Usually it&#8217;s as simple as using your editor to select a region then
-   instructing it to comment out that region.
-</p>
+instructing it to comment out that region.</p>
 <p>If using C-style comments &#8212; by which I mean comments delimited by <code>/*</code> and <code>*/</code>
-   &#8212; then bear in mind they do not nest, so you may run into problems with real
-   comments in the code you want to comment out, or even with commenting-out code
-   which has already been commented-out.
-</p>
+&#8212; then bear in mind they do not nest, so you may run into problems with real
+comments in the code you want to comment out, or even with commenting-out code
+which has already been commented-out.</p>
 <p>I came to C++ from a C background, and remember attending a training course at
-   which the presenter pointed out how easy it was to comment out C++ comments
-   using C comments:
-</p>
+which the presenter pointed out how easy it was to comment out C++ comments
+using C comments:</p>
 <div class="typocode">
 
 <pre class="prettyprint">/*
@@ -114,19 +80,16 @@ for (Surfaces::iterator sf = surfaces.begin();
 
 </div>
 
-<p>Oh dear!
-</p>
+<p>Oh dear!</p>
 <p>If your editor&#8217;s syntax highlighting makes it obvious that the whole loop is
-   commented out, great. Would it still be obvious if, for example, you were
-   paging through the source file on a remote computer? Or if you
-   were code-reviewing a printed version of the file? Or if you had hit
-   a commented-out line while searching? Or even if you were at a customer site and
-   didn&#8217;t have access to your favourite editor?
-</p>
+commented out, great. Would it still be obvious if, for example, you were
+paging through the source file on a remote computer? Or if you
+were code-reviewing a printed version of the file? Or if you had hit
+a commented-out line while searching? Or even if you were at a customer site and
+didn&#8217;t have access to your favourite editor?</p>
 <p>The more useful thing to say about C++ comments is that they run from where
-   they start until the end of the line, and therefore do not suffer from this
-   nesting problem. So a C++ comment can be commented out by a C++ comment!
-</p>
+they start until the end of the line, and therefore do not suffer from this
+nesting problem. So a C++ comment can be commented out by a C++ comment!</p>
 <div class="typocode">
 
 <pre class="prettyprint">// for (Surfaces::iterator sf = surfaces.begin();
@@ -141,8 +104,7 @@ for (Surfaces::iterator sf = surfaces.begin();
 </div>
 
 <p>If using C-style comments, then the following style makes it clear which lines
-   are part of the comment:
-</p>
+are part of the comment:</p>
 <div class="typocode">
 
 <pre class="prettyprint">/* for (Surfaces::iterator sf = surfaces.begin();
@@ -158,12 +120,10 @@ for (Surfaces::iterator sf = surfaces.begin();
 </div>
 
 <p>If your editor does not allow you to easily comment out a lengthy region of
-   code in this way then either use a better editor or read the rest of this
-   article and consdier whether commenting out the code is really what&#8217;s required.
-</p>
+code in this way then either use a better editor or read the rest of this
+article and consdier whether commenting out the code is really what&#8217;s required.</p>
 <p>A more heavy duty way to stop a block of code from executing is to instruct
-   the preprocessor to skip past it.
-</p>
+the preprocessor to skip past it.</p>
 <div class="typocode">
 
 <pre class="prettyprint">#if 0
@@ -173,18 +133,16 @@ for (Surfaces::iterator sf = surfaces.begin();
          // std::cout &lt;&lt; "Drawing: " &lt;&lt; *sf &lt;&lt; "\n";
          sf-&gt;draw();
     }
-#endif
+#endif     
 
 </pre>
 
 </div>
 
 <p>If this technique is used, the preprocessed-out code blends perfectly with the
-   executable code. Even syntax-highlighting does not expose the fact that the
-   code will not be executed.
-</p>
-
-<h3><a href="#toc2" name="tocmore-examples" id="tocmore-examples">More Examples</a></h3>
+executable code. Even syntax-highlighting does not expose the fact that the
+code will not be executed.</p>
+<h3 id="more-examples">More Examples</h3>
 <div class="typocode"><div class="codetitle">Example 1</div>
 
 <pre class="prettyprint">void Session::registerClient(Client const &amp; /* client */) {
@@ -207,73 +165,55 @@ for (Surfaces::iterator sf = surfaces.begin();
          convertTable1(data);
          break;
     ....
-}
+}    
 
 </pre>
 
 </div>
 
-
-<h3><a href="#toc3" name="tocwhy-commentout-code" id="tocwhy-commentout-code">Why Comment-Out code?</a></h3>
+<h3 id="why-comment-out-code">Why Comment-Out code?</h3>
 <p>The obvious answer &#8212; to stop it from executing &#8212; begs the further questions:
-   Why should the code not execute? Did it ever execute? Will it ever execute?
-   There are several possibilities:
-</p>
+Why should the code not execute? Did it ever execute? Will it ever execute?
+There are several possibilities:</p>
 <ol>
- <li><p>The commented-out code has been superceded by something better, but the
-      author of the new code wants the old code to stick around for a while,
-      perhaps as a reference, perhaps out of historical interest, or perhaps
-      because the new code might not turn out to be better after all.
-     <br />
-</p>
-
- </li>
-
- <li><p>Commenting the code out appears to fix a bug, but noone understands
-      why &#8212; hence the old code is left in comments.
-      <br />
-</p>
-
- </li>
-
- <li><p>The code was commented out during an experiment, maybe an attempt to
-      reproduce a bug, and should never actually have been checked-in in such
-      a state. In other words, a bug has been introduced: in fact the code
-      should still be executed.
-      <br />
-</p>
-
- </li>
-
- <li><p>The source file belongs to a third party library which has required
-      modifications to work in-house. The lines which have been commented out
-      represent the source code in its original form.
-</p>
-
- </li>
-
- <li><p>The commented-out code produces irritatingly verbose debug diagnostics
-      which needed silencing.
-</p>
-
- </li>
-
- <li><p>The commented-out code represents work-in-progess which the author has
-      sensibly checked in to the source repository for safe keeping.
-</p>
-
- </li>
+<li>
+<p>The commented-out code has been superceded by something better, but the
+   author of the new code wants the old code to stick around for a while,
+   perhaps as a reference, perhaps out of historical interest, or perhaps
+   because the new code might not turn out to be better after all.</p>
+</li>
+<li>
+<p>Commenting the code out appears to fix a bug, but noone understands
+   why &#8212; hence the old code is left in comments.</p>
+</li>
+<li>
+<p>The code was commented out during an experiment, maybe an attempt to
+   reproduce a bug, and should never actually have been checked-in in such
+   a state. In other words, a bug has been introduced: in fact the code
+   should still be executed.</p>
+</li>
+<li>
+<p>The source file belongs to a third party library which has required
+   modifications to work in-house. The lines which have been commented out
+   represent the source code in its original form.</p>
+</li>
+<li>
+<p>The commented-out code produces irritatingly verbose debug diagnostics
+   which needed silencing.</p>
+</li>
+<li>
+<p>The commented-out code represents work-in-progess which the author has
+   sensibly checked in to the source repository for safe keeping.</p>
+</li>
 </ol>
 <p>These are all reasons for turning code into comments, some more reasonable
-   than others. Categorising our examples: Example 0) appears to be silenced debug,
-   Example 1) work in progress, and Example 2) a hacked-up experiment &#8212; though we
-   really cannot be sure. Example 2) might equally well remove the symptoms (if
-   not the cause) of a bug and Example 1) might represent a superceded method.
-</p>
+than others. Categorising our examples: Example 0) appears to be silenced debug,
+Example 1) work in progress, and Example 2) a hacked-up experiment &#8212; though we
+really cannot be sure. Example 2) might equally well remove the symptoms (if
+not the cause) of a bug and Example 1) might represent a superceded method.</p>
 <p>The important point is that unless the author of the commented-out code
-   explains what&#8217;s intended, it is impossible for future readers to accurately
-   guess. How, then, should the author explain? With a comment!
-</p>
+explains what&#8217;s intended, it is impossible for future readers to accurately
+guess. How, then, should the author explain? With a comment!</p>
 <div class="typocode">
 
 <pre class="prettyprint">for (Surfaces::iterator sf = surfaces.begin();
@@ -289,8 +229,7 @@ for (Surfaces::iterator sf = surfaces.begin();
 
 </div>
 
-<p>Depending on circumstance, the comment might read:
-</p>
+<p>Depending on circumstance, the comment might read:</p>
 <div class="typocode">
 
 <pre class="prettyprint">// Do not inflict verbose debug output on everyone.
@@ -300,9 +239,7 @@ for (Surfaces::iterator sf = surfaces.begin();
 
 </div>
 
-<pre><code>
-</code></pre><p>or even:
-</p>
+<p>or even:</p>
 <div class="typocode">
 
 <pre class="prettyprint">// Commenting out the above line of code appears to cure the
@@ -315,34 +252,28 @@ for (Surfaces::iterator sf = surfaces.begin();
 </div>
 
 <p>I have included an explicit name and date in the comment &#8212; redundant data,
-   strictly speaking, since they duplicate information held in the source
-   management system &#8212; because I do not intend the code to persist in its
-   current state. The comment has a sell-by date. Anyone reading it will
-   immediately understand what&#8217;s going on and who to hassle if they don&#8217;t like
-   it.
-</p>
-
-<h3><a href="#toc4" name="tocwhy-commenting-out-code-is-a-bad-idea" id="tocwhy-commenting-out-code-is-a-bad-idea">Why Commenting Out Code is a Bad Idea</a></h3>
+strictly speaking, since they duplicate information held in the source
+management system &#8212; because I do not intend the code to persist in its
+current state. The comment has a sell-by date. Anyone reading it will
+immediately understand what&#8217;s going on and who to hassle if they don&#8217;t like
+it.</p>
+<h3 id="why-commenting-out-code-is-a-bad-idea">Why Commenting Out Code is a Bad Idea</h3>
 <p>Commented-out code &#8212; like any other comment &#8212; ages badly. It needs
-   maintaining if it is to remain in a state where it can be uncommented and
-   compiled, should the need arise, and of course it won&#8217;t be maintained in this
-   way since the need is unlikely to arise. There is more than enough live code
-   to maintain without devoting attention to half-dead code in comments.
-</p>
+maintaining if it is to remain in a state where it can be uncommented and
+compiled, should the need arise, and of course it won&#8217;t be maintained in this
+way since the need is unlikely to arise. There is more than enough live code
+to maintain without devoting attention to half-dead code in comments.</p>
 <p>Once code has been commented out it becomes hard to remove: someone at some
-   point obviously thought the code worth leaving in, so future programmers working
-   on the file honour that decision, although they may well consider the code
-   smells a bit off &#8212; code which someone once found problems with, attempted
-   to cure, never really got to the bottom of, and left for someone else to sort
-   out, or, more than likely, ignore.
-</p>
-
-<h3><a href="#toc5" name="tocwhat-to-do-instead" id="tocwhat-to-do-instead">What to do Instead</a></h3>
+point obviously thought the code worth leaving in, so future programmers working
+on the file honour that decision, although they may well consider the code
+smells a bit off &#8212; code which someone once found problems with, attempted
+to cure, never really got to the bottom of, and left for someone else to sort
+out, or, more than likely, ignore.</p>
+<h3 id="what-to-do-instead">What to do Instead</h3>
 <p>The source management system is the proper home for old versions of source
-   code. If, for some reason, it really seems necessary to explicitly note
-   that an alternative version of the current code once existed, then
-   this can be indicated using indirection.
-</p>
+code. If, for some reason, it really seems necessary to explicitly note
+that an alternative version of the current code once existed, then
+this can be indicated using indirection.</p>
 <div class="typocode">
 
 <pre class="prettyprint">// Previously, surfaces were stored in a vector, not a list.
@@ -354,46 +285,39 @@ for (Surfaces::iterator sf = surfaces.begin();
 </div>
 
 <p>There is a direct parallel with the change history of a document: at times it
-   may be very useful to review who changed what, when, or to examine
-   side-by-side differences with the previous version of the document, but this is
-   achieved by accessing the document&#8217;s revision history, not by leaving obsolete
-   wording lying around in strike-through style.  The up-to-date version of the
-   document should be up-to-date.
-</p>
+may be very useful to review who changed what, when, or to examine
+side-by-side differences with the previous version of the document, but this is
+achieved by accessing the document&#8217;s revision history, not by leaving obsolete
+wording lying around in strike-through style.  The up-to-date version of the
+document should be up-to-date.</p>
 <p>Ideally, then, the dead code can be cut away. To achieve this ideal requires
-   proper use of the source management system. Check-in comments should be of the
-   same standard as any other project documentation &#8212; they need to be clear,
-   accurate, and must include relevant cross-references (to bug report numbers,
-   for example). An iterative approach to check-ins works well: i.e. take the
-   code in steps towards its new form, checking in after each step is complete.
-</p>
+proper use of the source management system. Check-in comments should be of the
+same standard as any other project documentation &#8212; they need to be clear,
+accurate, and must include relevant cross-references (to bug report numbers,
+for example). An iterative approach to check-ins works well: i.e. take the
+code in steps towards its new form, checking in after each step is complete.</p>
 <p>We may not be dealing with dead code, though. Perhaps the code represents work
-   in progress &#8212; functions which are being written and which do not yet work,
-   but which none-the-less belong in the source code repository. In this case,
-   the code needs to indicate why it has been commented out, as already
-   mentioned. An alternative would be to store the developing code on a branch
-   until it matures.
-</p>
+in progress &#8212; functions which are being written and which do not yet work,
+but which none-the-less belong in the source code repository. In this case,
+the code needs to indicate why it has been commented out, as already
+mentioned. An alternative would be to store the developing code on a branch
+until it matures.</p>
 <p>Similarly, if the commented-out code represents the original content of a
-   third-party file, then an in-line explanation is required to make this evident
-   to anyone inspecting that file. Even in this situation, I would argue the
-   original content should be cut and the source control system used to manage
-   the differences.
-</p>
+third-party file, then an in-line explanation is required to make this evident
+to anyone inspecting that file. Even in this situation, I would argue the
+original content should be cut and the source control system used to manage
+the differences.</p>
 <p>Debug output often gets commented-out because it degrades performance or fills
-   up screens. In this case, either the debug code really was a one-off, and
-   should be deleted after use, or it should be carefully integrated into the
-   trace system (the trace system being the module which provides the facility
-   to efficiently filter logged output at run time).
-</p>
-
-<h3><a href="#toc6" name="tocconclusions" id="tocconclusions">Conclusions</a></h3>
+up screens. In this case, either the debug code really was a one-off, and
+should be deleted after use, or it should be carefully integrated into the
+trace system (the trace system being the module which provides the facility
+to efficiently filter logged output at run time).</p>
+<h3 id="conclusions">Conclusions</h3>
 <p>What would happen if you were to cut commented-out code from your
-   source tree? My guess is that you would have significantly less code to
-   maintain, that much of the remaining code would be cleaner (and therefore
-   easier to maintain), that old versions of code would remain accessible, and
-   that functionality and efficiency would be unaltered.
-</p>
+source tree? My guess is that you would have significantly less code to
+maintain, that much of the remaining code would be cleaner (and therefore
+easier to maintain), that old versions of code would remain accessible, and
+that functionality and efficiency would be unaltered.</p>
 </div>
 
 <div class="comments"><hr/><div id="disqus_thread"></div><script type="text/javascript" src="http://disqus.com/forums/wordaligned/embed.js"></script></div>

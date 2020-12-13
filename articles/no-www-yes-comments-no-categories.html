@@ -28,14 +28,10 @@
       <div class="atomentry" id="no-www-yes-comments-no-categories">
 <h2 class="title"><a href="/articles/no-www-yes-comments-no-categories">No www, yes comments, no categories</a></h2>
 <p class="meta"><abbr class="published" title="2008-02-10">2008-02-10</abbr> &bull; <a href="/tag/self" rel="tag">Self</a>, <a href="/tag/web-applications" rel="tag">Web Applications</a> &bull; <a href="/articles/no-www-yes-comments-no-categories#disqus_thread">Comments</a></p>
-<p>I <a href="/articles/metablog.html">mentioned</a> a while ago that I&#8217;d decided to roll my own website, and I&#8217;m generally pleased with the results. The up-time and response times have been fine, and I&#8217;ve been able to change things easily.
-</p>
-
-<h4>No www</h4>
-<p><a href="http://no-www.org"><img style="float:right;" src="http://no-www.org/images/type1/class-b.png" alt="No WWW class B png"></img></a>
-</p>
-<p>Inspired by this <a href="http://simonwillison.net/2007/Feb/4/urls/">article</a>, I&#8217;ve chopped the www from this site&#8217;s address. Wordaligned.org is four characters fewer to type and a whole seven syllables (!) fewer to say than www.wordaligned.org. From now on anyone visiting <a href="http://www.wordaligned.org">www.wordaligned.org</a> will be redirected to <a href="http://wordaligned.org">wordaligned.org</a>. 
-</p>
+<p>I <a href="/articles/metablog.html">mentioned</a> a while ago that I&#8217;d decided to roll my own website, and I&#8217;m generally pleased with the results. The up-time and response times have been fine, and I&#8217;ve been able to change things easily.</p>
+<h4 id="no-www">No www</h4>
+<p><a href="http://no-www.org"><img style="float:right;" src="http://no-www.org/images/type1/class-b.png" alt="No WWW class B png"></img></a></p>
+<p>Inspired by this <a href="http://simonwillison.net/2007/Feb/4/urls/">article</a>, I&#8217;ve chopped the www from this site&#8217;s address. Wordaligned.org is four characters fewer to type and a whole seven syllables (!) fewer to say than www.wordaligned.org. From now on anyone visiting <a href="http://www.wordaligned.org">www.wordaligned.org</a> will be redirected to <a href="http://wordaligned.org">wordaligned.org</a>. </p>
 <pre>
 $ curl -I www.wordaligned.org
 HTTP/1.1 301 Moved Permanently
@@ -44,28 +40,17 @@ Server: lighttpd | Word Aligned
 Location: http://wordaligned.org/
 </pre>
 
-<p>(For what it&#8217;s worth, the bare wordaligned.org host name worked fine before the reconfiguration and was the one I generally chose to use myself.)
-</p>
-<p>The change itself was trivial &#8212; a single string in a configuration file and a simple <a href="http://trac.lighttpd.net/trac/wiki/Docs%3AModRedirect">lighttpd redirect</a>. I guess this is an example of <a href="/articles/why-software-development-isnt-like-construction.html">why I can&#8217;t agree with the analogy</a> on which Steve McConnell builds his book, <a href="http://www.cc2e.com">&#8220;Code Complete&#8221;</a>, that software development is like construction. <span id="excerpt0"/>Software is soft: there&#8217;s no problem moving a load-bearing wall.
-</p>
-<p>In fact, the only place the host name appears explicitly is in the site feed, a feed which, thanks to the indirection offered by <a href="http://www.feedburner.com">Feedburner</a>, hasn&#8217;t itself moved. Links-to-self in the various pages appearing on this site are all relative. Despite this, I&#8217;ve had to break backwards compatability, to a degree. I can&#8217;t visit Word Aligned bookmarks on del.icio.us and reddit etc. and change them to suit my new preferences; all I can do is leave a suitable chain of redirects. <a href="http://www.w3.org/Provider/Style/URI">Cool URIs aren&#8217;t supposed to change</a>, but I reckon the internet can handle some gentle tweaking.
-</p>
-
-<h4>Yes comments</h4>
-<p>I&#8217;ve found a way to enable comments. I <a href="/articles/metablog.html">ran into problems</a> with the comment system on my old blog and I&#8217;m hoping that outsourcing comments to <a href="http://www.haloscan.com">Haloscan</a> will solve these. My life has already been improved thanks to a <a href="http://www.haloscan.com/comments/wordaligned/attack_of_the_alien_asterisks/?src=hsrs#3580">comment</a> from James Slaughter pointing me at a <a href="http://www.google.com/search?q=consolas">decent monospaced font</a> for Windows. You&#8217;ll need Javascript enabled to enter comments, I think. The feed is at <a href="http://feeds.wordaligned.org/wordaligned/comments">feeds.wordaligned.org/wordaligned/comments</a>.
-</p>
-<p>On the subject of comments, I&#8217;ve finally got round to importing feedback posted to my old site. I do value this feedback &#8212; I&#8217;ve <a href="/articles/keyword-substitution-just-say-no.html#feedback-152">learned from it</a> and I&#8217;m sure others have too &#8212; so I apologise for the time it&#8217;s taken me to post it here. I also appreciate feedback I&#8217;ve had by email, and if I haven&#8217;t adjusted articles to take account of your suggestions etc. it&#8217;s probably because the task remains stacked on my todo list.
-</p>
-
-<h4>No Categories</h4>
-<p>I&#8217;ve decided to simplify things and remove the distinction between categories and tags; everything&#8217;s a tag here now. When I designed this site (OK, so I stole the design from just about every other blog out there!) I spent a while trying to figure out the distinction between categories and tags. I think I get it &#8212; an article posted in the &#8220;Blub&#8221; category should largely be about <a href="http://www.paulgraham.com/avg.html">Blub</a>, whereas an article tagged &#8220;Blub&#8221; just has to mention <a href="http://www.paulgraham.com/avg.html">Blub</a> &#8212; I get it but don&#8217;t really find the distinction worth making.
-</p>
-
-<h4>Problems?</h4>
-<p>As ever, please <a href="mailto:tag@wordaligned.org">let me know</a> if any of this causes problems or isn&#8217;t working properly. I&#8217;d like to know if the site isn&#8217;t loading or rendering properly, and will do my best to sort it out.
-</p>
-<p>My next challenge for this site is that ultimate in <a href="http://www.oreillynet.com/onlamp/blog/2007/08/constraints_and_software_devel.html">constrained software development</a>: designing a <a href="http://en.wikipedia.org/wiki/Favicon">graphic to fit in 16x16 pixels</a> which will somehow embody everything this site is about.
-</p>
+<p>(For what it&#8217;s worth, the bare wordaligned.org host name worked fine before the reconfiguration and was the one I generally chose to use myself.)</p>
+<p>The change itself was trivial &#8212; a single string in a configuration file and a simple <a href="http://trac.lighttpd.net/trac/wiki/Docs%3AModRedirect">lighttpd redirect</a>. I guess this is an example of <a href="/articles/why-software-development-isnt-like-construction.html">why I can&#8217;t agree with the analogy</a> on which Steve McConnell builds his book, <a href="http://www.cc2e.com">&#8220;Code Complete&#8221;</a>, that software development is like construction. <span id="excerpt0"/>Software is soft: there&#8217;s no problem moving a load-bearing wall.</p>
+<p>In fact, the only place the host name appears explicitly is in the site feed, a feed which, thanks to the indirection offered by <a href="http://www.feedburner.com">Feedburner</a>, hasn&#8217;t itself moved. Links-to-self in the various pages appearing on this site are all relative. Despite this, I&#8217;ve had to break backwards compatability, to a degree. I can&#8217;t visit Word Aligned bookmarks on del.icio.us and reddit etc. and change them to suit my new preferences; all I can do is leave a suitable chain of redirects. <a href="http://www.w3.org/Provider/Style/URI">Cool URIs aren&#8217;t supposed to change</a>, but I reckon the internet can handle some gentle tweaking.</p>
+<h4 id="yes-comments">Yes comments</h4>
+<p>I&#8217;ve found a way to enable comments. I <a href="/articles/metablog.html">ran into problems</a> with the comment system on my old blog and I&#8217;m hoping that outsourcing comments to <a href="http://www.haloscan.com">Haloscan</a> will solve these. My life has already been improved thanks to a <a href="http://www.haloscan.com/comments/wordaligned/attack_of_the_alien_asterisks/?src=hsrs#3580">comment</a> from James Slaughter pointing me at a <a href="http://www.google.com/search?q=consolas">decent monospaced font</a> for Windows. You&#8217;ll need Javascript enabled to enter comments, I think. The feed is at <a href="http://feeds.wordaligned.org/wordaligned/comments">feeds.wordaligned.org/wordaligned/comments</a>.</p>
+<p>On the subject of comments, I&#8217;ve finally got round to importing feedback posted to my old site. I do value this feedback &#8212; I&#8217;ve <a href="/articles/keyword-substitution-just-say-no.html#feedback-152">learned from it</a> and I&#8217;m sure others have too &#8212; so I apologise for the time it&#8217;s taken me to post it here. I also appreciate feedback I&#8217;ve had by email, and if I haven&#8217;t adjusted articles to take account of your suggestions etc. it&#8217;s probably because the task remains stacked on my todo list.</p>
+<h4 id="no-categories">No Categories</h4>
+<p>I&#8217;ve decided to simplify things and remove the distinction between categories and tags; everything&#8217;s a tag here now. When I designed this site (OK, so I stole the design from just about every other blog out there!) I spent a while trying to figure out the distinction between categories and tags. I think I get it &#8212; an article posted in the &#8220;Blub&#8221; category should largely be about <a href="http://www.paulgraham.com/avg.html">Blub</a>, whereas an article tagged &#8220;Blub&#8221; just has to mention <a href="http://www.paulgraham.com/avg.html">Blub</a> &#8212; I get it but don&#8217;t really find the distinction worth making.</p>
+<h4 id="problems">Problems?</h4>
+<p>As ever, please <a href="mailto:tag@wordaligned.org">let me know</a> if any of this causes problems or isn&#8217;t working properly. I&#8217;d like to know if the site isn&#8217;t loading or rendering properly, and will do my best to sort it out.</p>
+<p>My next challenge for this site is that ultimate in <a href="http://www.oreillynet.com/onlamp/blog/2007/08/constraints_and_software_devel.html">constrained software development</a>: designing a <a href="http://en.wikipedia.org/wiki/Favicon">graphic to fit in 16x16 pixels</a> which will somehow embody everything this site is about.</p>
 </div>
 
 <div class="comments"><hr/><div id="disqus_thread"></div><script type="text/javascript" src="http://disqus.com/forums/wordaligned/embed.js"></script></div>

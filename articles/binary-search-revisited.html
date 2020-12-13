@@ -26,83 +26,23 @@
       <div class="atomentry" id="binary-search-revisited">
 <h2 class="title"><a href="/articles/binary-search-revisited">Binary search revisited</a></h2>
 <p class="meta"><abbr class="published" title="2010-05-26">2010-05-26</abbr> &bull; <a href="/tag/c++" rel="tag">C++</a>, <a href="/tag/algorithms" rel="tag">Algorithms</a>, <a href="/tag/python" rel="tag">Python</a> &bull; <a href="/articles/binary-search-revisited#disqus_thread">Comments</a></p>
-<div class="toc">
-<h2>Contents</h2>
+<h3 id="recap">Recap</h3>
+<p>Recently <a href="/articles/binary-search.html">I wrote</a> about C++&#8217;s standard binary search algorithms (yes, four of them!) which do such a fine job of:</p>
 <ul>
- <li><a href="#tocrecap" name="toc0" id="toc0">Recap</a>
- </li>
-
- <li><a href="#tocthe-problem" name="toc1" id="toc1">The Problem</a>
- </li>
-
- <li><a href="#tocinput-iterators" name="toc2" id="toc2">Input iterators</a>
- </li>
-
- <li><a href="#tocfind" name="toc3" id="toc3">Find</a>
- </li>
-
- <li><a href="#tocrewrite-the-file" name="toc4" id="toc4">Rewrite the file!</a>
- </li>
-
- <li><a href="#tocadapting-iterators" name="toc5" id="toc5">Adapting iterators</a>
- </li>
-
- <li><a href="#tocmultipass-iterator" name="toc6" id="toc6">Multipass iterator</a>
- </li>
-
- <li><a href="#tocnot-so-fast" name="toc7" id="toc7">Not so fast</a>
- </li>
-
- <li><a href="#tocbetter-than-find" name="toc8" id="toc8">Better than find</a>
- </li>
-
- <li><a href="#tocimplementation" name="toc9" id="toc9">Implementation</a>
- </li>
-
- <li><a href="#tochardware-used" name="toc10" id="toc10">Hardware used</a>
- </li>
-
- <li><a href="#tocconclusions" name="toc11" id="toc11">Conclusions</a>
- </li>
+<li>specifying exactly what kind of range a binary search requires</li>
+<li>separating the core algorithm from the details of the range it&#8217;s working on</li>
+<li>delivering precise results</li>
 </ul>
-</div>
-<h3><a href="#toc0" name="tocrecap" id="tocrecap">Recap</a></h3>
-<p>Recently <a href="/articles/binary-search.html">I wrote</a> about C++&#8217;s standard binary search algorithms (yes, four of them!) which do such a fine job of:
-</p>
-<ul>
- <li>
-     specifying exactly what kind of range a binary search requires
- </li>
-
- <li>
-     separating the core algorithm from the details of the range it&#8217;s working on
- </li>
-
- <li>
-     delivering precise results
- </li>
-</ul>
-<p>To support these claims I included an implementation of a file iterator, suitable for use with <code>std::binary_search()</code> etc. to efficiently locate values in very large files.
-</p>
-<p>Now, there are a couple of issues with this approach:
-</p>
+<p>To support these claims I included an implementation of a file iterator, suitable for use with <code>std::binary_search()</code> etc. to efficiently locate values in very large files.</p>
+<p>Now, there are a couple of issues with this approach:</p>
 <ol>
- <li>
-     we had to write a lot of code to make a file iterator suitable for use with standard algorithms
- </li>
-
- <li>
-     this file iterator only works on highly structured files, where each value occupies a fixed number of bytes
- </li>
+<li>we had to write a lot of code to make a file iterator suitable for use with standard algorithms</li>
+<li>this file iterator only works on highly structured files, where each value occupies a fixed number of bytes</li>
 </ol>
-<p>In this follow up article we&#8217;ll consider each of these issues in a little more depth by working through two very different solutions to a related problem.
-</p>
-<span id="continue-reading"/>
-
-
-<h3><a href="#toc1" name="tocthe-problem" id="tocthe-problem">The Problem</a></h3>
-<p>Suppose, once again, that we have a large file, a few gigabytes, say. The file contains numbers, in order, and we&#8217;re interested in testing if this file contains a given number. This time, though, the file is a text file, where the numbers are represented in the usual way as sequences of digits separated by whitespace.
-</p>
+<p>In this follow up article we&#8217;ll consider each of these issues in a little more depth by working through two very different solutions to a related problem.</p>
+<p><span id="continue-reading"/></p>
+<h3 id="the-problem">The Problem</h3>
+<p>Suppose, once again, that we have a large file, a few gigabytes, say. The file contains numbers, in order, and we&#8217;re interested in testing if this file contains a given number. This time, though, the file is a text file, where the numbers are represented in the usual way as sequences of digits separated by whitespace.</p>
 <pre>
 $ less lots-of-numbers
 ...
@@ -111,14 +51,10 @@ $ less lots-of-numbers
 ...
 </pre>
 
-<p>Note that a number in this file does not occupy a fixed number of bytes. If we jump to a new position in the file using a seek operation, we cannot expect to land exactly where a number starts. Thus the random access file iterator we developed last time won&#8217;t work.
-</p>
-
-<h3><a href="#toc2" name="tocinput-iterators" id="tocinput-iterators">Input iterators</a></h3>
-<p>In C++ an input file is an example of an input stream, and the standard library gives us <code>istream_iterators</code> which perform formatted input. In our case, an <code>istream_iterator&lt;int&gt;</code> effectively converts the file into a stream of numbers.
-</p>
-<p>Istream iterators are <a href="http://www.sgi.com/tech/stl/InputIterator.html" title="InputIterator, SGI STL documentation">input iterators</a>. They progress through the input stream, item by item, with no repeating or rewinding allowed. Despite their limitations, the C++ standard library provides some algorithms which require nothing more than basic input iterators. For example, to count up even numbers in the file whose name is supplied on the command line we might use <code>std::count_if</code>.
-</p>
+<p>Note that a number in this file does not occupy a fixed number of bytes. If we jump to a new position in the file using a seek operation, we cannot expect to land exactly where a number starts. Thus the random access file iterator we developed last time won&#8217;t work.</p>
+<h3 id="input-iterators">Input iterators</h3>
+<p>In C++ an input file is an example of an input stream, and the standard library gives us <code>istream_iterators</code> which perform formatted input. In our case, an <code>istream_iterator&lt;int&gt;</code> effectively converts the file into a stream of numbers.</p>
+<p>Istream iterators are <a href="http://www.sgi.com/tech/stl/InputIterator.html" title="InputIterator, SGI STL documentation">input iterators</a>. They progress through the input stream, item by item, with no repeating or rewinding allowed. Despite their limitations, the C++ standard library provides some algorithms which require nothing more than basic input iterators. For example, to count up even numbers in the file whose name is supplied on the command line we might use <code>std::count_if</code>.</p>
 <div class="typocode">
 
 <pre class="prettyprint">#include &lt;algorithm&gt;
@@ -136,9 +72,9 @@ int main(int argc, char * argv[])
     typedef std::istream_iterator&lt;int&gt; i_iter;
     typedef std::ostream_iterator&lt;int&gt; o_iter;
     std::ifstream in(argv[1]);
-    
-    std::cout &lt;&lt; std::count_if(i_iter(in), i_iter(), is_even) &lt;&lt; '\n';
-    
+
+    std::cout &lt;&lt; std::count_if(i_iter(in), i_iter(), is_even) &lt;&lt; &#x27;\n&#x27;;
+
     return 0;
 }
 
@@ -146,8 +82,7 @@ int main(int argc, char * argv[])
 
 </div>
 
-<p>The next version of C++ supports lambda functions, so you&#8217;ll be able to put <code>is_even</code> right where it&#8217;s used, in the <code>count_if()</code> function call. Or, with the current version of C++, you could write:
-</p>
+<p>The next version of C++ supports lambda functions, so you&#8217;ll be able to put <code>is_even</code> right where it&#8217;s used, in the <code>count_if()</code> function call. Or, with the current version of C++, you could write:</p>
 <div class="typocode"><div class="codetitle">Ouch!</div>
 
 <pre class="prettyprint">    ....
@@ -158,12 +93,9 @@ int main(int argc, char * argv[])
 
 </div>
 
-<p>Maybe not!
-</p>
-
-<h3><a href="#toc3" name="tocfind" id="tocfind">Find</a></h3>
-<p>The very simplest search algorithm, <code>std::find</code>, needs nothing more than an input iterator. To determine if a number is in a file, we <strong>could</strong> just invoke <code>std::find</code>.
-</p>
+<p>Maybe not!</p>
+<h3 id="find">Find</h3>
+<p>The very simplest search algorithm, <code>std::find</code>, needs nothing more than an input iterator. To determine if a number is in a file, we <strong>could</strong> just invoke <code>std::find</code>.</p>
 <div class="typocode">
 
 <pre class="prettyprint">typedef std::istream_iterator&lt;int&gt; i_iter;
@@ -181,38 +113,28 @@ is_number_in_file(char const * filename, int n)
 
 </div>
 
-<p>Here, the find algorithm advances through the numbers in the file, from start to finish, stopping as soon as it hits one equal to the supplied value, <code>n</code>. We can expect this function to be light on memory use &#8212; there will be some buffering at the lower levels of the file access, but nothing more &#8212; and the function is evidently correct.
-</p>
-<p>It would be correct even if our file was unsorted, however. Is there any way we can do better?
-</p>
-
-<h3><a href="#toc4" name="tocrewrite-the-file" id="tocrewrite-the-file">Rewrite the file!</a></h3>
-<p>In the previous article we developed a random access iterator for accessing binary files, and usable for efficient binary searches of sorted binary files. Now would be a good time to question the problem specification. Is this a one off? Or are we going to be testing the presence of more numbers in the file in future? And if so, can we convert the file to binary to save time in the long run? 
-</p>
-<p>Although I&#8217;m not going to pursue this option here, it may well be the best approach. For now, though, let&#8217;s assume we have a one-off problem to solve, and that we aren&#8217;t allowed to tinker with the input.
-</p>
-
-<h3><a href="#toc5" name="tocadapting-iterators" id="tocadapting-iterators">Adapting iterators</a></h3>
-<p>If we want to use <code>std::binary_search</code> we need, as a minimum, <a href="http://www.sgi.com/tech/stl/ForwardIterator.html" title="ForwardIterator, SGI STL documentation">forward iterators</a>. Like input iterators, forward iterators advance, one step at a time. Unlike input iterators, you can copy a forward iterator and dereference or advance that copy in future, independently of the original.
-</p>
-<p>Forward iterators are suitable for multipass algorithms, such as <code>std::search</code>, which looks for the first occurrence of a sequence within a sequence (a generalised <code>strstr</code>, if you like), or <code>std::adjacent_find</code> and <code>std::search_n</code> which look for repeated elements; and of course <code>std::binary_search</code>, which is our immediate interest.
-</p>
-<p>Wouldn&#8217;t it be nice if we could convert our istream iterators into forwards iterators? Then we could plug them directly into all these algorithms.
-</p>
+<p>Here, the find algorithm advances through the numbers in the file, from start to finish, stopping as soon as it hits one equal to the supplied value, <code>n</code>. We can expect this function to be light on memory use &#8212; there will be some buffering at the lower levels of the file access, but nothing more &#8212; and the function is evidently correct.</p>
+<p>It would be correct even if our file was unsorted, however. Is there any way we can do better?</p>
+<h3 id="rewrite-the-file">Rewrite the file!</h3>
+<p>In the previous article we developed a random access iterator for accessing binary files, and usable for efficient binary searches of sorted binary files. Now would be a good time to question the problem specification. Is this a one off? Or are we going to be testing the presence of more numbers in the file in future? And if so, can we convert the file to binary to save time in the long run? </p>
+<p>Although I&#8217;m not going to pursue this option here, it may well be the best approach. For now, though, let&#8217;s assume we have a one-off problem to solve, and that we aren&#8217;t allowed to tinker with the input.</p>
+<h3 id="adapting-iterators">Adapting iterators</h3>
+<p>If we want to use <code>std::binary_search</code> we need, as a minimum, <a href="http://www.sgi.com/tech/stl/ForwardIterator.html" title="ForwardIterator, SGI STL documentation">forward iterators</a>. Like input iterators, forward iterators advance, one step at a time. Unlike input iterators, you can copy a forward iterator and dereference or advance that copy in future, independently of the original.</p>
+<p>Forward iterators are suitable for multipass algorithms, such as <code>std::search</code>, which looks for the first occurrence of a sequence within a sequence (a generalised <code>strstr</code>, if you like), or <code>std::adjacent_find</code> and <code>std::search_n</code> which look for repeated elements; and of course <code>std::binary_search</code>, which is our immediate interest.</p>
+<p>Wouldn&#8217;t it be nice if we could convert our istream iterators into forwards iterators? Then we could plug them directly into all these algorithms.</p>
 <p>Other languages allow this. You can replicate streams in the Unix shell with <code>tee</code>. And you can do something similar in Python, thanks to one of the standard <a href="http://docs.python.org/py3k/library/itertools.html">iterator tools</a>. Independent iterators over the same sequence needed? <tt><a href="http://docs.python.org/py3k/library/itertools.html#itertools.tee
-">Itertools.tee</a></tt> is your friend. The example below codes up adjacent find in Python.
-</p>
+">Itertools.tee</a></tt> is your friend. The example below codes up adjacent find in Python.</p>
 <div class="typocode">
 
 <pre class="prettyprint">from itertools import tee
 import sys
 
 def adjacent_find(xs):
-    '''Does the supplied iterable contain any adjacent repeats?
-    
+    &#x27;&#x27;&#x27;Does the supplied iterable contain any adjacent repeats?
+
     Returns True if xs contains two consecutive, equal items,
     False otherwise. 
-    '''
+    &#x27;&#x27;&#x27;
     try:
         curr, next_ = tee(xs)
         next(next_)
@@ -224,22 +146,16 @@ def adjacent_find(xs):
 
 </div>
 
-<p><a href="http://www.jezuk.co.uk/mango" title="Mango: iterators, algorithms, functions, for Java, by Jez Higgins"><img src="http://www.jezuk.co.uk/files/mango-header.png" alt="Mango: iterators, algorithms, functions, for Java, by Jez Higgins"/></a>
-</p>
-<p>Why, even Java has an iterator adaptors, courtesy of Jez Higgins&#8217; <a href="http://www.jezuk.co.uk/mango" title="Mango: iterators, algorithms, functions, for Java, by Jez Higgins">Mango library</a>.
-</p>
-<p>What about C++? I couldn&#8217;t find any such iterator adaptors in the standard library, but I turned up something in the standard library research and development unit, also known as <a href="http://www.boost.org" title="Free, peer-reviewed, portable C++ source libraries">Boost</a>.
-</p>
-<p><a href="http://boost.org"><img src="http://www.boost.org/doc/libs/1_43_0/boost.png" alt="Boost logo"/></a>
-</p>
-
-<h3><a href="#toc6" name="tocmultipass-iterator" id="tocmultipass-iterator">Multipass iterator</a></h3>
-<p><a href="http://www.boost.org/doc/libs/1_43_0/libs/spirit/doc/html/index.html">Boost.Spirit</a> is a remarkable C++ parser framework, which uses operator overloading to represent parsers directly as EBNF grammars in C++. Somewhere in its depths it tracks back, and hence must adapt input iterators into forward iterators &#8212; or <a href="http://www.boost.org/doc/libs/1_43_0/libs/spirit/doc/html/spirit/support/multi_pass.html">multipass iterators</a>, to use its own term.
-</p>
-<blockquote><p>The <code>multi_pass</code> iterator will convert any input iterator into a forward iterator suitable for use with Spirit.Qi. <code>multi_pass</code> will buffer data when needed and will discard the buffer when its contents is not needed anymore. This happens either if only one copy of the iterator exists or if no backtracking can occur.
-</p>
-</blockquote><p>What&#8217;s good enough for parsing is more than good enough for searching. Here&#8217;s a function which detects whether a number is in a file. Most of the code here just includes the right headers and defines some typedefs. By leaning on high quality support libraries we&#8217;ve overcome our first issue: we no longer have to write loads of code just to call binary search!
-</p>
+<p><a href="http://www.jezuk.co.uk/mango" title="Mango: iterators, algorithms, functions, for Java, by Jez Higgins"><img src="http://www.jezuk.co.uk/files/mango-header.png" alt="Mango: iterators, algorithms, functions, for Java, by Jez Higgins"/></a></p>
+<p>Why, even Java has an iterator adaptors, courtesy of Jez Higgins&#8217; <a href="http://www.jezuk.co.uk/mango" title="Mango: iterators, algorithms, functions, for Java, by Jez Higgins">Mango library</a>.</p>
+<p>What about C++? I couldn&#8217;t find any such iterator adaptors in the standard library, but I turned up something in the standard library research and development unit, also known as <a href="http://www.boost.org" title="Free, peer-reviewed, portable C++ source libraries">Boost</a>.</p>
+<p><a href="http://boost.org"><img src="http://www.boost.org/doc/libs/1_43_0/boost.png" alt="Boost logo"/></a></p>
+<h3 id="multipass-iterator">Multipass iterator</h3>
+<p><a href="http://www.boost.org/doc/libs/1_43_0/libs/spirit/doc/html/index.html">Boost.Spirit</a> is a remarkable C++ parser framework, which uses operator overloading to represent parsers directly as EBNF grammars in C++. Somewhere in its depths it tracks back, and hence must adapt input iterators into forward iterators &#8212; or <a href="http://www.boost.org/doc/libs/1_43_0/libs/spirit/doc/html/spirit/support/multi_pass.html">multipass iterators</a>, to use its own term.</p>
+<blockquote>
+<p>The <code>multi_pass</code> iterator will convert any input iterator into a forward iterator suitable for use with Spirit.Qi. <code>multi_pass</code> will buffer data when needed and will discard the buffer when its contents is not needed anymore. This happens either if only one copy of the iterator exists or if no backtracking can occur.</p>
+</blockquote>
+<p>What&#8217;s good enough for parsing is more than good enough for searching. Here&#8217;s a function which detects whether a number is in a file. Most of the code here just includes the right headers and defines some typedefs. By leaning on high quality support libraries we&#8217;ve overcome our first issue: we no longer have to write loads of code just to call binary search!</p>
 <div class="typocode"><div class="codetitle">Boost spirit multipass iterators</div>
 
 <pre class="prettyprint">#include &lt;fstream&gt;
@@ -263,10 +179,10 @@ bool
 is_number_in_file(number n, char const * filename)
 {
     std::ifstream in(filename);
-    
+
     fwd_it begin = spirit::make_default_multi_pass(in_it(in));
     fwd_it end = spirit::make_default_multi_pass(in_it());
-    
+
     return std::binary_search(begin, end, n);
 }
 
@@ -274,71 +190,44 @@ is_number_in_file(number n, char const * filename)
 
 </div>
 
-
-<h3><a href="#toc7" name="tocnot-so-fast" id="tocnot-so-fast">Not so fast</a></h3>
-<p>If this library-based solution looks too good to be true, that&#8217;s because it is! As we noted <a href="/articles/binary-search.html#tocstdbinarysearch-requirements">before</a>, the standard binary search algorithm may indeed work with forward iterators, but it works far better with random access iterators. There&#8217;s no point reducing the number of integer comparisons to <code>O(log(N))</code> if we&#8217;re going to advance our iterators <code>O(N)</code> times.
-</p>
-<p>What&#8217;s worse, these multipass iterators aren&#8217;t magic. Did you read the smallprint concerning Python&#8217;s <tt><a href="http://docs.python.org/py3k/library/itertools.html#itertools.tee">tee</a></tt> iterator?
-</p>
-<blockquote><p>This itertool may require significant auxiliary storage (depending on how much temporary data needs to be stored).
-</p>
-</blockquote><p>If teed iterators diverge, intervening values have to be stored somewhere, and the same appears to be true of our inscrutable multipass iterators. Huge chunks of our large input file are buffered into memory. When I ran this function to confirm the presence of a single number somewhere near the middle of a 4.4GB input file, it took over 19 minutes.
-</p>
+<h3 id="not-so-fast">Not so fast</h3>
+<p>If this library-based solution looks too good to be true, that&#8217;s because it is! As we noted <a href="/articles/binary-search.html#tocstdbinarysearch-requirements">before</a>, the standard binary search algorithm may indeed work with forward iterators, but it works far better with random access iterators. There&#8217;s no point reducing the number of integer comparisons to <code>O(log(N))</code> if we&#8217;re going to advance our iterators <code>O(N)</code> times.</p>
+<p>What&#8217;s worse, these multipass iterators aren&#8217;t magic. Did you read the smallprint concerning Python&#8217;s <tt><a href="http://docs.python.org/py3k/library/itertools.html#itertools.tee">tee</a></tt> iterator?</p>
+<blockquote>
+<p>This itertool may require significant auxiliary storage (depending on how much temporary data needs to be stored).</p>
+</blockquote>
+<p>If teed iterators diverge, intervening values have to be stored somewhere, and the same appears to be true of our inscrutable multipass iterators. Huge chunks of our large input file are buffered into memory. When I ran this function to confirm the presence of a single number somewhere near the middle of a 4.4GB input file, it took over 19 minutes.</p>
 <pre>
-real	19m13.675s
-user	5m19.219s
-sys	1m26.278s
+real    19m13.675s
+user    5m19.219s
+sys 1m26.278s
 </pre>
 
-<p>Much of this time was spent paging.
-</p>
-<p>As a comparison, testing for the same value using <code>find</code> took just under 3 minutes.
-</p>
+<p>Much of this time was spent paging.</p>
+<p>As a comparison, testing for the same value using <code>find</code> took just under 3 minutes.</p>
 <pre>
-real	2m48.139s
-user	2m21.336s
-sys	0m7.252s
+real    2m48.139s
+user    2m21.336s
+sys 0m7.252s
 </pre>
 
-<p>You&#8217;ll have noticed that we used default multipass iterators. These iterators permit multi-dimensional <a href="http://www.boost.org/doc/libs/1_43_0/libs/spirit/doc/html/spirit/support/multi_pass.html">customisation</a>. I wasn&#8217;t feeling brave enough to attempt a template storage policy class, and I very much doubt I could have beaten a simple linear find anyway; anything built on a generic input iterator is unlikely to solve our problem efficiently.
-</p>
-
-<h3><a href="#toc8" name="tocbetter-than-find" id="tocbetter-than-find">Better than find</a></h3>
-<p>We can beat <code>std::find</code> with a bit of ingenuity. Standard istream iterators are useful but, in this case, not a good starting point. A better idea is to create a novel iterator which uses file seek operations to advance through the file, then fine-tunes the file position to point at a number.
-</p>
-<p>Consider an imagine an iterator which can be positioned at any seekable position in the file, and which we dereference to be the first number in the file which ends at or after that position. The graphic below shows a file with 11 seekable positions, 0 through 10 inclusive. 
-</p>
+<p>You&#8217;ll have noticed that we used default multipass iterators. These iterators permit multi-dimensional <a href="http://www.boost.org/doc/libs/1_43_0/libs/spirit/doc/html/spirit/support/multi_pass.html">customisation</a>. I wasn&#8217;t feeling brave enough to attempt a template storage policy class, and I very much doubt I could have beaten a simple linear find anyway; anything built on a generic input iterator is unlikely to solve our problem efficiently.</p>
+<h3 id="better-than-find">Better than find</h3>
+<p>We can beat <code>std::find</code> with a bit of ingenuity. Standard istream iterators are useful but, in this case, not a good starting point. A better idea is to create a novel iterator which uses file seek operations to advance through the file, then fine-tunes the file position to point at a number.</p>
+<p>Consider an imagine an iterator which can be positioned at any seekable position in the file, and which we dereference to be the first number in the file which ends at or after that position. The graphic below shows a file with 11 seekable positions, 0 through 10 inclusive. </p>
 <ul>
- <li>
-     positions 0 and 1 dereference to the number 42  <br />
- </li>
-
- <li>
-     positions 2, 3, 4 and 5 dereference to the number 57
- </li>
-
- <li>
-     positions 6, 7, 8 and 9 dereference to the number 133
- </li>
-
- <li>
-     it is an error to try and dereference position 10, at the end of the file
- </li>
+<li>positions 0 and 1 dereference to the number 42  </li>
+<li>positions 2, 3, 4 and 5 dereference to the number 57</li>
+<li>positions 6, 7, 8 and 9 dereference to the number 133</li>
+<li>it is an error to try and dereference position 10, at the end of the file</li>
 </ul>
-<img src="/images/text-file-iterator.png" alt="Text file iterator"/>
-
-<p>Now, this is a rather unusual iterator. It iterates over the numbers in the file, but each number gets repeated for every byte in the file it occupies. Despite this duality it&#8217;s perfectly usable &#8212; so long as we keep a clear head. Binary searches are fine.
-</p>
-<p>How does this version perform?
-</p>
-<p>Recall, a linear search for a single value in the middle of a 4.4GB took nearly 3 minutes. Running 10 binary searches through the same file took just 40 milliseconds &#8212; that&#8217;s a rate of 25 searches a second!
-</p>
-
-<h3><a href="#toc9" name="tocimplementation" id="tocimplementation">Implementation</a></h3>
-<p>Here&#8217;s our weird new iterator. It should be usable on files containing whitespace separated items of any type for which the stream read <code>operator&gt;&gt;()</code> has been defined.
-</p>
-<p>There&#8217;s quite a lot of code here, but much of it is random access iterator scaffolding. The interesting functions are the private implementation details towards the end of the class.
-</p>
+<p><img src="/images/text-file-iterator.png" alt="Text file iterator"/></p>
+<p>Now, this is a rather unusual iterator. It iterates over the numbers in the file, but each number gets repeated for every byte in the file it occupies. Despite this duality it&#8217;s perfectly usable &#8212; so long as we keep a clear head. Binary searches are fine.</p>
+<p>How does this version perform?</p>
+<p>Recall, a linear search for a single value in the middle of a 4.4GB took nearly 3 minutes. Running 10 binary searches through the same file took just 40 milliseconds &#8212; that&#8217;s a rate of 25 searches a second!</p>
+<h3 id="implementation">Implementation</h3>
+<p>Here&#8217;s our weird new iterator. It should be usable on files containing whitespace separated items of any type for which the stream read <code>operator&gt;&gt;()</code> has been defined.</p>
+<p>There&#8217;s quite a lot of code here, but much of it is random access iterator scaffolding. The interesting functions are the private implementation details towards the end of the class.</p>
 <div class="typocode">
 
 <pre class="prettyprint">#include &lt;fstream&gt;
@@ -359,46 +248,46 @@ public:
 };
 
 /*
-  Here's an unusual iterator which can be used to binary search
+  Here&#x27;s an unusual iterator which can be used to binary search
   for whitespace-separated items in a text file.
-  
+
   It masquerades as a random access iterator but a file
   is not usually a random access device. Nonetheless, file seek
   operations are quicker than stepping through the file item by
   item.
-  
+
   The unusual thing is that the iterators correspond to 
   file offsets rather than items within the file.
-  
-  Here's a short example where the items are numbers.
-  
+
+  Here&#x27;s a short example where the items are numbers.
+
   +---+---+---+---+---+---+---+---+---+---+
   | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 |
   +---+---+---+---+---+---+---+---+---+---+
-  |'4'|'2'|   |   |'5'|'7'|   |'1'|'3'|'3'|
+  |&#x27;4&#x27;|&#x27;2&#x27;|   |   |&#x27;5&#x27;|&#x27;7&#x27;|   |&#x27;1&#x27;|&#x27;3&#x27;|&#x27;3&#x27;|
   +---+---+---+---+---+---+---+---+---+---+
-  
+
   The graphic shows a text file which contains 3 numbers,
   42, 57, 133, separated by whitespace.
-  
+
   The file itself is 10 bytes long, and hence there are 11
   iterators over the file, corresponding to actual file positions
   (including the one-past-the end position). To dereference an
   iterator, we step back through the file until we reach either
   whitespace or the start of the file. Then we look forwards 
   again and read in the next item.
-  
+
   In the graphic above:
-  
+
    - Iterators 0 and 1 point to number 42
    - Iterators 2, 3, 4 and 5 point to number 57
    - Iterators 6, 7, 8, 9 point to number 133
    - Iterator 10 is the end, and must not be dereferenced
-  
+
   Dereferencing an iterator always returns an item which is in
   the file, and all items in the file have iterators pointing to
   them, so std::binary_search based on these iterators is valid.
-  
+
   The iterators also expose their underlying file positions
   directory (via the getpos() member function), and with a
   little thought we can make use of std::lower_bound() and
@@ -408,9 +297,9 @@ template &lt;typename item&gt;
 class text_file_item_iter
 {
     typedef text_file_item_iter&lt;item&gt; iter;
-    
+
 private: // Sanity
-    
+
     // Check things are OK, throwing an error on failure.
     void check(bool ok, std::string const &amp; what)
     {
@@ -419,7 +308,7 @@ private: // Sanity
             throw file_read_error(what);          
         }
     }
-    
+
 public: // Traits typedefs, which make this class usable with
         // algorithms which need a random access iterator.
     typedef std::random_access_iterator_tag iterator_category;
@@ -427,9 +316,9 @@ public: // Traits typedefs, which make this class usable with
     typedef std::streamoff difference_type;
     typedef item * pointer;
     typedef item &amp; reference;
-    
+
     enum start_pos { begin, end };
-    
+
 public: // Lifecycle
     text_file_item_iter(iter const &amp; other)
         : fname(other.fname)
@@ -437,12 +326,12 @@ public: // Lifecycle
         open();
         setpos(other.pos);
     }
-    
+
     text_file_item_iter()
         : pos(-1)
     {
     }
-    
+
     text_file_item_iter(std::string const &amp; fname,
                         start_pos where = begin)
         : fname(fname)
@@ -454,12 +343,12 @@ public: // Lifecycle
             seek_end();
         }
     }
-    
+
     ~text_file_item_iter()
     {
         close();
     }
-    
+
     iter &amp; operator=(iter const &amp; other)
     {
         close();
@@ -468,91 +357,91 @@ public: // Lifecycle
         setpos(other.pos);
         return *this;
     } 
-    
+
 public: // Comparison
-        // Note: it's an error to compare iterators over different files.
+        // Note: it&#x27;s an error to compare iterators over different files.
     bool operator&lt;(iter const &amp; other) const
     {
         return pos &lt; other.pos;
     }
-    
+
     bool operator&gt;(iter const &amp; other) const
     {
         return pos &gt; other.pos;
     }
-    
+
     bool operator==(iter const &amp; other) const
     {
         return pos == other.pos;
     }
-    
+
     bool operator!=(iter const &amp; other) const
     {
         return pos != other.pos;
     }
-    
+
 public: // Iteration
     iter &amp; operator++()
     {
         return *this += 1;
     }
-    
+
     iter &amp; operator--()
     {
         return *this -= 1;
     }
-    
+
     iter operator++(int)
     {
         iter tmp(*this);
         ++(*this);
         return tmp;
     }
-    
+
     iter operator--(int)
     {
         iter tmp(*this);
         --(*this);
         return tmp;
     }
-    
+
 public: // Step
     iter &amp; operator+=(difference_type n)
     {
         advance(n);
         return *this;
     }
-    
+
     iter &amp; operator-=(difference_type n)
     {
         advance(-n);
         return *this;
     }
-    
+
     iter operator+(difference_type n)
     {
         iter result(*this);
         return result += n;
     }
-    
+
     iter operator-(difference_type n)
     {
         iter result(*this);
         return result -= n;
     }
-    
+
 public: // Distance
     difference_type operator-(iter &amp; other)
     {
         return pos - other.pos;
     }
-    
+
 public: // Access
     value_type operator*()
     {
         return (*this)[0];
     }
-    
+
     value_type operator[](difference_type n)
     {
         std::streampos restore = getpos();
@@ -561,7 +450,7 @@ public: // Access
         setpos(restore);
         return result;
     }
-    
+
     // Allow direct access to the underlying stream position
     std::streampos getpos()
     {
@@ -569,7 +458,7 @@ public: // Access
         check(in, "getpos failed");
         return pos_;
     }
-    
+
 private: // Implementation details
     void open()
     {
@@ -577,7 +466,7 @@ private: // Implementation details
         check(in, "open failed");
         pos = getpos();
     }
-    
+
     void close()
     {
         if (in.is_open())
@@ -586,20 +475,20 @@ private: // Implementation details
             check(in, "close failed");
         }
     }
-    
+
     void advance(difference_type n)
     {
         check(in.seekg(n, std::ios_base::cur), "advance failed");
         pos = getpos();
     }
-    
+
     void seek_end()
     {
         check(in.seekg(0, std::ios_base::end), "seek_end failed");
         chop_whitespace();
         pos = getpos();
     }
-    
+
     void chop_whitespace()
     {
         do
@@ -609,13 +498,13 @@ private: // Implementation details
         in.get();
         in.clear();
     }
-    
+
     void setpos(std::streampos newpos)
     {
         check(in.seekg(newpos), "setpos failed");
         pos = newpos;
     }
-    
+
     // Return the item at the current position
     value_type read()
     {
@@ -629,7 +518,7 @@ private: // Implementation details
         check(in &gt;&gt; n, "read failed");
         return n;
     }
-    
+
 private: // State
     std::string fname;
     std::ifstream in;
@@ -640,28 +529,23 @@ private: // State
 
 </div>
 
-
-<h3><a href="#toc10" name="tochardware-used" id="tochardware-used">Hardware used</a></h3>
+<h3 id="hardware-used">Hardware used</h3>
 <pre>
-  Model Name:	            MacBook
-  Model Identifier:	    MacBook1,1
+  Model Name:               MacBook
+  Model Identifier:     MacBook1,1
   Processor Name:           Intel Core Duo
   Processor Speed:          2 GHz
-  Number Of Processors:	    1
+  Number Of Processors:     1
   Total Number Of Cores:    2
   L2 Cache (per processor): 2 MB
   Memory:                   2 GB
   Bus Speed:                667 MHz
 </pre>
 
-<p><a href="http://www.flickr.com/photos/photobunny_earl/1008279066" title="Mushroom, by photobunny"><img src="http://farm2.static.flickr.com/1440/1008279066_847d73c90d.jpg" alt="Mushroom, by photobunny"/></a>
-</p>
-
-<h3><a href="#toc11" name="tocconclusions" id="tocconclusions">Conclusions</a></h3>
-<p>Initially the Boost.Spirit solution looked promising but we pushed it too hard. Suitable abstractions can remove complexity; but they can also hide it. When efficiency matters, we need a handle on what&#8217;s going on.
-</p>
-<p>After this false start we <strong>did</strong> find a way to create a file iterator suitable for use with the standard binary search algorithms. Use it with care, though!
-</p>
+<p><a href="http://www.flickr.com/photos/photobunny_earl/1008279066" title="Mushroom, by photobunny"><img src="http://farm2.static.flickr.com/1440/1008279066_847d73c90d.jpg" alt="Mushroom, by photobunny"/></a></p>
+<h3 id="conclusions">Conclusions</h3>
+<p>Initially the Boost.Spirit solution looked promising but we pushed it too hard. Suitable abstractions can remove complexity; but they can also hide it. When efficiency matters, we need a handle on what&#8217;s going on.</p>
+<p>After this false start we <strong>did</strong> find a way to create a file iterator suitable for use with the standard binary search algorithms. Use it with care, though!</p>
 </div>
 
 <div class="comments"><hr/><div id="disqus_thread"></div><script type="text/javascript" src="http://disqus.com/forums/wordaligned/embed.js"></script></div>

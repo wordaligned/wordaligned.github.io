@@ -29,23 +29,19 @@
 <h2 class="title"><a href="/articles/internal-subversion-externals">Internal Subversion Externals</a></h2>
 <p class="meta"><abbr class="published" title="2006-11-23">2006-11-23</abbr> &bull; <a href="/tag/subversion" rel="tag">Subversion</a> &bull; <a href="/articles/internal-subversion-externals#disqus_thread">Comments</a></p>
 <p><a href="http://svnbook.red-bean.com/en/1.2/svn.advanced.externals.html">Subversion externals</a> provide a simple way for a project
-   to pull together components from more than one repository. This post
-   shows how <span id="excerpt0"/>they can also be used to create modules which
-   collect together components from the <em>same</em> repository.
-</p>
-<span id="continue-reading"/>
-
-
-<h3>An svn:externals example</h3>
+to pull together components from more than one repository. This post
+shows how <span id="excerpt0"/>they can also be used to create modules which
+collect together components from the <em>same</em> repository.</p>
+<p><span id="continue-reading"/></p>
+<h3 id="an-svnexternals-example">An svn:externals example</h3>
 <p>This <a href="http://blog.wordaligned.org">blog</a> is built using <a href="http://typosphere.org">Typo</a>
-   which is itself built on top of the <a href="http://www.rubyonrails.org/">Ruby on Rails</a> application framework.
-   If we peer into the <a href="http://typosphere.org">Typo</a> Subversion repository we can see how a tagged
-   version of the <a href="http://www.rubyonrails.org/">Ruby on Rails</a> code gets pulled in.
-</p>
+which is itself built on top of the <a href="http://www.rubyonrails.org/">Ruby on Rails</a> application framework.
+If we peer into the <a href="http://typosphere.org">Typo</a> Subversion repository we can see how a tagged
+version of the <a href="http://www.rubyonrails.org/">Ruby on Rails</a> code gets pulled in.</p>
 <div class="typocode">
 
 <pre class="prettyprint">$ svn proplist --verbose svn://typosphere.org/typo/trunk/vendor
-Properties on 'svn://typosphere.org/typo/trunk/vendor':
+Properties on &#x27;svn://typosphere.org/typo/trunk/vendor&#x27;:
   svn:externals : rails http://dev.rubyonrails.com/svn/rails/tags/rel_1-1-6
 
 </pre>
@@ -53,17 +49,15 @@ Properties on 'svn://typosphere.org/typo/trunk/vendor':
 </div>
 
 <p>The <code>proplist</code> command above lists the <a href="http://svnbook.red-bean.com/en/1.2/svn.advanced.props.html">properties</a> which have been
-   set on a <a href="http://typosphere.org">Typo</a> repository URL, and in this case shows that the
-   <code>typo/trunk/vendor</code> directory has an <code>svn:externals</code> property linking
-   the <a href="http://subversion.tigris.org">Subversion</a> URL
-   <code>http://dev.rubyonrails.com/svn/rails/tags/rel_1-1-6</code> to the local
-   name <code>rails</code>. (Don&#8217;t be confused by the <code>http://</code> protocol in the
-   rubyonrails URL &#8212; it&#8217;s still a Subversion repository we&#8217;re linking
-   to, it&#8217;s just one that&#8217;s served by Apache.)
-</p>
+set on a <a href="http://typosphere.org">Typo</a> repository URL, and in this case shows that the
+<code>typo/trunk/vendor</code> directory has an <code>svn:externals</code> property linking
+the <a href="http://subversion.tigris.org">Subversion</a> URL
+<code>http://dev.rubyonrails.com/svn/rails/tags/rel_1-1-6</code> to the local
+name <code>rails</code>. (Don&#8217;t be confused by the <code>http://</code> protocol in the
+rubyonrails URL &#8212; it&#8217;s still a Subversion repository we&#8217;re linking
+to, it&#8217;s just one that&#8217;s served by Apache.)</p>
 <p>The <code>rails</code> directory is not part of the <a href="http://typosphere.org">Typo</a> repository, as the following
-   listing shows:
-</p>
+listing shows:</p>
 <div class="typocode">
 
 <pre class="prettyprint">$ svn list svn://typosphere.org/typo/trunk/vendor
@@ -78,16 +72,15 @@ uuidtools/
 </div>
 
 <p>When we check out <a href="http://typosphere.org">Typo</a>, though, it fetches the tagged version of
-   <a href="http://www.rubyonrails.org/">Ruby on Rails</a> at URL
-   <code>http://dev.rubyonrails.com/svn/rails/tags/rel_1-1-6</code> and places it in
-   a local directory called <code>rails</code>. Here&#8217;s what we see when we check the
-   code out.
-</p>
+<a href="http://www.rubyonrails.org/">Ruby on Rails</a> at URL
+<code>http://dev.rubyonrails.com/svn/rails/tags/rel_1-1-6</code> and places it in
+a local directory called <code>rails</code>. Here&#8217;s what we see when we check the
+code out.</p>
 <div class="typocode">
 
 <pre class="prettyprint">$ svn checkout svn://typosphere.org/typo/trunk/vendor
 
-Fetching external item into 'vendor/rails'
+Fetching external item into &#x27;vendor/rails&#x27;
 A    vendor/rails/cleanlogs.sh
 A    vendor/rails/release.rb
 ....
@@ -96,27 +89,22 @@ A    vendor/rails/release.rb
 
 </div>
 
-
-<h3>Some things to notice</h3>
+<h3 id="some-things-to-notice">Some things to notice</h3>
 <p>Note here that we&#8217;re pulling in a tagged version of <a href="http://www.rubyonrails.org/">Ruby on Rails</a>
-   &#8212; not the main development trunk. The <a href="http://typosphere.org">Typo</a> developers
-   sensibly choose to develop against a stable version of the Ruby on
-   Rails framework. They could even have pulled in a particular Rails
-   repository revision by including the revision number in the
-   <code>svn:externals</code> definition (see <code>svn help propset</code> for details).
-</p>
+&#8212; not the main development trunk. The <a href="http://typosphere.org">Typo</a> developers
+sensibly choose to develop against a stable version of the Ruby on
+Rails framework. They could even have pulled in a particular Rails
+repository revision by including the revision number in the
+<code>svn:externals</code> definition (see <code>svn help propset</code> for details).</p>
 <p>Note also that the working copy we get in the <code>rails</code> subdirectory
-   retains its association with the host repository at <code>http://dev.rubyonrails.com/svn/rails</code>: if authorised to do so, we
-   could modify this working copy and check changes back in.
-</p>
-
-<h3>A Project Hierarchy</h3>
+retains its association with the host repository at <code>http://dev.rubyonrails.com/svn/rails</code>: if authorised to do so, we
+could modify this working copy and check changes back in.</p>
+<h3 id="a-project-hierarchy">A Project Hierarchy</h3>
 <p>Now consider a repository which is arranged into projects named
-   <code>blue_goat</code>, <code>red_bear</code>, <code>yellow_dog</code>, &#8230; . Each project has a
-   top-level directory beneath which are sub-directories for source code,
-   tests, build files and documentation. If we check everything out, we
-   end up with a working copy which looks something like this.
-</p>
+<code>blue_goat</code>, <code>red_bear</code>, <code>yellow_dog</code>, &#8230; . Each project has a
+top-level directory beneath which are sub-directories for source code,
+tests, build files and documentation. If we check everything out, we
+end up with a working copy which looks something like this.</p>
 <div class="typocode"><div class="codetitle">full working copy layout</div>
 
 <pre class="prettyprint">projects
@@ -156,24 +144,19 @@ A    vendor/rails/release.rb
 </div>
 
 <p>To save on screen space, I&#8217;ve shown only three projects and a tiny
-   subset of the files in these projects. In reality, there are tens of
-   thousands of files, and, since some of the test files are rather large,
-   they occupy several gigabytes on disk.
-</p>
+subset of the files in these projects. In reality, there are tens of
+thousands of files, and, since some of the test files are rather large,
+they occupy several gigabytes on disk.</p>
 <p>For the developers, this is fine. Typically developers are assigned to
-   one project at a time, and they check out a working copy for that
-   project only. For the technical author, it&#8217;s a different story.
-</p>
-
-<h3>The Technical Author</h3>
+one project at a time, and they check out a working copy for that
+project only. For the technical author, it&#8217;s a different story.</p>
+<h3 id="the-technical-author">The Technical Author</h3>
 <p>A single technical author is responsible for the documentation for all
-   active projects. Like every one else on the team, the author uses
-   version control; in contrast to everyone else on the team, the author
-   is interested in just a <em>single</em> sub-directory of <em>every</em> project &#8212; namely
-   the <code>doc</code> directory.
-</p>
-<p>Here&#8217;s what we can do. First, create and checkout a <code>collected_docs</code> directory.
-</p>
+active projects. Like every one else on the team, the author uses
+version control; in contrast to everyone else on the team, the author
+is interested in just a <em>single</em> sub-directory of <em>every</em> project &#8212; namely
+the <code>doc</code> directory.</p>
+<p>Here&#8217;s what we can do. First, create and checkout a <code>collected_docs</code> directory.</p>
 <div class="typocode">
 
 <pre class="prettyprint">$ svn mkdir svn://svnserver/collected_docs -m "Collected documentation."
@@ -184,8 +167,7 @@ $ svn co svn://svnserver/collected_docs
 </div>
 
 <p>Now set up the desired links to project subdirectories. We&#8217;ll put them
-   in a temporary file for now.
-</p>
+in a temporary file for now.</p>
 <div class="typocode">
 
 <pre class="prettyprint">$ cat &gt; /tmp/externals.props
@@ -198,12 +180,11 @@ yellow_dog svn://svnserver/projects/yellow_dog/doc
 </div>
 
 <p>Next, use this file to set the <code>svn:externals</code> property on the new
-   <code>collected_docs</code> directory, and check this change in.
-</p>
+<code>collected_docs</code> directory, and check this change in.</p>
 <div class="typocode">
 
 <pre class="prettyprint">$ svn propset svn:externals -F /tmp/externals.props collected_docs
-property 'svn:externals' set on 'collected_docs'
+property &#x27;svn:externals&#x27; set on &#x27;collected_docs&#x27;
 
 $ svn commit -m "Added links to project documentation."
 Sending        collected_docs
@@ -214,23 +195,22 @@ Committed revision 4567.
 
 </div>
 
-<p>When we update <code>collected_docs</code> we get the documentation directories.
-</p>
+<p>When we update <code>collected_docs</code> we get the documentation directories.</p>
 <div class="typocode">
 
 <pre class="prettyprint">$ svn update
 
-Fetching external item into 'collected_docs/blue_goat'
+Fetching external item into &#x27;collected_docs/blue_goat&#x27;
 A    collected_docs/blue_goat/user_guide.pdf
 Updated external to revision 4567.
 
-Fetching external item into 'collected_docs/red_bear'
+Fetching external item into &#x27;collected_docs/red_bear&#x27;
 A    collected_docs/red_bear/note.txt
 A    collected_docs/red_bear/user_guide.pdf
 A    collected_docs/red_bear/spec.html
 Updated external to revision 4567.
 
-Fetching external item into 'collected_docs/yellow_dog'
+Fetching external item into &#x27;collected_docs/yellow_dog&#x27;
 A    collected_docs/yellow_dog/user_guide.rst
 Updated external to revision 4567.
 
@@ -240,8 +220,7 @@ Updated to revision 4567.
 
 </div>
 
-<p>As a result, the technical author&#8217;s working copy contains just what&#8217;s needed.
-</p>
+<p>As a result, the technical author&#8217;s working copy contains just what&#8217;s needed.</p>
 <div class="typocode">
 
 <pre class="prettyprint">collected_docs
@@ -259,23 +238,19 @@ Updated to revision 4567.
 </div>
 
 <p>Have we forked the documentation by doing this? No &#8212; the externals
-   defintions act like soft links, so any changes made in the <code>collected_docs</code>
-   working copy appear in the project directory like they&#8217;re supposed to, and
-   vice-versa.
-</p>
-
-<h3>Limitations</h3>
+defintions act like soft links, so any changes made in the <code>collected_docs</code>
+working copy appear in the project directory like they&#8217;re supposed to, and
+vice-versa.</p>
+<h3 id="limitations">Limitations</h3>
 <p>As you&#8217;ve probably noticed, even though we used an internal external,
-   we still had to supply a fully qualified repository URL. Attempts to
-   use a relative path will fail (that&#8217;s to say, we can set the property,
-   but an attempt to checkout the external fails complaining about an
-   <code>Unrecognized URL scheme</code>). So if we want to use this technique
-   to tag and branch subsets of a repository, we&#8217;ll need to write a wrapper
-   script.
-</p>
+we still had to supply a fully qualified repository URL. Attempts to
+use a relative path will fail (that&#8217;s to say, we can set the property,
+but an attempt to checkout the external fails complaining about an
+<code>Unrecognized URL scheme</code>). So if we want to use this technique
+to tag and branch subsets of a repository, we&#8217;ll need to write a wrapper
+script.</p>
 <p>A second limitation is that if someone decides to move one of the
-   externals endpoints, again, our <code>collected_docs</code> fail to check out.
-</p>
+externals endpoints, again, our <code>collected_docs</code> fail to check out.</p>
 <div class="typocode">
 
 <pre class="prettyprint">$ svn move svn://svnserver/projects/yellow_dog/doc \
@@ -284,7 +259,7 @@ Updated to revision 4567.
 
 $ svn update collected_docs
 ...
-Fetching external item into 'collected_docs/yellow_dog'
+Fetching external item into &#x27;collected_docs/yellow_dog&#x27;
 svn: Target path does not exist
 
 </pre>

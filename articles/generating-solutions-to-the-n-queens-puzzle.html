@@ -29,12 +29,11 @@
 <h2 class="title"><a href="/articles/generating-solutions-to-the-n-queens-puzzle">Generating solutions to the 8 Queens Puzzle</a></h2>
 <p class="meta"><abbr class="published" title="2006-07-21">2006-07-21</abbr> &bull; <a href="/tag/python" rel="tag">Python</a>, <a href="/tag/puzzles" rel="tag">Puzzles</a> &bull; <a href="/articles/generating-solutions-to-the-n-queens-puzzle#disqus_thread">Comments</a></p>
 <p>Here&#8217;s a <a href="http://www.python.org">Python</a> solution to the
-   <a href="http://en.wikipedia.org/wiki/Eight_queens_puzzle">8 Queens puzzle</a>.
-   I think that generator functions are perfectly suited to this kind of thing:
-   they are easy to code and easy to use, they yield results as soon as
-   they can, and clients have full control over when to stop them
-   yielding results.
-</p>
+<a href="http://en.wikipedia.org/wiki/Eight_queens_puzzle">8 Queens puzzle</a>.
+I think that generator functions are perfectly suited to this kind of thing:
+they are easy to code and easy to use, they yield results as soon as
+they can, and clients have full control over when to stop them
+yielding results.</p>
 <div class="typocode"><div class="codetitle">n-queens.py</div>
 
 <pre class="prettyprint">class Queen:
@@ -42,15 +41,15 @@
     """
     def __init__(self, row, col):
         self.row, self.col = row, col
-    
+
     def __str__(self):
         return "(%d, %d)" % (self.row, self.col)
-    
+
     def safe_from(self, queens):
         """Is this queen safe from the input list of queens?
         """
         return not any(self.attacked_by(queen) for queen in queens)
-    
+
     def attacked_by(self, queen):
         """Is this queen attacked by the input queen?
         """
@@ -63,7 +62,7 @@
         def same_diagonal():
             return r + c == qr + qc or r - c == qr - qc
         return same_row() or same_column() or same_diagonal()
-    
+
 def queens_puzzle(board_size):
     """Generate solutions to the Queens puzzle for the input board size.
     """
@@ -82,7 +81,7 @@ def queens_puzzle(board_size):
 
 def outer_join(s, seq):
     return "%s%s%s" % (s, s.join(seq), s)
-    
+
 def print_solution(board_size, queens):
     line = outer_join("+", "-" * board_size)
     for row in range(board_size):
@@ -91,7 +90,7 @@ def print_solution(board_size, queens):
                          [" Q"[q.row == row] for q in queens])
     print line
     print
-    
+
 try:
     print """\
 Queens puzzle solver.
@@ -106,7 +105,7 @@ At the prompt, enter the board size or Q to quit.
             print "Please enter a positive board-size."
         else:
             if board_size &gt; 16:
-                print ("That's a tough one but I'll try my best. "
+                print ("That&#x27;s a tough one but I&#x27;ll try my best. "
                        "Press CTRL-C to interrupt.")
             try:
                 solutions = -1

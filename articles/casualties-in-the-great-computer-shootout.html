@@ -28,63 +28,29 @@
       <div class="atomentry" id="casualties-in-the-great-computer-shootout">
 <h2 class="title"><a href="/articles/casualties-in-the-great-computer-shootout">Casualties in the great computer shootout</a></h2>
 <p class="meta"><abbr class="published" title="2007-02-01">2007-02-01</abbr> &bull; <a href="/tag/c++" rel="tag">C++</a>, <a href="/tag/python" rel="tag">Python</a> &bull; <a href="/articles/casualties-in-the-great-computer-shootout#disqus_thread">Comments</a></p>
-<div class="toc">
-<h2>Contents</h2>
-<ul>
- <li><a href="#tocsame-job-different-languages" name="toc0" id="toc0">Same job, different languages</a>
- </li>
-
- <li><a href="#tocaccumulating-integers-using-c" name="toc1" id="toc1">Accumulating integers using C</a>
- </li>
-
- <li><a href="#tocaccumulating-integers-using-c" name="toc2" id="toc2">Accumulating integers using C++</a>
- </li>
-
- <li><a href="#tochighlevel-code-lowlevel-errors" name="toc3" id="toc3">High-level code, Low-level errors</a>
- </li>
-
- <li><a href="#tocaccumulating-integers-using-c-style-python" name="toc4" id="toc4">Accumulating integers using C style Python</a>
- </li>
-
- <li><a href="#toccorrectness" name="toc5" id="toc5">Correctness</a>
- </li>
-
- <li><a href="#tocrobustness" name="toc6" id="toc6">Robustness</a>
- </li>
-
- <li><a href="#toclast-one-standing" name="toc7" id="toc7">Last one standing</a>
- </li>
-</ul>
-</div><p>There&#8217;s an interesting shootout between various programming languages
-   going on <a href="http://shootout.alioth.debian.org/">here</a>. Rather than argue in general about the
-   relative merits of programming languages, this site measures them up
-   in terms of the resources they consume performing various simple
-   tasks.  I like the way they&#8217;ve side-stepped the language bigots
-   using this practical, experimental approach; though of course we have to
-   be careful when we analyse the results.
-</p>
+<p>There&#8217;s an interesting shootout between various programming languages
+going on <a href="http://shootout.alioth.debian.org/">here</a>. Rather than argue in general about the
+relative merits of programming languages, this site measures them up
+in terms of the resources they consume performing various simple
+tasks.  I like the way they&#8217;ve side-stepped the language bigots
+using this practical, experimental approach; though of course we have to
+be careful when we analyse the results.</p>
 <p>The headline figures and rankings are what the site concentrates on:
-   <span id="excerpt0"/>the shootout is all about who&#8217;s got the fastest gun, rather than who&#8217;s
-   the most accurate.
-</p>
-<span id="continue-reading"/>
-
-
-<h4><a href="#toc0" name="tocsame-job-different-languages" id="tocsame-job-different-languages">Same job, different languages</a></h4>
+<span id="excerpt0"/>the shootout is all about who&#8217;s got the fastest gun, rather than who&#8217;s
+the most accurate.</p>
+<p><span id="continue-reading"/></p>
+<h4 id="same-job-different-languages">Same job, different languages</h4>
 <p>If we dig a little deeper, there&#8217;s a huge amount of interest here in
-   comparing other facets of different languages. Getting the job done
-   isn&#8217;t just about writing the program. What do you need to do
-   to run it? How accurate is it? How robust? How extensible?
-</p>
-
-<h4><a href="#toc1" name="tocaccumulating-integers-using-c" id="tocaccumulating-integers-using-c">Accumulating integers using C</a></h4>
+comparing other facets of different languages. Getting the job done
+isn&#8217;t just about writing the program. What do you need to do
+to run it? How accurate is it? How robust? How extensible?</p>
+<h4 id="accumulating-integers-using-c">Accumulating integers using C</h4>
 <p>One of the simplest example tasks is to calculate the <a href="http://shootout.alioth.debian.org/debian/benchmark.php?test=sumcol&amp;lang=all">sum</a> of the
-   entries in a file containing a single column of signed integers. It&#8217;s
-   the kind of job you might expect C to do well, and the
-   <a href="http://shootout.alioth.debian.org/debian/benchmark.php?test=sumcol&amp;lang=gcc">C implementation</a>
-   does indeed rank very highly in terms of CPU use and
-   memory consumption &#8212; the entry even compiles cleanly.
-</p>
+entries in a file containing a single column of signed integers. It&#8217;s
+the kind of job you might expect C to do well, and the
+<a href="http://shootout.alioth.debian.org/debian/benchmark.php?test=sumcol&amp;lang=gcc">C implementation</a>
+does indeed rank very highly in terms of CPU use and
+memory consumption &#8212; the entry even compiles cleanly.</p>
 <div class="typocode"><div class="codetitle">Accumulating ints using C</div>
 
 <pre class="prettyprint">/* -*- mode: c -*-
@@ -102,7 +68,7 @@ main() {
     int sum = 0;
     char line[MAXLINELEN];
 
-while (fgets(line, MAXLINELEN, stdin)) {
+    while (fgets(line, MAXLINELEN, stdin)) {
          sum += atoi(line);
     }
     printf("%d\n", sum);
@@ -113,13 +79,11 @@ while (fgets(line, MAXLINELEN, stdin)) {
 
 </div>
 
-
-<h4><a href="#toc2" name="tocaccumulating-integers-using-c" id="tocaccumulating-integers-using-c">Accumulating integers using C++</a></h4>
+<h4 id="accumulating-integers-using-c_1">Accumulating integers using C++</h4>
 <p>The highest ranking <a href="http://shootout.alioth.debian.org/debian/benchmark.php?test=sumcol&amp;lang=gpp&amp;id=2">C++ program</a>
-   looks more like C than C++ and
-   provides a fine example of the ugly code you get when you try and
-   write C in C++.
-</p>
+looks more like C than C++ and
+provides a fine example of the ugly code you get when you try and
+write C in C++.</p>
 <div class="typocode"><div class="codetitle">Accumulating ints using C style C++</div>
 
 <pre class="prettyprint">// The Great Computer Language Shootout
@@ -143,10 +107,10 @@ int main(int argc, char * * argv) {
     char buff[4096];
     cin.rdbuf()-&gt;pubsetbuf(buff, 4096); // enable buffering
 
-while (cin.getline(line, MAXLINELEN)) {
+    while (cin.getline(line, MAXLINELEN)) {
         sum += atoi(line);
     }
-    cout &lt;&lt; sum &lt;&lt; '\n';
+    cout &lt;&lt; sum &lt;&lt; &#x27;\n&#x27;;
 }
 
 </pre>
@@ -154,11 +118,10 @@ while (cin.getline(line, MAXLINELEN)) {
 </div>
 
 <p>Here&#8217;s <a href="http://shootout.alioth.debian.org/debian/benchmark.php?test=sumcol&amp;lang=gpp&amp;id=3">how you should do it in C++</a>.
-   It&#8217;s a fraction slower but far cleaner. I include the code as written. It&#8217;s hard to
-   see why the author hasn&#8217;t included the extra few characters needed to
-   make it compile cleanly &#8212; perhaps he wanted the smallest possible C++
-   solution?
-</p>
+It&#8217;s a fraction slower but far cleaner. I include the code as written. It&#8217;s hard to
+see why the author hasn&#8217;t included the extra few characters needed to
+make it compile cleanly &#8212; perhaps he wanted the smallest possible C++
+solution?</p>
 <div class="typocode"><div class="codetitle">Accumulating ints using idiomatic C++</div>
 
 <pre class="prettyprint">// The Computer Language Shootout
@@ -174,7 +137,7 @@ main()
     std::ios_base::sync_with_stdio(false);
     std::istream_iterator&lt;int&gt; ii(std::cin), eos;
 
-std::cout &lt;&lt; accumulate(ii,eos,0) &lt;&lt; "\n";
+    std::cout &lt;&lt; accumulate(ii,eos,0) &lt;&lt; "\n";
 }
 
 </pre>
@@ -182,10 +145,9 @@ std::cout &lt;&lt; accumulate(ii,eos,0) &lt;&lt; "\n";
 </div>
 
 <p>The <code>std::ios_base::sync_with_stdio(false);</code> function call was a new
-   one on me. It looks like a performance hack &#8212; the program is equally
-   correct without it, and on my implementation runs equally quickly
-   without it. So I&#8217;d prefer a smaller and more conformant variant.
-</p>
+one on me. It looks like a performance hack &#8212; the program is equally
+correct without it, and on my implementation runs equally quickly
+without it. So I&#8217;d prefer a smaller and more conformant variant.</p>
 <div class="typocode">
 
 <pre class="prettyprint">....
@@ -202,18 +164,15 @@ int main()
 </div>
 
 <p>To our C programmer, this expressive little program may seem
-   obscure. Where&#8217;s the loop to sum the integers? In fact, where are the
-   integers coming from anyway? It&#8217;s true, there&#8217;s a lot beneath the surface of
-   this high-level code, and without some understanding of the primitive
-   elements, writing such code can be difficult and risky.
-</p>
-
-<h4><a href="#toc3" name="tochighlevel-code-lowlevel-errors" id="tochighlevel-code-lowlevel-errors">High-level code, Low-level errors</a></h4>
+obscure. Where&#8217;s the loop to sum the integers? In fact, where are the
+integers coming from anyway? It&#8217;s true, there&#8217;s a lot beneath the surface of
+this high-level code, and without some understanding of the primitive
+elements, writing such code can be difficult and risky.</p>
+<h4 id="high-level-code-low-level-errors">High-level code, Low-level errors</h4>
 <p>How can it be difficult to write such simple code? Here&#8217;s an example:
-   the <code>eos</code> parameter is a default constructed input stream integer
-   iterator. A C++ novice might have tried to indicate default
-   construction like this.
-</p>
+the <code>eos</code> parameter is a default constructed input stream integer
+iterator. A C++ novice might have tried to indicate default
+construction like this.</p>
 <div class="typocode"><div class="codetitle">incorrect default construction</div>
 
 <pre class="prettyprint">    std::istream_iterator&lt;int&gt; ii(std::cin), eos();
@@ -222,45 +181,40 @@ int main()
 
 </div>
 
-<p>It won&#8217;t compile, but the compilation error is hard to interpret.
-</p>
+<p>It won&#8217;t compile, but the compilation error is hard to interpret.</p>
 <div class="typocode">
 
-<pre class="prettyprint">sumcol3.cpp: In function 'int main()':
-sumcol3.cpp:8: error: no matching function for call to 'accumulate(std::istream_iterator&lt;int, char, std::char_traits&lt;char&gt;, ptrdiff_t&gt;&amp;, std::istream_iterator&lt;int, char, std::char_traits&lt;char&gt;, ptrdiff_t&gt; (&amp;)(), int)'
+<pre class="prettyprint">sumcol3.cpp: In function &#x27;int main()&#x27;:
+sumcol3.cpp:8: error: no matching function for call to &#x27;accumulate(std::istream_iterator&lt;int, char, std::char_traits&lt;char&gt;, ptrdiff_t&gt;&amp;, std::istream_iterator&lt;int, char, std::char_traits&lt;char&gt;, ptrdiff_t&gt; (&amp;)(), int)&#x27;
 
 </pre>
 
 </div>
 
-<p>Let me reformat that for you.
-</p>
+<p>Let me reformat that for you.</p>
 <div class="typocode">
 
-<pre class="prettyprint">sumcol3.cpp: In function 'int main()':
+<pre class="prettyprint">sumcol3.cpp: In function &#x27;int main()&#x27;:
 
 sumcol3.cpp:8: error: no matching function for call to
-'accumulate(
+&#x27;accumulate(
 std::istream_iterator&lt;int, char, std::char_traits&lt;char&gt;, ptrdiff_t&gt;&amp;,
 std::istream_iterator&lt;int, char, std::char_traits&lt;char&gt;, ptrdiff_t&gt; (&amp;)(),
-int)'
+int)&#x27;
 
 </pre>
 
 </div>
 
 <p>Sadly, this is fairly typical of the compile errors when you call
-   templated code incorrectly. In fact, this message is relatively
-   friendly. In the face of too many errors like the above, our C++
-   novice may well give up and revert to a C style implementation.
-</p>
-
-<h4><a href="#toc4" name="tocaccumulating-integers-using-c-style-python" id="tocaccumulating-integers-using-c-style-python">Accumulating integers using C style Python</a></h4>
+templated code incorrectly. In fact, this message is relatively
+friendly. In the face of too many errors like the above, our C++
+novice may well give up and revert to a C style implementation.</p>
+<h4 id="accumulating-integers-using-c-style-python">Accumulating integers using C style Python</h4>
 <p>C++ is one descendant of C. <a href="http://python.org">Python</a> is another. Both languages support
-   a number of higher level idioms &#8212; generic programming, object
-   oriented programming, functional programming &#8212; while retaining some
-   level of C compatibility. We can accumulate integers in Python like this.
-</p>
+a number of higher level idioms &#8212; generic programming, object
+oriented programming, functional programming &#8212; while retaining some
+level of C compatibility. We can accumulate integers in Python like this.</p>
 <div class="typocode"><div class="codetitle">C-style Python accumulator</div>
 
 <pre class="prettyprint">import sys
@@ -274,10 +228,9 @@ print total
 </div>
 
 <p>What we gain in readability, and indeed ease of coding, we lose in
-   efficiency. This code is an order of magnitude more wasteful than the
-   C solution. The <a href="http://shootout.alioth.debian.org/">shootout</a> also presents a more Pythonic
-   <a href="http://shootout.alioth.debian.org/debian/benchmark.php?test=sumcol&amp;lang=python">solution</a>.
-</p>
+efficiency. This code is an order of magnitude more wasteful than the
+C solution. The <a href="http://shootout.alioth.debian.org/">shootout</a> also presents a more Pythonic
+<a href="http://shootout.alioth.debian.org/debian/benchmark.php?test=sumcol&amp;lang=python">solution</a>.</p>
 <div class="typocode"><div class="codetitle">A more Pythonic integer accumulator</div>
 
 <pre class="prettyprint">import sys, itertools
@@ -288,14 +241,12 @@ print sum(itertools.imap(int, sys.stdin))
 </div>
 
 <p>Here, <code>sum</code> is a built-in generic function to add up the elements of a
-   collection (where the collection can be, as in this case, an iterable
-   object), and <code>itertools.imap</code> is what generates that collection by
-   applying <code>int</code> to each element of <code>sys.stdin</code>. Note that when a file,
-   such as <code>sys.stdin</code>, appears in an iterable context, the lines of that
-   file are what will be iterated over.
-</p>
-<p>We could do without <code>itertools</code> and simply use the built-in <code>map</code>.
-</p>
+collection (where the collection can be, as in this case, an iterable
+object), and <code>itertools.imap</code> is what generates that collection by
+applying <code>int</code> to each element of <code>sys.stdin</code>. Note that when a file,
+such as <code>sys.stdin</code>, appears in an iterable context, the lines of that
+file are what will be iterated over.</p>
+<p>We could do without <code>itertools</code> and simply use the built-in <code>map</code>.</p>
 <div class="typocode"><div class="codetitle">A smaller Python integer accumulator</div>
 
 <pre class="prettyprint">import sys
@@ -306,52 +257,42 @@ print sum(map(int, sys.stdin))
 </div>
 
 <p>The difference is that this version will build the whole collection in
-   memory before summing its elements (which, on the 6Kb input file, is
-   actually fractionally faster on my Python implementation).
-</p>
+memory before summing its elements (which, on the 6Kb input file, is
+actually fractionally faster on my Python implementation).</p>
 <p>Unfortunately, despite this elegance, the Python solution remains an order of
-   magnitude more wasteful than both the C and C++ solutions. Nonetheless,
-   it&#8217;s better in other important respects.
-</p>
-
-<h4><a href="#toc5" name="toccorrectness" id="toccorrectness">Correctness</a></h4>
+magnitude more wasteful than both the C and C++ solutions. Nonetheless,
+it&#8217;s better in other important respects.</p>
+<h4 id="correctness">Correctness</h4>
 <p>Computers are incredibly quick at accumulating
-   integers. It&#8217;s not a tricky problem, in contrast to, say, mapping out
-   a <a href="http://www.tsp.gatech.edu/">traveling salesman&#8217;s itinerary</a>, or
-   stacking crates in a warehouse.
-</p>
+integers. It&#8217;s not a tricky problem, in contrast to, say, mapping out
+a <a href="http://www.tsp.gatech.edu/">traveling salesman&#8217;s itinerary</a>, or
+stacking crates in a warehouse.</p>
 <p>If we <em>really</em> care about the speed of our integer
-   accumulator, it&#8217;s probably because we have a very long list of input
-   numbers. In C, which is often described as portable assembler, an
-   integer is actually just a word on the machine &#8212; and is therefore constrained
-   to fit in a fixed number of bytes (4, typically, possibly as few as
-   2), giving a large-ish but finite range of values. Assuming
-   <code>sizeof(int)</code> is 4, the maximum integer value is 2 <em></em> 31 - 1, which is
-   2147483647.
-</p>
+accumulator, it&#8217;s probably because we have a very long list of input
+numbers. In C, which is often described as portable assembler, an
+integer is actually just a word on the machine &#8212; and is therefore constrained
+to fit in a fixed number of bytes (4, typically, possibly as few as
+2), giving a large-ish but finite range of values. Assuming
+<code>sizeof(int)</code> is 4, the maximum integer value is 2 ** 31 - 1, which is
+2147483647.</p>
 <p>What will 2147483647 + 1 be? Not 2147483648 &#8212; that won&#8217;t fit in 4
-   bytes.  The actual result will depend on your implementation, but it
-   certainly won&#8217;t be right. Most likely, the program will run as usual
-   and will politely offer a vaguely convincing but <em>wrong</em> result.
-   This is dangerous behaviour.
-</p>
+bytes.  The actual result will depend on your implementation, but it
+certainly won&#8217;t be right. Most likely, the program will run as usual
+and will politely offer a vaguely convincing but <em>wrong</em> result.
+This is dangerous behaviour.</p>
 <p>C++ advocates believe static typing is there to protect them from
-   programming errors, and even that the compiler traps bugs before a
-   program can even be run. I&#8217;ve come to regard static typing as a way of
-   strapping code more tightly to the machine: great for
-   <a href="http://shootout.alioth.debian.org/">shootouts</a>, but less useful for flexible and correct programs.
-</p>
+programming errors, and even that the compiler traps bugs before a
+program can even be run. I&#8217;ve come to regard static typing as a way of
+strapping code more tightly to the machine: great for
+<a href="http://shootout.alioth.debian.org/">shootouts</a>, but less useful for flexible and correct programs.</p>
 <p><a href="http://python.org">Python</a> provides a higher-level model of integers. (Is the word &#8220;model&#8221;
-   correct in this context? The model of an integer is just an integer,
-   an unbounded one.) Python integers don&#8217;t overflow.  So the Python
-   program can accumulate any sum of any integers which will fit on the machine.
-</p>
-
-<h4><a href="#toc6" name="tocrobustness" id="tocrobustness">Robustness</a></h4>
+correct in this context? The model of an integer is just an integer,
+an unbounded one.) Python integers don&#8217;t overflow.  So the Python
+program can accumulate any sum of any integers which will fit on the machine.</p>
+<h4 id="robustness">Robustness</h4>
 <p>So, both C++ programs only cope with bounded integers and sums. They
-   aren&#8217;t much use when the input is malformed either, and their responses
-   differ. For example, if our input file contains commas, like this:
-</p>
+aren&#8217;t much use when the input is malformed either, and their responses
+differ. For example, if our input file contains commas, like this:</p>
 <div class="typocode"><div class="codetitle">malformed input 1</div>
 
 <pre class="prettyprint">276,
@@ -365,11 +306,10 @@ print sum(map(int, sys.stdin))
 </div>
 
 <p>then our C style C++ will ignore the commas and just sum the numbers,
-   whilst our idiomatic C++ stops when it hits the first comma and
-   produces the result <code>276</code>. Neither C++ variant draws attention to the
-   unexpected input. Similarly, if the input file contained an unexpected
-   floating point number:
-</p>
+whilst our idiomatic C++ stops when it hits the first comma and
+produces the result <code>276</code>. Neither C++ variant draws attention to the
+unexpected input. Similarly, if the input file contained an unexpected
+floating point number:</p>
 <div class="typocode"><div class="codetitle">malformed input 2</div>
 
 <pre class="prettyprint">276
@@ -383,12 +323,10 @@ print sum(map(int, sys.stdin))
 </div>
 
 <p>then the C++ implementations yield different answers. I&#8217;ll leave it to you
-   to figure out how they process the unexpected value.
-</p>
+to figure out how they process the unexpected value.</p>
 <p>Politely producing an answer which is not obviously wrong is, as I&#8217;ve
-   said, dangerous. The Python program doesn&#8217;t know what to do either, so,
-   in both cases it fails safely by raising an error.
-</p>
+said, dangerous. The Python program doesn&#8217;t know what to do either, so,
+in both cases it fails safely by raising an error.</p>
 <div class="typocode"><div class="codetitle">Python response to malformed input</div>
 
 <pre class="prettyprint">$ python -c \
@@ -396,25 +334,23 @@ print sum(map(int, sys.stdin))
 &lt; sumcol-input-with-comma.txt
 Traceback (most recent call last):
   File "&lt;string&gt;", line 1, in &lt;module&gt;
-ValueError: invalid literal for int() with base 10: '276,\n'
+ValueError: invalid literal for int() with base 10: &#x27;276,\n&#x27;
 
 $ python -c \
 "import sys; print sum(map(int, sys.stdin))" \
 &lt; sumcol-input-with-float.txt
 Traceback (most recent call last):
   File "&lt;string&gt;", line 1, in &lt;module&gt;
-ValueError: invalid literal for int() with base 10: '-98.1\n'
+ValueError: invalid literal for int() with base 10: &#x27;-98.1\n&#x27;
 
 </pre>
 
 </div>
 
-
-<h4><a href="#toc7" name="toclast-one-standing" id="toclast-one-standing">Last one standing</a></h4>
+<h4 id="last-one-standing">Last one standing</h4>
 <p>At first it seems Python bites the dust early in the programming
-   language <a href="http://shootout.alioth.debian.org/">shootout</a>. In the longer term, I wouldn&#8217;t be surprised
-   if it&#8217;s amongst the last ones standing.
-</p>
+language <a href="http://shootout.alioth.debian.org/">shootout</a>. In the longer term, I wouldn&#8217;t be surprised
+if it&#8217;s amongst the last ones standing.</p>
 </div>
 
 <h5><a name="feedback">Feedback</a></h5>

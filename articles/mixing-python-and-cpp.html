@@ -29,86 +29,62 @@
 <h2 class="title"><a href="/articles/mixing-python-and-cpp">Mixing Python and C++</a></h2>
 <p class="meta"><abbr class="published" title="2007-02-28">2007-02-28</abbr> &bull; <a href="/tag/c++" rel="tag">C++</a>, <a href="/tag/python" rel="tag">Python</a> &bull; <a href="/articles/mixing-python-and-cpp#disqus_thread">Comments</a></p>
 <p>A while ago, I expressed a desire to work on a <a href="http://wordaligned.org/tag/index.html">mixed language
-system</a>.
-</p>
-<blockquote><p>I can&#8217;t get over how neat Python is. Sometime soon I&#8217;d like to work
-   on a mixed language system: Python for the tricky bits, C++ for the
-   speedy bits.
-</p>
-</blockquote><p>I haven&#8217;t changed my mind. As usual, it&#8217;s been an evolution rather
-   than a revolution &#8212; step by step, I&#8217;ve got closer to realising this
-   ambition, and finally, now, I think I can say I&#8217;ve achieved it.
-</p>
-<span id="continue-reading"/>
-
-
-<h2>Why Python and C++?</h2>
+system</a>.</p>
+<blockquote>
+<p>I can&#8217;t get over how neat Python is. Sometime soon I&#8217;d like to work
+on a mixed language system: Python for the tricky bits, C++ for the
+speedy bits.</p>
+</blockquote>
+<p>I haven&#8217;t changed my mind. As usual, it&#8217;s been an evolution rather
+than a revolution &#8212; step by step, I&#8217;ve got closer to realising this
+ambition, and finally, now, I think I can say I&#8217;ve achieved it.</p>
+<p><span id="continue-reading"/></p>
+<h2 id="why-python-and-c">Why Python and C++?</h2>
 <p>No particular reason. C++ is the systems programming language I know
-   best. When you need to get close to the silicon, it does the job very
-   well. And Python is the high level language I know best. When you want to
-   write concise, flexible software, it does the job very well.
-   Really, though, I&#8217;d be just as happy to write the tricky code in any
-   decent high-level language, switching in low-level languages as
-   dictated by performance and platform requirements.
-</p>
-
-<h2>Mixed language development</h2>
+best. When you need to get close to the silicon, it does the job very
+well. And Python is the high level language I know best. When you want to
+write concise, flexible software, it does the job very well.
+Really, though, I&#8217;d be just as happy to write the tricky code in any
+decent high-level language, switching in low-level languages as
+dictated by performance and platform requirements.</p>
+<h2 id="mixed-language-development">Mixed language development</h2>
 <p>Perhaps the most obvious way to mix languages is in a single program:
-   you start off by writing the program in Python. If it doesn&#8217;t go
-   quickly enough, you profile it and write a C++ library to look after
-   the slow bits. There are disadvantages to this, though:
-</p>
+you start off by writing the program in Python. If it doesn&#8217;t go
+quickly enough, you profile it and write a C++ library to look after
+the slow bits. There are disadvantages to this, though:</p>
 <ul>
- <li>
-     you have to figure out how to interface between the two languages
- </li>
-
- <li>
-     the library and the program can become interdependent and harder to test in isolation
- </li>
-
- <li>
-     your IDE and build system may not like it
- </li>
+<li>you have to figure out how to interface between the two languages</li>
+<li>the library and the program can become interdependent and harder to test in isolation</li>
+<li>your IDE and build system may not like it</li>
 </ul>
 <p>As a consequence, this turns out to be a technique I&#8217;ve used relatively
-   little. Here are some other techniques I&#8217;ve used more frequently.
-</p>
+little. Here are some other techniques I&#8217;ve used more frequently.</p>
 <ul>
- <li><p><strong>Code Generation</strong>. Python is a great language for generating code
-     &#8212; either in Python or C++, or indeed in any other language.
-</p>
-
- </li>
-
- <li><p><strong>Multiple Processes</strong>. Rather than sharing a single process, the
-     C++ and the Python programs can run as separate executables. <span id="excerpt0"/>C++ does the
-     heavy lifting; Python manages the complex application logic. A nice
-     side-effect of this approach is that the operating system can use separate processors
-     for the separate processes without all the problems associated with
-     multi-threaded code.
-</p>
-
- </li>
-
- <li><p><strong>Prototyping</strong>. Sometimes a compiled C++ program is required. I&#8217;ve
-     found that sketching out a prototype in Python then simply rewriting
-     it in C++ can work well. The prototype can be used as both a
-     reference implementation and a source of test data. 
-</p>
-
- </li>
-
- <li><p><strong>Testing</strong>. Python is a great tool for creating test data and for running tests.
-</p>
-
- </li>
-
- <li><p><strong>Refactoring</strong>. C++ lacks the refactoring tool support available
-     for (e.g.) Java, but simple Python scripts can do some refactoring  jobs well enough.
-</p>
-
- </li>
+<li>
+<p><strong>Code Generation</strong>. Python is a great language for generating code
+  &#8212; either in Python or C++, or indeed in any other language.</p>
+</li>
+<li>
+<p><strong>Multiple Processes</strong>. Rather than sharing a single process, the
+  C++ and the Python programs can run as separate executables. <span id="excerpt0"/>C++ does the
+  heavy lifting; Python manages the complex application logic. A nice
+  side-effect of this approach is that the operating system can use separate processors
+  for the separate processes without all the problems associated with
+  multi-threaded code.</p>
+</li>
+<li>
+<p><strong>Prototyping</strong>. Sometimes a compiled C++ program is required. I&#8217;ve
+  found that sketching out a prototype in Python then simply rewriting
+  it in C++ can work well. The prototype can be used as both a
+  reference implementation and a source of test data. </p>
+</li>
+<li>
+<p><strong>Testing</strong>. Python is a great tool for creating test data and for running tests.</p>
+</li>
+<li>
+<p><strong>Refactoring</strong>. C++ lacks the refactoring tool support available
+  for (e.g.) Java, but simple Python scripts can do some refactoring  jobs well enough.</p>
+</li>
 </ul>
 </div>
 

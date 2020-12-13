@@ -29,10 +29,9 @@
 <h2 class="title"><a href="/articles/svn-help-patch">svn help patch</a></h2>
 <p class="meta"><abbr class="published" title="2007-10-03">2007-10-03</abbr> &bull; <a href="/tag/subversion" rel="tag">Subversion</a>, <a href="/tag/shell" rel="tag">Shell</a> &bull; <a href="/articles/svn-help-patch#disqus_thread">Comments</a></p>
 <p>Suppose you want to temporarily revert local changes made to your working
-   copy, then later restore your work in progress. There are a few ways to
-   do this. Perhaps the simplest would be to move, replicate, then
-   revert.
-</p>
+copy, then later restore your work in progress. There are a few ways to
+do this. Perhaps the simplest would be to move, replicate, then
+revert.</p>
 <div class="typocode">
 
 <pre class="prettyprint">$ mv working_copy working_copy_mine
@@ -44,12 +43,11 @@ $ svn revert -R working_copy
 </div>
 
 <p>Now all your changes to <code>working_copy</code> have been reverted and it
-   contains what you originally checked out (the <em>BASE</em> revision, in
-   <a href="http://subversion.tigris.org">Subversion</a> terminology, and note that this revision has been
-   cached locally in the <code>.svn</code> directories, so <code>svn revert</code> has no need
-   to visit the server). When you&#8217;re done, tidy up and put your
-   modifications back.
-</p>
+contains what you originally checked out (the <em>BASE</em> revision, in
+<a href="http://subversion.tigris.org">Subversion</a> terminology, and note that this revision has been
+cached locally in the <code>.svn</code> directories, so <code>svn revert</code> has no need
+to visit the server). When you&#8217;re done, tidy up and put your
+modifications back.</p>
 <div class="typocode">
 
 <pre class="prettyprint">$ rm -rf working_copy
@@ -60,9 +58,8 @@ $ mv working_copy_mine working_copy
 </div>
 
 <p>If it&#8217;s a large working copy you can save time, disk space and
-   keystrokes by avoiding the replication. First, save local differences
-   made to your working copy, then revert it.
-</p>
+keystrokes by avoiding the replication. First, save local differences
+made to your working copy, then revert it.</p>
 <div class="typocode">
 
 <pre class="prettyprint">$ svn diff working_copy &gt; working_copy.patch
@@ -73,13 +70,11 @@ $ svn revert -R working_copy
 </div>
 
 <p>Incidentally, you can fiddle around with <code>working_copy</code> as much as
-   you want now; <code>svn revert</code> will always restore the BASE revision.
-</p>
+you want now; <code>svn revert</code> will always restore the BASE revision.</p>
 <p>When done, <code>patch</code> your changes back in. Note there is no <code>svn patch</code>
-   command; Subversion&#8217;s native command for this kind of thing is
-   <code>svn merge</code> which only works on changes actually committed to the
-   repository. Instead, you&#8217;ll have to use good old <code>patch</code>.
-</p>
+command; Subversion&#8217;s native command for this kind of thing is
+<code>svn merge</code> which only works on changes actually committed to the
+repository. Instead, you&#8217;ll have to use good old <code>patch</code>.</p>
 <div class="typocode">
 
 <pre class="prettyprint">$ patch -p0 working_copy &lt; working_copy.patch
@@ -89,14 +84,12 @@ $ svn revert -R working_copy
 </div>
 
 <p><strong>Take care</strong>, though. If you&#8217;ve modified your working copy&#8217;s
-   structure (<code>svn add|delete|move</code>) or changed its properties (<code>svn
-propset|propedit|propdel</code>), this technique won&#8217;t work. 
-</p>
+structure (<code>svn add|delete|move</code>) or changed its properties (<code>svn
+propset|propedit|propdel</code>), this technique won&#8217;t work. </p>
 <p>I&#8217;d also suggest that if you regularly find yourself wanting to
-   shuffle tentative changes in this way, you probably ought to be
-   committing them on a private code branch where Subversion
-   can manage them for you.
-</p>
+shuffle tentative changes in this way, you probably ought to be
+committing them on a private code branch where Subversion
+can manage them for you.</p>
 </div>
 
 <div class="comments"><hr/><div id="disqus_thread"></div><script type="text/javascript" src="http://disqus.com/forums/wordaligned/embed.js"></script></div>

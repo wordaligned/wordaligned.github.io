@@ -26,76 +26,7 @@
       <div class="atomentry" id="longest-common-subsequence">
 <h2 class="title"><a href="/articles/longest-common-subsequence">Longest common subsequence</a></h2>
 <p class="meta"><abbr class="published" title="2009-03-11">2009-03-11</abbr> &bull; <a href="/tag/algorithms" rel="tag">Algorithms</a>, <a href="/tag/python" rel="tag">Python</a>, <a href="/tag/c++" rel="tag">C++</a>, <a href="/tag/lcs" rel="tag">Lcs</a>, <a href="/tag/clrs" rel="tag">CLRS</a>, <a href="/tag/animation" rel="tag">Animation</a> &bull; <a href="/articles/longest-common-subsequence#disqus_thread">Comments</a></p>
-<div class="toc">
-<h2>Contents</h2>
-<ul>
- <li><a href="#tocretracing-our-steps" name="toc0" id="toc0">Retracing our steps</a>
- </li>
-
- <li><a href="#tocsimple-example" name="toc1" id="toc1">Simple example</a>
- </li>
-
- <li><a href="#toca-recursive-approach" name="toc2" id="toc2">A recursive approach</a>
- </li>
-
- <li><a href="#tocproblems-with-the-recursive-solution" name="toc3" id="toc3">Problems with the recursive solution</a>
- </li>
-
- <li><a href="#tocdynamic-programming" name="toc4" id="toc4">Dynamic programming</a>
- </li>
-
- <li><a href="#tocmemoize" name="toc5" id="toc5">Memoize</a>
- </li>
-
- <li><a href="#tocrecursion-limit" name="toc6" id="toc6">Recursion limit</a>
- </li>
-
- <li><a href="#tocbottom-up-calculation" name="toc7" id="toc7">Bottom up calculation</a>
- </li>
-
- <li><a href="#tocextracting-an-lcs-from-the-grid" name="toc8" id="toc8">Extracting an LCS from the grid</a>
- </li>
-
- <li><a href="#tocanimation" name="toc9" id="toc9">Animation</a>
- </li>
-
- <li><a href="#tocperformance" name="toc10" id="toc10">Performance</a>
- </li>
-
- <li><a href="#tocreducing-the-space-for-lcs-lengths" name="toc11" id="toc11">Reducing the space for LCS lengths</a>
- </li>
-
- <li><a href="#tochirschbergs-linear-space-algorithm" name="toc12" id="toc12">Hirschberg&#8217;s Linear Space Algorithm</a>
- </li>
-
- <li><a href="#tocapplied-to-the-new-york-marathon-results" name="toc13" id="toc13">Applied to the New York Marathon Results</a>
- </li>
-
- <li><a href="#tochirschbergs-linear-space-algorithm-in-c" name="toc14" id="toc14">Hirschberg&#8217;s linear space algorithm in C++</a>
- </li>
-
- <li><a href="#tocapplications-edit-distance" name="toc15" id="toc15">Applications: edit distance</a>
- </li>
-
- <li><a href="#tocapplications-genetic-mutations" name="toc16" id="toc16">Applications: genetic mutations</a>
- </li>
-
- <li><a href="#tocapplications-version-control" name="toc17" id="toc17">Applications: version control</a>
- </li>
-
- <li><a href="#tocconclusions" name="toc18" id="toc18">Conclusions</a>
- </li>
-
- <li><a href="#tocnext-time" name="toc19" id="toc19">Next time</a>
- </li>
-
- <li><a href="#tocthanks" name="toc20" id="toc20">Thanks</a>
- </li>
-
- <li><a href="#tocpython-3-notes" name="toc21" id="toc21">Python 3 Notes</a>
- </li>
-</ul>
-</div><script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.1/jquery.min.js"></script>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.1/jquery.min.js"></script>
 <script type="text/javascript">
 function reset(i) {
     jQuery("div.lcs" + i).hide();
@@ -264,78 +195,45 @@ function animatelcs(i) {
 </div>
 </div>
 
-<p><button id="animatelcs1" onclick="animatelcs(1);">Calculate LCS</button>
-</p>
-<p>I pinched the idea for this animation from Ned Batchelder&#8217;s <a href="http://nedbatchelder.com/blog/200805/css_homer_animated.html">clever visualisation</a> of Rom&aacute;n Cort&eacute;s&#8217; brilliant <a href="http://www.romancortes.com/blog/homer-css/">CSS Homer Simpson</a>. It depends on Javascript, CSS and a font containing upwards, leftwards and north west <a href="http://www.alanwood.net/unicode/arrows.html">arrows</a>.  If it doesn&#8217;t work in your user agent, <a href="http://www.mozilla.org/firefox" title="Try Firefox!">my apologies</a>. If you&#8217;d like to find out why I&#8217;m comparing humans with chimpanzees, read on!
-</p>
-<span id="continue-reading"/>
-
-
-<h3><a href="#toc0" name="tocretracing-our-steps" id="tocretracing-our-steps">Retracing our steps</a></h3>
-<p>Taking a brief step back, this article is the third of a series. In the first episode <a href="/articles/a-race-within-a-race.html">we posed a puzzle</a>:
-</p>
-<blockquote><p>Starting with a list of runners ordered by finishing time, select a sublist of runners who are getting younger. <strong>What is the longest such sublist?</strong>
-</p>
-</blockquote><p>In the second episode <a href="/articles/ordered-sublists-a-brute-force-approach.html">we coded up a brute force solution</a> which searched all possible sublists to find an optimal solution. Although the code was simple and succinct, its exponential complexity made it unsuitable for practical use.
-</p>
-<p>In this episode we&#8217;ll discuss an elegant algorithm which solves our particular problem as a special case. On the way we&#8217;ll visit dynamic programming, Python decorators, version control and genetics.
-</p>
-<p>An outline of the approach is:
-</p>
+<p><button id="animatelcs1" onclick="animatelcs(1);">Calculate LCS</button></p>
+<p>I pinched the idea for this animation from Ned Batchelder&#8217;s <a href="http://nedbatchelder.com/blog/200805/css_homer_animated.html">clever visualisation</a> of Rom&aacute;n Cort&eacute;s&#8217; brilliant <a href="http://www.romancortes.com/blog/homer-css/">CSS Homer Simpson</a>. It depends on Javascript, CSS and a font containing upwards, leftwards and north west <a href="http://www.alanwood.net/unicode/arrows.html">arrows</a>.  If it doesn&#8217;t work in your user agent, <a href="http://www.mozilla.org/firefox" title="Try Firefox!">my apologies</a>. If you&#8217;d like to find out why I&#8217;m comparing humans with chimpanzees, read on!</p>
+<p><span id="continue-reading"/></p>
+<h3 id="retracing-our-steps">Retracing our steps</h3>
+<p>Taking a brief step back, this article is the third of a series. In the first episode <a href="/articles/a-race-within-a-race.html">we posed a puzzle</a>:</p>
+<blockquote>
+<p>Starting with a list of runners ordered by finishing time, select a sublist of runners who are getting younger. <strong>What is the longest such sublist?</strong></p>
+</blockquote>
+<p>In the second episode <a href="/articles/ordered-sublists-a-brute-force-approach.html">we coded up a brute force solution</a> which searched all possible sublists to find an optimal solution. Although the code was simple and succinct, its exponential complexity made it unsuitable for practical use.</p>
+<p>In this episode we&#8217;ll discuss an elegant algorithm which solves our particular problem as a special case. On the way we&#8217;ll visit dynamic programming, Python decorators, version control and genetics.</p>
+<p>An outline of the approach is:</p>
 <ol>
- <li>
-     forget about races, runners and ages
- </li>
-
- <li>
-     the essence of the problem is to determine the longest <strong>ordered</strong> subsequence found within a given sequence R
- </li>
-
- <li>
-     which is a measure of how close R is to being ordered
- </li>
-
- <li>
-     so, take a copy of R and sort it using our ordering criterion to form the sequence S
- </li>
-
- <li>
-     the subsequences of R which are also subsequences of S are precisely the ordered subsequences of R
- </li>
-
- <li>
-     so any <strong>longest subsequence common to both R and S</strong> is actually a longest ordered subsequence of R
- </li>
-
- <li>
-     which is exactly what we&#8217;re looking for!
- </li>
+<li>forget about races, runners and ages</li>
+<li>the essence of the problem is to determine the longest <strong>ordered</strong> subsequence found within a given sequence R</li>
+<li>which is a measure of how close R is to being ordered</li>
+<li>so, take a copy of R and sort it using our ordering criterion to form the sequence S</li>
+<li>the subsequences of R which are also subsequences of S are precisely the ordered subsequences of R</li>
+<li>so any <strong>longest subsequence common to both R and S</strong> is actually a longest ordered subsequence of R</li>
+<li>which is exactly what we&#8217;re looking for!</li>
 </ol>
-<p>Copying and sorting finite sequences is straightforward (and efficient implementations can be found in any standard library), so the steps above reduce our problem to an application of a more general problem: how to find the <strong>longest common subsequence</strong> of two sequences.
-</p>
+<p>Copying and sorting finite sequences is straightforward (and efficient implementations can be found in any standard library), so the steps above reduce our problem to an application of a more general problem: how to find the <strong>longest common subsequence</strong> of two sequences.</p>
+<h3 id="simple-example">Simple example</h3>
+<p>As a simple example I&#8217;ve highlighted &#8220;HMAN&#8221;, the longest subsequence common to both &#8220;HUMAN&#8221; and &#8220;CHIMPANZEE&#8221;</p>
+<p style="margin: 0;font-size:400%"><span style="color:#930">H</span> U <span style="color:#930">M</span> <span style="color:#930">A</span> <span style="color:#930">N</span></p>
+<p style="margin:0;font-size:400%">C <span style="color:#930">H</span> I <span style="color:#930">M</span> P <span style="color:#930">A</span> <span style="color:#930">N</span> Z E E</p>
 
-<h3><a href="#toc1" name="tocsimple-example" id="tocsimple-example">Simple example</a></h3>
-<p>As a simple example I&#8217;ve highlighted &#8220;HMAN&#8221;, the longest subsequence common to both &#8220;HUMAN&#8221; and &#8220;CHIMPANZEE&#8221;
-</p>
-<p style="margin: 0;font-size:400%"><span style="color:#930">H</span> U <span style="color:#930">M</span> <span style="color:#930">A</span> <span style="color:#930">N</span></p><p style="margin:0;font-size:400%">C <span style="color:#930">H</span> I <span style="color:#930">M</span> P <span style="color:#930">A</span> <span style="color:#930">N</span> Z E E</p>
-
-<p>Let&#8217;s note up front that there may not be a unique LCS of two sequences (as a trivial example, &#8220;A&#8221; and &#8220;B&#8221; are both LCSes of &#8220;AB&#8221;, &#8220;BA&#8221;), which is why we&#8217;ll talk about <strong>a</strong> longest common subsequence rather than <strong>the</strong> longest common subsequence.
-</p>
-<p>We can also rule out a simple divide and conquer scheme. We can&#8217;t just split both inputs in half and join together the LCSes of the beginnings and endings to form an answer. Consider finding the LCS of &#8220;123ABC&#8221;, &#8220;DEF123&#8221; for example &#8212; concatenating the LCSes of &#8220;123&#8221;, &#8220;DEF&#8221; and &#8220;ABC&#8221;, &#8220;123&#8221; gives the empty string, which is clearly wrong. (We&#8217;ll see later that a more sophisticated divide and conquer scheme <strong>does</strong> exist, but it comes at a cost.)
-</p>
-
-<h3><a href="#toc2" name="toca-recursive-approach" id="toca-recursive-approach">A recursive approach</a></h3>
-<p>An elegant recursive approach to solving this problem is based around the observation that the LCS of two sequences can be built from the LCSes of prefixes of these sequences. In algorithm speak, the longest common subsequence problem has <a href="http://en.wikipedia.org/wiki/Optimal_substructure">optimal substructure</a>.
-</p>
+<p>Let&#8217;s note up front that there may not be a unique LCS of two sequences (as a trivial example, &#8220;A&#8221; and &#8220;B&#8221; are both LCSes of &#8220;AB&#8221;, &#8220;BA&#8221;), which is why we&#8217;ll talk about <strong>a</strong> longest common subsequence rather than <strong>the</strong> longest common subsequence.</p>
+<p>We can also rule out a simple divide and conquer scheme. We can&#8217;t just split both inputs in half and join together the LCSes of the beginnings and endings to form an answer. Consider finding the LCS of &#8220;123ABC&#8221;, &#8220;DEF123&#8221; for example &#8212; concatenating the LCSes of &#8220;123&#8221;, &#8220;DEF&#8221; and &#8220;ABC&#8221;, &#8220;123&#8221; gives the empty string, which is clearly wrong. (We&#8217;ll see later that a more sophisticated divide and conquer scheme <strong>does</strong> exist, but it comes at a cost.)</p>
+<h3 id="a-recursive-approach">A recursive approach</h3>
+<p>An elegant recursive approach to solving this problem is based around the observation that the LCS of two sequences can be built from the LCSes of prefixes of these sequences. In algorithm speak, the longest common subsequence problem has <a href="http://en.wikipedia.org/wiki/Optimal_substructure">optimal substructure</a>.</p>
 <div class="typocode">
 
 <pre class="prettyprint">def lcs(xs, ys):
-    '''Return a longest common subsequence of xs and ys.
-    
+    &#x27;&#x27;&#x27;Return a longest common subsequence of xs and ys.
+
     Example
     &gt;&gt;&gt; lcs("HUMAN", "CHIMPANZEE")
-    ['H', 'M', 'A', 'N']
-    '''
+    [&#x27;H&#x27;, &#x27;M&#x27;, &#x27;A&#x27;, &#x27;N&#x27;]
+    &#x27;&#x27;&#x27;
     if xs and ys:
         *xb, xe = xs
         *yb, ye = ys
@@ -352,38 +250,30 @@ function animatelcs(i) {
 
 <div class="amazon"><a title="CLRS at Amazon" href="http://www.amazon.com/gp/product/0262032937?ie=UTF8&amp;tag=wordalig-20"><img src="/images/books/clrs.jpg" alt="CLRS cover"/></a></div>
 
-<p>A formal explanation of why this works would be much longer than the code. I&#8217;ll sketch out the reasoning, but for a more rigorous approach I recommend Cormen, Leiserson, Rivest and Stein&#8217;s classic reference, <a href="http://www.amazon.com/gp/product/0262032937?ie=UTF8&amp;tag=wordalig-20" title="CLRS at Amazon">&#8220;Introduction to Algorithms&#8221;</a> (CLRS).
-</p>
-<p>Essentially, if either input is empty, then the answer is just the empty sequence. Otherwise, split <code>xs</code> into its beginning, <code>xb</code>, and its final element <code>xe</code>; and similarly for <code>ys</code>. If the value <code>xe</code> equals <code>ye</code>, then <code>lcs(xs, ys)</code> must end with this value, and the remainder of <code>lcs(xs, ys)</code> must solve <code>lcs(xb, yb)</code>. Otherwise, the longer of <code>lcs(xs, yb)</code> and <code>lcs(xb, ys)</code> must be a solution to <code>lcs(xs, ys)</code>.
-</p>
-<p>By the way, the assignment <code>*xb, xe = xs</code> is a nice example of Python 3.0&#8217;s <a href="http://www.python.org/dev/peps/pep-3132/">extended unpacking syntax</a>. In Python 2.6 and earlier you might write <code>xb, xe = xs[:-1], xs[-1]</code>.
-</p>
-<p>The recursion here is interesting. At each step, we compare two elements from the original inputs. Depending on the result, we must evaluate either one or two smaller LCSes.
-</p>
-<p>Note also the call to <code>max</code> in the recursion. At this point, the algorithm chooses between two prefix pairs of the original inputs, <code>(xs, yb)</code> and <code>(xb, ys)</code>, based on the length of their LCSes. Here&#8217;s the source of multiple solutions: <code>max()</code> returns the larger of its two arguments, and if <code>lcs(xs, yb)</code> and <code>lcs(xb, ys)</code> have equal lengths, I suspect the first will always be selected; but if we wanted all LCSes rather than any one LCS, we would have to continue down both routes. 
-</p>
-<p>The other important point to make here is that, in any case, both routes must be fully evaluated before a choice can be made. Loosely speaking, every additional step can double the workload. This is a problem!
-</p>
-
-<h3><a href="#toc3" name="tocproblems-with-the-recursive-solution" id="tocproblems-with-the-recursive-solution">Problems with the recursive solution</a></h3>
-<p>Work is needed to turn the recursive solution into a practical one. The key issue is that the recursive algorithm calculates the LCS of the same prefix pair multiple times. Let&#8217;s run a quick code experiment to show this. Starting with the version of <code>lcs()</code> shown above, we can adapt it to keep track of call counts<a id="fn1link" href="#fn1"><sup>[1]</sup></a>.
-</p>
+<p>A formal explanation of why this works would be much longer than the code. I&#8217;ll sketch out the reasoning, but for a more rigorous approach I recommend Cormen, Leiserson, Rivest and Stein&#8217;s classic reference, <a href="http://www.amazon.com/gp/product/0262032937?ie=UTF8&amp;tag=wordalig-20" title="CLRS at Amazon">&#8220;Introduction to Algorithms&#8221;</a> (CLRS).</p>
+<p>Essentially, if either input is empty, then the answer is just the empty sequence. Otherwise, split <code>xs</code> into its beginning, <code>xb</code>, and its final element <code>xe</code>; and similarly for <code>ys</code>. If the value <code>xe</code> equals <code>ye</code>, then <code>lcs(xs, ys)</code> must end with this value, and the remainder of <code>lcs(xs, ys)</code> must solve <code>lcs(xb, yb)</code>. Otherwise, the longer of <code>lcs(xs, yb)</code> and <code>lcs(xb, ys)</code> must be a solution to <code>lcs(xs, ys)</code>.</p>
+<p>By the way, the assignment <code>*xb, xe = xs</code> is a nice example of Python 3.0&#8217;s <a href="http://www.python.org/dev/peps/pep-3132/">extended unpacking syntax</a>. In Python 2.6 and earlier you might write <code>xb, xe = xs[:-1], xs[-1]</code>.</p>
+<p>The recursion here is interesting. At each step, we compare two elements from the original inputs. Depending on the result, we must evaluate either one or two smaller LCSes.</p>
+<p>Note also the call to <code>max</code> in the recursion. At this point, the algorithm chooses between two prefix pairs of the original inputs, <code>(xs, yb)</code> and <code>(xb, ys)</code>, based on the length of their LCSes. Here&#8217;s the source of multiple solutions: <code>max()</code> returns the larger of its two arguments, and if <code>lcs(xs, yb)</code> and <code>lcs(xb, ys)</code> have equal lengths, I suspect the first will always be selected; but if we wanted all LCSes rather than any one LCS, we would have to continue down both routes. </p>
+<p>The other important point to make here is that, in any case, both routes must be fully evaluated before a choice can be made. Loosely speaking, every additional step can double the workload. This is a problem!</p>
+<h3 id="problems-with-the-recursive-solution">Problems with the recursive solution</h3>
+<p>Work is needed to turn the recursive solution into a practical one. The key issue is that the recursive algorithm calculates the LCS of the same prefix pair multiple times. Let&#8217;s run a quick code experiment to show this. Starting with the version of <code>lcs()</code> shown above, we can adapt it to keep track of call counts<a id="fn1link" href="#fn1"><sup><a href="https://blog.codeship.com/building-minimal-docker-containers-for-go-applications/">1</a></sup></a>.</p>
 <div class="typocode">
 
 <pre class="prettyprint">from collections import defaultdict
-concat = ''.join
+concat = &#x27;&#x27;.join
 
 def lcs(xs, ys):
     ....
 
 def count_lcs_calls(lcs):
-    '''Return a pair (lcs, calls)
-    
+    &#x27;&#x27;&#x27;Return a pair (lcs, calls)
+
     Where:
     lcs - a wrapped version of lcs, which counts up calls
     calls - a dict mapping arg pairs to the number of times lcs
     has been called with these args.
-    '''
+    &#x27;&#x27;&#x27;
     calls = defaultdict(int)
     def wrapped(xs, ys):
         calls[(concat(xs), concat(ys))] += 1
@@ -396,63 +286,57 @@ lcs, calls = count_lcs_calls(lcs)
 
 </div>
 
-<p>If <code>count_lcs_calls()</code> reminds you of a <a href="/articles/echo.html">Python decorator</a>, good! That&#8217;s pretty much how it works. We can now call the newly decorated version of <code>lcs</code> and examine the <code>calls</code> dict to see what&#8217;s been going on.
-</p>
-<p>With two completely different inputs, the recursive algorithm never passes the <code>xe == ye</code> test, and must always consider another pair of prefixes of the inputs.
-</p>
+<p>If <code>count_lcs_calls()</code> reminds you of a <a href="/articles/echo.html">Python decorator</a>, good! That&#8217;s pretty much how it works. We can now call the newly decorated version of <code>lcs</code> and examine the <code>calls</code> dict to see what&#8217;s been going on.</p>
+<p>With two completely different inputs, the recursive algorithm never passes the <code>xe == ye</code> test, and must always consider another pair of prefixes of the inputs.</p>
 <div class="typocode">
 
-<pre class="prettyprint">&gt;&gt;&gt; lcs('MAN', 'PIG')
+<pre class="prettyprint">&gt;&gt;&gt; lcs(&#x27;MAN&#x27;, &#x27;PIG&#x27;)
 []
-&gt;&gt;&gt; print(*sorted((v, k) for k, v in calls.items()), sep='\n')
-(1, ('', 'PIG'))
-(1, ('M', 'PIG'))
-(1, ('MA', 'PIG'))
-(1, ('MAN', ''))
-(1, ('MAN', 'P'))
-(1, ('MAN', 'PI'))
-(1, ('MAN', 'PIG'))
-(2, ('MA', 'PI'))
-(3, ('', 'PI'))
-(3, ('M', 'PI'))
-(3, ('MA', ''))
-(3, ('MA', 'P'))
-(6, ('', 'P'))
-(6, ('M', ''))
-(6, ('M', 'P'))
+&gt;&gt;&gt; print(*sorted((v, k) for k, v in calls.items()), sep=&#x27;\n&#x27;)
+(1, (&#x27;&#x27;, &#x27;PIG&#x27;))
+(1, (&#x27;M&#x27;, &#x27;PIG&#x27;))
+(1, (&#x27;MA&#x27;, &#x27;PIG&#x27;))
+(1, (&#x27;MAN&#x27;, &#x27;&#x27;))
+(1, (&#x27;MAN&#x27;, &#x27;P&#x27;))
+(1, (&#x27;MAN&#x27;, &#x27;PI&#x27;))
+(1, (&#x27;MAN&#x27;, &#x27;PIG&#x27;))
+(2, (&#x27;MA&#x27;, &#x27;PI&#x27;))
+(3, (&#x27;&#x27;, &#x27;PI&#x27;))
+(3, (&#x27;M&#x27;, &#x27;PI&#x27;))
+(3, (&#x27;MA&#x27;, &#x27;&#x27;))
+(3, (&#x27;MA&#x27;, &#x27;P&#x27;))
+(6, (&#x27;&#x27;, &#x27;P&#x27;))
+(6, (&#x27;M&#x27;, &#x27;&#x27;))
+(6, (&#x27;M&#x27;, &#x27;P&#x27;))
 
 </pre>
 
 </div>
 
-<p><a href="http://en.wikipedia.org/wiki/Pascal's_triangle"><img style="float:right" src="http://upload.wikimedia.org/wikipedia/commons/0/0d/PascalTriangleAnimated2.gif" alt="Pascal's triangle"/></a>
-</p>
-<p>Here, we show the LCS of &#8220;MAN&#8221; and &#8220;PIG is the empty sequence. The next command prints the call counts to standard output, showing that e.g. we calculate <code>lcs('MA', 'PI')</code> twice and <code>lcs('M', 'P')</code> six times. It should be no surprise to see these call counts appearing in Pascal&#8217;s triangle.
-</p>
-<p>At the other extreme, given identical inputs the recursion zips straight through the identical prefixes, and no call is repeated.
-</p>
+<p><a href="http://en.wikipedia.org/wiki/Pascal's_triangle"><img style="float:right" src="http://upload.wikimedia.org/wikipedia/commons/0/0d/PascalTriangleAnimated2.gif" alt="Pascal's triangle"/></a></p>
+<p>Here, we show the LCS of &#8220;MAN&#8221; and &#8220;PIG is the empty sequence. The next command prints the call counts to standard output, showing that e.g. we calculate <code>lcs('MA', 'PI')</code> twice and <code>lcs('M', 'P')</code> six times. It should be no surprise to see these call counts appearing in Pascal&#8217;s triangle.</p>
+<p>At the other extreme, given identical inputs the recursion zips straight through the identical prefixes, and no call is repeated.</p>
 <div class="typocode">
 
 <pre class="prettyprint">&gt;&gt;&gt; calls.clear()
-&gt;&gt;&gt; lcs('CHIMP', 'CHIMP')
-['C', 'H', 'I', 'M', 'P']
-&gt;&gt;&gt; print(*sorted((v, k) for k, v in calls.items()), sep='\n')
-(1, ('', ''))
-(1, ('C', 'C'))
-(1, ('CH', 'CH'))
-(1, ('CHI', 'CHI'))
-(1, ('CHIM', 'CHIM'))
-(1, ('CHIMP', 'CHIMP'))
+&gt;&gt;&gt; lcs(&#x27;CHIMP&#x27;, &#x27;CHIMP&#x27;)
+[&#x27;C&#x27;, &#x27;H&#x27;, &#x27;I&#x27;, &#x27;M&#x27;, &#x27;P&#x27;]
+&gt;&gt;&gt; print(*sorted((v, k) for k, v in calls.items()), sep=&#x27;\n&#x27;)
+(1, (&#x27;&#x27;, &#x27;&#x27;))
+(1, (&#x27;C&#x27;, &#x27;C&#x27;))
+(1, (&#x27;CH&#x27;, &#x27;CH&#x27;))
+(1, (&#x27;CHI&#x27;, &#x27;CHI&#x27;))
+(1, (&#x27;CHIM&#x27;, &#x27;CHIM&#x27;))
+(1, (&#x27;CHIMP&#x27;, &#x27;CHIMP&#x27;))
 
 </pre>
 
 </div>
 
-<p>Generally, though, we won&#8217;t be so lucky. By the time I interrupted a call to find the LCS of two short strands of DNA, there had already been a total of over 200 million recursive calls to the function, and we&#8217;d compared <code>'A'</code> and <code>'G'</code> alone over 24 million times. The algorithm, as presented, is of exponential complexity, hence suitable for only the briefest of inputs.
-</p>
+<p>Generally, though, we won&#8217;t be so lucky. By the time I interrupted a call to find the LCS of two short strands of DNA, there had already been a total of over 200 million recursive calls to the function, and we&#8217;d compared <code>'A'</code> and <code>'G'</code> alone over 24 million times. The algorithm, as presented, is of exponential complexity, hence suitable for only the briefest of inputs.</p>
 <div class="typocode">
 
-<pre class="prettyprint">&gt;&gt;&gt; lcs('ACCGGTCGAGTGCGCGGAAGCCGGCCGAA', 'GTCGTTCGGAATGCCGTTGCTCTGTAAA')
+<pre class="prettyprint">&gt;&gt;&gt; lcs(&#x27;ACCGGTCGAGTGCGCGGAAGCCGGCCGAA&#x27;, &#x27;GTCGTTCGGAATGCCGTTGCTCTGTAAA&#x27;)
 ....
 KeyboardInterrupt
 &gt;&gt;&gt; sum(calls.values())
@@ -462,47 +346,36 @@ KeyboardInterrupt
 &gt;&gt;&gt; import operator
 &gt;&gt;&gt; value = operator.itemgetter(1)
 &gt;&gt;&gt; mostcalled = list(sorted(calls.items(), key=value))[-5:]
-&gt;&gt;&gt; print(*mostcalled, sep='\n')
-(('', 'GT'), 13182769)
-(('A', 'GT'), 13182769)
-(('A', 'G'), 24853152)
-(('', 'G'), 24853152)
-(('A', ''), 24853152)
+&gt;&gt;&gt; print(*mostcalled, sep=&#x27;\n&#x27;)
+((&#x27;&#x27;, &#x27;GT&#x27;), 13182769)
+((&#x27;A&#x27;, &#x27;GT&#x27;), 13182769)
+((&#x27;A&#x27;, &#x27;G&#x27;), 24853152)
+((&#x27;&#x27;, &#x27;G&#x27;), 24853152)
+((&#x27;A&#x27;, &#x27;&#x27;), 24853152)
 
 </pre>
 
 </div>
 
-
-<h3><a href="#toc4" name="tocdynamic-programming" id="tocdynamic-programming">Dynamic programming</a></h3>
-<p>We&#8217;ve already seen the LCS of two sequences can be built from the LCSes of prefixes of these subsequences; that is, an optimal solution to the problem can be built from optimal solutions to subproblems, a property known as <strong>optimal substructure</strong>. Our code experiment above shows that the subproblems repeat, possibly many times. This second property, of <strong>overlapping subproblems</strong>, means we have a classic example of a problem we can solve using <a href="http://en.wikipedia.org/wiki/Dynamic_Programming">dynamic programming</a>. There are a couple of standard ways to progress:
-</p>
+<h3 id="dynamic-programming">Dynamic programming</h3>
+<p>We&#8217;ve already seen the LCS of two sequences can be built from the LCSes of prefixes of these subsequences; that is, an optimal solution to the problem can be built from optimal solutions to subproblems, a property known as <strong>optimal substructure</strong>. Our code experiment above shows that the subproblems repeat, possibly many times. This second property, of <strong>overlapping subproblems</strong>, means we have a classic example of a problem we can solve using <a href="http://en.wikipedia.org/wiki/Dynamic_Programming">dynamic programming</a>. There are a couple of standard ways to progress:</p>
 <ul>
- <li>
-     memoization
- </li>
-
- <li>
-     converting from top-down to bottom-up
- </li>
+<li>memoization</li>
+<li>converting from top-down to bottom-up</li>
 </ul>
-<p>Let&#8217;s try these out.
-</p>
-
-<h3><a href="#toc5" name="tocmemoize" id="tocmemoize">Memoize</a></h3>
-<p>Memoization is a simple idea. Rather than repeatedly recalculate a function for the same input values, we cache the result of each call, keyed by the function call arguments. If, as in this case, full evaluation is expensive compared to the look-up, and we&#8217;ve got space for the cache, then the technique makes sense.
-</p>
-<p>In Python, we can write an adaptor function which converts our original function into a memoized version of itself. Here&#8217;s just such an adaptor for functions which take an arbitrary number of positional parameters.
-</p>
+<p>Let&#8217;s try these out.</p>
+<h3 id="memoize">Memoize</h3>
+<p>Memoization is a simple idea. Rather than repeatedly recalculate a function for the same input values, we cache the result of each call, keyed by the function call arguments. If, as in this case, full evaluation is expensive compared to the look-up, and we&#8217;ve got space for the cache, then the technique makes sense.</p>
+<p>In Python, we can write an adaptor function which converts our original function into a memoized version of itself. Here&#8217;s just such an adaptor for functions which take an arbitrary number of positional parameters.</p>
 <div class="typocode">
 
 <pre class="prettyprint">def memoize(fn):
-    '''Return a memoized version of the input function.
-    
+    &#x27;&#x27;&#x27;Return a memoized version of the input function.
+
     The returned function caches the results of previous calls.
     Useful if a function call is expensive, and the function 
     is called repeatedly with the same arguments.
-    '''
+    &#x27;&#x27;&#x27;
     cache = dict()
     def wrapped(*v):
         key = tuple(v) # tuples are hashable, and can be used as dict keys
@@ -515,17 +388,16 @@ KeyboardInterrupt
 
 </div>
 
-<p>We can use this to <a href="http://docs.python.org/py3k/reference/compound_stmts.html#function">decorate</a> our longest common subsequence function. I&#8217;ve also taken the opportunity to bypass some of the list splitting, creating an inner function which uses indices into the original <code>xs</code> and <code>ys</code> inputs.
-</p>
+<p>We can use this to <a href="http://docs.python.org/py3k/reference/compound_stmts.html#function">decorate</a> our longest common subsequence function. I&#8217;ve also taken the opportunity to bypass some of the list splitting, creating an inner function which uses indices into the original <code>xs</code> and <code>ys</code> inputs.</p>
 <div class="typocode">
 
 <pre class="prettyprint">def lcs(xs, ys):
-    '''Return the longest subsequence common to xs and ys.
-    
+    &#x27;&#x27;&#x27;Return the longest subsequence common to xs and ys.
+
     Example
     &gt;&gt;&gt; lcs("HUMAN", "CHIMPANZEE")
-    ['H', 'M', 'A', 'N']
-    '''
+    [&#x27;H&#x27;, &#x27;M&#x27;, &#x27;A&#x27;, &#x27;N&#x27;]
+    &#x27;&#x27;&#x27;
     @memoize
     def lcs_(i, j):
         if i and j:
@@ -542,26 +414,23 @@ KeyboardInterrupt
 
 </div>
 
-<p>This is a big improvement. If <code>xs</code> and <code>ys</code> have <code>nx</code> and <code>ny</code> elements respectively, then the values of <code>i</code> and <code>j</code> passed to the inner <code>lcs_(i, j)</code> function must fall into the inclusive ranges <code>[0, nx]</code>, <code>[0, ny]</code>, and the cache will grow to contain at most <code>(nx + 1)&times;(ny + 1)</code> elements. If the input sequences are of similar size, it&#8217;s easy to see this version of <code>lcs</code> operates in quadratic time and space.
-</p>
+<p>This is a big improvement. If <code>xs</code> and <code>ys</code> have <code>nx</code> and <code>ny</code> elements respectively, then the values of <code>i</code> and <code>j</code> passed to the inner <code>lcs_(i, j)</code> function must fall into the inclusive ranges <code>[0, nx]</code>, <code>[0, ny]</code>, and the cache will grow to contain at most <code>(nx + 1)&times;(ny + 1)</code> elements. If the input sequences are of similar size, it&#8217;s easy to see this version of <code>lcs</code> operates in quadratic time and space.</p>
 <div class="typocode">
 
-<pre class="prettyprint">&gt;&gt;&gt; ss = lcs('ACCGGTCGAGTGCGCGGAAGCCGGCCGAA', 'GTCGTTCGGAATGCCGTTGCTCTGTAAA')
-&gt;&gt;&gt; ''.join(ss)
-'GTCGTCGGAAGCCGGCCGAA'
+<pre class="prettyprint">&gt;&gt;&gt; ss = lcs(&#x27;ACCGGTCGAGTGCGCGGAAGCCGGCCGAA&#x27;, &#x27;GTCGTTCGGAATGCCGTTGCTCTGTAAA&#x27;)
+&gt;&gt;&gt; &#x27;&#x27;.join(ss)
+&#x27;GTCGTCGGAAGCCGGCCGAA&#x27;
 
 </pre>
 
 </div>
 
-
-<h3><a href="#toc6" name="tocrecursion-limit" id="tocrecursion-limit">Recursion limit</a></h3>
-<p>The memoized version of <code>lcs()</code> remembers previous results, but it&#8217;s still highly recursive, and that can cause problems. Try comparing a couple of longer synthesised strands of DNA.
-</p>
+<h3 id="recursion-limit">Recursion limit</h3>
+<p>The memoized version of <code>lcs()</code> remembers previous results, but it&#8217;s still highly recursive, and that can cause problems. Try comparing a couple of longer synthesised strands of DNA.</p>
 <div class="typocode">
 
 <pre class="prettyprint">&gt;&gt;&gt; from random import choice
-&gt;&gt;&gt; def base(): return choice('ACGT')
+&gt;&gt;&gt; def base(): return choice(&#x27;ACGT&#x27;)
 &gt;&gt;&gt; dna1 = [base() for _ in range(10000)]
 &gt;&gt;&gt; dna2 = [base() for _ in range(10000)]
 &gt;&gt;&gt; lcs(dna1, dna2)
@@ -572,16 +441,13 @@ RuntimeError: maximum recursion depth exceeded
 
 </div>
 
-<p>We might try bumping up the recursion limit but this approach is neither clean nor portable. As the <a href="http://docs.python.org/library/sys.html#sys.setrecursionlimit">sys.setrecursionlimit() documentation</a> says:
-</p>
-<blockquote><p>The highest possible limit is platform-dependent. A user may need to set the limit higher when she has a program that requires deep recursion and a platform that supports a higher limit. This should be done with care, because a too-high limit can lead to a crash.
-</p>
-</blockquote><p>We might also try using a different language or a different <a href="http://www.stackless.com/">Python implementation</a>, but instead let&#8217;s stick with CPython and explore a bottom-up approach.
-</p>
-
-<h3><a href="#toc7" name="tocbottom-up-calculation" id="tocbottom-up-calculation">Bottom up calculation</a></h3>
-<p>Rather than continue with our top-down recursive algorithm, we can employ another standard dynamic programming technique and transform the algorithm into one which works from the bottom up. Recall that, in the general case, to calculate <code>lcs(xs, ys)</code> we needed to solve three sub-problems, <code>lcs(xb, yb)</code>, <code>lcs(xb, ys)</code>, <code>lcs(xs, yb)</code>, where <code>xb</code> is the result of removing the end element from <code>xs</code>, and similarly for <code>yb</code>.
-</p>
+<p>We might try bumping up the recursion limit but this approach is neither clean nor portable. As the <a href="http://docs.python.org/library/sys.html#sys.setrecursionlimit">sys.setrecursionlimit() documentation</a> says:</p>
+<blockquote>
+<p>The highest possible limit is platform-dependent. A user may need to set the limit higher when she has a program that requires deep recursion and a platform that supports a higher limit. This should be done with care, because a too-high limit can lead to a crash.</p>
+</blockquote>
+<p>We might also try using a different language or a different <a href="http://www.stackless.com/">Python implementation</a>, but instead let&#8217;s stick with CPython and explore a bottom-up approach.</p>
+<h3 id="bottom-up-calculation">Bottom up calculation</h3>
+<p>Rather than continue with our top-down recursive algorithm, we can employ another standard dynamic programming technique and transform the algorithm into one which works from the bottom up. Recall that, in the general case, to calculate <code>lcs(xs, ys)</code> we needed to solve three sub-problems, <code>lcs(xb, yb)</code>, <code>lcs(xb, ys)</code>, <code>lcs(xs, yb)</code>, where <code>xb</code> is the result of removing the end element from <code>xs</code>, and similarly for <code>yb</code>.</p>
 <div class="typocode">
 
 <pre class="prettyprint">    *xb, xe = xs
@@ -595,40 +461,39 @@ RuntimeError: maximum recursion depth exceeded
 
 </div>
 
-<p>These subproblems in turn depend on the LCSes of yet shorter prefix pairs of <code>xs</code> and <code>ys</code>. A bottom up approach reverses the direction and calculates the LCSes of all prefix pairs of <code>xs</code> and <code>ys</code>, from shortest to longest. We iterate through these prefix pairs filling a rectangular grid with the information needed to continue and to eventually reconstruct an LCS. Once again, the code is easier to read than an explanation.
-</p>
+<p>These subproblems in turn depend on the LCSes of yet shorter prefix pairs of <code>xs</code> and <code>ys</code>. A bottom up approach reverses the direction and calculates the LCSes of all prefix pairs of <code>xs</code> and <code>ys</code>, from shortest to longest. We iterate through these prefix pairs filling a rectangular grid with the information needed to continue and to eventually reconstruct an LCS. Once again, the code is easier to read than an explanation.</p>
 <div class="typocode">
 
 <pre class="prettyprint">from collections import defaultdict, namedtuple
 from itertools import product
 
 def lcs_grid(xs, ys):
-    '''Create a grid for longest common subsequence calculations.
-    
+    &#x27;&#x27;&#x27;Create a grid for longest common subsequence calculations.
+
     Returns a grid where grid[(j, i)] is a pair (n, move) such that
     - n is the length of the LCS of prefixes xs[:i], ys[:j]
     - move is \, ^, &lt;, or e, depending on whether the best move
       to (j, i) was diagonal, downwards, or rightwards, or None.
-    
+
     Example:
        T  A  R  O  T
     A 0&lt; 1\ 1&lt; 1&lt; 1&lt;
     R 0&lt; 1^ 2\ 2&lt; 2&lt;
     T 1\ 1&lt; 2^ 2&lt; 3\
-    '''
-    Cell = namedtuple('Cell', 'length move')
-    grid = defaultdict(lambda: Cell(0, 'e'))
+    &#x27;&#x27;&#x27;
+    Cell = namedtuple(&#x27;Cell&#x27;, &#x27;length move&#x27;)
+    grid = defaultdict(lambda: Cell(0, &#x27;e&#x27;))
     sqs = product(enumerate(ys), enumerate(xs))
     for (j, y), (i, x) in sqs:
         if x == y:
-            cell = Cell(grid[(j-1, i-1)].length + 1, '\\')
+            cell = Cell(grid[(j-1, i-1)].length + 1, &#x27;\\&#x27;)
         else:
             left = grid[(j, i-1)].length
             over = grid[(j-1, i)].length
             if left &lt; over:
-                cell = Cell(over, '^')
+                cell = Cell(over, &#x27;^&#x27;)
             else:
-                cell = Cell(left, '&lt;')
+                cell = Cell(left, &#x27;&lt;&#x27;)
         grid[(j, i)] = cell
     return grid
 
@@ -636,30 +501,26 @@ def lcs_grid(xs, ys):
 
 </div>
 
-<p>The implementation here makes a couple of <a href="http://www.merriam-webster.com/dictionary/questionable">unusual</a> choices. It models a 2 dimensional grid of values using a dict keyed by <code>(i, j)</code> pairs, rather than a more conventional array representation. Furthermore, it uses a <code>defaultdict</code>, which returns a value even for keys which haven&#8217;t been filled in. I&#8217;ve used this data structure primarily to avoid special case code at the edges of the grid. For example, a grid cell can be accessed at position <code>(j-1, i-1)</code> even if <code>i</code> or <code>j</code> is zero, and that cell automatically takes the desired <code>(0, 'e')</code> value.
-</p>
-<p>I&#8217;ve <a href="http://www.eflorenzano.com/blog/post/gems-python/" title="See item 4 of Eric Florenzano's Gems of Python list">come across the suggestion</a> that <code>defaultdict</code>&#8217;s should be converted into regular <code>dict</code>&#8217;s before being passed back to callers, which <a href="http://norvig.com/spell-correct.html" title="Peter Norvig admits that, much as he likes defaultdicts, they've caught him out">makes a lot of sense</a>, but in this case I&#8217;m choosing to return a <code>defaultdict</code> since its default value property will be useful in subsequent calculations &#8212; to find an actual LCS for example. 
-</p>
-
-<h3><a href="#toc8" name="tocextracting-an-lcs-from-the-grid" id="tocextracting-an-lcs-from-the-grid">Extracting an LCS from the grid</a></h3>
-<p>Cells in the LCS grid hold moves and LCS lengths. To extract an actual LCS, we need to retrace the moves. Here&#8217;s an iterative algorithm (a recursive one would also be possible) which does this.
-</p>
+<p>The implementation here makes a couple of <a href="http://www.merriam-webster.com/dictionary/questionable">unusual</a> choices. It models a 2 dimensional grid of values using a dict keyed by <code>(i, j)</code> pairs, rather than a more conventional array representation. Furthermore, it uses a <code>defaultdict</code>, which returns a value even for keys which haven&#8217;t been filled in. I&#8217;ve used this data structure primarily to avoid special case code at the edges of the grid. For example, a grid cell can be accessed at position <code>(j-1, i-1)</code> even if <code>i</code> or <code>j</code> is zero, and that cell automatically takes the desired <code>(0, 'e')</code> value.</p>
+<p>I&#8217;ve <a href="http://www.eflorenzano.com/blog/post/gems-python/" title="See item 4 of Eric Florenzano's Gems of Python list">come across the suggestion</a> that <code>defaultdict</code>&#8217;s should be converted into regular <code>dict</code>&#8217;s before being passed back to callers, which <a href="http://norvig.com/spell-correct.html" title="Peter Norvig admits that, much as he likes defaultdicts, they've caught him out">makes a lot of sense</a>, but in this case I&#8217;m choosing to return a <code>defaultdict</code> since its default value property will be useful in subsequent calculations &#8212; to find an actual LCS for example. </p>
+<h3 id="extracting-an-lcs-from-the-grid">Extracting an LCS from the grid</h3>
+<p>Cells in the LCS grid hold moves and LCS lengths. To extract an actual LCS, we need to retrace the moves. Here&#8217;s an iterative algorithm (a recursive one would also be possible) which does this.</p>
 <div class="typocode">
 
 <pre class="prettyprint">def lcs(xs, ys):
-    '''Return a longest common subsequence of xs, ys.'''
+    &#x27;&#x27;&#x27;Return a longest common subsequence of xs, ys.&#x27;&#x27;&#x27;
     # Create the LCS grid, then walk back from the bottom right corner
     grid = lcs_grid(xs, ys)
     i, j = len(xs) - 1, len(ys) - 1
     lcs = list()
-    for move in iter(lambda: grid[(j, i)].move, 'e'):
-        if move == '\\':
+    for move in iter(lambda: grid[(j, i)].move, &#x27;e&#x27;):
+        if move == &#x27;\\&#x27;:
             lcs.append(xs[i])
             i -= 1
             j -= 1
-        elif move == '^':
+        elif move == &#x27;^&#x27;:
             j -= 1
-        elif move == '&lt;':
+        elif move == &#x27;&lt;&#x27;:
             i -= 1
     lcs.reverse()
     return lcs
@@ -668,14 +529,10 @@ def lcs_grid(xs, ys):
 
 </div>
 
-<p>If you haven&#8217;t come across the 2-argument version of <a href="http://docs.python.org/py3k/library/functions.html#iter"><code>iter</code></a>, it&#8217;s a neat way to generate a sequence terminated by a sentinel value. In this case we move back through the grid, finishing when we hit an <code>'e'</code> end move. Note that we only require the <code>move</code> fields of the grid cells to reconstruct an LCS. The length fields were used during calculation of the grid itself.
-</p>
-
-<h3><a href="#toc9" name="tocanimation" id="tocanimation">Animation</a></h3>
-<p>I&#8217;ve reproduced here the animation shown at the start of the article. It demonstrates the LCS grid being calculated, one cell at a time. The numbers in the cells correspond to the lengths of the LCSes ending at various prefix pairs of the inputs and the arrows indicate the moves: as an example, the 2 in the 4th row, 4th column shows that <code>lcs("CHIM", "HUMA")</code> has length 2, and the leftwards arrow shows the best previous LCS was <code>lcs("CHIM", "HUM")</code>.
-</p>
-<p>Once the grid has been filled, the red and orange arrows track back through it to find an LCS. The orange arrows indicate matches &#8212; elements of an LCS &#8212; and the red arrows indicate a route which threads through in the greatest possible number of these.
-</p>
+<p>If you haven&#8217;t come across the 2-argument version of <a href="http://docs.python.org/py3k/library/functions.html#iter"><code>iter</code></a>, it&#8217;s a neat way to generate a sequence terminated by a sentinel value. In this case we move back through the grid, finishing when we hit an <code>'e'</code> end move. Note that we only require the <code>move</code> fields of the grid cells to reconstruct an LCS. The length fields were used during calculation of the grid itself.</p>
+<h3 id="animation">Animation</h3>
+<p>I&#8217;ve reproduced here the animation shown at the start of the article. It demonstrates the LCS grid being calculated, one cell at a time. The numbers in the cells correspond to the lengths of the LCSes ending at various prefix pairs of the inputs and the arrows indicate the moves: as an example, the 2 in the 4th row, 4th column shows that <code>lcs("CHIM", "HUMA")</code> has length 2, and the leftwards arrow shows the best previous LCS was <code>lcs("CHIM", "HUM")</code>.</p>
+<p>Once the grid has been filled, the red and orange arrows track back through it to find an LCS. The orange arrows indicate matches &#8212; elements of an LCS &#8212; and the red arrows indicate a route which threads through in the greatest possible number of these.</p>
 <div style="font: normal 48px arial, sans-serif; height: 12em;text-align: center;">
 <div style="border: 2px solid rgb(0, 0, 0); float: left; line-height: normal; background-color: rgb(255, 255, 255);">
 <div style="overflow: hidden; width: 6em; height: 12em;">
@@ -819,14 +676,10 @@ def lcs_grid(xs, ys):
 </div>
 </div>
 
-<p><button id="animatelcs2" onclick="animatelcs(2);">Calculate LCS</button>
-</p>
-
-<h3><a href="#toc10" name="tocperformance" id="tocperformance">Performance</a></h3>
-<p>If the inputs are of size X, Y, then the grid will have X &times; Y entries each of which gets set in constant time. Recovering an LCS from the grid is a linear operation, so overall, this algorithm operates in O(XY) time and requires O(XY) space. If X and Y are similarly sized, we have a quadratic algorithm.
-</p>
-<p>Practically speaking, we don&#8217;t bang into CPython&#8217;s recursion limit any more, but large inputs still put a strain on the machine. I tried running this new LCS calculation on a couple of long strands of DNA.
-</p>
+<p><button id="animatelcs2" onclick="animatelcs(2);">Calculate LCS</button></p>
+<h3 id="performance">Performance</h3>
+<p>If the inputs are of size X, Y, then the grid will have X &times; Y entries each of which gets set in constant time. Recovering an LCS from the grid is a linear operation, so overall, this algorithm operates in O(XY) time and requires O(XY) space. If X and Y are similarly sized, we have a quadratic algorithm.</p>
+<p>Practically speaking, we don&#8217;t bang into CPython&#8217;s recursion limit any more, but large inputs still put a strain on the machine. I tried running this new LCS calculation on a couple of long strands of DNA.</p>
 <div class="typocode">
 
 <pre class="prettyprint">&gt;&gt;&gt; len(dna1), len(dna2)
@@ -837,46 +690,30 @@ def lcs_grid(xs, ys):
 
 </div>
 
-<p>To complete this calculation, we&#8217;ll need a grid with 10000 &times; 10000 entries, i.e. 100 million entries. So if each grid entry occupies 10 bytes, we&#8217;re looking at roughly a gigabyte &#8212; a sizable chunk even for today&#8217;s computers. And if each step takes 100 nanoseconds, we&#8217;d be looking at a run-time of 10 seconds, if we don&#8217;t run out of memory first that is.
-</p>
-<p>This back of an envelope calculation turned out to be way off. Running the code snippet above caused my system to thrash. I killed it after 10 minutes, at which point the Python process alone was using over 1GB of memory.
-</p>
-<p>At this point the choice of a <code>dict</code> (a hashtable) very definitely becomes questionable. Actually, our choice of Python becomes questionable. When you have a quadratic algorithm with large inputs, the space and time constant factors both become critical.
-</p>
-<p>We have a number of options:
-</p>
+<p>To complete this calculation, we&#8217;ll need a grid with 10000 &times; 10000 entries, i.e. 100 million entries. So if each grid entry occupies 10 bytes, we&#8217;re looking at roughly a gigabyte &#8212; a sizable chunk even for today&#8217;s computers. And if each step takes 100 nanoseconds, we&#8217;d be looking at a run-time of 10 seconds, if we don&#8217;t run out of memory first that is.</p>
+<p>This back of an envelope calculation turned out to be way off. Running the code snippet above caused my system to thrash. I killed it after 10 minutes, at which point the Python process alone was using over 1GB of memory.</p>
+<p>At this point the choice of a <code>dict</code> (a hashtable) very definitely becomes questionable. Actually, our choice of Python becomes questionable. When you have a quadratic algorithm with large inputs, the space and time constant factors both become critical.</p>
+<p>We have a number of options:</p>
 <ol>
- <li>
-     find a leaner algorithm.
- </li>
-
- <li>
-     find a bigger computer.
- </li>
-
- <li>
-     treat our Python implementation as a prototype. Code up a high performance version in a language which gives better control over the machine.
- </li>
+<li>find a leaner algorithm.</li>
+<li>find a bigger computer.</li>
+<li>treat our Python implementation as a prototype. Code up a high performance version in a language which gives better control over the machine.</li>
 </ol>
-<p>Then there&#8217;s option 2a, to find a way of distributing the job over a number of computers. There&#8217;s also an option 3a, to tune up our Python implementation.
-</p>
-
-<h3><a href="#toc11" name="tocreducing-the-space-for-lcs-lengths" id="tocreducing-the-space-for-lcs-lengths">Reducing the space for LCS lengths</a></h3>
-<p>When you&#8217;ve run out of main memory, any estimate of runtime based on big-O analysis becomes useless. The system either crashes or thrashes, paging in virtual memory. By contrast, if we can reduce the memory required by a program, the time analysis should still hold &#8212; we never have to page in more time.
-</p>
-<p>Once you&#8217;ve watched the dynamic programming solution a few times, you&#8217;ll realise that the LCS lengths (the numbers in the grid) are computed row by row, with each row only depending on the row above. If we just wanted to calculate the LCS length of two sequences, we could write:
-</p>
+<p>Then there&#8217;s option 2a, to find a way of distributing the job over a number of computers. There&#8217;s also an option 3a, to tune up our Python implementation.</p>
+<h3 id="reducing-the-space-for-lcs-lengths">Reducing the space for LCS lengths</h3>
+<p>When you&#8217;ve run out of main memory, any estimate of runtime based on big-O analysis becomes useless. The system either crashes or thrashes, paging in virtual memory. By contrast, if we can reduce the memory required by a program, the time analysis should still hold &#8212; we never have to page in more time.</p>
+<p>Once you&#8217;ve watched the dynamic programming solution a few times, you&#8217;ll realise that the LCS lengths (the numbers in the grid) are computed row by row, with each row only depending on the row above. If we just wanted to calculate the LCS length of two sequences, we could write:</p>
 <div class="typocode">
 
 <pre class="prettyprint">import itertools
 
 def lcs_length(xs, ys):
-    '''Return the length of the LCS of xs and ys.
-    
+    &#x27;&#x27;&#x27;Return the length of the LCS of xs and ys.
+
     Example:
     &gt;&gt;&gt; lcs_length("HUMAN", "CHIMPANZEE")
     4
-    '''
+    &#x27;&#x27;&#x27;
     ny = len(ys)
     curr = list(itertools.repeat(0, 1 + ny))
     for x in xs:
@@ -892,18 +729,12 @@ def lcs_length(xs, ys):
 
 </div>
 
-<p>This LCS length algorithm requires just a linear amount of space for the current and previous rows in the grid (in fact we could halve this space again, since each the LCS calculation for each cell in the grid only depends on the contents of the previous <code>ny + 2</code> cells, but the code is a little more subtle).
-</p>
-<p>To calculate an actual LCS, though, we would still need a full grid of moves for the final backtracking stage of the algorithm. Clearly we can compact this grid, since each cell contains one of four moves (&uarr;, &larr;, &#x2196; e) and can therefore be be represented in just 2 bits. Despite this, the grid would still occupy a quadratic amount of space. 
-</p>
-<p>Fortunately, an ingenious hybrid algorithm by <a href="http://www.ics.uci.edu/~dan/">Professor Dan Hirschberg</a> requires just a linear amount of space.
-</p>
-
-<h3><a href="#toc12" name="tochirschbergs-linear-space-algorithm" id="tochirschbergs-linear-space-algorithm">Hirschberg&#8217;s Linear Space Algorithm</a></h3>
-<p>In a 1975 paper titled <a href="http://portal.acm.org/citation.cfm?id=360861">&#8220;A linear space algorithm for computing maximal common subsequences&#8221;</a>, D.S. Hirschberg describes a technique for computing an LCS using space proportional to the length of the inputs. The algorithm combines the dynamic programming technique discussed in this article with a classic divide and conquer approach.
-</p>
-<p>If you search for this paper, you&#8217;ll soon find a copy of the original online. It&#8217;s just three pages long and very accessible. The key idea is to split one of the input sequences in two.
-</p>
+<p>This LCS length algorithm requires just a linear amount of space for the current and previous rows in the grid (in fact we could halve this space again, since each the LCS calculation for each cell in the grid only depends on the contents of the previous <code>ny + 2</code> cells, but the code is a little more subtle).</p>
+<p>To calculate an actual LCS, though, we would still need a full grid of moves for the final backtracking stage of the algorithm. Clearly we can compact this grid, since each cell contains one of four moves (&uarr;, &larr;, &#x2196; e) and can therefore be be represented in just 2 bits. Despite this, the grid would still occupy a quadratic amount of space. </p>
+<p>Fortunately, an ingenious hybrid algorithm by <a href="http://www.ics.uci.edu/~dan/">Professor Dan Hirschberg</a> requires just a linear amount of space.</p>
+<h3 id="hirschbergs-linear-space-algorithm">Hirschberg&#8217;s Linear Space Algorithm</h3>
+<p>In a 1975 paper titled <a href="http://portal.acm.org/citation.cfm?id=360861">&#8220;A linear space algorithm for computing maximal common subsequences&#8221;</a>, D.S. Hirschberg describes a technique for computing an LCS using space proportional to the length of the inputs. The algorithm combines the dynamic programming technique discussed in this article with a classic divide and conquer approach.</p>
+<p>If you search for this paper, you&#8217;ll soon find a copy of the original online. It&#8217;s just three pages long and very accessible. The key idea is to split one of the input sequences in two.</p>
 <div class="typocode">
 
 <pre class="prettyprint">&gt;&gt;&gt; mid = len(xs)//2
@@ -913,8 +744,7 @@ def lcs_length(xs, ys):
 
 </div>
 
-<p>We then calculate LCS lengths for the pair <code>(xb, ys)</code> and the pair <code>(reversed(xe), reversed(ys))</code>. If we find a y-position, <code>k</code>, which maximises the sums of these forward and backwards LCS lengths, then we have a suitable position to split <code>ys</code>. Thus our answer reduces to finding the answer for two smaller subsequences.
-</p>
+<p>We then calculate LCS lengths for the pair <code>(xb, ys)</code> and the pair <code>(reversed(xe), reversed(ys))</code>. If we find a y-position, <code>k</code>, which maximises the sums of these forward and backwards LCS lengths, then we have a suitable position to split <code>ys</code>. Thus our answer reduces to finding the answer for two smaller subsequences.</p>
 <div class="typocode">
 
 <pre class="prettyprint">&gt;&gt;&gt; yb, ye = ys[:k], ys[k:]
@@ -924,39 +754,18 @@ def lcs_length(xs, ys):
 
 </div>
 
-<img src="/images/python-pony.png" width="550" height="265" alt="Python Pony"/>
-
-<p>The picture shows the first stage of this algorithm for the input pair (PYTHON, PONY).
-</p>
+<p><img src="/images/python-pony.png" width="550" height="265" alt="Python Pony"/></p>
+<p>The picture shows the first stage of this algorithm for the input pair (PYTHON, PONY).</p>
 <ol>
- <li>
-     split PYTHON evenly into PYT, HON
- </li>
-
- <li>
-     working forwards from the top left, use <code>lcs_length('PYT', 'PONY)'</code> to fill the T row of the grid.
- </li>
-
- <li>
-     working backwards from the bottom right, use <code>lcs_length('NOH', 'YNOP)'</code> to fill the H row of the grid
- </li>
-
- <li>
-     find the column which maximises the sum of lcs lengths on the T and H rows, adding each T-item to the H-item below and one to the right. In this case, the sums are + 2, 1 + 2, 1 + 1, 1 + 0, 2 +, the maximum value of 3 is at 1 + 2.
- </li>
-
- <li>
-     split PONY at this column.
- </li>
-
- <li>
-     thus <code>lcs('PYTHON', 'PONY')</code> is equal to <code>lcs('PYT', 'P') + lcs('HON', 'ONY')</code>
- </li>
+<li>split PYTHON evenly into PYT, HON</li>
+<li>working forwards from the top left, use <code>lcs_length('PYT', 'PONY)'</code> to fill the T row of the grid.</li>
+<li>working backwards from the bottom right, use <code>lcs_length('NOH', 'YNOP)'</code> to fill the H row of the grid</li>
+<li>find the column which maximises the sum of lcs lengths on the T and H rows, adding each T-item to the H-item below and one to the right. In this case, the sums are + 2, 1 + 2, 1 + 1, 1 + 0, 2 +, the maximum value of 3 is at 1 + 2.</li>
+<li>split PONY at this column.</li>
+<li>thus <code>lcs('PYTHON', 'PONY')</code> is equal to <code>lcs('PYT', 'P') + lcs('HON', 'ONY')</code></li>
 </ol>
-<p><a href="http://portal.acm.org/citation.cfm?id=360861">Hirschberg</a> proves the correctness of this algorithm and goes on to prove that it has quadratic performance but requires just a linear amount of space.
-</p>
-<p>The code looks something like the following.
-</p>
+<p><a href="http://portal.acm.org/citation.cfm?id=360861">Hirschberg</a> proves the correctness of this algorithm and goes on to prove that it has quadratic performance but requires just a linear amount of space.</p>
+<p>The code looks something like the following.</p>
 <div class="typocode">
 
 <pre class="prettyprint">import itertools
@@ -992,58 +801,49 @@ def lcs(xs, ys):
 
 </div>
 
-<p>I say &#8220;something like&#8221; because this code is unpolished and inefficient. Although the space requirement is proportional to the input sizes, it continually creates new list slices in order to get the job done. It may well be capable of handling large inputs in a using a limited amount of memory, but it takes far too long doing so. 
-</p>
-<p>On a more positive note, at least this implementation passes some simple tests.
-</p>
+<p>I say &#8220;something like&#8221; because this code is unpolished and inefficient. Although the space requirement is proportional to the input sizes, it continually creates new list slices in order to get the job done. It may well be capable of handling large inputs in a using a limited amount of memory, but it takes far too long doing so. </p>
+<p>On a more positive note, at least this implementation passes some simple tests.</p>
 <div class="typocode">
 
 <pre class="prettyprint">def test():
-    concat = ''.join
-    assert concat(lcs('', '')) == ''
-    assert concat(lcs('a', '')) == ''
-    assert concat(lcs('', 'b')) == ''
-    assert concat(lcs('abc', 'abc')) == 'abc'
-    assert concat(lcs('abcd', 'obce')) == 'bc'
-    assert concat(lcs('abc', 'ab')) == 'ab'
-    assert concat(lcs('abc', 'bc')) == 'bc'
-    assert concat(lcs('abcde', 'zbodf')) == 'bd'
-    assert concat(lcs('aa','aaaa')) == 'aa'
-    assert concat(lcs('GTCGTTCGGAATGCCGTTGCTCTGTAAA',
-                      'ACCGGTCGAGTGCGCGGAAGCCGGCCGAA')
-                  ) == 'GTCGTCGGAAGCCGGCCGAA'
+    concat = &#x27;&#x27;.join
+    assert concat(lcs(&#x27;&#x27;, &#x27;&#x27;)) == &#x27;&#x27;
+    assert concat(lcs(&#x27;a&#x27;, &#x27;&#x27;)) == &#x27;&#x27;
+    assert concat(lcs(&#x27;&#x27;, &#x27;b&#x27;)) == &#x27;&#x27;
+    assert concat(lcs(&#x27;abc&#x27;, &#x27;abc&#x27;)) == &#x27;abc&#x27;
+    assert concat(lcs(&#x27;abcd&#x27;, &#x27;obce&#x27;)) == &#x27;bc&#x27;
+    assert concat(lcs(&#x27;abc&#x27;, &#x27;ab&#x27;)) == &#x27;ab&#x27;
+    assert concat(lcs(&#x27;abc&#x27;, &#x27;bc&#x27;)) == &#x27;bc&#x27;
+    assert concat(lcs(&#x27;abcde&#x27;, &#x27;zbodf&#x27;)) == &#x27;bd&#x27;
+    assert concat(lcs(&#x27;aa&#x27;,&#x27;aaaa&#x27;)) == &#x27;aa&#x27;
+    assert concat(lcs(&#x27;GTCGTTCGGAATGCCGTTGCTCTGTAAA&#x27;,
+                      &#x27;ACCGGTCGAGTGCGCGGAAGCCGGCCGAA&#x27;)
+                  ) == &#x27;GTCGTCGGAAGCCGGCCGAA&#x27;
 
 </pre>
 
 </div>
 
-<p>This is an achievment in itself: if you examine the implementation, you&#8217;ll see plenty of space for off-by-one errors to creep in. This is about as far as we&#8217;ll get with Python, but a working implementation is a great resource when we switch to a more efficient language. 
-</p>
-
-<h3><a href="#toc13" name="tocapplied-to-the-new-york-marathon-results" id="tocapplied-to-the-new-york-marathon-results">Applied to the New York Marathon Results</a></h3>
-<p>Remember our original problem? At last we&#8217;re ready to take it on.
-</p>
-<p>In 2008, 38096 runners completed the world&#8217;s largest running event, the <a href="http://www.nycmarathon.org">New York City marathon</a>. A <a href="http://www.nycmarathon.org/Results.htm">full set of results</a> is available online, one page at a time, but it&#8217;s not too hard to scrape them into a single file for convenient offline processing.
-</p>
+<p>This is an achievment in itself: if you examine the implementation, you&#8217;ll see plenty of space for off-by-one errors to creep in. This is about as far as we&#8217;ll get with Python, but a working implementation is a great resource when we switch to a more efficient language. </p>
+<h3 id="applied-to-the-new-york-marathon-results">Applied to the New York Marathon Results</h3>
+<p>Remember our original problem? At last we&#8217;re ready to take it on.</p>
+<p>In 2008, 38096 runners completed the world&#8217;s largest running event, the <a href="http://www.nycmarathon.org">New York City marathon</a>. A <a href="http://www.nycmarathon.org/Results.htm">full set of results</a> is available online, one page at a time, but it&#8217;s not too hard to scrape them into a single file for convenient offline processing.</p>
 <p>Runners&#8217; ages are supplied to the nearest year. To find a longest sublist of the results comprising runners who aren&#8217;t getting any older, we sort the results in reverse age order, then run our LCS algorithm against the original results list. Note that we use age alone for comparison: so, for example, GAUTI HOSKULDSSON (a 47 year old male who finished in 295th place with a time of 2:47:00) equals
-   PHILIPPE LETESSIER (also 47, male, 298th in 2:47:14).
-</p>
-<p>To find a longest sublist of runners who are getting strictly younger, we must uniquify the youth-ordered results before applying the LCS algorithm.
-</p>
-<p>Here&#8217;s a sketch of how we&#8217;d do it in Python. I&#8217;ve omitted details of the <code>AgingRunner</code> class; all that matters is that it has an <code>age</code> field, which is used for both ordering and equality comparisons.
-</p>
+PHILIPPE LETESSIER (also 47, male, 298th in 2:47:14).</p>
+<p>To find a longest sublist of runners who are getting strictly younger, we must uniquify the youth-ordered results before applying the LCS algorithm.</p>
+<p>Here&#8217;s a sketch of how we&#8217;d do it in Python. I&#8217;ve omitted details of the <code>AgingRunner</code> class; all that matters is that it has an <code>age</code> field, which is used for both ordering and equality comparisons.</p>
 <div class="typocode">
 
 <pre class="prettyprint">class AgingRunner:
-    '''Class to represent runners keyed by age.
-    '''
+    &#x27;&#x27;&#x27;Class to represent runners keyed by age.
+    &#x27;&#x27;&#x27;
     ....
     def __lt__(self, other):
-        '''Return True if this runner is *older* than the other.'''
+        &#x27;&#x27;&#x27;Return True if this runner is *older* than the other.&#x27;&#x27;&#x27;
         return self.age &gt; other.age
-    
+
     def __eq__(self, other):
-        '''Return True if this runner is the same age as the other.'''
+        &#x27;&#x27;&#x27;Return True if this runner is the same age as the other.&#x27;&#x27;&#x27;
         return self.age == other.age
 
 def uniq(xs):
@@ -1061,16 +861,13 @@ getting_younger = lcs(runners, urunners)
 
 </div>
 
-<p>Sadly this really is just a sketch. Even though our space efficient Python LCS implementation runs comfortably in main memory on a modern computer, it just isn&#8217;t quick enough. Hirschberg&#8217;s paper (published way back in 1975) says:
-</p>
-<blockquote><p>We present an algorithm which will solve this problem in quadratic time and in linear space. For example, assuming coefficients of 2 microseconds and 10 bytes [&#8230;] for strings of length 10,000 we would require a little over 3 minutes and 100K bytes.
-</p>
-</blockquote><p>If we suppose a modern computer runs 1000 times faster, but that our naive Python implementation is 100 times slower than native code, for input sizes of 38096 we&#8217;d expect a run time of around 6 minutes. Sadly this estimate turns out to be optimistic. It took me almost an hour and a half to run this program on a computer with a 2GHZ Intel Core duo processor.
-</p>
-<p>C++ excels at high performance sequence crunching. Rather than try and tune up my Python program I used it as a reference implementation for a C++ one. The C++ version processed the full set of results in a respectable 18 seconds, giving a coefficient of around 12 nanoseconds &#8212; much closer to the figure I&#8217;d expect from a machine with a 2.33 GHz processor.
-</p>
-<p>I found the longest sequence of runners who weren&#8217;t getting any older had length 1724. I also found a sequence of 60 runners who were getting younger, covering every age between 80 and 18, with the exceptions of 79, 77, 76.
-</p>
+<p>Sadly this really is just a sketch. Even though our space efficient Python LCS implementation runs comfortably in main memory on a modern computer, it just isn&#8217;t quick enough. Hirschberg&#8217;s paper (published way back in 1975) says:</p>
+<blockquote>
+<p>We present an algorithm which will solve this problem in quadratic time and in linear space. For example, assuming coefficients of 2 microseconds and 10 bytes [&#8230;] for strings of length 10,000 we would require a little over 3 minutes and 100K bytes.</p>
+</blockquote>
+<p>If we suppose a modern computer runs 1000 times faster, but that our naive Python implementation is 100 times slower than native code, for input sizes of 38096 we&#8217;d expect a run time of around 6 minutes. Sadly this estimate turns out to be optimistic. It took me almost an hour and a half to run this program on a computer with a 2GHZ Intel Core duo processor.</p>
+<p>C++ excels at high performance sequence crunching. Rather than try and tune up my Python program I used it as a reference implementation for a C++ one. The C++ version processed the full set of results in a respectable 18 seconds, giving a coefficient of around 12 nanoseconds &#8212; much closer to the figure I&#8217;d expect from a machine with a 2.33 GHz processor.</p>
+<p>I found the longest sequence of runners who weren&#8217;t getting any older had length 1724. I also found a sequence of 60 runners who were getting younger, covering every age between 80 and 18, with the exceptions of 79, 77, 76.</p>
 <pre>
 24319, CHABANE KETFI, 80, M, 4:37:04
 31293, GRACCO VARAGNOLO, 78, M, 5:07:42
@@ -1103,20 +900,12 @@ getting_younger = lcs(runners, urunners)
 ....
 </pre>
 
-<p>Incidentally, CHABANE KETFI was comfortably the fastest of 17 octogenarian finishers, one of whom, PETER HARANGOZO, 87, was also the oldest finisher.
-</p>
-
-<h3><a href="#toc14" name="tochirschbergs-linear-space-algorithm-in-c" id="tochirschbergs-linear-space-algorithm-in-c">Hirschberg&#8217;s linear space algorithm in C++</a></h3>
-<p>Here&#8217;s a C++ implementation based on the reference Python implementation. It should work on any container type which supports forward and reverse iteration. It&#8217;s similar to the Python implementation, but note:
-</p>
+<p>Incidentally, CHABANE KETFI was comfortably the fastest of 17 octogenarian finishers, one of whom, PETER HARANGOZO, 87, was also the oldest finisher.</p>
+<h3 id="hirschbergs-linear-space-algorithm-in-c">Hirschberg&#8217;s linear space algorithm in C++</h3>
+<p>Here&#8217;s a C++ implementation based on the reference Python implementation. It should work on any container type which supports forward and reverse iteration. It&#8217;s similar to the Python implementation, but note:</p>
 <ol>
- <li>
-     rather than copy slices of the original sequences, it passes around iterators and reverse iterators into these sequences
- </li>
-
- <li>
-     rather than recursively accumulating sums of sub-LCS results, it ticks off items in a members array, <code>xs_in_lcs</code>
- </li>
+<li>rather than copy slices of the original sequences, it passes around iterators and reverse iterators into these sequences</li>
+<li>rather than recursively accumulating sums of sub-LCS results, it ticks off items in a members array, <code>xs_in_lcs</code></li>
 </ol>
 <div class="typocode">
 
@@ -1125,7 +914,7 @@ getting_younger = lcs(runners, urunners)
   "A linear space algorithm for computing maximal common subsequences"
   D. S. Hirschberg
   http://portal.acm.org/citation.cfm?id=360861
-  
+
   See also: http://wordaligned.org/articles/longest-common-subsquence.html
 */
 #include &lt;algorithm&gt;
@@ -1171,7 +960,7 @@ void lcs_lens(it xlo, it xhi, it ylo, it yhi, lengths &amp; lens)
     // Careful! We need the 1 for the leftmost column.
     lengths curr(1 + distance(ylo, yhi), 0);
     lengths prev(curr);
-    
+
     for (it x = xlo; x != xhi; ++x)
     {
         swap(prev, curr);
@@ -1194,7 +983,7 @@ void lcs_lens(it xlo, it xhi, it ylo, it yhi, lengths &amp; lens)
   Then, by calculating lengths of LCSes from the start and end
   corners of the [xlo, xhi] x [ylo, yhi] grid, we determine where
   the yrange should be split.
-  
+
   xo is the origin (element 0) of the xs sequence
   xlo, xhi is the range of xs being processed
   ylo, yhi is the range of ys being processed
@@ -1205,7 +994,7 @@ void
 calculate_lcs(it xo, it xlo, it xhi, it ylo, it yhi, members &amp; xs_in_lcs)
 {
     unsigned const nx = distance(xlo, xhi);
-    
+
     if (nx == 0)
     {
         // empty range. all done
@@ -1213,26 +1002,26 @@ calculate_lcs(it xo, it xlo, it xhi, it ylo, it yhi, members &amp; xs_in_lcs)
     else if (nx == 1)
     {
         // single item in x range.
-        // If it's in the yrange, mark its position in the LCS
+        // If it&#x27;s in the yrange, mark its position in the LCS
         xs_in_lcs[distance(xo, xlo)] = find(ylo, yhi, *xlo) != yhi;
     }
     else
     {
         // split the xrange
         it xmid = xlo + nx / 2;
-        
+
         // Find LCS lengths at xmid, working from both ends of the range
         lengths ll_b, ll_e;
         std::reverse_iterator&lt;it&gt; hix(xhi), midx(xmid), hiy(yhi), loy(ylo);
-        
+
         lcs_lens(xlo, xmid, ylo, yhi, ll_b);
         lcs_lens(hix, midx, hiy, loy, ll_e);
-        
+
         // Find the optimal place to split the y range
         lengths::const_reverse_iterator e = ll_e.rbegin();
         int lmax = -1;
         it y = ylo, ymid = ylo;
-        
+
         for (lengths::const_iterator b = ll_b.begin();
              b != ll_b.end(); ++b, ++e)
         {
@@ -1245,7 +1034,7 @@ calculate_lcs(it xo, it xlo, it xhi, it ylo, it yhi, members &amp; xs_in_lcs)
             // ll_b and ll_e contain one more value than the range [ylo, yhi) 
             // As b and e range over dereferenceable values of ll_b and ll_e,
             // y ranges over iterator positions [ylo, yhi] _including_ yhi.
-            // That's fine, y is used to split [ylo, yhi), we do not
+            // That&#x27;s fine, y is used to split [ylo, yhi), we do not
             // dereference it. However, y cannot go beyond ++yhi.
             if (y != yhi)
             {
@@ -1272,21 +1061,13 @@ void lcs(seq const &amp; xs, seq const &amp; ys, seq &amp; an_lcs)
 
 </div>
 
-
-<h3><a href="#toc15" name="tocapplications-edit-distance" id="tocapplications-edit-distance">Applications: edit distance</a></h3>
-<p>You may be thinking this is all of academic interest only. Who really cares about the longest common subsequence problem? Well, anyone who uses version control does. The longest common subsequence problem is closely related to the more general edit distance problem, which is all about finding the smallest number of point mutations needed to change one sequence into another. For example, if we allow just two such mutations:
-</p>
+<h3 id="applications-edit-distance">Applications: edit distance</h3>
+<p>You may be thinking this is all of academic interest only. Who really cares about the longest common subsequence problem? Well, anyone who uses version control does. The longest common subsequence problem is closely related to the more general edit distance problem, which is all about finding the smallest number of point mutations needed to change one sequence into another. For example, if we allow just two such mutations:</p>
 <ol>
- <li>
-     insert an element
- </li>
-
- <li>
-     delete an element
- </li>
+<li>insert an element</li>
+<li>delete an element</li>
 </ol>
-<p>then the number of mutations needed to convert a <code>xs</code> into <code>ys</code> is the sum of the lengths of <code>xs</code> and <code>ys</code> minus twice the length of their LCS. Or in Python:
-</p>
+<p>then the number of mutations needed to convert a <code>xs</code> into <code>ys</code> is the sum of the lengths of <code>xs</code> and <code>ys</code> minus twice the length of their LCS. Or in Python:</p>
 <div class="typocode">
 
 <pre class="prettyprint">&gt;&gt;&gt; edit_distance(xs, ys) == len(xs) + len(ys) - 2 * lcs(xs, ys)
@@ -1296,51 +1077,31 @@ True
 
 </div>
 
-<p>For example, we can change &#8220;HUMAN&#8221; into &#8220;CHIMPANZEE&#8221; using the LCS, &#8220;HMAN&#8221; as follows: delete the U from HUMAN, to give HMAN, then insert C, I, P, Z, E, E giving CHIMPANZEE. 
-</p>
-<p>In general:
-</p>
+<p>For example, we can change &#8220;HUMAN&#8221; into &#8220;CHIMPANZEE&#8221; using the LCS, &#8220;HMAN&#8221; as follows: delete the U from HUMAN, to give HMAN, then insert C, I, P, Z, E, E giving CHIMPANZEE. </p>
+<p>In general:</p>
 <ol>
- <li>
-     find an LCS of <code>xs</code> and <code>ys</code>. Let&#8217;s say this LCS has length <code>L</code>. 
- </li>
-
- <li>
-     strike out all elements of <code>xs</code> which are not in this LCS, a total of <code>len(xs) - L</code> moves
- </li>
-
- <li>
-     now insert all the elements of <code>ys</code> which are missing from the LCS, another <code>len(ys) - L</code> moves.
- </li>
+<li>find an LCS of <code>xs</code> and <code>ys</code>. Let&#8217;s say this LCS has length <code>L</code>. </li>
+<li>strike out all elements of <code>xs</code> which are not in this LCS, a total of <code>len(xs) - L</code> moves</li>
+<li>now insert all the elements of <code>ys</code> which are missing from the LCS, another <code>len(ys) - L</code> moves.</li>
 </ol>
-<p>Thus the edit distance is at most <code>len(xs) + len(ys) - 2 * L</code>. It remains to show there can be no shorter edit distance. The same argument works well enough in reverse. Given a minimal edit sequence, note we do not delete anything we already inserted, otherwise we could remove this insert-delete pair to form a shorter edit sequence. Thus we can sort this edit sequence so the deletions preceed the insertions to form another minimal edit sequence. . Now process all the deletions, leaving a subsequence of <code>xs</code>. Since we can now get from this subsequence to <code>ys</code> using insertions alone, it must also be a subsequence of <code>ys</code>.
-</p>
-<p>More general variants of the edit distance problem allow substitution and transposition mutations, and may assign weights to each type of mutation. In all cases, similar algorithms can be used to the dynamic programming algorithm shown in this example, but improvements can be made if we know the inputs are similar &#8212; as in the case of genetic mutations, for example.
-</p>
-
-<h3><a href="#toc16" name="tocapplications-genetic-mutations" id="tocapplications-genetic-mutations">Applications: genetic mutations</a></h3>
-<p><a href="http://www.csse.monash.edu.au/~lloyd/tildeAlgDS/Dynamic/HUMHBB/"><img src="/images/acgt.png" alt="{A,C,T,G}"/></a>
-</p>
-<p>I&#8217;ve already mentioned Cormen, Leiserson, Rivest and Stein&#8217;s classic reference, &#8220;Introduction to Algorithms&#8221; (CLRS for short). This book introduces the longest common subsequence problem as follows:
-</p>
-<blockquote><p>In biological applications, we often want to compare the DNA of two (or more) different organisms. [&#8230;] For example, the DNA of one organism may be S<sub>1</sub> = <a href="http://www.google.com/search?q=ACCGGTCGAGTGCGCGGAAGCCGGCCGAA" title="I hoped for a googlewhack -">ACCGGTCGAGTGCGCGGAAGCCGGCCGAA</a> while the DNA of another organism may be S<sub>2</sub> = <a href="http://www.google.com/search?q=GTCGTTCGGAATGCCGTTGCTCTGTAAA" title="- but others have borrowed the CLRS example -">GTCGTTCGGAATGCCGTTGCTCTGTAAA</a>. One goal of comparing two strands of DNA is to determine how &#8220;similar&#8221; the two strands are, as some measure of how cosely related the two organisms are. 
-</p>
-</blockquote><p>And, CLRS goes on to say, the longest common subsequence of S<sub>1</sub> and S<sub>2</sub> is one such measure of similarity. In this case, the longest common subsequence, S<sub>3</sub> would be <a href="http://www.google.com/search?q=GTCGTCGGAAGCCGGCCGAA" title="- which has become the canonical longest common subsequence!">GTCGTCGGAAGCCGGCCGAA</a> 
-</p>
-<p>Genetic comparision is an important application of sequence matching. As already mentioned, it&#8217;s also a special case, which means we can can do rather better than the general purpose algorithm presented above. For one thing, the alphabet of bases, Adenine, Cytosine, Guanine, Thymine has just 4 elements. More importantly, the evolution of life on this planet is based around DNA <strong>replication</strong>. Over 400 million years, glitches in DNA replication lead to genetic mutations, leading in turn to a variety of life forms. But, for example, human and chimpanzee DNA are <a href="http://news.nationalgeographic.com/news/2005/08/0831_050831_chimp_genes.html">at least 96% similar</a>. If we&#8217;re comparing two human genomes, a recent article entitled <a href="http://bioinformatics.oxfordjournals.org/cgi/content/full/25/2/274#SEC2">Human genomes as email attachments</a> points out:
-</p>
-<blockquote><p>The key insight is to consider that any two human genomes are more than 99% identical.
-</p>
-</blockquote><p>So the random A, C, G, T sequences I used earlier this article were highly non-representative.
-</p>
-<p>When the edit distance, D, between two sequences is small compared to the lengths of these sequences, more specialised algorithms can calculate this distance in O(ND) complexity and linear space. I&#8217;m not going to discuss these algorithms here, but they&#8217;re elegant and accessible. See a 1986 paper <a href="http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.4.6927">&#8220;An O(ND) difference algorithm and its variations&#8221;</a> by Eugene W. Myers for more details.
-</p>
-<p><a href="/pages/lcs-dna"><img src="/images/lcs-dna.gif" alt="lcs(ACCGGTCGAGTGCGCGGAAGCCGGCCGAA, GTCGTTCGGAATGCCGTTGCTCTGTAAA)"/></a>
-</p>
-
-<h3><a href="#toc17" name="tocapplications-version-control" id="tocapplications-version-control">Applications: version control</a></h3>
-<p>Similar considerations apply to a version controlled file. Generally the distance between two versions of a file is small compared to the size of the file itself; the Unix <code>diff</code> and <code>patch</code> tools exploit this, as do the difference engines embedded in version control systems. Here&#8217;s a comment in <a href="http://svn.collab.net/viewvc/svn/trunk/subversion/libsvn_diff/">Subversion&#8217;s differencing engine</a>.
-</p>
+<p>Thus the edit distance is at most <code>len(xs) + len(ys) - 2 * L</code>. It remains to show there can be no shorter edit distance. The same argument works well enough in reverse. Given a minimal edit sequence, note we do not delete anything we already inserted, otherwise we could remove this insert-delete pair to form a shorter edit sequence. Thus we can sort this edit sequence so the deletions preceed the insertions to form another minimal edit sequence. . Now process all the deletions, leaving a subsequence of <code>xs</code>. Since we can now get from this subsequence to <code>ys</code> using insertions alone, it must also be a subsequence of <code>ys</code>.</p>
+<p>More general variants of the edit distance problem allow substitution and transposition mutations, and may assign weights to each type of mutation. In all cases, similar algorithms can be used to the dynamic programming algorithm shown in this example, but improvements can be made if we know the inputs are similar &#8212; as in the case of genetic mutations, for example.</p>
+<h3 id="applications-genetic-mutations">Applications: genetic mutations</h3>
+<p><a href="http://www.csse.monash.edu.au/~lloyd/tildeAlgDS/Dynamic/HUMHBB/"><img src="/images/acgt.png" alt="{A,C,T,G}"/></a></p>
+<p>I&#8217;ve already mentioned Cormen, Leiserson, Rivest and Stein&#8217;s classic reference, &#8220;Introduction to Algorithms&#8221; (CLRS for short). This book introduces the longest common subsequence problem as follows:</p>
+<blockquote>
+<p>In biological applications, we often want to compare the DNA of two (or more) different organisms. [&#8230;] For example, the DNA of one organism may be S<sub>1</sub> = <a href="http://www.google.com/search?q=ACCGGTCGAGTGCGCGGAAGCCGGCCGAA" title="I hoped for a googlewhack -">ACCGGTCGAGTGCGCGGAAGCCGGCCGAA</a> while the DNA of another organism may be S<sub>2</sub> = <a href="http://www.google.com/search?q=GTCGTTCGGAATGCCGTTGCTCTGTAAA" title="- but others have borrowed the CLRS example -">GTCGTTCGGAATGCCGTTGCTCTGTAAA</a>. One goal of comparing two strands of DNA is to determine how &#8220;similar&#8221; the two strands are, as some measure of how cosely related the two organisms are. </p>
+</blockquote>
+<p>And, CLRS goes on to say, the longest common subsequence of S<sub>1</sub> and S<sub>2</sub> is one such measure of similarity. In this case, the longest common subsequence, S<sub>3</sub> would be <a href="http://www.google.com/search?q=GTCGTCGGAAGCCGGCCGAA" title="- which has become the canonical longest common subsequence!">GTCGTCGGAAGCCGGCCGAA</a> </p>
+<p>Genetic comparision is an important application of sequence matching. As already mentioned, it&#8217;s also a special case, which means we can can do rather better than the general purpose algorithm presented above. For one thing, the alphabet of bases, Adenine, Cytosine, Guanine, Thymine has just 4 elements. More importantly, the evolution of life on this planet is based around DNA <strong>replication</strong>. Over 400 million years, glitches in DNA replication lead to genetic mutations, leading in turn to a variety of life forms. But, for example, human and chimpanzee DNA are <a href="http://news.nationalgeographic.com/news/2005/08/0831_050831_chimp_genes.html">at least 96% similar</a>. If we&#8217;re comparing two human genomes, a recent article entitled <a href="http://bioinformatics.oxfordjournals.org/cgi/content/full/25/2/274#SEC2">Human genomes as email attachments</a> points out:</p>
+<blockquote>
+<p>The key insight is to consider that any two human genomes are more than 99% identical.</p>
+</blockquote>
+<p>So the random A, C, G, T sequences I used earlier this article were highly non-representative.</p>
+<p>When the edit distance, D, between two sequences is small compared to the lengths of these sequences, more specialised algorithms can calculate this distance in O(ND) complexity and linear space. I&#8217;m not going to discuss these algorithms here, but they&#8217;re elegant and accessible. See a 1986 paper <a href="http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.4.6927">&#8220;An O(ND) difference algorithm and its variations&#8221;</a> by Eugene W. Myers for more details.</p>
+<p><a href="/pages/lcs-dna"><img src="/images/lcs-dna.gif" alt="lcs(ACCGGTCGAGTGCGCGGAAGCCGGCCGAA, GTCGTTCGGAATGCCGTTGCTCTGTAAA)"/></a></p>
+<h3 id="applications-version-control">Applications: version control</h3>
+<p>Similar considerations apply to a version controlled file. Generally the distance between two versions of a file is small compared to the size of the file itself; the Unix <code>diff</code> and <code>patch</code> tools exploit this, as do the difference engines embedded in version control systems. Here&#8217;s a comment in <a href="http://svn.collab.net/viewvc/svn/trunk/subversion/libsvn_diff/">Subversion&#8217;s differencing engine</a>.</p>
 <blockquote><pre>
 /*
  * Calculate the Longest Common Subsequence between two datasources.
@@ -1352,91 +1113,45 @@ True
  */ 
 </pre></blockquote>
 
-<p>(I&#8217;m fairly sure they mean &#8220;Myers&#8221;, and <code>P</code> is the the number of deletions in an edit sequence. You can easily find a copy of the referenced paper, which walks through a beautiful greedy algorithm and beats Myers&#8217; earlier <code>O(ND)</code> algorithm by a factor of two, or better.)
-</p>
-
-<h3><a href="#toc18" name="tocconclusions" id="tocconclusions">Conclusions</a></h3>
-<p>The longest common subsequence problem and the more general edit distance problem have been &#8212; <a href="http://www.ics.uci.edu/~dan/">and continue to be</a> &#8212; extensively studied. A classic dynamic programming solution to this problem is based on an elegant recursive algorithm, though by the time we&#8217;ve created an efficient implementation some of that elegance has been hidden. And efficiency, here, is an important consideration, since the general purpose algorithm presented in this article is of quadratic complexity.
-</p>
-<p>A Python implementation is quick to develop and flexible enough to experiment with. With some effort we can control its space requirements. But a C++ implementation comfortably outperforms Python by an order of magnitude or more, and for large inputs, compiled native code is required. Does this make Python suitable only for toy projects, short scripts and blog posts? <a href="http://www.python.org/about/quotes/">No</a>, but I&#8217;ll save a more complete answer for another time!
-</p>
-<p>In the case where the input sequences are similar, more efficient <a href="http://en.wikipedia.org/wiki/Greedy_algorithm">greedy algorithms</a> exist. These algorithms form the backbone of the venerable Unix diff tool and of modern version control systems.
-</p>
-
-<h3><a href="#toc19" name="tocnext-time" id="tocnext-time">Next time</a></h3>
-<p>Let&#8217;s not forget that we really wanted to solve the longest ordered subsequence problem, not the longest common subsequence problem. In the next episode we&#8217;ll explore a beautiful &#8212; and efficient &#8212; longest ordered subsequence algorithm.
-</p>
+<p>(I&#8217;m fairly sure they mean &#8220;Myers&#8221;, and <code>P</code> is the the number of deletions in an edit sequence. You can easily find a copy of the referenced paper, which walks through a beautiful greedy algorithm and beats Myers&#8217; earlier <code>O(ND)</code> algorithm by a factor of two, or better.)</p>
+<h3 id="conclusions">Conclusions</h3>
+<p>The longest common subsequence problem and the more general edit distance problem have been &#8212; <a href="http://www.ics.uci.edu/~dan/">and continue to be</a> &#8212; extensively studied. A classic dynamic programming solution to this problem is based on an elegant recursive algorithm, though by the time we&#8217;ve created an efficient implementation some of that elegance has been hidden. And efficiency, here, is an important consideration, since the general purpose algorithm presented in this article is of quadratic complexity.</p>
+<p>A Python implementation is quick to develop and flexible enough to experiment with. With some effort we can control its space requirements. But a C++ implementation comfortably outperforms Python by an order of magnitude or more, and for large inputs, compiled native code is required. Does this make Python suitable only for toy projects, short scripts and blog posts? <a href="http://www.python.org/about/quotes/">No</a>, but I&#8217;ll save a more complete answer for another time!</p>
+<p>In the case where the input sequences are similar, more efficient <a href="http://en.wikipedia.org/wiki/Greedy_algorithm">greedy algorithms</a> exist. These algorithms form the backbone of the venerable Unix diff tool and of modern version control systems.</p>
+<h3 id="next-time">Next time</h3>
+<p>Let&#8217;s not forget that we really wanted to solve the longest ordered subsequence problem, not the longest common subsequence problem. In the next episode we&#8217;ll explore a beautiful &#8212; and efficient &#8212; longest ordered subsequence algorithm.</p>
 <hr />
-
-
-<h3><a href="#toc20" name="tocthanks" id="tocthanks">Thanks</a></h3>
-<p>My thanks to Soeren Meyer-Eppler for <a href="#comment-75731663">reporting</a> a tricky bug in the C++ LCS implementation. I should have run more tests using -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC!
-</p>
-
-<h3><a href="#toc21" name="tocpython-3-notes" id="tocpython-3-notes">Python 3 Notes</a></h3>
-<p><strong>Note 1.</strong> The results served up from the official New York Marathon site were encoded using <code>charset=iso-8859-1</code>, and I maintained this encoding for my local copy of these results. In Python 3.0, you can explicitly specify an encoding when <a href="http://docs.python.org/py3k/library/functions.html#open">opening a file</a> in text mode.
-</p>
+<h3 id="thanks">Thanks</h3>
+<p>My thanks to Soeren Meyer-Eppler for <a href="#comment-75731663">reporting</a> a tricky bug in the C++ LCS implementation. I should have run more tests using -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC!</p>
+<h3 id="python-3-notes">Python 3 Notes</h3>
+<p><strong>Note 1.</strong> The results served up from the official New York Marathon site were encoded using <code>charset=iso-8859-1</code>, and I maintained this encoding for my local copy of these results. In Python 3.0, you can explicitly specify an encoding when <a href="http://docs.python.org/py3k/library/functions.html#open">opening a file</a> in text mode.</p>
 <div class="typocode">
 
-<pre class="prettyprint">&gt;&gt;&gt; fp = open('nyc-results.txt', encoding='iso-8859-1')
+<pre class="prettyprint">&gt;&gt;&gt; fp = open(&#x27;nyc-results.txt&#x27;, encoding=&#x27;iso-8859-1&#x27;)
 
 </pre>
 
 </div>
 
-<p>From the <a href="http://docs.python.org/py3k/library/functions.html#open">documentation</a>:
-</p>
-<blockquote><p><em>encoding</em> is the name of the encoding used to decode or encode the file. This should only be used in text mode. The default encoding is platform dependent, but any encoding supported by Python can be passed. See the <a href="http://docs.python.org/py3k/library/codecs.html#module-codecs">codecs</a> module for the list of supported encodings.
-</p>
-</blockquote><p>Somewhere along the line a case conversion algorithm must have failed to get the details right. Here are the finishers with more than one non-ASCII character in their names:
-</p>
+<p>From the <a href="http://docs.python.org/py3k/library/functions.html#open">documentation</a>:</p>
+<blockquote>
+<p><em>encoding</em> is the name of the encoding used to decode or encode the file. This should only be used in text mode. The default encoding is platform dependent, but any encoding supported by Python can be passed. See the <a href="http://docs.python.org/py3k/library/codecs.html#module-codecs">codecs</a> module for the list of supported encodings.</p>
+</blockquote>
+<p>Somewhere along the line a case conversion algorithm must have failed to get the details right. Here are the finishers with more than one non-ASCII character in their names:</p>
 <ul>
- <li>
-     3275, TORBJ&ouml;RN SKJ&ouml;LDERFORS, 49, M, 3:22:46
- </li>
-
- <li>
-     4141, G&ouml;RAN H&auml;RSTEDT, 43, M, 3:27:40
- </li>
-
- <li>
-     4510, J&uuml;RG M&uuml;LLER, 49, M, 3:29:15
- </li>
-
- <li>
-     6763, &Oslash;YVIND SCHAGE F&oslash;RDE, 35, M, 3:39:16
- </li>
-
- <li>
-     8832, &Oslash;YSTEIN &Oslash;KLAND, 55, M, 3:47:19
- </li>
-
- <li>
-     11402, THOMAS KR&auml;HENB&uuml;HL, 31, M, 3:55:22
- </li>
-
- <li>
-     13582, L&aacute;SZL&oacute; SZAB&oacute;, 50, M, 4:00:55
- </li>
-
- <li>
-     18186, &Oslash;YVIND B&oslash;RRESEN, 52, M, 4:16:31
- </li>
-
- <li>
-     23727, FERNANDO SEBASTI&aacute;N L&oacute;PEZ, 34, M, 4:34:50
- </li>
-
- <li>
-     28315, KOLBR&uacute;N BRYNJA EGILSD&oacute;TTIR, 46, F, 4:52:29
- </li>
-
- <li>
-     33457, JAN KRISTIAN R&oslash;DST&oslash;L, 37, M, 5:25:12
- </li>
+<li>3275, TORBJ&ouml;RN SKJ&ouml;LDERFORS, 49, M, 3:22:46</li>
+<li>4141, G&ouml;RAN H&auml;RSTEDT, 43, M, 3:27:40</li>
+<li>4510, J&uuml;RG M&uuml;LLER, 49, M, 3:29:15</li>
+<li>6763, &Oslash;YVIND SCHAGE F&oslash;RDE, 35, M, 3:39:16</li>
+<li>8832, &Oslash;YSTEIN &Oslash;KLAND, 55, M, 3:47:19</li>
+<li>11402, THOMAS KR&auml;HENB&uuml;HL, 31, M, 3:55:22</li>
+<li>13582, L&aacute;SZL&oacute; SZAB&oacute;, 50, M, 4:00:55</li>
+<li>18186, &Oslash;YVIND B&oslash;RRESEN, 52, M, 4:16:31</li>
+<li>23727, FERNANDO SEBASTI&aacute;N L&oacute;PEZ, 34, M, 4:34:50</li>
+<li>28315, KOLBR&uacute;N BRYNJA EGILSD&oacute;TTIR, 46, F, 4:52:29</li>
+<li>33457, JAN KRISTIAN R&oslash;DST&oslash;L, 37, M, 5:25:12</li>
 </ul>
-<p><strong>Note 2.</strong> I&#8217;ve already pointed out Python 3.0&#8217;s <a href="http://www.python.org/dev/peps/pep-3132/">extended unpacking syntax</a>. Here&#8217;s another example:
-</p>
+<p><strong>Note 2.</strong> I&#8217;ve already pointed out Python 3.0&#8217;s <a href="http://www.python.org/dev/peps/pep-3132/">extended unpacking syntax</a>. Here&#8217;s another example:</p>
 <div class="typocode">
 
 <pre class="prettyprint">&gt;&gt;&gt; car, *cdr = items
@@ -1445,8 +1160,7 @@ True
 
 </div>
 
-<p><strong>Note 3.</strong> You may well have spotted the truncating integer division used in the divide and conquer algorithm:
-</p>
+<p><strong>Note 3.</strong> You may well have spotted the truncating integer division used in the divide and conquer algorithm:</p>
 <div class="typocode">
 
 <pre class="prettyprint">&gt;&gt;&gt; i = nx // 2
@@ -1455,14 +1169,10 @@ True
 
 </div>
 
-<p>Without the double slash, <code>i</code> would become a floating point number, and using it as slice index would raise a <code>TypeError</code>. The <code>//</code> floor division operator is available in Python 2.6 and earlier and I recommend using it for all C-style truncating integer divisions. Here&#8217;s <a href="http://python-history.blogspot.com/2009/03/problem-with-integer-division.html">the full history</a>. 
-</p>
-<p><strong>Note 4.</strong> To order and compare runners by age for the preliminary <code>sort()</code> and the subsequent <code>lcs()</code> calls, I added <code>__lt__</code> and <code>__eq__</code> methods to the <code>AgingRunner</code> class. In Python 2.6 the <code>__cmp__</code> method could have been used instead of these rich comparison methods, but this is <a href="http://docs.python.org/3.0/whatsnew/3.0.html#ordering-comparisons">no longer supported in 3.0</a>. A <a href="http://code.activestate.com/recipes/576685/">recipe</a> by Raymond Hettinger demonstrates a class decorator which automatically creates all the rich comparisons methods from any subset of them (e.g. <code>__gt__</code>, <code>__ge__</code>, <code>__le__</code> can all be sensibly derived from <code>__lt__</code>).
-</p>
+<p>Without the double slash, <code>i</code> would become a floating point number, and using it as slice index would raise a <code>TypeError</code>. The <code>//</code> floor division operator is available in Python 2.6 and earlier and I recommend using it for all C-style truncating integer divisions. Here&#8217;s <a href="http://python-history.blogspot.com/2009/03/problem-with-integer-division.html">the full history</a>. </p>
+<p><strong>Note 4.</strong> To order and compare runners by age for the preliminary <code>sort()</code> and the subsequent <code>lcs()</code> calls, I added <code>__lt__</code> and <code>__eq__</code> methods to the <code>AgingRunner</code> class. In Python 2.6 the <code>__cmp__</code> method could have been used instead of these rich comparison methods, but this is <a href="http://docs.python.org/3.0/whatsnew/3.0.html#ordering-comparisons">no longer supported in 3.0</a>. A <a href="http://code.activestate.com/recipes/576685/">recipe</a> by Raymond Hettinger demonstrates a class decorator which automatically creates all the rich comparisons methods from any subset of them (e.g. <code>__gt__</code>, <code>__ge__</code>, <code>__le__</code> can all be sensibly derived from <code>__lt__</code>).</p>
 <hr />
-
-<p><a id="fn1" href="#fn1link">[1]</a>. Note that the original version of <code>lcs()</code> works for any pair of sequences with equality comparable elements. The newly adapted version will only work for strings and byte arrays. This isn&#8217;t really a problem, since we&#8217;re just using it to run a quick code experiment.
-</p>
+<p><a id="fn1" href="#fn1link"><a href="https://blog.codeship.com/building-minimal-docker-containers-for-go-applications/">1</a></a>. Note that the original version of <code>lcs()</code> works for any pair of sequences with equality comparable elements. The newly adapted version will only work for strings and byte arrays. This isn&#8217;t really a problem, since we&#8217;re just using it to run a quick code experiment.</p>
 </div>
 
 <div class="comments"><hr/><div id="disqus_thread"></div><script type="text/javascript" src="http://disqus.com/forums/wordaligned/embed.js"></script></div>

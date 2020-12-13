@@ -8,48 +8,33 @@
 <language>en-gb</language>
 <item>
 <title>Sledgehammers vs Nut Crackers</title>
-<description>&lt;h2&gt;Awk&lt;/h2&gt;
-&lt;p&gt;I get awk and can read awk programs but find the language of little use. Its focus is narrow and its syntax can be surprising. Python matches it at home and smashes it away. Nonetheless, a number of the &lt;a href="./advent-of-code"&gt;advent of code&lt;/a&gt; puzzles fit the awk processing model &amp;#8212; line based instructions, the interpretation of which builds state contributing to the final result &amp;#8212; and I enjoyed writing awk solutions. There&amp;#8217;s satisfaction in using a tool which is up to the job, no more and no less: in using a nutcracker, rather than a sledgehammer, to crack a nut.
-&lt;/p&gt;
-
-&lt;h2&gt;Puzzle&lt;/h2&gt;
-&lt;p&gt;For example, the puzzle set on &lt;a href="http://adventofcode.com/day/6"&gt;day 6&lt;/a&gt; consists of a list of instructions for switching and toggling a 1000 x 1000 grid of lights. The instructions read:
-&lt;/p&gt;
+<description>&lt;h2 id=&quot;awk&quot;&gt;Awk&lt;/h2&gt;
+&lt;p&gt;I get awk and can read awk programs but find the language of little use. Its focus is narrow and its syntax can be surprising. Python matches it at home and smashes it away. Nonetheless, a number of the &lt;a href=&quot;./advent-of-code&quot;&gt;advent of code&lt;/a&gt; puzzles fit the awk processing model &amp;#8212; line based instructions, the interpretation of which builds state contributing to the final result &amp;#8212; and I enjoyed writing awk solutions. There&amp;#8217;s satisfaction in using a tool which is up to the job, no more and no less: in using a nutcracker, rather than a sledgehammer, to crack a nut.&lt;/p&gt;
+&lt;h2 id=&quot;puzzle&quot;&gt;Puzzle&lt;/h2&gt;
+&lt;p&gt;For example, the puzzle set on &lt;a href=&quot;http://adventofcode.com/day/6&quot;&gt;day 6&lt;/a&gt; consists of a list of instructions for switching and toggling a 1000 x 1000 grid of lights. The instructions read:&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;turn on 296,50 through 729,664
 turn on 212,957 through 490,987
 toggle 171,31 through 688,88
 turn off 991,989 through 994,998
 ....
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;and the question is, after following these instructions, &lt;strong&gt;how many lights are lit&lt;/strong&gt;?
-&lt;/p&gt;
-&lt;p&gt;Each instruction is a single line; the actions &amp;#8212; turn on, turn off, toggle &amp;#8212; can be matched by patterns; and to follow these actions requires no more than an array and arithmetic: &lt;code&gt;awk&lt;/code&gt; fits nicely.
-&lt;/p&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;and the question is, after following these instructions, &lt;strong&gt;how many lights are lit&lt;/strong&gt;?&lt;/p&gt;
+&lt;p&gt;Each instruction is a single line; the actions &amp;#8212; turn on, turn off, toggle &amp;#8212; can be matched by patterns; and to follow these actions requires no more than an array and arithmetic: &lt;code&gt;awk&lt;/code&gt; fits nicely.&lt;/p&gt;
+&lt;h2 id=&quot;code&quot;&gt;Code&lt;/h2&gt;
+&lt;script src=&quot;https://gist.github.com/wordaligned/ceb8671aad6a3416e094.js&quot; type=&quot;text/javascript&quot;&gt;&lt;/script&gt;
 
-&lt;h2&gt;Code&lt;/h2&gt;
-&lt;script src="https://gist.github.com/wordaligned/ceb8671aad6a3416e094.js" type="text/javascript"&gt;&lt;/script&gt;
+&lt;h2 id=&quot;comments&quot;&gt;Comments&lt;/h2&gt;
+&lt;p&gt;Here, the &lt;code&gt;BEGIN&lt;/code&gt; action sets the field separator &lt;code&gt;FS&lt;/code&gt; to the regular expression &lt;code&gt;[ ,]&lt;/code&gt; which picks out the textual and numeric fields from each instruction. Awk is highly dynamic: use a variable as a number and it becomes a number, in this case the coordinates of a lighting grid; and similarly, the fields &amp;#8220;on&amp;#8221;, &amp;#8220;off&amp;#8221; and &amp;#8220;toggle&amp;#8221; are matched and treated as strings.&lt;/p&gt;
+&lt;p&gt;The grid of lights appears to be represented as a two dimensional array, accessed &lt;code&gt;lights[x,y]&lt;/code&gt; rather than &lt;code&gt;lights[x][y]&lt;/code&gt;. In fact, the array &amp;#8212; like all arrays in awk &amp;#8212; is an associative container, which maps from strings &amp;#8212; not numbers &amp;#8212; to values.  The key &lt;code&gt;x,y&lt;/code&gt; becomes a string which joins the values of &lt;code&gt;x&lt;/code&gt; and &lt;code&gt;y&lt;/code&gt; with a separator defaulted to &lt;code&gt;&quot;\034&quot;&lt;/code&gt;.&lt;/p&gt;
+&lt;h2 id=&quot;niggles&quot;&gt;Niggles&lt;/h2&gt;
+&lt;p&gt;The escape character at the end of line 5 is needed to continue the long line. I&amp;#8217;d prefer to use parentheses to wrap the expression over more than one line, &lt;a href=&quot;http://pep8.org/#indentation&quot;&gt;as I would in Python&lt;/a&gt;, but this trick doesn&amp;#8217;t seem to work. I was somewhat surprised there was no built in &lt;code&gt;sum()&lt;/code&gt; function to count up the number of lights turned on by the &lt;code&gt;END&lt;/code&gt;. It would have been cute to pass &lt;code&gt;on()&lt;/code&gt;, &lt;code&gt;off()&lt;/code&gt; and &lt;code&gt;toggle()&lt;/code&gt; as functions into &lt;code&gt;switch()&lt;/code&gt;, separating traversal from action, but I couldn&amp;#8217;t find a way to do this in awk.&lt;/p&gt;
+&lt;p&gt;My awk script solved the puzzle in 45 seconds. A Python solution took 17 seconds. I didn&amp;#8217;t try optimising either.&lt;/p&gt;
+&lt;script src=&quot;https://gist.github.com/wordaligned/007c5cb30a3f7490e3ff.js&quot; type=&quot;text/javascript&quot;&gt;&lt;/script&gt;
 
-
-&lt;h2&gt;Comments&lt;/h2&gt;
-&lt;p&gt;Here, the &lt;code&gt;BEGIN&lt;/code&gt; action sets the field separator &lt;code&gt;FS&lt;/code&gt; to the regular expression &lt;code&gt;[ ,]&lt;/code&gt; which picks out the textual and numeric fields from each instruction. Awk is highly dynamic: use a variable as a number and it becomes a number, in this case the coordinates of a lighting grid; and similarly, the fields &amp;#8220;on&amp;#8221;, &amp;#8220;off&amp;#8221; and &amp;#8220;toggle&amp;#8221; are matched and treated as strings.
-&lt;/p&gt;
-&lt;p&gt;The grid of lights appears to be represented as a two dimensional array, accessed &lt;code&gt;lights[x,y]&lt;/code&gt; rather than &lt;code&gt;lights[x][y]&lt;/code&gt;. In fact, the array &amp;#8212; like all arrays in awk &amp;#8212; is an associative container, which maps from strings &amp;#8212; not numbers &amp;#8212; to values.  The key &lt;code&gt;x,y&lt;/code&gt; becomes a string which joins the values of &lt;code&gt;x&lt;/code&gt; and &lt;code&gt;y&lt;/code&gt; with a separator defaulted to &lt;code&gt;"\034"&lt;/code&gt;.
-&lt;/p&gt;
-
-&lt;h2&gt;Niggles&lt;/h2&gt;
-&lt;p&gt;The escape character at the end of line 5 is needed to continue the long line. I&amp;#8217;d prefer to use parentheses to wrap the expression over more than one line, &lt;a href="http://pep8.org/#indentation"&gt;as I would in Python&lt;/a&gt;, but this trick doesn&amp;#8217;t seem to work. I was somewhat surprised there was no built in &lt;code&gt;sum()&lt;/code&gt; function to count up the number of lights turned on by the &lt;code&gt;END&lt;/code&gt;. It would have been cute to pass &lt;code&gt;on()&lt;/code&gt;, &lt;code&gt;off()&lt;/code&gt; and &lt;code&gt;toggle()&lt;/code&gt; as functions into &lt;code&gt;switch()&lt;/code&gt;, separating traversal from action, but I couldn&amp;#8217;t find a way to do this in awk.
-&lt;/p&gt;
-&lt;p&gt;My awk script solved the puzzle in 45 seconds. A Python solution took 17 seconds. I didn&amp;#8217;t try optimising either.
-&lt;/p&gt;
-&lt;script src="https://gist.github.com/wordaligned/007c5cb30a3f7490e3ff.js" type="text/javascript"&gt;&lt;/script&gt;
-
-
-&lt;h2&gt;Don&amp;#8217;t use a sledgehammer to crack a nut!&lt;/h2&gt;
-&lt;p&gt;This advice, commonly given to programmers, demands explanation. If it&amp;#8217;s intended to imply a sledgehammer is more likely to pulverise the nut than open it, then fine, that&amp;#8217;s true &amp;#8212; but the analogy fails in this case: a solution written in Python would have been equally correct.
-&lt;/p&gt;
-&lt;p&gt;Alternatively, if we mean you shouldn&amp;#8217;t use a powerful language when a less powerful one would do, then the question becomes: &lt;strong&gt;why not&lt;/strong&gt;? Python is a general purpose programming language. It can crack nuts, peel bananas, serve web pages and so much more. If you know Python why bother with Awk?
-&lt;/p&gt;
-&lt;p&gt;At the outset of this post I admitted I don&amp;#8217;t generally bother with awk. Sometimes, though, I encounter the language and need to read and possibly adapt an existing script. So that&amp;#8217;s one reason to bother. Another reason is that it&amp;#8217;s elegant and compact. Studying its operation and motivation may help us compose and factor our own programs &amp;#8212; programs far more substantial than the scripts presented here, and in which there will surely be places for mini-languages of our own.
-&lt;/p&gt;</description>
+&lt;h2 id=&quot;dont-use-a-sledgehammer-to-crack-a-nut&quot;&gt;Don&amp;#8217;t use a sledgehammer to crack a nut!&lt;/h2&gt;
+&lt;p&gt;This advice, commonly given to programmers, demands explanation. If it&amp;#8217;s intended to imply a sledgehammer is more likely to pulverise the nut than open it, then fine, that&amp;#8217;s true &amp;#8212; but the analogy fails in this case: a solution written in Python would have been equally correct.&lt;/p&gt;
+&lt;p&gt;Alternatively, if we mean you shouldn&amp;#8217;t use a powerful language when a less powerful one would do, then the question becomes: &lt;strong&gt;why not&lt;/strong&gt;? Python is a general purpose programming language. It can crack nuts, peel bananas, serve web pages and so much more. If you know Python why bother with Awk?&lt;/p&gt;
+&lt;p&gt;At the outset of this post I admitted I don&amp;#8217;t generally bother with awk. Sometimes, though, I encounter the language and need to read and possibly adapt an existing script. So that&amp;#8217;s one reason to bother. Another reason is that it&amp;#8217;s elegant and compact. Studying its operation and motivation may help us compose and factor our own programs &amp;#8212; programs far more substantial than the scripts presented here, and in which there will surely be places for mini-languages of our own.&lt;/p&gt;</description>
 <dc:date>2016-02-23</dc:date>
 <guid>http://wordaligned.org/articles/sledgehammers-vs-nut-crackers</guid>
 <author>tag@wordaligned.org (Thomas Guest)</author>

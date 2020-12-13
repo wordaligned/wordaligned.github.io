@@ -26,20 +26,13 @@
       <div class="atomentry" id="partitioning-with-python">
 <h2 class="title"><a href="/articles/partitioning-with-python">Partitioning with Python</a></h2>
 <p class="meta"><abbr class="published" title="2009-06-17">2009-06-17</abbr> &bull; <a href="/tag/python" rel="tag">Python</a>, <a href="/tag/puzzles" rel="tag">Puzzles</a>, <a href="/tag/algorithms" rel="tag">Algorithms</a> &bull; <a href="/articles/partitioning-with-python#disqus_thread">Comments</a></p>
-<h3>Sums and Splits</h3>
-<p>On the subject of <a href="/articles/oulipo-eodermdrome.html">hunting for eodermdromes</a>, here are a couple of semi-related partitioning problems.
-</p>
+<h3 id="sums-and-splits">Sums and Splits</h3>
+<p>On the subject of <a href="/articles/oulipo-eodermdrome.html">hunting for eodermdromes</a>, here are a couple of semi-related partitioning problems.</p>
 <ol>
- <li>
-     for a positive integer, N, find the positive integer sequences which sum to N
- </li>
-
- <li>
-     for a sequence, S, find the distinct partitions of that sequence
- </li>
+<li>for a positive integer, N, find the positive integer sequences which sum to N</li>
+<li>for a sequence, S, find the distinct partitions of that sequence</li>
 </ol>
-<p>As an example of the first, the 16 distinct integer sequences which sum to 5 are:
-</p>
+<p>As an example of the first, the 16 distinct integer sequences which sum to 5 are:</p>
 <pre>
 5
 4 + 1
@@ -59,8 +52,7 @@
 1 + 4
 </pre>
 
-<p>and of the second, the 8 distinct ways of partitioning the sequence ABCD are:
-</p>
+<p>and of the second, the 8 distinct ways of partitioning the sequence ABCD are:</p>
 <pre>
 ABCD
 A BCD
@@ -72,71 +64,59 @@ AB C D
 A B C D
 </pre>
 
-<p>Note that I&#8217;ve counted 2 + 1 + 2, 2 + 2 + 1, and 1 + 2 + 2 as distinct sums totalling 5. That happens to be the formulation of the problem which interested me.
-</p>
-<span id="continue-reading"/>
-
-
-<h3>Context</h3>
-<p><a href="/articles/oulipo-eodermdrome.html"><img src="/images/eodermdrome.png" width="200px" height="200px" style="float:right" alt="eodermdrome"/></a>
-</p>
-<p>Before discussing a solution to these problems, some context. Recall that an <a href="/articles/oulipo-eodermdrome.html">eodermdrome</a> is a sequence which forms an Eulerian circuit through the fully connected graph whose vertices are the set of its elements. Put more simply: when you trace through the letters you get the figure shown, with no edge covered twice. Examples include:
-</p>
+<p>Note that I&#8217;ve counted 2 + 1 + 2, 2 + 2 + 1, and 1 + 2 + 2 as distinct sums totalling 5. That happens to be the formulation of the problem which interested me.</p>
+<p><span id="continue-reading"/></p>
+<h3 id="context">Context</h3>
+<p><a href="/articles/oulipo-eodermdrome.html"><img src="/images/eodermdrome.png" width="200px" height="200px" style="float:right" alt="eodermdrome"/></a></p>
+<p>Before discussing a solution to these problems, some context. Recall that an <a href="/articles/oulipo-eodermdrome.html">eodermdrome</a> is a sequence which forms an Eulerian circuit through the fully connected graph whose vertices are the set of its elements. Put more simply: when you trace through the letters you get the figure shown, with no edge covered twice. Examples include:</p>
 <p style="margin:0;font-size:300%"><span style="color:#888">E</span><span style="color:#930">O</span><span style="color:#036">D</span><span style="color:#888">E</span><span style="color:#555">R</span><span style="color:#e50">M</span><span style="color:#036">D</span><span style="color:#555">R</span><span style="color:#930">O</span><span style="color:#e50">M</span><span style="color:#888">E</span></p>
 <p style="margin:0;font-size:300%"><span style="color:#e50">E</span><span style="color:#555">N</span><span style="color:#036">H</span><span style="color:#930">A</span><span style="color:#555">N</span><span style="color:#888">C</span><span style="color:#e50">E</span> <span style="color:#930">A</span><span style="color:#888">C</span><span style="color:#036">H</span><span style="color:#e50">E</span></p>
 <p style="margin:0;font-size:300%"><span style="color:#036">T</span><span style="color:#930">A</span><span style="color:#888">X</span> <span style="color:#e50">D</span><span style="color:#555">E</span><span style="color:#930">A</span><span style="color:#e50">D</span> <span style="color:#036">T</span><span style="color:#555">E</span><span style="color:#888">X</span><span style="color:#036">T</span></p>
 
-<p>Eodermdromes turn out to be surprisingly rare. Writing a computer program to find them is a nice exercise in searching and text processing. Clearly, we should start with a collection of words. Then we can generate combinations of words from this collection and filter out the eodermdromes.
-</p>
+<p>Eodermdromes turn out to be surprisingly rare. Writing a computer program to find them is a nice exercise in searching and text processing. Clearly, we should start with a collection of words. Then we can generate combinations of words from this collection and filter out the eodermdromes.</p>
 <pre>
 (filter eodermdrome? (combinations words))
 </pre>
 
-<p>A large set of words (note: &#8220;set&#8221; not &#8220;collection&#8221;, we don&#8217;t need duplicates) gives the best chance of success. I started with a file containing more than 35 thousand distinct words. This gives over a billion possible word pairs, and when we consider word triples and quartets the numbers get silly even for a modern computer.
-</p>
-<p>As is so often the case in computing, we have a tension between opposing concerns. We&#8217;d like code which separates the task of generating candidates and the task of testing these candidates for eodermdromicity, but in order to run this code in a timely manner we need some of the eodermdrome testing to leak into the candidate generation. For example, we could preprocess the word set removing words which contain double Ls (all, ball, call, ill, Bill, kill &#8230;) since these can never appear in an eodermdrome. And we could similarly remove words which end ETE (delete, Pete, effete). As I hope you can see, it&#8217;s easy to end up with finickity code and co-dependent functions.
-</p>
-<p>I chose a simple but effective strategy to reduce the search space to something manageable, based on word length. First, then, I loaded my word set into a Python dict collecting lists of words keyed by their length.
-</p>
+<p>A large set of words (note: &#8220;set&#8221; not &#8220;collection&#8221;, we don&#8217;t need duplicates) gives the best chance of success. I started with a file containing more than 35 thousand distinct words. This gives over a billion possible word pairs, and when we consider word triples and quartets the numbers get silly even for a modern computer.</p>
+<p>As is so often the case in computing, we have a tension between opposing concerns. We&#8217;d like code which separates the task of generating candidates and the task of testing these candidates for eodermdromicity, but in order to run this code in a timely manner we need some of the eodermdrome testing to leak into the candidate generation. For example, we could preprocess the word set removing words which contain double Ls (all, ball, call, ill, Bill, kill &#8230;) since these can never appear in an eodermdrome. And we could similarly remove words which end ETE (delete, Pete, effete). As I hope you can see, it&#8217;s easy to end up with finickity code and co-dependent functions.</p>
+<p>I chose a simple but effective strategy to reduce the search space to something manageable, based on word length. First, then, I loaded my word set into a Python dict collecting lists of words keyed by their length.</p>
 <div class="typocode">
 
 <pre class="prettyprint">&gt;&gt;&gt; from collections import defaultdict
 &gt;&gt;&gt; words = defaultdict(list)
-&gt;&gt;&gt; for word in open('word-set.txt').read().split():
+&gt;&gt;&gt; for word in open(&#x27;word-set.txt&#x27;).read().split():
 ...     words[len(word)].append(word)
 
 </pre>
 
 </div>
 
-<p>Given this dict, picking out single word eodermdromes is easy.
-</p>
+<p>Given this dict, picking out single word eodermdromes is easy.</p>
 <div class="typocode">
 
 <pre class="prettyprint">&gt;&gt;&gt; list(filter(is_eodermdrome, words[11]))
-['eodermdrome']
+[&#x27;eodermdrome&#x27;]
 
 </pre>
 
 </div>
 
-<p>How about eodermdromes composed of a 6 letter word followed by a 5 letter word? We can form the <a href="http://docs.python.org/library/itertools.html#itertools.product">cartesian product</a> of the lists of 6 and 5 letter words and filter out the ones we want.
-</p>
+<p>How about eodermdromes composed of a 6 letter word followed by a 5 letter word? We can form the <a href="http://docs.python.org/library/itertools.html#itertools.product">cartesian product</a> of the lists of 6 and 5 letter words and filter out the ones we want.</p>
 <div class="typocode">
 
 <pre class="prettyprint">&gt;&gt;&gt; from itertools import product
 &gt;&gt;&gt; eod_6_5 = filter(is_eodermdrome, product(words[6], words[5]))
 &gt;&gt;&gt; next(eod_6_5)
-('earned', 'andre')
+(&#x27;earned&#x27;, &#x27;andre&#x27;)
 &gt;&gt;&gt; next(eod_6_5)
-('yearly', 'relay')
+(&#x27;yearly&#x27;, &#x27;relay&#x27;)
 
 </pre>
 
 </div>
 
-<p>How about <em>all eodermdromes</em> of length 11?
-</p>
+<p>How about <em>all eodermdromes</em> of length 11?</p>
 <div class="typocode">
 
 <pre class="prettyprint">&gt;&gt;&gt; from itertools import chain.from_iterable as seq
@@ -148,22 +128,17 @@ A B C D
 
 </div>
 
-<p>Note here that I&#8217;m using Python 3.0, and that <a href="http://docs.python.org/py3k/library/functions.html#filter">filter</a> is therefore a lazy function. The interactive session shown above hasn&#8217;t actually started taking anything from these lazily-evaluated streams.
-</p>
-<p>I certainly don&#8217;t claim this is the quickest way to search for eodermdromes. In fact, this little program took several hours to complete. But a back-of-an-envelope calculation showed it <em>would</em> complete in a few hours, and that was good enough.
-</p>
-<p>Note also that we haven&#8217;t shown an implementation of <code>sum_to_n()</code> yet, which takes us back to the problems posed at the start of this article.
-</p>
-
-<h3>Sum to N</h3>
-<p>Finding the positive integer series which sum to a positive integer N is a job for <a href="http://docs.python.org/library/itertools.html#itertools.combinations">itertools.combinations</a>.
-</p>
+<p>Note here that I&#8217;m using Python 3.0, and that <a href="http://docs.python.org/py3k/library/functions.html#filter">filter</a> is therefore a lazy function. The interactive session shown above hasn&#8217;t actually started taking anything from these lazily-evaluated streams.</p>
+<p>I certainly don&#8217;t claim this is the quickest way to search for eodermdromes. In fact, this little program took several hours to complete. But a back-of-an-envelope calculation showed it <em>would</em> complete in a few hours, and that was good enough.</p>
+<p>Note also that we haven&#8217;t shown an implementation of <code>sum_to_n()</code> yet, which takes us back to the problems posed at the start of this article.</p>
+<h3 id="sum-to-n">Sum to N</h3>
+<p>Finding the positive integer series which sum to a positive integer N is a job for <a href="http://docs.python.org/library/itertools.html#itertools.combinations">itertools.combinations</a>.</p>
 <div class="typocode">
 
 <pre class="prettyprint">from itertools import combinations, chain
 
 def sum_to_n(n):
-    'Generate the series of +ve integer lists which sum to a +ve integer, n.'
+    &#x27;Generate the series of +ve integer lists which sum to a +ve integer, n.&#x27;
     from operator import sub
     b, mid, e = [0], list(range(1, n)), [n]
     splits = (d for i in range(n) for d in combinations(mid, i)) 
@@ -173,46 +148,39 @@ def sum_to_n(n):
 
 </div>
 
-<p>The idea here is straightforward: there&#8217;s a 1-to-1 correspondence between the sums we want and ordered combinations drawn from the series 1, 2, &#8230; n-1. For example, if n is 11 one such combination would be:
-</p>
+<p>The idea here is straightforward: there&#8217;s a 1-to-1 correspondence between the sums we want and ordered combinations drawn from the series 1, 2, &#8230; n-1. For example, if n is 11 one such combination would be:</p>
 <pre>
 (1, 5, 7, 10)
 </pre>
 
-<p>we can extend this by pushing 0 in front and n at the end
-</p>
+<p>we can extend this by pushing 0 in front and n at the end</p>
 <pre>
 (0, 1, 5, 7, 10, 11)
 </pre>
 
-<p>This extended tuple can now be seen as partial sums of a series which sums to 11. Taking differences gives the series
-</p>
+<p>This extended tuple can now be seen as partial sums of a series which sums to 11. Taking differences gives the series</p>
 <pre>
 (1-0, 5-1, 7-5, 10-7, 11-10)
 </pre>
 
-<p>which is
-</p>
+<p>which is</p>
 <pre>
 (1, 4, 2, 3, 1)
 </pre>
 
-<p>which does indeed sum to 11
-</p>
+<p>which does indeed sum to 11</p>
 <pre>
 1 + 4 + 2 + 3 + 1 = 11
 </pre>
 
-<p>The Python code shown uses a clever idea to implement this staggered differencing, an idea I <a href="http://newsimg.bbc.co.uk/media/images/45909000/jpg/_45909582_badartists.jpg" title="Bristol's famous artist and thief">cleverly stole</a> from one of <a href="http://code.activestate.com/recipes/users/178123/">Raymond Hettinger&#8217;s brilliant Python recipes</a>.
-</p>
-
-<h3>Partitioning a Sequence</h3>
+<p>The Python code shown uses a clever idea to implement this staggered differencing, an idea I <a href="http://newsimg.bbc.co.uk/media/images/45909000/jpg/_45909582_badartists.jpg" title="Bristol's famous artist and thief">cleverly stole</a> from one of <a href="http://code.activestate.com/recipes/users/178123/">Raymond Hettinger&#8217;s brilliant Python recipes</a>.</p>
+<h3 id="partitioning-a-sequence">Partitioning a Sequence</h3>
 <div class="typocode"><div class="codetitle">Python Cookbook: Recipe 576795</div>
 
 <pre class="prettyprint">from itertools import chain, combinations
 
 def partition(iterable, chain=chain, map=map):
-    s = iterable if hasattr(iterable, '__getslice__') else tuple(iterable)
+    s = iterable if hasattr(iterable, &#x27;__getslice__&#x27;) else tuple(iterable)
     n = len(s)
     first, middle, last = [0], range(1, n), [n]
     getslice = s.__getslice__
@@ -223,8 +191,7 @@ def partition(iterable, chain=chain, map=map):
 
 </div>
 
-<p>This <a href="http://code.activestate.com/recipes/576795">recipe</a> shows sum-to-n and partitioning to be very similar problems. In fact, we could easily implement <code>sum_to_n()</code> on top of  <code>partition()</code>:
-</p>
+<p>This <a href="http://code.activestate.com/recipes/576795">recipe</a> shows sum-to-n and partitioning to be very similar problems. In fact, we could easily implement <code>sum_to_n()</code> on top of  <code>partition()</code>:</p>
 <div class="typocode">
 
 <pre class="prettyprint">def sum_to_n(n):
@@ -234,14 +201,13 @@ def partition(iterable, chain=chain, map=map):
 
 </div>
 
-<p>The posted recipe needs a minor overhaul to get it working with Python 3.0, <a href="http://docs.python.org/3.0/whatsnew/3.0.html#operators-and-special-methods">which does away</a> with <code>__getslice__</code>: getting a slice is simply what <code>__getitem__</code> does when given a slice object. The 2to3 tool fails to convert the recipe, which must be recast as something like:
-</p>
+<p>The posted recipe needs a minor overhaul to get it working with Python 3.0, <a href="http://docs.python.org/3.0/whatsnew/3.0.html#operators-and-special-methods">which does away</a> with <code>__getslice__</code>: getting a slice is simply what <code>__getitem__</code> does when given a slice object. The 2to3 tool fails to convert the recipe, which must be recast as something like:</p>
 <div class="typocode">
 
 <pre class="prettyprint">from itertools import chain, combinations
 
 def sliceable(xs):
-    '''Return a sliceable version of the iterable xs.'''
+    &#x27;&#x27;&#x27;Return a sliceable version of the iterable xs.&#x27;&#x27;&#x27;
     try:
         xs[:0]
         return xs
@@ -261,10 +227,8 @@ def partition(iterable):
 
 </div>
 
-
-<h3>Sum to N, again</h3>
-<p>Here&#8217;s a variant implementation of <code>sum_to_n()</code>. The idea here is to fill N slots with a pattern of 0&#8217;s and 1&#8217;s. We then reduce this pattern to the lengths of runs of repeated elements, giving a series which sums to N. <code>Itertools.product('01', repeat=n)</code> generates all possible binary patterns of length N, which turns out to be twice as many as we want since (e.g.) 00001111100 and 11110000011 represent the same sum, 4 + 5 + 2; hence the n-1 <code>repeat</code> count and the call to <code>chain</code> in the code below<a id="fn1link" href="#fn1"><sup>[1]</sup></a>.
-</p>
+<h3 id="sum-to-n-again">Sum to N, again</h3>
+<p>Here&#8217;s a variant implementation of <code>sum_to_n()</code>. The idea here is to fill N slots with a pattern of 0&#8217;s and 1&#8217;s. We then reduce this pattern to the lengths of runs of repeated elements, giving a series which sums to N. <code>Itertools.product('01', repeat=n)</code> generates all possible binary patterns of length N, which turns out to be twice as many as we want since (e.g.) 00001111100 and 11110000011 represent the same sum, 4 + 5 + 2; hence the n-1 <code>repeat</code> count and the call to <code>chain</code> in the code below<a id="fn1link" href="#fn1"><sup><a href="https://blog.codeship.com/building-minimal-docker-containers-for-go-applications/">1</a></sup></a>.</p>
 <div class="typocode">
 
 <pre class="prettyprint">from itertools import groupby, chain, product
@@ -273,19 +237,16 @@ def ilen(it):
     return sum(1 for _ in it)
 
 def sum_to_n(n):
-    return ([ilen(gp) for _, gp in groupby(chain('1', O1))]
-            for O1 in product('01', repeat=n-1))
+    return ([ilen(gp) for _, gp in groupby(chain(&#x27;1&#x27;, O1))]
+            for O1 in product(&#x27;01&#x27;, repeat=n-1))
 
 </pre>
 
 </div>
 
-<p>Fun, but the version using <a href="http://docs.python.org/library/itertools.html#itertools.combinations">combinations</a> is better!
-</p>
+<p>Fun, but the version using <a href="http://docs.python.org/library/itertools.html#itertools.combinations">combinations</a> is better!</p>
 <hr />
-
-<p><a id="fn1" href="#fn1link">[1]</a> My first thought was to use <code>itertools.islice</code> to limit the stream to the first 2<sup>n-1</sup> values, but I discovered <code>islice</code> has a surprising <a href="http://bugs.python.org/issue6305" title="I've reported this as a bug">limitation</a>.
-</p>
+<p><a id="fn1" href="#fn1link"><a href="https://blog.codeship.com/building-minimal-docker-containers-for-go-applications/">1</a></a> My first thought was to use <code>itertools.islice</code> to limit the stream to the first 2<sup>n-1</sup> values, but I discovered <code>islice</code> has a surprising <a href="http://bugs.python.org/issue6305" title="I've reported this as a bug">limitation</a>.</p>
 <div class="typocode">
 
 <pre class="prettyprint">&gt;&gt;&gt; from itertools import islice, count
@@ -301,7 +262,6 @@ ValueError: Stop argument for islice() must be a non-negative integer or None.
 </div>
 
 <hr />
-
 <p style="text-align:center">&sect;</p>
 <p style="text-align:center">so reuse ours</p>
 </div>

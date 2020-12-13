@@ -26,89 +26,41 @@
       <div class="atomentry" id="binary-search">
 <h2 class="title"><a href="/articles/binary-search">Binary search returns &#8230; ?</a></h2>
 <p class="meta"><abbr class="published" title="2010-05-12">2010-05-12</abbr> &bull; <a href="/tag/algorithms" rel="tag">Algorithms</a>, <a href="/tag/c" rel="tag">C</a>, <a href="/tag/c++" rel="tag">C++</a> &bull; <a href="/articles/binary-search#disqus_thread">Comments</a></p>
-<div class="toc">
-<h2>Contents</h2>
-<ul>
- <li><a href="#tocbsearch-in-c" name="toc0" id="toc0">Bsearch in C</a>
- </li>
-
- <li><a href="#tocbinary-search-in-c" name="toc1" id="toc1">Binary search in C++</a>
- </li>
-
- <li><a href="#tocstdbinarysearch-requirements" name="toc2" id="toc2">Std::binary_search() requirements</a>
- </li>
-
- <li><a href="#tocstdbinarysearch-limitations" name="toc3" id="toc3">Std::binary_search() limitations</a>
- </li>
-
- <li><a href="#toclocating-missing-elements" name="toc4" id="toc4">Locating missing elements</a>
- </li>
-
- <li><a href="#toclowerbound" name="toc5" id="toc5">Lower_bound</a>
- </li>
-
- <li><a href="#tocbinary-search-variants" name="toc6" id="toc6">Binary search variants</a>
- </li>
-
- <li><a href="#tociterating-over-numbers-in-a-file" name="toc7" id="toc7">Iterating over numbers in a file</a>
- </li>
-
- <li><a href="#toctriple-fail" name="toc8" id="toc8">Triple fail</a>
- </li>
-
- <li><a href="#tocthanks" name="toc9" id="toc9">Thanks</a>
- </li>
-</ul>
-</div><p>In an article inspired by Jon Bentley&#8217;s classic book, <a href="http://www.cs.bell-labs.com/cm/cs/pearls/">Programming Pearls</a>, Mike Taylor <a href="http://reprog.wordpress.com/2010/04/19/are-you-one-of-the-10-percent/" title="Are you one of the 10% of programmers who can write a binary search?">invites his readers</a> to implement the binary search algorithm. To spice things up, he requests we work:
-</p>
+<p>In an article inspired by Jon Bentley&#8217;s classic book, <a href="http://www.cs.bell-labs.com/cm/cs/pearls/">Programming Pearls</a>, Mike Taylor <a href="http://reprog.wordpress.com/2010/04/19/are-you-one-of-the-10-percent/" title="Are you one of the 10% of programmers who can write a binary search?">invites his readers</a> to implement the binary search algorithm. To spice things up, he requests we work:</p>
 <ol>
- <li>
-     without reference to any existing implementation
- </li>
-
- <li>
-     without calling any library routine, such as <code>bsearch</code>
- </li>
-
- <li>
-     without writing tests.
- </li>
+<li>without reference to any existing implementation</li>
+<li>without calling any library routine, such as <code>bsearch</code></li>
+<li>without writing tests.</li>
 </ol>
-<p>Mike Taylor doesn&#8217;t formally specify the problem. He&#8217;s confident his readers will know what a binary search is, and if not, the description he quotes from Programming Pearls should suffice:
-</p>
-<blockquote><p>Binary search solves the problem [of searching within a pre-sorted array] by keeping track of a range within the array in which T [i.e. the sought value] must be if it is anywhere in the array.  Initially, the range is the entire array.  The range is shrunk by comparing its middle element to T and discarding half the range.  The process continues until T is discovered in the array, or until the range in which it must lie is known to be empty.
-</p>
-</blockquote><p>So could our binary search implementation simply return a binary result, <code>true</code> if <code>T</code> is in the array, <code>false</code> otherwise? Well, Yes. And No. A binary search can provide more information, as Mike Taylor hints when he mentions <code>bsearch</code>. 
-</p>
-<p>Jon Bentley and Mike Taylor are primarily interested in how often programmers  make a mess of what appears to be a simple assignment and in how to avoid this mess. In this article, I&#8217;d like to point out that the problem specification needs attention too.
-</p>
+<p>Mike Taylor doesn&#8217;t formally specify the problem. He&#8217;s confident his readers will know what a binary search is, and if not, the description he quotes from Programming Pearls should suffice:</p>
+<blockquote>
+<p>Binary search solves the problem [of searching within a pre-sorted array] by keeping track of a range within the array in which T [i.e. the sought value] must be if it is anywhere in the array.  Initially, the range is the entire array.  The range is shrunk by comparing its middle element to T and discarding half the range.  The process continues until T is discovered in the array, or until the range in which it must lie is known to be empty.</p>
+</blockquote>
+<p>So could our binary search implementation simply return a binary result, <code>true</code> if <code>T</code> is in the array, <code>false</code> otherwise? Well, Yes. And No. A binary search can provide more information, as Mike Taylor hints when he mentions <code>bsearch</code>. </p>
+<p>Jon Bentley and Mike Taylor are primarily interested in how often programmers  make a mess of what appears to be a simple assignment and in how to avoid this mess. In this article, I&#8217;d like to point out that the problem specification needs attention too.</p>
 <p><a href="http://www.flickr.com/photos/pinprick/2547648374"><img src="http://farm4.static.flickr.com/3066/2547648374_587dbe8f4b_m.jpg" alt="unwrapped morbier"/></a>
-   <a href="http://www.flickr.com/photos/pinprick/2546825997"><img src="http://farm4.static.flickr.com/3083/2546825997_c28af1da65_m.jpg" alt="cut morbier"/></a>
-</p>
-<span id="continue-reading"/>
-
-
-<h3><a href="#toc0" name="tocbsearch-in-c" id="tocbsearch-in-c">Bsearch in C</a></h3>
-<p>The C library&#8217;s <code>bsearch</code> function returns the location of <code>T</code>, if found, or a sentinel value otherwise. We might use the array index of <code>T</code> or <code>-1</code> as location and sentinel. Standard C uses pointers:
-</p>
+<a href="http://www.flickr.com/photos/pinprick/2546825997"><img src="http://farm4.static.flickr.com/3083/2546825997_c28af1da65_m.jpg" alt="cut morbier"/></a></p>
+<p><span id="continue-reading"/></p>
+<h3 id="bsearch-in-c">Bsearch in C</h3>
+<p>The C library&#8217;s <code>bsearch</code> function returns the location of <code>T</code>, if found, or a sentinel value otherwise. We might use the array index of <code>T</code> or <code>-1</code> as location and sentinel. Standard C uses pointers:</p>
 <pre>
 <b>NAME</b>
     <b>bsearch</b> -- binary search of a sorted table
-    
+
 <b>SYNOPSIS</b>
     #include &lt;stdlib.h&gt;
-    
+
     void *
     <b>bsearch</b>(const void *key, const void *base, size_t nel, 
         size_t width,
         int (*compar) (const void *, const void *));
-    
+
 <b>DESCRIPTION</b> 
     The <b>bsearch()</b> function searches an array of `nel` objects, 
     the initial member of which is pointed to by `base`, for a member
     that matches the  object pointed to by `key`.  The size (in bytes)
     of each member of the array is specified by `width`.
-    
+
     The contents of the array should be in ascending sorted order 
     according to the comparison function referenced by `compar`.  The 
     `compar` routine is expected to have two arguments which point to
@@ -123,117 +75,61 @@
     compare as equal, which member is matched is unspecified.
 </pre>
 
-<p>Void pointers, function pointers, raw memory &#8212; generic functions in C aren&#8217;t pretty. How would this function look in a language with better support for generic programming?
-</p>
-
-<h3><a href="#toc1" name="tocbinary-search-in-c" id="tocbinary-search-in-c">Binary search in C++</a></h3>
-<p>C++ programmers can of course use <code>bsearch</code> directly since C++ includes the standard C library. The C++ counterpart would seem to be <a href="http://www.sgi.com/tech/stl/binary_search.html"><code>std::binary_search</code></a>.
-</p>
-<p>At first glance <code>std::binary_search</code> appears to be a weakened version of <code>bsearch</code>. Like <code>bsearch</code>, it searches for a value. Unlike <code>bsearch</code>, it simply returns a boolean result: <code>true</code> if the value is found, <code>false</code> otherwise. Nonetheless, it can tell us more than <code>bsearch</code> in some circumstances.
-</p>
-<p>Let&#8217;s return to Mike Taylor&#8217;s second constraint, the one about implementing functions which already exist in standard libraries. In a <a href="http://reprog.wordpress.com/2010/04/21/binary-search-redux-part-1/" title="Mike Taylor discusses his binary search challenge">follow up article</a> he explains:
-</p>
-<blockquote><p>&#8230; sometimes you do need to write a binary search, and the library routines won&#8217;t get the job done.  Or if they will, they&#8217;re grotesquely inefficient.  For example, suppose you have a 64-bit integer, and you need to find out whether it&#8217;s among the nine billion 64-bit integers that are stored in ascending order in a 72 Gb file.  The naive solution is to read the file into memory, making an array (or, heaven help us, an Array) of nine billion elements, then invoke the library search function.  And of course that just plain won&#8217;t work &#8212; the array won&#8217;t fit in memory.
-</p>
-</blockquote><p>Agreed! We should know how our wheels work and be ready to reinvent them when necessary: but C++&#8217;s <code>std::binary_search</code> <strong>will</strong> solve this problem efficiently. All we need is a suitable iterator over the file, in this case one which:
-</p>
+<p>Void pointers, function pointers, raw memory &#8212; generic functions in C aren&#8217;t pretty. How would this function look in a language with better support for generic programming?</p>
+<h3 id="binary-search-in-c">Binary search in C++</h3>
+<p>C++ programmers can of course use <code>bsearch</code> directly since C++ includes the standard C library. The C++ counterpart would seem to be <a href="http://www.sgi.com/tech/stl/binary_search.html"><code>std::binary_search</code></a>.</p>
+<p>At first glance <code>std::binary_search</code> appears to be a weakened version of <code>bsearch</code>. Like <code>bsearch</code>, it searches for a value. Unlike <code>bsearch</code>, it simply returns a boolean result: <code>true</code> if the value is found, <code>false</code> otherwise. Nonetheless, it can tell us more than <code>bsearch</code> in some circumstances.</p>
+<p>Let&#8217;s return to Mike Taylor&#8217;s second constraint, the one about implementing functions which already exist in standard libraries. In a <a href="http://reprog.wordpress.com/2010/04/21/binary-search-redux-part-1/" title="Mike Taylor discusses his binary search challenge">follow up article</a> he explains:</p>
+<blockquote>
+<p>&#8230; sometimes you do need to write a binary search, and the library routines won&#8217;t get the job done.  Or if they will, they&#8217;re grotesquely inefficient.  For example, suppose you have a 64-bit integer, and you need to find out whether it&#8217;s among the nine billion 64-bit integers that are stored in ascending order in a 72 Gb file.  The naive solution is to read the file into memory, making an array (or, heaven help us, an Array) of nine billion elements, then invoke the library search function.  And of course that just plain won&#8217;t work &#8212; the array won&#8217;t fit in memory.</p>
+</blockquote>
+<p>Agreed! We should know how our wheels work and be ready to reinvent them when necessary: but C++&#8217;s <code>std::binary_search</code> <strong>will</strong> solve this problem efficiently. All we need is a suitable iterator over the file, in this case one which:</p>
 <ul>
- <li>
-     increments in 8 byte steps
- </li>
-
- <li>
-     uses file seeks for larger steps
- </li>
-
- <li>
-     is dereferenced by reading 8 byte values from the file
- </li>
-
- <li>
-     stores file position, for use in ordering and distance operations
- </li>
+<li>increments in 8 byte steps</li>
+<li>uses file seeks for larger steps</li>
+<li>is dereferenced by reading 8 byte values from the file</li>
+<li>stores file position, for use in ordering and distance operations</li>
 </ul>
-<p>I include an <a href="#tociterating-over-numbers-in-a-file">implementation</a> of just such an iterator towards the end of this article. My aging laptop didn&#8217;t have enough disk space for a 72GB data file but I found room for a 5GB one. <code>Std::binary_search()</code> took milliseconds to test the presence of values in this file, and the times improved dramatically on repeat runs; using a linear search, the time extended to minutes, and repeat runs showed no such improvements.
-</p>
-
-<h3><a href="#toc2" name="tocstdbinarysearch-requirements" id="tocstdbinarysearch-requirements">Std::binary_search() requirements</a></h3>
-<p>It&#8217;s fair to suggest that creating a custom iterator just so we could use <code>std::binary_search</code> merely moves the problem. The iterator&#8217;s implementation is longer and arguably more fiddly than any custom binary search function would be. Why couldn&#8217;t we use a standard <a href="http://www.sgi.com/tech/stl/istream_iterator.html">input stream iterator</a> with the standard binary search algorithm?
-</p>
-<p>The reason is that <code>std::istream_iterator</code>s are <a href="http://www.sgi.com/tech/stl/InputIterator.html" title="SGI STL input iterator documentation">input iterators</a>, suitable only for single pass algorithms. Binary search doesn&#8217;t need to take any backwards steps but it does need to be able copy its iterators and advance them repeatedly. As a minimum, then, it requires <a href="http://www.sgi.com/tech/stl/ForwardIterator.html" title="SGI STL forwards iterator documentation">forwards iterators</a>.
-</p>
-<p>Note the algorithm&#8217;s <a href="http://www.sgi.com/tech/stl/binary_search.html">complexity</a>!
-</p>
-<blockquote><p>The number of comparisons is logarithmic: at most <code>log(last - first) + 2</code>. If ForwardIterator is a Random Access Iterator then the number of steps through the range is also logarithmic; otherwise, the number of steps is proportional to <code>last - first</code>.
-</p>
-</blockquote><p>In the case of our large file of numbers, comparisons are cheap; there&#8217;s little point minimising them if we&#8217;re going to take billions of short steps through the file. This is why we created a random access file iterator<a id="fn1link" href="#fn1"><sup>[1]</sup></a>.
-</p>
-<p>A more subtle point is that binary search deals with equivalence rather than equality: it only requires a less-than operator (or a comparison function), and returns true if it can find an element <code>x</code> which satisfies <code>!(x &lt; t) &amp;&amp; !(t &lt; x)</code>.
-</p>
-<p>The point I&#8217;m making is that C++ does a nice job of separating algorithms and containers, which is why the same algorithm can be used on vectors, files, arrays etc. It also carefully defines minimum requirements on the types used by algorithms<a id="fn2link" href="#fn2"><sup>[2]</sup></a>.
-</p>
-
-<h3><a href="#toc3" name="tocstdbinarysearch-limitations" id="tocstdbinarysearch-limitations">Std::binary_search() limitations</a></h3>
-<p>We noted earlier that <code>std::binary_search</code> delivers nothing more than a binary result. Is the element there or not? From the SGI STL <a href="http://www.sgi.com/tech/stl/binary_search.html">documentation</a>:
-</p>
-<blockquote><p>Note that this is not necessarily the information you are interested in!
-</p>
-</blockquote><p>Even <code>bsearch</code> tells us where it found the match; or rather, where it found <b>a</b> match, since there could be several. This imprecision is one of <code>bsearch</code>&#8217;s failings &#8212; but it really lets us down when it can&#8217;t find the element: in this case, it subdivides the range until it finds where the element would be if it were there, realises there is no match, then throws all positional information away and returns a null pointer.
-</p>
-<p>Suppose our large file represents a set of numbers and we want to know where our test number should go in this file, if it isn&#8217;t already present? A C++ binary search algorithm can do this, but it isn&#8217;t <code>std::binary_search</code>.
-</p>
-
-<h3><a href="#toc4" name="toclocating-missing-elements" id="toclocating-missing-elements">Locating missing elements</a></h3>
-<img src="/images/london-marathon-2008.jpg" alt="London Marathon, runners crossing Tower Bridge"/>
-
-<p>Here&#8217;s another problem binary search can solve. Suppose we want to know how many runners finished the 2010 London marathon in a time between 3 and 4 hours. Let&#8217;s suppose we&#8217;ve already loaded the ordered finishing times into an array.
-</p>
-<p>We might try using <code>bsearch</code> to find the position of the runners who finished with a time of exactly 3 hours and with a time of exactly 4 hours. Then the answer would be the difference between these two positions.
-</p>
-<p>There are two problems with this approach:
-</p>
+<p>I include an <a href="#tociterating-over-numbers-in-a-file">implementation</a> of just such an iterator towards the end of this article. My aging laptop didn&#8217;t have enough disk space for a 72GB data file but I found room for a 5GB one. <code>Std::binary_search()</code> took milliseconds to test the presence of values in this file, and the times improved dramatically on repeat runs; using a linear search, the time extended to minutes, and repeat runs showed no such improvements.</p>
+<h3 id="stdbinary_search-requirements">Std::binary_search() requirements</h3>
+<p>It&#8217;s fair to suggest that creating a custom iterator just so we could use <code>std::binary_search</code> merely moves the problem. The iterator&#8217;s implementation is longer and arguably more fiddly than any custom binary search function would be. Why couldn&#8217;t we use a standard <a href="http://www.sgi.com/tech/stl/istream_iterator.html">input stream iterator</a> with the standard binary search algorithm?</p>
+<p>The reason is that <code>std::istream_iterator</code>s are <a href="http://www.sgi.com/tech/stl/InputIterator.html" title="SGI STL input iterator documentation">input iterators</a>, suitable only for single pass algorithms. Binary search doesn&#8217;t need to take any backwards steps but it does need to be able copy its iterators and advance them repeatedly. As a minimum, then, it requires <a href="http://www.sgi.com/tech/stl/ForwardIterator.html" title="SGI STL forwards iterator documentation">forwards iterators</a>.</p>
+<p>Note the algorithm&#8217;s <a href="http://www.sgi.com/tech/stl/binary_search.html">complexity</a>!</p>
+<blockquote>
+<p>The number of comparisons is logarithmic: at most <code>log(last - first) + 2</code>. If ForwardIterator is a Random Access Iterator then the number of steps through the range is also logarithmic; otherwise, the number of steps is proportional to <code>last - first</code>.</p>
+</blockquote>
+<p>In the case of our large file of numbers, comparisons are cheap; there&#8217;s little point minimising them if we&#8217;re going to take billions of short steps through the file. This is why we created a random access file iterator<a id="fn1link" href="#fn1"><sup><a href="https://blog.codeship.com/building-minimal-docker-containers-for-go-applications/">1</a></sup></a>.</p>
+<p>A more subtle point is that binary search deals with equivalence rather than equality: it only requires a less-than operator (or a comparison function), and returns true if it can find an element <code>x</code> which satisfies <code>!(x &lt; t) &amp;&amp; !(t &lt; x)</code>.</p>
+<p>The point I&#8217;m making is that C++ does a nice job of separating algorithms and containers, which is why the same algorithm can be used on vectors, files, arrays etc. It also carefully defines minimum requirements on the types used by algorithms<a id="fn2link" href="#fn2"><sup><a href="http://devcenter.wercker.com/docs/quickstarts/advanced/building-minimal-containers-with-go">2</a></sup></a>.</p>
+<h3 id="stdbinary_search-limitations">Std::binary_search() limitations</h3>
+<p>We noted earlier that <code>std::binary_search</code> delivers nothing more than a binary result. Is the element there or not? From the SGI STL <a href="http://www.sgi.com/tech/stl/binary_search.html">documentation</a>:</p>
+<blockquote>
+<p>Note that this is not necessarily the information you are interested in!</p>
+</blockquote>
+<p>Even <code>bsearch</code> tells us where it found the match; or rather, where it found <b>a</b> match, since there could be several. This imprecision is one of <code>bsearch</code>&#8217;s failings &#8212; but it really lets us down when it can&#8217;t find the element: in this case, it subdivides the range until it finds where the element would be if it were there, realises there is no match, then throws all positional information away and returns a null pointer.</p>
+<p>Suppose our large file represents a set of numbers and we want to know where our test number should go in this file, if it isn&#8217;t already present? A C++ binary search algorithm can do this, but it isn&#8217;t <code>std::binary_search</code>.</p>
+<h3 id="locating-missing-elements">Locating missing elements</h3>
+<p><img src="/images/london-marathon-2008.jpg" alt="London Marathon, runners crossing Tower Bridge"/></p>
+<p>Here&#8217;s another problem binary search can solve. Suppose we want to know how many runners finished the 2010 London marathon in a time between 3 and 4 hours. Let&#8217;s suppose we&#8217;ve already loaded the ordered finishing times into an array.</p>
+<p>We might try using <code>bsearch</code> to find the position of the runners who finished with a time of exactly 3 hours and with a time of exactly 4 hours. Then the answer would be the difference between these two positions.</p>
+<p>There are two problems with this approach:</p>
 <ol>
- <li>
-     what if no one finished with a time of <strong>exactly</strong> 3 or 4 hours? 
- </li>
-
- <li>
-     what if more than one runner finished with a time of exactly 3 or 4 hours?
- </li>
+<li>what if no one finished with a time of <strong>exactly</strong> 3 or 4 hours? </li>
+<li>what if more than one runner finished with a time of exactly 3 or 4 hours?</li>
 </ol>
-<p>In the first case <code>bsearch</code> returns a null pointer and we can&#8217;t complete our calculation. In the second case, <code>bsearch</code> makes no guarantees about which of the equally-placed runners it will find, and even if we can make our calculation, we cannot be sure it is correct.
-</p>
-<p><code>Bsearch</code> is not much use, then, but a binary search can give us our answer. 
-</p>
-<p>Imagine we had a late result for the race, a runner who recorded a time of exactly 3 hours. What&#8217;s the first position in the array at which we could place this runner, whilst maintaining the array ordering? Similarly, where&#8217;s the first position at which we could insert a runner with a time of 4 hours, maintaining the array ordering. Both these positions are well defined and precise &#8212; even if everyone finished the race in less than 3 hours, or even if no one ran the race &#8212; and the correct answer is their difference.
-</p>
-
-<h3><a href="#toc5" name="toclowerbound" id="toclowerbound">Lower_bound</a></h3>
-<p>C++ supplies just such an algorithm. It goes by the name of <a href="http://www.sgi.com/tech/stl/lower_bound.html"><code>std::lower_bound</code></a>, but really it&#8217;s good old binary search. We want to find the first place our target element could go, whilst maintaining the ordering, which we do by repeatedly splitting the range.
-</p>
+<p>In the first case <code>bsearch</code> returns a null pointer and we can&#8217;t complete our calculation. In the second case, <code>bsearch</code> makes no guarantees about which of the equally-placed runners it will find, and even if we can make our calculation, we cannot be sure it is correct.</p>
+<p><code>Bsearch</code> is not much use, then, but a binary search can give us our answer. </p>
+<p>Imagine we had a late result for the race, a runner who recorded a time of exactly 3 hours. What&#8217;s the first position in the array at which we could place this runner, whilst maintaining the array ordering? Similarly, where&#8217;s the first position at which we could insert a runner with a time of 4 hours, maintaining the array ordering. Both these positions are well defined and precise &#8212; even if everyone finished the race in less than 3 hours, or even if no one ran the race &#8212; and the correct answer is their difference.</p>
+<h3 id="lower_bound">Lower_bound</h3>
+<p>C++ supplies just such an algorithm. It goes by the name of <a href="http://www.sgi.com/tech/stl/lower_bound.html"><code>std::lower_bound</code></a>, but really it&#8217;s good old binary search. We want to find the first place our target element could go, whilst maintaining the ordering, which we do by repeatedly splitting the range.</p>
 <ul>
- <li>
-     while the range is non-empty
- </li>
-
- <li>
-     look at the element in the middle of the range
- </li>
-
- <li>
-     is its value less than the target value?
- </li>
-
- <li>
-     if so, continue looking in the top half of the range
- </li>
-
- <li>
-     if not, continue looking in the bottom half of the range
- </li>
+<li>while the range is non-empty</li>
+<li>look at the element in the middle of the range</li>
+<li>is its value less than the target value?</li>
+<li>if so, continue looking in the top half of the range</li>
+<li>if not, continue looking in the bottom half of the range</li>
 </ul>
-<p>The while loop exits when the range has been reduced to a single point and this point is what we return. On my platform, the code itself reads a bit like:
-</p>
+<p>The while loop exits when the range has been reduced to a single point and this point is what we return. On my platform, the code itself reads a bit like:</p>
 <div class="typocode">
 
 <pre class="prettyprint">template&lt;typename fwd_it, typename t&gt;
@@ -241,11 +137,11 @@ fwd_it
 lower_bound(fwd_it first, fwd_it last, const t &amp; val)
 {
     typedef typename iterator_traits&lt;fwd_it&gt;::difference_type distance;
-    
+
     distance len = std::distance(first, last);
     distance half;
     fwd_it middle;
-    
+
     while (len &gt; 0)
     {
         half = len &gt;&gt; 1;
@@ -267,10 +163,8 @@ lower_bound(fwd_it first, fwd_it last, const t &amp; val)
 
 </div>
 
-<p>I think this version of binary search is <a href="/articles/next-permutation.html" title="Next_permutation: when C++ gets it right">yet another gem from the C++ standard library</a>. As Jon Bentley and Mike Taylor eloquently point out, the implementation is subtle &#8212; in particular, if <code>(*middle &lt; val)</code> we must eliminate <code>middle</code> or risk an infinite loop &#8212; but by tightening the problem specification and paring back the requirements we&#8217;ve created a function which is far more useful than <code>bsearch</code> and arguably simpler to code.
-</p>
-<p>For comparison, here&#8217;s the <code>bsearch</code> implemented by glibc, version 2.11.
-</p>
+<p>I think this version of binary search is <a href="/articles/next-permutation.html" title="Next_permutation: when C++ gets it right">yet another gem from the C++ standard library</a>. As Jon Bentley and Mike Taylor eloquently point out, the implementation is subtle &#8212; in particular, if <code>(*middle &lt; val)</code> we must eliminate <code>middle</code> or risk an infinite loop &#8212; but by tightening the problem specification and paring back the requirements we&#8217;ve created a function which is far more useful than <code>bsearch</code> and arguably simpler to code.</p>
+<p>For comparison, here&#8217;s the <code>bsearch</code> implemented by glibc, version 2.11.</p>
 <div class="typocode">
 
 <pre class="prettyprint">/* Perform a binary search for KEY in BASE which has NMEMB elements
@@ -282,7 +176,7 @@ bsearch (const void *key, const void *base, size_t nmemb, size_t size,
   size_t l, u, idx;
   const void *p;
   int comparison;
-  
+
   l = 0;
   u = nmemb;
   while (l &lt; u)
@@ -298,17 +192,15 @@ bsearch (const void *key, const void *base, size_t nmemb, size_t size,
         return (void *) p;
     }
 
-return NULL;
+  return NULL;
 }
 
 </pre>
 
 </div>
 
-
-<h3><a href="#toc6" name="tocbinary-search-variants" id="tocbinary-search-variants">Binary search variants</a></h3>
-<p>On my platform, <code>std::binary_search</code> is built directly on <code>std::lower_bound</code>. Here&#8217;s the code.
-</p>
+<h3 id="binary-search-variants">Binary search variants</h3>
+<p>On my platform, <code>std::binary_search</code> is built directly on <code>std::lower_bound</code>. Here&#8217;s the code.</p>
 <div class="typocode">
 
 <pre class="prettyprint">template&lt;typename fwd_it, typename t&gt;
@@ -323,25 +215,20 @@ lower_bound(fwd_it first, fwd_it last, const t &amp; val)
 
 </div>
 
-<p><code>Std::upper_bound</code> searches a sorted range to find the last position an item could be inserted without changing the ordering.
-</p>
-<p><code>Std::equal_range</code> returns a pair of iterators, logically equal to <code>make_pair(lower_bound(...), upper_bound(...))</code>.
-</p>
+<p><code>Std::upper_bound</code> searches a sorted range to find the last position an item could be inserted without changing the ordering.</p>
+<p><code>Std::equal_range</code> returns a pair of iterators, logically equal to <code>make_pair(lower_bound(...), upper_bound(...))</code>.</p>
 <hr />
-
-
-<h3><a href="#toc7" name="tociterating-over-numbers-in-a-file" id="tociterating-over-numbers-in-a-file">Iterating over numbers in a file</a></h3>
-<p>The iterator class I created to use <code>std::binary_search</code> on an file containing fixed width binary formatted numbers appears below. To determine whether the file <code>numbers.bin</code> contains the target value <code>288230376151711744</code>, we would write something like:
-</p>
+<h3 id="iterating-over-numbers-in-a-file">Iterating over numbers in a file</h3>
+<p>The iterator class I created to use <code>std::binary_search</code> on an file containing fixed width binary formatted numbers appears below. To determine whether the file <code>numbers.bin</code> contains the target value <code>288230376151711744</code>, we would write something like:</p>
 <div class="typocode">
 
 <pre class="prettyprint">#include &lt;algorithm&gt;
 
 ....
-    
+
     typedef binary_file_number_iter&lt;long long, 8&gt; iter;
     long long target = 288230376151711744LL;
-    
+
     bool found = std::binary_search(iter("numbers.bin", iter::begin),
                                     iter("numbers.bin", iter::end),
                                     target);
@@ -350,22 +237,18 @@ lower_bound(fwd_it first, fwd_it last, const t &amp; val)
 
 </div>
 
-<p>To test the performance of these iterators I created a 5GB binary file packed with 8 byte numbers. These numbers were multiples of 3:
-</p>
+<p>To test the performance of these iterators I created a 5GB binary file packed with 8 byte numbers. These numbers were multiples of 3:</p>
 <pre title="File contents">
 0, 3, 6, 9, ..., 2015231997
 </pre>
 
-<p>I then timed how long it took to search this file for 10 interesting numbers (and to confirm the returned results were as expected).
-</p>
+<p>I then timed how long it took to search this file for 10 interesting numbers (and to confirm the returned results were as expected).</p>
 <pre title="Seach targets">
 -1, 0, 1, 2, 1007616000, 1007616001, 1007616002, 1007616003, 2015231997, 2015232000
 </pre>
 
-<p><code>Binary_search()</code> recorded a time of 0.308 seconds on a rather old MacBook<a id="fn3link" href="#fn3"><sup>[3]</sup></a>. Using a hand-coded linear search the run time was just over 38 minutes. That is, the binary search ran 7000 times faster on this sample.
-</p>
-<p>Interestingly, repeated runs of the binary search test using the same input file and the same targets ran in an average time of just 0.030 seconds, a 10-fold times speed up over the first run. Similarly repeating the linear search showed no such improvement. I&#8217;m attributing this to operating system file caching, but I don&#8217;t pretend to know exactly what&#8217;s going on here. (My thanks to Michal Mocny for his explanation in the <a href="#comment-49972118">comments</a> below).
-</p>
+<p><code>Binary_search()</code> recorded a time of 0.308 seconds on a rather old MacBook<a id="fn3link" href="#fn3"><sup>[3]</sup></a>. Using a hand-coded linear search the run time was just over 38 minutes. That is, the binary search ran 7000 times faster on this sample.</p>
+<p>Interestingly, repeated runs of the binary search test using the same input file and the same targets ran in an average time of just 0.030 seconds, a 10-fold times speed up over the first run. Similarly repeating the linear search showed no such improvement. I&#8217;m attributing this to operating system file caching, but I don&#8217;t pretend to know exactly what&#8217;s going on here. (My thanks to Michal Mocny for his explanation in the <a href="#comment-49972118">comments</a> below).</p>
 <div class="typocode"><div class="codetitle">Binary file number iterator</div>
 
 <pre class="prettyprint">#ifndef BINARY_FILE_NUMBER_ITERATOR_HPP_INCLUDED
@@ -387,6 +270,7 @@ public:
     }
 };
 
+
 // This iterator class is used for numbers packed into a file
 // using a fixed width binary format. Numbers must be packed
 // most significant byte first.
@@ -402,7 +286,7 @@ template &lt;typename number, int number_size&gt;
 class binary_file_number_iter
 {
     typedef binary_file_number_iter&lt;number, number_size&gt; iter;
-    
+
 private: // Sanity
     // Check things are OK, closing the stream and throwing an error on failure.
     void check(bool ok, std::string const &amp; what)
@@ -413,7 +297,7 @@ private: // Sanity
             throw file_read_error(what);          
         }
     }
-    
+
 public: // Traits typedefs, which make this class usable with
         // algorithms which need a random access iterator.
     typedef std::random_access_iterator_tag iterator_category;
@@ -421,13 +305,13 @@ public: // Traits typedefs, which make this class usable with
     typedef std::streamoff difference_type;
     typedef number * pointer;
     typedef number &amp; reference;
-    
+
 public:
     static int const number_width = number_size;
-    
+
 public: // Enum used to construct begin, end iterators
     enum start_pos { begin, end };
-    
+
 public: // Lifecycle
     binary_file_number_iter(std::string const &amp; filename,
                             start_pos where = begin)
@@ -440,24 +324,24 @@ public: // Lifecycle
             seek_end();
         }
     }
-    
+
     binary_file_number_iter()
         : pos(-1)
     {
     }
-    
+
     binary_file_number_iter(iter const &amp; other)
         : filename(other.filename)
     {
         open();
         setpos(other.pos);
     }
-    
+
     ~binary_file_number_iter()
     {
         close();
     }
-    
+
     iter &amp; operator=(iter const &amp; other)
     {
         close();
@@ -466,91 +350,91 @@ public: // Lifecycle
         setpos(other.pos);
         return *this;
     } 
-    
+
 public: // Comparison
         // Note: it is an error to compare iterators into different files.
     bool operator&lt;(iter const &amp; other) const
     {
         return pos &lt; other.pos;
     }
-    
+
     bool operator&gt;(iter const &amp; other) const
     {
         return pos &gt; other.pos;
     }
-    
+
     bool operator==(iter const &amp; other) const
     {
         return pos == other.pos;
     }
-    
+
     bool operator!=(iter const &amp; other) const
     {
         return pos != other.pos;
     }
-    
+
 public: // Iteration
     iter &amp; operator++()
     {
         return *this += 1;
     }
-    
+
     iter &amp; operator--()
     {
         return *this -= 1;
     }
-    
+
     iter operator++(int)
     {
         iter tmp(*this);
         ++(*this);
         return tmp;
     }
-    
+
     iter operator--(int)
     {
         iter tmp(*this);
         --(*this);
         return tmp;
     }
-    
+
 public: // Step
     iter &amp; operator+=(difference_type n)
     {
         advance(n);
         return *this;
     }
-    
+
     iter &amp; operator-=(difference_type n)
     {
         advance(-n);
         return *this;
     }
-    
+
     iter operator+(difference_type n)
     {
         iter result(*this);
         return result += n;
     }
-    
+
     iter operator-(difference_type n)
     {
         iter result(*this);
         return result -= n;
     }
-    
+
 public: // Distance
     difference_type operator-(iter &amp; other)
     {
         return (pos - other.pos) / number_size;
     }
-    
+
 public: // Access
     value_type operator*()
     {
         return (*this)[0];
     }
-    
+
     value_type operator[](difference_type n)
     {
         std::streampos restore = getpos();
@@ -559,7 +443,7 @@ public: // Access
         setpos(restore);
         return result;
     }
-    
+
     // Allow access to the underlying stream position
     std::streampos getpos()
     {
@@ -574,7 +458,7 @@ private: // Implementation details
         check(in, "open failed");
         pos = getpos();
     }
-    
+
     void close()
     {
         if (in.is_open())
@@ -582,31 +466,31 @@ private: // Implementation details
             in.close();
         }
     }
-    
+
     void advance(difference_type n)
     {
         check(in.seekg(n * number_size, std::ios_base::cur), "advance failed");
         pos = getpos();
     }
-    
+
     void seek_end()
     {
         check(in.seekg(0, std::ios_base::end), "seek_end failed");
         pos = getpos();
     }
-    
+
     void setpos(std::streampos newpos)
     {
         check(in.seekg(newpos), "setpos failed");
         pos = newpos;
     }
-    
+
     value_type read()
     {
         number n = 0;
         unsigned char buf[number_size];
         check(in.read((char *)buf, number_size), "read failed");
-        
+
         for (int i = 0; i != number_size; ++i)
         {
             n &lt;&lt;= 8;
@@ -614,7 +498,7 @@ private: // Implementation details
         }
         return n;
     }
-    
+
 private: // State
     std::string filename;
     std::ifstream in;
@@ -627,14 +511,13 @@ private: // State
 
 </div>
 
-<p>Here are some basic tests for the binary file number iterator.
-</p>
+<p>Here are some basic tests for the binary file number iterator.</p>
 <div class="typocode"><div class="codetitle">Test binary file number iterator</div>
 
 <pre class="prettyprint">#include &lt;assert.h&gt;
 #include &lt;fstream&gt;
 #include &lt;algorithm&gt;
-#include &lt;ext/algorithm&gt; // For Gnu's non-standard is_sorted
+#include &lt;ext/algorithm&gt; // For Gnu&#x27;s non-standard is_sorted
 #include &lt;iostream&gt;
 
 #include "binary_file_number_iterator.hpp"
@@ -661,9 +544,9 @@ char const * empty_test_file(char const * name)
 /*
   Create a small test file containing numbers, in ascending order,
   for number sizes 1, 2, 4 and 8 bytes.
-  
+
   A hex view of the file looks like:
-  
+
   0000 0000 0000 0000 0303 0303 0303 0303
   0606 0606 0606 0606 0909 0909 0909 0909
   0c0c 0c0c 0c0c 0c0c 0f0f 0f0f 0f0f 0f0f
@@ -707,11 +590,11 @@ template &lt;typename iter&gt;
 void basic_file_tests()
 {
     char const * basic_file = basic_test_file("basic_test_file");
-    
+
     typedef typename iter::value_type value_t;
     typedef typename std::pair&lt;iter, iter&gt; range;
     int const w = iter::number_width;
-    
+
     iter beg(basic_file, iter::begin);
     iter end(basic_file, iter::end);
     assert(beg &lt; end);
@@ -719,7 +602,7 @@ void basic_file_tests()
     assert(!(beg == end));
     assert(beg != end);
     assert(end - beg == 48 / w);
-    
+
     iter mid = beg;
     assert(mid[0] == 0);
     assert(mid[8/w] == repeat&lt;value_t&gt;(3, w));
@@ -729,7 +612,7 @@ void basic_file_tests()
     assert(*(mid += 16/w) == repeat&lt;value_t&gt;(6, w));
     assert(mid &lt; end);
     assert(mid &gt; beg);
-    
+
     assert(is_sorted(beg, end));
     assert(std::lower_bound(beg, mid, -1) == beg);
     assert(std::lower_bound(beg, mid, 0) == beg);
@@ -737,7 +620,7 @@ void basic_file_tests()
     assert(std::upper_bound(beg, mid, 1) == beg + 8/w);
     assert(std::binary_search(beg, end, 0));
     assert(std::binary_search(beg, end, repeat&lt;value_t&gt;(0xf, w)));
-    
+
     mid = beg + 8/w;
     assert(std::equal_range(beg, end, 0) == std::make_pair(beg, mid));
     assert(std::equal_range(beg, end, 1) == std::make_pair(mid, mid));
@@ -757,51 +640,33 @@ int main()
 
 </div>
 
-
-<h3><a href="#toc8" name="toctriple-fail" id="toctriple-fail">Triple fail</a></h3>
-<p>In this article we&#8217;ve discussed binary search:
-</p>
+<h3 id="triple-fail">Triple fail</h3>
+<p>In this article we&#8217;ve discussed binary search:</p>
 <ol>
- <li>
-     referring to existing implementations
- </li>
-
- <li>
-     calling library routines, such as <code>std::binary_search</code>
- </li>
-
- <li>
-     and written some tests.
- </li>
+<li>referring to existing implementations</li>
+<li>calling library routines, such as <code>std::binary_search</code></li>
+<li>and written some tests.</li>
 </ol>
-<p>Despite this indiscipline, we never even bothered to roll our own binary search: we&#8217;ve tackled the exact opposite of the problem which Mike Taylor set. Programming tasks rarely start with a clear specification, and even if they do, the specification needs questioning.
-</p>
+<p>Despite this indiscipline, we never even bothered to roll our own binary search: we&#8217;ve tackled the exact opposite of the problem which Mike Taylor set. Programming tasks rarely start with a clear specification, and even if they do, the specification needs questioning.</p>
 <hr />
-
-
-<h3><a href="#toc9" name="tocthanks" id="tocthanks">Thanks</a></h3>
-<p>My thanks to <a href="http://www.flickr.com/photos/pinprick/">pinprick</a> for the <a href="http://www.flickr.com/photos/pinprick/2547648374">cheese</a> <a href="http://www.flickr.com/photos/pinprick/2546825997">photos</a>, and for this delicious description.
-</p>
-<blockquote><p>morbier is a soft-ripened, washed rind cheese. the tradition of bathing the rinds in salty water (or strong ale) goes back to trappist monks, who perfected the art. washing the rind makes it tougher, protecting the cheese and making it last longer. washing the rind also makes it a place where a certain bacteria, b. linens, love to hang out. while they work their magic, making the cheese inside smooth and creamy and silky, they also make the outside stinky. there isn&#8217;t any good way to put it. however, most stinky cheese taste amazing, and once you realize that, you find that you love the smell of stinky cheese. stink on the outside means gold on the inside! 
-   &#8212; <a href="http://www.flickr.com/photos/pinprick/2547648374">pinprick</a>
-</p>
-</blockquote><p>How long before flickr implements scratch and sniff?
-</p>
+<h3 id="thanks">Thanks</h3>
+<p>My thanks to <a href="http://www.flickr.com/photos/pinprick/">pinprick</a> for the <a href="http://www.flickr.com/photos/pinprick/2547648374">cheese</a> <a href="http://www.flickr.com/photos/pinprick/2546825997">photos</a>, and for this delicious description.</p>
+<blockquote>
+<p>morbier is a soft-ripened, washed rind cheese. the tradition of bathing the rinds in salty water (or strong ale) goes back to trappist monks, who perfected the art. washing the rind makes it tougher, protecting the cheese and making it last longer. washing the rind also makes it a place where a certain bacteria, b. linens, love to hang out. while they work their magic, making the cheese inside smooth and creamy and silky, they also make the outside stinky. there isn&#8217;t any good way to put it. however, most stinky cheese taste amazing, and once you realize that, you find that you love the smell of stinky cheese. stink on the outside means gold on the inside! 
+&#8212; <a href="http://www.flickr.com/photos/pinprick/2547648374">pinprick</a></p>
+</blockquote>
+<p>How long before flickr implements scratch and sniff?</p>
 <hr />
-
-<p><a id="fn1" href="#fn1link">[1]</a>: Well, something which masquerades as a random access iterator. Files are not usually random access devices, and the time taken by a seek operation may well vary with the seek offset. By supplying random access scaffolding, we at least ensure that a single, efficient, seek operation is used each time we advance the file position. 
-</p>
-<p><a id="fn2" href="#fn2link">[2]</a>: The C++ standard describes the requirements on types in some detail. Unfortunately C++ implementations provide little support for enforcing these requirements. Violations are likely to be punished by <a href="/articles/koenigs-first-rule-of-debugging.html#a-problem-on-line-106">grotesque compiler warnings</a>.
-</p>
-<p><a id="fn3" href="#fn3link">[3]</a>: The laptop specification:
-</p>
+<p><a id="fn1" href="#fn1link"><a href="https://blog.codeship.com/building-minimal-docker-containers-for-go-applications/">1</a></a>: Well, something which masquerades as a random access iterator. Files are not usually random access devices, and the time taken by a seek operation may well vary with the seek offset. By supplying random access scaffolding, we at least ensure that a single, efficient, seek operation is used each time we advance the file position. </p>
+<p><a id="fn2" href="#fn2link"><a href="http://devcenter.wercker.com/docs/quickstarts/advanced/building-minimal-containers-with-go">2</a></a>: The C++ standard describes the requirements on types in some detail. Unfortunately C++ implementations provide little support for enforcing these requirements. Violations are likely to be punished by <a href="/articles/koenigs-first-rule-of-debugging.html#a-problem-on-line-106">grotesque compiler warnings</a>.</p>
+<p><a id="fn3" href="#fn3link">[3]</a>: The laptop specification:</p>
 <pre>
 Hardware Overview:
-  Model Name:	            MacBook
-  Model Identifier:	    MacBook1,1
-  Processor Name:	    Intel Core Duo
-  Processor Speed:	    2 GHz
-  Number Of Processors:	    1
+  Model Name:               MacBook
+  Model Identifier:     MacBook1,1
+  Processor Name:       Intel Core Duo
+  Processor Speed:      2 GHz
+  Number Of Processors:     1
   Total Number Of Cores:    2
   L2 Cache (per processor): 2 MB
   Memory:                   2 GB

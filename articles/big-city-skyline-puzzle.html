@@ -28,64 +28,34 @@
       <div class="atomentry" id="big-city-skyline-puzzle">
 <h2 class="title"><a href="/articles/big-city-skyline-puzzle">Big City Skyline Puzzle</a></h2>
 <p class="meta"><abbr class="published" title="2007-10-01">2007-10-01</abbr> &bull; <a href="/tag/puzzles" rel="tag">Puzzles</a>, <a href="/tag/c++" rel="tag">C++</a>, <a href="/tag/python" rel="tag">Python</a>, <a href="/tag/google" rel="tag">Google</a> &bull; <a href="/articles/big-city-skyline-puzzle#disqus_thread">Comments</a></p>
-<p>There&#8217;s a relatively short supply of computer science puzzles<sup><a href="#footnote1">[1]</a></sup> and many new ones simply re-spin the classics &#8212; once you&#8217;ve removed the packaging they come down to the same old binary search, quick sort, bit-vector, &#8230;
-</p>
-<p>So I was interested to find one which was new to me, referenced in <a href="http://googleblog.blogspot.com/2007/09/our-plans-for-code-jam.html">this post</a> on the official Google blog. 
-</p>
-<span id="continue-reading"/>
-
-
-<h3>Little big Google</h3>
-<p>Actually, Google supply a <a href="http://services.google.com/blog_resources/Google_CodeJam_Practice.pdf">couple of puzzles</a>. The subtext of both is that Google is a <strong>big</strong> company working on <strong>big</strong> problems, but hey!, a <a href="/articles/an-ideal-working-environment.html">childish sense of wonder, curiosity and competition</a> are still encouraged. The first puzzle takes you to a new job in Big City, where the beautiful skyline is filled with millions of impossibly tall thin buildings. The second expands your scope (perhaps due to  over-crowding in BC?) &#8212; now you&#8217;re at Google Moon, searching nothing less than the Universe for nothing more than stock quotes.
-</p>
-<p>I&#8217;m not going to spoil either puzzle. I won&#8217;t talk about the lunar one since I haven&#8217;t had time to look at it yet, except to say that it looks like a variant on the <a href="http://en.wikipedia.org/wiki/Travelling_salesman_problem">traveling salesman problem</a> (which won&#8217;t make it any easier to solve).
-</p>
-
-<h3>Big City Skyline</h3>
-<p>The Big City Skyline puzzle requires careful budgeting of time and space. I don&#8217;t think it&#8217;s giving much away to say that a quadratic algorithm won&#8217;t cut it. An <code>O(N log N)</code> solution will, though, provided each stage completes in roughly a microsecond &#8212; not unreasonable on a 2GHz machine. The 512MB space limit doesn&#8217;t look too bad since the largest numbers involved fit comfortably into 8 bytes: all you have to do is choose a reasonably compact container and avoid replicating the inputs.
-</p>
-<p>As usual I put together some unit tests<sup><a href="#footnote2">[2]</a></sup> and a first implementation using Python. 
-</p>
-
-<h3>Wasting Resources</h3>
-<p><span id="excerpt0"/>As a rule of thumb, I reckon Python to be an order of magnitude more wasteful of CPU cycles and memory than my favourite low-level language, C++.
-</p>
-<p>What do I mean by an order of magnitude? Well, it&#8217;s a factor somewhere between 2 and 10. The problem is, I really have no better understanding or control than that. Sometimes it&#8217;s 2, sometimes it&#8217;s 10, sometimes it&#8217;s somewhere in between. I <em>have</em> looked at the CPython implementation, but not closely enough to understand how much memory a list of N large integers requires, nor how long it takes to iterate through such a list. The language reference provides few guarantees.
-</p>
-<p>This wastefulness doesn&#8217;t just mean a Python program consumes proportionately more resources. It also means there will be a point at which a Python program fails because it exhausts resources and the machine starts to thrash &#8212; and at this point: 
-</p>
+<p>There&#8217;s a relatively short supply of computer science puzzles<sup><a href="#footnote1"><a href="https://blog.codeship.com/building-minimal-docker-containers-for-go-applications/">1</a></a></sup> and many new ones simply re-spin the classics &#8212; once you&#8217;ve removed the packaging they come down to the same old binary search, quick sort, bit-vector, &#8230;</p>
+<p>So I was interested to find one which was new to me, referenced in <a href="http://googleblog.blogspot.com/2007/09/our-plans-for-code-jam.html">this post</a> on the official Google blog. </p>
+<p><span id="continue-reading"/></p>
+<h3 id="little-big-google">Little big Google</h3>
+<p>Actually, Google supply a <a href="http://services.google.com/blog_resources/Google_CodeJam_Practice.pdf">couple of puzzles</a>. The subtext of both is that Google is a <strong>big</strong> company working on <strong>big</strong> problems, but hey!, a <a href="/articles/an-ideal-working-environment.html">childish sense of wonder, curiosity and competition</a> are still encouraged. The first puzzle takes you to a new job in Big City, where the beautiful skyline is filled with millions of impossibly tall thin buildings. The second expands your scope (perhaps due to  over-crowding in BC?) &#8212; now you&#8217;re at Google Moon, searching nothing less than the Universe for nothing more than stock quotes.</p>
+<p>I&#8217;m not going to spoil either puzzle. I won&#8217;t talk about the lunar one since I haven&#8217;t had time to look at it yet, except to say that it looks like a variant on the <a href="http://en.wikipedia.org/wiki/Travelling_salesman_problem">traveling salesman problem</a> (which won&#8217;t make it any easier to solve).</p>
+<h3 id="big-city-skyline">Big City Skyline</h3>
+<p>The Big City Skyline puzzle requires careful budgeting of time and space. I don&#8217;t think it&#8217;s giving much away to say that a quadratic algorithm won&#8217;t cut it. An <code>O(N log N)</code> solution will, though, provided each stage completes in roughly a microsecond &#8212; not unreasonable on a 2GHz machine. The 512MB space limit doesn&#8217;t look too bad since the largest numbers involved fit comfortably into 8 bytes: all you have to do is choose a reasonably compact container and avoid replicating the inputs.</p>
+<p>As usual I put together some unit tests<sup><a href="#footnote2"><a href="http://devcenter.wercker.com/docs/quickstarts/advanced/building-minimal-containers-with-go">2</a></a></sup> and a first implementation using Python. </p>
+<h3 id="wasting-resources">Wasting Resources</h3>
+<p><span id="excerpt0"/>As a rule of thumb, I reckon Python to be an order of magnitude more wasteful of CPU cycles and memory than my favourite low-level language, C++.</p>
+<p>What do I mean by an order of magnitude? Well, it&#8217;s a factor somewhere between 2 and 10. The problem is, I really have no better understanding or control than that. Sometimes it&#8217;s 2, sometimes it&#8217;s 10, sometimes it&#8217;s somewhere in between. I <em>have</em> looked at the CPython implementation, but not closely enough to understand how much memory a list of N large integers requires, nor how long it takes to iterate through such a list. The language reference provides few guarantees.</p>
+<p>This wastefulness doesn&#8217;t just mean a Python program consumes proportionately more resources. It also means there will be a point at which a Python program fails because it exhausts resources and the machine starts to thrash &#8212; and at this point: </p>
 <ol>
- <li>
-     big-O complexity analysis ceases to be of any practical value
- </li>
-
- <li>
-     you&#8217;ll need a higher-spec machine
- </li>
-
- <li>
-     or a leaner program
- </li>
+<li>big-O complexity analysis ceases to be of any practical value</li>
+<li>you&#8217;ll need a higher-spec machine</li>
+<li>or a leaner program</li>
 </ol>
-<p>The Big City Skyline puzzle specifies a target platform (a platform similar to the one I used for the exercise), ruling out option 2.
-</p>
-<p>As you may have guessed, my first Python solution bumped into my machine&#8217;s limits well before I&#8217;d reached the &#8220;hard&#8221; values of N &#8212; a disappointment, though perhaps not a huge surprise. Actually, either a pass or a fail would have been a surpise: I had <em>no way of knowing</em> beforehand. Python does ship with an [<code>array</code> module][array module] which I&#8217;m guessing might have done the job &#8212; had <code>sizeof(int)</code> been 8 on my platform that is, which it isn&#8217;t. There&#8217;s also a [<code>numpy</code> module][numpy module] which provides far more, but which I&#8217;ve never had cause to use yet.
-</p>
-
-<h3>Accounting for Resources</h3>
-<p>I&#8217;ve never had cause to use <code>numpy</code> because I&#8217;m proficient in C and C++. One great thing about C, and to a lesser extent, C++, is that it&#8217;s easy to predict how a simple program will consume resources &#8212; especially if, as in this case, you can use <a href="http://www.sgi.com/tech/stl/table_of_contents.html">standard</a> <code>vectors</code> and <code>algorithms</code>. I reworked my Python program into C++, checked it passed the tests. It then crunched through a random Big City skyline in well under 30 seconds. The important point is that this was <em>not</em> a surprise. I <em>knew</em> how much memory would be needed and (roughly) how much time would be taken.
-</p>
-<p>I was pleased how clean the C++ solution was. It reminded me that on a good day, the C++ standard library allows you to write code which is clear, <a href="http://www.artima.com/cppsource/lazy_builder.html">concise and efficient</a>.
-</p>
-<p><hr />
-   <a id="footnote1">[1]</a>
-</p>
-<p>You&#8217;ll find a decent <a href="http://www.codinghorror.com/blog/archives/000951.html">list of these puzzles</a> and an interesting meta-discussion over at Coding Horror (look in the comments too, where you&#8217;ll find a broken solution to the Google Skyline puzzle).
-</p>
-<p><a id="footnote2">[2]</a>
-</p>
-<p>Unit tests and some timing tests for the skyline puzzle are available via anonymous subversion access at: <code>http://svn.wordaligned.org/svn/etc/skyline</code>
-</p>
+<p>The Big City Skyline puzzle specifies a target platform (a platform similar to the one I used for the exercise), ruling out option 2.</p>
+<p>As you may have guessed, my first Python solution bumped into my machine&#8217;s limits well before I&#8217;d reached the &#8220;hard&#8221; values of N &#8212; a disappointment, though perhaps not a huge surprise. Actually, either a pass or a fail would have been a surpise: I had <em>no way of knowing</em> beforehand. Python does ship with an <a href="http://docs.python.org/lib/module-array.html"><code>array</code> module</a> which I&#8217;m guessing might have done the job &#8212; had <code>sizeof(int)</code> been 8 on my platform that is, which it isn&#8217;t. There&#8217;s also a <a href="http://numpy.scipy.org"><code>numpy</code> module</a> which provides far more, but which I&#8217;ve never had cause to use yet.</p>
+<h3 id="accounting-for-resources">Accounting for Resources</h3>
+<p>I&#8217;ve never had cause to use <code>numpy</code> because I&#8217;m proficient in C and C++. One great thing about C, and to a lesser extent, C++, is that it&#8217;s easy to predict how a simple program will consume resources &#8212; especially if, as in this case, you can use <a href="http://www.sgi.com/tech/stl/table_of_contents.html">standard</a> <code>vectors</code> and <code>algorithms</code>. I reworked my Python program into C++, checked it passed the tests. It then crunched through a random Big City skyline in well under 30 seconds. The important point is that this was <em>not</em> a surprise. I <em>knew</em> how much memory would be needed and (roughly) how much time would be taken.</p>
+<p>I was pleased how clean the C++ solution was. It reminded me that on a good day, the C++ standard library allows you to write code which is clear, <a href="http://www.artima.com/cppsource/lazy_builder.html">concise and efficient</a>.</p>
+<hr />
+<p><a id="footnote1"><a href="https://blog.codeship.com/building-minimal-docker-containers-for-go-applications/">1</a></a></p>
+<p>You&#8217;ll find a decent <a href="http://www.codinghorror.com/blog/archives/000951.html">list of these puzzles</a> and an interesting meta-discussion over at Coding Horror (look in the comments too, where you&#8217;ll find a broken solution to the Google Skyline puzzle).</p>
+<p><a id="footnote2"><a href="http://devcenter.wercker.com/docs/quickstarts/advanced/building-minimal-containers-with-go">2</a></a></p>
+<p>Unit tests and some timing tests for the skyline puzzle are available via anonymous subversion access at: <code>http://svn.wordaligned.org/svn/etc/skyline</code></p>
 </div>
 
 <div class="comments"><hr/><div id="disqus_thread"></div><script type="text/javascript" src="http://disqus.com/forums/wordaligned/embed.js"></script></div>

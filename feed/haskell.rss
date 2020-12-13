@@ -8,15 +8,13 @@
 <language>en-gb</language>
 <item>
 <title>Group When</title>
-<description>&lt;p&gt;Phil Nash&amp;#8217;s recent tweet intrigued me.
-&lt;/p&gt;
-&lt;div&gt;&lt;blockquote class="twitter-tweet" lang="en"&gt;&lt;p&gt;Functional people: I often (in F#) need to process a seq into a smaller list or seq &amp;ndash; where items from the input are grouped in some way&amp;hellip;&lt;/p&gt;&amp;mdash; Phil Nash (@phil_nash) &lt;a href="https://twitter.com/phil_nash/statuses/489167611641724928"&gt;July 15, 2014&lt;/a&gt;&lt;/blockquote&gt;&lt;blockquote class="twitter-tweet" lang="en"&gt;&lt;p&gt;&amp;hellip; the need to group may not be known until after the first item in the group.&amp;#10;I struggle to find a nicely functional way to do this. Ideas?&lt;/p&gt;&amp;mdash; Phil Nash (@phil_nash) &lt;a href="https://twitter.com/phil_nash/statuses/489167962931482626"&gt;July 15, 2014&lt;/a&gt;&lt;/blockquote&gt;&lt;script async src="http://wordaligned.org//platform.twitter.com/widgets.js" charset="utf-8"&gt;&lt;/script&gt;&lt;/div&gt;
+<description>&lt;p&gt;Phil Nash&amp;#8217;s recent tweet intrigued me.&lt;/p&gt;
+&lt;div&gt;&lt;blockquote class=&quot;twitter-tweet&quot; lang=&quot;en&quot;&gt;&lt;p&gt;Functional people: I often (in F#) need to process a seq into a smaller list or seq &amp;ndash; where items from the input are grouped in some way&amp;hellip;&lt;/p&gt;&amp;mdash; Phil Nash (@phil_nash) &lt;a href=&quot;https://twitter.com/phil_nash/statuses/489167611641724928&quot;&gt;July 15, 2014&lt;/a&gt;&lt;/blockquote&gt;&lt;blockquote class=&quot;twitter-tweet&quot; lang=&quot;en&quot;&gt;&lt;p&gt;&amp;hellip; the need to group may not be known until after the first item in the group.&amp;#10;I struggle to find a nicely functional way to do this. Ideas?&lt;/p&gt;&amp;mdash; Phil Nash (@phil_nash) &lt;a href=&quot;https://twitter.com/phil_nash/statuses/489167962931482626&quot;&gt;July 15, 2014&lt;/a&gt;&lt;/blockquote&gt;&lt;script async src=&quot;http://wordaligned.org//platform.twitter.com/widgets.js&quot; charset=&quot;utf-8&quot;&gt;&lt;/script&gt;&lt;/div&gt;
 
-&lt;p&gt;He later clarified what he was after &amp;#8212; and had now found &amp;#8212; linking to a &lt;a href="http://fssnip.net/6A"&gt;solution&lt;/a&gt; posted a couple of years ago by &lt;a href="http://tomasp.net"&gt;Tomas Petricek&lt;/a&gt;. The function &lt;code&gt;groupWhen&lt;/code&gt; splits a sequence into groups, starting a new group whenever the predicate returns true.
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
+&lt;p&gt;He later clarified what he was after &amp;#8212; and had now found &amp;#8212; linking to a &lt;a href=&quot;http://fssnip.net/6A&quot;&gt;solution&lt;/a&gt; posted a couple of years ago by &lt;a href=&quot;http://tomasp.net&quot;&gt;Tomas Petricek&lt;/a&gt;. The function &lt;code&gt;groupWhen&lt;/code&gt; splits a sequence into groups, starting a new group whenever the predicate returns true.&lt;/p&gt;
+&lt;div class=&quot;typocode&quot;&gt;
 
-&lt;pre class="prettyprint"&gt; module Seq =
+&lt;pre class=&quot;prettyprint&quot;&gt; module Seq =
    /// Iterates over elements of the input sequence and groups adjacent elements.
    /// A new group is started when the specified predicate holds about the element
    /// of the sequence (and at the beginning of the iteration).
@@ -26,15 +24,15 @@
    let groupWhen f (input:seq&amp;lt;_&amp;gt;) = seq {
      use en = input.GetEnumerator()
      let running = ref true
-     
+
      // Generate a group starting with the current element. Stops generating
-     // when it founds element such that 'f en.Current' is 'true'
+     // when it founds element such that &amp;#x27;f en.Current&amp;#x27; is &amp;#x27;true&amp;#x27;
      let rec group() = 
        [ yield en.Current
          if en.MoveNext() then
            if not (f en.Current) then yield! group() 
          else running := false ]
-     
+
      if en.MoveNext() then
        // While there are still elements, start a new group
        while running.Value do
@@ -44,21 +42,19 @@
 
 &lt;/div&gt;
 
-&lt;p&gt;Here&amp;#8217;s a nice Haskell version coded up by &lt;a href="https://twitter.com/sdarlington"&gt;@sdarlington&lt;/a&gt;.
-&lt;/p&gt;
-&lt;script src="https://gist.github.com/sdarlington/be76048bff124694769d.js"&gt;&lt;/script&gt;
+&lt;p&gt;Here&amp;#8217;s a nice Haskell version coded up by &lt;a href=&quot;https://twitter.com/sdarlington&quot;&gt;@sdarlington&lt;/a&gt;.&lt;/p&gt;
+&lt;script src=&quot;https://gist.github.com/sdarlington/be76048bff124694769d.js&quot;&gt;&lt;/script&gt;
 
-&lt;p&gt;Maybe &lt;a href="https://docs.python.org/3/library/itertools.html#itertools.takewhile"&gt;takewhile&lt;/a&gt; and &lt;a href="https://docs.python.org/3/library/itertools.html#itertools.dropwhile"&gt;dropwhile&lt;/a&gt; could power a Python solution, but my first choice would be &lt;a href="https://docs.python.org/3/library/itertools.html#itertools.groupby"&gt;itertools.groupby&lt;/a&gt;. &lt;code&gt;Groupby&lt;/code&gt; chops a sequence into subsequences, where the elements of each subsequence have the same key value. A suitable key function, in this case, must change its return value every time the sequence yields an element for which the predicate holds. It could toggle between a pair of values, for example. Or it could just count the number of times the predicate holds.
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
+&lt;p&gt;Maybe &lt;a href=&quot;https://docs.python.org/3/library/itertools.html#itertools.takewhile&quot;&gt;takewhile&lt;/a&gt; and &lt;a href=&quot;https://docs.python.org/3/library/itertools.html#itertools.dropwhile&quot;&gt;dropwhile&lt;/a&gt; could power a Python solution, but my first choice would be &lt;a href=&quot;https://docs.python.org/3/library/itertools.html#itertools.groupby&quot;&gt;itertools.groupby&lt;/a&gt;. &lt;code&gt;Groupby&lt;/code&gt; chops a sequence into subsequences, where the elements of each subsequence have the same key value. A suitable key function, in this case, must change its return value every time the sequence yields an element for which the predicate holds. It could toggle between a pair of values, for example. Or it could just count the number of times the predicate holds.&lt;/p&gt;
+&lt;div class=&quot;typocode&quot;&gt;
 
-&lt;pre class="prettyprint"&gt;class count_p:
-    ''' Return a value which increments every time the predicate holds.
-    '''
+&lt;pre class=&quot;prettyprint&quot;&gt;class count_p:
+    &amp;#x27;&amp;#x27;&amp;#x27; Return a value which increments every time the predicate holds.
+    &amp;#x27;&amp;#x27;&amp;#x27;
     def __init__(self, pred):
         self._n = 0
         self._pred = pred
-    
+
     def __call__(self, v):
         self._n += self._pred(v)
         return self._n
@@ -70,11 +66,10 @@ def group_when(pred, xs):
 
 &lt;/div&gt;
 
-&lt;p&gt;Here, &lt;code&gt;group_when&lt;/code&gt; accepts an iterable and returns an iterable sequence of iterable groups. Clients choose how to consume the results.
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
+&lt;p&gt;Here, &lt;code&gt;group_when&lt;/code&gt; accepts an iterable and returns an iterable sequence of iterable groups. Clients choose how to consume the results.&lt;/p&gt;
+&lt;div class=&quot;typocode&quot;&gt;
 
-&lt;pre class="prettyprint"&gt;&amp;gt;&amp;gt;&amp;gt; def odd(v): return v % 2
+&lt;pre class=&quot;prettyprint&quot;&gt;&amp;gt;&amp;gt;&amp;gt; def odd(v): return v % 2
 &amp;gt;&amp;gt;&amp;gt; xs = group_when(odd, [3, 3, 2, 4, 1, 2])
 &amp;gt;&amp;gt;&amp;gt; print([list(g) for g in xs])
 [[3], [3, 2, 4], [1, 2]]
@@ -83,11 +78,10 @@ def group_when(pred, xs):
 
 &lt;/div&gt;
 
-&lt;p&gt;Note that &lt;code&gt;count_p&lt;/code&gt; does something very like &lt;a href="acc"&gt;itertools.accumulate&lt;/a&gt;. Here&amp;#8217;s another version of &lt;code&gt;group_when&lt;/code&gt; which takes advantage of this.
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
+&lt;p&gt;Note that &lt;code&gt;count_p&lt;/code&gt; does something very like &lt;a href=&quot;acc&quot;&gt;itertools.accumulate&lt;/a&gt;. Here&amp;#8217;s another version of &lt;code&gt;group_when&lt;/code&gt; which takes advantage of this.&lt;/p&gt;
+&lt;div class=&quot;typocode&quot;&gt;
 
-&lt;pre class="prettyprint"&gt;def group_when(pred, xs):
+&lt;pre class=&quot;prettyprint&quot;&gt;def group_when(pred, xs):
     xs, ys = tee(xs)
     accu = accumulate(map(pred, ys))
     return (gp for _, gp in groupby(xs, lambda _: next(accu)))
@@ -96,14 +90,13 @@ def group_when(pred, xs):
 
 &lt;/div&gt;
 
-&lt;p style="text-align:center"&gt;&amp;sect;&lt;/p&gt;
+&lt;p style=&quot;text-align:center&quot;&gt;&amp;sect;&lt;/p&gt;
 
-&lt;p&gt;After a short break, here&amp;#8217;s a third version of &lt;code&gt;group_when&lt;/code&gt;. This is the first time I&amp;#8217;ve found a use for &lt;code&gt;takewhile&lt;/code&gt; and &lt;code&gt;dropwhile&lt;/code&gt;. Beware: as the teed streams &lt;code&gt;xs&lt;/code&gt; and &lt;code&gt;ys&lt;/code&gt; diverge, the amount of backing storage required will grow &amp;#8230; only for the stored values to then be dropped!
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
+&lt;p&gt;After a short break, here&amp;#8217;s a third version of &lt;code&gt;group_when&lt;/code&gt;. This is the first time I&amp;#8217;ve found a use for &lt;code&gt;takewhile&lt;/code&gt; and &lt;code&gt;dropwhile&lt;/code&gt;. Beware: as the teed streams &lt;code&gt;xs&lt;/code&gt; and &lt;code&gt;ys&lt;/code&gt; diverge, the amount of backing storage required will grow &amp;#8230; only for the stored values to then be dropped!&lt;/p&gt;
+&lt;div class=&quot;typocode&quot;&gt;
 
-&lt;pre class="prettyprint"&gt;from itertools import *
- 
+&lt;pre class=&quot;prettyprint&quot;&gt;from itertools import *
+
 def group_when(p, xs):
     def notp(x): return not p(x)
     xs = iter(xs)
@@ -112,10 +105,10 @@ def group_when(p, xs):
         xs, ys = tee(xs)
         yield chain([x], takewhile(notp, xs))
         xs = dropwhile(notp, ys)
- 
+
 def odd(x):
     return x % 2
- 
+
 [list(g) for g in group_when(odd, [3, 3, 2, 4, 1, 2])] # [[3], [3, 2, 4], [1, 2]]
 
 &lt;/pre&gt;
@@ -130,76 +123,54 @@ def odd(x):
 
 <item>
 <title>Launching missiles and other unhappy accidents</title>
-<description>&lt;h3&gt;Team work&lt;/h3&gt;
-&lt;p&gt;&lt;a href="http://en.wikipedia.org/wiki/Buses_in_London"&gt;&lt;img style="float:right;" src="http://upload.wikimedia.org/wikipedia/commons/thumb/d/d0/Routemaster.JPG/180px-Routemaster.JPG" alt="Routemaster bus"/&gt;&lt;/a&gt;
-&lt;/p&gt;
-&lt;p&gt;Only Iain really understood the application engine, a particularly subtle and complex part of our system. We depended on him alone for any modifications in this area. To reduce the risk, the project manager paired me with Iain to work on a new feature for the engine. After all,
-&lt;/p&gt;
-&lt;blockquote&gt;&lt;p&gt;&amp;#8220;What would happen if Iain fell under a bus?&amp;#8221;
-&lt;/p&gt;
-&lt;/blockquote&gt;&lt;p&gt;Well, if something that terrible happened, I don&amp;#8217;t suppose I&amp;#8217;d have cared much about the app engine. As it turned out we never got started on that feature. A customer reported a critical bug in the graphics library &amp;#8212; a more straightforward part of the system, but one which only &lt;strong&gt;I&lt;/strong&gt; knew about &amp;#8212; and by the time I&amp;#8217;d turned in a fix Iain was heading off for the weekend. Celtic were at home to Rangers. He had a plane to catch.
-&lt;/p&gt;
-&lt;p&gt;&lt;a href="http://www.celticfc.net"&gt;&lt;img  src="http://www.celticfc.net/images/doc/celticcrest.png" alt="Celtic FC Logo"/&gt;&lt;/a&gt;
-&lt;/p&gt;
-
-&lt;h3&gt;Haskell makes the A-Z&lt;/h3&gt;
-&lt;p&gt;&lt;a href="http://haskell.org"&gt;&lt;img src="http://haskell.org/wikistatic/haskellwiki_logo.png" alt="Haskell wiki logo" style="float:right;"/&gt;&lt;/a&gt;
-&lt;/p&gt;
-&lt;p&gt;Switching from buses and planes to Haskell, &lt;a href="http://www.computerworld.com.au/index.php/id;1974033854"&gt;Computerworld&amp;#8217;s great A-Z of Programming Languages series&lt;/a&gt; recently featured &lt;a href="http://research.microsoft.com/~simonpj/"&gt;Simon Peyton Jones&lt;/a&gt; talking with characteristic exuberance about the language.
-&lt;/p&gt;
-&lt;p&gt;Haskell&amp;#8217;s roots are in academia. Unlike, say, C++ or Erlang, it wasn&amp;#8217;t created with a particular real world application in mind. Rather, the language aimed at rigorously investigating an approach to programming, that approach being strongly-typed lazily-evaluated functional programming. Pure functional programming, if you like. As the language continues to evolve its purity has not been watered down &amp;#8212; what&amp;#8217;s more, as computer architectures develop, the real world seems to be turning towards Haskell.
-&lt;/p&gt;
-&lt;p&gt;So much for the summary. It&amp;#8217;s the terrible side effects I&amp;#8217;d like to pick up on.
-&lt;/p&gt;
-&lt;span id="continue-reading"/&gt;
-
-
-&lt;h3&gt;Launching Missiles&lt;/h3&gt;
-&lt;p&gt;In the interview Simon Peyton Jones talks about pure functions and side effects, a subject &lt;a href="http://wordaligned.org/articles/programming-nirvana-plan-b.html"&gt;I was lucky enough to hear him present&lt;/a&gt; on at this year&amp;#8217;s ACCU conference.
-&lt;/p&gt;
-&lt;p&gt;Advantage number 1. Pure functions can execute in parallel.
-&lt;/p&gt;
-&lt;blockquote&gt;&lt;p&gt;If the functions that you call do not have any side effect effects behind the scenes, if all they do is compute a value from the input values that you give them, then if you have two such things, you can clearly do them both at the same time. And that&amp;#8217;s purely functional programming. Mainstream languages are, by default, dangerous for parallel evaluation. And purely functional languages are by default fine at parallel evaluation.
-&lt;/p&gt;
-&lt;/blockquote&gt;&lt;p&gt;Advantage number 2. Pure functions are safer.
-&lt;/p&gt;
-&lt;blockquote&gt;&lt;p&gt;Functional, whether lazy or non-lazy, means no side effect. It doesn&amp;#8217;t mess about behind the scenes &amp;#8212; it doesn&amp;#8217;t launch the missiles, it doesn&amp;#8217;t write to the disk.
-&lt;/p&gt;
-&lt;/blockquote&gt;&lt;p&gt;&lt;a href="http://en.wikipedia.org/wiki/Ballistic_missile"&gt;&lt;img src="http://upload.wikimedia.org/wikipedia/commons/thumb/6/60/Minuteman3launch.jpg/300px-Minuteman3launch.jpg" alt="Missile launch"/&gt;&lt;/a&gt;
-&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;Launching missiles?&lt;/strong&gt; As a side effect, it&amp;#8217;s certainly more dangerous than printing &amp;#8220;Hello, World&amp;#8221; to a terminal. Simon Peyton Jones again, in this case discussing what&amp;#8217;s meant by evaluation order, and why strictness matters.
-&lt;/p&gt;
-&lt;blockquote&gt;&lt;p&gt;In theory, lazy evaluation means that you can&amp;#8217;t take the ML or Scheme route of just saying &amp;#8216;oh well, we&amp;#8217;ll just allow you to do input/output side effects&amp;#8217;, as you don&amp;#8217;t know what order they&amp;#8217;ll happen in. You wouldn&amp;#8217;t know if you armed the missiles before launching them, or launched them before arming them.
-&lt;/p&gt;
+<description>&lt;h3 id=&quot;team-work&quot;&gt;Team work&lt;/h3&gt;
+&lt;p&gt;&lt;a href=&quot;http://en.wikipedia.org/wiki/Buses_in_London&quot;&gt;&lt;img style=&quot;float:right;&quot; src=&quot;http://upload.wikimedia.org/wikipedia/commons/thumb/d/d0/Routemaster.JPG/180px-Routemaster.JPG&quot; alt=&quot;Routemaster bus&quot;/&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;Only Iain really understood the application engine, a particularly subtle and complex part of our system. We depended on him alone for any modifications in this area. To reduce the risk, the project manager paired me with Iain to work on a new feature for the engine. After all,&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&amp;#8220;What would happen if Iain fell under a bus?&amp;#8221;&lt;/p&gt;
 &lt;/blockquote&gt;
-&lt;h3&gt;Safety Critical&lt;/h3&gt;
-&lt;p&gt;Haskell&amp;#8217;s roots, as already mentioned, are in academia, but funnily enough Simon Peyton Jones has more teaching experience with a language more traditionally associated with missiles and the military.
-&lt;/p&gt;
-&lt;blockquote&gt;&lt;p&gt;While I was at Glasgow I was exclusively engaged in first year teaching of Ada &amp;#8230;
-&lt;/p&gt;
-&lt;/blockquote&gt;&lt;p&gt;Let&amp;#8217;s suppose Haskell were used to control a hypothetical missile launcher. It&amp;#8217;s true that the &lt;strong&gt;language&lt;/strong&gt; allows programmers to formally partition the system between the safe, pure functions, and those which risk changing the world by probing the launch device; but to be truly confident, we must also test the &lt;strong&gt;platform&lt;/strong&gt;, by which I mean the compiler, the machine code it generates, and indeed the underlying machine which that code executes on.
-&lt;/p&gt;
-&lt;p&gt;Haskell compiler writers have a big responsibility!
-&lt;/p&gt;
-&lt;p&gt;Here&amp;#8217;s an even bigger irony: C, a language as side-effectful as they come, is often used to program military devices for the reason that C, as a platform, is easier to ratify. You compile sample programs, you cross-check the generated assembler.
-&lt;/p&gt;
-&lt;p&gt;OK, I know, I&amp;#8217;m reading far too much into the &amp;#8220;launch the missiles&amp;#8221; example, but I&amp;#8217;ll admit the phrase makes me shiver, much like the hacker term &lt;a href="http://www.catb.org/jargon/html/I/ICBM-address.html"&gt;&amp;#8220;ICBM address&amp;#8221;&lt;/a&gt; for geo-tagging does &amp;#8212; and indeed the suggestion that bus accidents should motivate team work.
-&lt;/p&gt;
-&lt;p&gt;Somewhere out there, computer programs really do have the power to launch missiles. I couldn&amp;#8217;t find any report of disaster caused by such a program but I did find &lt;a href="http://www.wired.com/science/discoveries/news/2007/09/dayintech_0926"&gt;this story&lt;/a&gt; about a satellite early warning system reporting &lt;strong&gt;in error&lt;/strong&gt; that five ballistic missiles had been launched at Russia. 
-   Fortunately duty officer Lt. Col. Stanislav Petrov smelled a rat.
-&lt;/p&gt;
-&lt;blockquote&gt;&lt;p&gt;&amp;#8220;I had a funny feeling in my gut&amp;#8221; that this was a false alarm. For one thing, the report indicated that only five missiles had been fired. Had the United States been launching an actual nuclear attack, he reasoned, ICBMs would be raining down on them.
-&lt;/p&gt;
+&lt;p&gt;Well, if something that terrible happened, I don&amp;#8217;t suppose I&amp;#8217;d have cared much about the app engine. As it turned out we never got started on that feature. A customer reported a critical bug in the graphics library &amp;#8212; a more straightforward part of the system, but one which only &lt;strong&gt;I&lt;/strong&gt; knew about &amp;#8212; and by the time I&amp;#8217;d turned in a fix Iain was heading off for the weekend. Celtic were at home to Rangers. He had a plane to catch.&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;http://www.celticfc.net&quot;&gt;&lt;img  src=&quot;http://www.celticfc.net/images/doc/celticcrest.png&quot; alt=&quot;Celtic FC Logo&quot;/&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;h3 id=&quot;haskell-makes-the-a-z&quot;&gt;Haskell makes the A-Z&lt;/h3&gt;
+&lt;p&gt;&lt;a href=&quot;http://haskell.org&quot;&gt;&lt;img src=&quot;http://haskell.org/wikistatic/haskellwiki_logo.png&quot; alt=&quot;Haskell wiki logo&quot; style=&quot;float:right;&quot;/&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;Switching from buses and planes to Haskell, &lt;a href=&quot;http://www.computerworld.com.au/index.php/id;1974033854&quot;&gt;Computerworld&amp;#8217;s great A-Z of Programming Languages series&lt;/a&gt; recently featured &lt;a href=&quot;http://research.microsoft.com/~simonpj/&quot;&gt;Simon Peyton Jones&lt;/a&gt; talking with characteristic exuberance about the language.&lt;/p&gt;
+&lt;p&gt;Haskell&amp;#8217;s roots are in academia. Unlike, say, C++ or Erlang, it wasn&amp;#8217;t created with a particular real world application in mind. Rather, the language aimed at rigorously investigating an approach to programming, that approach being strongly-typed lazily-evaluated functional programming. Pure functional programming, if you like. As the language continues to evolve its purity has not been watered down &amp;#8212; what&amp;#8217;s more, as computer architectures develop, the real world seems to be turning towards Haskell.&lt;/p&gt;
+&lt;p&gt;So much for the summary. It&amp;#8217;s the terrible side effects I&amp;#8217;d like to pick up on.&lt;/p&gt;
+&lt;p&gt;&lt;span id=&quot;continue-reading&quot;/&gt;&lt;/p&gt;
+&lt;h3 id=&quot;launching-missiles&quot;&gt;Launching Missiles&lt;/h3&gt;
+&lt;p&gt;In the interview Simon Peyton Jones talks about pure functions and side effects, a subject &lt;a href=&quot;http://wordaligned.org/articles/programming-nirvana-plan-b.html&quot;&gt;I was lucky enough to hear him present&lt;/a&gt; on at this year&amp;#8217;s ACCU conference.&lt;/p&gt;
+&lt;p&gt;Advantage number 1. Pure functions can execute in parallel.&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;If the functions that you call do not have any side effect effects behind the scenes, if all they do is compute a value from the input values that you give them, then if you have two such things, you can clearly do them both at the same time. And that&amp;#8217;s purely functional programming. Mainstream languages are, by default, dangerous for parallel evaluation. And purely functional languages are by default fine at parallel evaluation.&lt;/p&gt;
 &lt;/blockquote&gt;
-&lt;h3&gt;Falling under a bus&lt;/h3&gt;
-&lt;p&gt;There was no sign of Iain at work on the Monday morning, and he&amp;#8217;d normally be one of the first in. I had a funny feeling in my gut when the project manager summarily told us to stop what we were doing and gather for an all-hands meeting. Something serious had happened. Maybe we&amp;#8217;d been taken over or someone had been sacked. Actually, it was worse than that.
-&lt;/p&gt;
-&lt;p&gt;We all stood in the centre of the open-plan office, shuffling, shutting phones down, waiting. The project manager broke the news. This morning he&amp;#8217;d had a call. On Saturday, Iain had been at the match with some friends. Afterwards, heading away from the ground, no doubt jostled by the crowd, he&amp;#8217;d fallen into the road. He&amp;#8217;d been hit by a bus. Emergency brain surgery &amp;#8230; a helicopter flight &amp;#8230; more surgery to follow &amp;#8230; the situation looked bad &amp;#8230; would keep us all informed.
-&lt;/p&gt;
-
-&lt;h3&gt;Outcome&lt;/h3&gt;
-&lt;p&gt;After a long period of convalescence Iain returned to work. He has some chilling scars and trouble with tinnitus. Otherwise, he was lucky. Now, when we shuffle work around so as not to depend on one person, we don&amp;#8217;t talk about falling under buses.
-&lt;/p&gt;</description>
+&lt;p&gt;Advantage number 2. Pure functions are safer.&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Functional, whether lazy or non-lazy, means no side effect. It doesn&amp;#8217;t mess about behind the scenes &amp;#8212; it doesn&amp;#8217;t launch the missiles, it doesn&amp;#8217;t write to the disk.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;&lt;a href=&quot;http://en.wikipedia.org/wiki/Ballistic_missile&quot;&gt;&lt;img src=&quot;http://upload.wikimedia.org/wikipedia/commons/thumb/6/60/Minuteman3launch.jpg/300px-Minuteman3launch.jpg&quot; alt=&quot;Missile launch&quot;/&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Launching missiles?&lt;/strong&gt; As a side effect, it&amp;#8217;s certainly more dangerous than printing &amp;#8220;Hello, World&amp;#8221; to a terminal. Simon Peyton Jones again, in this case discussing what&amp;#8217;s meant by evaluation order, and why strictness matters.&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;In theory, lazy evaluation means that you can&amp;#8217;t take the ML or Scheme route of just saying &amp;#8216;oh well, we&amp;#8217;ll just allow you to do input/output side effects&amp;#8217;, as you don&amp;#8217;t know what order they&amp;#8217;ll happen in. You wouldn&amp;#8217;t know if you armed the missiles before launching them, or launched them before arming them.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h3 id=&quot;safety-critical&quot;&gt;Safety Critical&lt;/h3&gt;
+&lt;p&gt;Haskell&amp;#8217;s roots, as already mentioned, are in academia, but funnily enough Simon Peyton Jones has more teaching experience with a language more traditionally associated with missiles and the military.&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;While I was at Glasgow I was exclusively engaged in first year teaching of Ada &amp;#8230;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;Let&amp;#8217;s suppose Haskell were used to control a hypothetical missile launcher. It&amp;#8217;s true that the &lt;strong&gt;language&lt;/strong&gt; allows programmers to formally partition the system between the safe, pure functions, and those which risk changing the world by probing the launch device; but to be truly confident, we must also test the &lt;strong&gt;platform&lt;/strong&gt;, by which I mean the compiler, the machine code it generates, and indeed the underlying machine which that code executes on.&lt;/p&gt;
+&lt;p&gt;Haskell compiler writers have a big responsibility!&lt;/p&gt;
+&lt;p&gt;Here&amp;#8217;s an even bigger irony: C, a language as side-effectful as they come, is often used to program military devices for the reason that C, as a platform, is easier to ratify. You compile sample programs, you cross-check the generated assembler.&lt;/p&gt;
+&lt;p&gt;OK, I know, I&amp;#8217;m reading far too much into the &amp;#8220;launch the missiles&amp;#8221; example, but I&amp;#8217;ll admit the phrase makes me shiver, much like the hacker term &lt;a href=&quot;http://www.catb.org/jargon/html/I/ICBM-address.html&quot;&gt;&amp;#8220;ICBM address&amp;#8221;&lt;/a&gt; for geo-tagging does &amp;#8212; and indeed the suggestion that bus accidents should motivate team work.&lt;/p&gt;
+&lt;p&gt;Somewhere out there, computer programs really do have the power to launch missiles. I couldn&amp;#8217;t find any report of disaster caused by such a program but I did find &lt;a href=&quot;http://www.wired.com/science/discoveries/news/2007/09/dayintech_0926&quot;&gt;this story&lt;/a&gt; about a satellite early warning system reporting &lt;strong&gt;in error&lt;/strong&gt; that five ballistic missiles had been launched at Russia. 
+Fortunately duty officer Lt. Col. Stanislav Petrov smelled a rat.&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&amp;#8220;I had a funny feeling in my gut&amp;#8221; that this was a false alarm. For one thing, the report indicated that only five missiles had been fired. Had the United States been launching an actual nuclear attack, he reasoned, ICBMs would be raining down on them.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h3 id=&quot;falling-under-a-bus&quot;&gt;Falling under a bus&lt;/h3&gt;
+&lt;p&gt;There was no sign of Iain at work on the Monday morning, and he&amp;#8217;d normally be one of the first in. I had a funny feeling in my gut when the project manager summarily told us to stop what we were doing and gather for an all-hands meeting. Something serious had happened. Maybe we&amp;#8217;d been taken over or someone had been sacked. Actually, it was worse than that.&lt;/p&gt;
+&lt;p&gt;We all stood in the centre of the open-plan office, shuffling, shutting phones down, waiting. The project manager broke the news. This morning he&amp;#8217;d had a call. On Saturday, Iain had been at the match with some friends. Afterwards, heading away from the ground, no doubt jostled by the crowd, he&amp;#8217;d fallen into the road. He&amp;#8217;d been hit by a bus. Emergency brain surgery &amp;#8230; a helicopter flight &amp;#8230; more surgery to follow &amp;#8230; the situation looked bad &amp;#8230; would keep us all informed.&lt;/p&gt;
+&lt;h3 id=&quot;outcome&quot;&gt;Outcome&lt;/h3&gt;
+&lt;p&gt;After a long period of convalescence Iain returned to work. He has some chilling scars and trouble with tinnitus. Otherwise, he was lucky. Now, when we shuffle work around so as not to depend on one person, we don&amp;#8217;t talk about falling under buses.&lt;/p&gt;</description>
 <dc:date>2008-09-28</dc:date>
 <guid>http://wordaligned.org/articles/launching-missiles-and-other-unhappy-accidents</guid>
 <author>tag@wordaligned.org (Thomas Guest)</author>
@@ -209,65 +180,29 @@ def odd(x):
 
 <item>
 <title>Programming Nirvana, Plan B</title>
-<description>&lt;h3&gt;Caging the Effects Monster&lt;/h3&gt;
-&lt;p&gt;&lt;a href="http://research.microsoft.com/~simonpj/"&gt;&lt;img src="http://research.microsoft.com/~simonpj/GIFs/spj-snow.jpg" alt="Simon Peyton Jones in the snow" style="float:right;"/&gt;&lt;/a&gt;
-&lt;/p&gt;
-&lt;p&gt;&lt;a href="http://research.microsoft.com/~simonpj/"&gt;Simon Peyton Jones&lt;/a&gt; gave an outstanding &lt;a href="http://accu.org/index.php/conferences/accu_conference_2008/accu2008_sessions#Caging%20the%20Effects%20Monster:%20the%20next%20decade's%20big%20challenge"&gt;keynote&lt;/a&gt; on functional programming at &lt;a href="http://accu.org/index.php/conferences/accu_conference_2008"&gt;ACCU 2008&lt;/a&gt;. A language researcher at Microsoft in Cambridge, he&amp;#8217;s perhaps best known as the man behind the &lt;a href="http://haskell.org"&gt;Haskell&lt;/a&gt; programming language and &lt;a href="http://haskell.org/ghc/"&gt;GHC&lt;/a&gt;, the leading Haskell compiler. He also happens to be a superb presenter who positively exudes enthusiasm. &lt;span /&gt;Not many compiler writers connect so well with an audience.
-&lt;/p&gt;
-&lt;span id="continue-reading"/&gt;
-
-&lt;p&gt;I&amp;#8217;m a huge fan of a functional programming &lt;em&gt;style&lt;/em&gt;, by which I mean I like first class functions, higher order functions, anonymous functions, list comprehensions, closures and so on. In the languages I use most often, &lt;a href="http://wordaligned.org/tags/c++"&gt;C++&lt;/a&gt;, &lt;a href="http://wordaligned.org/tags/python"&gt;Python&lt;/a&gt; and &lt;a href="http://wordaligned.org/tags/shell"&gt;Shell&lt;/a&gt;, functional programming is a central paradigm &amp;#8212; every bit as useful and important as object-oriented and procedural programming.
-&lt;/p&gt;
-&lt;p&gt;For Haskell and other pure functional languages it&amp;#8217;s not just about style. Simon Peyton Jones&amp;#8217; central argument was that &lt;span /&gt;programming will increasingly be about the control of side-effects: to write correct programs, side-effects must be contained. A pure function has &lt;strong&gt;no&lt;/strong&gt; side-effects. Thus you can be sure what it does. You can even &lt;strong&gt;prove&lt;/strong&gt; it correct. A pure program built entirely from pure functions is equally correct but, sadly, of limited use. Haskell&amp;#8217;s type system distinguishes pure functions from impure ones &amp;#8212; the ones which change the world. If you minimise and contain impurity, you&amp;#8217;re winning!
-&lt;/p&gt;
-&lt;img src="http://wordaligned.org/images/the-challenge-of-effects.jpg" alt="The challenge of effects"/&gt;
-
-&lt;p&gt;It&amp;#8217;s certainly a compelling argument. In the languages I use from day to day, as already mentioned, I favour a functional style. I also adopt value-based programming (sometimes known as single assignment programming &amp;#8212; once you&amp;#8217;ve set something, you don&amp;#8217;t change it) as far as possible: it&amp;#8217;s easier to figure out what a program does, and you can avoid a whole class of defects. Simon Peyton Jones describes my approach as &amp;#8220;Plan A&amp;#8221;, the mainstream route towards writing programs which are both useful and safe. He promotes &amp;#8220;Plan B&amp;#8221;, a more radical approach, where &amp;#8220;useless&amp;#8221; languages like Haskell find ways to change the world.
-&lt;/p&gt;
-
-&lt;h3&gt;Strong Static Typing&lt;/h3&gt;
-&lt;p&gt;Static type checking is central to Haskell and the language comes with a rich type system allowing static analysis and compile-time checking. It&amp;#8217;s the type system which determines, rigorously, which parts of a program have side-effects. Unlike C++, the type system doesn&amp;#8217;t seem to get in the way. A lot more is inferred. In fact, some type declarations are unnecessary since the compiler could deduce them from the code &amp;#8212; but in Haskell type declarations, at least for module exports, are seen as a good thing. 
-&lt;/p&gt;
-&lt;p&gt;I found this interesting. Although I like dynamic languages I also like strong typing (yes, you can have both). In theory, static strong typing would be best of all; you eliminate the bug before you run the code. My experience with languages like C++ and Java have caused me to kick against this theory. The C++ type system just seems to get in your way: by the time you&amp;#8217;ve &lt;a href="http://wordaligned.org/articles/koenigs-first-rule-of-debugging.html#a-problem-on-line-106"&gt;wrestled the compiler into submission&lt;/a&gt; and got a program you can actually run you&amp;#8217;ve worked so hard you feel like it &lt;em&gt;must&lt;/em&gt; be good, when actually you&amp;#8217;d have been better off running, testing, revising the code in an iterative manner. You&amp;#8217;d certainly have had more fun! Haskell, though, may cause me to revise my opinion once again. It may indeed offer the benefits of strong static typing without the baggage.
-&lt;/p&gt;
-
-&lt;h3&gt;A Taste of Haskell&lt;/h3&gt;
-&lt;p&gt;&lt;a href="http://haskell.org"&gt;&lt;img src="http://haskell.org/wikistatic/haskellwiki_logo.png" alt="Haskell wiki logo" style="float:right;"/&gt;&lt;/a&gt;
-&lt;/p&gt;
-&lt;p&gt;In the afternoon I attended Simon Peyton Jones&amp;#8217; &lt;a href="http://accu.org/index.php/conferences/accu_conference_2008/accu2008_sessions#A%20Taste%20of%20Haskell"&gt;&amp;#8220;Taste of Haskell&amp;#8221;&lt;/a&gt; tutorial, which went into Haskell in more depth. The room was packed and people had to be turned away. Although I have written and read some Haskell I know very little about it, and three hours training with the world expert on the subject haven&amp;#8217;t really altered that. Nonetheless, I&amp;#8217;d like to record my first impressions here. They may all turn out to be wrong!
-&lt;/p&gt;
+<description>&lt;h3 id=&quot;caging-the-effects-monster&quot;&gt;Caging the Effects Monster&lt;/h3&gt;
+&lt;p&gt;&lt;a href=&quot;http://research.microsoft.com/~simonpj/&quot;&gt;&lt;img src=&quot;http://research.microsoft.com/~simonpj/GIFs/spj-snow.jpg&quot; alt=&quot;Simon Peyton Jones in the snow&quot; style=&quot;float:right;&quot;/&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;http://research.microsoft.com/~simonpj/&quot;&gt;Simon Peyton Jones&lt;/a&gt; gave an outstanding &lt;a href=&quot;http://accu.org/index.php/conferences/accu_conference_2008/accu2008_sessions#Caging%20the%20Effects%20Monster:%20the%20next%20decade&#x27;s%20big%20challenge&quot;&gt;keynote&lt;/a&gt; on functional programming at &lt;a href=&quot;http://accu.org/index.php/conferences/accu_conference_2008&quot;&gt;ACCU 2008&lt;/a&gt;. A language researcher at Microsoft in Cambridge, he&amp;#8217;s perhaps best known as the man behind the &lt;a href=&quot;http://haskell.org&quot;&gt;Haskell&lt;/a&gt; programming language and &lt;a href=&quot;http://haskell.org/ghc/&quot;&gt;GHC&lt;/a&gt;, the leading Haskell compiler. He also happens to be a superb presenter who positively exudes enthusiasm. &lt;span /&gt;Not many compiler writers connect so well with an audience.&lt;/p&gt;
+&lt;p&gt;&lt;span id=&quot;continue-reading&quot;/&gt;&lt;/p&gt;
+&lt;p&gt;I&amp;#8217;m a huge fan of a functional programming &lt;em&gt;style&lt;/em&gt;, by which I mean I like first class functions, higher order functions, anonymous functions, list comprehensions, closures and so on. In the languages I use most often, &lt;a href=&quot;http://wordaligned.org/tags/c++&quot;&gt;C++&lt;/a&gt;, &lt;a href=&quot;http://wordaligned.org/tags/python&quot;&gt;Python&lt;/a&gt; and &lt;a href=&quot;http://wordaligned.org/tags/shell&quot;&gt;Shell&lt;/a&gt;, functional programming is a central paradigm &amp;#8212; every bit as useful and important as object-oriented and procedural programming.&lt;/p&gt;
+&lt;p&gt;For Haskell and other pure functional languages it&amp;#8217;s not just about style. Simon Peyton Jones&amp;#8217; central argument was that &lt;span /&gt;programming will increasingly be about the control of side-effects: to write correct programs, side-effects must be contained. A pure function has &lt;strong&gt;no&lt;/strong&gt; side-effects. Thus you can be sure what it does. You can even &lt;strong&gt;prove&lt;/strong&gt; it correct. A pure program built entirely from pure functions is equally correct but, sadly, of limited use. Haskell&amp;#8217;s type system distinguishes pure functions from impure ones &amp;#8212; the ones which change the world. If you minimise and contain impurity, you&amp;#8217;re winning!&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;http://wordaligned.org/images/the-challenge-of-effects.jpg&quot; alt=&quot;The challenge of effects&quot;/&gt;&lt;/p&gt;
+&lt;p&gt;It&amp;#8217;s certainly a compelling argument. In the languages I use from day to day, as already mentioned, I favour a functional style. I also adopt value-based programming (sometimes known as single assignment programming &amp;#8212; once you&amp;#8217;ve set something, you don&amp;#8217;t change it) as far as possible: it&amp;#8217;s easier to figure out what a program does, and you can avoid a whole class of defects. Simon Peyton Jones describes my approach as &amp;#8220;Plan A&amp;#8221;, the mainstream route towards writing programs which are both useful and safe. He promotes &amp;#8220;Plan B&amp;#8221;, a more radical approach, where &amp;#8220;useless&amp;#8221; languages like Haskell find ways to change the world.&lt;/p&gt;
+&lt;h3 id=&quot;strong-static-typing&quot;&gt;Strong Static Typing&lt;/h3&gt;
+&lt;p&gt;Static type checking is central to Haskell and the language comes with a rich type system allowing static analysis and compile-time checking. It&amp;#8217;s the type system which determines, rigorously, which parts of a program have side-effects. Unlike C++, the type system doesn&amp;#8217;t seem to get in the way. A lot more is inferred. In fact, some type declarations are unnecessary since the compiler could deduce them from the code &amp;#8212; but in Haskell type declarations, at least for module exports, are seen as a good thing. &lt;/p&gt;
+&lt;p&gt;I found this interesting. Although I like dynamic languages I also like strong typing (yes, you can have both). In theory, static strong typing would be best of all; you eliminate the bug before you run the code. My experience with languages like C++ and Java have caused me to kick against this theory. The C++ type system just seems to get in your way: by the time you&amp;#8217;ve &lt;a href=&quot;http://wordaligned.org/articles/koenigs-first-rule-of-debugging.html#a-problem-on-line-106&quot;&gt;wrestled the compiler into submission&lt;/a&gt; and got a program you can actually run you&amp;#8217;ve worked so hard you feel like it &lt;em&gt;must&lt;/em&gt; be good, when actually you&amp;#8217;d have been better off running, testing, revising the code in an iterative manner. You&amp;#8217;d certainly have had more fun! Haskell, though, may cause me to revise my opinion once again. It may indeed offer the benefits of strong static typing without the baggage.&lt;/p&gt;
+&lt;h3 id=&quot;a-taste-of-haskell&quot;&gt;A Taste of Haskell&lt;/h3&gt;
+&lt;p&gt;&lt;a href=&quot;http://haskell.org&quot;&gt;&lt;img src=&quot;http://haskell.org/wikistatic/haskellwiki_logo.png&quot; alt=&quot;Haskell wiki logo&quot; style=&quot;float:right;&quot;/&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;In the afternoon I attended Simon Peyton Jones&amp;#8217; &lt;a href=&quot;http://accu.org/index.php/conferences/accu_conference_2008/accu2008_sessions#A%20Taste%20of%20Haskell&quot;&gt;&amp;#8220;Taste of Haskell&amp;#8221;&lt;/a&gt; tutorial, which went into Haskell in more depth. The room was packed and people had to be turned away. Although I have written and read some Haskell I know very little about it, and three hours training with the world expert on the subject haven&amp;#8217;t really altered that. Nonetheless, I&amp;#8217;d like to record my first impressions here. They may all turn out to be wrong!&lt;/p&gt;
 &lt;ul&gt;
- &lt;li&gt;
-     I still maintain &lt;a href="http://wordaligned.org/articles/from-hash-key-to-haskell.html"&gt;Haskell could do with proper characters&lt;/a&gt; for arrows, lambda, forall, function composition and so on. And guess what: GHC does indeed support Unicode, so you &lt;em&gt;can&lt;/em&gt; write a program which uses &amp;#x2200; instead of &lt;code&gt;forall&lt;/code&gt;, for example. All you have to do is figure out how to input these characters.
- &lt;/li&gt;
-
- &lt;li&gt;
-     It&amp;#8217;s not a minimal language, unlike, say, Scheme; there&amp;#8217;s a lot of syntactic sugar, a deliberate decision, but nonetheless a concern. It will take a while before I get used to the syntax even if the concepts seem clear.
- &lt;/li&gt;
-
- &lt;li&gt;
-     Most (possibly all?) functions take a single argument; so a function taking two arguments is actually a one-argument function which returns another one-argument function.
- &lt;/li&gt;
-
- &lt;li&gt;
-     You can write your own infix operators and set their precedence.
- &lt;/li&gt;
-
- &lt;li&gt;
-     Don&amp;#8217;t be frightened by &lt;a href="http://homepages.inf.ed.ac.uk/wadler/topics/monads.html"&gt;Monads&lt;/a&gt;. They should really be called &amp;#8220;warm fluffy things&amp;#8221;.
- &lt;/li&gt;
-
- &lt;li&gt;
-     Haskell is, by default, lazily evaluated. So it elegantly solves all the &lt;a href="http://wordaligned.org/tag/streams/"&gt;stream-based&lt;/a&gt; puzzles I&amp;#8217;ve been posing on this site. What was new to me was the suggestion that lazy evaluation somehow removes the need for Lisp-style macros. I wonder &lt;a href="http://reddit.com/r/programming/info/6en91/comments/"&gt;what&amp;#8217;s meant by this&lt;/a&gt;?
- &lt;/li&gt;
-
- &lt;li&gt;
-     Perhaps Haskell remains a vehicle for programming language research as well as for practical application. &lt;a href="http://haskell.org/ghc/"&gt;GHC&lt;/a&gt; provides many extensions to the Haskell 98 standard, to the extent that some extensions have effectively become standard.
- &lt;/li&gt;
-
- &lt;li&gt;
-     The best book about Haskell hasn&amp;#8217;t been finished yet. It&amp;#8217;s called &lt;a href="http://book.realworldhaskell.org/"&gt;&amp;#8220;Real World Haskell&amp;#8221;&lt;/a&gt; and it&amp;#8217;s being written collaboratively.
- &lt;/li&gt;
+&lt;li&gt;I still maintain &lt;a href=&quot;http://wordaligned.org/articles/from-hash-key-to-haskell.html&quot;&gt;Haskell could do with proper characters&lt;/a&gt; for arrows, lambda, forall, function composition and so on. And guess what: GHC does indeed support Unicode, so you &lt;em&gt;can&lt;/em&gt; write a program which uses &amp;#x2200; instead of &lt;code&gt;forall&lt;/code&gt;, for example. All you have to do is figure out how to input these characters.&lt;/li&gt;
+&lt;li&gt;It&amp;#8217;s not a minimal language, unlike, say, Scheme; there&amp;#8217;s a lot of syntactic sugar, a deliberate decision, but nonetheless a concern. It will take a while before I get used to the syntax even if the concepts seem clear.&lt;/li&gt;
+&lt;li&gt;Most (possibly all?) functions take a single argument; so a function taking two arguments is actually a one-argument function which returns another one-argument function.&lt;/li&gt;
+&lt;li&gt;You can write your own infix operators and set their precedence.&lt;/li&gt;
+&lt;li&gt;Don&amp;#8217;t be frightened by &lt;a href=&quot;http://homepages.inf.ed.ac.uk/wadler/topics/monads.html&quot;&gt;Monads&lt;/a&gt;. They should really be called &amp;#8220;warm fluffy things&amp;#8221;.&lt;/li&gt;
+&lt;li&gt;Haskell is, by default, lazily evaluated. So it elegantly solves all the &lt;a href=&quot;http://wordaligned.org/tag/streams/&quot;&gt;stream-based&lt;/a&gt; puzzles I&amp;#8217;ve been posing on this site. What was new to me was the suggestion that lazy evaluation somehow removes the need for Lisp-style macros. I wonder &lt;a href=&quot;http://reddit.com/r/programming/info/6en91/comments/&quot;&gt;what&amp;#8217;s meant by this&lt;/a&gt;?&lt;/li&gt;
+&lt;li&gt;Perhaps Haskell remains a vehicle for programming language research as well as for practical application. &lt;a href=&quot;http://haskell.org/ghc/&quot;&gt;GHC&lt;/a&gt; provides many extensions to the Haskell 98 standard, to the extent that some extensions have effectively become standard.&lt;/li&gt;
+&lt;li&gt;The best book about Haskell hasn&amp;#8217;t been finished yet. It&amp;#8217;s called &lt;a href=&quot;http://book.realworldhaskell.org/&quot;&gt;&amp;#8220;Real World Haskell&amp;#8221;&lt;/a&gt; and it&amp;#8217;s being written collaboratively.&lt;/li&gt;
 &lt;/ul&gt;</description>
 <dc:date>2008-04-04</dc:date>
 <guid>http://wordaligned.org/articles/programming-nirvana-plan-b</guid>
@@ -278,17 +213,14 @@ def odd(x):
 
 <item>
 <title>Fun with Erlang, ACCU 2008</title>
-<description>&lt;p&gt;I&amp;#8217;ve just got back from a &lt;a href="http://accu.org/index.php/conferences/accu_conference_2008/accu2008_sessions#Fun%20with%20Erlang"&gt;one day course on Erlang&lt;/a&gt; given by its inventor, Joe Armstrong, at day 0 of the &lt;a href="http://accu.org/index.php/conferences/accu_conference_2008"&gt;ACCU 2008 conference&lt;/a&gt;. Actually, he crammed as much as he could from a three day course into a single day. I&amp;#8217;m not too disappointed we didn&amp;#8217;t reach the stated aim of the course, of developing and running a networked application and changing it on the fly: I&amp;#8217;m happy enough to have written some &lt;a href="http://erlang.org"&gt;Erlang&lt;/a&gt; code and been exposed to some new ideas.
-&lt;/p&gt;
-&lt;div class="amazon"&gt;&lt;a href="http://www.amazon.com/gp/product/193435600X?ie=UTF8&amp;amp;tag=wordalig-20&amp;amp;linkCode=as2&amp;amp;camp=1789&amp;amp;creative=9325&amp;amp;creativeASIN=193435600X"&gt;&lt;img src="http://wordaligned.org/images/programming-erlang.jpg" alt="Programming Erlang"/&gt;&lt;/a&gt;&lt;/div&gt;
+<description>&lt;p&gt;I&amp;#8217;ve just got back from a &lt;a href=&quot;http://accu.org/index.php/conferences/accu_conference_2008/accu2008_sessions#Fun%20with%20Erlang&quot;&gt;one day course on Erlang&lt;/a&gt; given by its inventor, Joe Armstrong, at day 0 of the &lt;a href=&quot;http://accu.org/index.php/conferences/accu_conference_2008&quot;&gt;ACCU 2008 conference&lt;/a&gt;. Actually, he crammed as much as he could from a three day course into a single day. I&amp;#8217;m not too disappointed we didn&amp;#8217;t reach the stated aim of the course, of developing and running a networked application and changing it on the fly: I&amp;#8217;m happy enough to have written some &lt;a href=&quot;http://erlang.org&quot;&gt;Erlang&lt;/a&gt; code and been exposed to some new ideas.&lt;/p&gt;
+&lt;div class=&quot;amazon&quot;&gt;&lt;a href=&quot;http://www.amazon.com/gp/product/193435600X?ie=UTF8&amp;amp;tag=wordalig-20&amp;amp;linkCode=as2&amp;amp;camp=1789&amp;amp;creative=9325&amp;amp;creativeASIN=193435600X&quot;&gt;&lt;img src=&quot;http://wordaligned.org/images/programming-erlang.jpg&quot; alt=&quot;Programming Erlang&quot;/&gt;&lt;/a&gt;&lt;/div&gt;
 
-&lt;p&gt;Armstrong is affable and enthusiastic and not afraid to voice his opinions. He&amp;#8217;s a good teacher. I do recommend his book, &lt;a href="http://www.amazon.com/gp/product/193435600X?ie=UTF8&amp;amp;amp;tag=wordalig-20&amp;amp;amp;linkCode=as2&amp;amp;amp;camp=1789&amp;amp;amp;creative=9325&amp;amp;amp;creativeASIN=193435600X"&gt;&amp;#8220;Programming Erlang: Software for a Concurrent World&amp;#8221;&lt;/a&gt;, but found the tone a bit matey in places. In person he&amp;#8217;s much more direct and engaging.
-&lt;/p&gt;
-&lt;p&gt;&lt;a href="http://erlang.org"&gt;Erlang&lt;/a&gt; is a functional programming language which builds in support for multiple processes &amp;#8212; these are &lt;em&gt;not&lt;/em&gt; operating system processes; and in some ways, Erlang &lt;em&gt;is&lt;/em&gt; the operating system. You define functions and other rules and controls using pattern matching. When patterns are used to dispatch message responses in a &lt;code&gt;receive&lt;/code&gt; statement, the code reads well, and functions can be defined using patterns in an elegant and concise way &amp;#8212; no if-this-then-that-else-other.
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
+&lt;p&gt;Armstrong is affable and enthusiastic and not afraid to voice his opinions. He&amp;#8217;s a good teacher. I do recommend his book, &lt;a href=&quot;http://www.amazon.com/gp/product/193435600X?ie=UTF8&amp;amp;tag=wordalig-20&amp;amp;linkCode=as2&amp;amp;camp=1789&amp;amp;creative=9325&amp;amp;creativeASIN=193435600X&quot;&gt;&amp;#8220;Programming Erlang: Software for a Concurrent World&amp;#8221;&lt;/a&gt;, but found the tone a bit matey in places. In person he&amp;#8217;s much more direct and engaging.&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;http://erlang.org&quot;&gt;Erlang&lt;/a&gt; is a functional programming language which builds in support for multiple processes &amp;#8212; these are &lt;em&gt;not&lt;/em&gt; operating system processes; and in some ways, Erlang &lt;em&gt;is&lt;/em&gt; the operating system. You define functions and other rules and controls using pattern matching. When patterns are used to dispatch message responses in a &lt;code&gt;receive&lt;/code&gt; statement, the code reads well, and functions can be defined using patterns in an elegant and concise way &amp;#8212; no if-this-then-that-else-other.&lt;/p&gt;
+&lt;div class=&quot;typocode&quot;&gt;
 
-&lt;pre class="prettyprint"&gt;-module(accum).
+&lt;pre class=&quot;prettyprint&quot;&gt;-module(accum).
 -export([evens_and_odds/1]).
 -import(lists, [reverse/1]).
 
@@ -302,20 +234,15 @@ evens_and_odds([], E, O)    -&amp;gt;  {E, O}.
 
 &lt;/div&gt;
 
-&lt;p&gt;(I know this example should be coded using &lt;code&gt;lists:partition&lt;/code&gt;, it&amp;#8217;s just here to show the pattern syntax.)
-&lt;/p&gt;
-&lt;p&gt;&lt;a href="http://www.sics.se/~joe/images/mc.jpg" title="Joe Armstrong and the big thumper"&gt;&lt;img src="http://www.sics.se/~joe/images/joe_mc.jpg" alt="Joe Armstrong and the big thumper" style="float:right;"/&gt;&lt;/a&gt;
-&lt;/p&gt;
-&lt;p&gt;Erlang is no academic pure functional language, though. It originated at &lt;a href="http://www.ericsson.com"&gt;Ericsson&lt;/a&gt; over 20 years ago and has been used to develop &lt;em&gt;extremely&lt;/em&gt; reliable distributed concurrent systems. Hence the current interest: Erlang can take advantage of multiple processor cores on multiple machines, which is why it&amp;#8217;s been adopted by up and coming projects like &lt;a href="http://couchdb.org"&gt;CouchDB&lt;/a&gt;. Given its proprietary origins, I think we&amp;#8217;re lucky to find the language available under an open source license. (Armstrong has some stories to tell about that!) On the other hand, Armstrong admitted that some of the documentation was weak &amp;#8212; at Ericsson you could always  ask one of the Erlang developers if you didn&amp;#8217;t understand something. Personally, I&amp;#8217;d be wary of the OTP platform, a full-featured distributed application framework built on top of Erlang.
-&lt;/p&gt;
-&lt;p&gt;Processes communicate by messages and by generating exceptions. You can link processes together. This doesn&amp;#8217;t mean designing a distributed system is easy, but I&amp;#8217;d say it gives us an appropriate language for such systems. Or as Armstrong puts it:
-&lt;/p&gt;
-&lt;blockquote&gt;&lt;p&gt;&amp;#8220;You cannot describe concurrent systems in sequential languages.&amp;#8221;
-&lt;/p&gt;
-&lt;/blockquote&gt;&lt;hr /&gt;
-
-&lt;p&gt;By the way, I&amp;#8217;ll be back at the conference on Thursday, to hear what &lt;a href="http://wordaligned.org/articles/programming-nirvana-plan-b.html"&gt;Simon Peyton Jones has to say about functional programming and Haskell&lt;/a&gt;. See some of you then.
-&lt;/p&gt;</description>
+&lt;p&gt;(I know this example should be coded using &lt;code&gt;lists:partition&lt;/code&gt;, it&amp;#8217;s just here to show the pattern syntax.)&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;http://www.sics.se/~joe/images/mc.jpg&quot; title=&quot;Joe Armstrong and the big thumper&quot;&gt;&lt;img src=&quot;http://www.sics.se/~joe/images/joe_mc.jpg&quot; alt=&quot;Joe Armstrong and the big thumper&quot; style=&quot;float:right;&quot;/&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;Erlang is no academic pure functional language, though. It originated at &lt;a href=&quot;http://www.ericsson.com&quot;&gt;Ericsson&lt;/a&gt; over 20 years ago and has been used to develop &lt;em&gt;extremely&lt;/em&gt; reliable distributed concurrent systems. Hence the current interest: Erlang can take advantage of multiple processor cores on multiple machines, which is why it&amp;#8217;s been adopted by up and coming projects like &lt;a href=&quot;http://couchdb.org&quot;&gt;CouchDB&lt;/a&gt;. Given its proprietary origins, I think we&amp;#8217;re lucky to find the language available under an open source license. (Armstrong has some stories to tell about that!) On the other hand, Armstrong admitted that some of the documentation was weak &amp;#8212; at Ericsson you could always  ask one of the Erlang developers if you didn&amp;#8217;t understand something. Personally, I&amp;#8217;d be wary of the OTP platform, a full-featured distributed application framework built on top of Erlang.&lt;/p&gt;
+&lt;p&gt;Processes communicate by messages and by generating exceptions. You can link processes together. This doesn&amp;#8217;t mean designing a distributed system is easy, but I&amp;#8217;d say it gives us an appropriate language for such systems. Or as Armstrong puts it:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&amp;#8220;You cannot describe concurrent systems in sequential languages.&amp;#8221;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;hr /&gt;
+&lt;p&gt;By the way, I&amp;#8217;ll be back at the conference on Thursday, to hear what &lt;a href=&quot;http://wordaligned.org/articles/programming-nirvana-plan-b.html&quot;&gt;Simon Peyton Jones has to say about functional programming and Haskell&lt;/a&gt;. See some of you then.&lt;/p&gt;</description>
 <dc:date>2008-04-01</dc:date>
 <guid>http://wordaligned.org/articles/fun-with-erlang-accu-2008</guid>
 <author>tag@wordaligned.org (Thomas Guest)</author>
@@ -325,63 +252,43 @@ evens_and_odds([], E, O)    -&amp;gt;  {E, O}.
 
 <item>
 <title>From Hash Key to Haskell</title>
-<description>&lt;h3&gt;Mac Hash&lt;/h3&gt;
-&lt;p&gt;How annoying, there&amp;#8217;s no hash key on the Mac UK keyboard!
-&lt;/p&gt;
-&lt;p&gt;SHIFT+3 gets you the UK pound sign, &amp;pound; (I&amp;#8217;d prefer the Euro, &amp;euro;), and once you&amp;#8217;ve found that you&amp;#8217;re in the right vicinity &amp;#8212; as if by magic, ALT+3 produces the #.
-&lt;/p&gt;
-&lt;p&gt;Unfortunately this same key combination doesn&amp;#8217;t work on the Windows XP virtual machine I run under &lt;a href="http://www.parallels.com/en/products/desktop/"&gt;Parallels&lt;/a&gt;. I&amp;#8217;ve done enough configuring to get the Mac keyboard working tolerably with this virtualised XP, but whenever I need to enter a # I&amp;#8217;m reduced to cutting and pasting.
-&lt;/p&gt;
-
-&lt;h3&gt;Trigraph Confusion&lt;/h3&gt;
-&lt;p&gt;C and C++ programmers could avoid the # by using trigraphs, an obscure language feature which allows you to write &lt;code&gt;??=&lt;/code&gt; instead. Yes, there are other trigraphs. Courtesy of Wikipedia, here&amp;#8217;s an &lt;a href="http://en.wikipedia.org/wiki/C_trigraph#Example"&gt;example program&lt;/a&gt; which uses them all.
-&lt;/p&gt;
+<description>&lt;h3 id=&quot;mac-hash&quot;&gt;Mac Hash&lt;/h3&gt;
+&lt;p&gt;How annoying, there&amp;#8217;s no hash key on the Mac UK keyboard!&lt;/p&gt;
+&lt;p&gt;SHIFT+3 gets you the UK pound sign, &amp;pound; (I&amp;#8217;d prefer the Euro, &amp;euro;), and once you&amp;#8217;ve found that you&amp;#8217;re in the right vicinity &amp;#8212; as if by magic, ALT+3 produces the #.&lt;/p&gt;
+&lt;p&gt;Unfortunately this same key combination doesn&amp;#8217;t work on the Windows XP virtual machine I run under &lt;a href=&quot;http://www.parallels.com/en/products/desktop/&quot;&gt;Parallels&lt;/a&gt;. I&amp;#8217;ve done enough configuring to get the Mac keyboard working tolerably with this virtualised XP, but whenever I need to enter a # I&amp;#8217;m reduced to cutting and pasting.&lt;/p&gt;
+&lt;h3 id=&quot;trigraph-confusion&quot;&gt;Trigraph Confusion&lt;/h3&gt;
+&lt;p&gt;C and C++ programmers could avoid the # by using trigraphs, an obscure language feature which allows you to write &lt;code&gt;??=&lt;/code&gt; instead. Yes, there are other trigraphs. Courtesy of Wikipedia, here&amp;#8217;s an &lt;a href=&quot;http://en.wikipedia.org/wiki/C_trigraph#Example&quot;&gt;example program&lt;/a&gt; which uses them all.&lt;/p&gt;
 &lt;blockquote&gt;&lt;pre&gt;
 ??=include &amp;lt;stdio.h&amp;gt;
 
 int main(void)
 ??&amp;lt;
     char n??(5??);
-    n??(4??) = '0' - (??-0 ??' 1 ??! 2);
-    printf("%c??/n", n??(4??));
+    n??(4??) = &#x27;0&#x27; - (??-0 ??&#x27; 1 ??! 2);
+    printf(&quot;%c??/n&quot;, n??(4??));
     return 0;
 ??&amp;gt;
 &lt;/pre&gt;&lt;/blockquote&gt;
 
-&lt;p&gt;Impressively unreadable!
-&lt;/p&gt;
+&lt;p&gt;Impressively unreadable!&lt;/p&gt;
+&lt;h3 id=&quot;what-you-see-is-not-what-you-type&quot;&gt;What you see is not what you type&lt;/h3&gt;
+&lt;p&gt;An important difference between a typewriter and a text editor is the software between keypress and screen update &amp;#8212; the software I&amp;#8217;ve failed to fully configure on my virtual XP machine. So why not exploit this indirection?&lt;/p&gt;
+&lt;p&gt;Developers of mobile phones have grown ingenious at adapting a numeric keypad to generate text almost as ably as a QWERTY one. (Which do serious texters prefer, I wonder, an &lt;a href=&quot;http://www.apple.com/iphone/&quot;&gt;iphone&lt;/a&gt; or a numeric keypad?) And my &lt;a href=&quot;http://www.adiumx.com/&quot;&gt;instant messenger client&lt;/a&gt; is cute enough to display smiley punctuation sequences as emoticon graphics.&lt;/p&gt;
+&lt;h3 id=&quot;python-smiley&quot;&gt;Python smiley&lt;/h3&gt;
+&lt;p&gt;On which point, &lt;span /&gt;has anyone else noticed the square-jawed smiley you get when you chop the last element from a Python list? This one&amp;#8217;s wearing a cap.&lt;/p&gt;
+&lt;pre style=&quot;font-size: 150%&quot;&gt;q[:-1]&lt;/pre&gt;
 
-&lt;h3&gt;What you see is not what you type&lt;/h3&gt;
-&lt;p&gt;An important difference between a typewriter and a text editor is the software between keypress and screen update &amp;#8212; the software I&amp;#8217;ve failed to fully configure on my virtual XP machine. So why not exploit this indirection?
-&lt;/p&gt;
-&lt;p&gt;Developers of mobile phones have grown ingenious at adapting a numeric keypad to generate text almost as ably as a QWERTY one. (Which do serious texters prefer, I wonder, an &lt;a href="http://www.apple.com/iphone/"&gt;iphone&lt;/a&gt; or a numeric keypad?) And my &lt;a href="http://www.adiumx.com/"&gt;instant messenger client&lt;/a&gt; is cute enough to display smiley punctuation sequences as emoticon graphics.
-&lt;/p&gt;
+&lt;h3 id=&quot;readable-haskell&quot;&gt;Readable Haskell&lt;/h3&gt;
+&lt;p&gt;&lt;a href=&quot;http://www.haskell.org&quot;&gt;Haskell&lt;/a&gt; is one of my &lt;a href=&quot;http://www.codinghorror.com/blog/archives/000916.html&quot; title=&quot;Jeff Attwood cautions against the magpie mentality.&quot;&gt;shiny new things&lt;/a&gt; for 2008. I&amp;#8217;ve scratched at it before and one of the things which put me off is the number of digraphs in the code. They don&amp;#8217;t look right. I&amp;#8217;m talking about the arrows in particular:&lt;/p&gt;
+&lt;pre style=&quot;font-size: 150%&quot;&gt;-&amp;gt;  &amp;lt;-  =&amp;gt;&lt;/pre&gt;
 
-&lt;h3&gt;Python smiley&lt;/h3&gt;
-&lt;p&gt;On which point, &lt;span /&gt;has anyone else noticed the square-jawed smiley you get when you chop the last element from a Python list? This one&amp;#8217;s wearing a cap.
-&lt;/p&gt;
-&lt;pre style="font-size: 150%"&gt;q[:-1]&lt;/pre&gt;
-
-
-&lt;h3&gt;Readable Haskell&lt;/h3&gt;
-&lt;p&gt;&lt;a href="http://www.haskell.org"&gt;Haskell&lt;/a&gt; is one of my &lt;a href="http://www.codinghorror.com/blog/archives/000916.html" title="Jeff Attwood cautions against the magpie mentality."&gt;shiny new things&lt;/a&gt; for 2008. I&amp;#8217;ve scratched at it before and one of the things which put me off is the number of digraphs in the code. They don&amp;#8217;t look right. I&amp;#8217;m talking about the arrows in particular:
-&lt;/p&gt;
-&lt;pre style="font-size: 150%"&gt;-&amp;gt;  &amp;lt;-  =&amp;gt;&lt;/pre&gt;
-
-&lt;p&gt;Of course I&amp;#8217;m used to the logical digraphs &lt;code&gt;&amp;amp;&amp;amp;&lt;/code&gt;, &lt;code&gt;||&lt;/code&gt; and the comparison operators, &lt;code&gt;==&lt;/code&gt;, &lt;code&gt;&amp;lt;=&lt;/code&gt; etc. These don&amp;#8217;t look out of place in the C family of languages, but Haskell&amp;#8217;s roots seem closer to mathematics and logic; it &lt;em&gt;craves&lt;/em&gt; proper mathematical and logical symbols.
-&lt;/p&gt;
-&lt;img style="float:right;" src="http://haskell.org/haskellwiki_logo_small.png" alt="Haskell Logo"/&gt;
-
-&lt;p&gt;The symbol Haskell uses for anonymous functions is a single backslash, &lt;code&gt;\&lt;/code&gt;. This should of course be a lambda, &amp;#x03BB;. It&amp;#8217;s ironic that this character is the star of the &lt;a href="http://www.haskell.org"&gt;Haskell homepage&lt;/a&gt; but can&amp;#8217;t be found in Haskell source code.
-&lt;/p&gt;
-&lt;p&gt;It shouldn&amp;#8217;t be too hard to view and edit Haskell code using more appropriate characters even if you actually input them as usual. Oh look, &lt;a href="http://www.iro.umontreal.ca/~monnier/elisp/#haskell-mode"&gt;Emacs does it already&lt;/a&gt;!
-&lt;/p&gt;
-&lt;p&gt;Set &lt;code&gt;(setq haskell-font-lock-symbols 'unicode)&lt;/code&gt; and your Haskell code will look something like the sample shown in the upper screen below (I&amp;#8217;ve split the editor window and shown a plain-text view of the same content in the lower screen).
-&lt;/p&gt;
-&lt;img src="http://wordaligned.org/files/haskell-emacs-screen.png" alt="Emacs Haskell mode screen grab"/&gt;
-
-&lt;p&gt;Much better!
-&lt;/p&gt;</description>
+&lt;p&gt;Of course I&amp;#8217;m used to the logical digraphs &lt;code&gt;&amp;amp;&amp;amp;&lt;/code&gt;, &lt;code&gt;||&lt;/code&gt; and the comparison operators, &lt;code&gt;==&lt;/code&gt;, &lt;code&gt;&amp;lt;=&lt;/code&gt; etc. These don&amp;#8217;t look out of place in the C family of languages, but Haskell&amp;#8217;s roots seem closer to mathematics and logic; it &lt;em&gt;craves&lt;/em&gt; proper mathematical and logical symbols.&lt;/p&gt;
+&lt;p&gt;&lt;img style=&quot;float:right;&quot; src=&quot;http://haskell.org/haskellwiki_logo_small.png&quot; alt=&quot;Haskell Logo&quot;/&gt;&lt;/p&gt;
+&lt;p&gt;The symbol Haskell uses for anonymous functions is a single backslash, &lt;code&gt;\&lt;/code&gt;. This should of course be a lambda, &amp;#x03BB;. It&amp;#8217;s ironic that this character is the star of the &lt;a href=&quot;http://www.haskell.org&quot;&gt;Haskell homepage&lt;/a&gt; but can&amp;#8217;t be found in Haskell source code.&lt;/p&gt;
+&lt;p&gt;It shouldn&amp;#8217;t be too hard to view and edit Haskell code using more appropriate characters even if you actually input them as usual. Oh look, &lt;a href=&quot;http://www.iro.umontreal.ca/~monnier/elisp/#haskell-mode&quot;&gt;Emacs does it already&lt;/a&gt;!&lt;/p&gt;
+&lt;p&gt;Set &lt;code&gt;(setq haskell-font-lock-symbols &#x27;unicode)&lt;/code&gt; and your Haskell code will look something like the sample shown in the upper screen below (I&amp;#8217;ve split the editor window and shown a plain-text view of the same content in the lower screen).&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;http://wordaligned.org/files/haskell-emacs-screen.png&quot; alt=&quot;Emacs Haskell mode screen grab&quot;/&gt;&lt;/p&gt;
+&lt;p&gt;Much better!&lt;/p&gt;</description>
 <dc:date>2008-01-19</dc:date>
 <guid>http://wordaligned.org/articles/from-hash-key-to-haskell</guid>
 <author>tag@wordaligned.org (Thomas Guest)</author>

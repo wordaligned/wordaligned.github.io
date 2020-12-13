@@ -26,11 +26,9 @@
       <div class="atomentry" id="setinsert-or-setadd">
 <h2 class="title"><a href="/articles/setinsert-or-setadd">Set.insert or set.add?</a></h2>
 <p class="meta"><abbr class="published" title="2010-11-17">2010-11-17</abbr> &bull; <a href="/tag/c++" rel="tag">C++</a>, <a href="/tag/python" rel="tag">Python</a> &bull; <a href="/articles/setinsert-or-setadd#disqus_thread">Comments</a></p>
-<h2>Get set, go!</h2>
-<p>Suppose you have an element <code>e</code> to put in a set <code>S</code>.
-</p>
-<p>Should you:
-</p>
+<h2 id="get-set-go">Get set, go!</h2>
+<p>Suppose you have an element <code>e</code> to put in a set <code>S</code>.</p>
+<p>Should you:</p>
 <div class="typocode">
 
 <pre class="prettyprint">S.add(e)
@@ -39,8 +37,7 @@
 
 </div>
 
-<p>or:
-</p>
+<p>or:</p>
 <div class="typocode">
 
 <pre class="prettyprint">S.insert(e)
@@ -49,60 +46,43 @@
 
 </div>
 
-<p>?
-</p>
-<p>It depends on which language you&#8217;re using. I use C++ and Python and I usually get it wrong.
-</p>
+<p>?</p>
+<p>It depends on which language you&#8217;re using. I use C++ and Python and I usually get it wrong.</p>
 <div class="typocode">
 
 <pre class="prettyprint">&gt;&gt;&gt; S.insert(e)
 Traceback (most recent call last):
   File "&lt;stdin&gt;", line 1, in &lt;module&gt;
-AttributeError: 'set' object has no attribute 'insert'
+AttributeError: &#x27;set&#x27; object has no attribute &#x27;insert&#x27;
 
 </pre>
 
 </div>
 
-<p>Try again!
-</p>
+<p>Try again!</p>
 <div class="typocode">
 
-<pre class="prettyprint">error: 'class std::set&lt;int, std::less&lt;int&gt;, std::allocator&lt;int&gt; &gt;' 
-has no member named 'add'
+<pre class="prettyprint">error: &#x27;class std::set&lt;int, std::less&lt;int&gt;, std::allocator&lt;int&gt; &gt;&#x27; 
+has no member named &#x27;add&#x27;
 
 </pre>
 
 </div>
 
-<p>Maybe my <a href="/articles/accidental-emacs.html" title="Emacs of course!">IDE</a> should auto-complete the correct member function but it doesn&#8217;t, or at least I haven&#8217;t configured it to, so instead I&#8217;ve worked out how to remember.
-</p>
-<p>Now, neither C++ nor Python pins down how a set should be implemented &#8212; read the language standard and reference manual respectively and all you&#8217;ll get is an interface and some hints. Read between the lines of these references, though, or study <a href="http://gcc.gnu.org/onlinedocs/libstdc++/latest-doxygen/a01064_source.html" title="G++ stl_tree.h, on which std::sets and std::multisets are based">the</a> <a href="http://svn.python.org/view/python/trunk/Objects/setobject.c?view=markup" title="setobject.c, from CPython">implementations</a>, and you&#8217;ll soon realise a Python set is an unordered container designed for fast membership, union, intersection, and differencing operations &#8212; much like the mathematical sets I learned about at school &#8212; whereas a C++ set is an ordered container, featuring logarithmic access times and persistent iterators. 
-</p>
-<p>Think: C++ set &asymp; binary tree; Python set &asymp; hashed array.
-</p>
-<p>It&#8217;s apparent which method is correct for which language now. To put something into a binary tree you must recurse down the tree and find where to <strong>insert</strong> it. Hence <code>std::set::insert()</code> is correct C++. To put something into a hashed array you hash it and <strong>add</strong> it right there. Hence <code>set.add()</code> is proper Python.
-</p>
-
-<h2>How long is a string?</h2>
-<p>I&#8217;m suggesting programmers should know at least some of what goes on in their standard language library implementations. Appreciating an API isn&#8217;t always enough. You <strong>insert</strong> into trees and <strong>add</strong> to hashes: so if your set is a tree, call <code>S.insert()</code>, and if it&#8217;s a hash, <code>S.add()</code>.
-</p>
-<p>Such logical arguments don&#8217;t always deliver.
-</p>
-<p><strong>Question:</strong> Suppose now that <code>S</code> is a string and you&#8217;re after its length. Should you use <code>S.length()</code> or <code>S.size()</code>?
-</p>
-<p><strong>Answer:</strong> Neither or both.
-</p>
-<p><a href="http://www.flickr.com/photos/the-g-uk/3867089043/" title="string [how long?] by the|G|, on Flickr"><img src="http://farm3.static.flickr.com/2538/3867089043_2f2b3f5fa6.jpg" width="485" height="149" alt="string [how long?]" /></a>
-</p>
-<p>In Python a string is a standard sequence and as for all other sequences <code>len(S)</code> does the trick. In C++ a string is a standard container and as for all other containers <code>S.size()</code> returns the number of elements; <strong>but</strong>, being <code>std::string</code>, <code>S.length()</code> does too.
-</p>
-<p>Oh, and the next revision of C++ features an <code>unordered_set</code> (available now as <code>std::tr1::unordered_set</code>) which is a hashed container. I think <code>unordered_set</code> is a poor name for something which models a set better than <code>std::set</code> does but that&#8217;s the price it pays for coming late to the party. And you don&#8217;t <code>std::unordered_set::add</code> elements to it, you <code>std::unordered_set::insert</code> them.
-</p>
+<p>Maybe my <a href="/articles/accidental-emacs.html" title="Emacs of course!">IDE</a> should auto-complete the correct member function but it doesn&#8217;t, or at least I haven&#8217;t configured it to, so instead I&#8217;ve worked out how to remember.</p>
+<p>Now, neither C++ nor Python pins down how a set should be implemented &#8212; read the language standard and reference manual respectively and all you&#8217;ll get is an interface and some hints. Read between the lines of these references, though, or study <a href="http://gcc.gnu.org/onlinedocs/libstdc++/latest-doxygen/a01064_source.html" title="G++ stl_tree.h, on which std::sets and std::multisets are based">the</a> <a href="http://svn.python.org/view/python/trunk/Objects/setobject.c?view=markup" title="setobject.c, from CPython">implementations</a>, and you&#8217;ll soon realise a Python set is an unordered container designed for fast membership, union, intersection, and differencing operations &#8212; much like the mathematical sets I learned about at school &#8212; whereas a C++ set is an ordered container, featuring logarithmic access times and persistent iterators. </p>
+<p>Think: C++ set &asymp; binary tree; Python set &asymp; hashed array.</p>
+<p>It&#8217;s apparent which method is correct for which language now. To put something into a binary tree you must recurse down the tree and find where to <strong>insert</strong> it. Hence <code>std::set::insert()</code> is correct C++. To put something into a hashed array you hash it and <strong>add</strong> it right there. Hence <code>set.add()</code> is proper Python.</p>
+<h2 id="how-long-is-a-string">How long is a string?</h2>
+<p>I&#8217;m suggesting programmers should know at least some of what goes on in their standard language library implementations. Appreciating an API isn&#8217;t always enough. You <strong>insert</strong> into trees and <strong>add</strong> to hashes: so if your set is a tree, call <code>S.insert()</code>, and if it&#8217;s a hash, <code>S.add()</code>.</p>
+<p>Such logical arguments don&#8217;t always deliver.</p>
+<p><strong>Question:</strong> Suppose now that <code>S</code> is a string and you&#8217;re after its length. Should you use <code>S.length()</code> or <code>S.size()</code>?</p>
+<p><strong>Answer:</strong> Neither or both.</p>
+<p><a href="http://www.flickr.com/photos/the-g-uk/3867089043/" title="string [how long?] by the|G|, on Flickr"><img src="http://farm3.static.flickr.com/2538/3867089043_2f2b3f5fa6.jpg" width="485" height="149" alt="string [how long?]" /></a></p>
+<p>In Python a string is a standard sequence and as for all other sequences <code>len(S)</code> does the trick. In C++ a string is a standard container and as for all other containers <code>S.size()</code> returns the number of elements; <strong>but</strong>, being <code>std::string</code>, <code>S.length()</code> does too.</p>
+<p>Oh, and the next revision of C++ features an <code>unordered_set</code> (available now as <code>std::tr1::unordered_set</code>) which is a hashed container. I think <code>unordered_set</code> is a poor name for something which models a set better than <code>std::set</code> does but that&#8217;s the price it pays for coming late to the party. And you don&#8217;t <code>std::unordered_set::add</code> elements to it, you <code>std::unordered_set::insert</code> them.</p>
 <hr />
-
-<p>My thanks to <a href="http://www.flickr.com/photos/the-g-uk">the|G|&trade;</a> for permission to use his <a href="http://www.flickr.com/photos/the-g-uk/3867089043" title="string [how long?] on Flickr">string</a>.
-</p>
+<p>My thanks to <a href="http://www.flickr.com/photos/the-g-uk">the|G|&trade;</a> for permission to use his <a href="http://www.flickr.com/photos/the-g-uk/3867089043" title="string [how long?] on Flickr">string</a>.</p>
 </div>
 
 <div class="comments"><hr/><div id="disqus_thread"></div><script type="text/javascript" src="http://disqus.com/forums/wordaligned/embed.js"></script></div>

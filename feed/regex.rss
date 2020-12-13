@@ -8,146 +8,89 @@
 <language>en-gb</language>
 <item>
 <title>String literals and regular expressions</title>
-<description>&lt;div class="toc"&gt;
-&lt;h2&gt;Contents&lt;/h2&gt;
-&lt;ul&gt;
- &lt;li&gt;&lt;a href="http://wordaligned.org/articles/string-literals-and-regular-expressions#tocstring-literals" name="toc0" id="toc0"&gt;String Literals&lt;/a&gt;
- &lt;/li&gt;
+<description>&lt;p&gt;According to the &lt;a href=&quot;http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2005/n1836.pdf&quot;&gt;&amp;#8220;Draft Technical Report on C++ Library Extensions&amp;#8221;&lt;/a&gt;
+(more commonly known as &lt;a href=&quot;http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2005/n1836.pdf&quot;&gt;TR1&lt;/a&gt;) regular expressions are making their way
+into the C++ standard library. Actually, &lt;a href=&quot;http://boost.org&quot;&gt;Boost&lt;/a&gt; users have had
+a &lt;a href=&quot;http://www.boost.org/libs/regex/doc/index.html&quot;&gt;regular expression library&lt;/a&gt; for a while now. The library
+is well designed and easy to use but is let down by the limitations
+of string literals.&lt;/p&gt;
+&lt;p&gt;&lt;span id=&quot;continue-reading&quot;/&gt;&lt;/p&gt;
+&lt;h4 id=&quot;string-literals&quot;&gt;String Literals&lt;/h4&gt;
+&lt;p&gt;Let&amp;#8217;s go back to basics and examine a C++ string literal:&lt;/p&gt;
+&lt;div class=&quot;typocode&quot;&gt;
 
- &lt;li&gt;&lt;a href="http://wordaligned.org/articles/string-literals-and-regular-expressions#tocescape-sequences" name="toc1" id="toc1"&gt;Escape Sequences&lt;/a&gt;
- &lt;/li&gt;
-
- &lt;li&gt;&lt;a href="http://wordaligned.org/articles/string-literals-and-regular-expressions#tocliteral-backslashes" name="toc2" id="toc2"&gt;Literal Backslashes&lt;/a&gt;
- &lt;/li&gt;
-
- &lt;li&gt;&lt;a href="http://wordaligned.org/articles/string-literals-and-regular-expressions#tocregular-expressions" name="toc3" id="toc3"&gt;Regular Expressions&lt;/a&gt;
- &lt;/li&gt;
-
- &lt;li&gt;&lt;a href="http://wordaligned.org/articles/string-literals-and-regular-expressions#tocattempting-to-match-a-c-string-literal" name="toc4" id="toc4"&gt;Attempting to Match a C++ String Literal&lt;/a&gt;
- &lt;/li&gt;
-
- &lt;li&gt;&lt;a href="http://wordaligned.org/articles/string-literals-and-regular-expressions#toccorrectly-matching-a-c-string-literal" name="toc5" id="toc5"&gt;Correctly Matching a C++ String Literal&lt;/a&gt;
- &lt;/li&gt;
-
- &lt;li&gt;&lt;a href="http://wordaligned.org/articles/string-literals-and-regular-expressions#tocnow-lets-do-it-in-c" name="toc6" id="toc6"&gt;Now let&amp;#8217;s do it in C++&lt;/a&gt;
- &lt;/li&gt;
-
- &lt;li&gt;&lt;a href="http://wordaligned.org/articles/string-literals-and-regular-expressions#toca-complete-c-string-literal-matcher" name="toc7" id="toc7"&gt;A complete C++ string literal matcher&lt;/a&gt;
- &lt;/li&gt;
-
- &lt;li&gt;&lt;a href="http://wordaligned.org/articles/string-literals-and-regular-expressions#tocraw-strings-in-python" name="toc8" id="toc8"&gt;Raw Strings in Python&lt;/a&gt;
- &lt;/li&gt;
-
- &lt;li&gt;&lt;a href="http://wordaligned.org/articles/string-literals-and-regular-expressions#tocraw-strings-in-c" name="toc9" id="toc9"&gt;Raw Strings in C++?&lt;/a&gt;
- &lt;/li&gt;
-
- &lt;li&gt;&lt;a href="http://wordaligned.org/articles/string-literals-and-regular-expressions#tocverbatim-strings-in-c" name="toc10" id="toc10"&gt;Verbatim Strings in C++?&lt;/a&gt;
- &lt;/li&gt;
-
- &lt;li&gt;&lt;a href="http://wordaligned.org/articles/string-literals-and-regular-expressions#toctheres-no-escape" name="toc11" id="toc11"&gt;There&amp;#8217;s no escape&lt;/a&gt;
- &lt;/li&gt;
-&lt;/ul&gt;
-&lt;/div&gt;&lt;p&gt;According to the &lt;a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2005/n1836.pdf"&gt;&amp;#8220;Draft Technical Report on C++ Library Extensions&amp;#8221;&lt;/a&gt;
-   (more commonly known as &lt;a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2005/n1836.pdf"&gt;TR1&lt;/a&gt;) regular expressions are making their way
-   into the C++ standard library. Actually, &lt;a href="http://boost.org"&gt;Boost&lt;/a&gt; users have had
-   a &lt;a href="http://www.boost.org/libs/regex/doc/index.html"&gt;regular expression library&lt;/a&gt; for a while now. The library
-   is well designed and easy to use but is let down by the limitations
-   of string literals.
-&lt;/p&gt;
-&lt;span id="continue-reading"/&gt;
-
-
-&lt;h4&gt;&lt;a href="http://wordaligned.org/articles/string-literals-and-regular-expressions#toc0" name="tocstring-literals" id="tocstring-literals"&gt;String Literals&lt;/a&gt;&lt;/h4&gt;
-&lt;p&gt;Let&amp;#8217;s go back to basics and examine a C++ string literal:
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
-
-&lt;pre class="prettyprint"&gt;char const * s = "string literal";
+&lt;pre class=&quot;prettyprint&quot;&gt;char const * s = &quot;string literal&quot;;
 
 &lt;/pre&gt;
 
 &lt;/div&gt;
 
 &lt;p&gt;Here, the string literal comprises the sequence of characters &lt;code&gt;s&lt;/code&gt;,
-   &lt;code&gt;t&lt;/code&gt;, &amp;#8230; &lt;code&gt;l&lt;/code&gt;. The double-quotes &lt;code&gt;"&lt;/code&gt; serve to delimit the contents of
-   the string.
-&lt;/p&gt;
-&lt;p&gt;All&amp;#8217;s fine until we need a double-quote inside the string:
-&lt;/p&gt;
-&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;Broken string literal&lt;/div&gt;
+&lt;code&gt;t&lt;/code&gt;, &amp;#8230; &lt;code&gt;l&lt;/code&gt;. The double-quotes &lt;code&gt;&quot;&lt;/code&gt; serve to delimit the contents of
+the string.&lt;/p&gt;
+&lt;p&gt;All&amp;#8217;s fine until we need a double-quote inside the string:&lt;/p&gt;
+&lt;div class=&quot;typocode&quot;&gt;&lt;div class=&quot;codetitle&quot;&gt;Broken string literal&lt;/div&gt;
 
-&lt;pre class="prettyprint"&gt;char const * s = "The "x" in C++0x will probably be 9";
+&lt;pre class=&quot;prettyprint&quot;&gt;char const * s = &quot;The &quot;x&quot; in C++0x will probably be 9&quot;;
 
 &lt;/pre&gt;
 
 &lt;/div&gt;
 
-&lt;p&gt;This line of code gives a compilation error:
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
+&lt;p&gt;This line of code gives a compilation error:&lt;/p&gt;
+&lt;div class=&quot;typocode&quot;&gt;
 
-&lt;pre class="prettyprint"&gt;error: expected `,' or `;' before "x"
+&lt;pre class=&quot;prettyprint&quot;&gt;error: expected `,&amp;#x27; or `;&amp;#x27; before &quot;x&quot;
 
 &lt;/pre&gt;
 
 &lt;/div&gt;
 
 &lt;p&gt;since the first internal double-quote closed the string. But how can we
-   include a double-quote without closing the string?
-&lt;/p&gt;
-
-&lt;h4&gt;&lt;a href="http://wordaligned.org/articles/string-literals-and-regular-expressions#toc1" name="tocescape-sequences" id="tocescape-sequences"&gt;Escape Sequences&lt;/a&gt;&lt;/h4&gt;
+include a double-quote without closing the string?&lt;/p&gt;
+&lt;h4 id=&quot;escape-sequences&quot;&gt;Escape Sequences&lt;/h4&gt;
 &lt;p&gt;Here&amp;#8217;s how: the backslash, &lt;code&gt;\&lt;/code&gt;, is treated as an &lt;em&gt;escape&lt;/em&gt;
-   &lt;em&gt;character&lt;/em&gt;. That is to say, normal interpretation of the string is suspended
-   for a while &amp;#8212; in this case for a single character &amp;#8212; allowing us to write:
-&lt;/p&gt;
-&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;Fixed string literal&lt;/div&gt;
+&lt;em&gt;character&lt;/em&gt;. That is to say, normal interpretation of the string is suspended
+for a while &amp;#8212; in this case for a single character &amp;#8212; allowing us to write:&lt;/p&gt;
+&lt;div class=&quot;typocode&quot;&gt;&lt;div class=&quot;codetitle&quot;&gt;Fixed string literal&lt;/div&gt;
 
-&lt;pre class="prettyprint"&gt;char const * s = "The \"x\" in C++0x will probably be 9";
+&lt;pre class=&quot;prettyprint&quot;&gt;char const * s = &quot;The \&quot;x\&quot; in C++0x will probably be 9&quot;;
 
 &lt;/pre&gt;
 
 &lt;/div&gt;
 
 &lt;p&gt;Here, the internal double-quotes have been &lt;em&gt;escaped&lt;/em&gt;, so they don&amp;#8217;t close the
-   string literal but are in fact interpreted as double-quote characters
-   within the string itself. Yes, it&amp;#8217;s confusing.
-&lt;/p&gt;
-
-&lt;h4&gt;&lt;a href="http://wordaligned.org/articles/string-literals-and-regular-expressions#toc2" name="tocliteral-backslashes" id="tocliteral-backslashes"&gt;Literal Backslashes&lt;/a&gt;&lt;/h4&gt;
+string literal but are in fact interpreted as double-quote characters
+within the string itself. Yes, it&amp;#8217;s confusing.&lt;/p&gt;
+&lt;h4 id=&quot;literal-backslashes&quot;&gt;Literal Backslashes&lt;/h4&gt;
 &lt;p&gt;Now, if the backslash takes on a special meaning, how are
-   we to insert a literal backslash into the string? Simple &amp;#8212; we must escape that too:
-&lt;/p&gt;
-&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;String literal containing a single backslash&lt;/div&gt;
+we to insert a literal backslash into the string? Simple &amp;#8212; we must escape that too:&lt;/p&gt;
+&lt;div class=&quot;typocode&quot;&gt;&lt;div class=&quot;codetitle&quot;&gt;String literal containing a single backslash&lt;/div&gt;
 
-&lt;pre class="prettyprint"&gt;char const * s = "A backslash \\ starts an escape sequence";
+&lt;pre class=&quot;prettyprint&quot;&gt;char const * s = &quot;A backslash \\ starts an escape sequence&quot;;
 
 &lt;/pre&gt;
 
 &lt;/div&gt;
 
 &lt;p&gt;Here, despite first appearances, the string contains just a &lt;em&gt;single&lt;/em&gt;
-   backslash character.  We did say it was confusing! Which leads us on to &amp;#8230;
-&lt;/p&gt;
-
-&lt;h3&gt;&lt;a href="http://wordaligned.org/articles/string-literals-and-regular-expressions#toc3" name="tocregular-expressions" id="tocregular-expressions"&gt;Regular Expressions&lt;/a&gt;&lt;/h3&gt;
+backslash character.  We did say it was confusing! Which leads us on to &amp;#8230;&lt;/p&gt;
+&lt;h3 id=&quot;regular-expressions&quot;&gt;Regular Expressions&lt;/h3&gt;
 &lt;p&gt;Put string literals aside for now. We&amp;#8217;re going to talk about regular
-   expressions (let&amp;#8217;s call them regexes from now on).  Regexes are used
-   to find and match patterns in blocks of text.  Like string literals,
-   regexes are composed of sequences of characters, and, also like
-   string literals, we need to escape the usual meaning of characters in regexes.
-&lt;/p&gt;
-&lt;p&gt;Once again, the backslash, &lt;code&gt;\&lt;/code&gt;, is used as the escape sequence prefix.
-&lt;/p&gt;
-&lt;p&gt;&lt;a href="http://www.ruby-lang.org" title="Ruby Website"&gt;Ruby&lt;/a&gt; embeds a powerful regex engine, so let&amp;#8217;s use Ruby for our regex
-   examples:
-&lt;/p&gt;
-&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;Some Ruby regex patterns&lt;/div&gt;
+expressions (let&amp;#8217;s call them regexes from now on).  Regexes are used
+to find and match patterns in blocks of text.  Like string literals,
+regexes are composed of sequences of characters, and, also like
+string literals, we need to escape the usual meaning of characters in regexes.&lt;/p&gt;
+&lt;p&gt;Once again, the backslash, &lt;code&gt;\&lt;/code&gt;, is used as the escape sequence prefix.&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;http://www.ruby-lang.org&quot; title=&quot;Ruby Website&quot;&gt;Ruby&lt;/a&gt; embeds a powerful regex engine, so let&amp;#8217;s use Ruby for our regex
+examples:&lt;/p&gt;
+&lt;div class=&quot;typocode&quot;&gt;&lt;div class=&quot;codetitle&quot;&gt;Some Ruby regex patterns&lt;/div&gt;
 
-&lt;pre class="prettyprint"&gt;/w/
+&lt;pre class=&quot;prettyprint&quot;&gt;/w/
 /w+/
 /\w+/
-/"\w*"/
+/&quot;\w*&quot;/
 /\\/
 
 &lt;/pre&gt;
@@ -155,165 +98,126 @@
 &lt;/div&gt;
 
 &lt;p&gt;Notice here that the &lt;em&gt;forward&lt;/em&gt; slash, &lt;code&gt;/&lt;/code&gt;, is used as a delimiter and
-   is not part of the body of the regex pattern &amp;#8212; just like the
-   double-quote, &lt;code&gt;"&lt;/code&gt;, was not part of the body our string literals.
-&lt;/p&gt;
-&lt;p&gt;What do these regex patterns mean?
-&lt;/p&gt;
+is not part of the body of the regex pattern &amp;#8212; just like the
+double-quote, &lt;code&gt;&quot;&lt;/code&gt;, was not part of the body our string literals.&lt;/p&gt;
+&lt;p&gt;What do these regex patterns mean?&lt;/p&gt;
 &lt;ol&gt;
- &lt;li&gt;
-     &lt;code&gt;/w/&lt;/code&gt; matches the character &lt;code&gt;w&lt;/code&gt;.
- &lt;/li&gt;
-
- &lt;li&gt;
-     &lt;code&gt;/w+/&lt;/code&gt; matches a sequence of one or more adjacent &lt;code&gt;w&lt;/code&gt;&amp;#8217;s.
- &lt;/li&gt;
-
- &lt;li&gt;
-     &lt;code&gt;/\w+/&lt;/code&gt; matches one or more adjacent &amp;#8220;word&amp;#8221; characters.
- &lt;/li&gt;
-
- &lt;li&gt;
-     &lt;code&gt;/"\w*"/&lt;/code&gt; matches a double-quote delimited sequence of zero or more &amp;#8220;word&amp;#8221; characters.
- &lt;/li&gt;
-
- &lt;li&gt;
-     &lt;code&gt;/\\/&lt;/code&gt; matches a &lt;em&gt;single&lt;/em&gt; backslash.
- &lt;/li&gt;
+&lt;li&gt;&lt;code&gt;/w/&lt;/code&gt; matches the character &lt;code&gt;w&lt;/code&gt;.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;/w+/&lt;/code&gt; matches a sequence of one or more adjacent &lt;code&gt;w&lt;/code&gt;&amp;#8217;s.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;/\w+/&lt;/code&gt; matches one or more adjacent &amp;#8220;word&amp;#8221; characters.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;/&quot;\w*&quot;/&lt;/code&gt; matches a double-quote delimited sequence of zero or more &amp;#8220;word&amp;#8221; characters.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;/\\/&lt;/code&gt; matches a &lt;em&gt;single&lt;/em&gt; backslash.&lt;/li&gt;
 &lt;/ol&gt;
 &lt;p&gt;Did you notice that the backslash, &lt;code&gt;\&lt;/code&gt;, gives the succeding &lt;code&gt;w&lt;/code&gt; a special
-   meaning? Did you notice that the &lt;code&gt;+&lt;/code&gt; has a special meaning within a regex
-   (it means one or more)?  To match a literal &lt;code&gt;+&lt;/code&gt;, we&amp;#8217;d need to escape
-   it like this: &lt;code&gt;/\+/&lt;/code&gt;. And did you notice that to match a literal backslash
-   we must escape it? Good &amp;#8212; but that was the easy bit!
-&lt;/p&gt;
-
-&lt;h4&gt;&lt;a href="http://wordaligned.org/articles/string-literals-and-regular-expressions#toc4" name="tocattempting-to-match-a-c-string-literal" id="tocattempting-to-match-a-c-string-literal"&gt;Attempting to Match a C++ String Literal&lt;/a&gt;&lt;/h4&gt;
+meaning? Did you notice that the &lt;code&gt;+&lt;/code&gt; has a special meaning within a regex
+(it means one or more)?  To match a literal &lt;code&gt;+&lt;/code&gt;, we&amp;#8217;d need to escape
+it like this: &lt;code&gt;/\+/&lt;/code&gt;. And did you notice that to match a literal backslash
+we must escape it? Good &amp;#8212; but that was the easy bit!&lt;/p&gt;
+&lt;h4 id=&quot;attempting-to-match-a-c-string-literal&quot;&gt;Attempting to Match a C++ String Literal&lt;/h4&gt;
 &lt;p&gt;Let&amp;#8217;s suppose we want to use our regex pattern matching on some C++ code.
-   Now, matching a C++ string literal is going to be tricky. A first attempt,
-   &lt;code&gt;/".*"/&lt;/code&gt;, just won&amp;#8217;t do because the &lt;code&gt;.*&lt;/code&gt; is &lt;em&gt;greedy&lt;/em&gt; and will eat up
-   everything until the final &lt;code&gt;"&lt;/code&gt; in the text to be matched. So
-   we might match too much:
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
+Now, matching a C++ string literal is going to be tricky. A first attempt,
+&lt;code&gt;/&quot;.*&quot;/&lt;/code&gt;, just won&amp;#8217;t do because the &lt;code&gt;.*&lt;/code&gt; is &lt;em&gt;greedy&lt;/em&gt; and will eat up
+everything until the final &lt;code&gt;&quot;&lt;/code&gt; in the text to be matched. So
+we might match too much:&lt;/p&gt;
+&lt;div class=&quot;typocode&quot;&gt;
 
-&lt;pre class="prettyprint"&gt;char * s1 = "string", * s2 = "literal";
+&lt;pre class=&quot;prettyprint&quot;&gt;char * s1 = &quot;string&quot;, * s2 = &quot;literal&quot;;
             ^---------match----------^
 
 &lt;/pre&gt;
 
 &lt;/div&gt;
 
-&lt;p&gt;A non-greedy second attempt, &lt;code&gt;/".*?"/&lt;/code&gt;, won&amp;#8217;t do either since it gets
-   confused by an escaped double-quote in a string literal. So
-   we might match too little:
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
+&lt;p&gt;A non-greedy second attempt, &lt;code&gt;/&quot;.*?&quot;/&lt;/code&gt;, won&amp;#8217;t do either since it gets
+confused by an escaped double-quote in a string literal. So
+we might match too little:&lt;/p&gt;
+&lt;div class=&quot;typocode&quot;&gt;
 
-&lt;pre class="prettyprint"&gt;char const * s = "The \"x\" in C++0x will probably be 9";
+&lt;pre class=&quot;prettyprint&quot;&gt;char const * s = &quot;The \&quot;x\&quot; in C++0x will probably be 9&quot;;
                  ^match^
 
 &lt;/pre&gt;
 
 &lt;/div&gt;
 
-
-&lt;h4&gt;&lt;a href="http://wordaligned.org/articles/string-literals-and-regular-expressions#toc5" name="toccorrectly-matching-a-c-string-literal" id="toccorrectly-matching-a-c-string-literal"&gt;Correctly Matching a C++ String Literal&lt;/a&gt;&lt;/h4&gt;
+&lt;h4 id=&quot;correctly-matching-a-c-string-literal&quot;&gt;Correctly Matching a C++ String Literal&lt;/h4&gt;
 &lt;p&gt;To properly match a C++ string literal we need to apply the following
-   pattern: start with a double-quote; continue with a sequence of
-   &lt;em&gt;either&lt;/em&gt; characters which aren&amp;#8217;t the double-quote or the backslash
-   &lt;em&gt;or&lt;/em&gt; escape sequences; then finish with a double-quote.
-&lt;/p&gt;
+pattern: start with a double-quote; continue with a sequence of
+&lt;em&gt;either&lt;/em&gt; characters which aren&amp;#8217;t the double-quote or the backslash
+&lt;em&gt;or&lt;/em&gt; escape sequences; then finish with a double-quote.&lt;/p&gt;
 &lt;p&gt;Precisely what makes up a valid escape sequence is a little fiddly;
-   there are octal and hexadecimal escapes, there are various whitespace
-   characters, and there are unicode values. We can however compose a
-   pattern using a suitable short-cut as follows:
-&lt;/p&gt;
-&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;A regex to match a C++ string literal&lt;/div&gt;
+there are octal and hexadecimal escapes, there are various whitespace
+characters, and there are unicode values. We can however compose a
+pattern using a suitable short-cut as follows:&lt;/p&gt;
+&lt;div class=&quot;typocode&quot;&gt;&lt;div class=&quot;codetitle&quot;&gt;A regex to match a C++ string literal&lt;/div&gt;
 
-&lt;pre class="prettyprint"&gt;/"([^"\\]|\\.)*"/
+&lt;pre class=&quot;prettyprint&quot;&gt;/&quot;([^&quot;\\]|\\.)*&quot;/
 
 &lt;/pre&gt;
 
 &lt;/div&gt;
 
 &lt;p&gt;We can read this as: a string literal starts with a double quote,
-   followed by any number of items which are:
-&lt;/p&gt;
+followed by any number of items which are:&lt;/p&gt;
 &lt;ul&gt;
- &lt;li&gt;
-     &lt;em&gt;either&lt;/em&gt; not a double-quote or a backslash
- &lt;/li&gt;
-
- &lt;li&gt;
-     &lt;em&gt;or&lt;/em&gt; are a backslash followed by any single character
- &lt;/li&gt;
+&lt;li&gt;&lt;em&gt;either&lt;/em&gt; not a double-quote or a backslash&lt;/li&gt;
+&lt;li&gt;&lt;em&gt;or&lt;/em&gt; are a backslash followed by any single character&lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;and then finishes with a closing double-quote.
-&lt;/p&gt;
+&lt;p&gt;and then finishes with a closing double-quote.&lt;/p&gt;
 &lt;p&gt;As you&amp;#8217;ve probably spotted, we have to double up the backslashes in
-   the regex pattern because the backslash is used as an escape sequence;
-   i.e. a literal backslash is matched by the pattern &lt;code&gt;\\\\&lt;/code&gt;.
-&lt;/p&gt;
+the regex pattern because the backslash is used as an escape sequence;
+i.e. a literal backslash is matched by the pattern &lt;code&gt;\\\\&lt;/code&gt;.&lt;/p&gt;
+&lt;h4 id=&quot;now-lets-do-it-in-c&quot;&gt;Now let&amp;#8217;s do it in C++&lt;/h4&gt;
+&lt;p&gt;I&amp;#8217;ll use the &lt;a href=&quot;http://www.boost.org/libs/regex/doc/index.html&quot;&gt;Boost&lt;/a&gt; implementation since the compilers I
+have available don&amp;#8217;t support &lt;a href=&quot;http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2005/n1836.pdf&quot;&gt;TR1&lt;/a&gt; yet. We&amp;#8217;re going to need to
+construct a &lt;code&gt;boost::regex&lt;/code&gt; using a pattern represented by a string
+literal. Which is where the problems start.  Of course we can&amp;#8217;t write:&lt;/p&gt;
+&lt;div class=&quot;typocode&quot;&gt;&lt;div class=&quot;codetitle&quot;&gt;This regex won&amp;#8217;t compile!&lt;/div&gt;
 
-&lt;h4&gt;&lt;a href="http://wordaligned.org/articles/string-literals-and-regular-expressions#toc6" name="tocnow-lets-do-it-in-c" id="tocnow-lets-do-it-in-c"&gt;Now let&amp;#8217;s do it in C++&lt;/a&gt;&lt;/h4&gt;
-&lt;p&gt;I&amp;#8217;ll use the &lt;a href="http://www.boost.org/libs/regex/doc/index.html"&gt;Boost&lt;/a&gt; implementation since the compilers I
-   have available don&amp;#8217;t support &lt;a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2005/n1836.pdf"&gt;TR1&lt;/a&gt; yet. We&amp;#8217;re going to need to
-   construct a &lt;code&gt;boost::regex&lt;/code&gt; using a pattern represented by a string
-   literal. Which is where the problems start.  Of course we can&amp;#8217;t write:
-&lt;/p&gt;
-&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;This regex won&amp;#8217;t compile!&lt;/div&gt;
-
-&lt;pre class="prettyprint"&gt;boost::regex const
-    string_matcher(/"([^"\\]|\\.)*"/);
+&lt;pre class=&quot;prettyprint&quot;&gt;boost::regex const
+    string_matcher(/&quot;([^&quot;\\]|\\.)*&quot;/);
 
 &lt;/pre&gt;
 
 &lt;/div&gt;
 
 &lt;p&gt;because we haven&amp;#8217;t passed a string literal to the &lt;code&gt;boost::regex&lt;/code&gt;
-   constructor.  In order to pass a string literal we&amp;#8217;ll need to use
-   double-quotes instead of forward-slashes and we&amp;#8217;ll have to escape
-   the internal double-quotes. Let&amp;#8217;s try again:
-&lt;/p&gt;
-&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;This regex throws an exception!&lt;/div&gt;
+constructor.  In order to pass a string literal we&amp;#8217;ll need to use
+double-quotes instead of forward-slashes and we&amp;#8217;ll have to escape
+the internal double-quotes. Let&amp;#8217;s try again:&lt;/p&gt;
+&lt;div class=&quot;typocode&quot;&gt;&lt;div class=&quot;codetitle&quot;&gt;This regex throws an exception!&lt;/div&gt;
 
-&lt;pre class="prettyprint"&gt;boost::regex const
-    string_matcher("\"([^\"\\]|\\.)*\"");
+&lt;pre class=&quot;prettyprint&quot;&gt;boost::regex const
+    string_matcher(&quot;\&quot;([^\&quot;\\]|\\.)*\&quot;&quot;);
 
 &lt;/pre&gt;
 
 &lt;/div&gt;
 
 &lt;p&gt;Oh dear &amp;#8212; the error moves to run-time. We get an exception:
-   &lt;code&gt;Unmatched [ or [^&lt;/code&gt;. This is because the closing square bracket &lt;code&gt;]&lt;/code&gt;
-   has been escaped by the time it gets to the regex engine. Unfortunately
-   the &lt;code&gt;\\&lt;/code&gt;&amp;#8217;s in the string literal contract to just single backslashes. We need
-   to redouble them.
-&lt;/p&gt;
-&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;This regex is just right!&lt;/div&gt;
+&lt;code&gt;Unmatched [ or [^&lt;/code&gt;. This is because the closing square bracket &lt;code&gt;]&lt;/code&gt;
+has been escaped by the time it gets to the regex engine. Unfortunately
+the &lt;code&gt;\\&lt;/code&gt;&amp;#8217;s in the string literal contract to just single backslashes. We need
+to redouble them.&lt;/p&gt;
+&lt;div class=&quot;typocode&quot;&gt;&lt;div class=&quot;codetitle&quot;&gt;This regex is just right!&lt;/div&gt;
 
-&lt;pre class="prettyprint"&gt;boost::regex const
-    string_matcher("\"([^\"\\\\]|\\\\.)*\"");
+&lt;pre class=&quot;prettyprint&quot;&gt;boost::regex const
+    string_matcher(&quot;\&quot;([^\&quot;\\\\]|\\\\.)*\&quot;&quot;);
 
 &lt;/pre&gt;
 
 &lt;/div&gt;
 
 &lt;p&gt;Here, each pair of backslashes has contracted to a single backslash by the
-   time the regex engine sees it, which &amp;#8212; believe it or not &amp;#8212; is what&amp;#8217;s
-   required.
-&lt;/p&gt;
+time the regex engine sees it, which &amp;#8212; believe it or not &amp;#8212; is what&amp;#8217;s
+required.&lt;/p&gt;
 &lt;p&gt;This &lt;code&gt;string_matcher&lt;/code&gt; works, but as code it is rather more cryptic
-   than communicative.
-&lt;/p&gt;
+than communicative.&lt;/p&gt;
+&lt;h4 id=&quot;a-complete-c-string-literal-matcher&quot;&gt;A complete C++ string literal matcher&lt;/h4&gt;
+&lt;p&gt;Here&amp;#8217;s a complete program for you to try.&lt;/p&gt;
+&lt;div class=&quot;typocode&quot;&gt;&lt;div class=&quot;codetitle&quot;&gt;A C++ string matcher&lt;/div&gt;
 
-&lt;h4&gt;&lt;a href="http://wordaligned.org/articles/string-literals-and-regular-expressions#toc7" name="toca-complete-c-string-literal-matcher" id="toca-complete-c-string-literal-matcher"&gt;A complete C++ string literal matcher&lt;/a&gt;&lt;/h4&gt;
-&lt;p&gt;Here&amp;#8217;s a complete program for you to try.
-&lt;/p&gt;
-&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;A C++ string matcher&lt;/div&gt;
-
-&lt;pre class="prettyprint"&gt;#include &amp;lt;boost/regex.hpp&amp;gt;
+&lt;pre class=&quot;prettyprint&quot;&gt;#include &amp;lt;boost/regex.hpp&amp;gt;
 #include &amp;lt;iostream&amp;gt;
 #include &amp;lt;stdexcept&amp;gt;
 #include &amp;lt;string&amp;gt;
@@ -323,23 +227,23 @@ int main(int argc, char * argv[])
   try
   {
     boost::regex const
-      string_matcher("\"([^\"\\\\]|\\\\.)*\"");
+      string_matcher(&quot;\&quot;([^\&quot;\\\\]|\\\\.)*\&quot;&quot;);
     std::string line;
     while (std::getline(std::cin, line))
     {
       if (boost::regex_match(line, string_matcher))
       {
-        std::cout &amp;lt;&amp;lt; line &amp;lt;&amp;lt; " is a C++ string literal\n";
+        std::cout &amp;lt;&amp;lt; line &amp;lt;&amp;lt; &quot; is a C++ string literal\n&quot;;
       }
     }
   }
   catch (std::exception &amp;amp; exc)
   {
-    std::cerr &amp;lt;&amp;lt; "An error occurred: " &amp;lt;&amp;lt; exc.what();
+    std::cerr &amp;lt;&amp;lt; &quot;An error occurred: &quot; &amp;lt;&amp;lt; exc.what();
   }
   catch (...)
   {
-    std::cerr &amp;lt;&amp;lt; "An error occurred\n";
+    std::cerr &amp;lt;&amp;lt; &quot;An error occurred\n&quot;;
   }
   return 0;
 }
@@ -348,89 +252,75 @@ int main(int argc, char * argv[])
 
 &lt;/div&gt;
 
+&lt;h4 id=&quot;raw-strings-in-python&quot;&gt;Raw Strings in Python&lt;/h4&gt;
+&lt;p&gt;Unlike &lt;a href=&quot;http://www.ruby-lang.org&quot; title=&quot;Ruby Website&quot;&gt;Ruby&lt;/a&gt;, &lt;a href=&quot;http://python.org&quot;&gt;Python&lt;/a&gt; doesn&amp;#8217;t include support for regexes in the
+language itself. Instead, regex support is provided by the standard
+&lt;a href=&quot;http://docs.python.org/lib/module-re.html&quot;&gt;regular expression library&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;http://python.org&quot;&gt;Python&lt;/a&gt;&amp;#8217;s flexible string literals allow us to simplify the pattern,
+though. Here, we use a &lt;a href=&quot;http://docs.python.org/ref/strings.html&quot;&gt;raw string&lt;/a&gt;, and we chose to delimit it with
+single-quotes so we don&amp;#8217;t need to escape the internal double-quotes.&lt;/p&gt;
+&lt;div class=&quot;typocode&quot;&gt;
 
-&lt;h4&gt;&lt;a href="http://wordaligned.org/articles/string-literals-and-regular-expressions#toc8" name="tocraw-strings-in-python" id="tocraw-strings-in-python"&gt;Raw Strings in Python&lt;/a&gt;&lt;/h4&gt;
-&lt;p&gt;Unlike &lt;a href="http://www.ruby-lang.org" title="Ruby Website"&gt;Ruby&lt;/a&gt;, &lt;a href="http://python.org"&gt;Python&lt;/a&gt; doesn&amp;#8217;t include support for regexes in the
-   language itself. Instead, regex support is provided by the standard
-   &lt;a href="http://docs.python.org/lib/module-re.html"&gt;regular expression library&lt;/a&gt;.
-&lt;/p&gt;
-&lt;p&gt;&lt;a href="http://python.org"&gt;Python&lt;/a&gt;&amp;#8217;s flexible string literals allow us to simplify the pattern,
-   though. Here, we use a &lt;a href="http://docs.python.org/ref/strings.html"&gt;raw string&lt;/a&gt;, and we chose to delimit it with
-   single-quotes so we don&amp;#8217;t need to escape the internal double-quotes.
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
-
-&lt;pre class="prettyprint"&gt;string_literal_pattern = r'"([^"\\]|\\.)*"'
+&lt;pre class=&quot;prettyprint&quot;&gt;string_literal_pattern = r&amp;#x27;&quot;([^&quot;\\]|\\.)*&quot;&amp;#x27;
 
 &lt;/pre&gt;
 
 &lt;/div&gt;
 
-&lt;p&gt;This is nice. Basically, &lt;a href="http://docs.python.org/ref/strings.html"&gt;raw strings&lt;/a&gt; leave the backslashes
-   unprocessed.  &lt;a href="http://docs.python.org/ref/strings.html"&gt;Raw strings&lt;/a&gt; aren&amp;#8217;t just restricted to regex patterns,
-   though perhaps that&amp;#8217;s their most common use.
-&lt;/p&gt;
-
-&lt;h4&gt;&lt;a href="http://wordaligned.org/articles/string-literals-and-regular-expressions#toc9" name="tocraw-strings-in-c" id="tocraw-strings-in-c"&gt;Raw Strings in C++?&lt;/a&gt;&lt;/h4&gt;
+&lt;p&gt;This is nice. Basically, &lt;a href=&quot;http://docs.python.org/ref/strings.html&quot;&gt;raw strings&lt;/a&gt; leave the backslashes
+unprocessed.  &lt;a href=&quot;http://docs.python.org/ref/strings.html&quot;&gt;Raw strings&lt;/a&gt; aren&amp;#8217;t just restricted to regex patterns,
+though perhaps that&amp;#8217;s their most common use.&lt;/p&gt;
+&lt;h4 id=&quot;raw-strings-in-c&quot;&gt;Raw Strings in C++?&lt;/h4&gt;
 &lt;p&gt;C++ doesn&amp;#8217;t support raw strings (at least, it doesn&amp;#8217;t support them
-   yet, and I haven&amp;#8217;t found them mentioned in &lt;a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2005/n1836.pdf"&gt;TR1&lt;/a&gt;) &amp;#8212; but it does
-   support wide-strings, indicated by the &lt;code&gt;L&lt;/code&gt; prefix.
-&lt;/p&gt;
-&lt;div class="typocode"&gt;
+yet, and I haven&amp;#8217;t found them mentioned in &lt;a href=&quot;http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2005/n1836.pdf&quot;&gt;TR1&lt;/a&gt;) &amp;#8212; but it does
+support wide-strings, indicated by the &lt;code&gt;L&lt;/code&gt; prefix.&lt;/p&gt;
+&lt;div class=&quot;typocode&quot;&gt;
 
-&lt;pre class="prettyprint"&gt;cpp_wide_string = L"this is a wide string";
+&lt;pre class=&quot;prettyprint&quot;&gt;cpp_wide_string = L&quot;this is a wide string&quot;;
 
 &lt;/pre&gt;
 
 &lt;/div&gt;
 
 &lt;p&gt;Maybe if we switched the &lt;code&gt;L&lt;/code&gt; for an &lt;code&gt;R&lt;/code&gt; we could allow raw strings into
-   C++? It would make regex patterns far more readable.
-&lt;/p&gt;
-
-&lt;h4&gt;&lt;a href="http://wordaligned.org/articles/string-literals-and-regular-expressions#toc10" name="tocverbatim-strings-in-c" id="tocverbatim-strings-in-c"&gt;Verbatim Strings in C++?&lt;/a&gt;&lt;/h4&gt;
-&lt;p&gt;Alternatively &amp;#8230;
-&lt;/p&gt;
-&lt;p&gt;I&amp;#8217;ve never used C# but &lt;a href="http://www.google.co.uk/search?q=c%23%20string%20literals&amp;amp;hl=en&amp;amp;meta="&gt;googling&lt;/a&gt;
-   suggests raw strings are supported and rather nicely named
-   &amp;#8220;verbatim string literals&amp;#8221;. C# uses the &lt;code&gt;@&lt;/code&gt; prefix to indicate that a
-   string literal is a verbatim string. Now, &lt;code&gt;@&lt;/code&gt; isn&amp;#8217;t even part of the C++
-   source character set, so maybe this too would be possible.
-&lt;/p&gt;
-
-&lt;h4&gt;&lt;a href="http://wordaligned.org/articles/string-literals-and-regular-expressions#toc11" name="toctheres-no-escape" id="toctheres-no-escape"&gt;There&amp;#8217;s no escape&lt;/a&gt;&lt;/h4&gt;
+C++? It would make regex patterns far more readable.&lt;/p&gt;
+&lt;h4 id=&quot;verbatim-strings-in-c&quot;&gt;Verbatim Strings in C++?&lt;/h4&gt;
+&lt;p&gt;Alternatively &amp;#8230;&lt;/p&gt;
+&lt;p&gt;I&amp;#8217;ve never used C# but &lt;a href=&quot;http://www.google.co.uk/search?q=c%23%20string%20literals&amp;amp;hl=en&amp;amp;meta=&quot;&gt;googling&lt;/a&gt;
+suggests raw strings are supported and rather nicely named
+&amp;#8220;verbatim string literals&amp;#8221;. C# uses the &lt;code&gt;@&lt;/code&gt; prefix to indicate that a
+string literal is a verbatim string. Now, &lt;code&gt;@&lt;/code&gt; isn&amp;#8217;t even part of the C++
+source character set, so maybe this too would be possible.&lt;/p&gt;
+&lt;h4 id=&quot;theres-no-escape&quot;&gt;There&amp;#8217;s no escape&lt;/h4&gt;
 &lt;p&gt;The proliferation of backslashes when we combine regexes and string
-   literals is unfortunate. &lt;span /&gt;It could be worse. What if the backslash key
-   had fallen off our keyboard? Remarkably &amp;ndash; and, as far as I know,
-   uniquely &amp;ndash; C++ caters for this situation. A number source characters
-   can be written as &amp;#8220;trigraphs&amp;#8221; &amp;#8212; sequences of three characters
-   starting &lt;code&gt;??&lt;/code&gt;. The backslash is one such character: it can be
-   written as &lt;code&gt;??/&lt;/code&gt;.
-&lt;/p&gt;
-&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;regex using trigraphs&lt;/div&gt;
+literals is unfortunate. &lt;span /&gt;It could be worse. What if the backslash key
+had fallen off our keyboard? Remarkably &amp;ndash; and, as far as I know,
+uniquely &amp;ndash; C++ caters for this situation. A number source characters
+can be written as &amp;#8220;trigraphs&amp;#8221; &amp;#8212; sequences of three characters
+starting &lt;code&gt;??&lt;/code&gt;. The backslash is one such character: it can be
+written as &lt;code&gt;??/&lt;/code&gt;.&lt;/p&gt;
+&lt;div class=&quot;typocode&quot;&gt;&lt;div class=&quot;codetitle&quot;&gt;regex using trigraphs&lt;/div&gt;
 
-&lt;pre class="prettyprint"&gt;boost::regex const
-    string_matcher("??/"([^??/"??/??/??/??/]|??/??/??/??/.)*??/"");
+&lt;pre class=&quot;prettyprint&quot;&gt;boost::regex const
+    string_matcher(&quot;??/&quot;([^??/&quot;??/??/??/??/]|??/??/??/??/.)*??/&quot;&quot;);
 
 &lt;/pre&gt;
 
 &lt;/div&gt;
 
-&lt;p&gt;For completeness, we could also lose the &lt;code&gt;|&lt;/code&gt;, &lt;code&gt;[&lt;/code&gt; and &lt;code&gt;]&lt;/code&gt; keys.
-&lt;/p&gt;
-&lt;div class="typocode"&gt;&lt;div class="codetitle"&gt;regex using even more trigraphs&lt;/div&gt;
+&lt;p&gt;For completeness, we could also lose the &lt;code&gt;|&lt;/code&gt;, &lt;code&gt;[&lt;/code&gt; and &lt;code&gt;]&lt;/code&gt; keys.&lt;/p&gt;
+&lt;div class=&quot;typocode&quot;&gt;&lt;div class=&quot;codetitle&quot;&gt;regex using even more trigraphs&lt;/div&gt;
 
-&lt;pre class="prettyprint"&gt;boost::regex const
-    string_matcher("??/"(??(^??/"??/??/??/??/??)??!??/??/??/??/.)*??/"");
+&lt;pre class=&quot;prettyprint&quot;&gt;boost::regex const
+    string_matcher(&quot;??/&quot;(??(^??/&quot;??/??/??/??/??)??!??/??/??/??/.)*??/&quot;&quot;);
 
 &lt;/pre&gt;
 
 &lt;/div&gt;
 
 &lt;p&gt;The string literal used to initialise &lt;code&gt;string_matcher&lt;/code&gt; &lt;em&gt;is&lt;/em&gt; valid, but
-   the regex wouldn&amp;#8217;t match it properly. I&amp;#8217;ll leave the fix as an exercise
-   for the reader.
-&lt;/p&gt;</description>
+the regex wouldn&amp;#8217;t match it properly. I&amp;#8217;ll leave the fix as an exercise
+for the reader.&lt;/p&gt;</description>
 <dc:date>2006-09-02</dc:date>
 <guid>http://wordaligned.org/articles/string-literals-and-regular-expressions</guid>
 <author>tag@wordaligned.org (Thomas Guest)</author>

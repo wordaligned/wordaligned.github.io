@@ -28,8 +28,7 @@
 <p class="meta"><abbr class="published" title="2016-04-04">2016-04-04</abbr> &bull; <a href="/tag/puzzles" rel="tag">Puzzles</a>, <a href="/tag/python" rel="tag">Python</a> &bull; <a href="/articles/8-queens-puzzle#disqus_thread">Comments</a></p>
 <p style="font-size:4em">&#9819;&#9819;&#9819;&#9819;&#9819;&#9819;&#9819;&#9819;</p>
 
-<p>Here&#8217;s one of my favourite <a href="http://code.activestate.com/recipes/576647-eight-queens-six-lines">recipes, by Raymond Hettinger</a>, lightly adapted for Python 3.
-</p>
+<p>Here&#8217;s one of my favourite <a href="http://code.activestate.com/recipes/576647-eight-queens-six-lines">recipes, by Raymond Hettinger</a>, lightly adapted for Python 3.</p>
 <pre><code>from itertools import permutations
 
 n = width_of_chessboard = 8
@@ -38,17 +37,17 @@ sqs = range(n)
 Qs = (Q for Q in permutations(sqs)
       if n == len({Q[i]+i for i in sqs})
            == len({Q[i]-i for i in sqs}))
-</code></pre><p>We start by assigning <code>sqs</code> to the range 0 through 7.
-</p>
+</code></pre>
+<p>We start by assigning <code>sqs</code> to the range 0 through 7.</p>
 <pre><code>&gt;&gt;&gt; sqs = range(8)
 &gt;&gt;&gt; list(sqs)
 [0, 1, 2, 3, 4, 5, 6, 7]
-</code></pre><p>The range has 8 indices. If each index represents a column on a standard 8x8 chessboard and the value at that index represents a row on the same chessboard, then our range represents 8 positions on the board. Using the built-in <a href="https://docs.python.org/3/library/functions.html#enumerate">enumerate</a> function to generate these <code>(index, value)</code> pairs we see that <code>sqs</code> encodes the diagonal <code>(0, 0)</code> to <code>(7, 7)</code>:
-</p>
+</code></pre>
+<p>The range has 8 indices. If each index represents a column on a standard 8x8 chessboard and the value at that index represents a row on the same chessboard, then our range represents 8 positions on the board. Using the built-in <a href="https://docs.python.org/3/library/functions.html#enumerate">enumerate</a> function to generate these <code>(index, value)</code> pairs we see that <code>sqs</code> encodes the diagonal <code>(0, 0)</code> to <code>(7, 7)</code>:</p>
 <pre><code>&gt;&gt;&gt; list(enumerate(sqs))
 [(0, 0), (1, 1), (2, 2), (3, 3), (4, 4), (5, 5), (6, 6), (7, 7)]
-</code></pre><p>Next, permute the values &#8212; the rows.
-</p>
+</code></pre>
+<p>Next, permute the values &#8212; the rows.</p>
 <pre><code>&gt;&gt;&gt; from itertools import permutations
 &gt;&gt;&gt; rooks = permutations(sqs)
 &gt;&gt;&gt; next(rooks)
@@ -59,31 +58,27 @@ Qs = (Q for Q in permutations(sqs)
 (0, 1, 2, 3, 4, 6, 5, 7)
 &gt;&gt;&gt; list(rooks)[34567]
 (6, 7, 0, 1, 3, 4, 5, 2)
-</code></pre><p><a href="https://docs.python.org/3/library/itertools.html#itertools.permutations">Itertools.permutations</a> generates values lazily. The snippet above shows the first two results, then skips forward 34568 places. <code>Permutations(sqs)</code> generates all possible arrangements of 8 pieces on a chessboard such that each row has exactly one piece on it and so does each column. That is, it generates all possible ways of placing 8 <a href="http://mathworld.wolfram.com/RooksProblem.html">rooks on a chessboard</a> so that no pair attacks each other.
-</p>
-<p>In the final program, we filter these rook positions to generate solutions to the more challenging &#8212; and more interesting &#8212; <a href="https://en.wikipedia.org/wiki/Eight_queens_puzzle">eight Queens puzzle</a>.
-</p>
-<p>Consider our starting point, the diagonal <code>(0, 0)</code> to <code>(7, 7)</code>
-</p>
+</code></pre>
+<p><a href="https://docs.python.org/3/library/itertools.html#itertools.permutations">Itertools.permutations</a> generates values lazily. The snippet above shows the first two results, then skips forward 34568 places. <code>Permutations(sqs)</code> generates all possible arrangements of 8 pieces on a chessboard such that each row has exactly one piece on it and so does each column. That is, it generates all possible ways of placing 8 <a href="http://mathworld.wolfram.com/RooksProblem.html">rooks on a chessboard</a> so that no pair attacks each other.</p>
+<p>In the final program, we filter these rook positions to generate solutions to the more challenging &#8212; and more interesting &#8212; <a href="https://en.wikipedia.org/wiki/Eight_queens_puzzle">eight Queens puzzle</a>.</p>
+<p>Consider our starting point, the diagonal <code>(0, 0)</code> to <code>(7, 7)</code></p>
 <pre><code>&gt;&gt;&gt; diagonal = range(8)
 &gt;&gt;&gt; {r-c for c,r in enumerate(diagonal)}
 {0}
 &gt;&gt;&gt; {r+c for c,r in enumerate(diagonal)}
 {0, 2, 4, 6, 8, 10, 12, 14}
-</code></pre><p>Here, a set comprehension collects the distinct values taken by the difference between the row and column along this diagonal, which in this case gives <code>{0}</code>. That is, if we placed 8 bishops along this &#x2197; diagonal they would all attack each other along this diagonal. The sum of the row and column takes 8 distinct values, however, meaning no pair attacks along a &#x2196; diagonal.
-</p>
-<p><a href="https://docs.python.org/3/reference/expressions.html#comparisons">Comparison operators chain in Python</a>, so the expression:
-</p>
+</code></pre>
+<p>Here, a set comprehension collects the distinct values taken by the difference between the row and column along this diagonal, which in this case gives <code>{0}</code>. That is, if we placed 8 bishops along this &#x2197; diagonal they would all attack each other along this diagonal. The sum of the row and column takes 8 distinct values, however, meaning no pair attacks along a &#x2196; diagonal.</p>
+<p><a href="https://docs.python.org/3/reference/expressions.html#comparisons">Comparison operators chain in Python</a>, so the expression:</p>
 <pre><code>n == len({Q[i]+i for i in sqs}) == len({Q[i]-i for i in sqs})
-</code></pre><p>is <code>True</code> if both sets have 8 elements, that is, if the squares in <code>Q</code> are on distinct &#x2196; and &#x2197; diagonals; or, equivalently no pair of bishops placed on the squares in <code>Q</code> would attack each other. Since we already know <code>Q</code> positions 8 rooks so that no pair attacks each other, and a chess Queen combines the moves of a rook and a bishop, we can see that <code>Qs</code> generates every possible way of placing 8 Queens on a chessboard so that no pair attacks each other: which is to say, we&#8217;ve solved the <a href="https://en.wikipedia.org/wiki/Eight_queens_puzzle">8 Queens puzzle</a>.
-</p>
+</code></pre>
+<p>is <code>True</code> if both sets have 8 elements, that is, if the squares in <code>Q</code> are on distinct &#x2196; and &#x2197; diagonals; or, equivalently no pair of bishops placed on the squares in <code>Q</code> would attack each other. Since we already know <code>Q</code> positions 8 rooks so that no pair attacks each other, and a chess Queen combines the moves of a rook and a bishop, we can see that <code>Qs</code> generates every possible way of placing 8 Queens on a chessboard so that no pair attacks each other: which is to say, we&#8217;ve solved the <a href="https://en.wikipedia.org/wiki/Eight_queens_puzzle">8 Queens puzzle</a>.</p>
 <pre><code>Qs = (Q for Q in permutations(sqs)
       if n == len({Q[i]+i for i in sqs})
            == len({Q[i]-i for i in sqs}))
-</code></pre><p>This is beautiful code and there&#8217;s one final twist.
-</p>
-<p><code>Qs</code> is a <a href="https://docs.python.org/3/reference/expressions.html#generator-expressions">generator expression</a> primed to permute squares into neighbourly rooks filtered by amicable bishops yielding unthreatening Queens. Until asked, however, it does nothing.
-</p>
+</code></pre>
+<p>This is beautiful code and there&#8217;s one final twist.</p>
+<p><code>Qs</code> is a <a href="https://docs.python.org/3/reference/expressions.html#generator-expressions">generator expression</a> primed to permute squares into neighbourly rooks filtered by amicable bishops yielding unthreatening Queens. Until asked, however, it does nothing.</p>
 <p style="font-size:4em">&#9813;&#9813;&#9813;&#9813;&#9813;&#9813;&#9813;&#9813;</p>
 </div>
 

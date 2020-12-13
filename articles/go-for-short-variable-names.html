@@ -26,42 +26,32 @@
       <div class="atomentry" id="go-for-short-variable-names">
 <h2 class="title"><a href="/articles/go-for-short-variable-names">Go for short variable names</a></h2>
 <p class="meta"><abbr class="published" title="2014-03-06">2014-03-06</abbr> &bull; <a href="/tag/go" rel="tag">Go</a> &bull; <a href="/articles/go-for-short-variable-names#disqus_thread">Comments</a></p>
-<p>Recently Brad Fitzpatrick promoted the <a href="http://golang.org/s/style" title="Go style guide">Go style guide</a> on twitter, which prompted Tim Penhey to take issue with its advice on variable naming.
-</p>
+<p>Recently Brad Fitzpatrick promoted the <a href="http://golang.org/s/style" title="Go style guide">Go style guide</a> on twitter, which prompted Tim Penhey to take issue with its advice on variable naming.</p>
 <div><blockquote class="twitter-tweet" lang="en"><p><a href="https://twitter.com/bradfitz">@bradfitz</a> sorry, but can&#39;t agree with &#8220;use short variable names over descriptive ones&#8221; <a href="https://twitter.com/search?q=%23golang&amp;src=hash">#golang</a> <a href="https://twitter.com/search?q=%23styleguide&amp;src=hash">#styleguide</a> /cc <a href="https://twitter.com/sidneidasilva">@sidneidasilva</a></p>&mdash; Tim Penhey (@howbazaar) <a href="https://twitter.com/howbazaar/statuses/437893595857571840">February 24, 2014</a></blockquote><script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script></div>
 
-<p>A brief and inconclusive exchange followed. Twitter&#8217;s fine for opinions and one-liners but flawed for discussions &#8212; even when the subject happens to be brevity.
-</p>
-<p>I&#8217;m not going to tweet about it, but I like Go and I like its style. I&#8217;d rather read code which uses short variable names. Long descriptive names, which may appear to provide more information, often obscure the structure and flow of the code. The narrower the scope, the shorter names can be; so the style guide implicitly sanctions short functions and shuns globals. All good.
-</p>
-<p>How short is short?
-</p>
+<p>A brief and inconclusive exchange followed. Twitter&#8217;s fine for opinions and one-liners but flawed for discussions &#8212; even when the subject happens to be brevity.</p>
+<p>I&#8217;m not going to tweet about it, but I like Go and I like its style. I&#8217;d rather read code which uses short variable names. Long descriptive names, which may appear to provide more information, often obscure the structure and flow of the code. The narrower the scope, the shorter names can be; so the style guide implicitly sanctions short functions and shuns globals. All good.</p>
+<p>How short is short?</p>
 <div><blockquote class="twitter-tweet" data-conversation="none" lang="en"><p><a href="https://twitter.com/golang">@golang</a> where does it stop? In our project we have &#8220;c, ch, d, m, s, st&#8221; and they point and say &#8220;style guide says it is fine&#8221;.</p>&mdash; Tim Penhey (@howbazaar) <a href="https://twitter.com/howbazaar/statuses/438084788038037505">February 24, 2014</a></blockquote></div>
 
-<p>Those variables are certainly short rather than descriptive but they aren&#8217;t scary: <code>c</code> could be a character; <code>ch</code> for channel, maybe, or another character; <code>d</code> for data, difference or distance; <code>m</code>, midpoint; <code>s</code> string; <code>st</code> state. All guesses, of course, but in context I&#8217;d expect to see &#8212; in the space of just a few lines of code &#8212; where each variable lives and how it&#8217;s used, a more clear and correct indication of what it means than a lengthy name could ever be.
-</p>
-<p>Single character variables are just fine, says the <a href="http://golang.org/s/style" title="Go style guide">style guide</a>:
-</p>
-<blockquote><p>Prefer c to lineCount. Prefer i to sliceIndex.
-</p>
-</blockquote><p>Some languages allow you to go further. Omit a variable in Perl and it defaults to being what you&#8217;d like it to be. Usually.
-</p>
-<p>A single character variable name is an extreme form of abbreviation. It works nicely for small things, like pixels and characters.
-</p>
+<p>Those variables are certainly short rather than descriptive but they aren&#8217;t scary: <code>c</code> could be a character; <code>ch</code> for channel, maybe, or another character; <code>d</code> for data, difference or distance; <code>m</code>, midpoint; <code>s</code> string; <code>st</code> state. All guesses, of course, but in context I&#8217;d expect to see &#8212; in the space of just a few lines of code &#8212; where each variable lives and how it&#8217;s used, a more clear and correct indication of what it means than a lengthy name could ever be.</p>
+<p>Single character variables are just fine, says the <a href="http://golang.org/s/style" title="Go style guide">style guide</a>:</p>
+<blockquote>
+<p>Prefer c to lineCount. Prefer i to sliceIndex.</p>
+</blockquote>
+<p>Some languages allow you to go further. Omit a variable in Perl and it defaults to being what you&#8217;d like it to be. Usually.</p>
+<p>A single character variable name is an extreme form of abbreviation. It works nicely for small things, like pixels and characters.</p>
 <pre><code>Pixel pixel, pel, px, <b>p</b>;
 Character character, char, ch, <b>c</b>;</code></pre>
 
-<p>Some less terse abbreviations hurt my ear: <code>mngr</code>, <code>svr</code>, <code>cnt</code>.
-</p>
+<p>Some less terse abbreviations hurt my ear: <code>mngr</code>, <code>svr</code>, <code>cnt</code>.</p>
 <p>The style guide is, after all, a guide, and common sense applies.
-   Some abbreviations are ugly and others save so little space they aren&#8217;t worth it.
-</p>
-<p>Go&#8217;s advice on naming tips a hat to the language&#8217;s C heritage and to C&#8217;s great application, UNIX, which is unsurprising when you realise one of Go&#8217;s prominent contributors, Ken Thompson, had a hand in both. When Thompson was asked what he would do differently if he were redesigning UNIX <a href="http://en.wikiquote.org/wiki/Kenneth_Thompson#Attributed" title="Ken Thompson, quoted in The UNIX Programming Environment (Kernighan, Pike)">he replied</a>: 
-</p>
-<blockquote><p>I&#8217;d spell <a href="http://unixhelp.ed.ac.uk/CGI/man-cgi?creat" title="man 2 creat">creat</a> with an &#8220;e&#8221;.
-</p>
-</blockquote><p>So, working on Go, <a href="https://code.google.com/p/go/source/detail?r=4a3f6bbb5f0c6021279ccb3c23558b3c480d995f" title="Spell it with an e">he did</a>.
-</p>
+Some abbreviations are ugly and others save so little space they aren&#8217;t worth it.</p>
+<p>Go&#8217;s advice on naming tips a hat to the language&#8217;s C heritage and to C&#8217;s great application, UNIX, which is unsurprising when you realise one of Go&#8217;s prominent contributors, Ken Thompson, had a hand in both. When Thompson was asked what he would do differently if he were redesigning UNIX <a href="http://en.wikiquote.org/wiki/Kenneth_Thompson#Attributed" title="Ken Thompson, quoted in The UNIX Programming Environment (Kernighan, Pike)">he replied</a>: </p>
+<blockquote>
+<p>I&#8217;d spell <a href="http://unixhelp.ed.ac.uk/CGI/man-cgi?creat" title="man 2 creat">creat</a> with an &#8220;e&#8221;.</p>
+</blockquote>
+<p>So, working on Go, <a href="https://code.google.com/p/go/source/detail?r=4a3f6bbb5f0c6021279ccb3c23558b3c480d995f" title="Spell it with an e">he did</a>.</p>
 </div>
 
 <div class="comments"><hr/><div id="disqus_thread"></div><script type="text/javascript" src="http://disqus.com/forums/wordaligned/embed.js"></script></div>

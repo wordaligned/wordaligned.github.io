@@ -29,48 +29,40 @@
 <h2 class="title"><a href="/articles/my-first-typo-sidebar">My First Typo Sidebar</a></h2>
 <p class="meta"><abbr class="published" title="2006-11-12">2006-11-12</abbr> &bull; <a href="/tag/web-applications" rel="tag">Web Applications</a>, <a href="/tag/ruby" rel="tag">Ruby</a>, <a href="/tag/ruby-on-rails" rel="tag">Ruby on Rails</a> &bull; <a href="/articles/my-first-typo-sidebar#disqus_thread">Comments</a></p>
 <p>I recently developed my very own plugin for this <a href="http://blog.wordaligned.org">blog</a>. To cut a
-   short story even shorter, I wrote a <a href="http://www.ruby-lang.org">Ruby</a> class and an HTML
-   template, and I was done.
-</p>
-<span id="continue-reading"/>
-
-
-<h3>The Plugin</h3>
+short story even shorter, I wrote a <a href="http://www.ruby-lang.org">Ruby</a> class and an HTML
+template, and I was done.</p>
+<p><span id="continue-reading"/></p>
+<h3 id="the-plugin">The Plugin</h3>
 <p>Whilst wandering around the <a href="http://www.google.co.uk/ig/directory?hl=en">Google gadgets</a>
-   pages, I&#8217;d spotted <a href="http://abowman.com">Adam Bowman&#8217;s</a> animated <a href="http://abowman.com/google-modules/tree-frog/">Treefrog</a>.
-   It appealed. I wanted one on my <a href="http://blog.wordaligned.org">blog</a>.
-</p>
+pages, I&#8217;d spotted <a href="http://abowman.com">Adam Bowman&#8217;s</a> animated <a href="http://abowman.com/google-modules/tree-frog/">Treefrog</a>.
+It appealed. I wanted one on my <a href="http://blog.wordaligned.org">blog</a>.</p>
 <p>What did I have to do? The content required nothing complicated,
-   nothing dynamic: just a static chunk of HTML. How difficult could it be?
-</p>
-
-<h3>Read the code, Not the manual</h3>
+nothing dynamic: just a static chunk of HTML. How difficult could it be?</p>
+<h3 id="read-the-code-not-the-manual">Read the code, Not the manual</h3>
 <p>I&#8217;ve fiddled round with Typo
-   <a href="/articles/my-test-first-ruby-program.html">before</a>
-   and found reading the code to be the best way to figure out
-   what to do. In this case, I needed to look at an existing sidebar
-   plugin. I guessed the best model for my new plugin would be the
-   &#8220;Static&#8221; sidebar component which I use to list a collection
-   of links to favourite web sites.
-</p>
+<a href="/articles/my-test-first-ruby-program.html">before</a>
+and found reading the code to be the best way to figure out
+what to do. In this case, I needed to look at an existing sidebar
+plugin. I guessed the best model for my new plugin would be the
+&#8220;Static&#8221; sidebar component which I use to list a collection
+of links to favourite web sites.</p>
 <p>I soon found the controller for this plugin in the
-   <code>components/plugins/sidebars/</code> subdirectory of my <a href="http://www.typosphere.org">Typo</a>
-   installation. It&#8217;s a simple <a href="http://www.ruby-lang.org">Ruby</a> class derived from
-   <code>Sidebars::ComponentPlugin</code>:
-</p>
+<code>components/plugins/sidebars/</code> subdirectory of my <a href="http://www.typosphere.org">Typo</a>
+installation. It&#8217;s a simple <a href="http://www.ruby-lang.org">Ruby</a> class derived from
+<code>Sidebars::ComponentPlugin</code>:</p>
 <div class="typocode"><div class="codetitle">components/plugins/sidebars/static_controller.rb</div>
 
 <pre class="prettyprint">class Plugins::Sidebars::StaticController &lt; Sidebars::ComponentPlugin
   description "Static content, like links to other sites, advertisements, or blog meta-infomation"
 
-DEFAULT_TEXT = %q{
+  DEFAULT_TEXT = %q{
 &lt;ul&gt;
   &lt;li&gt;&lt;a href="http://www.typosphere.org" title="Typo"&gt;Typo&lt;/a&gt;&lt;/li&gt;
   ....
 &lt;/ul&gt;
 }
 
-setting :title, 'Links'
+  setting :title, &#x27;Links&#x27;
   setting :body, DEFAULT_TEXT, :input_type =&gt; :text_area
 
 end
@@ -80,37 +72,33 @@ end
 </div>
 
 <p>I also spotted a <code>components/plugins/sidebars/static</code> subdirectory,
-   and in this subdirectory was a two-line HTML template.
-</p>
+and in this subdirectory was a two-line HTML template.</p>
 <div class="typocode"><div class="codetitle">components/plugins/sidebars/static/content.html</div>
 
-<pre class="prettyprint">&lt;h3&gt;&lt;%= @sb_config['title'] %&gt;&lt;/h3&gt;
-&lt;%= @sb_config['body'] %&gt;
+<pre class="prettyprint">&lt;h3&gt;&lt;%= @sb_config[&#x27;title&#x27;] %&gt;&lt;/h3&gt;
+&lt;%= @sb_config[&#x27;body&#x27;] %&gt;
 
 </pre>
 
 </div>
 
-
-<h3>My Plugin</h3>
-<p>My plugin was even more simple than the static one. I created a class:
-</p>
+<h3 id="my-plugin">My Plugin</h3>
+<p>My plugin was even more simple than the static one. I created a class:</p>
 <div class="typocode"><div class="codetitle">components/plugins/sidebars/treefrog_controller.rb</div>
 
 <pre class="prettyprint">class Plugins::Sidebars::TreefrogController &lt; Sidebars::ComponentPlugin
-  description 'Treefrog'
-  setting :title, 'Treefrog'
+  description &#x27;Treefrog&#x27;
+  setting :title, &#x27;Treefrog&#x27;
 end
 
 </pre>
 
 </div>
 
-<p>and an HTML template:
-</p>
+<p>and an HTML template:</p>
 <div class="typocode"><div class="codetitle">components/plugins/sidebars/treefrog/content.rhtml</div>
 
-<pre class="prettyprint">&lt;h3&gt;&lt;%= @sb_config['title'] %&gt;&lt;/h3&gt;
+<pre class="prettyprint">&lt;h3&gt;&lt;%= @sb_config[&#x27;title&#x27;] %&gt;&lt;/h3&gt;
 &lt;object
 type="application/x-shockwave-flash"
 data="files/treefrog.swf"
@@ -123,38 +111,28 @@ width="150" height="200"&gt;
 </div>
 
 <p>and I was done. As <a href="/articles/my-test-first-ruby-program.html">before</a>, I ran a local <a href="http://www.typosphere.org">Typo</a> session to check my
-   plugin worked, then I copied the files over to my
-   live site. Job done.
-</p>
-
-<h3>So What?</h3>
+plugin worked, then I copied the files over to my
+live site. Job done.</p>
+<h3 id="so-what">So What?</h3>
 <p>So what&#8217;s so amazing about this? Absolutely nothing.  This is hardly
-   rocket science.
-</p>
-<p>Notice, though, that:
-</p>
+rocket science.</p>
+<p>Notice, though, that:</p>
 <ol>
- <li><p>I didn&#8217;t have to restart my blog server
-</p>
-
- </li>
-
- <li><p>I didn&#8217;t have to change <em>any</em> existing part of my <a href="http://www.typosphere.org">blog
-   application</a> &#8212; the changes were purely additive.
-</p>
-
- </li>
-
- <li><p>I didn&#8217;t reconfigure anything. I didn&#8217;t have to register my plugin. I
-      didn&#8217;t have to tell my class where to find the HTML template. I didn&#8217;t
-      have to write or generate loads of XML.
-</p>
-
- </li>
+<li>
+<p>I didn&#8217;t have to restart my blog server</p>
+</li>
+<li>
+<p>I didn&#8217;t have to change <em>any</em> existing part of my <a href="http://www.typosphere.org">blog
+   application</a> &#8212; the changes were purely additive.</p>
+</li>
+<li>
+<p>I didn&#8217;t reconfigure anything. I didn&#8217;t have to register my plugin. I
+   didn&#8217;t have to tell my class where to find the HTML template. I didn&#8217;t
+   have to write or generate loads of XML.</p>
+</li>
 </ol>
 <p>No, this isn&#8217;t amazing. So why do so many other application
-   development frameworks get it so very wrong?
-</p>
+development frameworks get it so very wrong?</p>
 </div>
 
 <h5><a name="feedback">Feedback</a></h5>

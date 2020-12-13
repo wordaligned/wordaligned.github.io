@@ -28,17 +28,13 @@
       <div class="atomentry" id="one-svnserve-multiple-repositories">
 <h2 class="title"><a href="/articles/one-svnserve-multiple-repositories">One svnserve, multiple repositories</a></h2>
 <p class="meta"><abbr class="published" title="2007-01-17">2007-01-17</abbr> &bull; <a href="/tag/subversion" rel="tag">Subversion</a> &bull; <a href="/articles/one-svnserve-multiple-repositories#disqus_thread">Comments</a></p>
-<p>A note on how a single <code>svnserve</code> can serve multiple repositories.
-</p>
-<span id="continue-reading"/>
-
-
-<h3>Yellow Dog</h3>
+<p>A note on how a single <code>svnserve</code> can serve multiple repositories.</p>
+<p><span id="continue-reading"/></p>
+<h3 id="yellow-dog">Yellow Dog</h3>
 <p>Let&#8217;s suppose the Yellow Dog project uses <a href="http://subversion.tigris.org">Subversion</a>. You&#8217;ve set up a
-   Subversion server (let&#8217;s give it a hostname <code>svnserver</code>), created a
-   user <code>svn</code>, and a repository <code>/home/svn/repository</code>. Here&#8217;s the
-   command you use to start the server:
-</p>
+Subversion server (let&#8217;s give it a hostname <code>svnserver</code>), created a
+user <code>svn</code>, and a repository <code>/home/svn/repository</code>. Here&#8217;s the
+command you use to start the server:</p>
 <div class="typocode">
 
 <pre class="prettyprint">$ svnserve -d -r /home/svn/repository
@@ -47,17 +43,13 @@
 
 </div>
 
-
-<h3>Red Bear, Blue Goat</h3>
+<h3 id="red-bear-blue-goat">Red Bear, Blue Goat</h3>
 <p><span id="excerpt0"/>Sometime later, the Red Bear project also decides to use
-   Subversion. This project is unrelated to the Yellow Dog project and
-   therefore needs its own repository. Similarly, we want a Blue Goat
-   repository for yet another unrelated project.
-</p>
-
-<h3>What to do</h3>
-<p>Here&#8217;s what to do.
-</p>
+Subversion. This project is unrelated to the Yellow Dog project and
+therefore needs its own repository. Similarly, we want a Blue Goat
+repository for yet another unrelated project.</p>
+<h3 id="what-to-do">What to do</h3>
+<p>Here&#8217;s what to do.</p>
 <div class="typocode"><div class="codetitle">Creating the new repositories</div>
 
 <pre class="prettyprint">$ ssh svn@svnserver
@@ -70,8 +62,7 @@ $ svnadmin create blue_goat
 
 </div>
 
-<p>Now we should have a directory layout like the following.
-</p>
+<p>Now we should have a directory layout like the following.</p>
 <div class="typocode"><div class="codetitle">The view from /home/svn</div>
 
 <pre class="prettyprint">+---repositories
@@ -99,10 +90,9 @@ $ svnadmin create blue_goat
 </div>
 
 <p>All we need to do is move the (poorly named) original Yellow Dog
-   repository alongside the newer ones. I&#8217;d recommend taking down
-   <code>svnserve</code> first, and of course notifying everyone working on the
-   Yellow Dog project &#8212; but the move really will only take a few seconds.
-</p>
+repository alongside the newer ones. I&#8217;d recommend taking down
+<code>svnserve</code> first, and of course notifying everyone working on the
+Yellow Dog project &#8212; but the move really will only take a few seconds.</p>
 <div class="typocode"><div class="codetitle">Moving the old repository and restarting the server</div>
 
 <pre class="prettyprint">$ killall svnserve
@@ -113,32 +103,19 @@ $ svnserve -d -r /home/svn/repositories
 
 </div>
 
-
-<h3>Inetd mode</h3>
+<h3 id="inetd-mode">Inetd mode</h3>
 <p>If you&#8217;re using <code>svnserve</code> in <code>inetd</code> mode, most of the above applies
-   directly &#8212; you simply adjust the <code>svnserve</code> configuration file in the
-   obvious way to reflect the new repository root.
-</p>
-
-<h3>Repository URLs</h3>
-<p>The new repository URLs are:
-</p>
+directly &#8212; you simply adjust the <code>svnserve</code> configuration file in the
+obvious way to reflect the new repository root.</p>
+<h3 id="repository-urls">Repository URLs</h3>
+<p>The new repository URLs are:</p>
 <ul>
- <li>
-     <code>svn://svnserver/yellow_dog</code>
- </li>
-
- <li>
-     <code>svn://svnserver/blue_goat</code>
- </li>
-
- <li>
-     <code>svn://svnserver/red_bear</code>
- </li>
+<li><code>svn://svnserver/yellow_dog</code></li>
+<li><code>svn://svnserver/blue_goat</code></li>
+<li><code>svn://svnserver/red_bear</code></li>
 </ul>
 <p>Note that the old URL for the Yellow Dog project was <code>svn://svnserver</code>. This
-   means that anyone with a Yellow Dog working copy will have to svn switch it.
-</p>
+means that anyone with a Yellow Dog working copy will have to svn switch it.</p>
 <div class="typocode">
 
 <pre class="prettyprint">$ svn switch --relocate svn://svnserver svn://svnserver/yellow_dog
@@ -147,29 +124,18 @@ $ svnserve -d -r /home/svn/repositories
 
 </div>
 
-
-<h3>Loose Ends</h3>
+<h3 id="loose-ends">Loose Ends</h3>
 <p>There may be a few scripts kicking around which need to be changed to
-   reflect the new layout:
-</p>
+reflect the new layout:</p>
 <ul>
- <li>
-     the repository backup script
- </li>
-
- <li>
-     the Yellow Dog automated build
- </li>
-
- <li>
-     any <a href="/articles/personal-overnight-builds.html">personal build scripts</a>.
- </li>
+<li>the repository backup script</li>
+<li>the Yellow Dog automated build</li>
+<li>any <a href="/articles/personal-overnight-builds.html">personal build scripts</a>.</li>
 </ul>
 <p>Nothing should be hard, but with a very little forwarded planning
-   you&#8217;ll see no loss of service. Once you&#8217;ve adjusted (if necessary)
-   your backup script, I&#8217;d suggest now would be a good time to rehearse
-   the recover-from-backup procedure.
-</p>
+you&#8217;ll see no loss of service. Once you&#8217;ve adjusted (if necessary)
+your backup script, I&#8217;d suggest now would be a good time to rehearse
+the recover-from-backup procedure.</p>
 </div>
 
 <h5><a name="feedback">Feedback</a></h5>

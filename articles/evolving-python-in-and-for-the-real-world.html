@@ -28,72 +28,42 @@
       <div class="atomentry" id="evolving-python-in-and-for-the-real-world">
 <h2 class="title"><a href="/articles/evolving-python-in-and-for-the-real-world">Evolving Python in and for the real world</a></h2>
 <p class="meta"><abbr class="published" title="2007-06-22">2007-06-22</abbr> &bull; <a href="/tag/c++" rel="tag">C++</a>, <a href="/tag/python" rel="tag">Python</a>, <a href="/tag/reviews" rel="tag">Reviews</a> &bull; <a href="/articles/evolving-python-in-and-for-the-real-world#disqus_thread">Comments</a></p>
-<p>When I first became interested in Python &#8212; and in particular interested enough to discover the <a href="http://www.python.org/dev/peps/">PEPs</a> &#8212; I wondered what exactly Python 3000 was. From what I could make out Python 3000 seemed to be more of philosophical than practical importance. I assumed the term provided a framework for discussing how Python might have been given the luxury of hindsight; if only we didn&#8217;t have to worry about backwards compatibility; if only we could break existing code; if only &#8230;
-</p>
-<span id="continue-reading"/>
-
-
-<h4>Warts, wrinkles, backwards compatibility</h4>
-<p>I guess I was wrong. <a href="http://www.python.org/dev/peps/pep-3000/">Python 3000</a> is real and it is happening. The benevolent dictator for life is exercising his prerogative and pushing through some <a href="http://www.artima.com/weblogs/viewpost.jsp?thread=208549">dictatorial changes</a>.  Python&#8217;s warts and wrinkles aren&#8217;t being quietly tolerated or even deprecated. Instead, the language as a whole will be forked.
-</p>
-<p>There&#8217;s been plenty of reaction to this in the <a href="http://lambda-the-ultimate.org/node/2302">usual places</a>.
-</p>
-<p>Undoubtedly if you need to maintain two parallel versions of a Python application, things will get messy; and simply leaping from Python 2.x to Python 3.x is going to require a lot more care than, say, hopping from 2.5 to 2.6.
-</p>
-<p>That said, I think the move is the right thing for Python. For one thing, Python builds on a stable subset of a stable platform (i.e. C) and you can easily download and build any released version of Python <sup><a href="#footnote1">[1]</a></sup>, which in turn means you can avoid fiddling with code you don&#8217;t want to touch simply by bundling it with the version of Python it was developed against.
-</p>
-<p>It&#8217;s a brave move too. All of a sudden everyone loves <code>reduce</code>. All of a sudden everyone has a suggestion to make.
-</p>
-<p>I applaud Python 3000 because software should be soft, including the language it&#8217;s written in. Every week Isobel has to learn 10 spellings, which usually centre on the same vowel sounds spelled in different ways: try, sigh, pie, why? <strong>Why?</strong> Backwards compatibility<sup><a href="#footnote2">[2]</a></sup>. She has to cope with inconsistent English but I&#8217;d rather she didn&#8217;t have to learn about two types of classes, &#8220;classic&#8221; and &#8220;new-style&#8221;. I don&#8217;t want her to have to prefer <code>xrange</code> to <code>range</code>, <code>itertools.imap</code> to <code>map</code> and so on. And however important it might be for a programmer to appreciate integral arithmetic, I&#8217;d prefer the division symbol to indicate division, not division and truncation.
-</p>
-<p>I suspect the decision to push towards Python 3000 was one more easily taken by a dictator than by a committee, but I do find it encouraging that someone so intimately involved with the language can step back from the code-face and realise the importance of putting things right. As a programmer, I know how it feels to be responsible for a bug in code which got shipped &#8212; however successful that code might be. This too must motivate Guido van Rossum.
-</p>
-
-<h4>Design by Committee</h4>
-<p>Committees can make bold decisions too. The best true story I&#8217;ve ever read on the subject of computer language evolution has to be Bjarne Stroustrup&#8217;s <a href="http://www.research.att.com/~bs/dne.html">&#8220;The Design and Evolution of C++&#8221;</a> (also known as the D&amp;E book). It&#8217;s not intended for students who want learn how to program in C++, but I regard it essential reading for anyone who really wants to make sense of the language (just as Isobel will need to appreciate the roots of English if she ever wants to really get to grips with it). The D&amp;E book story ends in 1994 but C++ has continued to evolve. Stroustrup has started work on bringing the story up to date, and you can find a draft of his paper &#8220;Evolving a language in and for the real world: C++ 1991-2006&#8221; <a href="http://www.research.att.com/~bs/hopl-almost-final.pdf">here</a>. On the subject of committees, responsibility, and real world pressures, he writes:
-</p>
-<blockquote><p>Changing the definition of a widely used language is very different from simple design from first principles. Whenever we have a &#8220;good idea&#8221;, however major or minor, we must remember that:
-</p>
+<p>When I first became interested in Python &#8212; and in particular interested enough to discover the <a href="http://www.python.org/dev/peps/">PEPs</a> &#8212; I wondered what exactly Python 3000 was. From what I could make out Python 3000 seemed to be more of philosophical than practical importance. I assumed the term provided a framework for discussing how Python might have been given the luxury of hindsight; if only we didn&#8217;t have to worry about backwards compatibility; if only we could break existing code; if only &#8230;</p>
+<p><span id="continue-reading"/></p>
+<h4 id="warts-wrinkles-backwards-compatibility">Warts, wrinkles, backwards compatibility</h4>
+<p>I guess I was wrong. <a href="http://www.python.org/dev/peps/pep-3000/">Python 3000</a> is real and it is happening. The benevolent dictator for life is exercising his prerogative and pushing through some <a href="http://www.artima.com/weblogs/viewpost.jsp?thread=208549">dictatorial changes</a>.  Python&#8217;s warts and wrinkles aren&#8217;t being quietly tolerated or even deprecated. Instead, the language as a whole will be forked.</p>
+<p>There&#8217;s been plenty of reaction to this in the <a href="http://lambda-the-ultimate.org/node/2302">usual places</a>.</p>
+<p>Undoubtedly if you need to maintain two parallel versions of a Python application, things will get messy; and simply leaping from Python 2.x to Python 3.x is going to require a lot more care than, say, hopping from 2.5 to 2.6.</p>
+<p>That said, I think the move is the right thing for Python. For one thing, Python builds on a stable subset of a stable platform (i.e. C) and you can easily download and build any released version of Python <sup><a href="#footnote1"><a href="http://en.wikipedia.org/wiki/Optimization_(computer_science)#Quotes">1</a></a></sup>, which in turn means you can avoid fiddling with code you don&#8217;t want to touch simply by bundling it with the version of Python it was developed against.</p>
+<p>It&#8217;s a brave move too. All of a sudden everyone loves <code>reduce</code>. All of a sudden everyone has a suggestion to make.</p>
+<p>I applaud Python 3000 because software should be soft, including the language it&#8217;s written in. Every week Isobel has to learn 10 spellings, which usually centre on the same vowel sounds spelled in different ways: try, sigh, pie, why? <strong>Why?</strong> Backwards compatibility<sup><a href="#footnote2"><a href="http://www.pragmaticprogrammer.com/titles/ruby/index.html">2</a></a></sup>. She has to cope with inconsistent English but I&#8217;d rather she didn&#8217;t have to learn about two types of classes, &#8220;classic&#8221; and &#8220;new-style&#8221;. I don&#8217;t want her to have to prefer <code>xrange</code> to <code>range</code>, <code>itertools.imap</code> to <code>map</code> and so on. And however important it might be for a programmer to appreciate integral arithmetic, I&#8217;d prefer the division symbol to indicate division, not division and truncation.</p>
+<p>I suspect the decision to push towards Python 3000 was one more easily taken by a dictator than by a committee, but I do find it encouraging that someone so intimately involved with the language can step back from the code-face and realise the importance of putting things right. As a programmer, I know how it feels to be responsible for a bug in code which got shipped &#8212; however successful that code might be. This too must motivate Guido van Rossum.</p>
+<h4 id="design-by-committee">Design by Committee</h4>
+<p>Committees can make bold decisions too. The best true story I&#8217;ve ever read on the subject of computer language evolution has to be Bjarne Stroustrup&#8217;s <a href="http://www.research.att.com/~bs/dne.html">&#8220;The Design and Evolution of C++&#8221;</a> (also known as the D&amp;E book). It&#8217;s not intended for students who want learn how to program in C++, but I regard it essential reading for anyone who really wants to make sense of the language (just as Isobel will need to appreciate the roots of English if she ever wants to really get to grips with it). The D&amp;E book story ends in 1994 but C++ has continued to evolve. Stroustrup has started work on bringing the story up to date, and you can find a draft of his paper &#8220;Evolving a language in and for the real world: C++ 1991-2006&#8221; <a href="http://www.research.att.com/~bs/hopl-almost-final.pdf">here</a>. On the subject of committees, responsibility, and real world pressures, he writes:</p>
+<blockquote>
+<p>Changing the definition of a widely used language is very different from simple design from first principles. Whenever we have a &#8220;good idea&#8221;, however major or minor, we must remember that:</p>
 <ul>
- <li>
-     there are millions of lines of code &#8220;out there&#8221; &#8212; most will not be rewritten however much gain might result from a rewrite
- </li>
-
- <li>
-     there are millions of programmers &#8220;out there&#8221; &#8212;  won&#8217;t take out time to learn something new unless they consider it essential
- </li>
-
- <li>
-     there are decade old compilers still in use &#8212; programmers can&#8217;t use a language feature that doesn&#8217;t compile on every platform they support
- </li>
-
- <li>
-     there are many millions of outdated textbooks out there &#8212; many will still be in use in five years&#8217; time
- </li>
+<li>there are millions of lines of code &#8220;out there&#8221; &#8212; most will not be rewritten however much gain might result from a rewrite</li>
+<li>there are millions of programmers &#8220;out there&#8221; &#8212;  won&#8217;t take out time to learn something new unless they consider it essential</li>
+<li>there are decade old compilers still in use &#8212; programmers can&#8217;t use a language feature that doesn&#8217;t compile on every platform they support</li>
+<li>there are many millions of outdated textbooks out there &#8212; many will still be in use in five years&#8217; time</li>
 </ul>
-<p>The committee considers these factors and obviously that gives a somewhat conservative bias. Among other things, the members of the committee are indirectly responsible for well over a million lines of code (as members of their organizations).
-</p>
-</blockquote><p>Yet despite these pressures, the C++ committee agreed to delay standarising C++ by a whole year so that the fabulous <a href="http://www.sgi.com/tech/stl/">STL</a> could be formally incorporated into the language. I think it&#8217;s not overstating things to say that the subsequent success of the STL has exposed problems in the C++ language itself, and that addressing these problems is the focus of its next formal revision, C++09. It&#8217;s also clear, though, that the C++ standards committee will make every effort to ensure C++09 is backwards compatible; meaning that it&#8217;s going to include all the old baggage and introduce a whole lot more.
-</p>
-<p>Although I&#8217;m far from being a C++ language lawyer, I know C++ well enough to wield it safely. I also know C++ well enough to see that C++09 will squarely hit all the right targets: it&#8217;s going to allow us to write more compact, more readable, more efficient C++, and compiler error messages are going to make a lot more sense (once implementations are brought up to date, that is). That said, I think the ever growing C++ legacy is going to become a huge barrier to entry: if you haven&#8217;t grown up with C++, it&#8217;s going to be increasingly hard to use it, and it&#8217;s going to be a less-favoured choice for green field development. 
-</p>
-
-<h4>A prediction</h4>
-<p>I would be surprised if Isobel or any of her classmates ever learn to program in C++. I expect a good few of them to learn Python.
-</p>
-
-<h4>The real world?</h4>
-<p>Stroustrup says the task facing a &#8220;real world&#8221; language like C++ isn&#8217;t as easy as a &#8220;simple design from first principles&#8221;. Well, I strive for <a href="http://wiki.hsr.ch/SimpleCode/">simplicity</a> but, paradoxically, there&#8217;s nothing easy about it. <span id="excerpt0"/>In my experience simplicity must be discovered, not designed. Thus a simple design derives from &ndash; and may indeed break &ndash; a more complex one. That&#8217;s what Python 3000 is doing.
-</p>
-<p><hr />
-   <a id="footnote1">[1]</a>
-   Even in this digital age, not quite any released version. The README in the Python downloads ftp site says: 
-</p>
-<blockquote><p>If you find an older Python release (e.g. 0.9.8), we&#8217;re interested in getting a copy!  mailto:webmaster@python.org
-</p>
-</blockquote><p><a id="footnote2">[2]</a>
-   The written form of human languages <em>can</em> be radically revised. In 1928 <a href="http://www.allaboutturkey.com/ataturk.htm">Kemal Atat&uuml;rk</a> didn&#8217;t just change the way Turkish was spelled: he changed the alphabet too.
-</p>
+<p>The committee considers these factors and obviously that gives a somewhat conservative bias. Among other things, the members of the committee are indirectly responsible for well over a million lines of code (as members of their organizations).</p>
+</blockquote>
+<p>Yet despite these pressures, the C++ committee agreed to delay standarising C++ by a whole year so that the fabulous <a href="http://www.sgi.com/tech/stl/">STL</a> could be formally incorporated into the language. I think it&#8217;s not overstating things to say that the subsequent success of the STL has exposed problems in the C++ language itself, and that addressing these problems is the focus of its next formal revision, C++09. It&#8217;s also clear, though, that the C++ standards committee will make every effort to ensure C++09 is backwards compatible; meaning that it&#8217;s going to include all the old baggage and introduce a whole lot more.</p>
+<p>Although I&#8217;m far from being a C++ language lawyer, I know C++ well enough to wield it safely. I also know C++ well enough to see that C++09 will squarely hit all the right targets: it&#8217;s going to allow us to write more compact, more readable, more efficient C++, and compiler error messages are going to make a lot more sense (once implementations are brought up to date, that is). That said, I think the ever growing C++ legacy is going to become a huge barrier to entry: if you haven&#8217;t grown up with C++, it&#8217;s going to be increasingly hard to use it, and it&#8217;s going to be a less-favoured choice for green field development. </p>
+<h4 id="a-prediction">A prediction</h4>
+<p>I would be surprised if Isobel or any of her classmates ever learn to program in C++. I expect a good few of them to learn Python.</p>
+<h4 id="the-real-world">The real world?</h4>
+<p>Stroustrup says the task facing a &#8220;real world&#8221; language like C++ isn&#8217;t as easy as a &#8220;simple design from first principles&#8221;. Well, I strive for <a href="http://wiki.hsr.ch/SimpleCode/">simplicity</a> but, paradoxically, there&#8217;s nothing easy about it. <span id="excerpt0"/>In my experience simplicity must be discovered, not designed. Thus a simple design derives from &ndash; and may indeed break &ndash; a more complex one. That&#8217;s what Python 3000 is doing.</p>
+<hr />
+<p><a id="footnote1"><a href="http://en.wikipedia.org/wiki/Optimization_(computer_science)#Quotes">1</a></a>
+Even in this digital age, not quite any released version. The README in the Python downloads ftp site says: </p>
+<blockquote>
+<p>If you find an older Python release (e.g. 0.9.8), we&#8217;re interested in getting a copy!  mailto:webmaster@python.org</p>
+</blockquote>
+<p><a id="footnote2"><a href="http://www.pragmaticprogrammer.com/titles/ruby/index.html">2</a></a>
+The written form of human languages <em>can</em> be radically revised. In 1928 <a href="http://www.allaboutturkey.com/ataturk.htm">Kemal Atat&uuml;rk</a> didn&#8217;t just change the way Turkish was spelled: he changed the alphabet too.</p>
 </div>
 
 <div class="comments"><hr/><div id="disqus_thread"></div><script type="text/javascript" src="http://disqus.com/forums/wordaligned/embed.js"></script></div>

@@ -27,16 +27,14 @@
 <h2 class="title"><a href="/articles/why-zip-when-you-can-map">Why zip when you can map?</a></h2>
 <p class="meta"><abbr class="published" title="2014-12-16">2014-12-16</abbr> &bull; <a href="/tag/python" rel="tag">Python</a> &bull; <a href="/articles/why-zip-when-you-can-map#disqus_thread">Comments</a></p>
 <p><a href="http://en.wikipedia.org/wiki/Zipper"><img src="/images/zip.jpg" title="Why zip?" alt="Why zip?"/></a>
-   <a href="http://www.strava.com/activities/158661061"><img src="/images/dundry-thunder.jpg" alt="when you can map?" title="when you can map!"/></a>
-</p>
-<p>You&#8217;ve got a couple of parallel lists you&#8217;d like to combine and output, a line for each pair. Here&#8217;s one way to do it: use <code>zip</code> to do the combining.
-</p>
+<a href="http://www.strava.com/activities/158661061"><img src="/images/dundry-thunder.jpg" alt="when you can map?" title="when you can map!"/></a></p>
+<p>You&#8217;ve got a couple of parallel lists you&#8217;d like to combine and output, a line for each pair. Here&#8217;s one way to do it: use <code>zip</code> to do the combining.</p>
 <div class="typocode">
 
 <pre class="prettyprint">&gt;&gt;&gt; times = [42.12, 42.28, 42.34, 42.40, 42.45]
-&gt;&gt;&gt; names = ['Hickman', 'Guest', 'Burns', 'Williams']
-&gt;&gt;&gt; fmt = '{:20} {:.2f}'.format
-&gt;&gt;&gt; print('\n'.join(fmt(n, t) for n, t in zip(names, times)))
+&gt;&gt;&gt; names = [&#x27;Hickman&#x27;, &#x27;Guest&#x27;, &#x27;Burns&#x27;, &#x27;Williams&#x27;]
+&gt;&gt;&gt; fmt = &#x27;{:20} {:.2f}&#x27;.format
+&gt;&gt;&gt; print(&#x27;\n&#x27;.join(fmt(n, t) for n, t in zip(names, times)))
 Hickman              42.12
 Guest                42.28
 Burns                42.34
@@ -46,24 +44,21 @@ Williams             42.40
 
 </div>
 
-<p>Slightly more succinctly:
-</p>
+<p>Slightly more succinctly:</p>
 <div class="typocode">
 
-<pre class="prettyprint">&gt;&gt;&gt; print('\n'.join(fmt(*nt) for nt in zip(names, times)))
+<pre class="prettyprint">&gt;&gt;&gt; print(&#x27;\n&#x27;.join(fmt(*nt) for nt in zip(names, times)))
 ...
 
 </pre>
 
 </div>
 
-<p>If you look at the generator expression passed into <code>str.join</code>, you can see we&#8217;re just mapping <code>fmt</code> to the zipped <code>names</code> and <code>times</code> lists.
-</p>
-<p>Well, sort of.
-</p>
+<p>If you look at the generator expression passed into <code>str.join</code>, you can see we&#8217;re just mapping <code>fmt</code> to the zipped <code>names</code> and <code>times</code> lists.</p>
+<p>Well, sort of.</p>
 <div class="typocode">
 
-<pre class="prettyprint">&gt;&gt;&gt; print('\n'.join(map(fmt, zip(names, times))))
+<pre class="prettyprint">&gt;&gt;&gt; print(&#x27;\n&#x27;.join(map(fmt, zip(names, times))))
 Traceback (most recent call last):
 ...
 IndexError: tuple index out of range
@@ -72,12 +67,11 @@ IndexError: tuple index out of range
 
 </div>
 
-<p>To fix this, we <strong>could</strong> use <code>itertools.starmap</code> which effectively unpacks the zipped pairs.
-</p>
+<p>To fix this, we <strong>could</strong> use <code>itertools.starmap</code> which effectively unpacks the zipped pairs.</p>
 <div class="typocode">
 
 <pre class="prettyprint">&gt;&gt;&gt; from itertools import starmap
-&gt;&gt;&gt; print('\n'.join(starmap(fmt, zip(names, times))))
+&gt;&gt;&gt; print(&#x27;\n&#x27;.join(starmap(fmt, zip(names, times))))
 Hickman              42.12
 Guest                42.28
 Burns                42.34
@@ -87,13 +81,11 @@ Williams             42.40
 
 </div>
 
-<p>This latest version looks clean enough but there&#8217;s something odd about zipping two lists together only to unpack the resulting 2-tuples for consumption by the format function.
-</p>
-<p>Don&#8217;t forget, <code>map</code> happily accepts more than one sequence! There&#8217;s no need to <code>zip</code> after all.
-</p>
+<p>This latest version looks clean enough but there&#8217;s something odd about zipping two lists together only to unpack the resulting 2-tuples for consumption by the format function.</p>
+<p>Don&#8217;t forget, <code>map</code> happily accepts more than one sequence! There&#8217;s no need to <code>zip</code> after all.</p>
 <div class="typocode"><div class="codetitle">Don&#8217;t zip, map!</div>
 
-<pre class="prettyprint">&gt;&gt;&gt; print('\n'.join(map(fmt, names, times)))
+<pre class="prettyprint">&gt;&gt;&gt; print(&#x27;\n&#x27;.join(map(fmt, names, times)))
 ...
 
 </pre>

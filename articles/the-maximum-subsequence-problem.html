@@ -28,42 +28,9 @@
       <div class="atomentry" id="the-maximum-subsequence-problem">
 <h2 class="title"><a href="/articles/the-maximum-subsequence-problem">The Maximum Sum contiguous subsequence problem</a></h2>
 <p class="meta"><abbr class="published" title="2007-12-17">2007-12-17</abbr> &bull; <a href="/tag/algorithms" rel="tag">Algorithms</a>, <a href="/tag/puzzles" rel="tag">Puzzles</a>, <a href="/tag/python" rel="tag">Python</a>, <a href="/tag/functional-programming" rel="tag">Functional Programming</a>, <a href="/tag/scheme" rel="tag">Scheme</a>, <a href="/tag/streams" rel="tag">Streams</a>, <a href="/tag/charts" rel="tag">Charts</a> &bull; <a href="/articles/the-maximum-subsequence-problem#disqus_thread">Comments</a></p>
-<div class="toc">
-<h2>Contents</h2>
-<ul>
- <li><a href="#tocwelcome-to-the-pearly-gates" name="toc0" id="toc0">Welcome to the Pearly Gates</a>
- </li>
-
- <li><a href="#tocprogramming-pearl" name="toc1" id="toc1">Programming Pearl</a>
- </li>
-
- <li><a href="#toclinear-solution" name="toc2" id="toc2">Linear Solution</a>
- </li>
-
- <li><a href="#tocstreaming-solution" name="toc3" id="toc3">Streaming Solution</a>
- </li>
-
- <li><a href="#tocstream-accumulate" name="toc4" id="toc4">Stream Accumulate</a>
- </li>
-
- <li><a href="#tocstream-floor" name="toc5" id="toc5">Stream Floor</a>
- </li>
-
- <li><a href="#tocstream-diff" name="toc6" id="toc6">Stream Diff</a>
- </li>
-
- <li><a href="#tocstreams-and-collections" name="toc7" id="toc7">Streams and Collections</a>
- </li>
-
- <li><a href="#tocstream-on" name="toc8" id="toc8">Stream on&#8230;</a>
- </li>
-</ul>
-</div>
-<h3><a href="#toc0" name="tocwelcome-to-the-pearly-gates" id="tocwelcome-to-the-pearly-gates">Welcome to the Pearly Gates</a></h3>
-<p>The Pearly Gates club never closes. Its public entrance, a revolving door, just keeps on spinning. With each rotation some punters enter and others leave. The club&#8217;s owners would like to track this traffic. Specifically, they&#8217;d like to know the maximum increase in people entering the club over a given period.
-</p>
-<p>The starting point is to track the people who enter/leave with each spin of the door. Here&#8217;s a 5 minute sample of that information. Negative numbers mean more people left than entered during a particular cycle.
-</p>
+<h3 id="welcome-to-the-pearly-gates">Welcome to the Pearly Gates</h3>
+<p>The Pearly Gates club never closes. Its public entrance, a revolving door, just keeps on spinning. With each rotation some punters enter and others leave. The club&#8217;s owners would like to track this traffic. Specifically, they&#8217;d like to know the maximum increase in people entering the club over a given period.</p>
+<p>The starting point is to track the people who enter/leave with each spin of the door. Here&#8217;s a 5 minute sample of that information. Negative numbers mean more people left than entered during a particular cycle.</p>
 <div class="typocode"><div class="codetitle">Entries Log</div>
 
 <pre class="prettyprint">0 1 2 -3 3 -1 0 -4 0 -1 -4 2 4 1 1 3 1 0 -2 -3 -3 -2 3 1 1 4 5 -3 -2 -1 ...
@@ -72,9 +39,8 @@
 
 </div>
 
-<p>Here&#8217;s the same information plotted on a graph.
-</p>
-<img alt="Graph of entries to Pearly Gates club" src="http://chart.apis.google.com/chart?
+<p>Here&#8217;s the same information plotted on a graph.</p>
+<p><img alt="Graph of entries to Pearly Gates club" src="http://chart.apis.google.com/chart?
 cht=lc
 &amp;chtt=Entries+to+the+Pearly+Gates+club
 &amp;chs=500x200
@@ -84,24 +50,17 @@ cht=lc
 &amp;chd=t:45.5,45.5|45.5,54.5,63.6,18.2,72.7,36.4,45.5,9.1,45.5,36.4,9.1,63.6,81.8,54.5,54.5,72.7,54.5,45.5,27.3,18.2,18.2,27.3,72.7,54.5,54.5,81.8,90.9,18.2,27.3,36.4
 &amp;chco=BBBBBB,0000CC
 &amp;chls=1,1,0|4,1,0
-" />
-
-<p>The archetypal problem we&#8217;d like to solve can be stated:
-</p>
-<blockquote><p><strong>Given a sequence of numbers, find the maximum sum of a contiguous subsequence of those numbers.</strong> 
-</p>
-</blockquote><p>As an example, the maximum sum contiguous subsequence of 0, -1, <strong>2, -1, 3</strong>, -1, 0 would be 4 (= 2 + -1 + 3).
-</p>
-<p>This problem is generally known as <strong>the maximum sum contiguous subsequence problem</strong> and if you haven&#8217;t encountered it before, I&#8217;d recommend trying to solve it before reading on. Even if you have encountered it before, I&#8217;ll invite you to read on anyway &#8212; it&#8217;s well worth another look.
-</p>
-<span id="continue-reading"/>
-
-
-<h3><a href="#toc1" name="tocprogramming-pearl" id="tocprogramming-pearl">Programming Pearl</a></h3>
-<p>The maximum sum contiguous subsequence problem appears in Jon Bentley&#8217;s <a href="http://www.cs.bell-labs.com/cm/cs/pearls/">&#8220;Programming Pearls&#8221;</a>. He first presents a brute force solution which examines all possible contiguous subsequences of the initial sequence and returns the maximum sum of these subsequences.
-</p>
-<p>A Python implementation might read:
-</p>
+" /></p>
+<p>The archetypal problem we&#8217;d like to solve can be stated:</p>
+<blockquote>
+<p><strong>Given a sequence of numbers, find the maximum sum of a contiguous subsequence of those numbers.</strong> </p>
+</blockquote>
+<p>As an example, the maximum sum contiguous subsequence of 0, -1, <strong>2, -1, 3</strong>, -1, 0 would be 4 (= 2 + -1 + 3).</p>
+<p>This problem is generally known as <strong>the maximum sum contiguous subsequence problem</strong> and if you haven&#8217;t encountered it before, I&#8217;d recommend trying to solve it before reading on. Even if you have encountered it before, I&#8217;ll invite you to read on anyway &#8212; it&#8217;s well worth another look.</p>
+<p><span id="continue-reading"/></p>
+<h3 id="programming-pearl">Programming Pearl</h3>
+<p>The maximum sum contiguous subsequence problem appears in Jon Bentley&#8217;s <a href="http://www.cs.bell-labs.com/cm/cs/pearls/">&#8220;Programming Pearls&#8221;</a>. He first presents a brute force solution which examines all possible contiguous subsequences of the initial sequence and returns the maximum sum of these subsequences.</p>
+<p>A Python implementation might read:</p>
 <div class="typocode">
 
 <pre class="prettyprint">def generate_pairs(n):
@@ -119,9 +78,8 @@ def max_sum_subsequence(seq):
 
 </div>
 
-<p>It&#8217;s a straightforward piece of code, though note the <code>+ 1</code> which ensures that we slice to the end of <code>seq</code>, and also that we include empty slices, which sum to <code>0</code>, handling the case when every item in the sequence is negative. The trouble is, the algorithm is of cubic complexity: to process just 6 hours of logged activity takes over 2 minutes on a 2GHz Intel Core Duo MacBook, and the cubic nature of the algorithm means we&#8217;d quickly fail to process more substantial log files in real time.
-</p>
-<img alt="Graph plotting accumulated entries to the Pearly Gates club" src="http://chart.apis.google.com/chart?
+<p>It&#8217;s a straightforward piece of code, though note the <code>+ 1</code> which ensures that we slice to the end of <code>seq</code>, and also that we include empty slices, which sum to <code>0</code>, handling the case when every item in the sequence is negative. The trouble is, the algorithm is of cubic complexity: to process just 6 hours of logged activity takes over 2 minutes on a 2GHz Intel Core Duo MacBook, and the cubic nature of the algorithm means we&#8217;d quickly fail to process more substantial log files in real time.</p>
+<p><img alt="Graph plotting accumulated entries to the Pearly Gates club" src="http://chart.apis.google.com/chart?
 cht=lc
 &amp;chtt=Accumulated+entries+to+the+Pearly+Gates+club
 &amp;chs=500x250
@@ -132,16 +90,11 @@ cht=lc
 &amp;chco=CCCCCC,CC0000
 &amp;chls=3,1,0|3,1,0
 &amp;chdl=Entries|Accum.+Entries
-" />
-
-<p>A simple optimisation eliminates the repeated calls to <code>sum</code> by accumulating the input sequence &#8212; the red line in the graph above. Subtracting element <code>i-1</code> from element <code>j</code> of this cumulative sequence gives us the sum of elements in the range i, j of the original sequence. We won&#8217;t study the code for this quadratic solution &#8212; it doesn&#8217;t add much to our analysis. Again, some care is needed to avoid <a href="/articles/joined-output-and-the-fencepost-problem.html">fencepost problems</a>.
-</p>
-<p>We won&#8217;t look at the divide-and-conquer NlogN solution either. It&#8217;s hard to understand, and we can do far better.
-</p>
-
-<h3><a href="#toc2" name="toclinear-solution" id="toclinear-solution">Linear Solution</a></h3>
-<p>There is a linear solution. The idea is to scan the sequence from start to finish keeping track of <code>maxsofar</code>, the maximum sum of a contiguous subsequence seen so far, and <code>maxendinghere</code>, the maximum sum of a contiguous subsequence which ends at the current position. Bentley&#8217;s pseudo-code reads:
-</p>
+" /></p>
+<p>A simple optimisation eliminates the repeated calls to <code>sum</code> by accumulating the input sequence &#8212; the red line in the graph above. Subtracting element <code>i-1</code> from element <code>j</code> of this cumulative sequence gives us the sum of elements in the range i, j of the original sequence. We won&#8217;t study the code for this quadratic solution &#8212; it doesn&#8217;t add much to our analysis. Again, some care is needed to avoid <a href="/articles/joined-output-and-the-fencepost-problem.html">fencepost problems</a>.</p>
+<p>We won&#8217;t look at the divide-and-conquer NlogN solution either. It&#8217;s hard to understand, and we can do far better.</p>
+<h3 id="linear-solution">Linear Solution</h3>
+<p>There is a linear solution. The idea is to scan the sequence from start to finish keeping track of <code>maxsofar</code>, the maximum sum of a contiguous subsequence seen so far, and <code>maxendinghere</code>, the maximum sum of a contiguous subsequence which ends at the current position. Bentley&#8217;s pseudo-code reads:</p>
 <div class="typocode">
 
 <pre class="prettyprint">maxsofar = 0
@@ -156,8 +109,7 @@ for i = [0, n)
 
 </div>
 
-<p>This translates directly into Python.
-</p>
+<p>This translates directly into Python.</p>
 <div class="typocode">
 
 <pre class="prettyprint">def max_sum_subsequence(seq):
@@ -174,8 +126,7 @@ for i = [0, n)
 
 </div>
 
-<p>Now, this is a fabulous solution. Bentley describes it as subtle. Such a succinct code snippet hardly <strong>looks</strong> subtle, but I agree, the loop body <strong>does</strong> take a bit of understanding:
-</p>
+<p>Now, this is a fabulous solution. Bentley describes it as subtle. Such a succinct code snippet hardly <strong>looks</strong> subtle, but I agree, the loop body <strong>does</strong> take a bit of understanding:</p>
 <div class="typocode">
 
 <pre class="prettyprint">maxendinghere = max(maxendinghere + s, 0)
@@ -185,16 +136,11 @@ maxsofar = max(maxsofar, maxendinghere)
 
 </div>
 
-<p><strong>Why does this work?</strong> 
-</p>
-<p>Well, essentially maxendinghere is what&#8217;s accumulating the subsequences &#8212; it keeps rolling the next element into itself. Should this accumulated sum ever become negative we know that the subsequence-which-ends-here we&#8217;re currently tracking is worse than the empty subsequence-which-restarts-here; so we can reset our subsequence accumulator, and the first clause of the loop invariant still holds. Combine this with the observation that maxsofar tracks peaks in maxendinghere and we&#8217;re done.
-</p>
-<p>The loop-invariant comment provides a good example of how comments can help us understand an algorithm, even though the code is minimal and the variable names are well-chosen.
-</p>
-
-<h3><a href="#toc3" name="tocstreaming-solution" id="tocstreaming-solution">Streaming Solution</a></h3>
-<p>I prefer to think of this problem in terms of streams &#8212; lazily evaluated sequences. Think of our log file as generating a stream of numbers:
-</p>
+<p><strong>Why does this work?</strong> </p>
+<p>Well, essentially maxendinghere is what&#8217;s accumulating the subsequences &#8212; it keeps rolling the next element into itself. Should this accumulated sum ever become negative we know that the subsequence-which-ends-here we&#8217;re currently tracking is worse than the empty subsequence-which-restarts-here; so we can reset our subsequence accumulator, and the first clause of the loop invariant still holds. Combine this with the observation that maxsofar tracks peaks in maxendinghere and we&#8217;re done.</p>
+<p>The loop-invariant comment provides a good example of how comments can help us understand an algorithm, even though the code is minimal and the variable names are well-chosen.</p>
+<h3 id="streaming-solution">Streaming Solution</h3>
+<p>I prefer to think of this problem in terms of streams &#8212; lazily evaluated sequences. Think of our log file as generating a stream of numbers:</p>
 <div class="typocode">
 
 <pre class="prettyprint">... 0 1 2 -3 3 -1 0 -4 0 -1 -4 2 4 1 1 3 1 0 -2 -3 -3 -2 3 1 1 4 5 -3 -2 -1 ...
@@ -203,12 +149,9 @@ maxsofar = max(maxsofar, maxendinghere)
 
 </div>
 
-<p>The first thing we do is transform this stream to generate another stream, the cumulative sum of numbers seen so far. It&#8217;s an integration of sorts. You&#8217;ll remember we already used this stream, or an in-memory version of it, in our quadratic solution to the problem: the difference between points on it yields subsequence-sums.
-</p>
-
-<h4><a href="#toc4" name="tocstream-accumulate" id="tocstream-accumulate">Stream Accumulate</a></h4>
-<p>We generate the accumulated stream from our original stream like this:
-</p>
+<p>The first thing we do is transform this stream to generate another stream, the cumulative sum of numbers seen so far. It&#8217;s an integration of sorts. You&#8217;ll remember we already used this stream, or an in-memory version of it, in our quadratic solution to the problem: the difference between points on it yields subsequence-sums.</p>
+<h4 id="stream-accumulate">Stream Accumulate</h4>
+<p>We generate the accumulated stream from our original stream like this:</p>
 <div class="typocode">
 
 <pre class="prettyprint">def stream_accumulate(stream):
@@ -221,9 +164,8 @@ maxsofar = max(maxsofar, maxendinghere)
 
 </div>
 
-<p>The graph below samples the first five minutes of this stream. The red line accumulates values from the pale grey line.
-</p>
-<img alt="Graph plotting accumulated entries to the Pearly Gates club" src="http://chart.apis.google.com/chart?
+<p>The graph below samples the first five minutes of this stream. The red line accumulates values from the pale grey line.</p>
+<p><img alt="Graph plotting accumulated entries to the Pearly Gates club" src="http://chart.apis.google.com/chart?
 cht=lc
 &amp;chs=500x250
 &amp;chxt=x,y
@@ -234,14 +176,10 @@ cht=lc
 &amp;chco=CCCCCC,CC0000
 &amp;chls=3,1,0|3,1,0
 &amp;chdl=Entries|Accum.+Entries
-" />
-
-<p>These accumulated numbers represent the number of members who have entered the club since we started tracking them. On our graph, the maximum sum contiguous subsequence is simply the greatest Y-increase between any two points on this graph. X&#8217;s mark these points on the graph above. (Note: it&#8217;s <strong>not</strong> the Y-range of the graph we want since our X-values are time-ordered, and we require X1 &lt;= X2). 
-</p>
-
-<h4><a href="#toc5" name="tocstream-floor" id="tocstream-floor">Stream Floor</a></h4>
-<p>A second transformation yields the floor of the accumulated stream.
-</p>
+" /></p>
+<p>These accumulated numbers represent the number of members who have entered the club since we started tracking them. On our graph, the maximum sum contiguous subsequence is simply the greatest Y-increase between any two points on this graph. X&#8217;s mark these points on the graph above. (Note: it&#8217;s <strong>not</strong> the Y-range of the graph we want since our X-values are time-ordered, and we require X1 &lt;= X2). </p>
+<h4 id="stream-floor">Stream Floor</h4>
+<p>A second transformation yields the floor of the accumulated stream.</p>
 <div class="typocode">
 
 <pre class="prettyprint">import sys
@@ -256,11 +194,9 @@ def stream_floor(stream):
 
 </div>
 
-<p>(Note that, for our purposes, the floor of the stream isn&#8217;t exactly the stream of minimum values taken by the stream &#8212; we enforce a baseline at zero. It would be better to allow clients of this function to supply an optional baseline value, but I wanted the simplest possible code that shows the idea.)
-</p>
-<p>Here&#8217;s a graph plotting the accumulated entries alongside the floor of these entries.
-</p>
-<img alt="Graph plotting accumulated entries and floor of accumulated entries to the Pearly Gates club" src="http://chart.apis.google.com/chart?
+<p>(Note that, for our purposes, the floor of the stream isn&#8217;t exactly the stream of minimum values taken by the stream &#8212; we enforce a baseline at zero. It would be better to allow clients of this function to supply an optional baseline value, but I wanted the simplest possible code that shows the idea.)</p>
+<p>Here&#8217;s a graph plotting the accumulated entries alongside the floor of these entries.</p>
+<p><img alt="Graph plotting accumulated entries and floor of accumulated entries to the Pearly Gates club" src="http://chart.apis.google.com/chart?
 cht=lc
 &amp;chs=500x250
 &amp;chxt=x,y
@@ -271,14 +207,10 @@ cht=lc
 &amp;chls=3,1,0|3,1,0
 &amp;chm=b,CCCCCC,0,1,0
 &amp;chdl=Accum.+Entries|Floor+Accum.+Entries
-" />
-
-<p>We&#8217;re very close to what we want now. We can track Y-increases on the graph just by generating the difference between the accumulated stream and its floor &#8212; the shading on the graph.
-</p>
-
-<h4><a href="#toc6" name="tocstream-diff" id="tocstream-diff">Stream Diff</a></h4>
-<p>Here&#8217;s an implementation of <code>stream_diff</code>. We can&#8217;t just plug a minus sign &#8220;-&#8221; into the mapping function, so we have to use the less wieldy <code>operator.sub</code>.
-</p>
+" /></p>
+<p>We&#8217;re very close to what we want now. We can track Y-increases on the graph just by generating the difference between the accumulated stream and its floor &#8212; the shading on the graph.</p>
+<h4 id="stream-diff">Stream Diff</h4>
+<p>Here&#8217;s an implementation of <code>stream_diff</code>. We can&#8217;t just plug a minus sign &#8220;-&#8221; into the mapping function, so we have to use the less wieldy <code>operator.sub</code>.</p>
 <div class="typocode">
 
 <pre class="prettyprint">import itertools
@@ -291,8 +223,7 @@ def stream_diff(s, t):
 
 </div>
 
-<p>Alternatively, we could generate the new stream with an explicit loop:
-</p>
+<p>Alternatively, we could generate the new stream with an explicit loop:</p>
 <div class="typocode">
 
 <pre class="prettyprint">import itertools
@@ -305,9 +236,8 @@ def stream_diff(s, t):
 
 </div>
 
-<p>The final graph shows us the difference between the accumulated entry count and its floor. I&#8217;ve also added the ceiling of this stream as a thick red line (I&#8217;m sure you can figure out how to implement <code>stream_ceiling</code>), and this ceiling represents the stream of maximum sum contiguous subsequences. 
-</p>
-<img alt="Graph plotting Max-ends-here and Max-so-far" src="http://chart.apis.google.com/chart?
+<p>The final graph shows us the difference between the accumulated entry count and its floor. I&#8217;ve also added the ceiling of this stream as a thick red line (I&#8217;m sure you can figure out how to implement <code>stream_ceiling</code>), and this ceiling represents the stream of maximum sum contiguous subsequences. </p>
+<p><img alt="Graph plotting Max-ends-here and Max-so-far" src="http://chart.apis.google.com/chart?
 cht=lc
 &amp;chtt=Maximum+Subsequences+at+the+Pearly+Gates+club
 &amp;chs=500x250
@@ -319,16 +249,11 @@ cht=lc
 &amp;chls=4,1,0|2,1,0
 &amp;chm=b,CCCCCC,1,2,0
 &amp;chdl=Max-so-far|Max-ending-here
-" />
-
-<p>We&#8217;ve re-labelled the lines <code>Max-so-far</code> and <code>Max-ending-here</code> because they&#8217;re the stream of values taken by the variables <code>maxsofar</code> and <code>maxendinghere</code> during Bentley&#8217;s clever solution to the maximum sum contiguous subsequence problem. I think we&#8217;re in a better position to understand how this solution works now.
-</p>
-
-<h3><a href="#toc7" name="tocstreams-and-collections" id="tocstreams-and-collections">Streams and Collections</a></h3>
-<p>Please don&#8217;t imagine these streams are bloated. <span id="excerpt0"/>They may be infinite (remember the Pearly Gates club never closes!) but that doesn&#8217;t mean they take up much space. The graphs shown represent snapshots of their activity, and at no point do our presented algorithms actually store a five minute buffer of entries.
-</p>
-<p>A final solution to the maximum sum contiguous subsequence problem reads like this. We&#8217;ve pushed the general purpose stream transformation functions into a separate module, <code>stream.py</code>.
-</p>
+" /></p>
+<p>We&#8217;ve re-labelled the lines <code>Max-so-far</code> and <code>Max-ending-here</code> because they&#8217;re the stream of values taken by the variables <code>maxsofar</code> and <code>maxendinghere</code> during Bentley&#8217;s clever solution to the maximum sum contiguous subsequence problem. I think we&#8217;re in a better position to understand how this solution works now.</p>
+<h3 id="streams-and-collections">Streams and Collections</h3>
+<p>Please don&#8217;t imagine these streams are bloated. <span id="excerpt0"/>They may be infinite (remember the Pearly Gates club never closes!) but that doesn&#8217;t mean they take up much space. The graphs shown represent snapshots of their activity, and at no point do our presented algorithms actually store a five minute buffer of entries.</p>
+<p>A final solution to the maximum sum contiguous subsequence problem reads like this. We&#8217;ve pushed the general purpose stream transformation functions into a separate module, <code>stream.py</code>.</p>
 <div class="typocode">
 
 <pre class="prettyprint">import itertools
@@ -348,10 +273,8 @@ def max_sum_subsequence(ss):
 
 </div>
 
-<p>The iterable supplied to <code>max_sum_subsequence</code> has its last value read, and should therefore be bounded if we want the function to return. We haven&#8217;t supplied arguments to extract a portion of this iterable (to generate maximum subsequences for the club on a particular day, for example) because that&#8217;s what <code>itertools.islice</code> is for.
-</p>
-<p>Note that <code>max_sum_subsequence_stream()</code> may be more useful to clients than <code>max_sum_subsequence()</code>. Suppose, for example, we&#8217;re only interested when the maximum sum subsequence exceeds 100. We can do this directly by connecting <code>itertools.dropwhile()</code> to our function.
-</p>
+<p>The iterable supplied to <code>max_sum_subsequence</code> has its last value read, and should therefore be bounded if we want the function to return. We haven&#8217;t supplied arguments to extract a portion of this iterable (to generate maximum subsequences for the club on a particular day, for example) because that&#8217;s what <code>itertools.islice</code> is for.</p>
+<p>Note that <code>max_sum_subsequence_stream()</code> may be more useful to clients than <code>max_sum_subsequence()</code>. Suppose, for example, we&#8217;re only interested when the maximum sum subsequence exceeds 100. We can do this directly by connecting <code>itertools.dropwhile()</code> to our function.</p>
 <div class="typocode">
 
 <pre class="prettyprint">def max_subseq_exceeds(seq, limit=100):
@@ -362,10 +285,8 @@ def max_sum_subsequence(ss):
 
 </div>
 
-<p>Perhaps we&#8217;d like to know if the maximum sum subsequence reaches a plateau; that is, it stays on a level for a while.
-</p>
-<p>Here&#8217;s the stream module.
-</p>
+<p>Perhaps we&#8217;d like to know if the maximum sum subsequence reaches a plateau; that is, it stays on a level for a while.</p>
+<p>Here&#8217;s the stream module.</p>
 <div class="typocode"><div class="codetitle">stream.py</div>
 
 <pre class="prettyprint">"General purpose stream generation functions."
@@ -373,7 +294,7 @@ import itertools
 
 def floor(stream, baseline=None):
     """Generate the stream of minimum values from the input stream.
-    
+
     The baseline, if supplied, is an upper limit for the floor.
     &gt;&gt;&gt; ff = floor((1, 2, -2, 3))
     &gt;&gt;&gt; assert list(ff) == [1, 1, -2, -2]
@@ -394,7 +315,7 @@ def floor(stream, baseline=None):
 
 def ceil(stream):
     """Generate the stream of maximum values from the input stream.
-    
+
     &gt;&gt;&gt; top = ceil([0, -1, 2, -2, 3])
     &gt;&gt;&gt; assert list(top) == [0, 0, 2, 2, 3]
     """
@@ -410,7 +331,7 @@ def ceil(stream):
 
 def accumulate(stream):
     """Generate partial sums from the stream.
-    
+
     &gt;&gt;&gt; accu = accumulate([1, 2, 3, 4])
     &gt;&gt;&gt; assert list(accu) == [1, 3, 6, 10]
     """
@@ -421,7 +342,7 @@ def accumulate(stream):
 
 def diff(s, t):
     """Generate the differences between two streams
-    
+
     If the streams are of unequal length, the shorter is truncated.
     &gt;&gt;&gt; dd = diff([2, 4, 6, 8], [1, 2, 3])
     &gt;&gt;&gt; assert list(dd) == [1, 2, 3]
@@ -431,9 +352,9 @@ def diff(s, t):
 
 def last(stream, default=None):
     """Return the last item in the stream or the default if the stream is empty.
-    
-    &gt;&gt;&gt; last('abc')
-    'c'
+
+    &gt;&gt;&gt; last(&#x27;abc&#x27;)
+    &#x27;c&#x27;
     &gt;&gt;&gt; last([], default=-1)
     -1
     """
@@ -450,33 +371,23 @@ if __name__ == "__main__":
 
 </div>
 
-
-<h3><a href="#toc8" name="tocstream-on" id="tocstream-on">Stream on&#8230;</a></h3>
+<h3 id="stream-on">Stream on&#8230;</h3>
 <ol>
- <li><p>The maximum sum contiguous subsequence problem is described in <a href="http://www.cs.bell-labs.com/cm/cs/pearls/">&#8220;Programming Pearls&#8221;</a> by Jon Bentley. 
-</p>
-
- </li>
-
- <li><p>My favourite introduction to computer programming, &#8220;Structure and Interpretation of Computer Programs&#8221;, has <a href="http://mitpress.mit.edu/sicp/full-text/book/book-Z-H-24.html#%_sec_3.5">lots to say about streams</a>, and suggests they have a role in concurrent programming and modelling time. 
-</p>
-
- </li>
-
- <li><p>Streams are a natural fit with functional programming, and well supported by languages like <a href="http://www.schemers.org">Scheme</a> and <a href="http://haskell.org">Haskell</a>. Python also handles them nicely: look into <a href="http://www.python.org/dev/peps/pep-0255/">generators</a>, <a href="http://www.python.org/dev/peps/pep-0289/">generator expressions</a>, the <a href="http://docs.python.org/lib/module-itertools.html">itertools module</a>, and study <code>test_generators.py</code> carefully.
-</p>
-
- </li>
-
- <li><p>If you liked this article, try more Word Aligned articles <a href="/tag/streams/">tagged &#8220;streams&#8221;</a>. And if you like puzzles, there are more articles <a href="/tag/puzzles/">tagged &#8220;puzzles&#8221;</a> too.
-</p>
-
- </li>
-
- <li><p>The graphs in this article are generated using the <a href="http://code.google.com/apis/chart/">Google chart API</a>, which is both useful and <span id="excerpt1"/>a fine example of how to design and document a programming interface.
-</p>
-
- </li>
+<li>
+<p>The maximum sum contiguous subsequence problem is described in <a href="http://www.cs.bell-labs.com/cm/cs/pearls/">&#8220;Programming Pearls&#8221;</a> by Jon Bentley. </p>
+</li>
+<li>
+<p>My favourite introduction to computer programming, &#8220;Structure and Interpretation of Computer Programs&#8221;, has <a href="http://mitpress.mit.edu/sicp/full-text/book/book-Z-H-24.html#%_sec_3.5">lots to say about streams</a>, and suggests they have a role in concurrent programming and modelling time. </p>
+</li>
+<li>
+<p>Streams are a natural fit with functional programming, and well supported by languages like <a href="http://www.schemers.org">Scheme</a> and <a href="http://haskell.org">Haskell</a>. Python also handles them nicely: look into <a href="http://www.python.org/dev/peps/pep-0255/">generators</a>, <a href="http://www.python.org/dev/peps/pep-0289/">generator expressions</a>, the <a href="http://docs.python.org/lib/module-itertools.html">itertools module</a>, and study <code>test_generators.py</code> carefully.</p>
+</li>
+<li>
+<p>If you liked this article, try more Word Aligned articles <a href="/tag/streams/">tagged &#8220;streams&#8221;</a>. And if you like puzzles, there are more articles <a href="/tag/puzzles/">tagged &#8220;puzzles&#8221;</a> too.</p>
+</li>
+<li>
+<p>The graphs in this article are generated using the <a href="http://code.google.com/apis/chart/">Google chart API</a>, which is both useful and <span id="excerpt1"/>a fine example of how to design and document a programming interface.</p>
+</li>
 </ol>
 </div>
 

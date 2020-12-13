@@ -29,38 +29,33 @@
 <h2 class="title"><a href="/articles/getting-started-with-typo">Getting started with Typo</a></h2>
 <p class="meta"><abbr class="published" title="2006-07-17">2006-07-17</abbr> &bull; <a href="/tag/web-applications" rel="tag">Web Applications</a>, <a href="/tag/ruby" rel="tag">Ruby</a> &bull; <a href="/articles/getting-started-with-typo#disqus_thread">Comments</a></p>
 <p><a href="http://www.typosphere.org">Typo</a> is a
-   <a href="http://www.rubyonrails.org/">Ruby on Rails</a> blogging application.
-   I&#8217;d already installed one Rails application on
-   <a href="http://www.textdrive.com">Textdrive</a> before, when I set up a
-   <a href="http://wiki.wordaligned.org/sicp">Wiki</a>, and this time it was even easier.
-   It took no more than half an hour to get the thing up and running.
-   The steps were:
-</p>
+<a href="http://www.rubyonrails.org/">Ruby on Rails</a> blogging application.
+I&#8217;d already installed one Rails application on
+<a href="http://www.textdrive.com">Textdrive</a> before, when I set up a
+<a href="http://wiki.wordaligned.org/sicp">Wiki</a>, and this time it was even easier.
+It took no more than half an hour to get the thing up and running.
+The steps were:</p>
 <p>The steps were:
-   <em> log into my server
-</em> obtain the latest version of <a href="http://www.typosphere.org">Typo</a>
-   * create a production database
-   <em> edit the database configuration file
-</em> tweak the example <a href="http:/www.lighttpd.net">lighttpd</a> server configuration to use my assigned port
-   * start up <a href="http://www.typosphere.org">Typo</a>
-   <em> log in and configure using the Typo admin interface
-</em> shutdown <a href="http://www.typosphere.org">Typo</a>
-   * reconfigure my main <a href="http:/www.lighttpd.net">lighttpd</a>
-   * restart <a href="http:/www.lighttpd.net">lighttpd</a>
-   * &#8230; and we&#8217;re done!
-</p>
+* log into my server
+* obtain the latest version of <a href="http://www.typosphere.org">Typo</a>
+* create a production database
+* edit the database configuration file
+* tweak the example <a href="http:/www.lighttpd.net">lighttpd</a> server configuration to use my assigned port
+* start up <a href="http://www.typosphere.org">Typo</a>
+* log in and configure using the Typo admin interface
+* shutdown <a href="http://www.typosphere.org">Typo</a>
+* reconfigure my main <a href="http:/www.lighttpd.net">lighttpd</a>
+* restart <a href="http:/www.lighttpd.net">lighttpd</a>
+* &#8230; and we&#8217;re done!</p>
 <p><span id="continue-reading"/>
-   Here are the details. Note that my domain is <code>wordaligned.org</code> and my user name is
-   <code>wordaligned</code> &#8212; adjust as required.
-   You&#8217;ll also need a two port numbers: one for running <a href="http://www.typosphere.org">Typo</a>
-   standalone, and one for running <a href="http:/www.lighttpd.net">lighttpd</a>.
-   <a href="http://www.textdrive.com">Textdrive</a> can supply these on request.
-</p>
-
-<h4>Obtaining Typo</h4>
+Here are the details. Note that my domain is <code>wordaligned.org</code> and my user name is
+<code>wordaligned</code> &#8212; adjust as required.
+You&#8217;ll also need a two port numbers: one for running <a href="http://www.typosphere.org">Typo</a>
+standalone, and one for running <a href="http:/www.lighttpd.net">lighttpd</a>.
+<a href="http://www.textdrive.com">Textdrive</a> can supply these on request.</p>
+<h4 id="obtaining-typo">Obtaining Typo</h4>
 <p>Apparently the trunk is good and stable and upgrading as simple as
-   <code>svn update</code> so let&#8217;s log in to the server and go for it:
-</p>
+<code>svn update</code> so let&#8217;s log in to the server and go for it:</p>
 <div class="typocode">
 
 <pre class="prettyprint">svn checkout svn://typosphere.org/typo/trunk typo
@@ -69,10 +64,8 @@
 
 </div>
 
-
-<h4>Database Configuration</h4>
-<p>First, create and initialise a <code>mysql</code> production database.
-</p>
+<h4 id="database-configuration">Database Configuration</h4>
+<p>First, create and initialise a <code>mysql</code> production database.</p>
 <div class="typocode">
 
 <pre class="prettyprint">mysql -u wordaligned -p
@@ -85,9 +78,8 @@ cat typo/db/schema.mysql.sql | mysql -u wordaligned -p wordaligned_typo
 </div>
 
 <p>Now configure Typo to use this database by creating a <code>database.yml</code>
-   file which points at your production database, the mysql adapter,
-   and the correct user/password credentials.
-</p>
+file which points at your production database, the mysql adapter,
+and the correct user/password credentials.</p>
 <div class="typocode">
 
 <pre class="prettyprint">cd typo/config
@@ -98,15 +90,13 @@ vi database.yml                     # edit as required
 
 </div>
 
-
-<h4>Starting Typo Standalone</h4>
+<h4 id="starting-typo-standalone">Starting Typo Standalone</h4>
 <p>Do you have a port number to run Typo standlone? I&#8217;d obtained 2508 for
-   <a href="http://instiki.org">Instiki</a>
-   which I no longer required (now that I&#8217;m using
-   [lighttpd](http:/www.lighttpd.net to serve my <a href="http://wiki.wordaligned.org/sicp">wiki</a>), so I just used that.
-   I edited the lighttpd configuration file in <tt>config/lighttpd.conf</tt>
-   to use this port number and my Typo production environment:
-</p>
+<a href="http://instiki.org">Instiki</a>
+which I no longer required (now that I&#8217;m using
+<a href="http:/www.lighttpd.net to serve my [wiki](http://wiki.wordaligned.org/sicp)">lighttpd</a>, so I just used that.
+I edited the lighttpd configuration file in <tt>config/lighttpd.conf</tt>
+to use this port number and my Typo production environment:</p>
 <div class="typocode">
 
 <pre class="prettyprint"># Default configuration file for the lighttpd web server
@@ -132,18 +122,14 @@ fastcgi.server = ( ".fcgi" =&gt;
 </div>
 
 <p>I also edited the shebang line in both <code>public/dispatch.rb</code>,
-   <code>public/dispatch.fcgi</code> to explicitly reference <code>ruby</code> at
-   <code>/usr/local/bin/ruby</code>. Now I started Typo with: <code>script/serverlighttpd</code>,
-   logged in at <code>http://wordaligned.org:2508</code>, which put me
-   directly into the Typo administration section.
-</p>
-<p>Having done this, I shutdown Typo with <code>CTRL-C</code>.
-</p>
-
-<h4>Reconfigure lighttpd</h4>
+<code>public/dispatch.fcgi</code> to explicitly reference <code>ruby</code> at
+<code>/usr/local/bin/ruby</code>. Now I started Typo with: <code>script/serverlighttpd</code>,
+logged in at <code>http://wordaligned.org:2508</code>, which put me
+directly into the Typo administration section.</p>
+<p>Having done this, I shutdown Typo with <code>CTRL-C</code>.</p>
+<h4 id="reconfigure-lighttpd">Reconfigure lighttpd</h4>
 <p>Now I merged the example <a href="http:/www.lighttpd.net">lighttpd</a>
-   configuration with my main one, which now reads something like:
-</p>
+configuration with my main one, which now reads something like:</p>
 <div class="typocode">
 
 <pre class="prettyprint"># Making sure file uploads above 64k always work when using IE or Safari

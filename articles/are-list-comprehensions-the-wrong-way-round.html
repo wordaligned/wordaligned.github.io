@@ -29,18 +29,14 @@
 <h2 class="title"><a href="/articles/are-list-comprehensions-the-wrong-way-round">Are List Comprehensions the Wrong Way Round?</a></h2>
 <p class="meta"><abbr class="published" title="2006-08-13">2006-08-13</abbr> &bull; <a href="/tag/python" rel="tag">Python</a>, <a href="/tag/c++" rel="tag">C++</a> &bull; <a href="/articles/are-list-comprehensions-the-wrong-way-round#disqus_thread">Comments</a></p>
 <p>Let&#8217;s suppose you&#8217;re the director of a large art gallery and another
-   art gallery wants to borrow one of your Picassos for an
-   exhibition. First, you&#8217;ll need to list your Picassos &#8212; which
-   means someone visiting each room in the gallery, looking in all the
-   artworks in that room and noting down the ones by <a href="http://www.picasso.fr/anglais/">Picasso</a>.
-</p>
+art gallery wants to borrow one of your Picassos for an
+exhibition. First, you&#8217;ll need to list your Picassos &#8212; which
+means someone visiting each room in the gallery, looking in all the
+artworks in that room and noting down the ones by <a href="http://www.picasso.fr/anglais/">Picasso</a>.</p>
 <p><a href="http://python.org">Python</a> provides a couple of ways to model this problem. You can use
-   explicit loops or <a href="http://docs.python.org/tut/node7.html#SECTION007140000000000000000">list comprehensions</a>.
-</p>
-<span id="continue-reading"/>
-
-
-<h4>Explicit Loops</h4>
+explicit loops or <a href="http://docs.python.org/tut/node7.html#SECTION007140000000000000000">list comprehensions</a>.</p>
+<p><span id="continue-reading"/></p>
+<h4 id="explicit-loops">Explicit Loops</h4>
 <div class="typocode">
 
 <pre class="prettyprint">picassos = list()
@@ -55,44 +51,28 @@ for room in gallery:
 </div>
 
 <p>Up until <a href="http://python.org">Python</a> 2.0, this was the only way to code the
-   algorithm. It reads top-down approach and probably expresses the way
-   you (you&#8217;re the gallery director, remember?) would address the
-   problem:
-</p>
+algorithm. It reads top-down approach and probably expresses the way
+you (you&#8217;re the gallery director, remember?) would address the
+problem:</p>
 <ol>
- <li>
-     Give someone a pen and a blank piece of paper (that&#8217;s the <code>list()</code>)
- </li>
-
- <li>
-     tell them to visit each room in the gallery (that&#8217;s the <code>for room in gallery:</code>)
- </li>
-
- <li>
-     and to look at each artwork in the room (<code>for artwork in room:</code>)
- </li>
-
- <li>
-     and, if that artwork is by <a href="http://www.picasso.fr/anglais/">Picasso</a>, add it to the list (<code>if artwork.is_picasso(): picassos.append(artwork)</code>)
- </li>
+<li>Give someone a pen and a blank piece of paper (that&#8217;s the <code>list()</code>)</li>
+<li>tell them to visit each room in the gallery (that&#8217;s the <code>for room in gallery:</code>)</li>
+<li>and to look at each artwork in the room (<code>for artwork in room:</code>)</li>
+<li>and, if that artwork is by <a href="http://www.picasso.fr/anglais/">Picasso</a>, add it to the list (<code>if artwork.is_picasso(): picassos.append(artwork)</code>)</li>
 </ol>
 <p>By the way, I use the term artwork and not painting since <a href="http://www.picasso.fr/anglais/">Picasso</a> was
-   a painter, sculptor, printmaker and ceramicist.
-</p>
-
-<h4>List Comprehensions</h4>
+a painter, sculptor, printmaker and ceramicist.</p>
+<h4 id="list-comprehensions">List Comprehensions</h4>
 <p><a href="http://python.org">Python</a> 2.0 introduced <a href="http://docs.python.org/tut/node7.html#SECTION007140000000000000000">list comprehensions</a> &#8212; a neat way of building
-   lists from lists (or indeed any other iterable). This reverses the
-   algorithm by putting it from the point-of-view of the someone who tours
-   the gallery and makes the list. That someone&#8217;s task focuses
-   on the artwork:
-   1. Looking at an artwork
-   2. if it&#8217;s a <a href="http://www.picasso.fr/anglais/">Picasso</a>, put it on the list
-   3. and repeat this procedure for all the artworks in the current room
-   4. and for all the rooms in the gallery
-</p>
-<p>Let&#8217;s try coding this bottom-up algorithm:
-</p>
+lists from lists (or indeed any other iterable). This reverses the
+algorithm by putting it from the point-of-view of the someone who tours
+the gallery and makes the list. That someone&#8217;s task focuses
+on the artwork:
+1. Looking at an artwork
+2. if it&#8217;s a <a href="http://www.picasso.fr/anglais/">Picasso</a>, put it on the list
+3. and repeat this procedure for all the artworks in the current room
+4. and for all the rooms in the gallery</p>
+<p>Let&#8217;s try coding this bottom-up algorithm:</p>
 <div class="typocode"><div class="codetitle">Broken List Comprehension!</div>
 
 <pre class="prettyprint">picassos = [artwork if artwork.is_picasso()
@@ -103,8 +83,7 @@ for room in gallery:
 
 </div>
 
-<p><a href="http://python.org">Python</a> doesn&#8217;t like it!
-</p>
+<p><a href="http://python.org">Python</a> doesn&#8217;t like it!</p>
 <div class="typocode">
 
 <pre class="prettyprint">  File "&lt;stdin&gt;", line 1
@@ -116,11 +95,9 @@ SyntaxError: invalid syntax
 
 </div>
 
-
-<h4>List Comprehensions are the Wrong Way Round</h4>
+<h4 id="list-comprehensions-are-the-wrong-way-round">List Comprehensions are the Wrong Way Round</h4>
 <p>After a quick squint at the Python <a href="http://www.python.org/doc">documentation</a> we realise we should
-   have written:
-</p>
+have written:</p>
 <div class="typocode"><div class="codetitle">Corrected List Comprehension</div>
 
 <pre class="prettyprint">picassos = [artwork
@@ -133,17 +110,15 @@ SyntaxError: invalid syntax
 </div>
 
 <p>One of the things I like about <a href="http://python.org">Python</a> is that you don&#8217;t often need
-   to squint at the <a href="http://www.python.org/doc">documentation</a> to clear up matters of
-   syntax. Things usually work the way you expect them to. It&#8217;s pretty
-   much the reverse of C++ where you&#8217;re always struggling to persuade the
-   compiler you&#8217;re talking the same language.
-</p>
+to squint at the <a href="http://www.python.org/doc">documentation</a> to clear up matters of
+syntax. Things usually work the way you expect them to. It&#8217;s pretty
+much the reverse of C++ where you&#8217;re always struggling to persuade the
+compiler you&#8217;re talking the same language.</p>
 <p>In this case I suppose it&#8217;s easy enough to remember how to
-   get things right (roughly: write the explicit loop you&#8217;d need for a top-down
-   solution, shift the inner-most expression to the front, put the whole
-   thing in square backets) but it still seems wrong to me. To me wrong
-   it still seems but.
-</p>
+get things right (roughly: write the explicit loop you&#8217;d need for a top-down
+solution, shift the inner-most expression to the front, put the whole
+thing in square backets) but it still seems wrong to me. To me wrong
+it still seems but.</p>
 </div>
 
 <h5><a name="feedback">Feedback</a></h5>

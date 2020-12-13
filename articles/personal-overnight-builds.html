@@ -29,59 +29,34 @@
 <h2 class="title"><a href="/articles/personal-overnight-builds">Personal overnight builds</a></h2>
 <p class="meta"><abbr class="published" title="2006-10-09">2006-10-09</abbr> &bull; <a href="/tag/subversion" rel="tag">Subversion</a>, <a href="/tag/self" rel="tag">Self</a> &bull; <a href="/articles/personal-overnight-builds#disqus_thread">Comments</a></p>
 <p>Recently I wrote about <a href="/articles/personal-version-control.html">personal version control</a> &#8212; my habit of keeping
-   personal configuration files, scripts and similar under version
-   control.  One of the scripts which I control in this way is my personal
-   overnight build script.
-</p>
-<span id="continue-reading"/>
-
-
-<h3>What&#8217;s an overnight build?</h3>
+personal configuration files, scripts and similar under version
+control.  One of the scripts which I control in this way is my personal
+overnight build script.</p>
+<p><span id="continue-reading"/></p>
+<h3 id="whats-an-overnight-build">What&#8217;s an overnight build?</h3>
 <p>A well organised software project typically has an overnight build
-   which runs on a dedicated machine (or even dedicated machines) and
-   does something like:
-</p>
+which runs on a dedicated machine (or even dedicated machines) and
+does something like:</p>
 <ol>
- <li>
-     performs a clean check out of all the source code
- </li>
-
- <li>
-     builds everything
- </li>
-
- <li>
-     tests everything
- </li>
-
- <li>
-     collates and publishes test results
- </li>
+<li>performs a clean check out of all the source code</li>
+<li>builds everything</li>
+<li>tests everything</li>
+<li>collates and publishes test results</li>
 </ol>
-<p>Typically, the overnight build is scheduled to run overnight because:
-</p>
+<p>Typically, the overnight build is scheduled to run overnight because:</p>
 <ol>
- <li>
-     it takes a while (since <em>everything</em> means <em>everything</em> &#8212; release, debug,
-   installer, documentation &#8230;)
- </li>
-
- <li>
-     the source repository may be in a state of flux during the day
- </li>
+<li>it takes a while (since <em>everything</em> means <em>everything</em> &#8212; release, debug,
+   installer, documentation &#8230;)</li>
+<li>the source repository may be in a state of flux during the day</li>
 </ol>
 <p>Sometimes, in addition to this overnight build, an incremental build
-   runs during the day &#8212; but that&#8217;s another story.
-</p>
-
-<h3>What&#8217;s a personal overnight build?</h3>
+runs during the day &#8212; but that&#8217;s another story.</p>
+<h3 id="whats-a-personal-overnight-build">What&#8217;s a personal overnight build?</h3>
 <p>A personal overnight build does something very similar. The only
-   essential difference between my overnight build and the scheduled one
-   is that I update a working copy rather than perform a clean
-   checkout.
-</p>
-<p>In essence, the script I run looks like this:
-</p>
+essential difference between my overnight build and the scheduled one
+is that I update a working copy rather than perform a clean
+checkout.</p>
+<p>In essence, the script I run looks like this:</p>
 <div class="typocode"><div class="codetitle">my_build.sh</div>
 
 <pre class="prettyprint">#!/bin/sh
@@ -92,8 +67,7 @@ cd /home/tag/dev &amp;&amp; svn diff -u &amp;&amp; svn update &amp;&amp; make al
 
 </div>
 
-<p>I then create a cronjob to run this build at 3 in the morning on weekdays:
-</p>
+<p>I then create a cronjob to run this build at 3 in the morning on weekdays:</p>
 <div class="typocode"><div class="codetitle">cronjob</div>
 
 <pre class="prettyprint">0 3 * * 1-5 /home/tag/bin/my_build.sh &gt; /home/tag/build.log 2&gt;&amp;1
@@ -103,22 +77,18 @@ cd /home/tag/dev &amp;&amp; svn diff -u &amp;&amp; svn update &amp;&amp; make al
 </div>
 
 <p>(Note, incidentally, that I redirect output to a log file, rather than
-   have cron email me the results.)
-</p>
-
-<h3>Why bother?</h3>
+have cron email me the results.)</p>
+<h3 id="why-bother">Why bother?</h3>
 <p>Because <span id="excerpt0"/>I&#8217;m lazy. I found myself performing the same mechanical
-   sequence of actions every morning: check what&#8217;s changed, review the
-   changes, update, rebuild. A machine could do it for me &ndash; so now a
-   machine does do it for me. I start every day up to date.
-</p>
+sequence of actions every morning: check what&#8217;s changed, review the
+changes, update, rebuild. A machine could do it for me &ndash; so now a
+machine does do it for me. I start every day up to date.</p>
 <p>Of course, there&#8217;s no reason why a personal overnight build should
-   only run overnight. Once you have the script in place, you can kick it
-   off by hand when you go for lunch, or sit down for a planning meeting.
-   Equally, there&#8217;s no reason why a personal build should only run on one
-   machine. If you&#8217;re developing portable code you should port it all
-   the time.
-</p>
+only run overnight. Once you have the script in place, you can kick it
+off by hand when you go for lunch, or sit down for a planning meeting.
+Equally, there&#8217;s no reason why a personal build should only run on one
+machine. If you&#8217;re developing portable code you should port it all
+the time.</p>
 </div>
 
 <div class="comments"><hr/><div id="disqus_thread"></div><script type="text/javascript" src="http://disqus.com/forums/wordaligned/embed.js"></script></div>
@@ -159,8 +129,8 @@ machine does do it for me.</a></p>
 <div class="sidebar-node">
 <h3>Chain</h3>
 <ul>
-<li><a accesskey="n" href="/articles/soft-documentation" title="Next article">&laquo; Soft Documentation</a></li>
-<li><a accesskey="p" href="/articles/from-cvs-to-subversion" title="Previous article">&raquo; From CVS to Subversion</a></li>
+<li><a accesskey="n" href="/articles/the-lazy-builders-complexity-lesson" title="Next article">&laquo; The Lazy Builder&#8217;s Complexity Lesson</a></li>
+<li><a accesskey="p" href="/articles/soft-documentation" title="Previous article">&raquo; Soft Documentation</a></li>
 </ul>
 
 

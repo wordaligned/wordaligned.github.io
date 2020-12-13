@@ -26,59 +26,15 @@
       <div class="atomentry" id="power-programming">
 <h2 class="title"><a href="/articles/power-programming">Power programming</a></h2>
 <p class="meta"><abbr class="published" title="2010-01-26">2010-01-26</abbr> &bull; <a href="/tag/python" rel="tag">Python</a>, <a href="/tag/perl" rel="tag">Perl</a>, <a href="/tag/lisp" rel="tag">Lisp</a>, <a href="/tag/arc" rel="tag">Arc</a> &bull; <a href="/articles/power-programming#disqus_thread">Comments</a></p>
-<div class="toc">
-<h2>Contents</h2>
-<ul>
- <li><a href="#tocpowerful-or-dangerous" name="toc0" id="toc0">Powerful or dangerous?</a>
- </li>
-
- <li><a href="#tocdecision-trees" name="toc1" id="toc1">Decision trees</a>
- </li>
-
- <li><a href="#toccuteness-calculator" name="toc2" id="toc2">Cuteness calculator</a>
- </li>
-
- <li><a href="#toceval" name="toc3" id="toc3">Eval</a>
- </li>
-
- <li><a href="#tocdynamic-or-hacky" name="toc4" id="toc4">Dynamic or hacky?</a>
- </li>
-
- <li><a href="#tocjam-to-golf" name="toc5" id="toc5">Jam to golf</a>
- </li>
-
- <li><a href="#toccode-vs-data" name="toc6" id="toc6">Code vs data</a>
- </li>
-
- <li><a href="#tocpowerful-language-vs-power-user" name="toc7" id="toc7">Powerful language vs power user?</a>
- </li>
-
- <li><a href="#tocappendix-a-first-impressions-of-arc" name="toc8" id="toc8">Appendix A: First impressions of Arc</a>
- </li>
-
- <li><a href="#tocappendix-b-c-solution" name="toc9" id="toc9">Appendix B: C++ solution</a>
- </li>
-
- <li><a href="#tocappendix-c-a-python-solution" name="toc10" id="toc10">Appendix C: A Python Solution</a>
- </li>
-
- <li><a href="#tocnotes" name="toc11" id="toc11">Notes</a>
- </li>
-</ul>
-</div>
-<h3><a href="#toc0" name="tocpowerful-or-dangerous" id="tocpowerful-or-dangerous">Powerful or dangerous?</a></h3>
-<p>Recently I <a href="/articles/next-permutation.html" title="Next permutation: when C++ gets it right">wrote about</a> one of the <a href="http://code.google.com/codejam/">Google Code Jam</a> challenges, where, perhaps surprisingly, the best answer &#8212; the most elegant and obviously correct answer, requiring the fewest lines of code, with virtually zero space overhead, and running the quickest &#8212; the very best answer was coded in C++.
-</p>
-<p>Why should this be surprising? C++ is a powerful language.
-</p>
-<blockquote><p>In my experience there is almost no limit to the damage that a sufficiently ingenious fool can do with C++. But there is also almost no limit to the degree of complexity that a skillful library designer can hide behind a simple, safe, and elegant C++ interface. 
-</p>
-<p>&#8212; Greg Colvin, <a href="http://www.artima.com/cppsource/spiritofc2.html" title="Greg Colvin, In the Spirit of C">&#8220;In the Spirit of C&#8221;</a>
-</p>
-</blockquote><p>Yes. And yes! But in this article I wanted to discuss something C++ <strong>can&#8217;t</strong> do. Let&#8217;s start with another <a href="http://code.google.com/codejam/contest/dashboard?c=186264#" title="Decision Tree, Google Code Jam 2009">challenge</a> from the same round of the 2009 Google Code Jam.
-</p>
-
-<h3><a href="#toc1" name="tocdecision-trees" id="tocdecision-trees">Decision trees</a></h3>
+<h3 id="powerful-or-dangerous">Powerful or dangerous?</h3>
+<p>Recently I <a href="/articles/next-permutation.html" title="Next permutation: when C++ gets it right">wrote about</a> one of the <a href="http://code.google.com/codejam/">Google Code Jam</a> challenges, where, perhaps surprisingly, the best answer &#8212; the most elegant and obviously correct answer, requiring the fewest lines of code, with virtually zero space overhead, and running the quickest &#8212; the very best answer was coded in C++.</p>
+<p>Why should this be surprising? C++ is a powerful language.</p>
+<blockquote>
+<p>In my experience there is almost no limit to the damage that a sufficiently ingenious fool can do with C++. But there is also almost no limit to the degree of complexity that a skillful library designer can hide behind a simple, safe, and elegant C++ interface. </p>
+<p>&#8212; Greg Colvin, <a href="http://www.artima.com/cppsource/spiritofc2.html" title="Greg Colvin, In the Spirit of C">&#8220;In the Spirit of C&#8221;</a></p>
+</blockquote>
+<p>Yes. And yes! But in this article I wanted to discuss something C++ <strong>can&#8217;t</strong> do. Let&#8217;s start with another <a href="http://code.google.com/codejam/contest/dashboard?c=186264#" title="Decision Tree, Google Code Jam 2009">challenge</a> from the same round of the 2009 Google Code Jam.</p>
+<h3 id="decision-trees">Decision trees</h3>
 <blockquote><p>Decision trees &#8212; in particular, a type called classification trees &#8212; are data structures that are used to classify <i>items</i> into <i>categories</i> using <i>features</i> of those items. For example, each animal is either &#8220;cute&#8221; or not. For any given animal, we can decide whether it is cute by looking at the animal&#8217;s features and using the following decision tree.</p>
 <pre>(0.2 furry
   (0.81 fast
@@ -95,27 +51,22 @@
 )
 </pre><p>&mdash; <a href="http://code.google.com/codejam/contest/dashboard?c=186264#">Decision Trees, Google Code Jam 2009</a></p></blockquote>
 
-<p><a href="http://www.zazzle.com/cute_beaver_magnet-147411069592023743"><img src="/images/cute-beaver.png" alt="Cute beaver!" width="227px" height="193px" style="float:right;margin:25px 25px"/></a>
-</p>
-<p>The challenge goes on to describe the structure more formally, then steps through an example calculation. What is the probability, <code>p</code>, that a beaver is cute?
-</p>
-<blockquote><p>For example, a beaver is an animal that has two features: <code>furry</code> and <code>freshwater</code>. We start at the root with <code>p</code> equal to <code>1</code>. We multiply <code>p</code> by <code>0.2</code>, the weight of the root and move into the first sub-tree because the beaver has the <code>furry</code> feature. There, we multiply <code>p</code> by <code>0.81</code>, which makes <code>p</code> equal to <code>0.162</code>. From there we move further down into the second sub-tree because the beaver does not have the fast feature. Finally, we multiply <code>p</code> by <code>0.2</code> and end up with <code>0.0324</code> &#8212; the probability that the beaver is cute. 
-</p>
-</blockquote><img src="/images/decision-tree.png" alt="Decision tree calculation"/>
-
-<p>The challenge itself involves processing input comprising a number of test cases. Each test case consists of a decision tree followed by a number of animals. A solution should parse the input and output the calculated cuteness probabilities.
-</p>
-<span id="continue-reading"/>
-
-
-<h3><a href="#toc2" name="toccuteness-calculator" id="toccuteness-calculator">Cuteness calculator</a></h3>
+<p><a href="http://www.zazzle.com/cute_beaver_magnet-147411069592023743"><img src="/images/cute-beaver.png" alt="Cute beaver!" width="227px" height="193px" style="float:right;margin:25px 25px"/></a></p>
+<p>The challenge goes on to describe the structure more formally, then steps through an example calculation. What is the probability, <code>p</code>, that a beaver is cute?</p>
+<blockquote>
+<p>For example, a beaver is an animal that has two features: <code>furry</code> and <code>freshwater</code>. We start at the root with <code>p</code> equal to <code>1</code>. We multiply <code>p</code> by <code>0.2</code>, the weight of the root and move into the first sub-tree because the beaver has the <code>furry</code> feature. There, we multiply <code>p</code> by <code>0.81</code>, which makes <code>p</code> equal to <code>0.162</code>. From there we move further down into the second sub-tree because the beaver does not have the fast feature. Finally, we multiply <code>p</code> by <code>0.2</code> and end up with <code>0.0324</code> &#8212; the probability that the beaver is cute. </p>
+</blockquote>
+<p><img src="/images/decision-tree.png" alt="Decision tree calculation"/></p>
+<p>The challenge itself involves processing input comprising a number of test cases. Each test case consists of a decision tree followed by a number of animals. A solution should parse the input and output the calculated cuteness probabilities.</p>
+<p><span id="continue-reading"/></p>
+<h3 id="cuteness-calculator">Cuteness calculator</h3>
 <div class="typocode">
 
 <pre class="prettyprint">def cuteness(decision_tree, features):
     """Return the probability an animal is cute.
-    
+
     - decision_tree, the decision tree
-    - features, the animal's features,
+    - features, the animal&#x27;s features,
     """
     p = 1.0
     dt = decision_tree
@@ -132,25 +83,24 @@
 
 </div>
 
-<p>Calculating an animal&#8217;s cuteness given a decision tree and the animal&#8217;s features isn&#8217;t hard. In Python we don&#8217;t need to code up a specialised decision tree class &#8212; a nested tuple does just fine. The <code>cuteness()</code> function shown above descends the decision tree, switching left or right according to each feature&#8217;s presence or absence. The efficiency of this algorithm is proportional to the depth of the tree multiplied by the length of the feature list; as far as the code jam challenge goes, it&#8217;s not a concern.
-</p>
+<p>Calculating an animal&#8217;s cuteness given a decision tree and the animal&#8217;s features isn&#8217;t hard. In Python we don&#8217;t need to code up a specialised decision tree class &#8212; a nested tuple does just fine. The <code>cuteness()</code> function shown above descends the decision tree, switching left or right according to each feature&#8217;s presence or absence. The efficiency of this algorithm is proportional to the depth of the tree multiplied by the length of the feature list; as far as the code jam challenge goes, it&#8217;s not a concern.</p>
 <div class="typocode">
 
 <pre class="prettyprint">&gt;&gt;&gt; decision_tree = (
-...     0.2, 'furry',
-...         (0.81, 'fast',
+...     0.2, &#x27;furry&#x27;,
+...         (0.81, &#x27;fast&#x27;,
 ...             (0.3,),
 ...             (0.2,),
 ...         ),
-...         (0.1, 'fishy',
-...             (0.3, 'freshwater',
+...         (0.1, &#x27;fishy&#x27;,
+...             (0.3, &#x27;freshwater&#x27;,
 ...                  (0.01,),
 ...                  (0.01,),
 ...             ),
 ...             (0.1,),
 ...         ),
 ...     )
-&gt;&gt;&gt; beaver = ('furry', 'freshwater')
+&gt;&gt;&gt; beaver = (&#x27;furry&#x27;, &#x27;freshwater&#x27;)
 &gt;&gt;&gt; cuteness(decision_tree, beaver)
 0.032400000000000005
 
@@ -158,8 +108,7 @@
 
 </div>
 
-<p>No, the real problem here is how to parse the input data to create the decision trees and feature sets. As you can see, though, the textual specification of a decision tree closely resembles a Python representation of that decision tree. Just add punctuation.
-</p>
+<p>No, the real problem here is how to parse the input data to create the decision trees and feature sets. As you can see, though, the textual specification of a decision tree closely resembles a Python representation of that decision tree. Just add punctuation.</p>
 <table><thead><tr><td>Specification</td><td>Python</td></tr></thead>
 <tr><td><pre>(0.2 furry
   (0.81 fast
@@ -187,15 +136,12 @@
   ),
 )</pre></td></tr></table>
 
-<p>Rather than parse the decision tree definition by hand, why not tweak it so that it <strong>is</strong> a valid Python nested tuple? Then we can just let the Python interpreter <a href="http://docs.python.org/library/functions.html#eval"><tt>eval</tt></a> the tuple and use it directly.
-</p>
-
-<h3><a href="#toc3" name="toceval" id="toceval">Eval</a></h3>
-<p>A program&#8217;s ability to read and execute source code at run-time is one of the things which makes <a href="http://en.wikipedia.org/wiki/Dynamic_programming_language#Eval">dynamic languages</a> dynamic. You can&#8217;t do it in C and C++ &#8212; no, sneaking instructions <a href="http://en.wikipedia.org/wiki/Buffer_overrun">past the end of a buffer</a> doesn&#8217;t count. Should you do it in Python? Well, it won&#8217;t hurt to give it a try.
-</p>
+<p>Rather than parse the decision tree definition by hand, why not tweak it so that it <strong>is</strong> a valid Python nested tuple? Then we can just let the Python interpreter <a href="http://docs.python.org/library/functions.html#eval"><tt>eval</tt></a> the tuple and use it directly.</p>
+<h3 id="eval">Eval</h3>
+<p>A program&#8217;s ability to read and execute source code at run-time is one of the things which makes <a href="http://en.wikipedia.org/wiki/Dynamic_programming_language#Eval">dynamic languages</a> dynamic. You can&#8217;t do it in C and C++ &#8212; no, sneaking instructions <a href="http://en.wikipedia.org/wiki/Buffer_overrun">past the end of a buffer</a> doesn&#8217;t count. Should you do it in Python? Well, it won&#8217;t hurt to give it a try.</p>
 <div class="typocode">
 
-<pre class="prettyprint">spec = '''\
+<pre class="prettyprint">spec = &#x27;&#x27;&#x27;\
 (0.2 furry
   (0.81 fast
     (0.3)
@@ -209,49 +155,41 @@
     (0.1)
   )
 )
-'''
+&#x27;&#x27;&#x27;
 
-tuple_rep = re.sub(r'([\.\d]+|\))', r'\1,', spec)
-tuple_rep = re.sub(r'([a-z]+)', r'"\1",', tuple_rep)
+tuple_rep = re.sub(r&#x27;([\.\d]+|\))&#x27;, r&#x27;\1,&#x27;, spec)
+tuple_rep = re.sub(r&#x27;([a-z]+)&#x27;, r&#x27;"\1",&#x27;, tuple_rep)
 decision_tree = eval(tuple_rep)[0]
 
 </pre>
 
 </div>
 
-<p>Here, we start with the input specification of the decision tree (imagine this has been read directly from standard input). The first regex substitution inserts commas after numbers, and right parentheses. The second substitution quotes and inserts a comma after feature strings. This turns the decision tree&#8217;s specification into a textual representation of a nested Python tuple. We then <code>eval</code> that tuple and assign the result to <code>decision_tree</code> &#8212; a Python decision tree we can go on and use in the rest of our program. And that&#8217;s the code jam challenge cracked, pretty much.
-</p>
+<p>Here, we start with the input specification of the decision tree (imagine this has been read directly from standard input). The first regex substitution inserts commas after numbers, and right parentheses. The second substitution quotes and inserts a comma after feature strings. This turns the decision tree&#8217;s specification into a textual representation of a nested Python tuple. We then <code>eval</code> that tuple and assign the result to <code>decision_tree</code> &#8212; a Python decision tree we can go on and use in the rest of our program. And that&#8217;s the code jam challenge cracked, pretty much.</p>
 <div class="typocode">
 
 <pre class="prettyprint">&gt;&gt;&gt; from pprint import pprint
 &gt;&gt;&gt; pprint(decision_tree)
 (0.2,
- 'furry',
- (0.81, 'fast', (0.3,), (0.2,)),
- (0.1, 'fishy', (0.3, 'freshwater', (0.01,), (0.01,)), (0.1,)))
+ &#x27;furry&#x27;,
+ (0.81, &#x27;fast&#x27;, (0.3,), (0.2,)),
+ (0.1, &#x27;fishy&#x27;, (0.3, &#x27;freshwater&#x27;, (0.01,), (0.01,)), (0.1,)))
 
 </pre>
 
 </div>
 
-<p>(Minor wrinkle: you&#8217;ll have spotted the final decision tree is the first element of the evaluated tuple. That&#8217;s because the regex substitution puts a trailing comma after the right parenthesis which closes the decision tree specification, which turns <code>tuple_rep</code> into a one-tuple. The single element contained in this one-tuple is what we need.)
-</p>
-
-<h3><a href="#toc4" name="tocdynamic-or-hacky" id="tocdynamic-or-hacky">Dynamic or hacky?</a></h3>
-<p>As you can see, it doesn&#8217;t take much code to pull the decision tree in ready for use. Python allows us to convert between text and code and to execute code within the current environment: you just need to keep a clear head and remember where you are. Regular expressions may not have the first class language support they enjoy in Perl and Ruby, but they are well supported, and the raw string syntax makes them more readable.
-</p>
-<p>Certainly, this code snippet is easier to put together than a full blown <a href="http://code.google.com/codejam/contest/dashboard?c=186264#s=a&amp;a=0" title="Google's analysis of the decision tree challenge, including a parser">parser</a>, but I think it will take more than this to convince a C++ programmer that Python is a powerful language, rather than a dangerous tool for ingenious fools. It fails to convince me. I can&#8217;t remember ever using <code>eval</code> or <code>exec</code> in production code, where keeping a separation between layers is more important than speed of coding.
-</p>
-
-<h3><a href="#toc5" name="tocjam-to-golf" id="tocjam-to-golf">Jam to golf</a></h3>
-<p><a href="http://codegolf.com"><img src="http://codegolf.com/images/logo.png" alt="Code Golf logo" width="332px" height="75px"/></a>
-</p>
-<p>That said, Python is a fine language for scripting, and speed of coding <strong>is</strong> what matters in this particular challenge. Just for fun, what if there were <a href="http://stackoverflow.com/questions/1433263/decision-tree-code-golf" title="Decision tree code golf on Stack Overflow">a prize for brevity</a>? Then of course Perl would <a href="http://stackoverflow.com/questions/1433263/decision-tree-code-golf/1442392#1442392" title="gnibbler's winning Perl entry">win</a>!
-</p>
+<p>(Minor wrinkle: you&#8217;ll have spotted the final decision tree is the first element of the evaluated tuple. That&#8217;s because the regex substitution puts a trailing comma after the right parenthesis which closes the decision tree specification, which turns <code>tuple_rep</code> into a one-tuple. The single element contained in this one-tuple is what we need.)</p>
+<h3 id="dynamic-or-hacky">Dynamic or hacky?</h3>
+<p>As you can see, it doesn&#8217;t take much code to pull the decision tree in ready for use. Python allows us to convert between text and code and to execute code within the current environment: you just need to keep a clear head and remember where you are. Regular expressions may not have the first class language support they enjoy in Perl and Ruby, but they are well supported, and the raw string syntax makes them more readable.</p>
+<p>Certainly, this code snippet is easier to put together than a full blown <a href="http://code.google.com/codejam/contest/dashboard?c=186264#s=a&amp;a=0" title="Google's analysis of the decision tree challenge, including a parser">parser</a>, but I think it will take more than this to convince a C++ programmer that Python is a powerful language, rather than a dangerous tool for ingenious fools. It fails to convince me. I can&#8217;t remember ever using <code>eval</code> or <code>exec</code> in production code, where keeping a separation between layers is more important than speed of coding.</p>
+<h3 id="jam-to-golf">Jam to golf</h3>
+<p><a href="http://codegolf.com"><img src="http://codegolf.com/images/logo.png" alt="Code Golf logo" width="332px" height="75px"/></a></p>
+<p>That said, Python is a fine language for scripting, and speed of coding <strong>is</strong> what matters in this particular challenge. Just for fun, what if there were <a href="http://stackoverflow.com/questions/1433263/decision-tree-code-golf" title="Decision tree code golf on Stack Overflow">a prize for brevity</a>? Then of course Perl would <a href="http://stackoverflow.com/questions/1433263/decision-tree-code-golf/1442392#1442392" title="gnibbler's winning Perl entry">win</a>!</p>
 <div class="typocode"><div class="codetitle">Code Jam golf, by gnibbler, Stack Overflow</div>
 
 <pre class="prettyprint">say("Case #$_:"),
-$_=eval"''".'.&lt;&gt;'x&lt;&gt;,
+$_=eval"&#x27;&#x27;".&#x27;.&lt;&gt;&#x27;x&lt;&gt;,
 s:[a-z]+:*(/ $&amp;\\s/?:g,s/\)\s*\(/):/g,
 eval"\$_=&lt;&gt;;say$_;"x&lt;&gt;for 1..&lt;&gt;
 
@@ -259,12 +197,9 @@ eval"\$_=&lt;&gt;;say$_;"x&lt;&gt;for 1..&lt;&gt;
 
 </div>
 
-<p>Note that this does more than simply parse a decision tree &#8212; it&#8217;s a complete solution to the code jam <a href="http://code.google.com/codejam/contest/dashboard?c=186264#" title="Decision Tree, Google Code Jam 2009">challenge</a>, reading trees, features, calculating cutenesses, and producing output in the required format. Sadly that&#8217;s all I can say about it because the details of its operation are beyond me.
-</p>
-
-<h3><a href="#toc6" name="toccode-vs-data" id="toccode-vs-data">Code vs data</a></h3>
-<p>Using Python to dynamically execute code may not generally be needed or welcomed in Python production code, and over-reliance on the same trick risks reinforcing Perl&#8217;s  &#8220;write only&#8221; reputation, but Python and Perl aren&#8217;t the only contenders. <span id="excerpt0"/>The equivalence of code and data marks Lisp&#8217;s apotheosis. Take a look at a <a href="http://stackoverflow.com/questions/1433263/decision-tree-code-golf/1540845#1540845" title="Arc solution to decision tree">Lisp solution</a> to the challenge. This one is coded up in <a href="http://arclanguage.org" title="Arc, a new dialect of Lisp">Arc</a>.
-</p>
+<p>Note that this does more than simply parse a decision tree &#8212; it&#8217;s a complete solution to the code jam <a href="http://code.google.com/codejam/contest/dashboard?c=186264#" title="Decision Tree, Google Code Jam 2009">challenge</a>, reading trees, features, calculating cutenesses, and producing output in the required format. Sadly that&#8217;s all I can say about it because the details of its operation are beyond me.</p>
+<h3 id="code-vs-data">Code vs data</h3>
+<p>Using Python to dynamically execute code may not generally be needed or welcomed in Python production code, and over-reliance on the same trick risks reinforcing Perl&#8217;s  &#8220;write only&#8221; reputation, but Python and Perl aren&#8217;t the only contenders. <span id="excerpt0"/>The equivalence of code and data marks Lisp&#8217;s apotheosis. Take a look at a <a href="http://stackoverflow.com/questions/1433263/decision-tree-code-golf/1540845#1540845" title="Arc solution to decision tree">Lisp solution</a> to the challenge. This one is coded up in <a href="http://arclanguage.org" title="Arc, a new dialect of Lisp">Arc</a>.</p>
 <pre class="prettyprint lang-lisp">
 (def r () (read))
 (for i 1 (r)
@@ -284,17 +219,15 @@ eval"\$_=&lt;&gt;;say$_;"x&lt;&gt;for 1..&lt;&gt;
     (prn p)))
 </pre>
 
-<p>Which challenge does this solve? 
-</p>
-<p>I meant the code golf challenge, of solving the decision tree problem using the fewest keystrokes. At 154 characters this Arc program is nearly half as long again as the winning Perl entry, but it&#8217;s hardly flabby. What really impresses me, though, is that the code is (almost) as readable as it is succinct. It&#8217;s elegant code. The only real scars left by the battle for brevity are the one character variable names. Here&#8217;s the same code with improved variable names and some comments added. It&#8217;s the <code>(read)</code> calls which evaluate expressions on standard input. The <code>(for ...)</code> and <code>(repeat ...)</code> expressions operate as you might expect. The third looping construct, <code>(loop ...)</code> initialises, tests and proceeds, much like a C for loop.
-</p>
+<p>Which challenge does this solve? </p>
+<p>I meant the code golf challenge, of solving the decision tree problem using the fewest keystrokes. At 154 characters this Arc program is nearly half as long again as the winning Perl entry, but it&#8217;s hardly flabby. What really impresses me, though, is that the code is (almost) as readable as it is succinct. It&#8217;s elegant code. The only real scars left by the battle for brevity are the one character variable names. Here&#8217;s the same code with improved variable names and some comments added. It&#8217;s the <code>(read)</code> calls which evaluate expressions on standard input. The <code>(for ...)</code> and <code>(repeat ...)</code> expressions operate as you might expect. The third looping construct, <code>(loop ...)</code> initialises, tests and proceeds, much like a C for loop.</p>
 <pre class="prettyprint lang-lisp">
 (for i 1 (read)               ; Read N, # test cases, and loop
   (prn "Case #" i ":")
-  
+
   (read)                      ; Skip L, # lines taken by decision tree
   (= dtree (read))            ; and read the tree in directly
-  
+
   (repeat (read)              ; Repeat over A, # animals
     (read)                    ; Skip animal name
     ; Read in the animal's features and walk down the 
@@ -310,43 +243,22 @@ eval"\$_=&lt;&gt;;say$_;"x&lt;&gt;for 1..&lt;&gt;
     (prn p)))
 </pre>
 
-<p>You could argue the elegance of this solution is due to the fact the input comprises a sequence of tokens and <a href="http://en.wikipedia.org/wiki/S-expression" title="S-expressions, Wikipedia">S-expressions</a>. If commas had been used to separate input elements and the text fields had been enclosed in quotes, then maybe a Python solution would have been equally clean. Or if the input had been in XML, then we&#8217;d be looking to a library rather than <code>eval</code> for parsing the input.
-</p>
-<p>It&#8217;s a fair point, but the equivalence of code and data counts as Lisp&#8217;s biggest idea. Where Python&#8217;s <code>eval</code> is workable but rarely needed, Lisp&#8217;s <code>(read)</code> is fundamental.
-</p>
-
-<h3><a href="#toc7" name="tocpowerful-language-vs-power-user" id="tocpowerful-language-vs-power-user">Powerful language vs power user?</a></h3>
-<p>So, the most elegant answer to the code jam decision tree challenge would also be the quickest to write, and it would be written in Lisp. Did code jam champion, <a href="http://www.go-hero.net/jam/09/name/ACRush" title="ACRush's code jam solutions">ACRush</a>, submit a Lisp solution?
-</p>
-<p>Absolutely not!
-</p>
-<p>Another fundamental thing about Lisp is that it&#8217;s straightforward to parse. A C++ expert can knock up an input parser for decision trees and features to order. ACRush brushed this round aside with a perfect score, taking just 45 minutes to code up working C++ solutions to this question <strong>and two others</strong>. I&#8217;ve reproduced his solution to the <a href="http://code.google.com/codejam/contest/dashboard?c=186264#" title="Decision Tree, Google Code Jam 2009">decision tree challenge</a> at the end of this article. It&#8217;s plain and direct. Given the time constraints, I think it exhibits astonishing fluency &#8212; the work of someone who can think in C++.
-</p>
-<p>In this article we&#8217;ve encountered four programming languages:
-</p>
+<p>You could argue the elegance of this solution is due to the fact the input comprises a sequence of tokens and <a href="http://en.wikipedia.org/wiki/S-expression" title="S-expressions, Wikipedia">S-expressions</a>. If commas had been used to separate input elements and the text fields had been enclosed in quotes, then maybe a Python solution would have been equally clean. Or if the input had been in XML, then we&#8217;d be looking to a library rather than <code>eval</code> for parsing the input.</p>
+<p>It&#8217;s a fair point, but the equivalence of code and data counts as Lisp&#8217;s biggest idea. Where Python&#8217;s <code>eval</code> is workable but rarely needed, Lisp&#8217;s <code>(read)</code> is fundamental.</p>
+<h3 id="powerful-language-vs-power-user">Powerful language vs power user?</h3>
+<p>So, the most elegant answer to the code jam decision tree challenge would also be the quickest to write, and it would be written in Lisp. Did code jam champion, <a href="http://www.go-hero.net/jam/09/name/ACRush" title="ACRush's code jam solutions">ACRush</a>, submit a Lisp solution?</p>
+<p>Absolutely not!</p>
+<p>Another fundamental thing about Lisp is that it&#8217;s straightforward to parse. A C++ expert can knock up an input parser for decision trees and features to order. ACRush brushed this round aside with a perfect score, taking just 45 minutes to code up working C++ solutions to this question <strong>and two others</strong>. I&#8217;ve reproduced his solution to the <a href="http://code.google.com/codejam/contest/dashboard?c=186264#" title="Decision Tree, Google Code Jam 2009">decision tree challenge</a> at the end of this article. It&#8217;s plain and direct. Given the time constraints, I think it exhibits astonishing fluency &#8212; the work of someone who can think in C++.</p>
+<p>In this article we&#8217;ve encountered four programming languages:</p>
 <ul>
- <li>
-     Python
- </li>
-
- <li>
-     Perl
- </li>
-
- <li>
-     Lisp
- </li>
-
- <li>
-     C++
- </li>
+<li>Python</li>
+<li>Perl</li>
+<li>Lisp</li>
+<li>C++</li>
 </ul>
-<p>These languages are very different but they share features too. They are all mature, popular and well-supported<a id="fn1link" href="#fn1"><sup>[1]</sup></a>. Each is a powerful general purpose programming language. <span id="excerpt1"/>But ultimately, the power of the programmer is what matters.
-</p>
-
-<h3><a href="#toc8" name="tocappendix-a-first-impressions-of-arc" id="tocappendix-a-first-impressions-of-arc">Appendix A: First impressions of Arc</a></h3>
-<p>Here&#8217;s another revision of the Arc solution, this time decomposed into subfunctions. I found no complete formal documentation of <a href="http://arclanguage.org" title="Arc, a new dialect of Lisp">Arc</a>. You&#8217;ll have to read the source and follow the forum, and to actually run any code you&#8217;ll have to download a an old version of MzScheme. The official line is: by all means have a play, but expect things to change. That said, the language looks delightful, practical, and quite <a href="http://www.paulgraham.com/arcll1.html" title="No onions in the varnish, says Paul Graham">onion free</a>. The <a href="http://ycombinator.com/arc/tut.txt">tutorial</a> made me smile. Recommended reading.
-</p>
+<p>These languages are very different but they share features too. They are all mature, popular and well-supported<a id="fn1link" href="#fn1"><sup><a href="https://blog.codeship.com/building-minimal-docker-containers-for-go-applications/">1</a></sup></a>. Each is a powerful general purpose programming language. <span id="excerpt1"/>But ultimately, the power of the programmer is what matters.</p>
+<h3 id="appendix-a-first-impressions-of-arc">Appendix A: First impressions of Arc</h3>
+<p>Here&#8217;s another revision of the Arc solution, this time decomposed into subfunctions. I found no complete formal documentation of <a href="http://arclanguage.org" title="Arc, a new dialect of Lisp">Arc</a>. You&#8217;ll have to read the source and follow the forum, and to actually run any code you&#8217;ll have to download a an old version of MzScheme. The official line is: by all means have a play, but expect things to change. That said, the language looks delightful, practical, and quite <a href="http://www.paulgraham.com/arcll1.html" title="No onions in the varnish, says Paul Graham">onion free</a>. The <a href="http://ycombinator.com/arc/tut.txt">tutorial</a> made me smile. Recommended reading.</p>
 <pre class="prettyprint lang-lisp">
 ; The input is a sequence of valid Arc expressions.
 ; Create some read aliases to execute these.
@@ -382,10 +294,8 @@ eval"\$_=&lt;&gt;;say$_;"x&lt;&gt;for 1..&lt;&gt;
          (prn (cuteness dtree (animal-features)))))
 </pre>
 
-
-<h3><a href="#toc9" name="tocappendix-b-c-solution" id="tocappendix-b-c-solution">Appendix B: C++ solution</a></h3>
-<p>Here&#8217;s champion ACRush&#8217;s C++ solution. I&#8217;ve removed some general purpose macros from the top of the file. You can download the <a href="http://code.google.com/codejam/contest/scoreboard/do?cmd=GetSourceCode&amp;contest=186264&amp;problem=171116&amp;io_set_id=1&amp;username=ACRush">original here</a>.
-</p>
+<h3 id="appendix-b-c-solution">Appendix B: C++ solution</h3>
+<p>Here&#8217;s champion ACRush&#8217;s C++ solution. I&#8217;ve removed some general purpose macros from the top of the file. You can download the <a href="http://code.google.com/codejam/contest/scoreboard/do?cmd=GetSourceCode&amp;contest=186264&amp;problem=171116&amp;io_set_id=1&amp;username=ACRush">original here</a>.</p>
 <div class="typocode">
 
 <pre class="prettyprint">#include &lt;set&gt;
@@ -430,7 +340,7 @@ int main()
             gets(str);
             string s="";
             for (int k=0;str[k];k++)
-                if (str[k]=='(' || str[k]==')')
+                if (str[k]==&#x27;(&#x27; || str[k]==&#x27;)&#x27;)
                     s+=" "+string(1,str[k])+" ";
                 else
                     s+=str[k];
@@ -472,8 +382,7 @@ int main()
 
 </div>
 
-
-<h3><a href="#toc10" name="tocappendix-c-a-python-solution" id="tocappendix-c-a-python-solution">Appendix C: A Python Solution</a></h3>
+<h3 id="appendix-c-a-python-solution">Appendix C: A Python Solution</h3>
 <div class="typocode">
 
 <pre class="prettyprint">import re
@@ -487,12 +396,12 @@ def cuteness(decision_tree, features):
     return p
 
 def read_decision_tree(spec):
-    tuple_rep = re.sub(r'([\.\d]+|\))', r'\1,', spec)
-    tuple_rep = re.sub(r'([a-z]+)', r'"\1",', tuple_rep)
+    tuple_rep = re.sub(r&#x27;([\.\d]+|\))&#x27;, r&#x27;\1,&#x27;, spec)
+    tuple_rep = re.sub(r&#x27;([a-z]+)&#x27;, r&#x27;"\1",&#x27;, tuple_rep)
     return eval(tuple_rep)[0]
 
 def take_lines(lines, n):
-    return ''.join(islice(lines, n))
+    return &#x27;&#x27;.join(islice(lines, n))
 
 def main(fp):
     lines = iter(fp)
@@ -514,11 +423,8 @@ main(sys.stdin)
 </div>
 
 <hr />
-
-
-<h3><a href="#toc11" name="tocnotes" id="tocnotes">Notes</a></h3>
-<p><a id="fn1" href="#fn1link">[1]</a> (Arc may not be mature, popular or well-supported; but Lisp certainly is.)
-</p>
+<h3 id="notes">Notes</h3>
+<p><a id="fn1" href="#fn1link"><a href="https://blog.codeship.com/building-minimal-docker-containers-for-go-applications/">1</a></a> (Arc may not be mature, popular or well-supported; but Lisp certainly is.)</p>
 </div>
 
 <div class="comments"><hr/><div id="disqus_thread"></div><script type="text/javascript" src="http://disqus.com/forums/wordaligned/embed.js"></script></div>

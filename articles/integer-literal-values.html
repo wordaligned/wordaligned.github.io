@@ -26,8 +26,7 @@
       <div class="atomentry" id="integer-literal-values">
 <h2 class="title"><a href="/articles/integer-literal-values">Converting integer literals in C++ and Python</a></h2>
 <p class="meta"><abbr class="published" title="2009-08-06">2009-08-06</abbr> &bull; <a href="/tag/python" rel="tag">Python</a>, <a href="/tag/c++" rel="tag">C++</a> &bull; <a href="/articles/integer-literal-values#disqus_thread">Comments</a></p>
-<p>An integral literal in a C program can be decimal, hexadecimal or octal.
-</p>
+<p>An integral literal in a C program can be decimal, hexadecimal or octal.</p>
 <div class="typocode">
 
 <pre class="prettyprint">int percent = 110;
@@ -38,8 +37,7 @@ unsigned agent = 007;
 
 </div>
 
-<p>This snippet would be equivalent to (e.g.):
-</p>
+<p>This snippet would be equivalent to (e.g.):</p>
 <div class="typocode">
 
 <pre class="prettyprint">int percent = 0156;
@@ -50,10 +48,8 @@ unsigned agent = 0x7;
 
 </div>
 
-<p>So programmers can choose the best of these options when including numbers in their code.
-</p>
-<p>Python adopted this same C syntax, but has recently gone on to extend and modify it. Some Python 2.6 numbers:
-</p>
+<p>So programmers can choose the best of these options when including numbers in their code.</p>
+<p>Python adopted this same C syntax, but has recently gone on to extend and modify it. Some Python 2.6 numbers:</p>
 <div class="typocode">
 
 <pre class="prettyprint">Python 2.6
@@ -64,10 +60,8 @@ unsigned agent = 0x7;
 
 </div>
 
-<p>I&#8217;m pleased to see support for binary literals, which are useful for (e.g.) bitmasks. I&#8217;ve never really seen the point of <a href="/articles/octal-literals.html">octals</a>; nonetheless, they&#8217;ve been enhanced for Python 3. Python 2.6 backports the new improved <a href="http://www.python.org/dev/peps/pep-3127">octal literal syntax</a> whilst retaining support for classic C-style octals. Python 3 drops C-style octals.
-</p>
-<span id="continue-reading"/>
-
+<p>I&#8217;m pleased to see support for binary literals, which are useful for (e.g.) bitmasks. I&#8217;ve never really seen the point of <a href="/articles/octal-literals.html">octals</a>; nonetheless, they&#8217;ve been enhanced for Python 3. Python 2.6 backports the new improved <a href="http://www.python.org/dev/peps/pep-3127">octal literal syntax</a> whilst retaining support for classic C-style octals. Python 3 drops C-style octals.</p>
+<p><span id="continue-reading"/></p>
 <div class="typocode">
 
 <pre class="prettyprint">Python 3.1
@@ -83,29 +77,27 @@ SyntaxError: invalid token
 
 </div>
 
-<p>Now consider the compiler/interpreter writer&#8217;s problem. Clearly it must be possible to take a string representing an integer literal and work out what number it represents. At a first glance, the <a href="http://docs.python.org/library/functions.html#int">int()</a> builtin isn&#8217;t quite smart enough to do the job without us supplying an explicit base for the conversion:
-</p>
+<p>Now consider the compiler/interpreter writer&#8217;s problem. Clearly it must be possible to take a string representing an integer literal and work out what number it represents. At a first glance, the <a href="http://docs.python.org/library/functions.html#int">int()</a> builtin isn&#8217;t quite smart enough to do the job without us supplying an explicit base for the conversion:</p>
 <div class="typocode">
 
-<pre class="prettyprint">&gt;&gt;&gt; int('0xff')
+<pre class="prettyprint">&gt;&gt;&gt; int(&#x27;0xff&#x27;)
 Traceback (most recent call last):
   File "&lt;stdin&gt;", line 1, in &lt;module&gt;
-ValueError: invalid literal for int() with base 10: '0xff'
-&gt;&gt;&gt; int('0xff', 16)
+ValueError: invalid literal for int() with base 10: &#x27;0xff&#x27;
+&gt;&gt;&gt; int(&#x27;0xff&#x27;, 16)
 255
 
 </pre>
 
 </div>
 
-<p>We might consider reading any prefix from the literal and dispatching the string to an appropriate handler. Something like this:
-</p>
+<p>We might consider reading any prefix from the literal and dispatching the string to an appropriate handler. Something like this:</p>
 <div class="typocode">
 
 <pre class="prettyprint">def integer_literal_value(s):
-    if s.startswith('0x'):
+    if s.startswith(&#x27;0x&#x27;):
         return int(s, 16)
-    if s.startswith('0b'):
+    if s.startswith(&#x27;0b&#x27;):
         return int(s, 2)
     ...
 
@@ -113,42 +105,38 @@ ValueError: invalid literal for int() with base 10: '0xff'
 
 </div>
 
-<p>Yuck! Surely there&#8217;s an easier way to do something this fundamental? Well, there&#8217;s always <a href="http://docs.python.org/library/functions.html#eval">eval()</a>, which turns the interpreter on itself.
-</p>
+<p>Yuck! Surely there&#8217;s an easier way to do something this fundamental? Well, there&#8217;s always <a href="http://docs.python.org/library/functions.html#eval">eval()</a>, which turns the interpreter on itself.</p>
 <div class="typocode">
 
 <pre class="prettyprint">&gt;&gt;&gt; def integer_literal_value(s): return eval(s)
 ... 
 &gt;&gt;&gt; v = integer_literal_value
-&gt;&gt;&gt; v('0x80'), v('0o7'), v('0b1010101'), v('42')
+&gt;&gt;&gt; v(&#x27;0x80&#x27;), v(&#x27;0o7&#x27;), v(&#x27;0b1010101&#x27;), v(&#x27;42&#x27;)
 (128, 7, 85, 42)
 
 </pre>
 
 </div>
 
-<p>We should have looked more carefully at the <a href="http://docs.python.org/library/functions.html#int">int()</a> documentation:
-</p>
-<blockquote><p><strong>int([x[, radix]])</strong> &#8230; The <em>radix</em> parameter gives the base for the conversion (which is 10 by default) and may be any integer in the range [2, 36], or zero. If <em>radix</em> is zero, the proper <em>radix</em> is determined based on the contents of string; the interpretation is the same as for integer literals. 
-</p>
-</blockquote><p>Perfect!
-</p>
+<p>We should have looked more carefully at the <a href="http://docs.python.org/library/functions.html#int">int()</a> documentation:</p>
+<blockquote>
+<p><strong>int([x[, radix]])</strong> &#8230; The <em>radix</em> parameter gives the base for the conversion (which is 10 by default) and may be any integer in the range [2, 36], or zero. If <em>radix</em> is zero, the proper <em>radix</em> is determined based on the contents of string; the interpretation is the same as for integer literals. </p>
+</blockquote>
+<p>Perfect!</p>
 <div class="typocode">
 
 <pre class="prettyprint">&gt;&gt;&gt; from functools import partial
 &gt;&gt;&gt; integer_literal_value = partial(int, base=0)
 &gt;&gt;&gt; v = integer_literal_value
-&gt;&gt;&gt; v('0x80'), v('0o7'), v('0b1010101'), v('42')
+&gt;&gt;&gt; v(&#x27;0x80&#x27;), v(&#x27;0o7&#x27;), v(&#x27;0b1010101&#x27;), v(&#x27;42&#x27;)
 (128, 7, 85, 42)
 
 </pre>
 
 </div>
 
-<p>(Notice, by the way, that <em>radix</em> is used in the online documentation but the actual argument name is <em>base</em>. I&#8217;ll confess that before I wrote this note I hadn&#8217;t spotted this use of zero as a special value for string&rarr;integer conversions even though it&#8217;s been available since Python 2.1)
-</p>
-<p>C++ also offers a way to convert integer literals into the numbers they represent, but it&#8217;s not very well known. As is usual for format conversions, we use streams &#8212; stringstreams typically, but here I show an example using standard input and output. The trick is to disable any numeric formatting of the input stream.
-</p>
+<p>(Notice, by the way, that <em>radix</em> is used in the online documentation but the actual argument name is <em>base</em>. I&#8217;ll confess that before I wrote this note I hadn&#8217;t spotted this use of zero as a special value for string&rarr;integer conversions even though it&#8217;s been available since Python 2.1)</p>
+<p>C++ also offers a way to convert integer literals into the numbers they represent, but it&#8217;s not very well known. As is usual for format conversions, we use streams &#8212; stringstreams typically, but here I show an example using standard input and output. The trick is to disable any numeric formatting of the input stream.</p>
 <div class="typocode"><div class="codetitle">integer_literal_value.cpp</div>
 
 <pre class="prettyprint">#include &lt;iostream&gt;
@@ -159,7 +147,7 @@ int main()
     std::cin.unsetf(std::ios::basefield);
     while (std::cin &gt;&gt; x)
     {
-        std::cout &lt;&lt; x &lt;&lt; '\n';
+        std::cout &lt;&lt; x &lt;&lt; &#x27;\n&#x27;;
     }
     return std::cin.eof() ? 0 : 1;
 }
@@ -168,8 +156,7 @@ int main()
 
 </div>
 
-<p>It <a href="http://www.cplusplus.com/reference/iostream/ios_base/fmtflags">works by magic</a>.
-</p>
+<p>It <a href="http://www.cplusplus.com/reference/iostream/ios_base/fmtflags">works by magic</a>.</p>
 <div class="typocode">
 
 <pre class="prettyprint">$ g++ integer_literal_value.cpp -o integer_literal_value

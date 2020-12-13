@@ -29,15 +29,11 @@
 <h2 class="title"><a href="/articles/creating-a-temporary-subversion-repository">Creating a Temporary Subversion Repository</a></h2>
 <p class="meta"><abbr class="published" title="2006-08-08">2006-08-08</abbr> &bull; <a href="/tag/subversion" rel="tag">Subversion</a> &bull; <a href="/articles/creating-a-temporary-subversion-repository#disqus_thread">Comments</a></p>
 <p>Sometimes you need to create a temporary <a href="http://subversion.tigris.org">Subversion</a> repository for test
-   purposes. Here&#8217;s how.
-</p>
-<span id="continue-reading"/>
-
-
-<h4>Creating the Repository</h4>
+purposes. Here&#8217;s how.</p>
+<p><span id="continue-reading"/></p>
+<h4 id="creating-the-repository">Creating the Repository</h4>
 <p>To create a temporary <a href="http://subversion.tigris.org">Subversion</a> repository for test purposes, all you
-   need to do is:
-</p>
+need to do is:</p>
 <div class="typocode">
 
 <pre class="prettyprint">svnadmin create /home/tag/tmp/temp_repos
@@ -46,15 +42,12 @@
 
 </div>
 
-<p>This new repository uses the default <a href="http://svnbook.red-bean.com/en/1.2/svn.reposadmin.html#svn.reposadmin.basics.backends">FSFS</a> database layer.
-</p>
-
-<h4>Local access to the test repository</h4>
+<p>This new repository uses the default <a href="http://svnbook.red-bean.com/en/1.2/svn.reposadmin.html#svn.reposadmin.basics.backends">FSFS</a> database layer.</p>
+<h4 id="local-access-to-the-test-repository">Local access to the test repository</h4>
 <p>If you simply wish to access this test repository from your local
-   machine, you don&#8217;t even need to start up the <a href="http://subversion.tigris.org">Subversion</a> server. Use
-   the file protocol directly. Here&#8217;s an example, using the <code>svn info</code> command
-   to obtain basic top-level repository information:
-</p>
+machine, you don&#8217;t even need to start up the <a href="http://subversion.tigris.org">Subversion</a> server. Use
+the file protocol directly. Here&#8217;s an example, using the <code>svn info</code> command
+to obtain basic top-level repository information:</p>
 <div class="typocode">
 
 <pre class="prettyprint">&gt; svn info file:///home/tag/tmp/testrepo
@@ -72,16 +65,13 @@ Last Changed Date: 2006-08-08 08:50:12 +0100 (Tue, 08 Aug 2006)
 </div>
 
 <p>You already have full access rights to this test repository without
-   requiring to enter any username/password credentials. Effectively,
-   if you&#8217;re on the <a href="http://subversion.tigris.org">Subversion</a> server you can do what you want!
-</p>
-
-<h4>Remote access to the test repository using svn</h4>
+requiring to enter any username/password credentials. Effectively,
+if you&#8217;re on the <a href="http://subversion.tigris.org">Subversion</a> server you can do what you want!</p>
+<h4 id="remote-access-to-the-test-repository-using-svn">Remote access to the test repository using svn</h4>
 <p>Local access may well be good enough to run whatever experiments you
-   need to run. If, however, you want to access the repository remotely,
-   you&#8217;ll need to start the server. The easiest way to do this is using
-   the custom <code>svn</code> protocol:
-</p>
+need to run. If, however, you want to access the repository remotely,
+you&#8217;ll need to start the server. The easiest way to do this is using
+the custom <code>svn</code> protocol:</p>
 <div class="typocode">
 
 <pre class="prettyprint">svnserve --daemon --root /home/tag/tmp/testrepo
@@ -90,8 +80,7 @@ Last Changed Date: 2006-08-08 08:50:12 +0100 (Tue, 08 Aug 2006)
 
 </div>
 
-<p>Now you can access this repository using <code>svn</code> URLs.
-</p>
+<p>Now you can access this repository using <code>svn</code> URLs.</p>
 <div class="typocode">
 
 <pre class="prettyprint">svn info svn://svnhostname
@@ -100,14 +89,11 @@ Last Changed Date: 2006-08-08 08:50:12 +0100 (Tue, 08 Aug 2006)
 
 </div>
 
-<p>By default, you will have read-only access to the test repository.
-</p>
-
-<h4>Read/Write Remote access</h4>
+<p>By default, you will have read-only access to the test repository.</p>
+<h4 id="readwrite-remote-access">Read/Write Remote access</h4>
 <p>The simplest way to gain remote read/write access to your test
-   repository is to edit the <code>svnserve.conf</code> file. Of course, you&#8217;ll want
-   to be on the host machine to do this:
-</p>
+repository is to edit the <code>svnserve.conf</code> file. Of course, you&#8217;ll want
+to be on the host machine to do this:</p>
 <div class="typocode">
 
 <pre class="prettyprint">emacs /home/tag/tmp/temp_repos/conf/svnserve.conf
@@ -116,8 +102,7 @@ Last Changed Date: 2006-08-08 08:50:12 +0100 (Tue, 08 Aug 2006)
 
 </div>
 
-<p>If you edit this file to read:
-</p>
+<p>If you edit this file to read:</p>
 <div class="typocode">
 
 <pre class="prettyprint">[general]
@@ -128,9 +113,8 @@ anon-access = write
 </div>
 
 <p>then anyone has read/write access. Alternatively, configure <a href="http://subversion.tigris.org">Subversion</a>
-   to use a password file for authorisation by editing <code>conf/svnserve.conf</code>
-   and <code>conf/passwd</code>.
-</p>
+to use a password file for authorisation by editing <code>conf/svnserve.conf</code>
+and <code>conf/passwd</code>.</p>
 <div class="typocode"><div class="codetitle">svnserve.conf</div>
 
 <pre class="prettyprint">[general]
@@ -152,11 +136,9 @@ sally = sallyssecret
 
 </div>
 
-
-<h4>When you&#8217;re done</h4>
+<h4 id="when-youre-done">When you&#8217;re done</h4>
 <p>When you&#8217;re finished with your repository, just throw it away. You can
-   always make another one.
-</p>
+always make another one.</p>
 <div class="typocode">
 
 <pre class="prettyprint">killall svnserve
@@ -166,14 +148,11 @@ rm -rf /home/tag/tmp/test_repo
 
 </div>
 
-
-<h4>Guess What?</h4>
+<h4 id="guess-what">Guess What?</h4>
 <p>Creating a real live production <a href="http://subversion.tigris.org">Subversion</a> repository is no different
-   to creating a temporary one. You might make different
-   arrangements to serve it, to back it up, and possibly to access it.
-</p>
-<p>Oh, and you&#8217;ll be careful not to delete it.
-</p>
+to creating a temporary one. You might make different
+arrangements to serve it, to back it up, and possibly to access it.</p>
+<p>Oh, and you&#8217;ll be careful not to delete it.</p>
 </div>
 
 <div class="comments"><hr/><div id="disqus_thread"></div><script type="text/javascript" src="http://disqus.com/forums/wordaligned/embed.js"></script></div>

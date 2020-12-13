@@ -28,48 +28,26 @@
       <div class="atomentry" id="top-ten-percent">
 <h2 class="title"><a href="/articles/top-ten-percent">Top Ten Percent</a></h2>
 <p class="meta"><abbr class="published" title="2008-02-26">2008-02-26</abbr> &bull; <a href="/tag/algorithms" rel="tag">Algorithms</a>, <a href="/tag/c++" rel="tag">C++</a> &bull; <a href="/articles/top-ten-percent#disqus_thread">Comments</a></p>
-<p>Recently I discussed two different approaches <a href="/articles/top-ten-tags.html">to finding the first N items</a>, in order, from a collection of size S:
-</p>
+<p>Recently I discussed two different approaches <a href="/articles/top-ten-tags.html">to finding the first N items</a>, in order, from a collection of size S:</p>
 <ul>
- <li>
-     full sort then slice
- </li>
-
- <li>
-     heap-based partial sort
- </li>
+<li>full sort then slice</li>
+<li>heap-based partial sort</li>
 </ul>
-<p>These two operations are respectively of complexity:
-</p>
+<p>These two operations are respectively of complexity:</p>
 <ul>
- <li>
-     S&middot;log(S)
- </li>
-
- <li>
-     S&middot;log(N)
- </li>
+<li>S&middot;log(S)</li>
+<li>S&middot;log(N)</li>
 </ul>
-<p>If we fix N and increase S, partial sort gets the job done most efficiently, while clearly conveying the intent of the code.
-</p>
-<p>What if we fix the ratio S/N? As an example, fixing S/N at 10 would correspond to finding the top 10% of the collection. In this case, a third approach will beat both full and partial sort as S increases.
-</p>
-<span id="continue-reading"/>
-
-
-<h3>Partial Sort for fixed S/N</h3>
-<p>First, let&#8217;s see what happens to the heap based partial sort when we fix S/N at 10. The complexity, O(S&middot;logN), becomes O(S&middot;log(S/10)) which is equivalent to O(S&middot;(logS-log10)), or simply O(S&middot;logS).
-</p>
-<p>Thus partial sort has the same complexity as full sort; but the lower constant multipliers in the full sort mean that eventually it outperforms partial sort.
-</p>
-<p>How then can we reliably beat full sort?
-</p>
-
-<h3>Partition then Sort</h3>
-<p>The idea is simple: partition the collection to place the first N elements at the front, then sort these elements in place. The partitioning algorithm is one of a family generally known as <a href="http://en.wikipedia.org/wiki/Selection_algorithm">selection algorithms</a>, implemented in C++ as <a href="http://www.sgi.com/tech/stl/nth_element.html">std::nth_element</a>. <a href="http://www.sgi.com/tech/stl/sort.html">Std::sort</a> handles the subsequent sort on the reduced range, as usual. 
-</p>
-<p>In code:
-</p>
+<p>If we fix N and increase S, partial sort gets the job done most efficiently, while clearly conveying the intent of the code.</p>
+<p>What if we fix the ratio S/N? As an example, fixing S/N at 10 would correspond to finding the top 10% of the collection. In this case, a third approach will beat both full and partial sort as S increases.</p>
+<p><span id="continue-reading"/></p>
+<h3 id="partial-sort-for-fixed-sn">Partial Sort for fixed S/N</h3>
+<p>First, let&#8217;s see what happens to the heap based partial sort when we fix S/N at 10. The complexity, O(S&middot;logN), becomes O(S&middot;log(S/10)) which is equivalent to O(S&middot;(logS-log10)), or simply O(S&middot;logS).</p>
+<p>Thus partial sort has the same complexity as full sort; but the lower constant multipliers in the full sort mean that eventually it outperforms partial sort.</p>
+<p>How then can we reliably beat full sort?</p>
+<h3 id="partition-then-sort">Partition then Sort</h3>
+<p>The idea is simple: partition the collection to place the first N elements at the front, then sort these elements in place. The partitioning algorithm is one of a family generally known as <a href="http://en.wikipedia.org/wiki/Selection_algorithm">selection algorithms</a>, implemented in C++ as <a href="http://www.sgi.com/tech/stl/nth_element.html">std::nth_element</a>. <a href="http://www.sgi.com/tech/stl/sort.html">Std::sort</a> handles the subsequent sort on the reduced range, as usual. </p>
+<p>In code:</p>
 <div class="typocode">
 
 <pre class="prettyprint">template &lt;typename Iter&gt;
@@ -84,20 +62,13 @@ nth_element_then_sort(Iter first, Iter nth, Iter last)
 
 </div>
 
-<p>Here, <code>Iter</code> must be a random access iterator, and the caller must ensure the distance between <code>nth</code> and <code>first</code> is N. Note that this algorithm arranges the <strong>smallest</strong> N elements in order at the front of the collection. If we want the largest, or indeed any other ordering, we&#8217;ll need to supply an ordering predicate to <code>nth_element</code> and <code>sort</code>.
-</p>
-<p>The standard <code>nth_element</code> algorithm uses a repeated partitioning scheme similar to the divide-and-conquer approach at the heart of quicksort. This time, though, after each division, the algorithm concentrates on just one side of what&#8217;s left. Hence <span id="excerpt0"/>we have iteration on a rapidly diminishing range, not recursion, and a linear operation, O(S). The subsequent <code>sort</code> is O(N&middot;logN).
-</p>
-<p>Thus the overall complexity is O(S) + O(N&middot;logN). If we fix the ratio S/N, the O(N&middot;logN) term eventually dominates; that is, the algorithm is dominated by the time taken by the final sort of the first N items.
-</p>
-<p>Using the example ratio of S/N = 10, O(N&middot;logN) is O((S&middot;logS)/10), which predicts this partition-then-sort combination to run 10 times more quickly than a full sort.
-</p>
-<p>Appended to this article is a short C++ program which calibrates our three variant partial sorting algorithms on a collection of random numbers. It requires two numbers, S and N, as command line input, and generates clock times for full, partial and partition sorts. It cross-checks the results for consistency, raising an error if a problem is detected.
-</p>
-
-<h3>Performance</h3>
-<p>I compiled the program and ran it with S set to 0, 2 million, 4 million, 6 million &#8230;, and the ratio S/N fixed at 10.
-</p>
+<p>Here, <code>Iter</code> must be a random access iterator, and the caller must ensure the distance between <code>nth</code> and <code>first</code> is N. Note that this algorithm arranges the <strong>smallest</strong> N elements in order at the front of the collection. If we want the largest, or indeed any other ordering, we&#8217;ll need to supply an ordering predicate to <code>nth_element</code> and <code>sort</code>.</p>
+<p>The standard <code>nth_element</code> algorithm uses a repeated partitioning scheme similar to the divide-and-conquer approach at the heart of quicksort. This time, though, after each division, the algorithm concentrates on just one side of what&#8217;s left. Hence <span id="excerpt0"/>we have iteration on a rapidly diminishing range, not recursion, and a linear operation, O(S). The subsequent <code>sort</code> is O(N&middot;logN).</p>
+<p>Thus the overall complexity is O(S) + O(N&middot;logN). If we fix the ratio S/N, the O(N&middot;logN) term eventually dominates; that is, the algorithm is dominated by the time taken by the final sort of the first N items.</p>
+<p>Using the example ratio of S/N = 10, O(N&middot;logN) is O((S&middot;logS)/10), which predicts this partition-then-sort combination to run 10 times more quickly than a full sort.</p>
+<p>Appended to this article is a short C++ program which calibrates our three variant partial sorting algorithms on a collection of random numbers. It requires two numbers, S and N, as command line input, and generates clock times for full, partial and partition sorts. It cross-checks the results for consistency, raising an error if a problem is detected.</p>
+<h3 id="performance">Performance</h3>
+<p>I compiled the program and ran it with S set to 0, 2 million, 4 million, 6 million &#8230;, and the ratio S/N fixed at 10.</p>
 <div class="typocode"><div class="codetitle">Test script</div>
 
 <pre class="prettyprint">#! /bin/bash
@@ -116,11 +87,9 @@ done
 
 </div>
 
-<p>The loop in this script never terminates. Just kill the process once you&#8217;ve seen enough.
-</p>
-<p>The results confirm this Nth-element-then-sort algorithm performs better than both full and partial sort at generating the first 10% of a collection. Full sort pulls ahead of partial sort before we get to 20 million.
-</p>
-<img alt="Partial Sort Performance Chart" src="http://chart.apis.google.com/chart?
+<p>The loop in this script never terminates. Just kill the process once you&#8217;ve seen enough.</p>
+<p>The results confirm this Nth-element-then-sort algorithm performs better than both full and partial sort at generating the first 10% of a collection. Full sort pulls ahead of partial sort before we get to 20 million.</p>
+<p><img alt="Partial Sort Performance Chart" src="http://chart.apis.google.com/chart?
 cht=lc
 &amp;chtt=The+Great+Partial+Sort+Shootout
 &amp;chs=500x300
@@ -129,27 +98,23 @@ cht=lc
 &amp;chd=t:0,2,4,6,8,11,13,15,18,20,22,24,27,29,32,34,36,39,41,44,46,48,51,54,56,58,61,63,66,68,71|0,1,2,4,6,9,12,14,17,20,23,26,29,32,36,39,43,46,50,52,56,60,64,68,72,74,78,82,85,89,92|0,0,1,1,2,2,2,3,3,4,3,4,4,5,5,5,5,6,8,7,8,8,8,10,10,10,9,10,11,13,11
 &amp;chco=ff0000,00ff00,0000ff
 &amp;chls=2,0,0|2,0,0|2,0,0
-&amp;chdl=Full+Sort|Partial+Sort|Nth+Elem+and+Sort" />
-
-
-<h3>Test Platform</h3>
-<p>I ran the tests on a laptop using code compiled and optimised by GCC version 4.0.1.
-</p>
+&amp;chdl=Full+Sort|Partial+Sort|Nth+Elem+and+Sort" /></p>
+<h3 id="test-platform">Test Platform</h3>
+<p>I ran the tests on a laptop using code compiled and optimised by GCC version 4.0.1.</p>
 <pre>
 Hardware Overview:
-  Model Name:	            MacBook
-  Model Identifier:	    MacBook1,1
-  Processor Name:	    Intel Core Duo
-  Processor Speed:	    2 GHz
-  Number Of Processors:	    1
+  Model Name:               MacBook
+  Model Identifier:     MacBook1,1
+  Processor Name:       Intel Core Duo
+  Processor Speed:      2 GHz
+  Number Of Processors:     1
   Total Number Of Cores:    2
   L2 Cache (per processor): 2 MB
   Memory:                   2 GB
   Bus Speed:                667 MHz
 </pre>
 
-<p>Here&#8217;s a table showing the actual times, in milliseconds. Note that on this platform the <code>clock()</code> resolution is 10 milliseconds, so I&#8217;ve multiplied the actual program output by 10.
-</p>
+<p>Here&#8217;s a table showing the actual times, in milliseconds. Note that on this platform the <code>clock()</code> resolution is 10 milliseconds, so I&#8217;ve multiplied the actual program output by 10.</p>
 <table>
 <thead><tr><td>S/million</td><td>Full Sort/ms</td><td>Partial/ms</td><td>Nth elem+sort/ms</td></tr></thead>
 <tr><td>0</td><td>0</td><td>0</td><td>0</td></tr>
@@ -185,24 +150,23 @@ Hardware Overview:
 <tr><td>60</td><td>4260</td><td>5540</td><td>640</td></tr>
 </table>
 
-
-<h3>Test Code</h3>
+<h3 id="test-code">Test Code</h3>
 <div class="typocode"><div class="codetitle">The Great Partial Sort Shootout</div>
 
 <pre class="prettyprint">/*
   This program runs three different partial sort algorithms head to head,
   writing timing information to standard out.
 
-Usage: partial_sort S N
+  Usage: partial_sort S N
 
-Here, S is the size of the collection to partially sort and N is
+  Here, S is the size of the collection to partially sort and N is
   the number of elements from this collection to sort. S and N must
   be positive with S &gt;= N.
 
-The program outputs three figures, the clock times taken by
-  full_sort, partial_sort, nth_element_then_sort respectively.
+  The program outputs three figures, the clock times taken by
+  full_sort, partial_sort, nth_element_then_sort respectively. 
 
-Example:
+  Example:
   $ partial_sort 1000000 500000
   11 17 6
 */
@@ -274,13 +238,13 @@ void
 check_equal_n(std::vector&lt;numbers&gt; const &amp; nn, size_type N)
 {
     typedef numbers::const_iterator const_iter;
-    
+
     if (!nn.empty())
     {
         const_iter const first = nn[0].begin();
         const_iter const nth = first + N;
         std::vector&lt;numbers&gt;::const_iterator ni = nn.begin() + 1;
-        
+
         while (ni != nn.end() &amp;&amp; equal(first, nth, ni-&gt;begin()))
         {
             ++ni;
@@ -298,25 +262,25 @@ void
 clock_sorters(std::ostream &amp; out, number_pair SN)
 {
     typedef std::vector&lt;numbers&gt; numbers_vec;
-    
+
     // Unpack S and N
     size_type const S = SN.first;
     size_type const N = SN.second;
-    
+
     sort_fn sorters[] =
         {
             full_sort,
             part_sort,
             nth_element_then_sort
         };
-    
+
     unsigned const n_sorters = sizeof(sorters)/sizeof(*sorters);
     std::ostream_iterator&lt;clock_t&gt; put_times(out, " ");
-    
+
     numbers ns(S);
     random_fill(ns);
     numbers_vec nn(n_sorters, ns);
-    
+
     sort_fn * sorter = sorters;
     for (numbers_vec::iterator ni = nn.begin(); ni != nn.end(); ++ni)
     {
@@ -324,7 +288,7 @@ clock_sorters(std::ostream &amp; out, number_pair SN)
             clock_it(*sorter++, ni-&gt;begin(), ni-&gt;begin() + N, ni-&gt;end());
     }
     check_equal_n(nn, N);
-    out &lt;&lt; '\n';
+    out &lt;&lt; &#x27;\n&#x27;;
 }
 
 // Processes the command line reading S, the size of the
@@ -335,9 +299,9 @@ read_cli(int argc, char * argv[])
 {
     number_pair SN;
     std::stringstream buf;
-    
+
     if (!(argc == 3 &amp;&amp;
-          buf &lt;&lt; argv[1] &lt;&lt; ' ' &lt;&lt; argv[2] &amp;&amp;
+          buf &lt;&lt; argv[1] &lt;&lt; &#x27; &#x27; &lt;&lt; argv[2] &amp;&amp;
           buf &gt;&gt; SN.first &gt;&gt; SN.second &amp;&amp;
           SN.first &gt;= SN.second))
     {
@@ -352,14 +316,14 @@ read_cli(int argc, char * argv[])
 int main(int argc, char * argv[])
 {
     int error = 0;
-    
+
     try
     {
         clock_sorters(std::cout, read_cli(argc, argv));
     }
     catch (std::exception const &amp; exc)
     {
-        std::cout &lt;&lt; "An error occurred: " &lt;&lt; exc.what() &lt;&lt; '\n';
+        std::cout &lt;&lt; "An error occurred: " &lt;&lt; exc.what() &lt;&lt; &#x27;\n&#x27;;
         error = 1;
     }
     catch (...)
@@ -367,7 +331,7 @@ int main(int argc, char * argv[])
         std::cout &lt;&lt; "An error occurred.\n";
         error = 1;
     }
-    
+
     return error;
 }
 

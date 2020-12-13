@@ -28,28 +28,24 @@
       <div class="atomentry" id="zippy-triples-served-with-python">
 <h2 class="title"><a href="/articles/zippy-triples-served-with-python">Zippy triples served with Python</a></h2>
 <p class="meta"><abbr class="published" title="2007-11-20">2007-11-20</abbr> &bull; <a href="/tag/python" rel="tag">Python</a>, <a href="/tag/puzzles" rel="tag">Puzzles</a>, <a href="/tag/functional-programming" rel="tag">Functional Programming</a>, <a href="/tag/streams" rel="tag">Streams</a> &bull; <a href="/articles/zippy-triples-served-with-python#disqus_thread">Comments</a></p>
-<h3>The Problem</h3>
+<h3 id="the-problem">The Problem</h3>
 <p>Here&#8217;s a problem I encountered when writing the HTML generator for this site. Logically, Word Aligned is a time-ordered collection of articles. I wanted each article to link to its predecessor and successor. So the general problem is: 
-   <strong>How do you iterate through a collection yielding (previous, this, next) triples?</strong>
-</p>
-<span id="continue-reading"/>
-
-
-<h3>Specification</h3>
-<p>Some test cases make things clearer. Let&#8217;s name the function we&#8217;re developing <code>prev_this_next()</code>.
-</p>
+<strong>How do you iterate through a collection yielding (previous, this, next) triples?</strong></p>
+<p><span id="continue-reading"/></p>
+<h3 id="specification">Specification</h3>
+<p>Some test cases make things clearer. Let&#8217;s name the function we&#8217;re developing <code>prev_this_next()</code>.</p>
 <div class="typocode">
 
-<pre class="prettyprint">&gt;&gt;&gt; long_weekend = 'Fri', 'Sat', 'Sun', 'Mon',
+<pre class="prettyprint">&gt;&gt;&gt; long_weekend = &#x27;Fri&#x27;, &#x27;Sat&#x27;, &#x27;Sun&#x27;, &#x27;Mon&#x27;,
 &gt;&gt;&gt; yesterday_today_tomorrow = prev_this_next(long_weekend)
 &gt;&gt;&gt; yesterday_today_tomorrow.next()
-(None, 'Fri', 'Sat')
+(None, &#x27;Fri&#x27;, &#x27;Sat&#x27;)
 &gt;&gt;&gt; yesterday_today_tomorrow.next()
-('Fri', 'Sat', 'Sun')
+(&#x27;Fri&#x27;, &#x27;Sat&#x27;, &#x27;Sun&#x27;)
 &gt;&gt;&gt; yesterday_today_tomorrow.next()
-('Sat', 'Sun', 'Mon')
+(&#x27;Sat&#x27;, &#x27;Sun&#x27;, &#x27;Mon&#x27;)
 &gt;&gt;&gt; yesterday_today_tomorrow.next()
-('Sun', 'Mon', None)
+(&#x27;Sun&#x27;, &#x27;Mon&#x27;, None)
 &gt;&gt;&gt; yesterday_today_tomorrow.next()
 Traceback (most recent call last):
     ...
@@ -63,24 +59,19 @@ StopIteration
 (2, 3, 4)
 (3, 4, None)
 &gt;&gt;&gt; print "\n".join(map(repr, prev_this_next("XYZ")))
-(None, 'X', 'Y')
-('X', 'Y', 'Z')
-('Y', 'Z', None)
+(None, &#x27;X&#x27;, &#x27;Y&#x27;)
+(&#x27;X&#x27;, &#x27;Y&#x27;, &#x27;Z&#x27;)
+(&#x27;Y&#x27;, &#x27;Z&#x27;, None)
 
 </pre>
 
 </div>
 
-<p>You&#8217;ll notice we&#8217;ve specified behaviour at the boundaries: the first item in the collection has no predecessor, thus the first triple returned has its first item set to <code>None</code>; and similarly the final triple has its third item set to <code>None</code>. We might equally well have chosen to return a user supplied default, or to wrap the collection at its ends. For now, let&#8217;s go with the simple behaviour shown.
-</p>
-<p>You&#8217;ll also have noticed I&#8217;m writing Python &#8212; fair enough, since this web site is generated off-line using Python. The <code>long_weekend</code> example drives the Python iterator protocol by hand, calling <code>yesterday_today_tomorrow.next()</code> until a <code>StopIteration</code> exception terminates the iteration. It&#8217;s quite rare to use iterators in this way: more commonly, you just loop through them using <code>for</code>, or plug them into container operations. The second and third test cases show more typical usage.
-</p>
-
-<h3>First Implementation</h3>
-<p>If this were C++, we&#8217;d prefer our collection to support bi-directional iteration: think of a doubly-linked <code>std::list</code>, or a plain old random access <code>std::vector</code>. Then we could just decrement/increment each iterator from the collection to find its neighbours. 
-</p>
-<p>In Python, we might decide to assume a random access container and write something like this:
-</p>
+<p>You&#8217;ll notice we&#8217;ve specified behaviour at the boundaries: the first item in the collection has no predecessor, thus the first triple returned has its first item set to <code>None</code>; and similarly the final triple has its third item set to <code>None</code>. We might equally well have chosen to return a user supplied default, or to wrap the collection at its ends. For now, let&#8217;s go with the simple behaviour shown.</p>
+<p>You&#8217;ll also have noticed I&#8217;m writing Python &#8212; fair enough, since this web site is generated off-line using Python. The <code>long_weekend</code> example drives the Python iterator protocol by hand, calling <code>yesterday_today_tomorrow.next()</code> until a <code>StopIteration</code> exception terminates the iteration. It&#8217;s quite rare to use iterators in this way: more commonly, you just loop through them using <code>for</code>, or plug them into container operations. The second and third test cases show more typical usage.</p>
+<h3 id="first-implementation">First Implementation</h3>
+<p>If this were C++, we&#8217;d prefer our collection to support bi-directional iteration: think of a doubly-linked <code>std::list</code>, or a plain old random access <code>std::vector</code>. Then we could just decrement/increment each iterator from the collection to find its neighbours. </p>
+<p>In Python, we might decide to assume a random access container and write something like this:</p>
 <div class="typocode">
 
 <pre class="prettyprint">def get_default(items):
@@ -103,8 +94,7 @@ def prev_this_next(items):
 
 </div>
 
-<p>This code isn&#8217;t elegant but it does pass our tests. Incidentally, an attempt to implement <code>get_default</code> using <a href="/articles/permission-and-forgiveness.html">EAFP</a>, as shown below, would fail. Can you see why?
-</p>
+<p>This code isn&#8217;t elegant but it does pass our tests. Incidentally, an attempt to implement <code>get_default</code> using <a href="/articles/permission-and-forgiveness.html">EAFP</a>, as shown below, would fail. Can you see why?</p>
 <div class="typocode">
 
 <pre class="prettyprint">def inner(index):
@@ -117,17 +107,13 @@ def prev_this_next(items):
 
 </div>
 
-<p>This fails because accessing <code>items[-1]</code> doesn&#8217;t raise an <code>IndexError</code> (unless <code>items</code> is empty); it&#8217;s a convenient way to access the final element of <code>items</code>.
-</p>
-<p>Even with the correct version of <code>get_default</code>, if our collection of items is a stream &#8212; by which I mean a lazily-evaluated iterable &#8212; this code raises an exception. We don&#8217;t know how long the stream will be (indeed, it could be infinite) and we can&#8217;t just access elements from it at random. For C++ programmers, think of sequentially reading a file using an input iterator.
-</p>
-
-<h3>Stream Test Case</h3>
-<p>Let&#8217;s adapt one of our test cases to expose this flaw.
-</p>
+<p>This fails because accessing <code>items[-1]</code> doesn&#8217;t raise an <code>IndexError</code> (unless <code>items</code> is empty); it&#8217;s a convenient way to access the final element of <code>items</code>.</p>
+<p>Even with the correct version of <code>get_default</code>, if our collection of items is a stream &#8212; by which I mean a lazily-evaluated iterable &#8212; this code raises an exception. We don&#8217;t know how long the stream will be (indeed, it could be infinite) and we can&#8217;t just access elements from it at random. For C++ programmers, think of sequentially reading a file using an input iterator.</p>
+<h3 id="stream-test-case">Stream Test Case</h3>
+<p>Let&#8217;s adapt one of our test cases to expose this flaw.</p>
 <div class="typocode">
 
-<pre class="prettyprint">&gt;&gt;&gt; long_weekend = iter(('Fri', 'Sat', 'Sun', 'Mon'))
+<pre class="prettyprint">&gt;&gt;&gt; long_weekend = iter((&#x27;Fri&#x27;, &#x27;Sat&#x27;, &#x27;Sun&#x27;, &#x27;Mon&#x27;))
 &gt;&gt;&gt; yesterday_today_tomorrow = prev_this_next(long_weekend)
 ...
 
@@ -135,22 +121,19 @@ def prev_this_next(items):
 
 </div>
 
-<p>Running this code raises an exception:
-</p>
+<p>Running this code raises an exception:</p>
 <div class="typocode">
 
 <pre class="prettyprint">Traceback (most recent call last):
     ...
-TypeError: object of type 'tupleiterator' has no len()
+TypeError: object of type &#x27;tupleiterator&#x27; has no len()
 
 </pre>
 
 </div>
 
-
-<h3>Stream Solution</h3>
-<p>Thinking of this problem in terms of streams gives us a solution which is both more general and more simple. All we have to do is tee up three independent iterators into the stream, stagger them, then zip them back together. <span id="excerpt0"/>The itertools module supplies the components. We connect.
-</p>
+<h3 id="stream-solution">Stream Solution</h3>
+<p>Thinking of this problem in terms of streams gives us a solution which is both more general and more simple. All we have to do is tee up three independent iterators into the stream, stagger them, then zip them back together. <span id="excerpt0"/>The itertools module supplies the components. We connect.</p>
 <div class="typocode">
 
 <pre class="prettyprint">import itertools
@@ -170,8 +153,7 @@ def prev_this_next(items):
 
 </div>
 
-<p>This code works on any iterable, infinite, finite or empty, lazy or eager. Some more testcases:
-</p>
+<p>This code works on any iterable, infinite, finite or empty, lazy or eager. Some more testcases:</p>
 <div class="typocode">
 
 <pre class="prettyprint">&gt;&gt;&gt; [ptn for ptn in prev_this_next(list())]
@@ -186,10 +168,8 @@ def prev_this_next(items):
 
 </div>
 
-
-<h3>Triples Times Two</h3>
-<p>Now suppose you want to peel items from an iterable, three at a time. Let&#8217;s call this function <code>three_at_a_time()</code> and let&#8217;s specify its behaviour with some simple tests:
-</p>
+<h3 id="triples-times-two">Triples Times Two</h3>
+<p>Now suppose you want to peel items from an iterable, three at a time. Let&#8217;s call this function <code>three_at_a_time()</code> and let&#8217;s specify its behaviour with some simple tests:</p>
 <div class="typocode">
 
 <pre class="prettyprint">&gt;&gt;&gt; t = three_at_a_time((1, 2, 3, 4, 5, 6))
@@ -209,16 +189,14 @@ StopIteration
 &gt;&gt;&gt; [t for t in ttt]
 [(0, 1, 2), (9, 10, 11), (18, 19, 20)]
 &gt;&gt;&gt; "".join(chain(*three_at_a_time("Word Aligned")))
-'Word Aligned'
+&#x27;Word Aligned&#x27;
 
 </pre>
 
 </div>
 
-<p>Note that any trailing single element or pair at the end of the collection is discarded. We might equally have decided to pad the collection with a user-supplied default or throw an exception.
-</p>
-<p>Here&#8217;s one implementation.
-</p>
+<p>Note that any trailing single element or pair at the end of the collection is discarded. We might equally have decided to pad the collection with a user-supplied default or throw an exception.</p>
+<p>Here&#8217;s one implementation.</p>
 <div class="typocode">
 
 <pre class="prettyprint">def three_at_a_time(items):
@@ -229,8 +207,7 @@ StopIteration
 
 </div>
 
-<p>Here&#8217;s another.
-</p>
+<p>Here&#8217;s another.</p>
 <div class="typocode">
 
 <pre class="prettyprint">def n_at_a_time(items, n):

@@ -11,7 +11,7 @@
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
 <meta name="author" content="Thomas Guest" />
 <meta name="description" content="A collection of articles on software development written by Thomas Guest." />
-<meta name="keywords" content="CLRS, Regex, Missiles, Cycling, Agile, Self, Editors, Emacs, Primes, Torvalds, ImageMagick, Hoare, IDE, Decorators, Tests, Shell, PIL, Lcs, Turing, Javascript, Ruby on Rails, Puzzles, Europython, Characters, Pictures, Fractals, Crabs, Github, DocBook, Dynamic Languages, lighttpd, Bugs, CVS, Reviews, Steganography, Oulipo, Perec, Content, Markdown, Two Wheels, Conferences, Chess, Syntax, Unix, Arc, Go, Web-applications, Iphone, Web Applications, Java, Esr, Recursion, Charts, Perl, Subversion, Recommended, Animation, Teamwork, Build, ACCU, Knuth, Android, OCR, Boost, php, Erlang, Swansea, Python, cvs2svn, Scrum, SICP, Windows, Books, Awk, Graphics, Disqus, Ruby, openid, C, Zlib, Talks, Trac, Lisp, Documentation, C++, Etc, Streams, Bristol, Tesseract, Drawing, Accidents, Google, Apple, Functional Programming, Pi, Haskell, Design, Virtualization, Unicode, Spolsky, Algorithms, Curl, Scheme" />
+<meta name="keywords" content="lighttpd, Curl, Turing, Documentation, ImageMagick, Content, Zlib, Regex, Editors, CVS, Ruby on Rails, ACCU, Reviews, Recommended, Knuth, Torvalds, Tesseract, Python, Markdown, Drawing, Shell, Trac, Puzzles, Virtualization, Bugs, Characters, Web Applications, Functional Programming, Pictures, Europython, Lcs, Bristol, Perl, Graphics, Steganography, cvs2svn, Tests, Windows, C, Awk, Charts, Unicode, Books, Emacs, Lisp, Scheme, Streams, Oulipo, php, Swansea, Android, Subversion, Erlang, Chess, Cycling, Conferences, Haskell, Google, Primes, SICP, Unix, Apple, Ruby, Design, Animation, Missiles, Agile, Arc, Hoare, Accidents, Perec, Self, IDE, Decorators, Dynamic Languages, Iphone, Two Wheels, Build, Scrum, CLRS, Boost, Java, Spolsky, Syntax, Go, Javascript, Talks, Web-applications, Pi, DocBook, openid, PIL, Esr, Recursion, Disqus, C++, Github, Algorithms, Etc, Teamwork, OCR, Fractals, Crabs" />
 <link rel="alternate" type="application/rss+xml" title="Feed" href="http://feeds.wordaligned.org/wordaligned" />
 </head>
 
@@ -25,15 +25,74 @@
 
   <div id="page">
     <div id="content">
-      <div class="atomentry" id="cryptic-message">
+      <div class="atomentry" id="complex-numbers-for-planar-geometry">
+<h2 class="title"><a href="/articles/complex-numbers-for-planar-geometry">Complex numbers for planar geometry</a></h2>
+<p class="meta"><abbr class="published" title="2020-12-12">2020-12-12</abbr> &bull; <a href="/tag/python" rel="tag">Python</a>, <a href="/tag/puzzles" rel="tag">Puzzles</a> &bull; <a href="/articles/complex-numbers-for-planar-geometry#disqus_thread">Comments</a></p>
+<p>Once again, I&#8217;m enjoying solving <a href="http://was.tl">Eric Wastl</a>&#8217;s excellent <a href="https://adventofcode.com">Advent of Code</a> puzzles.</p>
+<p>Today, <a href="day12">day 12</a> involved a ship navigating in a 2D plane. The ship follows a series of instructions taking the form of actions and values such as <code>F10 N3 F7 R90 F11 ...</code>, where, for the first part:</p>
+<ul>
+<li>actions N, S, E, W step by the value in the compass directions N, S, E, W</li>
+<li>actions L, R turn the ship left and right by the number of degrees specified by the value</li>
+<li>action F advances the ship in the direction it faces by the given value</li>
+</ul>
+<p>Perhaps the most obvious way to model this is by implementing a <code>Point</code> class, with <code>x</code> and <code>y</code> values, and suitable methods to advance and rotate.</p>
+<p>Another way is to use complex numbers, which are natively supported by Python &#8212; and many other languages. The complex plane <em>is</em> a 2D plane. The point <code>(x, y)</code> is represented by a single complex number <code>p = x + y * j</code>. Stepping in any direction corresponds to addition, and rotation to multiplication.</p>
+<p>So, the instructions <code>N, S, E, W</code> map to adding complex numbers <code>j, -j, 1, -1</code>.</p>
+<p>Quarter turns left and right map to multiplication by <code>j</code> and <code>-j</code>.</p>
+<div class="typocode">
+
+<pre class="prettyprint">def ship_position(instructions):
+    &#x27;&#x27;&#x27;Return the final position of the ship after following the instructions
+
+    Instructions are a series of (action, value) pairs.
+    &#x27;&#x27;&#x27;
+    ship, direction = 0, 1 # Start at the origin facing E
+    step = {&#x27;N&#x27;:1j, &#x27;W&#x27;:-1, &#x27;S&#x27;:-1j, &#x27;E&#x27;: 1}
+    turn = {&#x27;R&#x27;:-1j, &#x27;L&#x27;:1j}
+    for action, value in instructions:
+        if action in &#x27;NSEW&#x27;:
+            ship += value * step[action]
+        elif action in &#x27;LR&#x27;:
+            assert value % 90 == 0 # check rectilinear motion
+            direction *= turn[action] ** (value//90)
+        else:
+            assert action == &#x27;F&#x27;
+            ship += value * direction
+    return ship
+
+</pre>
+
+</div>
+
+<p>It&#8217;s also possible to implement the conditionals above arithmetically. We can think of each instruction advancing the ship (possibly by zero) and turning it (possibly by zero degrees).</p>
+<div class="typocode">
+
+<pre class="prettyprint">def ship_position(instructions):
+    ship, direction = 0, 1
+    step = {&#x27;N&#x27;:1j, &#x27;W&#x27;:-1, &#x27;S&#x27;:-1j, &#x27;E&#x27;: 1}
+    turn = {&#x27;R&#x27;:-1j, &#x27;L&#x27;:1j}
+    for action, value in instructions:
+        ship += value * (step.get(action, 0) + (action==&#x27;F&#x27;) * direction)
+        direction *= turn.get(action, 1) ** (value//90)
+    return ship
+
+</pre>
+
+</div>
+
+<p>More solutions <a href="https://github.com/wordaligned/advent-of-code-2020">here</a>, and thanks again to Eric Wastl.</p>
+
+</div>
+
+
+<div class="atomentry" id="cryptic-message">
 <h2 class="title"><a href="/articles/cryptic-message">Cryptic Message</a></h2>
 <p class="meta"><abbr class="published" title="2019-06-08">2019-06-08</abbr> &bull; <a href="/tag/puzzles" rel="tag">Puzzles</a> &bull; <a href="/articles/cryptic-message#disqus_thread">Comments</a></p>
-<p>Anyone able to help make sense of this bizarre tweet which appeared on my timeline?
-</p>
-<blockquote class="twitter-tweet" data-lang="en"><p lang="en" dir="ltr">The challenge is to decipher the message</p>&mdash; Thomas Guest (@thomasguest) <a href="https://twitter.com/thomasguest/status/1137215876271415297?ref_src=twsrc%5Etfw">June 8, 2019</a></blockquote><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+<p>Anyone able to help make sense of this bizarre tweet which appeared on my timeline?</p>
+<blockquote class="twitter-tweet" data-lang="en"><p lang="en" dir="ltr">The challenge is to decipher the message</p>&mdash; Thomas Guest (@thomasguest) <a href="https://twitter.com/thomasguest/status/1137215876271415297?ref_src=twsrc%5Etfw">June 8, 2019</a></blockquote>
+<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
 
-Please answer using the same style so others can find their own solution. Bonus points for both quality and quantity.
-
+<p>Please answer using the same style so others can find their own solution. Bonus points for both quality and quantity.</p>
 <div><img src="/images/laboratory.jpg" alt="Laboratory" title="Searching for clues" /></div>
 
 </div>
@@ -42,25 +101,16 @@ Please answer using the same style so others can find their own solution. Bonus 
 <div class="atomentry" id="dr-gs-award-winning-puzzles">
 <h2 class="title"><a href="/articles/dr-gs-award-winning-puzzles">Dr G&#8217;s Award Winning Puzzles</a></h2>
 <p class="meta"><abbr class="published" title="2019-04-09">2019-04-09</abbr> &bull; <a href="/tag/self" rel="tag">Self</a>, <a href="/tag/puzzles" rel="tag">Puzzles</a> &bull; <a href="/articles/dr-gs-award-winning-puzzles#disqus_thread">Comments</a></p>
-<p>A colleague of mine shares my love of puzzles. Whilst I like solving them, he also likes to design and build them. What I hadn&#8217;t realised is that there&#8217;s a community of puzzlers out there, who hold conventions, share designs, and generally celebrate and advance the art of puzzling.
-</p>
-<p>Dr G &#8212; my colleague &#8212; is part of that community and also owns a 3D printer. He works from home but whenever he visits the office there&#8217;ll be a freshly-printed puzzle for us to play with. I feel as excited as a young hobbit when Gandalf visits the Shire.
-</p>
-<p>The best puzzles have just a few simple pieces. You can see how the parts must finally align but the geometry conspires to confound. There <em>will</em> be a sequence of twists and turns. There <em>must</em> be.
-</p>
-<img src="/images/casino-unpacked.jpg" alt="Casino"/>
-
-<p>Casino, designed by Dr Volker Latussek, is both mould breaking and an instant classic. You have to slot 6 identical casino chips into a cubic box. The lip which makes the opening to the box rectangular rather than square is the single asymmetry which makes this task almost impossible rather than utterly trivial.
-</p>
-<p>I fiddled with it, rolling the chips into position, sliding and shunting. After many minutes of manipulation I put it down, the chips loosely arranged in and on top of the box. After a lunch break I picked it up, and to my amazement the chips slid easily and directly into place.
-</p>
-<img src="/images/casino-solved.jpg" alt="Casino"/>
-
-<img src="/images/packtic-unpacked.jpg" alt="PackTIC"/>
-
-<p>PackTIC, designed by Andrew Crowell is a very different puzzle. The TIC stands for Turning Interlocking Cube. A bit like a 3D version of Tetris, you have to manipulate a 5 very different cubilinear pieces so they fuse into an irregular chassis. I took this one on the train with me. At the end of the journey I had figured out how the pieces would fit, but not how to assemble them. The following morning, as with the Casino puzzle, everything just clicked into place.
-</p>
-<img src="/images/packtic-solved.jpg" alt="PackTIC"/>
+<p>A colleague of mine shares my love of puzzles. Whilst I like solving them, he also likes to design and build them. What I hadn&#8217;t realised is that there&#8217;s a community of puzzlers out there, who hold conventions, share designs, and generally celebrate and advance the art of puzzling.</p>
+<p>Dr G &#8212; my colleague &#8212; is part of that community and also owns a 3D printer. He works from home but whenever he visits the office there&#8217;ll be a freshly-printed puzzle for us to play with. I feel as excited as a young hobbit when Gandalf visits the Shire.</p>
+<p>The best puzzles have just a few simple pieces. You can see how the parts must finally align but the geometry conspires to confound. There <em>will</em> be a sequence of twists and turns. There <em>must</em> be.</p>
+<p><img src="/images/casino-unpacked.jpg" alt="Casino"/></p>
+<p>Casino, designed by Dr Volker Latussek, is both mould breaking and an instant classic. You have to slot 6 identical casino chips into a cubic box. The lip which makes the opening to the box rectangular rather than square is the single asymmetry which makes this task almost impossible rather than utterly trivial.</p>
+<p>I fiddled with it, rolling the chips into position, sliding and shunting. After many minutes of manipulation I put it down, the chips loosely arranged in and on top of the box. After a lunch break I picked it up, and to my amazement the chips slid easily and directly into place.</p>
+<p><img src="/images/casino-solved.jpg" alt="Casino"/></p>
+<p><img src="/images/packtic-unpacked.jpg" alt="PackTIC"/></p>
+<p>PackTIC, designed by Andrew Crowell is a very different puzzle. The TIC stands for Turning Interlocking Cube. A bit like a 3D version of Tetris, you have to manipulate a 5 very different cubilinear pieces so they fuse into an irregular chassis. I took this one on the train with me. At the end of the journey I had figured out how the pieces would fit, but not how to assemble them. The following morning, as with the Casino puzzle, everything just clicked into place.</p>
+<p><img src="/images/packtic-solved.jpg" alt="PackTIC"/></p>
 
 </div>
 
@@ -68,21 +118,20 @@ Please answer using the same style so others can find their own solution. Bonus 
 <div class="atomentry" id="aligning-the-first-line-of-a-triplequoted-string-in-python">
 <h2 class="title"><a href="/articles/aligning-the-first-line-of-a-triplequoted-string-in-python">Aligning the first line of a triple-quoted string in Python</a></h2>
 <p class="meta"><abbr class="published" title="2019-02-17">2019-02-17</abbr> &bull; <a href="/tag/python" rel="tag">Python</a> &bull; <a href="/articles/aligning-the-first-line-of-a-triplequoted-string-in-python#disqus_thread">Comments</a></p>
-<p>Python&#8217;s triple-quoted strings are a convenient syntax for strings where the contents span multiple lines. Unescaped newlines are allowed in triple-quoted strings. So, rather than write:
-</p>
+<p>Python&#8217;s triple-quoted strings are a convenient syntax for strings where the contents span multiple lines. Unescaped newlines are allowed in triple-quoted strings. So, rather than write:</p>
 <pre><code>song = ("Happy birthday to you\n"
         "Happy birthday to you\n"
         "Happy birthday dear Gail\n"
         "Happy birthday to you\n")
-</code></pre><p>you can write:
-</p>
+</code></pre>
+<p>you can write:</p>
 <pre><code>song = """Happy birthday to you
 Happy birthday to you
 Happy birthday dear Gail
 Happy birthday to you
 """
-</code></pre><p>The only downside here is that the first line doesn&#8217;t align nicely with the lines which follow. The way around this is to embed a <code>\newline</code> escape sequence, meaning both <a href="https://docs.python.org/3/reference/lexical_analysis.html#string-and-bytes-literals" title="String and Bytes literals">backslash and newline are ignored</a>.
-</p>
+</code></pre>
+<p>The only downside here is that the first line doesn&#8217;t align nicely with the lines which follow. The way around this is to embed a <code>\newline</code> escape sequence, meaning both <a href="https://docs.python.org/3/reference/lexical_analysis.html#string-and-bytes-literals" title="String and Bytes literals">backslash and newline are ignored</a>.</p>
 <pre><code>song = """\
 Happy birthday to you
 Happy birthday to you
@@ -97,18 +146,14 @@ Happy birthday to you
 <div class="atomentry" id="python-counters-pydiff">
 <h2 class="title"><a href="/articles/python-counters-pydiff">Python Counters @PyDiff</a></h2>
 <p class="meta"><abbr class="published" title="2019-01-19">2019-01-19</abbr> &bull; <a href="/tag/talks" rel="tag">Talks</a>, <a href="/tag/python" rel="tag">Python</a> &bull; <a href="/articles/python-counters-pydiff#disqus_thread">Comments</a></p>
-<p>On Monday I gave a talk at <a href="http://www.pydiff.wales/">PyDiff</a> on the subject of Python Counters. A Counter is a specialised <code>dict</code> which has much in common with a <code>set</code>. Of course all dicts are like sets, but with Counters the resemblance is even stronger. The <a href="https://docs.python.org/3/library/collections.html#collections.Counter">documentation</a> states:
-</p>
-<blockquote><p>The Counter class is similar to bags or multisets in other languages.
-</p>
-</blockquote><p>Alongside set operations of union, intersection and is-a-subset, Counter also supports addition and subtraction &#8212; natural and unsurprising operations for a container whose job is to keep count of its elements. If you want to unite the contents of two Counters, it&#8217;s probably <code>+</code> you want rather than <code>|</code>.
-</p>
-<p>Counters came to mind as a lightning talk subject since I had a go at the <a href="https://adventofcode.com/2018" title="25 Christmas themed puzzles made available one-per-day as a countdown to Christmas">Advent of Code</a> last year and used no fewer than 12 Counters in my <a href="https://github.com/wordaligned/advent-of-code-2018/blob/master/solutions.ipynb">solutions</a> to 25 puzzles &#8212; and that total could well increase since I haven&#8217;t finished yet.
-</p>
-<p>The talk itself is on <a href="https://github.com/wordaligned/python-counters">github</a>.
-</p>
-<p><a href="https://github.com/wordaligned/python-counters"><img alt="Coins" src="/images/coins.jpg"></a>
-</p>
+<p>On Monday I gave a talk at <a href="http://www.pydiff.wales/">PyDiff</a> on the subject of Python Counters. A Counter is a specialised <code>dict</code> which has much in common with a <code>set</code>. Of course all dicts are like sets, but with Counters the resemblance is even stronger. The <a href="https://docs.python.org/3/library/collections.html#collections.Counter">documentation</a> states:</p>
+<blockquote>
+<p>The Counter class is similar to bags or multisets in other languages.</p>
+</blockquote>
+<p>Alongside set operations of union, intersection and is-a-subset, Counter also supports addition and subtraction &#8212; natural and unsurprising operations for a container whose job is to keep count of its elements. If you want to unite the contents of two Counters, it&#8217;s probably <code>+</code> you want rather than <code>|</code>.</p>
+<p>Counters came to mind as a lightning talk subject since I had a go at the <a href="https://adventofcode.com/2018" title="25 Christmas themed puzzles made available one-per-day as a countdown to Christmas">Advent of Code</a> last year and used no fewer than 12 Counters in my <a href="https://github.com/wordaligned/advent-of-code-2018/blob/master/solutions.ipynb">solutions</a> to 25 puzzles &#8212; and that total could well increase since I haven&#8217;t finished yet.</p>
+<p>The talk itself is on <a href="https://github.com/wordaligned/python-counters">github</a>.</p>
+<p><a href="https://github.com/wordaligned/python-counters"><img alt="Coins" src="/images/coins.jpg"></a></p>
 
 </div>
 
@@ -117,87 +162,60 @@ Happy birthday to you
 <h2 class="title"><a href="/articles/metaphormers">Metaphormers</a></h2>
 <p class="meta"><abbr class="published" title="2018-05-30">2018-05-30</abbr> &bull; <a href="/tag/self" rel="tag">Self</a>, <a href="/tag/talks" rel="tag">Talks</a> &bull; <a href="/articles/metaphormers#disqus_thread">Comments</a></p>
 <p><img src="/images/glyphicons/glyphicons-553-firework.png" alt="icon"/>
-   <img src="/images/glyphicons/glyphicons-23-fire.png" alt="icon"/>
-   <img src="/images/glyphicons/glyphicons-242-flash.png" alt="icon"/>
-</p>
-<p>A metaphor is a figure of speech where you describe something in terms of something else. For example, when Katy Perry sings &#8220;Baby, you&#8217;re a firework&#8221; she doesn&#8217;t mean you&#8217;re an explosive for use on bonfire night &#8212; she&#8217;s saying you&#8217;ve got a spark inside you, you should &#8220;ignite the light&#8221;, &#8220;show &#8216;em what you&#8217;re worth&#8221;, &#8220;shoot across the sky&#8221; and &#8220;make &#8216;em go, Oh, oh, oh!&#8221;.
-</p>
-<p>You&#8217;re spectacular &#8212; a <strong>firework</strong>.
-</p>
-<p>This post considers some metaphors for computer programming. I hope we can gain some insights into what we do by looking at it from a different angle. In other words: what are we like?
-</p>
+<img src="/images/glyphicons/glyphicons-23-fire.png" alt="icon"/>
+<img src="/images/glyphicons/glyphicons-242-flash.png" alt="icon"/></p>
+<p>A metaphor is a figure of speech where you describe something in terms of something else. For example, when Katy Perry sings &#8220;Baby, you&#8217;re a firework&#8221; she doesn&#8217;t mean you&#8217;re an explosive for use on bonfire night &#8212; she&#8217;s saying you&#8217;ve got a spark inside you, you should &#8220;ignite the light&#8221;, &#8220;show &#8216;em what you&#8217;re worth&#8221;, &#8220;shoot across the sky&#8221; and &#8220;make &#8216;em go, Oh, oh, oh!&#8221;.</p>
+<p>You&#8217;re spectacular &#8212; a <strong>firework</strong>.</p>
+<p>This post considers some metaphors for computer programming. I hope we can gain some insights into what we do by looking at it from a different angle. In other words: what are we like?</p>
 <p><img src="/images/glyphicons/glyphicons-236-pen.png" alt="icon"/>
-   <img src="/images/glyphicons/glyphicons-108-text-resize.png" alt="icon"/>
-   <img src="/images/glyphicons/glyphicons-111-align-left.png" alt="icon"/>
-</p>
-<p>We <strong>write</strong> software. That&#8217;s not a metaphor though. It&#8217;s <strong>literally</strong> what we do. We write, edit, review and publish texts. In scrum teams we even work on <strong>stories</strong>. It&#8217;s not particularly helpful.
-</p>
-<p>It&#8217;s not unhelpful either, unlike the next couple of examples, for which I blame recruitment agents.
-</p>
+<img src="/images/glyphicons/glyphicons-108-text-resize.png" alt="icon"/>
+<img src="/images/glyphicons/glyphicons-111-align-left.png" alt="icon"/></p>
+<p>We <strong>write</strong> software. That&#8217;s not a metaphor though. It&#8217;s <strong>literally</strong> what we do. We write, edit, review and publish texts. In scrum teams we even work on <strong>stories</strong>. It&#8217;s not particularly helpful.</p>
+<p>It&#8217;s not unhelpful either, unlike the next couple of examples, for which I blame recruitment agents.</p>
 <p><img src="/images/glyphicons/glyphicons-592-person-running.png" alt="icon"/>
-   <img src="/images/glyphicons/glyphicons-18-music.png" alt="icon"/>
-   <img src="/images/glyphicons/glyphicons-49-star-empty.png" alt="icon"/>
-</p>
-<p>An advert for a programming <strong>ninja</strong> isn&#8217;t meant to attract a Japanese mercenary trained in espionage and assassination, must have 2 years PHP experience &#8212; it&#8217;s meant to make a dull job sound exciting. Similarly a <strong>rockstar</strong> is unwelcome on most software teams. Creativity and even attitude may be useful. Not so the rampant ego and <a href="http://www.thisisinsider.com/van-halen-brown-m-ms-contract-2016-9">trantrums</a>.
-</p>
+<img src="/images/glyphicons/glyphicons-18-music.png" alt="icon"/>
+<img src="/images/glyphicons/glyphicons-49-star-empty.png" alt="icon"/></p>
+<p>An advert for a programming <strong>ninja</strong> isn&#8217;t meant to attract a Japanese mercenary trained in espionage and assassination, must have 2 years PHP experience &#8212; it&#8217;s meant to make a dull job sound exciting. Similarly a <strong>rockstar</strong> is unwelcome on most software teams. Creativity and even attitude may be useful. Not so the rampant ego and <a href="http://www.thisisinsider.com/van-halen-brown-m-ms-contract-2016-9">trantrums</a>.</p>
 <p><img src="/images/glyphicons/glyphicons-313-rugby.png" alt="icon"/>
-   <img src="/images/glyphicons/glyphicons-330-soccer-ball.png" alt="icon"/>
-   <img src="/images/glyphicons/glyphicons-463-basketball.png" alt="icon"/>
-</p>
-<p>How about <strong>sports</strong>? We&#8217;re <strong>agile</strong>. We work in <strong>teams</strong> on <strong>sprints</strong> scoring (story) <strong>points</strong>. In our <strong>scrum</strong> meetings we discuss <strong>tactics</strong>.
-</p>
+<img src="/images/glyphicons/glyphicons-330-soccer-ball.png" alt="icon"/>
+<img src="/images/glyphicons/glyphicons-463-basketball.png" alt="icon"/></p>
+<p>How about <strong>sports</strong>? We&#8217;re <strong>agile</strong>. We work in <strong>teams</strong> on <strong>sprints</strong> scoring (story) <strong>points</strong>. In our <strong>scrum</strong> meetings we discuss <strong>tactics</strong>.</p>
 <p><img src="/images/glyphicons/glyphicons-273-cake.png" alt="icon"/>
-   <img src="/images/glyphicons/glyphicons-274-drink.png" alt="icon"/>
-   <img src="/images/glyphicons/glyphicons-276-fast-food.png" alt="icon"/>
-   <img src="/images/glyphicons/glyphicons-278-pizza.png" alt="icon"/>
-   <img src="/images/glyphicons/glyphicons-277-cutlery.png" alt="icon"/>
-</p>
-<p>Is coding like <strong>cooking</strong>? We assemble the right <strong>ingredients</strong> and follow tried and trusted <strong>recipes</strong>. Our products are <strong>consumed</strong> and adjusted to <strong>taste</strong> based on feedback.
-</p>
+<img src="/images/glyphicons/glyphicons-274-drink.png" alt="icon"/>
+<img src="/images/glyphicons/glyphicons-276-fast-food.png" alt="icon"/>
+<img src="/images/glyphicons/glyphicons-278-pizza.png" alt="icon"/>
+<img src="/images/glyphicons/glyphicons-277-cutlery.png" alt="icon"/></p>
+<p>Is coding like <strong>cooking</strong>? We assemble the right <strong>ingredients</strong> and follow tried and trusted <strong>recipes</strong>. Our products are <strong>consumed</strong> and adjusted to <strong>taste</strong> based on feedback.</p>
 <p><img src="/images/glyphicons/glyphicons-263-spade.png" alt="icon"/>
-   <img src="/images/glyphicons/glyphicons-311-flower.png" alt="icon"/>
-   <img src="/images/glyphicons/glyphicons-22-snowflake.png" alt="icon"/>
-   <img src="/images/glyphicons/glyphicons-232-sun.png" alt="icon"/>
-   <img src="/images/glyphicons/glyphicons-2-leaf.png" alt="icon"/>
-   <img src="/images/glyphicons/glyphicons-71-umbrella.png" alt="icon"/>
-   <img src="/images/glyphicons/glyphicons-361-bug.png" alt="icon"/>
-</p>
-<p>Software grows organically. Tending to a codebase is a form of <strong>gardening</strong> &#8212; we nurture new features and allow them to <strong>blossom</strong>, all the while <strong>pruning</strong> dead code and trying to keep <strong>bugs</strong> under control. Release cycles are seasonal. Success depends on both weather and climate.
-</p>
+<img src="/images/glyphicons/glyphicons-311-flower.png" alt="icon"/>
+<img src="/images/glyphicons/glyphicons-22-snowflake.png" alt="icon"/>
+<img src="/images/glyphicons/glyphicons-232-sun.png" alt="icon"/>
+<img src="/images/glyphicons/glyphicons-2-leaf.png" alt="icon"/>
+<img src="/images/glyphicons/glyphicons-71-umbrella.png" alt="icon"/>
+<img src="/images/glyphicons/glyphicons-361-bug.png" alt="icon"/></p>
+<p>Software grows organically. Tending to a codebase is a form of <strong>gardening</strong> &#8212; we nurture new features and allow them to <strong>blossom</strong>, all the while <strong>pruning</strong> dead code and trying to keep <strong>bugs</strong> under control. Release cycles are seasonal. Success depends on both weather and climate.</p>
 <p><img src="/images/glyphicons/glyphicons-535-lab-alt.png" alt="icon"/>
-   <img src="/images/glyphicons/glyphicons-235-brush.png" alt="icon"/>
-   <img src="/images/glyphicons/glyphicons-599-scissors-alt.png" alt="icon"/>
-</p>
-<p>If Computer <strong>Science</strong> is the discipline, <a href="https://en.wikipedia.org/wiki/The_Art_of_Computer_Programming">The <strong>Art</strong> of Computer Programming</a>, supplies the detail, and the practice is often described as a <strong>Craft</strong>. There&#8217;s a progression, <a href="https://en.wikipedia.org/wiki/The_Pragmatic_Programmer">from journeyman to master</a>, during which we learn the <strong>tools</strong> of our <strong>trade</strong>. Although end users may never see the elegant code which underpins the interface they use, we take pride in our work and like to think they can sense our attention to detail.
-</p>
+<img src="/images/glyphicons/glyphicons-235-brush.png" alt="icon"/>
+<img src="/images/glyphicons/glyphicons-599-scissors-alt.png" alt="icon"/></p>
+<p>If Computer <strong>Science</strong> is the discipline, <a href="https://en.wikipedia.org/wiki/The_Art_of_Computer_Programming">The <strong>Art</strong> of Computer Programming</a>, supplies the detail, and the practice is often described as a <strong>Craft</strong>. There&#8217;s a progression, <a href="https://en.wikipedia.org/wiki/The_Pragmatic_Programmer">from journeyman to master</a>, during which we learn the <strong>tools</strong> of our <strong>trade</strong>. Although end users may never see the elegant code which underpins the interface they use, we take pride in our work and like to think they can sense our attention to detail.</p>
 <p><img src="/images/glyphicons/glyphicons-21-home.png" alt="icon"/>
-   <img src="/images/glyphicons/glyphicons-69-ruler.png" alt="icon"/>
-   <img src="/images/glyphicons/glyphicons-377-hand-saw.png" alt="icon"/>
-   <img src="/images/glyphicons/glyphicons-375-claw-hammer.png" alt="icon"/>
-</p>
-<p>The most popular metaphor is <a href="https://en.wikipedia.org/wiki/Code_Complete"><strong>construction</strong></a>. It&#8217;s there in our job titles: <strong>Architect</strong>, <strong>Project Manager</strong>, <strong>Engineer</strong>. We plan, assemble, build, test, deliver. Unfortunately this metaphor fails to recognise the supple, fluid nature of software &#8212; its <strong>softness</strong>.
-</p>
-<p>If you&#8217;re building a house you start with foundations and then the walls go up, at which point it becomes impossible to change the foundations. If you&#8217;re building software, you could start with the wiring and then put the roof on. There&#8217;s nothing stopping you swapping the foundations at any point: running on another platform, or switching the memory manager, for example, is no more difficult than changing the user interface styling.
-</p>
-<p>Or consider a software service, supported by a collaboration of microservices which are continually developed, reconfigured, replaced. That&#8217;s not construction. It&#8217;s communication.
-</p>
+<img src="/images/glyphicons/glyphicons-69-ruler.png" alt="icon"/>
+<img src="/images/glyphicons/glyphicons-377-hand-saw.png" alt="icon"/>
+<img src="/images/glyphicons/glyphicons-375-claw-hammer.png" alt="icon"/></p>
+<p>The most popular metaphor is <a href="https://en.wikipedia.org/wiki/Code_Complete"><strong>construction</strong></a>. It&#8217;s there in our job titles: <strong>Architect</strong>, <strong>Project Manager</strong>, <strong>Engineer</strong>. We plan, assemble, build, test, deliver. Unfortunately this metaphor fails to recognise the supple, fluid nature of software &#8212; its <strong>softness</strong>.</p>
+<p>If you&#8217;re building a house you start with foundations and then the walls go up, at which point it becomes impossible to change the foundations. If you&#8217;re building software, you could start with the wiring and then put the roof on. There&#8217;s nothing stopping you swapping the foundations at any point: running on another platform, or switching the memory manager, for example, is no more difficult than changing the user interface styling.</p>
+<p>Or consider a software service, supported by a collaboration of microservices which are continually developed, reconfigured, replaced. That&#8217;s not construction. It&#8217;s communication.</p>
 <p><img src="/images/glyphicons/glyphicons-371-globe-af.png" alt="icon"/>
-   <img src="/images/glyphicons/glyphicons-51-link.png" alt="icon"/>
-   <img src="/images/glyphicons/glyphicons-33-wifi-alt.png" alt="icon"/>
-   <img src="/images/glyphicons/glyphicons-552-podcast.png" alt="icon"/>
-</p>
-<p>Communication is the metaphor I&#8217;m going to champion. Code <strong>communicates</strong>, via compiler or <strong>interpreter</strong>, with the platform. It communicates with us via editor and browser. We use text, pictures, speech, gestures. We share rooms, screens, thoughts. We listen to our users. We engage with our community.
-</p>
-<p>At the start of this post I dismissed &#8220;writing&#8221; as too literal. Beyond the literal and beneath the words, it&#8217;s evident we&#8217;re in the <strong>language</strong> business: not just programming languages, but also the dialect of our APIs and modules, the metaphors which describe and define our designs. Design patterns are simply shared metaphor &#8212; factory, visitor, facade &#8212; and a codebase communicates by shaping and extending its own local metaphors.
-</p>
-<p>Software is the development of metaphor. We are <strong>metaphormers</strong>.
-</p>
-<p>As Katy Perry would say: Oh, oh, oh!
-</p>
+<img src="/images/glyphicons/glyphicons-51-link.png" alt="icon"/>
+<img src="/images/glyphicons/glyphicons-33-wifi-alt.png" alt="icon"/>
+<img src="/images/glyphicons/glyphicons-552-podcast.png" alt="icon"/></p>
+<p>Communication is the metaphor I&#8217;m going to champion. Code <strong>communicates</strong>, via compiler or <strong>interpreter</strong>, with the platform. It communicates with us via editor and browser. We use text, pictures, speech, gestures. We share rooms, screens, thoughts. We listen to our users. We engage with our community.</p>
+<p>At the start of this post I dismissed &#8220;writing&#8221; as too literal. Beyond the literal and beneath the words, it&#8217;s evident we&#8217;re in the <strong>language</strong> business: not just programming languages, but also the dialect of our APIs and modules, the metaphors which describe and define our designs. Design patterns are simply shared metaphor &#8212; factory, visitor, facade &#8212; and a codebase communicates by shaping and extending its own local metaphors.</p>
+<p>Software is the development of metaphor. We are <strong>metaphormers</strong>.</p>
+<p>As Katy Perry would say: Oh, oh, oh!</p>
 <p style="text-align:center">&sect;</p>
 
-<p>The icons used on this page were downloaded from <a href="http://glyphicons.com">http://glyphicons.com</a> and are licensed under the <a href=http://creativecommons.org/licenses/by/3.0/deed.en>CC BY 3.0</a> terms.
-</p>
+<p>The icons used on this page were downloaded from <a href="http://glyphicons.com">http://glyphicons.com</a> and are licensed under the <a href=http://creativecommons.org/licenses/by/3.0/deed.en>CC BY 3.0</a> terms.</p>
 
 </div>
 
@@ -205,19 +223,18 @@ Happy birthday to you
 <div class="atomentry" id="dict-of-lists">
 <h2 class="title"><a href="/articles/dict-of-lists">Creating a dict of lists in Python</a></h2>
 <p class="meta"><abbr class="published" title="2018-04-29">2018-04-29</abbr> &bull; <a href="/tag/python" rel="tag">Python</a>, <a href="/tag/streams" rel="tag">Streams</a> &bull; <a href="/articles/dict-of-lists#disqus_thread">Comments</a></p>
-<p>Suppose you have a list of objects which you want to convert into a dict mapping from some object key to the (sub-)list of objects with that key. To provide a simple example, let&#8217;s start with a list of fruits.
-</p>
+<p>Suppose you have a list of objects which you want to convert into a dict mapping from some object key to the (sub-)list of objects with that key. To provide a simple example, let&#8217;s start with a list of fruits.</p>
 <div class="typocode">
 
 <pre class="prettyprint">from collections import namedtuple
 
-Fruit = namedtuple('Fruit', 'name colour')
+Fruit = namedtuple(&#x27;Fruit&#x27;, &#x27;name colour&#x27;)
 
-def banana():     return Fruit('banana', 'yellow')
-def grape():      return Fruit('grape', 'green')
-def pear():       return Fruit('pear', 'green')
-def strawberry(): return Fruit('strawberry', 'red')
-def cherry():     return Fruit('cherry', 'red')
+def banana():     return Fruit(&#x27;banana&#x27;, &#x27;yellow&#x27;)
+def grape():      return Fruit(&#x27;grape&#x27;, &#x27;green&#x27;)
+def pear():       return Fruit(&#x27;pear&#x27;, &#x27;green&#x27;)
+def strawberry(): return Fruit(&#x27;strawberry&#x27;, &#x27;red&#x27;)
+def cherry():     return Fruit(&#x27;cherry&#x27;, &#x27;red&#x27;)
 
 fruits = [
     banana(), pear(), cherry(), cherry(), pear(),
@@ -228,8 +245,7 @@ fruits = [
 
 </div>
 
-<p>We&#8217;d like to arrange a fruitbowl &#8212; a dict which groups fruits by colour. This can be done by creating an empty bowl, then iterating through the fruits placing each in the correct list.
-</p>
+<p>We&#8217;d like to arrange a fruitbowl &#8212; a dict which groups fruits by colour. This can be done by creating an empty bowl, then iterating through the fruits placing each in the correct list.</p>
 <div class="typocode">
 
 <pre class="prettyprint">fruitbowl = {}
@@ -241,8 +257,7 @@ for fruit in fruits:
 
 </div>
 
-<p><code>Dict.setdefault</code> is a bit of an oddity in Python, both doing something and returning a value, but it&#8217;s a convenient shorthand in this case. Despite this convenience it&#8217;s more common to use a <code>defaultdict</code>.
-</p>
+<p><code>Dict.setdefault</code> is a bit of an oddity in Python, both doing something and returning a value, but it&#8217;s a convenient shorthand in this case. Despite this convenience it&#8217;s more common to use a <code>defaultdict</code>.</p>
 <div class="typocode">
 
 <pre class="prettyprint">from collections import defaultdict
@@ -256,22 +271,20 @@ for fruit in fruits:
 
 </div>
 
-<p>Here&#8217;s a function to display the fruitbowl.
-</p>
+<p>Here&#8217;s a function to display the fruitbowl.</p>
 <div class="typocode">
 
 <pre class="prettyprint">def print_bowl(bowl):
-    print('\n'.join(
-        '{}: {}'.format(colour,
-                        ', '.join(f.name for f in fruits))
+    print(&#x27;\n&#x27;.join(
+        &#x27;{}: {}&#x27;.format(colour,
+                        &#x27;, &#x27;.join(f.name for f in fruits))
         for colour, fruits in bowl.items()))
 
 </pre>
 
 </div>
 
-<p>If we call this function, we see the fruits have indeed been grouped by colour.
-</p>
+<p>If we call this function, we see the fruits have indeed been grouped by colour.</p>
 <div class="typocode">
 
 <pre class="prettyprint">&gt;&gt;&gt; print_bowl(fruitbowl)
@@ -283,16 +296,14 @@ red: cherry, cherry, cherry, strawberry, cherry
 
 </div>
 
-<p>This is all fine and idiomatic Python, but whenever I see an empty dict being created followed by a loop to populate it, I wonder if a comprehension could be used.
-</p>
-<p>Is there a way to declare and initialise the dict in a single expression? Here&#8217;s the best I came up with.
-</p>
+<p>This is all fine and idiomatic Python, but whenever I see an empty dict being created followed by a loop to populate it, I wonder if a comprehension could be used.</p>
+<p>Is there a way to declare and initialise the dict in a single expression? Here&#8217;s the best I came up with.</p>
 <div class="typocode">
 
 <pre class="prettyprint">from operator import attrgetter
 from itertools import groupby
 
-colour = attrgetter('colour')
+colour = attrgetter(&#x27;colour&#x27;)
 
 fruitbowl = {
     col: list(fts)
@@ -302,37 +313,34 @@ fruitbowl = {
 
 </div>
 
-<p>Is this better than the <code>defaultdict</code> solution. Probably not, but it&#8217;s a technique worth remembering. Maybe the <code>fruitbowl</code> isn&#8217;t needed, and we actually just need to iterate through the fruits grouped by colour. For example, which colour is most popular?
-</p>
+<p>Is this better than the <code>defaultdict</code> solution. Probably not, but it&#8217;s a technique worth remembering. Maybe the <code>fruitbowl</code> isn&#8217;t needed, and we actually just need to iterate through the fruits grouped by colour. For example, which colour is most popular?</p>
 <div class="typocode">
 
 <pre class="prettyprint">&gt;&gt;&gt; max(fruitbowl.items(), key=lambda kv: len(kv[1]))[0]
-'green'
+&#x27;green&#x27;
 
 </pre>
 
 </div>
 
-<p>Using <code>groupby</code>, we don&#8217;t need the bowl.
-</p>
+<p>Using <code>groupby</code>, we don&#8217;t need the bowl.</p>
 <div class="typocode">
 
 <pre class="prettyprint">&gt;&gt;&gt; def grouplen(k_gp):
 ...     return sum(1 for _ in k_gp[1])
 &gt;&gt;&gt; max(groupby(sorted(fruits, key=colour), colour), key=grouplen)[0]
-&gt;&gt;&gt; 'green'
+&gt;&gt;&gt; &#x27;green&#x27;
 
 </pre>
 
 </div>
 
-<p>In this case, we don&#8217;t need <code>groupby</code> either. <a href="./timtowtdi-vs-tsboapooowtdi">There is more than one way to do it</a>.
-</p>
+<p>In this case, we don&#8217;t need <code>groupby</code> either. <a href="./timtowtdi-vs-tsboapooowtdi">There is more than one way to do it</a>.</p>
 <div class="typocode">
 
 <pre class="prettyprint">&gt;&gt;&gt; from collections import Counter
 &gt;&gt;&gt; Counter(map(colour, fruits)).most_common(1)
-[('green', 7)]
+[(&#x27;green&#x27;, 7)]
 
 </pre>
 
@@ -344,110 +352,54 @@ fruitbowl = {
 <div class="atomentry" id="timtowtdi-vs-tsboapooowtdi">
 <h2 class="title"><a href="/articles/timtowtdi-vs-tsboapooowtdi">TIMTOWTDI vs TSBO-APOO-OWTDI</a></h2>
 <p class="meta"><abbr class="published" title="2018-04-19">2018-04-19</abbr> &bull; <a href="/tag/python" rel="tag">Python</a>, <a href="/tag/perl" rel="tag">Perl</a> &bull; <a href="/articles/timtowtdi-vs-tsboapooowtdi#disqus_thread">Comments</a></p>
-<div class="toc">
-<h2>Contents</h2>
-<ul>
- <li><a href="#toctimtowtdi" name="toc0" id="toc0">TIMTOWTDI</a>
- </li>
-
- <li><a href="#toctsboapooowtdi" name="toc1" id="toc1">TSBO-APOO-OWTDI</a>
- </li>
-
- <li><a href="#toctimtop" name="toc2" id="toc2">TIMTOP</a>
- </li>
-
- <li><a href="#toctimtopom" name="toc3" id="toc3">TIMTOPOM</a>
- </li>
-
- <li><a href="#toctimtoutf" name="toc4" id="toc4">TIMTOUTF</a>
- </li>
-
- <li><a href="#toctimtowofs" name="toc5" id="toc5">TIMTOWOFS</a>
- </li>
-
- <li><a href="#tocapsdotadiw" name="toc6" id="toc6">APSDOTADIW</a>
- </li>
-</ul>
-</div>
-<h2><a href="#toc0" name="toctimtowtdi" id="toctimtowtdi">TIMTOWTDI</a></h2>
-<p>TIMTOWTDI stands for &#8220;There is more than one way to do it&#8221;, an approach promoted by the Perl community.
-</p>
-<p>The mindset behind it gets explored in more detail by the language&#8217;s creator, Larry Wall, in a talk given in 1999: <a href="https://www.perl.com/pub/1999/03/pm.html/">&#8220;Perl, the first postmodern computer language&#8221;</a>. He attributes the slogan to his daughter, Heidi, who says it&#8217;s a strategy which works well in her maths class; and <strong>she</strong> associates it with another saying used at school: &#8220;Tsall Good&#8221;. This doesn&#8217;t mean everything is good, or even everything has good bits. It means, overall, things are good. See the big picture.
-</p>
-<p>Perl epitomises this. It&#8217;s eclectic and inclusive, supporting a variety of styles. One-liner? Fine! Like a shell script? Sure! Structured programming, object-oriented, functional? Why not! Tsall good.
-</p>
-<p>I like that.
-</p>
-<p>But do I feel that way about programming?
-</p>
-
-<h2><a href="#toc1" name="toctsboapooowtdi" id="toctsboapooowtdi">TSBO-APOO-OWTDI</a></h2>
-<p>A contrasting mantra appears in the <a href="https://www.python.org/dev/peps/pep-0020/">Zen of Python</a>, a list of aphorisms which summarise the guiding principles behind Python&#8217;s design. Item number 13 states &#8220;There should be one &#8212; and preferably only one &#8212; obvious way to do it.&#8221;
-</p>
-<p>Perhaps realising this sounds overly prescriptive, this rule is tempered by item 14, &#8220;Although that way may not be obvious at first unless you&#8217;re Dutch.&#8221;
-</p>
-<p>Guido van Rossum, Python&#8217;s BDFL &#8212; Benevolent Dictator For Life &#8212; would be the Dutch person who finds things obvious. That&#8217;s right: <strong>Dictator</strong>. Programmers don&#8217;t like being told what to do any more than two year olds. How then has Python become so popular? 
-</p>
-<p>Maybe emphasis falls on <strong>should</strong>. There <strong>should</strong> be only one obvious way to do it: it&#8217;s just that &#8212; Dutch or otherwise &#8212; we haven&#8217;t got there yet.
-</p>
-
-<h2><a href="#toc2" name="toctimtop" id="toctimtop">TIMTOP</a></h2>
-<p>For example, there is more than one Python. Obviously there&#8217;s Python 2 and Python 3, but it&#8217;s less obvious which to use. Don&#8217;t forget <a href="https://pypy.org/">PyPy</a>. Increasingly Python comes packaged with data processing and visualisation extensions, served up as a <a href="http://jupyter.org/">Jupyter</a> notebook.
-</p>
-
-<h2><a href="#toc3" name="toctimtopom" id="toctimtopom">TIMTOPOM</a></h2>
-<p>There is more than one program options module.
-</p>
-<p>When I started with Python there was <a href="https://docs.python.org/3/library/getopt.html">getopt</a>, the one and only command line handler. Coming from a C/C++ background I was quite happy to use something resembling GNU&#8217;s getopt. Then <a href="https://docs.python.org/3/library/optparse.html">optparse</a> appeared. Now there&#8217;s <a href="https://docs.python.org/3/library/argparse.html">argparse</a>. All of these libraries are readily available. Which should I use? Not optparse, that&#8217;s deprecated, unless I&#8217;m already using it and it works, that is. Regarding the other contenders, the <a href="https://docs.python.org/3/library/getopt.html">documentation</a> archly notes:
-</p>
-<blockquote><p>Users who are unfamiliar with the C <a href="http://man7.org/linux/man-pages/man3/getopt.3.html"><code>getopt()</code></a> function or who would like to write less code and get better help and error messages should consider using the <a href="https://docs.python.org/3/library/argparse.html#module-argparse">argparse module</a> instead.
-</p>
-</blockquote><p>There are other non-standard Python options for parsing a command line too: ones which <a href="http://docopt.org/">generate code from the usage</a> notes, or by <a href="https://github.com/google/python-fire">inspecting the code you want to expose</a>.
-</p>
-<p>There is more than one way to do it.
-</p>
-
-<h2><a href="#toc4" name="toctimtoutf" id="toctimtoutf">TIMTOUTF</a></h2>
-<p>There is more than one unit test framework. The obvious one, <a href="https://docs.python.org/3/library/unittest.html">unittest</a>, like getopt, draws inspiration from elsewhere &#8212; in this case Java&#8217;s Junit. Unfortunately the port is too faithful, and you&#8217;ll have to inherit from super classes etc to test something. I much prefer <a href="https://docs.pytest.org">PyTest</a>, which flexes the language itself to deliver test assertions as <code>assert</code>s.
-</p>
-<p>There&#8217;s also a <a href="https://docs.python.org/3/library/doctest.html">doctest</a> module in the standard library which executes and checks code found in strings (hold that thought!), and there are many other non-standard testing frameworks.
-</p>
-<p>There is more than one way to do it.
-</p>
-
-<h2><a href="#toc5" name="toctimtowofs" id="toctimtowofs">TIMTOWOFS</a></h2>
-<p>There is more than one way of formatting strings.
-</p>
-<p>As we&#8217;ve seen there&#8217;s more than one Python, and libraries are always up for reinvention. This is arguably evolution rather than a multiplicity of options. That is, the most recent way to do it should be preferred.
-</p>
-<p>When it comes to string formatting, though, there has <strong>always</strong> been more than one way to do it, and more ways are still being added.
-</p>
-<p>Do you use <code>'single'</code> or <code>"double"</code> quotes for a string? <code>"""Triple"""</code> quotes. Raw strings? Raw with an <code>r</code> or Raw with an <code>R</code>? TIMTOWTDI.
-</p>
-<p>What if you want to embed the value of a variable in a string? Users familiar with C&#8217;s <code>printf()</code> function might prefer <code>%</code> formatting. Fans of $shell $parameter $expansion can use <a href="https://docs.python.org/3/library/string.html#template-strings">template strings</a>.
-</p>
-<p><a href="https://www.python.org/dev/peps/pep-3101/">Advanced string formatting</a> &#8212; <code>str.format</code> &#8212; appeared in Python 3.0, backported to Python 2.6. No doubt it has advantages over <code>%</code> formatting, but for me it&#8217;s a little more obscure and a little less obvious. Python 3.6 introduces <a href="https://www.python.org/dev/peps/pep-0498/">f-strings</a> which build on <code>str.format</code> and knock down my reservations. The syntax allows you to evaluate expressions in strings: evidently Python is heading in Perl&#8217;s direction.
-</p>
-
-<h2><a href="#toc6" name="tocapsdotadiw" id="tocapsdotadiw">APSDOTADIW</a></h2>
-<p>Let&#8217;s finish by returning to Perl, and to <a href="https://www.perl.com/pub/1999/03/pm.html/">Larry Wall&#8217;s 1999 talk</a>. 
-</p>
-<blockquote><p>How many times have we heard the mantra that a program should do one thing and do it well?
-</p>
-</blockquote><p>Perl is not that program. Perl wants to do everything well. It integrates features and makes no attempt to homogenise them.
-</p>
-<blockquote><p>You&#8217;ve all heard the saying: If all you have is a hammer, everything starts to look like a nail.
-</p>
-</blockquote><p>Perl is no hammer: it has memorably been described as a Swiss army chainsaw, but Larry Wall likens it to a more conventional tool.
-</p>
-<blockquote><p>If all you have is duct tape, everything starts to look like a duct. Right. When&#8217;s the last time you used duct tape on a duct?
-</p>
-</blockquote><p>Python may aspire to offer a single obvious way to do something. It fails splendidly, being more duct tape than hammer.
-</p>
+<h2 id="timtowtdi">TIMTOWTDI</h2>
+<p>TIMTOWTDI stands for &#8220;There is more than one way to do it&#8221;, an approach promoted by the Perl community.</p>
+<p>The mindset behind it gets explored in more detail by the language&#8217;s creator, Larry Wall, in a talk given in 1999: <a href="https://www.perl.com/pub/1999/03/pm.html/">&#8220;Perl, the first postmodern computer language&#8221;</a>. He attributes the slogan to his daughter, Heidi, who says it&#8217;s a strategy which works well in her maths class; and <strong>she</strong> associates it with another saying used at school: &#8220;Tsall Good&#8221;. This doesn&#8217;t mean everything is good, or even everything has good bits. It means, overall, things are good. See the big picture.</p>
+<p>Perl epitomises this. It&#8217;s eclectic and inclusive, supporting a variety of styles. One-liner? Fine! Like a shell script? Sure! Structured programming, object-oriented, functional? Why not! Tsall good.</p>
+<p>I like that.</p>
+<p>But do I feel that way about programming?</p>
+<h2 id="tsbo-apoo-owtdi">TSBO-APOO-OWTDI</h2>
+<p>A contrasting mantra appears in the <a href="https://www.python.org/dev/peps/pep-0020/">Zen of Python</a>, a list of aphorisms which summarise the guiding principles behind Python&#8217;s design. Item number 13 states &#8220;There should be one &#8212; and preferably only one &#8212; obvious way to do it.&#8221;</p>
+<p>Perhaps realising this sounds overly prescriptive, this rule is tempered by item 14, &#8220;Although that way may not be obvious at first unless you&#8217;re Dutch.&#8221;</p>
+<p>Guido van Rossum, Python&#8217;s BDFL &#8212; Benevolent Dictator For Life &#8212; would be the Dutch person who finds things obvious. That&#8217;s right: <strong>Dictator</strong>. Programmers don&#8217;t like being told what to do any more than two year olds. How then has Python become so popular? </p>
+<p>Maybe emphasis falls on <strong>should</strong>. There <strong>should</strong> be only one obvious way to do it: it&#8217;s just that &#8212; Dutch or otherwise &#8212; we haven&#8217;t got there yet.</p>
+<h2 id="timtop">TIMTOP</h2>
+<p>For example, there is more than one Python. Obviously there&#8217;s Python 2 and Python 3, but it&#8217;s less obvious which to use. Don&#8217;t forget <a href="https://pypy.org/">PyPy</a>. Increasingly Python comes packaged with data processing and visualisation extensions, served up as a <a href="http://jupyter.org/">Jupyter</a> notebook.</p>
+<h2 id="timtopom">TIMTOPOM</h2>
+<p>There is more than one program options module.</p>
+<p>When I started with Python there was <a href="https://docs.python.org/3/library/getopt.html">getopt</a>, the one and only command line handler. Coming from a C/C++ background I was quite happy to use something resembling GNU&#8217;s getopt. Then <a href="https://docs.python.org/3/library/optparse.html">optparse</a> appeared. Now there&#8217;s <a href="https://docs.python.org/3/library/argparse.html">argparse</a>. All of these libraries are readily available. Which should I use? Not optparse, that&#8217;s deprecated, unless I&#8217;m already using it and it works, that is. Regarding the other contenders, the <a href="https://docs.python.org/3/library/getopt.html">documentation</a> archly notes:</p>
+<blockquote>
+<p>Users who are unfamiliar with the C <a href="http://man7.org/linux/man-pages/man3/getopt.3.html"><code>getopt()</code></a> function or who would like to write less code and get better help and error messages should consider using the <a href="https://docs.python.org/3/library/argparse.html#module-argparse">argparse module</a> instead.</p>
+</blockquote>
+<p>There are other non-standard Python options for parsing a command line too: ones which <a href="http://docopt.org/">generate code from the usage</a> notes, or by <a href="https://github.com/google/python-fire">inspecting the code you want to expose</a>.</p>
+<p>There is more than one way to do it.</p>
+<h2 id="timtoutf">TIMTOUTF</h2>
+<p>There is more than one unit test framework. The obvious one, <a href="https://docs.python.org/3/library/unittest.html">unittest</a>, like getopt, draws inspiration from elsewhere &#8212; in this case Java&#8217;s Junit. Unfortunately the port is too faithful, and you&#8217;ll have to inherit from super classes etc to test something. I much prefer <a href="https://docs.pytest.org">PyTest</a>, which flexes the language itself to deliver test assertions as <code>assert</code>s.</p>
+<p>There&#8217;s also a <a href="https://docs.python.org/3/library/doctest.html">doctest</a> module in the standard library which executes and checks code found in strings (hold that thought!), and there are many other non-standard testing frameworks.</p>
+<p>There is more than one way to do it.</p>
+<h2 id="timtowofs">TIMTOWOFS</h2>
+<p>There is more than one way of formatting strings.</p>
+<p>As we&#8217;ve seen there&#8217;s more than one Python, and libraries are always up for reinvention. This is arguably evolution rather than a multiplicity of options. That is, the most recent way to do it should be preferred.</p>
+<p>When it comes to string formatting, though, there has <strong>always</strong> been more than one way to do it, and more ways are still being added.</p>
+<p>Do you use <code>'single'</code> or <code>"double"</code> quotes for a string? <code>"""Triple"""</code> quotes. Raw strings? Raw with an <code>r</code> or Raw with an <code>R</code>? TIMTOWTDI.</p>
+<p>What if you want to embed the value of a variable in a string? Users familiar with C&#8217;s <code>printf()</code> function might prefer <code>%</code> formatting. Fans of $shell $parameter $expansion can use <a href="https://docs.python.org/3/library/string.html#template-strings">template strings</a>.</p>
+<p><a href="https://www.python.org/dev/peps/pep-3101/">Advanced string formatting</a> &#8212; <code>str.format</code> &#8212; appeared in Python 3.0, backported to Python 2.6. No doubt it has advantages over <code>%</code> formatting, but for me it&#8217;s a little more obscure and a little less obvious. Python 3.6 introduces <a href="https://www.python.org/dev/peps/pep-0498/">f-strings</a> which build on <code>str.format</code> and knock down my reservations. The syntax allows you to evaluate expressions in strings: evidently Python is heading in Perl&#8217;s direction.</p>
+<h2 id="apsdotadiw">APSDOTADIW</h2>
+<p>Let&#8217;s finish by returning to Perl, and to <a href="https://www.perl.com/pub/1999/03/pm.html/">Larry Wall&#8217;s 1999 talk</a>. </p>
+<blockquote>
+<p>How many times have we heard the mantra that a program should do one thing and do it well?</p>
+</blockquote>
+<p>Perl is not that program. Perl wants to do everything well. It integrates features and makes no attempt to homogenise them.</p>
+<blockquote>
+<p>You&#8217;ve all heard the saying: If all you have is a hammer, everything starts to look like a nail.</p>
+</blockquote>
+<p>Perl is no hammer: it has memorably been described as a Swiss army chainsaw, but Larry Wall likens it to a more conventional tool.</p>
+<blockquote>
+<p>If all you have is duct tape, everything starts to look like a duct. Right. When&#8217;s the last time you used duct tape on a duct?</p>
+</blockquote>
+<p>Python may aspire to offer a single obvious way to do something. It fails splendidly, being more duct tape than hammer.</p>
 <hr />
-
-<p>I presented this blog post as a <a href="https://www.meetup.com/PyDiff/events/249220768">lightning talk at PyDiff</a> a couple of days ago. The <a href="/docs/timtowtdi">slides are here</a>. The talk was recorded too: <a href="https://cardiff.cloud.panopto.eu/Panopto/Pages/Viewer.aspx?id=324c4015-51ed-4bd7-a1c7-a8c50089e746">I appear about 24 minutes in</a>.
-</p>
+<p>I presented this blog post as a <a href="https://www.meetup.com/PyDiff/events/249220768">lightning talk at PyDiff</a> a couple of days ago. The <a href="/docs/timtowtdi">slides are here</a>. The talk was recorded too: <a href="https://cardiff.cloud.panopto.eu/Panopto/Pages/Viewer.aspx?id=324c4015-51ed-4bd7-a1c7-a8c50089e746">I appear about 24 minutes in</a>.</p>
 
 </div>
 
@@ -455,18 +407,13 @@ fruitbowl = {
 <div class="atomentry" id="ddd-wales-2018">
 <h2 class="title"><a href="/articles/ddd-wales-2018">DDD Wales, 2018</a></h2>
 <p class="meta"><abbr class="published" title="2018-03-25">2018-03-25</abbr> &bull; <a href="/tag/self" rel="tag">Self</a>, <a href="/tag/swansea" rel="tag">Swansea</a> &bull; <a href="/articles/ddd-wales-2018#disqus_thread">Comments</a></p>
-<p>The first ever <a href="https://www.dddwales.com/">DDD Wales</a> was held yesterday at <a href="https://swansea.techhub.com/">TechHub Swansea</a>. It was a free-to-attend one day event comprising 5 full one hour sessions split into 3 parallel tracks; that makes 15 sessions to choose from. Additionally, there were lightning talks in the lunch break.
-</p>
+<p>The first ever <a href="https://www.dddwales.com/">DDD Wales</a> was held yesterday at <a href="https://swansea.techhub.com/">TechHub Swansea</a>. It was a free-to-attend one day event comprising 5 full one hour sessions split into 3 parallel tracks; that makes 15 sessions to choose from. Additionally, there were lightning talks in the lunch break.</p>
 <div><blockquote class="twitter-tweet" data-lang="en"><p lang="en" dir="ltr">Wow what a day! Time for some rest! Thank you again to all our amazing sponsors, exhibitors, Speakers, attendees and venue. <br><br>See you next year <a href="https://twitter.com/hashtag/DDDWales?src=hash&amp;ref_src=twsrc%5Etfw">#DDDWales</a></p>&mdash; DDD Wales (@dddcymru) <a href="https://twitter.com/dddcymru/status/977684471750316032?ref_src=twsrc%5Etfw">March 24, 2018</a></blockquote><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script></div>
 
-<p>I enjoyed <a href="https://twitter.com/kevinrjones">Kevin Jones</a>&#8217; introduction to Kotlin, the more so since it was almost entirely coded live. Kevin ably demonstrated Kotlin to be &#8220;Java without the ceremony&#8221;. I could see connections with other modern compiled languages &#8212; Swift for example &#8212; languages which aren&#8217;t feature-shy, but which aim for a light, clean syntax; languages which build on existing systems and libraries. It was interesting to see his use of the JetBrains IDE as a teaching aid, and indeed to pick up on audience thoughts on the use of IDEs to flesh out code.
-</p>
-<p><a href="https://twitter.com/ChrisCundill">Chris Cundill&#8217;s</a> talk on <a href="http://releaseflow.org/#about">&#8220;release flow&#8221;</a> was another highlight. You may not have heard of release flow but you&#8217;ll know what it is: a tried and tested strategy for code branching. Chris used his talk to challenge and call out some more recent alternatives &#8212; Gitflow being the prime target. The session got me thinking. One dimension Chris didn&#8217;t cover was people: personalities, roles and permissions. Who can merge to which branch? Which developers work in private then push bulk updates? Git has won the version control system battle. The fight has moved into surrounding areas: branching, merging, reviewing, continuous integration, and the competition is bringing improvements in tooling and best practice.
-</p>
-<p>The final talk I attended was <a href="https://twitter.com/davidcarboni">David Carboni&#8217;s</a> session on creating a minimal Docker container to run a microservice written in <a href="https://golang.org/">Go</a>. David started off by explaining why simplicity matters. I agree. I couldn&#8217;t agree more. The rest of the session was, again, live coding, replaying a <a href="https://github.com/davidcarboni/ddd">demo</a> which uses the techniques described in <a href="https://blog.codeship.com/building-minimal-docker-containers-for-go-applications/">a couple</a> of <a href="http://devcenter.wercker.com/docs/quickstarts/advanced/building-minimal-containers-with-go">blog posts</a> to whittle a Docker container down from a base size of ~700MB to a <a href="https://docs.docker.com/develop/develop-images/baseimages/">scratch</a> size ~7MB.
-</p>
-<p>All in all, a great day. The split-level <a href="https://swansea.techhub.com/">venue</a> suited the three track conference well. The speakers delivered terrific sessions which the audiences engaged with. I&#8217;d like to thank the organisers, sponsors, speakers, and other attendees.
-</p>
+<p>I enjoyed <a href="https://twitter.com/kevinrjones">Kevin Jones</a>&#8217; introduction to Kotlin, the more so since it was almost entirely coded live. Kevin ably demonstrated Kotlin to be &#8220;Java without the ceremony&#8221;. I could see connections with other modern compiled languages &#8212; Swift for example &#8212; languages which aren&#8217;t feature-shy, but which aim for a light, clean syntax; languages which build on existing systems and libraries. It was interesting to see his use of the JetBrains IDE as a teaching aid, and indeed to pick up on audience thoughts on the use of IDEs to flesh out code.</p>
+<p><a href="https://twitter.com/ChrisCundill">Chris Cundill&#8217;s</a> talk on <a href="http://releaseflow.org/#about">&#8220;release flow&#8221;</a> was another highlight. You may not have heard of release flow but you&#8217;ll know what it is: a tried and tested strategy for code branching. Chris used his talk to challenge and call out some more recent alternatives &#8212; Gitflow being the prime target. The session got me thinking. One dimension Chris didn&#8217;t cover was people: personalities, roles and permissions. Who can merge to which branch? Which developers work in private then push bulk updates? Git has won the version control system battle. The fight has moved into surrounding areas: branching, merging, reviewing, continuous integration, and the competition is bringing improvements in tooling and best practice.</p>
+<p>The final talk I attended was <a href="https://twitter.com/davidcarboni">David Carboni&#8217;s</a> session on creating a minimal Docker container to run a microservice written in <a href="https://golang.org/">Go</a>. David started off by explaining why simplicity matters. I agree. I couldn&#8217;t agree more. The rest of the session was, again, live coding, replaying a <a href="https://github.com/davidcarboni/ddd">demo</a> which uses the techniques described in <a href="https://blog.codeship.com/building-minimal-docker-containers-for-go-applications/">a couple</a> of <a href="http://devcenter.wercker.com/docs/quickstarts/advanced/building-minimal-containers-with-go">blog posts</a> to whittle a Docker container down from a base size of ~700MB to a <a href="https://docs.docker.com/develop/develop-images/baseimages/">scratch</a> size ~7MB.</p>
+<p>All in all, a great day. The split-level <a href="https://swansea.techhub.com/">venue</a> suited the three track conference well. The speakers delivered terrific sessions which the audiences engaged with. I&#8217;d like to thank the organisers, sponsors, speakers, and other attendees.</p>
 
 </div>
 
@@ -474,20 +421,16 @@ fruitbowl = {
 <div class="atomentry" id="perec-igniteswansea-3">
 <h2 class="title"><a href="/articles/perec-igniteswansea-3">Perec @IgniteSwansea #3</a></h2>
 <p class="meta"><abbr class="published" title="2018-02-03">2018-02-03</abbr> &bull; <a href="/tag/self" rel="tag">Self</a>, <a href="/tag/perec" rel="tag">Perec</a>, <a href="/tag/talks" rel="tag">Talks</a>, <a href="/tag/oulipo" rel="tag">Oulipo</a> &bull; <a href="/articles/perec-igniteswansea-3#disqus_thread">Comments</a></p>
-<img src="/docs/ignite/perec/me-at-ignite.jpg" alt="Puzzle"/>
-
-<p>At <a href="http://www.igniteswansea.co.uk/">Ignite Swansea #3</a> I spoke about Georges Perec&#8217;s masterpiece, Life A User&#8217;s Manual. 
-</p>
-<p>Perec was &#8212; and indeed still is &#8212; a member of OuLiPo, a Parisian literary group interested in exploring the effects of applying mathematical patterns to text. His work seemed an appropriate subject for a presentation constrained to fit the ignite formula:
-</p>
-<blockquote><p>20 slides &times; 15 seconds = 5 minutes
-</p>
-</blockquote><p>It&#8217;s material I&#8217;ve spoken about <a href="/tags/perec">before</a> but <a href="/docs/ignite/perec/">the slides are new</a>. The talk was <a href="https://youtu.be/-y7YOKIa6yQ">recorded</a>. I enjoyed attempting <a href="https://en.wikipedia.org/wiki/Just_a_Minute">just-a-minute</a> &times; 5, though on the night I could have sworn I was subject to a cruel powerpoint bug which sped up the playback.
-</p>
+<p><img src="/docs/ignite/perec/me-at-ignite.jpg" alt="Puzzle"/></p>
+<p>At <a href="http://www.igniteswansea.co.uk/">Ignite Swansea #3</a> I spoke about Georges Perec&#8217;s masterpiece, Life A User&#8217;s Manual. </p>
+<p>Perec was &#8212; and indeed still is &#8212; a member of OuLiPo, a Parisian literary group interested in exploring the effects of applying mathematical patterns to text. His work seemed an appropriate subject for a presentation constrained to fit the ignite formula:</p>
+<blockquote>
+<p>20 slides &times; 15 seconds = 5 minutes</p>
+</blockquote>
+<p>It&#8217;s material I&#8217;ve spoken about <a href="/tags/perec">before</a> but <a href="/docs/ignite/perec/">the slides are new</a>. The talk was <a href="https://youtu.be/-y7YOKIa6yQ">recorded</a>. I enjoyed attempting <a href="https://en.wikipedia.org/wiki/Just_a_Minute">just-a-minute</a> &times; 5, though on the night I could have sworn I was subject to a cruel powerpoint bug which sped up the playback.</p>
 <iframe width="560" height="315" src="https://www.youtube.com/embed/-y7YOKIa6yQ?rel=0&amp;showinfo=0" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
 
-<p>OuLiPo fans might like to see if they can find the clinamen. The moustache is what happens in the fourth week of <a href="https://uk.movember.com/">Movember</a>. My thanks to all <a href="http://www.igniteswansea.co.uk/">@IgniteSwansea</a> and <a href="https://www.cinemaco.co.uk/">Cinema &amp; Co</a> for putting on such a great evening.
-</p>
+<p>OuLiPo fans might like to see if they can find the clinamen. The moustache is what happens in the fourth week of <a href="https://uk.movember.com/">Movember</a>. My thanks to all <a href="http://www.igniteswansea.co.uk/">@IgniteSwansea</a> and <a href="https://www.cinemaco.co.uk/">Cinema &amp; Co</a> for putting on such a great evening.</p>
 
 </div>
 
@@ -495,18 +438,13 @@ fruitbowl = {
 <div class="atomentry" id="bugwards-compatible">
 <h2 class="title"><a href="/articles/bugwards-compatible">Bugwards Compatible</a></h2>
 <p class="meta"><abbr class="published" title="2018-02-02">2018-02-02</abbr> &bull; <a href="/tag/tests" rel="tag">Tests</a> &bull; <a href="/articles/bugwards-compatible#disqus_thread">Comments</a></p>
-<p><a href="https://twitter.com/chrisoldwood">Chris Oldwood</a> recently tweeted about &#8220;TFW you write some tests for a bit of legacy code before making a change and you unearth a bunch of bugs&#8221;
-</p>
+<p><a href="https://twitter.com/chrisoldwood">Chris Oldwood</a> recently tweeted about &#8220;TFW you write some tests for a bit of legacy code before making a change and you unearth a bunch of bugs&#8221;</p>
 <div><blockquote class="twitter-tweet" data-lang="en"><p lang="en" dir="ltr">TFW you write some tests for a bit of legacy code before making a change and you unearth a bunch of bugs.</p>&mdash; Chris Oldwood (@chrisoldwood) <a href="https://twitter.com/chrisoldwood/status/959576034059448321?ref_src=twsrc%5Etfw">February 2, 2018</a></blockquote><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script></div>
 
-<p>He doesn&#8217;t elaborate on what exactly &#8220;that feeling&#8221; is, but I&#8217;ll bet it&#8217;s not surprise. Writing tests for code almost invariably shakes something out &#8212; perhaps some undocumented assumptions about the inputs; perhaps a failure to match the documented behaviour; perhaps an access violation which will crash the application.
-</p>
-<p>&#8220;That feeling&#8221; can include relief: the code is legacy code and evidently the bugs have gone unnoticed or at least unreported. Often, any such relief may be accompanied by a sense of wonder. The bugs may be so severe &#8212; the code so broken &#8212; that the maintainer questions how it <strong>ever</strong> worked.
-</p>
-<p>&#8220;That feeling&#8221; may also be dismay, since the legacy code requires changing. If the existing behaviour is buggy but predictable it could well be that clients have adapted to this behaviour and wouldn&#8217;t welcome a fix. In other words, the change will have to be both backwards and <strong>bugwards compatible</strong>. Chris will have to tread carefully.
-</p>
-<p>Such delicate decisions are not limited to the code&#8217;s runtime behaviour. It might seem that, once the code is under test, Chris can <a href="http://wiki.c2.com/?RefactorMercilessly">refactor mercilessly</a> &#8212; renaming variables, updating idioms, tidying layout. Again, tread carefully! Make sure the code <strong>is</strong> under test. Be aware of the differences which reviewers must evaluate. Consider the wider context. Respect the original authors.
-</p>
+<p>He doesn&#8217;t elaborate on what exactly &#8220;that feeling&#8221; is, but I&#8217;ll bet it&#8217;s not surprise. Writing tests for code almost invariably shakes something out &#8212; perhaps some undocumented assumptions about the inputs; perhaps a failure to match the documented behaviour; perhaps an access violation which will crash the application.</p>
+<p>&#8220;That feeling&#8221; can include relief: the code is legacy code and evidently the bugs have gone unnoticed or at least unreported. Often, any such relief may be accompanied by a sense of wonder. The bugs may be so severe &#8212; the code so broken &#8212; that the maintainer questions how it <strong>ever</strong> worked.</p>
+<p>&#8220;That feeling&#8221; may also be dismay, since the legacy code requires changing. If the existing behaviour is buggy but predictable it could well be that clients have adapted to this behaviour and wouldn&#8217;t welcome a fix. In other words, the change will have to be both backwards and <strong>bugwards compatible</strong>. Chris will have to tread carefully.</p>
+<p>Such delicate decisions are not limited to the code&#8217;s runtime behaviour. It might seem that, once the code is under test, Chris can <a href="http://wiki.c2.com/?RefactorMercilessly">refactor mercilessly</a> &#8212; renaming variables, updating idioms, tidying layout. Again, tread carefully! Make sure the code <strong>is</strong> under test. Be aware of the differences which reviewers must evaluate. Consider the wider context. Respect the original authors.</p>
 
 </div>
 
@@ -514,22 +452,14 @@ fruitbowl = {
 <div class="atomentry" id="meetup-turn-up">
 <h2 class="title"><a href="/articles/meetup-turn-up">Meetup? Turn Up!</a></h2>
 <p class="meta"><abbr class="published" title="2018-01-18">2018-01-18</abbr> &bull; <a href="/tag/talks" rel="tag">Talks</a> &bull; <a href="/articles/meetup-turn-up#disqus_thread">Comments</a></p>
-<p><a href="https://www.meetup.com/Agile-Bath-Bristol/events/245853715/"><img alt="Sell out" src="/images/agile-bb-meetup.png"/></a>
-</p>
-<p>Monday&#8217;s <a href="https://www.meetup.com/Agile-Bath-Bristol/events/245853715/">Agile Bath &amp; Bristol meetup</a> was a sell out. All 50 available spaces were taken. I myself was lucky to get a place &#8212; I was on the waiting list until a spot opened up at 3pm on the day. And I was the speaker!
-</p>
-<p>The reality turned out to be different: of the 50 who&#8217;d claimed spaces, roughly one in four actually showed up.
-</p>
-<p>I know, it was <a href="https://en.wikipedia.org/wiki/Blue_Monday_(date)">Blue Monday</a>. I know, there are bugs going round &#8212; my daughter has been running a fever and didn&#8217;t go in to college, and if I hadn&#8217;t been presenting I myself would have cancelled to stay in with her. I know, your work day over-runs, you&#8217;re hungry, something else comes up. I know, it&#8217;s a free event, so it&#8217;s not as though you&#8217;ve <em>lost</em> anything.
-</p>
-<p>Despite all these things a 25% turnout reflects badly on us all. It&#8217;s unfair on the sponsors and organisers, especially when refreshments are offered. It&#8217;s impolite to those who turn up at the advertised time, and must then sit waiting in case more people who&#8217;ve said they&#8217;re coming actually show up. It&#8217;s tough on the speakers: planning a session for an audience of 50 is different to one you&#8217;d plan for 12.
-</p>
-<p>I realise 25% is egregiously low, but &#8212; in my experience &#8212; 50% is far from unusual, and even considered acceptable. I think it&#8217;s shabby. The one excuse noone has is forgetting the event is on &#8212; Meetup etc. integrate with your calendar and issue repeated reminders to attend and requests to cancel if you cannot.
-</p>
-<p>So, my thanks to those who turned up and participated. I enjoyed it. Smaller numbers allowed for a more collaborative session. Ironically, topics discussed included punctuality, respect, commitment.
-</p>
-<p>Please, don&#8217;t sign up to a meetup you don&#8217;t plan to attend. If you decide to cancel, release your place so someone else can have it. Otherwise, arrive on time.
-</p>
+<p><a href="https://www.meetup.com/Agile-Bath-Bristol/events/245853715/"><img alt="Sell out" src="/images/agile-bb-meetup.png"/></a></p>
+<p>Monday&#8217;s <a href="https://www.meetup.com/Agile-Bath-Bristol/events/245853715/">Agile Bath &amp; Bristol meetup</a> was a sell out. All 50 available spaces were taken. I myself was lucky to get a place &#8212; I was on the waiting list until a spot opened up at 3pm on the day. And I was the speaker!</p>
+<p>The reality turned out to be different: of the 50 who&#8217;d claimed spaces, roughly one in four actually showed up.</p>
+<p>I know, it was <a href="https://en.wikipedia.org/wiki/Blue_Monday_(date)">Blue Monday</a>. I know, there are bugs going round &#8212; my daughter has been running a fever and didn&#8217;t go in to college, and if I hadn&#8217;t been presenting I myself would have cancelled to stay in with her. I know, your work day over-runs, you&#8217;re hungry, something else comes up. I know, it&#8217;s a free event, so it&#8217;s not as though you&#8217;ve <em>lost</em> anything.</p>
+<p>Despite all these things a 25% turnout reflects badly on us all. It&#8217;s unfair on the sponsors and organisers, especially when refreshments are offered. It&#8217;s impolite to those who turn up at the advertised time, and must then sit waiting in case more people who&#8217;ve said they&#8217;re coming actually show up. It&#8217;s tough on the speakers: planning a session for an audience of 50 is different to one you&#8217;d plan for 12.</p>
+<p>I realise 25% is egregiously low, but &#8212; in my experience &#8212; 50% is far from unusual, and even considered acceptable. I think it&#8217;s shabby. The one excuse noone has is forgetting the event is on &#8212; Meetup etc. integrate with your calendar and issue repeated reminders to attend and requests to cancel if you cannot.</p>
+<p>So, my thanks to those who turned up and participated. I enjoyed it. Smaller numbers allowed for a more collaborative session. Ironically, topics discussed included punctuality, respect, commitment.</p>
+<p>Please, don&#8217;t sign up to a meetup you don&#8217;t plan to attend. If you decide to cancel, release your place so someone else can have it. Otherwise, arrive on time.</p>
 
 </div>
 
@@ -537,10 +467,8 @@ fruitbowl = {
 <div class="atomentry" id="advent-of-code-2017">
 <h2 class="title"><a href="/articles/advent-of-code-2017">Advent of Code 2017</a></h2>
 <p class="meta"><abbr class="published" title="2018-01-12">2018-01-12</abbr> &bull; <a href="/tag/puzzles" rel="tag">Puzzles</a>, <a href="/tag/python" rel="tag">Python</a> &bull; <a href="/articles/advent-of-code-2017#disqus_thread">Comments</a></p>
-<p>A big thanks to <a href="http://was.tl">Eric Wastl</a> for another great <a href="http://adventofcode.com/2017">Advent of Code</a>. Inspired by <a href="https://github.com/norvig/pytudes/blob/master/ipynb/Advent%20of%20Code.ipynb">Peter Norvig</a>, I&#8217;ve published <a href="https://github.com/wordaligned/advent-of-code-2017/blob/master/advent-of-code-2017.ipynb">my solutions</a> as a Jupyter notebook.
-</p>
-<p><a href="https://github.com/wordaligned/advent-of-code-2017/blob/master/advent-of-code-2017.ipynb"><img src="https://raw.githubusercontent.com/wordaligned/advent-of-code-2017/8e8344b4c5fc00827e42576059f36389dcfa453c/done.png" alt="Done!"/></a>
-</p>
+<p>A big thanks to <a href="http://was.tl">Eric Wastl</a> for another great <a href="http://adventofcode.com/2017">Advent of Code</a>. Inspired by <a href="https://github.com/norvig/pytudes/blob/master/ipynb/Advent%20of%20Code.ipynb">Peter Norvig</a>, I&#8217;ve published <a href="https://github.com/wordaligned/advent-of-code-2017/blob/master/advent-of-code-2017.ipynb">my solutions</a> as a Jupyter notebook.</p>
+<p><a href="https://github.com/wordaligned/advent-of-code-2017/blob/master/advent-of-code-2017.ipynb"><img src="https://raw.githubusercontent.com/wordaligned/advent-of-code-2017/8e8344b4c5fc00827e42576059f36389dcfa453c/done.png" alt="Done!"/></a></p>
 
 </div>
 
@@ -548,20 +476,15 @@ fruitbowl = {
 <div class="atomentry" id="computer-world">
 <h2 class="title"><a href="/articles/computer-world">Computer World</a></h2>
 <p class="meta"><abbr class="published" title="2017-09-30">2017-09-30</abbr> &bull; <a href="/tag/apple" rel="tag">Apple</a>, <a href="/tag/self" rel="tag">Self</a>, <a href="/tag/design" rel="tag">Design</a> &bull; <a href="/articles/computer-world#disqus_thread">Comments</a></p>
-<p><a data-flickr-embed="true"  href="https://www.flickr.com/photos/thomasguest/37406493811/in/dateposted-friend/" title="The Hitchhiker&#x27;s Guide to the Galaxy"><img src="https://farm5.staticflickr.com/4371/37406493811_0d17fab6cf.jpg" width="401" height="500" alt="The Hitchhiker&#x27;s Guide to the Galaxy"></a><script async src="//embedr.flickr.com/assets/client-code.js" charset="utf-8"></script>
-</p>
-<p>Douglas Adams&#8217; &#8220;Hitchhiker&#8217;s Guide to the Galaxy&#8221; tells the story of the two most powerful computers ever made. The first, Deep Thought, was designed to figure out the meaning of Life the Universe and Everything. After 7,500,000 years of processing it came up with the concise but unedifying Ultimate Answer of 42. It then undertook the task of designing its successor, a computer sophisticated enough to calculate the Ultimate Question:
-</p>
-<blockquote><p>&#8220;&#8230; A computer which can calculate the Question to the Ultimate Answer, a computer of such infinite and subtle complexity that organic life itself shall form part of its operational matrix &#8230; Yes! I shall design this computer for you. And I shall name it also unto you. And it shall be called &#8230; The Earth.&#8221;
-</p>
-</blockquote><p>When I first heard this it seemed ridiculous. Now, almost 40 years on, I&#8217;ve realised it&#8217;s true.
-</p>
-<p>It&#8217;s no longer correct to think of computers as discrete units. Computers have the property that when you connect two of them you get another computer, and so on. The network <strong>is</strong> the computer. The Apple in your hand, the Echo on your shelf, the chip in your <a href="https://www.amazon.co.uk/Scepticism-Inc-Bo-Fowler/dp/009927468X">shopping trolley</a> &#8212; all combine to form a global connected device. And as Adams predicted, we ourselves form part of the operating system, constantly feeding data back in.
-</p>
-<img src="/images/planet-earth.jpg" alt="Planet Earth"/>
-
-<p>Douglas Adams&#8217; insight puts software development into perspective. True: we no longer print our product on silicon or ship it in boxes, and yes: we accept <a href="http://wordaligned.org/articles/why-software-development-isnt-like-construction">construction</a> is not the right metaphor, but: nor is production. <a href="http://swanseacon.co.uk/schedule/#session-27">Professor Dave Snowden</a> talks about entanglement &#8212; think of a system growing like brambles in a thicket. He emphasises what&#8217;s natural, evolutionary and human. Object oriented design lost out when it narrowed its focus. Remember, people are objects too. The world is our platform.
-</p>
+<p><a data-flickr-embed="true"  href="https://www.flickr.com/photos/thomasguest/37406493811/in/dateposted-friend/" title="The Hitchhiker&#x27;s Guide to the Galaxy"><img src="https://farm5.staticflickr.com/4371/37406493811_0d17fab6cf.jpg" width="401" height="500" alt="The Hitchhiker&#x27;s Guide to the Galaxy"></a><script async src="//embedr.flickr.com/assets/client-code.js" charset="utf-8"></script></p>
+<p>Douglas Adams&#8217; &#8220;Hitchhiker&#8217;s Guide to the Galaxy&#8221; tells the story of the two most powerful computers ever made. The first, Deep Thought, was designed to figure out the meaning of Life the Universe and Everything. After 7,500,000 years of processing it came up with the concise but unedifying Ultimate Answer of 42. It then undertook the task of designing its successor, a computer sophisticated enough to calculate the Ultimate Question:</p>
+<blockquote>
+<p>&#8220;&#8230; A computer which can calculate the Question to the Ultimate Answer, a computer of such infinite and subtle complexity that organic life itself shall form part of its operational matrix &#8230; Yes! I shall design this computer for you. And I shall name it also unto you. And it shall be called &#8230; The Earth.&#8221;</p>
+</blockquote>
+<p>When I first heard this it seemed ridiculous. Now, almost 40 years on, I&#8217;ve realised it&#8217;s true.</p>
+<p>It&#8217;s no longer correct to think of computers as discrete units. Computers have the property that when you connect two of them you get another computer, and so on. The network <strong>is</strong> the computer. The Apple in your hand, the Echo on your shelf, the chip in your <a href="https://www.amazon.co.uk/Scepticism-Inc-Bo-Fowler/dp/009927468X">shopping trolley</a> &#8212; all combine to form a global connected device. And as Adams predicted, we ourselves form part of the operating system, constantly feeding data back in.</p>
+<p><img src="/images/planet-earth.jpg" alt="Planet Earth"/></p>
+<p>Douglas Adams&#8217; insight puts software development into perspective. True: we no longer print our product on silicon or ship it in boxes, and yes: we accept <a href="http://wordaligned.org/articles/why-software-development-isnt-like-construction">construction</a> is not the right metaphor, but: nor is production. <a href="http://swanseacon.co.uk/schedule/#session-27">Professor Dave Snowden</a> talks about entanglement &#8212; think of a system growing like brambles in a thicket. He emphasises what&#8217;s natural, evolutionary and human. Object oriented design lost out when it narrowed its focus. Remember, people are objects too. The world is our platform.</p>
 
 </div>
 
@@ -571,51 +494,18 @@ fruitbowl = {
 <p class="meta"><abbr class="published" title="2017-09-26">2017-09-26</abbr> &bull; <a href="/tag/self" rel="tag">Self</a>, <a href="/tag/talks" rel="tag">Talks</a>, <a href="/tag/swansea" rel="tag">Swansea</a> &bull; <a href="/articles/swanseacon-2017#disqus_thread">Comments</a></p>
 <div><blockquote class="twitter-tweet" data-lang="en"><p lang="en" dir="ltr">Unit tests, lets get sceptical <a href="https://twitter.com/thomasguest">@thomasguest</a> was a great end to the morning before lunch <a href="https://t.co/EM4RPAs975">pic.twitter.com/EM4RPAs975</a></p>&mdash; SwanseaCon (@SwanseaCon) <a href="https://twitter.com/SwanseaCon/status/912361247760404480">September 25, 2017</a></blockquote><script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script></div>
 
-<p>I&#8217;m just back from a packed two days at <a href="http://swanseacon.co.uk">SwanseaCon</a> and would like to thank the organisers, speakers and participants for making such a welcoming and diverse conference happen right where I live.
-</p>
-<p>For me, highlights included:
-</p>
+<p>I&#8217;m just back from a packed two days at <a href="http://swanseacon.co.uk">SwanseaCon</a> and would like to thank the organisers, speakers and participants for making such a welcoming and diverse conference happen right where I live.</p>
+<p>For me, highlights included:</p>
 <ul>
- <li>
-     Professor Dave Snowden&#8217;s erudite and slide-free talk. It was a privilege to listen: although I may not quite have kept up, I will certainly follow up
- </li>
-
- <li>
-     Irina Tsyganok&#8217;s sensitive and inspirational presentation on pair-programming
- </li>
-
- <li>
-     Lawrence Weetman&#8217;s dishwashing demo &#8212; with three on-stage helpers, no less
- </li>
-
- <li>
-     Scott Fulton&#8217;s honest report on some personal agile life lessons
- </li>
+<li>Professor Dave Snowden&#8217;s erudite and slide-free talk. It was a privilege to listen: although I may not quite have kept up, I will certainly follow up</li>
+<li>Irina Tsyganok&#8217;s sensitive and inspirational presentation on pair-programming</li>
+<li>Lawrence Weetman&#8217;s dishwashing demo &#8212; with three on-stage helpers, no less</li>
+<li>Scott Fulton&#8217;s honest report on some personal agile life lessons</li>
 </ul>
-<p>The venue wasn&#8217;t too shabby either.
-</p>
-<p><a data-flickr-embed="true"  href="https://www.flickr.com/photos/thomasguest/37286571132/in/photostream/" title="The view from SwanseaCon"><img src="https://farm5.staticflickr.com/4462/37286571132_a5892fe22c_z.jpg" width="640" height="185" alt="The view from SwanseaCon"></a><script async src="//embedr.flickr.com/assets/client-code.js" charset="utf-8"></script>
-</p>
-<p>Having attended a fair few technical conferences, it felt refreshing and important to be part of something a little softer. Software development is about community, communication and culture, and SwanseaCon scored top marks on all three.
-</p>
-<p>So, again, thanks!
-</p>
-
-</div>
-
-
-<div class="atomentry" id="pay-rise-please">
-<h2 class="title"><a href="/articles/pay-rise-please">Pay rise please</a></h2>
-<p class="meta"><abbr class="published" title="2017-07-25">2017-07-25</abbr> &bull; <a href="/tag/self" rel="tag">Self</a>, <a href="/tag/perec" rel="tag">Perec</a>, <a href="/tag/oulipo" rel="tag">Oulipo</a>, <a href="/tag/javascript" rel="tag">Javascript</a> &bull; <a href="/articles/pay-rise-please#disqus_thread">Comments</a></p>
-<p>In 1967 Georges Perec wrote a radio play, L&#8217;Augmentation, in which you, the protagonist, make some delicate decisions whilst negotiating a pay rise. Is your boss, Mr X, in a good mood? Did he have fish for lunch? Does one of his daughters have measles?
-</p>
-<img src="/images/perec-flowchart.jpg" alt="Flowchart"/>
-
-<p>The story takes the form of a <a href="https://en.wikipedia.org/wiki/Flowchart">flow chart</a>. It&#8217;s no coincidence it was written when computers were becoming a part of office and laboratory work, and when flow charts became a popular way to represent the algorithms they were programmed with. 1967 is also the year Perec joined Oulipo, a literary organisation whose members seek to create works based around mathematical constraints and structures. The loops and branches of Perec&#8217;s flow chart perfectly embody the frustrating routines of office politics.
-</p>
-<p>Fifty years on, I&#8217;ve <a href="https://github.com/wordaligned/pay-rise-please" title="Pay rise please, on Github">created a version</a> to run on Alexa, which you can <a href="https://www.amazon.co.uk/Mr-Pay-rise-please/dp/B07417SK8N" title="Pay rise please, on Amazon">download from Amazon</a>. It may not get me a pay rise, but I should qualify for a <a href="https://developer.amazon.com/alexa-skills-kit">freebie Echo Dot</a>.
-</p>
-<img src="/images/perec512.jpg" alt="Georges Perec"/>
+<p>The venue wasn&#8217;t too shabby either.</p>
+<p><a data-flickr-embed="true"  href="https://www.flickr.com/photos/thomasguest/37286571132/in/photostream/" title="The view from SwanseaCon"><img src="https://farm5.staticflickr.com/4462/37286571132_a5892fe22c_z.jpg" width="640" height="185" alt="The view from SwanseaCon"></a><script async src="//embedr.flickr.com/assets/client-code.js" charset="utf-8"></script></p>
+<p>Having attended a fair few technical conferences, it felt refreshing and important to be part of something a little softer. Software development is about community, communication and culture, and SwanseaCon scored top marks on all three.</p>
+<p>So, again, thanks!</p>
 
 </div>
 
@@ -663,13 +553,13 @@ fruitbowl = {
 
 <div class="sidebar-node">
 <h3>Top Tags</h3>
-<ul id="categories"><li><a href="/tag/python" rel="tag">Python</a> <em>(126)</em></li>
+<ul id="categories"><li><a href="/tag/python" rel="tag">Python</a> <em>(127)</em></li>
 <li><a href="/tag/c++" rel="tag">C++</a> <em>(71)</em></li>
 <li><a href="/tag/self" rel="tag">Self</a> <em>(70)</em></li>
-<li><a href="/tag/puzzles" rel="tag">Puzzles</a> <em>(38)</em></li>
+<li><a href="/tag/puzzles" rel="tag">Puzzles</a> <em>(39)</em></li>
 <li><a href="/tag/accu" rel="tag">ACCU</a> <em>(33)</em></li>
-<li><a href="/tag/web-applications" rel="tag">Web Applications</a> <em>(27)</em></li>
 <li><a href="/tag/subversion" rel="tag">Subversion</a> <em>(27)</em></li>
+<li><a href="/tag/web-applications" rel="tag">Web Applications</a> <em>(27)</em></li>
 <li><a href="/tag/algorithms" rel="tag">Algorithms</a> <em>(25)</em></li>
 <li><a href="/tag/google" rel="tag">Google</a> <em>(19)</em></li>
 <li><a href="/tag/streams" rel="tag">Streams</a> <em>(17)</em></li></ul>
@@ -695,7 +585,7 @@ fruitbowl = {
 <div class="sidebar-node">
 <h3>Chain</h3>
 <ul>
-<li><a accesskey="p" href="/articles/cryptic-message" title="First article">&raquo; Cryptic Message</a></li>
+<li><a accesskey="p" href="/articles/complex-numbers-for-planar-geometry" title="First article">&raquo; Complex numbers for planar geometry</a></li>
 
 </ul>
 
