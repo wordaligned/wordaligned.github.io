@@ -7,6 +7,60 @@
 <dc:creator>tag@wordaligned.org</dc:creator>
 <language>en-gb</language>
 <item>
+<title>Fearless Debugging</title>
+<description>&lt;h2 id=&quot;jurassic-jigsaw&quot;&gt;Jurassic Jigsaw&lt;/h2&gt;
+&lt;p&gt;My thanks to &lt;a href=&quot;http://was.tl&quot;&gt;Eric Wastl&lt;/a&gt; for another excellent &lt;a href=&quot;https://adventofcode.com/&quot;&gt;Advent of Code&lt;/a&gt;. I&amp;#8217;ve now &lt;a href=&quot;https://github.com/wordaligned/advent-of-code-2020&quot;&gt;worked through all 25 puzzles&lt;/a&gt;, some simple, some tough, some familiar, some new; all beautifully set and highly enjoyable.&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;https://adventofcode.com/2020/day/20&quot;&gt;Day 20, Jurrasic Jigsaw&lt;/a&gt;, took me longest by far to complete. The puzzle is easy to understand. You have to assemble jigsaw pieces into a seascape. For part one, you need to find the corner pieces. For part two, you must locate monsters in the seascape.&lt;/p&gt;
+&lt;p&gt;Here, a jigsaw piece is a monochrome square, represented like so:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;..##.#..#.
+##..#.....
+#...##..#.
+####.#...#
+##.##.###.
+##...#.###
+.#.#.#..##
+..#....#..
+###...#.#.
+..###..###
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;And this is the sea monster:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;                   # 
+#    ##    ##    ###
+ #  #  #  #  #  #
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The twist was that the jigsaw pieces could be rotated and flipped over before matching them up. Once matched, the edges of the pieces were to be removed. Implementing the rotate, flip, match and remove code proved fiddly, and I was pleased to get this working and producing correct results for the supplied example.&lt;/p&gt;
+&lt;p&gt;Unfortunately my code produced the wrong answer for part two, the bit where you have to locate sea monsters. So, I would need to debug.&lt;/p&gt;
+&lt;h2 id=&quot;fear-of-debugging&quot;&gt;Fear of Debugging&lt;/h2&gt;
+&lt;p&gt;Like it or not, debugging is a key part of software development.&lt;/p&gt;
+&lt;p&gt;Generally, I do like it. There&amp;#8217;s satisfaction to be had in paring scope, retracing steps, then making the right fix, improving test coverage, and generally leaving the world a better place.&lt;/p&gt;
+&lt;p&gt;What I don&amp;#8217;t like, though &amp;#8212; what scares me &amp;#8212; is the suspicion the bug lurks in the worst possible place. What if it&amp;#8217;s in a library we don&amp;#8217;t have the source for? Or if it&amp;#8217;s a timing issue caused by some erratic locking? Or if there&amp;#8217;s an issue with the compiler for the most obscure platform. Or, in this particular case, that the code to fiddle with jigsaw pieces has a bug &amp;#8212; a bug subtle enough to pass the examples but fail the real thing.&lt;/p&gt;
+&lt;p&gt;It&amp;#8217;s not unreasonable to fear the worst. At some point the issues mentioned above &lt;strong&gt;will&lt;/strong&gt; cause bugs, bugs which &lt;strong&gt;are&lt;/strong&gt; hard to fix. We need to be ready.&lt;/p&gt;
+&lt;p&gt;Fear, though, is the wrong mindset. Debugging requires you to be calm, methodical and detached. Much as an artist draws what they see and not what they know, a programmer must observe and follow the evidence. A second pair of eyes is always useful; simply explaining the issue to a colleague gives you another perspective.&lt;/p&gt;
+&lt;h2 id=&quot;here-be-monsters&quot;&gt;Here be Monsters&lt;/h2&gt;
+&lt;p&gt;I was working on my own on the Advent of Code. I could have tried explaining to a &lt;a href=&quot;https://en.wikipedia.org/wiki/Rubber_duck_debugging&quot;&gt;rubber duck&lt;/a&gt;, but didn&amp;#8217;t. Instead I examined and traced my code. I checked and double-checked the flip, rotate, match and remove logic. I printed out intermediate state. I walked to the sea-front and back. I slept on it.&lt;/p&gt;
+&lt;p&gt;Fearing the worst turned out to be the wrong strategy.&lt;/p&gt;
+&lt;p&gt;What did work was reading the problem statement again, carefully. At last I saw it! Somehow, a rogue character had wormed its way into my inputs. The sea monster I had used looked like this:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;                   #
+#    ##    ##    ###
+ #  #  #  #  #  #
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;when it should have been:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;                  # 
+#    ##    ##    ###
+ #  #  #  #  #  #
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Since both monsters appear the same number of times in the example seascape, my test case failed to catch the bug.&lt;/p&gt;
+&lt;p&gt;So, with a single, simple, whitespace correction, my advent of code was complete. One of life&amp;#8217;s ironies is that when you lose something you find it in the last place you look. It&amp;#8217;s not always so with debugging: a bug can exist in many different places and sometimes the fix causes the codebase to unravel, requiring a chain of additional fixes, but, in this case, finding the bug fixed it.&lt;/p&gt;
+&lt;p&gt;&lt;image src=&quot;http://wordaligned.org/images/seascape.png&quot; alt=&quot;Seascape with monsters&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;A monster can exist in many different places, and in this case finding the monster fixed it&lt;/p&gt;</description>
+<dc:date>2021-01-02</dc:date>
+<guid>http://wordaligned.org/articles/fearless-debugging</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/fearless-debugging</link>
+<category>Puzzles</category>
+</item>
+
+<item>
 <title>Complex numbers for planar geometry</title>
 <description>&lt;p&gt;Once again, I&amp;#8217;m enjoying solving &lt;a href=&quot;http://was.tl&quot;&gt;Eric Wastl&lt;/a&gt;&amp;#8217;s excellent &lt;a href=&quot;https://adventofcode.com&quot;&gt;Advent of Code&lt;/a&gt; puzzles.&lt;/p&gt;
 &lt;p&gt;Today, &lt;a href=&quot;day12&quot;&gt;day 12&lt;/a&gt; involved a ship navigating in a 2D plane. The ship follows a series of instructions taking the form of actions and values such as &lt;code&gt;F10 N3 F7 R90 F11 ...&lt;/code&gt;, where, for the first part:&lt;/p&gt;
@@ -2113,25 +2167,6 @@ ValueError: max() arg is an empty sequence
 <guid>http://wordaligned.org/articles/a-race-within-a-race</guid>
 <author>tag@wordaligned.org (Thomas Guest)</author>
 <link>http://wordaligned.org/articles/a-race-within-a-race</link>
-<category>Puzzles</category>
-</item>
-
-<item>
-<title>What&#8217;s in the box?</title>
-<description>&lt;p&gt;Last week I posted &lt;a href=&quot;http://wordaligned.org/articles/a-little-teaser.html&quot;&gt;a little teaser&lt;/a&gt; which hid a series of clues in and around the page&amp;#8217;s HTML and the referenced graphic. Thanks to everyone who joined in. Some of you said you learned something in the process, which is good; and &lt;a href=&quot;http://netpbm.sourceforge.net/&quot;&gt;I did too&lt;/a&gt;, which is better!&lt;/p&gt;
-&lt;p&gt;Filip Salomonsson completed the treasure hunt first. Extra credits go to Robin Stocker for his &lt;a href=&quot;http://www.flickr.com/photos/thomasguest/3106269463/&quot;&gt;Swiss version&lt;/a&gt;, &lt;a href=&quot;http://chneukirchen.org/&quot;&gt;Christian Neukirchen&lt;/a&gt; for a solution which requires no programming, and to Shiar who spotted the answer at once but nevertheless followed the clues to the end! &lt;/p&gt;
-&lt;p&gt;A full solution appears below, &lt;a href=&quot;http://fliptitle.com&quot;&gt;ROT-180&amp;deg;&lt;/a&gt; encoded.&lt;/p&gt;
-&lt;p&gt;&lt;a href=&quot;http://wordaligned.org/articles/a-little-teaser.html&quot;&gt;&lt;img src=&quot;http://wordaligned.org/images/top-row-flipped.png&quot; alt=&quot;What&#x27;s this? Answer below!&quot;/&gt;&lt;/a&gt;&lt;/p&gt;
-&lt;div style=&quot;text-align:right;&quot;&gt;&lt;p&gt;&amp;#x02D9;&amp;#x01DD;&amp;#x0279;&amp;#x01DD;&amp;#x0265; p&amp;#x01DD;&amp;#x028C;&amp;#x0131;&amp;#x0279;&amp;#x0279;&amp;#x0250; &amp;#x01DD;&amp;#x028C;,no&amp;#x028E; &amp;#x028D;ou&amp;#x029E; &amp;#x01DD;&amp;#x026F; &amp;#x0287;&amp;#x01DD;l o&amp;#x0287; &amp;#x0183;&amp;#x0279;o&amp;#x02D9;p&amp;#x01DD;u&amp;#x0183;&amp;#x0131;l&amp;#x0250;p&amp;#x0279;o&amp;#x028D;@s&amp;#x028E;&amp;#x01DD;&amp;#x029E;&amp;#x0287;l&amp;#x0250;:o&amp;#x0287;l&amp;#x0131;&amp;#x0250;&amp;#x026F; &amp;#x01DD;s&amp;#x0250;&amp;#x01DD;ld &amp;#x02D9;(-&amp;#x061B; p&amp;#x01DD;u&amp;#x0183;&amp;#x0131;l&amp;#x0250; p&amp;#x0279;o&amp;#x028D; o&amp;#x0287; uo&amp;#x0131;&amp;#x0287;d&amp;#x0131;&amp;#x0279;&amp;#x0254;sqns &amp;#x0183;uol&amp;#x01DD;&amp;#x025F;&amp;#x0131;l &amp;#x01DD;&amp;#x01DD;&amp;#x0279;&amp;#x025F; &amp;#x0250; s&amp;#x0131; &amp;#x01DD;z&amp;#x0131;&amp;#x0279;d &amp;#x0279;no&amp;#x028E; &amp;#x00A1;&amp;#x01DD;uop ll&amp;#x01DD;&amp;#x028D; &amp;#x02D9;&lt;a href=&quot;http://www.flickr.com/photos/thomasguest/3104398656/&quot;&gt;&amp;#x01DD;&amp;#x0279;&amp;#x01DD;&amp;#x0265;&lt;/a&gt; s&amp;#x0279;&amp;#x01DD;&amp;#x0287;&amp;#x0254;&amp;#x0250;&amp;#x0279;&amp;#x0250;&amp;#x0265;&amp;#x0254; &amp;#x025F;o s&amp;#x028D;o&amp;#x0279; &amp;#x01DD;&amp;#x01DD;&amp;#x0279;&amp;#x0265;&amp;#x0287; ll&amp;#x0250; &amp;#x01DD;&amp;#x01DD;s u&amp;#x0250;&amp;#x0254; no&amp;#x028E; &amp;#x02D9;&amp;#x028E;&amp;#x01DD;&amp;#x029E; &amp;#x0287;l&amp;#x0250; &amp;#x01DD;&amp;#x0265;&amp;#x0287; u&amp;#x028D;op &amp;#x0183;u&amp;#x0131;plo&amp;#x0265; &amp;#x01DD;l&amp;#x0131;&amp;#x0265;&amp;#x028D; p&amp;#x0279;&amp;#x0250;oq&amp;#x028E;&amp;#x01DD;&amp;#x029E; &amp;#x028E;&amp;#x0287;&amp;#x0279;&amp;#x01DD;&amp;#x028D;b &amp;#x0254;&amp;#x0250;&amp;#x026F; &amp;#x01DD;ldd&amp;#x0250; u&amp;#x0250; uo s&amp;#x0279;&amp;#x01DD;&amp;#x0287;&amp;#x0254;&amp;#x0250;&amp;#x0279;&amp;#x0250;&amp;#x0265;&amp;#x0254; &amp;#x025F;o &amp;#x028D;o&amp;#x0279; do&amp;#x0287; &amp;#x01DD;&amp;#x0265;&amp;#x0287; u&amp;#x0131; &amp;#x01DD;d&amp;#x028E;&amp;#x0287; &amp;#8216;&amp;#x01DD;&amp;#x0183;&amp;#x0250;&amp;#x026F;&amp;#x0131; s&amp;#x0131;&amp;#x0265;&amp;#x0287; &amp;#x01DD;&amp;#x0287;&amp;#x0250;&amp;#x0279;&amp;#x01DD;u&amp;#x01DD;&amp;#x0183; o&amp;#x0287; :uo&amp;#x0131;&amp;#x0287;nlos&lt;/p&gt;&lt;p&gt;&amp;#x02D9;004 &amp;#x0254;- p&amp;#x0250;&amp;#x01DD;&amp;#x0265; | &amp;#x0183;ud&amp;#x02D9;&amp;#x028D;o&amp;#x0279;-do&amp;#x0287; &amp;#x0250;&amp;#x0265;dl&amp;#x0250;- &amp;#x026F;udo&amp;#x0287;&amp;#x0183;ud :&amp;#x0183;u&amp;#x0131;&amp;#x026F;&amp;#x026F;&amp;#x0250;&amp;#x0279;&amp;#x0183;o&amp;#x0279;d &amp;#x028E;u&amp;#x0250; &amp;#x0183;u&amp;#x0131;&amp;#x0279;&amp;#x0131;nb&amp;#x01DD;&amp;#x0279; &amp;#x0287;no&amp;#x0265;&amp;#x0287;&amp;#x0131;&amp;#x028D; &amp;#x0279;&amp;#x01DD;&amp;#x028D;su&amp;#x0250; &amp;#x01DD;&amp;#x0265;&amp;#x0287; s&amp;#x0287;&amp;#x01DD;&amp;#x0183; &amp;#x0265;&amp;#x0254;&amp;#x0131;&amp;#x0265;&amp;#x028D; &amp;#x026F;udo&amp;#x0287;&amp;#x0183;ud &amp;#x0287;&amp;#x0250; &amp;#x01DD;&amp;#x026F; p&amp;#x01DD;&amp;#x0287;u&amp;#x0131;od u&amp;#x01DD;&amp;#x0265;&amp;#x0254;&amp;#x0279;&amp;#x0131;&amp;#x029E;n&amp;#x01DD;u u&amp;#x0250;&amp;#x0131;&amp;#x0287;s&amp;#x0131;&amp;#x0279;&amp;#x0265;&amp;#x0254; &amp;#x02D9;s&amp;#x01DD;nl&amp;#x0250;&amp;#x028C; &amp;#x0250;&amp;#x0265;dl&amp;#x0250; &amp;#x01DD;&amp;#x0265;&amp;#x0287; &amp;#x0287;&amp;#x01DD;&amp;#x0183; o&amp;#x0287; &amp;#x0287;d&amp;#x0131;&amp;#x0279;&amp;#x0254;s &amp;#x01DD;ld&amp;#x026F;&amp;#x0131;s &amp;#x0250; &amp;#x01DD;&amp;#x0287;&amp;#x0131;&amp;#x0279;&amp;#x028D; o&amp;#x0287; &amp;#x028E;&amp;#x0279;&amp;#x0250;&amp;#x0279;q&amp;#x0131;l &amp;#x0183;u&amp;#x0131;&amp;#x0183;&amp;#x0250;&amp;#x026F;&amp;#x0131; uo&amp;#x0265;&amp;#x0287;&amp;#x028E;d &amp;#x01DD;&amp;#x0265;&amp;#x0287; p&amp;#x01DD;sn &amp;#x0131;&lt;/p&gt;&lt;p&gt;&amp;#x02D9;&amp;#x01DD;nl&amp;#x0254; &amp;#x0287;x&amp;#x01DD;u &amp;#x01DD;&amp;#x0265;&amp;#x0287; &amp;#x0287;no ll&amp;#x01DD;ds &amp;#x0183;ud s&amp;#x0131;&amp;#x0265;&amp;#x0287; &amp;#x025F;o &amp;#x028D;o&amp;#x0279; do&amp;#x0287; &amp;#x01DD;&amp;#x0265;&amp;#x0287; u&amp;#x0131; s&amp;#x01DD;nl&amp;#x0250;&amp;#x028C; &amp;#x0250;&amp;#x0265;dl&amp;#x0250; &amp;#x01DD;&amp;#x0265;&amp;#x0287; :s&amp;#x028E;&amp;#x0250;s &amp;#x0265;&amp;#x0254;&amp;#x0131;&amp;#x0265;&amp;#x028D; &amp;#8216;&amp;#x0287;u&amp;#x01DD;&amp;#x026F;&amp;#x026F;o&amp;#x0254; &amp;#x01DD;&amp;#x0265;&amp;#x0287; p&amp;#x0250;&amp;#x01DD;&amp;#x0279; o&amp;#x0287; &amp;#x0183;ud&amp;#x02D9;&amp;#x028D;o&amp;#x0279;-do&amp;#x0287; &amp;#x01DD;soq&amp;#x0279;&amp;#x01DD;&amp;#x028C;- &amp;#x028E;&amp;#x025F;&amp;#x0131;&amp;#x0287;u&amp;#x01DD;p&amp;#x0131; &amp;#x029E;&amp;#x0254;&amp;#x0131;&amp;#x0183;&amp;#x0250;&amp;#x026F;&amp;#x01DD;&amp;#x0183;&amp;#x0250;&amp;#x026F;&amp;#x0131; p&amp;#x01DD;sn &amp;#x0131; &amp;#x02D9;&amp;#x028E;ll&amp;#x0250;&amp;#x0254;ol &amp;#x0183;ud &amp;#x01DD;&amp;#x0265;&amp;#x0287; &amp;#x01DD;&amp;#x028C;&amp;#x0250;s&lt;/p&gt;&lt;p&gt;&amp;#x02D9;&amp;#x0183;ud &amp;#x01DD;&amp;#x0265;&amp;#x0287; &amp;#x025F;o &amp;#x029E;un&amp;#x0265;&amp;#x0254; &amp;#x0287;x&amp;#x0287;z &amp;#x01DD;&amp;#x0265;&amp;#x0287; u&amp;#x0131; &amp;#x0287;u&amp;#x01DD;&amp;#x026F;&amp;#x026F;o&amp;#x0254; &amp;#x01DD;&amp;#x0265;&amp;#x0287; p&amp;#x0250;&amp;#x01DD;&amp;#x0279; &amp;#8216;&amp;#x01DD;nl&amp;#x0254; &amp;#x0287;x&amp;#x01DD;u &amp;#x01DD;&amp;#x0265;&amp;#x0287; &amp;#x0279;o&amp;#x025F; :&amp;#x01DD;&amp;#x01DD;s ll,no&amp;#x028E; &amp;#x02D9;&amp;#x01DD;sno&amp;#x026F; &amp;#x0279;no&amp;#x028E; &amp;#x0183;u&amp;#x0131;sn &amp;#x0279;&amp;#x0250;q&amp;#x01DD;p&amp;#x0131;s &amp;#x01DD;&amp;#x0265;&amp;#x0287; &amp;#x0287;&amp;#x0254;&amp;#x01DD;l&amp;#x01DD;s&lt;/p&gt;&lt;p&gt;&amp;#x02D9;&amp;#x0279;&amp;#x0250;q&amp;#x01DD;p&amp;#x0131;s &amp;#x01DD;&amp;#x0265;&amp;#x0287; u&amp;#x0131; &amp;#x0287;x&amp;#x01DD;&amp;#x0287; &amp;#x01DD;&amp;#x0287;&amp;#x0131;&amp;#x0265;&amp;#x028D; uo &amp;#x01DD;&amp;#x0287;&amp;#x0131;&amp;#x0265;&amp;#x028D; &amp;#x01DD;&amp;#x0265;&amp;#x0287; &amp;#x0287;&amp;#x0265;&amp;#x0183;&amp;#x0131;l&amp;#x0265;&amp;#x0183;&amp;#x0131;&amp;#x0265; &amp;#8216;&amp;#x01DD;nl&amp;#x0254; &amp;#x0287;x&amp;#x01DD;u &amp;#x01DD;&amp;#x0265;&amp;#x0287; &amp;#x01DD;&amp;#x01DD;s o&amp;#x0287; :sp&amp;#x0250;&amp;#x01DD;&amp;#x0279; l&amp;#x026F;&amp;#x0287;&amp;#x0265; &amp;#x01DD;&amp;#x0265;&amp;#x0287; u&amp;#x0131; &amp;#x0287;u&amp;#x01DD;&amp;#x026F;&amp;#x026F;o&amp;#x0254; &amp;#x0250; &amp;#x02D9;xo&amp;#x025F;&amp;#x01DD;&amp;#x0279;&amp;#x0131;&amp;#x025F; uo n+l&amp;#x0279;&amp;#x0287;&amp;#x0254; (&amp;#x02D9;&amp;#x0183;&amp;#x02D9;&amp;#x01DD;) &amp;#x0183;u&amp;#x0131;sn l&amp;#x026F;&amp;#x0287;&amp;#x0265; &amp;#x01DD;&amp;#x0265;&amp;#x0287; &amp;#x028D;&amp;#x01DD;&amp;#x0131;&amp;#x028C;&lt;/p&gt;&lt;/div&gt;
-
-&lt;p&gt;&lt;span id=&quot;continue-reading&quot;/&gt;&lt;/p&gt;
-&lt;p&gt;Some found the teaser too easy. Others asked if I&amp;#8217;d be posting a follow up.&lt;/p&gt;
-&lt;p&gt;&lt;a href=&quot;http://www.flickr.com/photos/thomasguest/3122529935/&quot; title=&quot;What&#x27;s in the box?&quot;&gt;&lt;img src=&quot;http://farm4.static.flickr.com/3264/3122529935_dfe6550cf6_o.png&quot; width=&quot;294&quot; height=&quot;450&quot; alt=&quot;What&#x27;s in the box?&quot; /&gt;&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;Sorry. Maybe.&lt;/p&gt;</description>
-<dc:date>2008-12-20</dc:date>
-<guid>http://wordaligned.org/articles/whats-in-the-box</guid>
-<author>tag@wordaligned.org (Thomas Guest)</author>
-<link>http://wordaligned.org/articles/whats-in-the-box</link>
 <category>Puzzles</category>
 </item>
 

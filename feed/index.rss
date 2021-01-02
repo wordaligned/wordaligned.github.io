@@ -7,6 +7,60 @@
 <dc:creator>tag@wordaligned.org</dc:creator>
 <language>en-gb</language>
 <item>
+<title>Fearless Debugging</title>
+<description>&lt;h2 id=&quot;jurassic-jigsaw&quot;&gt;Jurassic Jigsaw&lt;/h2&gt;
+&lt;p&gt;My thanks to &lt;a href=&quot;http://was.tl&quot;&gt;Eric Wastl&lt;/a&gt; for another excellent &lt;a href=&quot;https://adventofcode.com/&quot;&gt;Advent of Code&lt;/a&gt;. I&amp;#8217;ve now &lt;a href=&quot;https://github.com/wordaligned/advent-of-code-2020&quot;&gt;worked through all 25 puzzles&lt;/a&gt;, some simple, some tough, some familiar, some new; all beautifully set and highly enjoyable.&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;https://adventofcode.com/2020/day/20&quot;&gt;Day 20, Jurrasic Jigsaw&lt;/a&gt;, took me longest by far to complete. The puzzle is easy to understand. You have to assemble jigsaw pieces into a seascape. For part one, you need to find the corner pieces. For part two, you must locate monsters in the seascape.&lt;/p&gt;
+&lt;p&gt;Here, a jigsaw piece is a monochrome square, represented like so:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;..##.#..#.
+##..#.....
+#...##..#.
+####.#...#
+##.##.###.
+##...#.###
+.#.#.#..##
+..#....#..
+###...#.#.
+..###..###
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;And this is the sea monster:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;                   # 
+#    ##    ##    ###
+ #  #  #  #  #  #
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The twist was that the jigsaw pieces could be rotated and flipped over before matching them up. Once matched, the edges of the pieces were to be removed. Implementing the rotate, flip, match and remove code proved fiddly, and I was pleased to get this working and producing correct results for the supplied example.&lt;/p&gt;
+&lt;p&gt;Unfortunately my code produced the wrong answer for part two, the bit where you have to locate sea monsters. So, I would need to debug.&lt;/p&gt;
+&lt;h2 id=&quot;fear-of-debugging&quot;&gt;Fear of Debugging&lt;/h2&gt;
+&lt;p&gt;Like it or not, debugging is a key part of software development.&lt;/p&gt;
+&lt;p&gt;Generally, I do like it. There&amp;#8217;s satisfaction to be had in paring scope, retracing steps, then making the right fix, improving test coverage, and generally leaving the world a better place.&lt;/p&gt;
+&lt;p&gt;What I don&amp;#8217;t like, though &amp;#8212; what scares me &amp;#8212; is the suspicion the bug lurks in the worst possible place. What if it&amp;#8217;s in a library we don&amp;#8217;t have the source for? Or if it&amp;#8217;s a timing issue caused by some erratic locking? Or if there&amp;#8217;s an issue with the compiler for the most obscure platform. Or, in this particular case, that the code to fiddle with jigsaw pieces has a bug &amp;#8212; a bug subtle enough to pass the examples but fail the real thing.&lt;/p&gt;
+&lt;p&gt;It&amp;#8217;s not unreasonable to fear the worst. At some point the issues mentioned above &lt;strong&gt;will&lt;/strong&gt; cause bugs, bugs which &lt;strong&gt;are&lt;/strong&gt; hard to fix. We need to be ready.&lt;/p&gt;
+&lt;p&gt;Fear, though, is the wrong mindset. Debugging requires you to be calm, methodical and detached. Much as an artist draws what they see and not what they know, a programmer must observe and follow the evidence. A second pair of eyes is always useful; simply explaining the issue to a colleague gives you another perspective.&lt;/p&gt;
+&lt;h2 id=&quot;here-be-monsters&quot;&gt;Here be Monsters&lt;/h2&gt;
+&lt;p&gt;I was working on my own on the Advent of Code. I could have tried explaining to a &lt;a href=&quot;https://en.wikipedia.org/wiki/Rubber_duck_debugging&quot;&gt;rubber duck&lt;/a&gt;, but didn&amp;#8217;t. Instead I examined and traced my code. I checked and double-checked the flip, rotate, match and remove logic. I printed out intermediate state. I walked to the sea-front and back. I slept on it.&lt;/p&gt;
+&lt;p&gt;Fearing the worst turned out to be the wrong strategy.&lt;/p&gt;
+&lt;p&gt;What did work was reading the problem statement again, carefully. At last I saw it! Somehow, a rogue character had wormed its way into my inputs. The sea monster I had used looked like this:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;                   #
+#    ##    ##    ###
+ #  #  #  #  #  #
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;when it should have been:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;                  # 
+#    ##    ##    ###
+ #  #  #  #  #  #
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Since both monsters appear the same number of times in the example seascape, my test case failed to catch the bug.&lt;/p&gt;
+&lt;p&gt;So, with a single, simple, whitespace correction, my advent of code was complete. One of life&amp;#8217;s ironies is that when you lose something you find it in the last place you look. It&amp;#8217;s not always so with debugging: a bug can exist in many different places and sometimes the fix causes the codebase to unravel, requiring a chain of additional fixes, but, in this case, finding the bug fixed it.&lt;/p&gt;
+&lt;p&gt;&lt;image src=&quot;http://wordaligned.org/images/seascape.png&quot; alt=&quot;Seascape with monsters&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;A monster can exist in many different places, and in this case finding the monster fixed it&lt;/p&gt;</description>
+<dc:date>2021-01-02</dc:date>
+<guid>http://wordaligned.org/articles/fearless-debugging</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/fearless-debugging</link>
+<category>Puzzles</category>
+</item>
+
+<item>
 <title>Complex numbers for planar geometry</title>
 <description>&lt;p&gt;Once again, I&amp;#8217;m enjoying solving &lt;a href=&quot;http://was.tl&quot;&gt;Eric Wastl&lt;/a&gt;&amp;#8217;s excellent &lt;a href=&quot;https://adventofcode.com&quot;&gt;Advent of Code&lt;/a&gt; puzzles.&lt;/p&gt;
 &lt;p&gt;Today, &lt;a href=&quot;day12&quot;&gt;day 12&lt;/a&gt; involved a ship navigating in a 2D plane. The ship follows a series of instructions taking the form of actions and values such as &lt;code&gt;F10 N3 F7 R90 F11 ...&lt;/code&gt;, where, for the first part:&lt;/p&gt;
@@ -1046,152 +1100,6 @@ Falsifying example: test_combining_chunks(xs_n=(&amp;#x27;001&amp;#x27;, 2))
 <link>http://wordaligned.org/articles/lazy-sequences-working-hard</link>
 <category>Python</category>
 <category>Streams</category>
-</item>
-
-<item>
-<title>Slicing a list evenly with Python</title>
-<description>&lt;p&gt;&lt;img src=&quot;http://wordaligned.org/images/sliced-python.jpg&quot; alt=&quot;Sliced Python&quot;/&gt;&lt;/p&gt;
-&lt;p&gt;Here&amp;#8217;s a problem I came up against recently.&lt;/p&gt;
-&lt;p&gt;The task was to chop a list into exactly &lt;code&gt;n&lt;/code&gt; evenly slized chunks. To give a little more context, let&amp;#8217;s suppose we want to divide a list of jobs equally between &lt;code&gt;n&lt;/code&gt; workers, where &lt;code&gt;n&lt;/code&gt; might be the number of CPU cores available.&lt;/p&gt;
-&lt;p&gt;We can build the result by repeatedly slicing the input:&lt;/p&gt;
-&lt;div class=&quot;typocode&quot;&gt;
-
-&lt;pre class=&quot;prettyprint&quot;&gt;def chunk(xs, n):
-    &amp;#x27;&amp;#x27;&amp;#x27;Split the list, xs, into n chunks&amp;#x27;&amp;#x27;&amp;#x27;
-    L = len(xs)
-    assert 0 &amp;lt; n &amp;lt;= L
-    s = L//n
-    return [xs[p:p+s] for p in range(0, L, s)]
-
-&lt;/pre&gt;
-
-&lt;/div&gt;
-
-&lt;p&gt;This looks promising&lt;/p&gt;
-&lt;div class=&quot;typocode&quot;&gt;
-
-&lt;pre class=&quot;prettyprint&quot;&gt;&amp;gt;&amp;gt;&amp;gt; chunk(&amp;#x27;abcdefghi&amp;#x27;, 3)
-[&amp;#x27;abc&amp;#x27;, &amp;#x27;def&amp;#x27;, &amp;#x27;ghi&amp;#x27;]
-
-&lt;/pre&gt;
-
-&lt;/div&gt;
-
-&lt;p&gt;but if the size of the list is not an exact multiple of &lt;code&gt;n&lt;/code&gt;, the result won&amp;#8217;t contain &lt;strong&gt;exactly&lt;/strong&gt; &lt;code&gt;n&lt;/code&gt; chunks.&lt;/p&gt;
-&lt;div class=&quot;typocode&quot;&gt;
-
-&lt;pre class=&quot;prettyprint&quot;&gt;&amp;gt;&amp;gt;&amp;gt; chunk(&amp;#x27;abcde&amp;#x27;, 3)
-[&amp;#x27;a&amp;#x27;, &amp;#x27;b&amp;#x27;, &amp;#x27;c&amp;#x27;, &amp;#x27;d&amp;#x27;, &amp;#x27;e&amp;#x27;]
-&amp;gt;&amp;gt;&amp;gt; chunk(&amp;#x27;abcdefgh&amp;#x27;, 3)
-[&amp;#x27;ab&amp;#x27;, &amp;#x27;cd&amp;#x27;, &amp;#x27;ef&amp;#x27;, &amp;#x27;gh&amp;#x27;]
-&amp;gt;&amp;gt;&amp;gt; chunk(&amp;#x27;abcdefghij&amp;#x27;, 3)
-[&amp;#x27;abc&amp;#x27;, &amp;#x27;def&amp;#x27;, &amp;#x27;ghi&amp;#x27;, &amp;#x27;j&amp;#x27;]
-
-&lt;/pre&gt;
-
-&lt;/div&gt;
-
-&lt;p&gt;(By the way, I&amp;#8217;m using strings rather than lists in the examples. The code works equally well for both types, and strings make it slightly easier to see what&amp;#8217;s going on.)&lt;/p&gt;
-&lt;p&gt;One way to fix the problem is to group the final chunks together.&lt;/p&gt;
-&lt;div class=&quot;typocode&quot;&gt;
-
-&lt;pre class=&quot;prettyprint&quot;&gt;def chunk(xs, n):
-    &amp;#x27;&amp;#x27;&amp;#x27;Split the list, xs, into n chunks&amp;#x27;&amp;#x27;&amp;#x27;
-    L = len(xs)
-    assert 0 &amp;lt; n &amp;lt;= L
-    s, r = divmod(L, n)
-    chunks = [xs[p:p+s] for p in range(0, L, s)]
-    chunks[n-1:] = [xs[-r-s:]]
-    return chunks
-
-&lt;/pre&gt;
-
-&lt;/div&gt;
-
-&lt;p&gt;Now we have exactly &lt;code&gt;n&lt;/code&gt; chunks, but they may not be evenly sized, since the last chunk gets padded with any surplus.&lt;/p&gt;
-&lt;div class=&quot;typocode&quot;&gt;
-
-&lt;pre class=&quot;prettyprint&quot;&gt;&amp;gt;&amp;gt;&amp;gt; chunk(&amp;#x27;abcde&amp;#x27;, 3)
-[&amp;#x27;a&amp;#x27;, &amp;#x27;b&amp;#x27;, &amp;#x27;cde&amp;#x27;]
-&amp;gt;&amp;gt;&amp;gt; chunk(&amp;#x27;abcdefgh&amp;#x27;, 3)
-[&amp;#x27;ab&amp;#x27;, &amp;#x27;cd&amp;#x27;, &amp;#x27;efgh&amp;#x27;]
-&amp;gt;&amp;gt;&amp;gt; chunk(&amp;#x27;abcdefghij&amp;#x27;, 3)
-[&amp;#x27;abc&amp;#x27;, &amp;#x27;def&amp;#x27;, &amp;#x27;ghij&amp;#x27;]
-
-&lt;/pre&gt;
-
-&lt;/div&gt;
-
-&lt;p&gt;What does &amp;#8220;evenly sized&amp;#8221; actually mean? Loosely speaking, we want the resulting chunks as closely sized as possible.&lt;/p&gt;
-&lt;p&gt;More precisely, if the result of dividing the length of the list &lt;code&gt;L&lt;/code&gt; by the number of chunks &lt;code&gt;n&lt;/code&gt; gives a size &lt;code&gt;s&lt;/code&gt; with remainder &lt;code&gt;r&lt;/code&gt;, then the function should return &lt;code&gt;r&lt;/code&gt; chunks of size &lt;code&gt;s+1&lt;/code&gt; and &lt;code&gt;n-r&lt;/code&gt; chunks of size &lt;code&gt;s&lt;/code&gt;. There are &lt;a href=&quot;https://en.wikipedia.org/wiki/Combination&quot;&gt;choose(n, r)&lt;/a&gt; ways of doing this. Here&amp;#8217;s a solution which puts the longer chunks to the front of the results.&lt;/p&gt;
-&lt;div class=&quot;typocode&quot;&gt;
-
-&lt;pre class=&quot;prettyprint&quot;&gt;def chunk(xs, n):
-    &amp;#x27;&amp;#x27;&amp;#x27;Split the list, xs, into n evenly sized chunks&amp;#x27;&amp;#x27;&amp;#x27;
-    L = len(xs)
-    assert 0 &amp;lt; n &amp;lt;= L
-    s, r = divmod(L, n)
-    t = s + 1
-    return ([xs[p:p+t] for p in range(0, r*t, t)] +
-            [xs[p:p+s] for p in range(r*t, L, s)])
-
-&lt;/pre&gt;
-
-&lt;/div&gt;
-
-&lt;p&gt;Here&amp;#8217;s a second implementation, this time using &lt;code&gt;itertools&lt;/code&gt;. Chaining &lt;code&gt;r&lt;/code&gt; copies of &lt;code&gt;s+1&lt;/code&gt; and &lt;code&gt;n-r&lt;/code&gt; copies of &lt;code&gt;s&lt;/code&gt; gives us the &lt;code&gt;n&lt;/code&gt; chunk widths. Accumulating the widths gives us the list offsets for slicing &amp;#8212; though note we need to prepend an initial &lt;code&gt;0&lt;/code&gt;. Now we can form a &lt;a href=&quot;http://wordaligned.org/articles/zippy-triples-served-with-python&quot;&gt;(this, next) pair of iterators&lt;/a&gt; over the offsets, and the result is the accumulation of repeated &lt;code&gt;(begin, end)&lt;/code&gt; slices taken from the original list.&lt;/p&gt;
-&lt;div class=&quot;typocode&quot;&gt;
-
-&lt;pre class=&quot;prettyprint&quot;&gt;from itertools import accumulate, chain, repeat, tee
-
-def chunk(xs, n):
-    assert n &amp;gt; 0
-    L = len(xs)
-    s, r = divmod(L, n)
-    widths = chain(repeat(s+1, r), repeat(s, n-r))
-    offsets = accumulate(chain((0,), widths))
-    b, e = tee(offsets)
-    next(e)
-    return [xs[s] for s in map(slice, b, e)]
-
-&lt;/pre&gt;
-
-&lt;/div&gt;
-
-&lt;p&gt;This version does something sensible in the case when the number of slices, &lt;code&gt;n&lt;/code&gt;, exceeds the length of the list.&lt;/p&gt;
-&lt;div class=&quot;typocode&quot;&gt;
-
-&lt;pre class=&quot;prettyprint&quot;&gt;&amp;gt;&amp;gt;&amp;gt; chunk(&amp;#x27;ab&amp;#x27;, 5)
-[&amp;#x27;a&amp;#x27;, &amp;#x27;b&amp;#x27;, &amp;#x27;&amp;#x27;, &amp;#x27;&amp;#x27;, &amp;#x27;&amp;#x27;]
-
-&lt;/pre&gt;
-
-&lt;/div&gt;
-
-&lt;p&gt;Finally, some tests.&lt;/p&gt;
-&lt;div class=&quot;typocode&quot;&gt;
-
-&lt;pre class=&quot;prettyprint&quot;&gt;def test_chunk():
-    assert chunk(&amp;#x27;&amp;#x27;, 1) == [&amp;#x27;&amp;#x27;]
-    assert chunk(&amp;#x27;ab&amp;#x27;, 2) == [&amp;#x27;a&amp;#x27;, &amp;#x27;b&amp;#x27;]
-    assert chunk(&amp;#x27;abc&amp;#x27;, 2) == [&amp;#x27;ab&amp;#x27;, &amp;#x27;c&amp;#x27;]
-
-    xs = list(range(8))
-    assert chunk(xs, 2) == [[0, 1, 2, 3], [4, 5, 6, 7]]
-    assert chunk(xs, 3) == [[0, 1, 2], [3, 4, 5], [6, 7]]
-    assert chunk(xs, 5) == [[0, 1], [2, 3], [4, 5], [6], [7]]
-
-    rs = range(1000000)
-    assert chunk(rs, 2) == [range(500000), range(500000, 1000000)]
-
-&lt;/pre&gt;
-
-&lt;/div&gt;</description>
-<dc:date>2017-05-14</dc:date>
-<guid>http://wordaligned.org/articles/slicing-a-list-evenly-with-python</guid>
-<author>tag@wordaligned.org (Thomas Guest)</author>
-<link>http://wordaligned.org/articles/slicing-a-list-evenly-with-python</link>
-<category>Python</category>
 </item>
 
 </channel>

@@ -11,7 +11,7 @@
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
 <meta name="author" content="Thomas Guest" />
 <meta name="description" content="A collection of articles on software development written by Thomas Guest." />
-<meta name="keywords" content="lighttpd, Curl, Turing, Documentation, ImageMagick, Content, Zlib, Regex, Editors, CVS, Ruby on Rails, ACCU, Reviews, Recommended, Knuth, Torvalds, Tesseract, Python, Markdown, Drawing, Shell, Trac, Puzzles, Virtualization, Bugs, Characters, Web Applications, Functional Programming, Pictures, Europython, Lcs, Bristol, Perl, Graphics, Steganography, cvs2svn, Tests, Windows, C, Awk, Charts, Unicode, Books, Emacs, Lisp, Scheme, Streams, Oulipo, php, Swansea, Android, Subversion, Erlang, Chess, Cycling, Conferences, Haskell, Google, Primes, SICP, Unix, Apple, Ruby, Design, Animation, Missiles, Agile, Arc, Hoare, Accidents, Perec, Self, IDE, Decorators, Dynamic Languages, Iphone, Two Wheels, Build, Scrum, CLRS, Boost, Java, Spolsky, Syntax, Go, Javascript, Talks, Web-applications, Pi, DocBook, openid, PIL, Esr, Recursion, Disqus, C++, Github, Algorithms, Etc, Teamwork, OCR, Fractals, Crabs" />
+<meta name="keywords" content="Functional Programming, Shell, Curl, Talks, lighttpd, Ruby on Rails, Bugs, Disqus, Missiles, Hoare, Haskell, Swansea, Python, Emacs, Windows, Subversion, Animation, Perec, Build, Pi, ACCU, Arc, Iphone, Two Wheels, Javascript, Turing, Primes, Web-applications, Erlang, Boost, Puzzles, Books, Dynamic Languages, Content, CVS, Streams, Github, Tesseract, Reviews, Virtualization, Conferences, Editors, C, PIL, Scrum, Android, Knuth, Markdown, SICP, CLRS, OCR, Esr, C++, Google, Bristol, Lcs, Self, Fractals, Web Applications, Awk, Accidents, Decorators, Tests, Go, Graphics, Recursion, Zlib, Trac, cvs2svn, Cycling, Torvalds, Scheme, Apple, Documentation, Recommended, IDE, Europython, Etc, Syntax, Lisp, Characters, Chess, Pictures, Design, Unix, Teamwork, Perl, DocBook, ImageMagick, Crabs, Steganography, openid, Oulipo, Ruby, Regex, Spolsky, Drawing, Algorithms, Charts, Java, Unicode, Agile, php" />
 <link rel="alternate" type="application/rss+xml" title="Feed" href="http://feeds.wordaligned.org/wordaligned" />
 </head>
 
@@ -25,7 +25,59 @@
 
   <div id="page">
     <div id="content">
-      <div class="atomentry" id="complex-numbers-for-planar-geometry">
+      <div class="atomentry" id="fearless-debugging">
+<h2 class="title"><a href="/articles/fearless-debugging">Fearless Debugging</a></h2>
+<p class="meta"><abbr class="published" title="2021-01-02">2021-01-02</abbr> &bull; <a href="/tag/puzzles" rel="tag">Puzzles</a> &bull; <a href="/articles/fearless-debugging#disqus_thread">Comments</a></p>
+<h2 id="jurassic-jigsaw">Jurassic Jigsaw</h2>
+<p>My thanks to <a href="http://was.tl">Eric Wastl</a> for another excellent <a href="https://adventofcode.com/">Advent of Code</a>. I&#8217;ve now <a href="https://github.com/wordaligned/advent-of-code-2020">worked through all 25 puzzles</a>, some simple, some tough, some familiar, some new; all beautifully set and highly enjoyable.</p>
+<p><a href="https://adventofcode.com/2020/day/20">Day 20, Jurrasic Jigsaw</a>, took me longest by far to complete. The puzzle is easy to understand. You have to assemble jigsaw pieces into a seascape. For part one, you need to find the corner pieces. For part two, you must locate monsters in the seascape.</p>
+<p>Here, a jigsaw piece is a monochrome square, represented like so:</p>
+<pre><code>..##.#..#.
+##..#.....
+#...##..#.
+####.#...#
+##.##.###.
+##...#.###
+.#.#.#..##
+..#....#..
+###...#.#.
+..###..###
+</code></pre>
+<p>And this is the sea monster:</p>
+<pre><code>                   # 
+#    ##    ##    ###
+ #  #  #  #  #  #
+</code></pre>
+<p>The twist was that the jigsaw pieces could be rotated and flipped over before matching them up. Once matched, the edges of the pieces were to be removed. Implementing the rotate, flip, match and remove code proved fiddly, and I was pleased to get this working and producing correct results for the supplied example.</p>
+<p>Unfortunately my code produced the wrong answer for part two, the bit where you have to locate sea monsters. So, I would need to debug.</p>
+<h2 id="fear-of-debugging">Fear of Debugging</h2>
+<p>Like it or not, debugging is a key part of software development.</p>
+<p>Generally, I do like it. There&#8217;s satisfaction to be had in paring scope, retracing steps, then making the right fix, improving test coverage, and generally leaving the world a better place.</p>
+<p>What I don&#8217;t like, though &#8212; what scares me &#8212; is the suspicion the bug lurks in the worst possible place. What if it&#8217;s in a library we don&#8217;t have the source for? Or if it&#8217;s a timing issue caused by some erratic locking? Or if there&#8217;s an issue with the compiler for the most obscure platform. Or, in this particular case, that the code to fiddle with jigsaw pieces has a bug &#8212; a bug subtle enough to pass the examples but fail the real thing.</p>
+<p>It&#8217;s not unreasonable to fear the worst. At some point the issues mentioned above <strong>will</strong> cause bugs, bugs which <strong>are</strong> hard to fix. We need to be ready.</p>
+<p>Fear, though, is the wrong mindset. Debugging requires you to be calm, methodical and detached. Much as an artist draws what they see and not what they know, a programmer must observe and follow the evidence. A second pair of eyes is always useful; simply explaining the issue to a colleague gives you another perspective.</p>
+<h2 id="here-be-monsters">Here be Monsters</h2>
+<p>I was working on my own on the Advent of Code. I could have tried explaining to a <a href="https://en.wikipedia.org/wiki/Rubber_duck_debugging">rubber duck</a>, but didn&#8217;t. Instead I examined and traced my code. I checked and double-checked the flip, rotate, match and remove logic. I printed out intermediate state. I walked to the sea-front and back. I slept on it.</p>
+<p>Fearing the worst turned out to be the wrong strategy.</p>
+<p>What did work was reading the problem statement again, carefully. At last I saw it! Somehow, a rogue character had wormed its way into my inputs. The sea monster I had used looked like this:</p>
+<pre><code>                   #
+#    ##    ##    ###
+ #  #  #  #  #  #
+</code></pre>
+<p>when it should have been:</p>
+<pre><code>                  # 
+#    ##    ##    ###
+ #  #  #  #  #  #
+</code></pre>
+<p>Since both monsters appear the same number of times in the example seascape, my test case failed to catch the bug.</p>
+<p>So, with a single, simple, whitespace correction, my advent of code was complete. One of life&#8217;s ironies is that when you lose something you find it in the last place you look. It&#8217;s not always so with debugging: a bug can exist in many different places and sometimes the fix causes the codebase to unravel, requiring a chain of additional fixes, but, in this case, finding the bug fixed it.</p>
+<p><image src="/images/seascape.png" alt="Seascape with monsters" /></p>
+<p>A monster can exist in many different places, and in this case finding the monster fixed it</p>
+
+</div>
+
+
+<div class="atomentry" id="complex-numbers-for-planar-geometry">
 <h2 class="title"><a href="/articles/complex-numbers-for-planar-geometry">Complex numbers for planar geometry</a></h2>
 <p class="meta"><abbr class="published" title="2020-12-12">2020-12-12</abbr> &bull; <a href="/tag/python" rel="tag">Python</a>, <a href="/tag/puzzles" rel="tag">Puzzles</a> &bull; <a href="/articles/complex-numbers-for-planar-geometry#disqus_thread">Comments</a></p>
 <p>Once again, I&#8217;m enjoying solving <a href="http://was.tl">Eric Wastl</a>&#8217;s excellent <a href="https://adventofcode.com">Advent of Code</a> puzzles.</p>
@@ -489,27 +541,6 @@ fruitbowl = {
 </div>
 
 
-<div class="atomentry" id="swanseacon-2017">
-<h2 class="title"><a href="/articles/swanseacon-2017">SwanseaCon 2017</a></h2>
-<p class="meta"><abbr class="published" title="2017-09-26">2017-09-26</abbr> &bull; <a href="/tag/self" rel="tag">Self</a>, <a href="/tag/talks" rel="tag">Talks</a>, <a href="/tag/swansea" rel="tag">Swansea</a> &bull; <a href="/articles/swanseacon-2017#disqus_thread">Comments</a></p>
-<div><blockquote class="twitter-tweet" data-lang="en"><p lang="en" dir="ltr">Unit tests, lets get sceptical <a href="https://twitter.com/thomasguest">@thomasguest</a> was a great end to the morning before lunch <a href="https://t.co/EM4RPAs975">pic.twitter.com/EM4RPAs975</a></p>&mdash; SwanseaCon (@SwanseaCon) <a href="https://twitter.com/SwanseaCon/status/912361247760404480">September 25, 2017</a></blockquote><script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script></div>
-
-<p>I&#8217;m just back from a packed two days at <a href="http://swanseacon.co.uk">SwanseaCon</a> and would like to thank the organisers, speakers and participants for making such a welcoming and diverse conference happen right where I live.</p>
-<p>For me, highlights included:</p>
-<ul>
-<li>Professor Dave Snowden&#8217;s erudite and slide-free talk. It was a privilege to listen: although I may not quite have kept up, I will certainly follow up</li>
-<li>Irina Tsyganok&#8217;s sensitive and inspirational presentation on pair-programming</li>
-<li>Lawrence Weetman&#8217;s dishwashing demo &#8212; with three on-stage helpers, no less</li>
-<li>Scott Fulton&#8217;s honest report on some personal agile life lessons</li>
-</ul>
-<p>The venue wasn&#8217;t too shabby either.</p>
-<p><a data-flickr-embed="true"  href="https://www.flickr.com/photos/thomasguest/37286571132/in/photostream/" title="The view from SwanseaCon"><img src="https://farm5.staticflickr.com/4462/37286571132_a5892fe22c_z.jpg" width="640" height="185" alt="The view from SwanseaCon"></a><script async src="//embedr.flickr.com/assets/client-code.js" charset="utf-8"></script></p>
-<p>Having attended a fair few technical conferences, it felt refreshing and important to be part of something a little softer. Software development is about community, communication and culture, and SwanseaCon scored top marks on all three.</p>
-<p>So, again, thanks!</p>
-
-</div>
-
-
 <div class="extended">
 <p><a href="/articles/">Visit the Word Aligned archives...</a></p>
 </div>
@@ -556,7 +587,7 @@ fruitbowl = {
 <ul id="categories"><li><a href="/tag/python" rel="tag">Python</a> <em>(127)</em></li>
 <li><a href="/tag/c++" rel="tag">C++</a> <em>(71)</em></li>
 <li><a href="/tag/self" rel="tag">Self</a> <em>(70)</em></li>
-<li><a href="/tag/puzzles" rel="tag">Puzzles</a> <em>(39)</em></li>
+<li><a href="/tag/puzzles" rel="tag">Puzzles</a> <em>(40)</em></li>
 <li><a href="/tag/accu" rel="tag">ACCU</a> <em>(33)</em></li>
 <li><a href="/tag/subversion" rel="tag">Subversion</a> <em>(27)</em></li>
 <li><a href="/tag/web-applications" rel="tag">Web Applications</a> <em>(27)</em></li>
@@ -585,7 +616,7 @@ fruitbowl = {
 <div class="sidebar-node">
 <h3>Chain</h3>
 <ul>
-<li><a accesskey="p" href="/articles/complex-numbers-for-planar-geometry" title="First article">&raquo; Complex numbers for planar geometry</a></li>
+<li><a accesskey="p" href="/articles/fearless-debugging" title="First article">&raquo; Fearless Debugging</a></li>
 
 </ul>
 
