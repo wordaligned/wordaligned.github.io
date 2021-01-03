@@ -7,6 +7,37 @@
 <dc:creator>tag@wordaligned.org</dc:creator>
 <language>en-gb</language>
 <item>
+<title>Python maths updates</title>
+<description>&lt;p&gt;A quick note on some useful updates made to standard Python maths support. &lt;a href=&quot;https://docs.python.org/3/library/math.html#math.prod&quot;&gt;Math.prod&lt;/a&gt; does for &lt;code&gt;*&lt;/code&gt; what &lt;a href=&quot;https://docs.python.org/3/library/functions.html#sum&quot;&gt;sum&lt;/a&gt; does for &lt;code&gt;+&lt;/code&gt;. It was added at Python 3.8.&lt;/p&gt;
+&lt;div class=&quot;typocode&quot;&gt;
+
+&lt;pre class=&quot;prettyprint&quot;&gt;&amp;gt;&amp;gt;&amp;gt; math.prod([3, 4, 5])
+60
+&amp;gt;&amp;gt;&amp;gt; math.prod([])
+1
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Added in 3.9, &lt;a href=&quot;https://docs.python.org/3/library/math.html#math.lcm&quot;&gt;math.lcm&lt;/a&gt;, returns the least common multiple of its integer arguments. As with &lt;a href=&quot;https://docs.python.org/3/library/math.html#math.prod&quot;&gt;math.prod&lt;/a&gt;, an empty list of arguments returns 1. Extended in 3.9, the related function &lt;a href=&quot;https://docs.python.org/3/library/math.html#math.gcd&quot;&gt;math.gcd&lt;/a&gt; now accepts an arbitrary list of arguments.&lt;/p&gt;
+&lt;p&gt;For Euclidean geometry, &lt;a href=&quot;https://docs.python.org/3/library/math.html#math.hypot&quot;&gt;math.hypot&lt;/a&gt; now supports n-dimensional points, and &lt;a href=&quot;https://docs.python.org/3/library/math.html#math.dist&quot;&gt;math.dist&lt;/a&gt; has been added, again working on any pair of n-dimensional points.&lt;/p&gt;
+&lt;p&gt;These useful additions and extensions are all in the standard math module (along with several others not mentioned here). Previously you&amp;#8217;d have to roll your own or rely on e.g. &lt;a href=&quot;https://numpy.org/&quot;&gt;numpy&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;I also wanted to mention a nice extension to the power function; in this case to the builtin &lt;a href=&quot;https://docs.python.org/3/library/functions.html#pow&quot;&gt;pow&lt;/a&gt; &amp;#8212; &lt;a href=&quot;https://docs.python.org/3/library/math.html#math.pow&quot;&gt;math.pow&lt;/a&gt; remains as it was. Builtin &lt;a href=&quot;https://docs.python.org/3/library/functions.html#pow&quot;&gt;pow&lt;/a&gt; takes an optional third parameter &lt;code&gt;pow(base, exp[, mod])&lt;/code&gt;. If &lt;code&gt;mod&lt;/code&gt; is specified it must be a non-zero integer, and both &lt;code&gt;base&lt;/code&gt; and &lt;code&gt;exp&lt;/code&gt; must also be integers. The significant but subtle change made at 3.8 is that &lt;code&gt;exp&lt;/code&gt; can now be a negative integer, enabling modular inverse calculations. &lt;/p&gt;
+&lt;p&gt;Quoting the &lt;a href=&quot;https://docs.python.org/3/library/functions.html#pow&quot;&gt;documentation&lt;/a&gt;:&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;&amp;#8230; If &lt;i&gt;mod&lt;/i&gt; is present and &lt;i&gt;exp&lt;/i&gt; is negative, &lt;i&gt;base&lt;/i&gt; must be relatively prime to &lt;i&gt;mod&lt;/i&gt;. In that case, &lt;i&gt;pow(inv_base, -exp, mod)&lt;/i&gt; is returned, where inv_base is an inverse to base modulo mod.&lt;/p&gt;&lt;p&gt;Here&amp;#8217;s an example of computing an inverse for 38 modulo 97:&lt;/p&gt;&lt;code&gt;&lt;pre&gt;&gt;&gt;&gt; pow(38, -1, mod=97)
+23
+&gt;&gt;&gt; 23 * 38 % 97 == 1
+True
+&lt;/pre&gt;&lt;/code&gt;&lt;/blockquote</description>
+<dc:date>2021-01-03</dc:date>
+<guid>http://wordaligned.org/articles/python-maths-updates</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/python-maths-updates</link>
+<category>Python</category>
+</item>
+
+<item>
 <title>Complex numbers for planar geometry</title>
 <description>&lt;p&gt;Once again, I&amp;#8217;m enjoying solving &lt;a href=&quot;http://was.tl&quot;&gt;Eric Wastl&lt;/a&gt;&amp;#8217;s excellent &lt;a href=&quot;https://adventofcode.com&quot;&gt;Advent of Code&lt;/a&gt; puzzles.&lt;/p&gt;
 &lt;p&gt;Today, &lt;a href=&quot;day12&quot;&gt;day 12&lt;/a&gt; involved a ship navigating in a 2D plane. The ship follows a series of instructions taking the form of actions and values such as &lt;code&gt;F10 N3 F7 R90 F11 ...&lt;/code&gt;, where, for the first part:&lt;/p&gt;
@@ -2159,121 +2190,6 @@ Williams             42.40
 <guid>http://wordaligned.org/articles/python-averages</guid>
 <author>tag@wordaligned.org (Thomas Guest)</author>
 <link>http://wordaligned.org/articles/python-averages</link>
-<category>Python</category>
-</item>
-
-<item>
-<title>Group When</title>
-<description>&lt;p&gt;Phil Nash&amp;#8217;s recent tweet intrigued me.&lt;/p&gt;
-&lt;div&gt;&lt;blockquote class=&quot;twitter-tweet&quot; lang=&quot;en&quot;&gt;&lt;p&gt;Functional people: I often (in F#) need to process a seq into a smaller list or seq &amp;ndash; where items from the input are grouped in some way&amp;hellip;&lt;/p&gt;&amp;mdash; Phil Nash (@phil_nash) &lt;a href=&quot;https://twitter.com/phil_nash/statuses/489167611641724928&quot;&gt;July 15, 2014&lt;/a&gt;&lt;/blockquote&gt;&lt;blockquote class=&quot;twitter-tweet&quot; lang=&quot;en&quot;&gt;&lt;p&gt;&amp;hellip; the need to group may not be known until after the first item in the group.&amp;#10;I struggle to find a nicely functional way to do this. Ideas?&lt;/p&gt;&amp;mdash; Phil Nash (@phil_nash) &lt;a href=&quot;https://twitter.com/phil_nash/statuses/489167962931482626&quot;&gt;July 15, 2014&lt;/a&gt;&lt;/blockquote&gt;&lt;script async src=&quot;http://wordaligned.org//platform.twitter.com/widgets.js&quot; charset=&quot;utf-8&quot;&gt;&lt;/script&gt;&lt;/div&gt;
-
-&lt;p&gt;He later clarified what he was after &amp;#8212; and had now found &amp;#8212; linking to a &lt;a href=&quot;http://fssnip.net/6A&quot;&gt;solution&lt;/a&gt; posted a couple of years ago by &lt;a href=&quot;http://tomasp.net&quot;&gt;Tomas Petricek&lt;/a&gt;. The function &lt;code&gt;groupWhen&lt;/code&gt; splits a sequence into groups, starting a new group whenever the predicate returns true.&lt;/p&gt;
-&lt;div class=&quot;typocode&quot;&gt;
-
-&lt;pre class=&quot;prettyprint&quot;&gt; module Seq =
-   /// Iterates over elements of the input sequence and groups adjacent elements.
-   /// A new group is started when the specified predicate holds about the element
-   /// of the sequence (and at the beginning of the iteration).
-   ///
-   /// For example: 
-   ///    Seq.groupWhen isOdd [3;3;2;4;1;2] = seq [[3]; [3; 2; 4]; [1; 2]]
-   let groupWhen f (input:seq&amp;lt;_&amp;gt;) = seq {
-     use en = input.GetEnumerator()
-     let running = ref true
-
-     // Generate a group starting with the current element. Stops generating
-     // when it founds element such that &amp;#x27;f en.Current&amp;#x27; is &amp;#x27;true&amp;#x27;
-     let rec group() = 
-       [ yield en.Current
-         if en.MoveNext() then
-           if not (f en.Current) then yield! group() 
-         else running := false ]
-
-     if en.MoveNext() then
-       // While there are still elements, start a new group
-       while running.Value do
-         yield group() |&amp;gt; Seq.ofList }
-
-&lt;/pre&gt;
-
-&lt;/div&gt;
-
-&lt;p&gt;Here&amp;#8217;s a nice Haskell version coded up by &lt;a href=&quot;https://twitter.com/sdarlington&quot;&gt;@sdarlington&lt;/a&gt;.&lt;/p&gt;
-&lt;script src=&quot;https://gist.github.com/sdarlington/be76048bff124694769d.js&quot;&gt;&lt;/script&gt;
-
-&lt;p&gt;Maybe &lt;a href=&quot;https://docs.python.org/3/library/itertools.html#itertools.takewhile&quot;&gt;takewhile&lt;/a&gt; and &lt;a href=&quot;https://docs.python.org/3/library/itertools.html#itertools.dropwhile&quot;&gt;dropwhile&lt;/a&gt; could power a Python solution, but my first choice would be &lt;a href=&quot;https://docs.python.org/3/library/itertools.html#itertools.groupby&quot;&gt;itertools.groupby&lt;/a&gt;. &lt;code&gt;Groupby&lt;/code&gt; chops a sequence into subsequences, where the elements of each subsequence have the same key value. A suitable key function, in this case, must change its return value every time the sequence yields an element for which the predicate holds. It could toggle between a pair of values, for example. Or it could just count the number of times the predicate holds.&lt;/p&gt;
-&lt;div class=&quot;typocode&quot;&gt;
-
-&lt;pre class=&quot;prettyprint&quot;&gt;class count_p:
-    &amp;#x27;&amp;#x27;&amp;#x27; Return a value which increments every time the predicate holds.
-    &amp;#x27;&amp;#x27;&amp;#x27;
-    def __init__(self, pred):
-        self._n = 0
-        self._pred = pred
-
-    def __call__(self, v):
-        self._n += self._pred(v)
-        return self._n
-
-def group_when(pred, xs):
-    return (gp for _, gp in groupby(xs, count_p(pred)))
-
-&lt;/pre&gt;
-
-&lt;/div&gt;
-
-&lt;p&gt;Here, &lt;code&gt;group_when&lt;/code&gt; accepts an iterable and returns an iterable sequence of iterable groups. Clients choose how to consume the results.&lt;/p&gt;
-&lt;div class=&quot;typocode&quot;&gt;
-
-&lt;pre class=&quot;prettyprint&quot;&gt;&amp;gt;&amp;gt;&amp;gt; def odd(v): return v % 2
-&amp;gt;&amp;gt;&amp;gt; xs = group_when(odd, [3, 3, 2, 4, 1, 2])
-&amp;gt;&amp;gt;&amp;gt; print([list(g) for g in xs])
-[[3], [3, 2, 4], [1, 2]]
-
-&lt;/pre&gt;
-
-&lt;/div&gt;
-
-&lt;p&gt;Note that &lt;code&gt;count_p&lt;/code&gt; does something very like &lt;a href=&quot;acc&quot;&gt;itertools.accumulate&lt;/a&gt;. Here&amp;#8217;s another version of &lt;code&gt;group_when&lt;/code&gt; which takes advantage of this.&lt;/p&gt;
-&lt;div class=&quot;typocode&quot;&gt;
-
-&lt;pre class=&quot;prettyprint&quot;&gt;def group_when(pred, xs):
-    xs, ys = tee(xs)
-    accu = accumulate(map(pred, ys))
-    return (gp for _, gp in groupby(xs, lambda _: next(accu)))
-
-&lt;/pre&gt;
-
-&lt;/div&gt;
-
-&lt;p style=&quot;text-align:center&quot;&gt;&amp;sect;&lt;/p&gt;
-
-&lt;p&gt;After a short break, here&amp;#8217;s a third version of &lt;code&gt;group_when&lt;/code&gt;. This is the first time I&amp;#8217;ve found a use for &lt;code&gt;takewhile&lt;/code&gt; and &lt;code&gt;dropwhile&lt;/code&gt;. Beware: as the teed streams &lt;code&gt;xs&lt;/code&gt; and &lt;code&gt;ys&lt;/code&gt; diverge, the amount of backing storage required will grow &amp;#8230; only for the stored values to then be dropped!&lt;/p&gt;
-&lt;div class=&quot;typocode&quot;&gt;
-
-&lt;pre class=&quot;prettyprint&quot;&gt;from itertools import *
-
-def group_when(p, xs):
-    def notp(x): return not p(x)
-    xs = iter(xs)
-    while True:
-        x = next(xs)
-        xs, ys = tee(xs)
-        yield chain([x], takewhile(notp, xs))
-        xs = dropwhile(notp, ys)
-
-def odd(x):
-    return x % 2
-
-[list(g) for g in group_when(odd, [3, 3, 2, 4, 1, 2])] # [[3], [3, 2, 4], [1, 2]]
-
-&lt;/pre&gt;
-
-&lt;/div&gt;</description>
-<dc:date>2014-07-16</dc:date>
-<guid>http://wordaligned.org/articles/group-when</guid>
-<author>tag@wordaligned.org (Thomas Guest)</author>
-<link>http://wordaligned.org/articles/group-when</link>
 <category>Python</category>
 </item>
 

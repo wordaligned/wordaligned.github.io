@@ -11,7 +11,7 @@
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
 <meta name="author" content="Thomas Guest" />
 <meta name="description" content="A collection of articles on software development written by Thomas Guest." />
-<meta name="keywords" content="Functional Programming, Shell, Curl, Talks, lighttpd, Ruby on Rails, Bugs, Disqus, Missiles, Hoare, Haskell, Swansea, Python, Emacs, Windows, Subversion, Animation, Perec, Build, Pi, ACCU, Arc, Iphone, Two Wheels, Javascript, Turing, Primes, Web-applications, Erlang, Boost, Puzzles, Books, Dynamic Languages, Content, CVS, Streams, Github, Tesseract, Reviews, Virtualization, Conferences, Editors, C, PIL, Scrum, Android, Knuth, Markdown, SICP, CLRS, OCR, Esr, C++, Google, Bristol, Lcs, Self, Fractals, Web Applications, Awk, Accidents, Decorators, Tests, Go, Graphics, Recursion, Zlib, Trac, cvs2svn, Cycling, Torvalds, Scheme, Apple, Documentation, Recommended, IDE, Europython, Etc, Syntax, Lisp, Characters, Chess, Pictures, Design, Unix, Teamwork, Perl, DocBook, ImageMagick, Crabs, Steganography, openid, Oulipo, Ruby, Regex, Spolsky, Drawing, Algorithms, Charts, Java, Unicode, Agile, php" />
+<meta name="keywords" content="Web Applications, Talks, Go, Esr, Pictures, Animation, Bugs, ImageMagick, Tesseract, Conferences, CVS, Tests, Books, Reviews, C++, Boost, Awk, Shell, Google, Decorators, Recommended, Syntax, Regex, Design, CLRS, Lcs, Unix, C, Missiles, Knuth, Erlang, Build, Turing, Haskell, Accidents, Hoare, PIL, Graphics, Content, Two Wheels, lighttpd, Unicode, Perl, Swansea, Javascript, Scrum, Agile, IDE, Cycling, Android, Chess, ACCU, Characters, Recursion, Java, Europython, Zlib, Oulipo, Algorithms, DocBook, Ruby on Rails, Pi, Crabs, Spolsky, Puzzles, Fractals, Functional Programming, Virtualization, Disqus, Self, Lisp, Perec, openid, Torvalds, Drawing, SICP, Editors, Curl, Emacs, Subversion, Web-applications, cvs2svn, Markdown, Github, Python, Teamwork, Iphone, Windows, Arc, OCR, Apple, Steganography, Dynamic Languages, Documentation, Bristol, php, Trac, Primes, Etc, Scheme, Streams, Charts, Ruby" />
 <link rel="alternate" type="application/rss+xml" title="Feed" href="http://feeds.wordaligned.org/wordaligned" />
 </head>
 
@@ -25,7 +25,36 @@
 
   <div id="page">
     <div id="content">
-      <div class="atomentry" id="fearless-debugging">
+      <div class="atomentry" id="python-maths-updates">
+<h2 class="title"><a href="/articles/python-maths-updates">Python maths updates</a></h2>
+<p class="meta"><abbr class="published" title="2021-01-03">2021-01-03</abbr> &bull; <a href="/tag/python" rel="tag">Python</a> &bull; <a href="/articles/python-maths-updates#disqus_thread">Comments</a></p>
+<p>A quick note on some useful updates made to standard Python maths support. <a href="https://docs.python.org/3/library/math.html#math.prod">Math.prod</a> does for <code>*</code> what <a href="https://docs.python.org/3/library/functions.html#sum">sum</a> does for <code>+</code>. It was added at Python 3.8.</p>
+<div class="typocode">
+
+<pre class="prettyprint">&gt;&gt;&gt; math.prod([3, 4, 5])
+60
+&gt;&gt;&gt; math.prod([])
+1
+
+</pre>
+
+</div>
+
+<p>Added in 3.9, <a href="https://docs.python.org/3/library/math.html#math.lcm">math.lcm</a>, returns the least common multiple of its integer arguments. As with <a href="https://docs.python.org/3/library/math.html#math.prod">math.prod</a>, an empty list of arguments returns 1. Extended in 3.9, the related function <a href="https://docs.python.org/3/library/math.html#math.gcd">math.gcd</a> now accepts an arbitrary list of arguments.</p>
+<p>For Euclidean geometry, <a href="https://docs.python.org/3/library/math.html#math.hypot">math.hypot</a> now supports n-dimensional points, and <a href="https://docs.python.org/3/library/math.html#math.dist">math.dist</a> has been added, again working on any pair of n-dimensional points.</p>
+<p>These useful additions and extensions are all in the standard math module (along with several others not mentioned here). Previously you&#8217;d have to roll your own or rely on e.g. <a href="https://numpy.org/">numpy</a>.</p>
+<p>I also wanted to mention a nice extension to the power function; in this case to the builtin <a href="https://docs.python.org/3/library/functions.html#pow">pow</a> &#8212; <a href="https://docs.python.org/3/library/math.html#math.pow">math.pow</a> remains as it was. Builtin <a href="https://docs.python.org/3/library/functions.html#pow">pow</a> takes an optional third parameter <code>pow(base, exp[, mod])</code>. If <code>mod</code> is specified it must be a non-zero integer, and both <code>base</code> and <code>exp</code> must also be integers. The significant but subtle change made at 3.8 is that <code>exp</code> can now be a negative integer, enabling modular inverse calculations. </p>
+<p>Quoting the <a href="https://docs.python.org/3/library/functions.html#pow">documentation</a>:</p>
+<blockquote><p>&#8230; If <i>mod</i> is present and <i>exp</i> is negative, <i>base</i> must be relatively prime to <i>mod</i>. In that case, <i>pow(inv_base, -exp, mod)</i> is returned, where inv_base is an inverse to base modulo mod.</p><p>Here&#8217;s an example of computing an inverse for 38 modulo 97:</p><code><pre>>>> pow(38, -1, mod=97)
+23
+>>> 23 * 38 % 97 == 1
+True
+</pre></code></blockquote
+
+</div>
+
+
+<div class="atomentry" id="fearless-debugging">
 <h2 class="title"><a href="/articles/fearless-debugging">Fearless Debugging</a></h2>
 <p class="meta"><abbr class="published" title="2021-01-02">2021-01-02</abbr> &bull; <a href="/tag/puzzles" rel="tag">Puzzles</a> &bull; <a href="/articles/fearless-debugging#disqus_thread">Comments</a></p>
 <h2 id="jurassic-jigsaw">Jurassic Jigsaw</h2>
@@ -525,22 +554,6 @@ fruitbowl = {
 </div>
 
 
-<div class="atomentry" id="computer-world">
-<h2 class="title"><a href="/articles/computer-world">Computer World</a></h2>
-<p class="meta"><abbr class="published" title="2017-09-30">2017-09-30</abbr> &bull; <a href="/tag/apple" rel="tag">Apple</a>, <a href="/tag/self" rel="tag">Self</a>, <a href="/tag/design" rel="tag">Design</a> &bull; <a href="/articles/computer-world#disqus_thread">Comments</a></p>
-<p><a data-flickr-embed="true"  href="https://www.flickr.com/photos/thomasguest/37406493811/in/dateposted-friend/" title="The Hitchhiker&#x27;s Guide to the Galaxy"><img src="https://farm5.staticflickr.com/4371/37406493811_0d17fab6cf.jpg" width="401" height="500" alt="The Hitchhiker&#x27;s Guide to the Galaxy"></a><script async src="//embedr.flickr.com/assets/client-code.js" charset="utf-8"></script></p>
-<p>Douglas Adams&#8217; &#8220;Hitchhiker&#8217;s Guide to the Galaxy&#8221; tells the story of the two most powerful computers ever made. The first, Deep Thought, was designed to figure out the meaning of Life the Universe and Everything. After 7,500,000 years of processing it came up with the concise but unedifying Ultimate Answer of 42. It then undertook the task of designing its successor, a computer sophisticated enough to calculate the Ultimate Question:</p>
-<blockquote>
-<p>&#8220;&#8230; A computer which can calculate the Question to the Ultimate Answer, a computer of such infinite and subtle complexity that organic life itself shall form part of its operational matrix &#8230; Yes! I shall design this computer for you. And I shall name it also unto you. And it shall be called &#8230; The Earth.&#8221;</p>
-</blockquote>
-<p>When I first heard this it seemed ridiculous. Now, almost 40 years on, I&#8217;ve realised it&#8217;s true.</p>
-<p>It&#8217;s no longer correct to think of computers as discrete units. Computers have the property that when you connect two of them you get another computer, and so on. The network <strong>is</strong> the computer. The Apple in your hand, the Echo on your shelf, the chip in your <a href="https://www.amazon.co.uk/Scepticism-Inc-Bo-Fowler/dp/009927468X">shopping trolley</a> &#8212; all combine to form a global connected device. And as Adams predicted, we ourselves form part of the operating system, constantly feeding data back in.</p>
-<p><img src="/images/planet-earth.jpg" alt="Planet Earth"/></p>
-<p>Douglas Adams&#8217; insight puts software development into perspective. True: we no longer print our product on silicon or ship it in boxes, and yes: we accept <a href="http://wordaligned.org/articles/why-software-development-isnt-like-construction">construction</a> is not the right metaphor, but: nor is production. <a href="http://swanseacon.co.uk/schedule/#session-27">Professor Dave Snowden</a> talks about entanglement &#8212; think of a system growing like brambles in a thicket. He emphasises what&#8217;s natural, evolutionary and human. Object oriented design lost out when it narrowed its focus. Remember, people are objects too. The world is our platform.</p>
-
-</div>
-
-
 <div class="extended">
 <p><a href="/articles/">Visit the Word Aligned archives...</a></p>
 </div>
@@ -584,7 +597,7 @@ fruitbowl = {
 
 <div class="sidebar-node">
 <h3>Top Tags</h3>
-<ul id="categories"><li><a href="/tag/python" rel="tag">Python</a> <em>(127)</em></li>
+<ul id="categories"><li><a href="/tag/python" rel="tag">Python</a> <em>(128)</em></li>
 <li><a href="/tag/c++" rel="tag">C++</a> <em>(71)</em></li>
 <li><a href="/tag/self" rel="tag">Self</a> <em>(70)</em></li>
 <li><a href="/tag/puzzles" rel="tag">Puzzles</a> <em>(40)</em></li>
@@ -616,7 +629,7 @@ fruitbowl = {
 <div class="sidebar-node">
 <h3>Chain</h3>
 <ul>
-<li><a accesskey="p" href="/articles/fearless-debugging" title="First article">&raquo; Fearless Debugging</a></li>
+<li><a accesskey="p" href="/articles/python-maths-updates" title="First article">&raquo; Python maths updates</a></li>
 
 </ul>
 

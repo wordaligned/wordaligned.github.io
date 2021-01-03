@@ -7,6 +7,37 @@
 <dc:creator>tag@wordaligned.org</dc:creator>
 <language>en-gb</language>
 <item>
+<title>Python maths updates</title>
+<description>&lt;p&gt;A quick note on some useful updates made to standard Python maths support. &lt;a href=&quot;https://docs.python.org/3/library/math.html#math.prod&quot;&gt;Math.prod&lt;/a&gt; does for &lt;code&gt;*&lt;/code&gt; what &lt;a href=&quot;https://docs.python.org/3/library/functions.html#sum&quot;&gt;sum&lt;/a&gt; does for &lt;code&gt;+&lt;/code&gt;. It was added at Python 3.8.&lt;/p&gt;
+&lt;div class=&quot;typocode&quot;&gt;
+
+&lt;pre class=&quot;prettyprint&quot;&gt;&amp;gt;&amp;gt;&amp;gt; math.prod([3, 4, 5])
+60
+&amp;gt;&amp;gt;&amp;gt; math.prod([])
+1
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;Added in 3.9, &lt;a href=&quot;https://docs.python.org/3/library/math.html#math.lcm&quot;&gt;math.lcm&lt;/a&gt;, returns the least common multiple of its integer arguments. As with &lt;a href=&quot;https://docs.python.org/3/library/math.html#math.prod&quot;&gt;math.prod&lt;/a&gt;, an empty list of arguments returns 1. Extended in 3.9, the related function &lt;a href=&quot;https://docs.python.org/3/library/math.html#math.gcd&quot;&gt;math.gcd&lt;/a&gt; now accepts an arbitrary list of arguments.&lt;/p&gt;
+&lt;p&gt;For Euclidean geometry, &lt;a href=&quot;https://docs.python.org/3/library/math.html#math.hypot&quot;&gt;math.hypot&lt;/a&gt; now supports n-dimensional points, and &lt;a href=&quot;https://docs.python.org/3/library/math.html#math.dist&quot;&gt;math.dist&lt;/a&gt; has been added, again working on any pair of n-dimensional points.&lt;/p&gt;
+&lt;p&gt;These useful additions and extensions are all in the standard math module (along with several others not mentioned here). Previously you&amp;#8217;d have to roll your own or rely on e.g. &lt;a href=&quot;https://numpy.org/&quot;&gt;numpy&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;I also wanted to mention a nice extension to the power function; in this case to the builtin &lt;a href=&quot;https://docs.python.org/3/library/functions.html#pow&quot;&gt;pow&lt;/a&gt; &amp;#8212; &lt;a href=&quot;https://docs.python.org/3/library/math.html#math.pow&quot;&gt;math.pow&lt;/a&gt; remains as it was. Builtin &lt;a href=&quot;https://docs.python.org/3/library/functions.html#pow&quot;&gt;pow&lt;/a&gt; takes an optional third parameter &lt;code&gt;pow(base, exp[, mod])&lt;/code&gt;. If &lt;code&gt;mod&lt;/code&gt; is specified it must be a non-zero integer, and both &lt;code&gt;base&lt;/code&gt; and &lt;code&gt;exp&lt;/code&gt; must also be integers. The significant but subtle change made at 3.8 is that &lt;code&gt;exp&lt;/code&gt; can now be a negative integer, enabling modular inverse calculations. &lt;/p&gt;
+&lt;p&gt;Quoting the &lt;a href=&quot;https://docs.python.org/3/library/functions.html#pow&quot;&gt;documentation&lt;/a&gt;:&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;&amp;#8230; If &lt;i&gt;mod&lt;/i&gt; is present and &lt;i&gt;exp&lt;/i&gt; is negative, &lt;i&gt;base&lt;/i&gt; must be relatively prime to &lt;i&gt;mod&lt;/i&gt;. In that case, &lt;i&gt;pow(inv_base, -exp, mod)&lt;/i&gt; is returned, where inv_base is an inverse to base modulo mod.&lt;/p&gt;&lt;p&gt;Here&amp;#8217;s an example of computing an inverse for 38 modulo 97:&lt;/p&gt;&lt;code&gt;&lt;pre&gt;&gt;&gt;&gt; pow(38, -1, mod=97)
+23
+&gt;&gt;&gt; 23 * 38 % 97 == 1
+True
+&lt;/pre&gt;&lt;/code&gt;&lt;/blockquote</description>
+<dc:date>2021-01-03</dc:date>
+<guid>http://wordaligned.org/articles/python-maths-updates</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/python-maths-updates</link>
+<category>Python</category>
+</item>
+
+<item>
 <title>Fearless Debugging</title>
 <description>&lt;h2 id=&quot;jurassic-jigsaw&quot;&gt;Jurassic Jigsaw&lt;/h2&gt;
 &lt;p&gt;My thanks to &lt;a href=&quot;http://was.tl&quot;&gt;Eric Wastl&lt;/a&gt; for another excellent &lt;a href=&quot;https://adventofcode.com/&quot;&gt;Advent of Code&lt;/a&gt;. I&amp;#8217;ve now &lt;a href=&quot;https://github.com/wordaligned/advent-of-code-2020&quot;&gt;worked through all 25 puzzles&lt;/a&gt;, some simple, some tough, some familiar, some new; all beautifully set and highly enjoyable.&lt;/p&gt;
@@ -1080,26 +1111,6 @@ Falsifying example: test_combining_chunks(xs_n=(&amp;#x27;001&amp;#x27;, 2))
 <link>http://wordaligned.org/articles/unleash-the-test-army</link>
 <category>Tests</category>
 <category>Python</category>
-</item>
-
-<item>
-<title>Lazy sequences working hard</title>
-<description>&lt;p&gt;I gave a talk &lt;a href=&quot;http://www.pydiff.wales/events/2017-05-16.html&quot;&gt;@PyDiff&lt;/a&gt; this evening in the computer science department at Cardiff University.&lt;/p&gt;
-&lt;blockquote&gt;
-&lt;p&gt;&lt;h2&gt;Lazy Sequences working hard&lt;/h2&gt;&lt;/p&gt;
-&lt;p&gt;Python has no problem handling large and even infinite streams of data. Just write lazy programs &amp;#8212; code which defers data access until the last minute. This talk examines Python&amp;#8217;s language and library support for such delaying tactics. There will be live coding, and we&amp;#8217;ll draw parallels with similar features in other languages, in particular the Unix shell.&lt;/p&gt;
-&lt;/blockquote&gt;
-&lt;p&gt;Being unsure where to pitch it, I started off easy and kept going until I&amp;#8217;d lost everybody &amp;#8212; including myself.&lt;/p&gt;
-&lt;p&gt;The room was well set up with a good quality projector and whiteboard, along with a desk to sit down when I wanted to write and run code and plenty of space to move around in otherwise. I did feel a bit like a jack-in-the-box by the end.&lt;/p&gt;
-&lt;p&gt;&lt;a data-flickr-embed=&quot;true&quot;  href=&quot;https://www.flickr.com/photos/thomasguest/34663534326/in/dateposted-friend/&quot; title=&quot;Me @PyDiff&quot;&gt;&lt;img src=&quot;https://c1.staticflickr.com/5/4164/34663534326_4bf8851eeb.jpg&quot; width=&quot;500&quot; height=&quot;375&quot; alt=&quot;Me @PyDiff&quot;&gt;&lt;/a&gt;&lt;script async src=&quot;http://wordaligned.org//embedr.flickr.com/assets/client-code.js&quot; charset=&quot;utf-8&quot;&gt;&lt;/script&gt;&lt;/p&gt;
-&lt;p&gt;I&amp;#8217;d based the talk on a Jupyter notebook which I replayed with the ingenious &lt;a href=&quot;https://github.com/damianavila/RISE&quot;&gt;RISE reveal.js extension&lt;/a&gt; written by Damian Avila. This worked well, since I got the pretty graphics along with the interactive coding. A static version of the slides is &lt;a href=&quot;http://nbviewer.jupyter.org/url/wordaligned.org/docs/lazy-sequences.ipynb&quot;&gt;available here&lt;/a&gt;.&lt;/p&gt;
-&lt;p&gt;Thanks to everyone who came. Sorry I had to rush off after. If anyone would &lt;a href=&quot;http://swanseasdc.co.uk/&quot;&gt;like to talk at Swansea&lt;/a&gt;, please let me know: you&amp;#8217;d be most welcome.&lt;/p&gt;</description>
-<dc:date>2017-05-16</dc:date>
-<guid>http://wordaligned.org/articles/lazy-sequences-working-hard</guid>
-<author>tag@wordaligned.org (Thomas Guest)</author>
-<link>http://wordaligned.org/articles/lazy-sequences-working-hard</link>
-<category>Python</category>
-<category>Streams</category>
 </item>
 
 </channel>
