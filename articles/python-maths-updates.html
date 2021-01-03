@@ -1,0 +1,120 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<link rel="icon" href="/images/favicon.png" type="image/png"/>
+<link href="/styles/application.css" media="all" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="/scripts/prettify.js"></script>
+<script type="text/javascript" src="/scripts/lang-lisp.js"></script>
+<title>Python maths updates</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="author" content="Thomas Guest" />
+<meta name="description" content="A Word Aligned article posted 2021-01-03, tagged Python." />
+<meta name="keywords" content="Python" />
+<link rel="alternate" type="application/rss+xml" title="Feed" href="http://feeds.wordaligned.org/wordaligned" />
+</head>
+
+<body onload="prettyPrint()">
+<div id="container">
+  <div id="header">
+<h1><span><a accesskey="h" href="/">Word Aligned</a></span></h1>
+<h2>space sensitive programming</h2>
+<a class="button" href="http://feeds.wordaligned.org/wordaligned" title="Subscribe to Word Aligned"><img style="float: right;" src="/images/feed.png" alt="Feed Logo" height="28" width="28"/></a>
+</div>
+
+  <div id="page">
+    <div id="content">
+      <div class="atomentry" id="python-maths-updates">
+<h2 class="title"><a href="/articles/python-maths-updates">Python maths updates</a></h2>
+<p class="meta"><abbr class="published" title="2021-01-03">2021-01-03</abbr> &bull; <a href="/tag/python" rel="tag">Python</a> &bull; <a href="/articles/python-maths-updates#disqus_thread">Comments</a></p>
+<p>A quick note on some useful updates made to standard Python maths support. <a href="https://docs.python.org/3/library/math.html#math.prod">Math.prod</a> does for <code>*</code> what <a href="https://docs.python.org/3/library/functions.html#sum">sum</a> does for <code>+</code>. It was added at Python 3.8.</p>
+<div class="typocode">
+
+<pre class="prettyprint">&gt;&gt;&gt; math.prod([3, 4, 5])
+60
+&gt;&gt;&gt; math.prod([])
+1
+
+</pre>
+
+</div>
+
+<p>Added in 3.9, <a href="https://docs.python.org/3/library/math.html#math.lcm">math.lcm</a>, returns the least common multiple of its integer arguments. As with <a href="https://docs.python.org/3/library/math.html#math.prod">math.prod</a>, an empty list of arguments returns 1. Extended in 3.9, the related function <a href="https://docs.python.org/3/library/math.html#math.gcd">math.gcd</a> now accepts an arbitrary list of arguments.</p>
+<p>For Euclidean geometry, <a href="https://docs.python.org/3/library/math.html#math.hypot">math.hypot</a> now supports n-dimensional points, and <a href="https://docs.python.org/3/library/math.html#math.dist">math.dist</a> has been added, again working on any pair of n-dimensional points.</p>
+<p>These useful additions and extensions are all in the standard math module (along with several others not mentioned here). Previously you&#8217;d have to roll your own or rely on e.g. <a href="https://numpy.org/">numpy</a>.</p>
+<p>I also wanted to mention a nice extension to the power function; in this case to the builtin <a href="https://docs.python.org/3/library/functions.html#pow">pow</a> &#8212; <a href="https://docs.python.org/3/library/math.html#math.pow">math.pow</a> remains as it was. Builtin <a href="https://docs.python.org/3/library/functions.html#pow">pow</a> takes an optional third parameter <code>pow(base, exp[, mod])</code>. If <code>mod</code> is specified it must be a non-zero integer, and both <code>base</code> and <code>exp</code> must also be integers. The significant but subtle change made at 3.8 is that <code>exp</code> can now be a negative integer, enabling modular inverse calculations. </p>
+<p>Quoting the <a href="https://docs.python.org/3/library/functions.html#pow">documentation</a>:</p>
+<blockquote><p>&#8230; If <i>mod</i> is present and <i>exp</i> is negative, <i>base</i> must be relatively prime to <i>mod</i>. In that case, <i>pow(inv_base, -exp, mod)</i> is returned, where inv_base is an inverse to base modulo mod.</p><p>Here&#8217;s an example of computing an inverse for 38 modulo 97:</p><code><pre>>>> pow(38, -1, mod=97)
+23
+>>> 23 * 38 % 97 == 1
+True
+</pre></code></blockquote
+</div>
+
+<div class="comments"><hr/><div id="disqus_thread"></div><script type="text/javascript" src="http://disqus.com/forums/wordaligned/embed.js"></script></div>
+      
+<div id="comments"><script type="text/javascript">
+//<![CDATA[
+(function() {
+    var links = document.getElementsByTagName('a');
+    var query = '?';
+    for(var i = 0; i < links.length; i++) {
+        if(links[i].href.indexOf('#disqus_thread') >= 0) {
+            query += 'url' + i + '=' + encodeURIComponent(links[i].href) + '&amp;';
+        }
+    }
+    document.write('<script type="text/javascript" src="http://disqus.com/forums/wordaligned/get_num_replies.js' + query + '"></' + 'script>');
+})();
+//]]>
+</script></div>
+
+    </div>
+    <div id="sidebar">
+      
+<div class="sidebar-node">
+<h3>Tagged</h3>
+<ul id="categories"><li><a href="/tag/python" rel="tag">Python</a></li></ul>
+
+</div>
+
+<div class="sidebar-node">
+<h3>Chain</h3>
+<ul>
+
+<li><a accesskey="p" href="/articles/fearless-debugging" title="Previous article">&raquo; Fearless Debugging</a></li>
+</ul>
+
+
+</div>
+
+<div class="sidebar-node">
+<h3>Feeds</h3>
+
+<ul>
+<li><a href="http://feeds.wordaligned.org/wordaligned"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Articles</a></li>
+<li><a href="http://feeds.wordaligned.org/wordaligned/comments"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Comments</a></li>
+</ul>
+
+
+</div>
+
+    </div>
+  </div>
+  <div id="footer">
+<hr />
+<p><a href="http://tag.wordaligned.org">Thomas Guest</a></p>
+</div>
+
+</div>
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-3373724-1']);
+  _gaq.push(['_trackPageview']);
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ga);
+  })();
+</script>
+</body>
+
+</html>
