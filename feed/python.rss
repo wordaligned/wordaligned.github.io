@@ -7,6 +7,80 @@
 <dc:creator>tag@wordaligned.org</dc:creator>
 <language>en-gb</language>
 <item>
+<title>Tripped up by Rstrip</title>
+<description>&lt;p&gt;Here&amp;#8217;s a simple function which is supposed to strip any &lt;code&gt;&quot;.jpg&quot;&lt;/code&gt; extension
+from a file name.&lt;/p&gt;
+&lt;div class=&quot;typocode&quot;&gt;
+
+&lt;pre class=&quot;prettyprint&quot;&gt;def photo_name(photo_file):
+    &quot;Return the name of the photo&quot;
+    return photo_file.rstrip(&amp;#x27;.jpg&amp;#x27;)
+
+assert photo_name(&amp;#x27;cat.jpg&amp;#x27;) == &amp;#x27;cat&amp;#x27;
+assert photo_name(&amp;#x27;selfie.jpg&amp;#x27;) == &amp;#x27;selfie&amp;#x27;
+assert photo_name(&amp;#x27;emoji.gif&amp;#x27;) == &amp;#x27;emoji.gif&amp;#x27; # A GIF is not a photo
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;As shown, it passes a few simple tests.&lt;/p&gt;
+&lt;p&gt;Unfortunately it turns out to be broken.&lt;/p&gt;
+&lt;div class=&quot;typocode&quot;&gt;
+
+&lt;pre class=&quot;prettyprint&quot;&gt;&amp;gt;&amp;gt;&amp;gt; photo_name(&amp;#x27;dog.jpg&amp;#x27;)
+&amp;#x27;do&amp;#x27;
+&amp;gt;&amp;gt;&amp;gt; photo_name(&amp;#x27;tile.png&amp;#x27;)
+&amp;#x27;tile.pn&amp;#x27;
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;There&amp;#8217;s no mystery here. A check of the &lt;a href=&quot;https://docs.python.org/3/library/stdtypes.html#str.rstrip&quot;&gt;documentation&lt;/a&gt; shows
+that the optional &lt;code&gt;chars&lt;/code&gt; parameter to &lt;code&gt;str.rstrip&lt;/code&gt; specifies a &lt;strong&gt;set&lt;/strong&gt; of
+trailing characters to be removed from the source string.&lt;/p&gt;
+&lt;p&gt;So, in the example above, &lt;code&gt;&#x27;.jpg&#x27;&lt;/code&gt; means: strip trailing
+characters in the set &lt;code&gt;{&#x27;.&#x27;, &#x27;j&#x27;, &#x27;p&#x27;, &#x27;g&#x27;}&lt;/code&gt;. In the case of
+&lt;code&gt;&#x27;dog.jpg&#x27;&lt;/code&gt; that includes the final &lt;code&gt;&#x27;g&#x27;&lt;/code&gt; of &lt;code&gt;&#x27;dog&#x27;&lt;/code&gt;. Similarly
+the final &lt;code&gt;&#x27;g&#x27;&lt;/code&gt; of &lt;code&gt;&#x27;tile.png&#x27;&lt;/code&gt; gets stripped.&lt;/p&gt;
+&lt;p&gt;That said, it&amp;#8217;s a common misunderstanding, and one which has been made
+for the eighteen years since the optional &lt;code&gt;chars&lt;/code&gt; argument got added
+to &lt;code&gt;rstrip&lt;/code&gt;. At Python 3.9 the &lt;a href=&quot;https://docs.python.org/3/library/stdtypes.html#str.rstrip&quot;&gt;documentation&lt;/a&gt; takes care to
+explain:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;The &lt;code&gt;chars&lt;/code&gt; argument is a string specifying the set of
+characters to be removed. If omitted or &lt;code&gt;None&lt;/code&gt;, the &lt;code&gt;chars&lt;/code&gt; argument
+defaults to removing whitespace. The &lt;code&gt;chars&lt;/code&gt; argument is not a suffix;
+rather, all combinations of its values are stripped.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;and points out that the new &lt;code&gt;removesuffix&lt;/code&gt; method might be what you&amp;#8217;re really after.&lt;/p&gt;
+&lt;p&gt;Out of interest I tracked the documentation back to Python 2.3, when the
+&lt;a href=&quot;https://docs.python.org/release/2.3/lib/string-methods.html&quot;&gt;function description&lt;/a&gt; was less clear.&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;If given and not None, &lt;code&gt;chars&lt;/code&gt; must be a string; the
+characters in the string will be stripped from the end of the string
+this method is called on. Changed in version 2.2.2: Support for the
+&lt;code&gt;chars&lt;/code&gt; argument.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;Luckily misuse of &lt;code&gt;rstrip&lt;/code&gt; to remove extensions will usually get
+spotted soon enough, even if &amp;#8212; as shown &amp;#8212; it evades can cursory inspection and testing.&lt;/p&gt;
+&lt;p&gt;It&amp;#8217;s worth reviewing why the confusion persists.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;code&gt;str.rstrip()&lt;/code&gt; to remove trailing whitespace is a common thing to want to do&lt;/li&gt;
+&lt;li&gt;removing a suffix is also a common thing to want to do&lt;/li&gt;
+&lt;li&gt;removing a set of trailing chars from a string is less common (except the special case of stripping whitespace)&lt;/li&gt;
+&lt;li&gt;the &lt;code&gt;chars&lt;/code&gt; parameter to &lt;code&gt;str.rstrip()&lt;/code&gt; is &lt;strong&gt;not&lt;/strong&gt; a set, it is an ordered sequence&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;s.rstrip(&#x27;.jpg&#x27;)&lt;/code&gt; (for example) &lt;em&gt;will&lt;/em&gt; remove any &lt;code&gt;&#x27;.jpg&#x27;&lt;/code&gt; suffix from &lt;code&gt;s&lt;/code&gt;, so it sort-of works&lt;/li&gt;
+&lt;/ol&gt;</description>
+<dc:date>2021-05-14</dc:date>
+<guid>http://wordaligned.org/articles/tripped-up-by-rstrip</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/tripped-up-by-rstrip</link>
+<category>Python</category>
+</item>
+
+<item>
 <title>Python maths updates</title>
 <description>&lt;p&gt;A quick note on some useful updates made to standard Python maths support. &lt;a href=&quot;https://docs.python.org/3/library/math.html#math.prod&quot;&gt;Math.prod&lt;/a&gt; does for &lt;code&gt;*&lt;/code&gt; what &lt;a href=&quot;https://docs.python.org/3/library/functions.html#sum&quot;&gt;sum&lt;/a&gt; does for &lt;code&gt;+&lt;/code&gt;. It was added at Python 3.8.&lt;/p&gt;
 &lt;div class=&quot;typocode&quot;&gt;
@@ -2093,103 +2167,6 @@ Williams             42.40
 <guid>http://wordaligned.org/articles/why-zip-when-you-can-map</guid>
 <author>tag@wordaligned.org (Thomas Guest)</author>
 <link>http://wordaligned.org/articles/why-zip-when-you-can-map</link>
-<category>Python</category>
-</item>
-
-<item>
-<title>Find the average of a collection of tuples or dicts using Python</title>
-<description>&lt;p&gt;You&amp;#8217;ve been running some tests, each of which returns a 3-tuple of numerical results &amp;#8212; &lt;code&gt;(real, user, sys)&lt;/code&gt; times, maybe &amp;#8212; and you&amp;#8217;d like to combine these into a single 3-tuple, the average result.&lt;/p&gt;
-&lt;p&gt;Easy!&lt;/p&gt;
-&lt;div class=&quot;typocode&quot;&gt;
-
-&lt;pre class=&quot;prettyprint&quot;&gt;def average(times):
-    N = float(len(times))
-    return (sum(t[0] for t in times)/N,
-            sum(t[1] for t in times)/N,
-            sum(t[2] for t in times)/N)
-
-&lt;/pre&gt;
-
-&lt;/div&gt;
-
-&lt;p&gt;If you want a more generic solution, one which works when the tuples might have any number of elements, you could do this:&lt;/p&gt;
-&lt;div class=&quot;typocode&quot;&gt;
-
-&lt;pre class=&quot;prettyprint&quot;&gt;def average(xs):
-    N = float(len(xs))
-    R = len(xs[0])
-    return tuple(sum(x[i] for x in xs)/N for i in range(R))
-
-&lt;/pre&gt;
-
-&lt;/div&gt;
-
-&lt;p&gt;or this:&lt;/p&gt;
-&lt;div class=&quot;typocode&quot;&gt;
-
-&lt;pre class=&quot;prettyprint&quot;&gt;def average(xs):
-    N = float(len(xs))
-    return tuple(sum(col)/N for col in zip(*xs))
-
-&lt;/pre&gt;
-
-&lt;/div&gt;
-
-&lt;p&gt;The second generic variant uses &lt;a href=&quot;https://docs.python.org/3/library/functions.html#zip&quot;&gt;zip&lt;/a&gt; to transpose its inputs. &lt;/p&gt;
-&lt;p&gt;Now suppose we have keyed collections of results which we want to average:&lt;/p&gt;
-&lt;div class=&quot;typocode&quot;&gt;
-
-&lt;pre class=&quot;prettyprint&quot;&gt;&amp;gt;&amp;gt;&amp;gt; times = [{&amp;#x27;real&amp;#x27;: 34.4, &amp;#x27;user&amp;#x27;: 26.2, &amp;#x27;sys&amp;#x27;: 7.3},
-             {&amp;#x27;real&amp;#x27;: 28.7, &amp;#x27;user&amp;#x27;: 21.5, &amp;#x27;sys&amp;#x27;: 6.4},
-             {&amp;#x27;real&amp;#x27;: 29.3, &amp;#x27;user&amp;#x27;: 22.0, &amp;#x27;sys&amp;#x27;: 6.9}]
-
-&lt;/pre&gt;
-
-&lt;/div&gt;
-
-&lt;p&gt;If, as in the example above, each result has the same set of keys, the average result could be calculated like this:&lt;/p&gt;
-&lt;div class=&quot;typocode&quot;&gt;
-
-&lt;pre class=&quot;prettyprint&quot;&gt;&amp;gt;&amp;gt;&amp;gt; N = float(len(times))
-&amp;gt;&amp;gt;&amp;gt; { k : sum(t[k] for t in times)/N for k in times[0] }
-{&amp;#x27;real&amp;#x27;: 30.8, &amp;#x27;sys&amp;#x27;: 6.9, &amp;#x27;user&amp;#x27;: 23.2}
-
-&lt;/pre&gt;
-
-&lt;/div&gt;
-
-&lt;p&gt;What if the inputs don&amp;#8217;t have the same keys? Consider the contents of four fridges.&lt;/p&gt;
-&lt;div class=&quot;typocode&quot;&gt;
-
-&lt;pre class=&quot;prettyprint&quot;&gt;&amp;gt;&amp;gt;&amp;gt; fridges = [
-    { &amp;#x27;egg&amp;#x27;: 5, &amp;#x27;milk&amp;#x27;: 1.700, &amp;#x27;sausage&amp;#x27;: 6 },
-    { &amp;#x27;beer&amp;#x27;: 6, &amp;#x27;milk&amp;#x27;: 0.568, &amp;#x27;egg&amp;#x27;: 1 },
-    { &amp;#x27;egg&amp;#x27;: 3, &amp;#x27;sausage&amp;#x27;: 4, &amp;#x27;milk&amp;#x27;: 0.125, &amp;#x27;lettuce&amp;#x27;: 1 },
-    { &amp;#x27;carrot&amp;#x27;: 4 }]
-
-&lt;/pre&gt;
-
-&lt;/div&gt;
-
-&lt;p&gt;A &lt;a href=&quot;https://docs.python.org/3/library/collections.html#collections.Counter&quot;&gt;Counter&lt;/a&gt; can collect and calculate the average fridge contents. &lt;/p&gt;
-&lt;div class=&quot;typocode&quot;&gt;
-
-&lt;pre class=&quot;prettyprint&quot;&gt;&amp;gt;&amp;gt;&amp;gt; from collections import Counter
-&amp;gt;&amp;gt;&amp;gt; total = sum(map(Counter, fridges), Counter())
-&amp;gt;&amp;gt;&amp;gt; N = float(len(fridges))
-&amp;gt;&amp;gt;&amp;gt; { k: v/N for k, v in total.items() }
-{&amp;#x27;sausage&amp;#x27;: 2.5, &amp;#x27;lettuce&amp;#x27;: 0.25, &amp;#x27;beer&amp;#x27;: 1.5, &amp;#x27;carrot&amp;#x27;: 1.0, 
- &amp;#x27;egg&amp;#x27;: 2.25, &amp;#x27;milk&amp;#x27;: 0.59825}
-
-&lt;/pre&gt;
-
-&lt;/div&gt;
-
-&lt;p&gt;Note that although &lt;code&gt;Counter&lt;/code&gt;s were primarily designed to work with positive integers to represent counts, there&amp;#8217;s nothing stopping us from using floating point numbers (amount of milk in our example) in the values field.&lt;/p&gt;</description>
-<dc:date>2014-12-03</dc:date>
-<guid>http://wordaligned.org/articles/python-averages</guid>
-<author>tag@wordaligned.org (Thomas Guest)</author>
-<link>http://wordaligned.org/articles/python-averages</link>
 <category>Python</category>
 </item>
 

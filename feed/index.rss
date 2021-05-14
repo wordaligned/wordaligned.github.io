@@ -7,6 +7,80 @@
 <dc:creator>tag@wordaligned.org</dc:creator>
 <language>en-gb</language>
 <item>
+<title>Tripped up by Rstrip</title>
+<description>&lt;p&gt;Here&amp;#8217;s a simple function which is supposed to strip any &lt;code&gt;&quot;.jpg&quot;&lt;/code&gt; extension
+from a file name.&lt;/p&gt;
+&lt;div class=&quot;typocode&quot;&gt;
+
+&lt;pre class=&quot;prettyprint&quot;&gt;def photo_name(photo_file):
+    &quot;Return the name of the photo&quot;
+    return photo_file.rstrip(&amp;#x27;.jpg&amp;#x27;)
+
+assert photo_name(&amp;#x27;cat.jpg&amp;#x27;) == &amp;#x27;cat&amp;#x27;
+assert photo_name(&amp;#x27;selfie.jpg&amp;#x27;) == &amp;#x27;selfie&amp;#x27;
+assert photo_name(&amp;#x27;emoji.gif&amp;#x27;) == &amp;#x27;emoji.gif&amp;#x27; # A GIF is not a photo
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;As shown, it passes a few simple tests.&lt;/p&gt;
+&lt;p&gt;Unfortunately it turns out to be broken.&lt;/p&gt;
+&lt;div class=&quot;typocode&quot;&gt;
+
+&lt;pre class=&quot;prettyprint&quot;&gt;&amp;gt;&amp;gt;&amp;gt; photo_name(&amp;#x27;dog.jpg&amp;#x27;)
+&amp;#x27;do&amp;#x27;
+&amp;gt;&amp;gt;&amp;gt; photo_name(&amp;#x27;tile.png&amp;#x27;)
+&amp;#x27;tile.pn&amp;#x27;
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;There&amp;#8217;s no mystery here. A check of the &lt;a href=&quot;https://docs.python.org/3/library/stdtypes.html#str.rstrip&quot;&gt;documentation&lt;/a&gt; shows
+that the optional &lt;code&gt;chars&lt;/code&gt; parameter to &lt;code&gt;str.rstrip&lt;/code&gt; specifies a &lt;strong&gt;set&lt;/strong&gt; of
+trailing characters to be removed from the source string.&lt;/p&gt;
+&lt;p&gt;So, in the example above, &lt;code&gt;&#x27;.jpg&#x27;&lt;/code&gt; means: strip trailing
+characters in the set &lt;code&gt;{&#x27;.&#x27;, &#x27;j&#x27;, &#x27;p&#x27;, &#x27;g&#x27;}&lt;/code&gt;. In the case of
+&lt;code&gt;&#x27;dog.jpg&#x27;&lt;/code&gt; that includes the final &lt;code&gt;&#x27;g&#x27;&lt;/code&gt; of &lt;code&gt;&#x27;dog&#x27;&lt;/code&gt;. Similarly
+the final &lt;code&gt;&#x27;g&#x27;&lt;/code&gt; of &lt;code&gt;&#x27;tile.png&#x27;&lt;/code&gt; gets stripped.&lt;/p&gt;
+&lt;p&gt;That said, it&amp;#8217;s a common misunderstanding, and one which has been made
+for the eighteen years since the optional &lt;code&gt;chars&lt;/code&gt; argument got added
+to &lt;code&gt;rstrip&lt;/code&gt;. At Python 3.9 the &lt;a href=&quot;https://docs.python.org/3/library/stdtypes.html#str.rstrip&quot;&gt;documentation&lt;/a&gt; takes care to
+explain:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;The &lt;code&gt;chars&lt;/code&gt; argument is a string specifying the set of
+characters to be removed. If omitted or &lt;code&gt;None&lt;/code&gt;, the &lt;code&gt;chars&lt;/code&gt; argument
+defaults to removing whitespace. The &lt;code&gt;chars&lt;/code&gt; argument is not a suffix;
+rather, all combinations of its values are stripped.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;and points out that the new &lt;code&gt;removesuffix&lt;/code&gt; method might be what you&amp;#8217;re really after.&lt;/p&gt;
+&lt;p&gt;Out of interest I tracked the documentation back to Python 2.3, when the
+&lt;a href=&quot;https://docs.python.org/release/2.3/lib/string-methods.html&quot;&gt;function description&lt;/a&gt; was less clear.&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;If given and not None, &lt;code&gt;chars&lt;/code&gt; must be a string; the
+characters in the string will be stripped from the end of the string
+this method is called on. Changed in version 2.2.2: Support for the
+&lt;code&gt;chars&lt;/code&gt; argument.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;Luckily misuse of &lt;code&gt;rstrip&lt;/code&gt; to remove extensions will usually get
+spotted soon enough, even if &amp;#8212; as shown &amp;#8212; it evades can cursory inspection and testing.&lt;/p&gt;
+&lt;p&gt;It&amp;#8217;s worth reviewing why the confusion persists.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;code&gt;str.rstrip()&lt;/code&gt; to remove trailing whitespace is a common thing to want to do&lt;/li&gt;
+&lt;li&gt;removing a suffix is also a common thing to want to do&lt;/li&gt;
+&lt;li&gt;removing a set of trailing chars from a string is less common (except the special case of stripping whitespace)&lt;/li&gt;
+&lt;li&gt;the &lt;code&gt;chars&lt;/code&gt; parameter to &lt;code&gt;str.rstrip()&lt;/code&gt; is &lt;strong&gt;not&lt;/strong&gt; a set, it is an ordered sequence&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;s.rstrip(&#x27;.jpg&#x27;)&lt;/code&gt; (for example) &lt;em&gt;will&lt;/em&gt; remove any &lt;code&gt;&#x27;.jpg&#x27;&lt;/code&gt; suffix from &lt;code&gt;s&lt;/code&gt;, so it sort-of works&lt;/li&gt;
+&lt;/ol&gt;</description>
+<dc:date>2021-05-14</dc:date>
+<guid>http://wordaligned.org/articles/tripped-up-by-rstrip</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/tripped-up-by-rstrip</link>
+<category>Python</category>
+</item>
+
+<item>
 <title>Why MVP1 is wrong</title>
 <description>&lt;p&gt;We&amp;#8217;re working on MVP1, short for Minimum Viable Product One &amp;#8212; the first version of our new App. The term &lt;a href=&quot;https://en.wikipedia.org/wiki/Minimum_viable_product&quot;&gt;MVP&lt;/a&gt; applies. You put something (product) which works (viable) in front of a user as quickly as possible (minimum). Then you improve it based on their response.&lt;/p&gt;
 &lt;p&gt;MVP1 is an oxymoron. It implies there&amp;#8217;ll be an MVP2, a &lt;strong&gt;second&lt;/strong&gt; minimum viable product. But there can only be a single minimum. By including an update based on user feedback version two is no longer minimal, it&amp;#8217;s simply a viable product. So the 1 in MVP1 is redundant, making the very title, MVP1, non-minimal!&lt;/p&gt;</description>
@@ -649,23 +723,6 @@ fruitbowl = {
 <category>Self</category>
 <category>Talks</category>
 <category>Swansea</category>
-</item>
-
-<item>
-<title>Pay rise please</title>
-<description>&lt;p&gt;In 1967 Georges Perec wrote a radio play, L&amp;#8217;Augmentation, in which you, the protagonist, make some delicate decisions whilst negotiating a pay rise. Is your boss, Mr X, in a good mood? Did he have fish for lunch? Does one of his daughters have measles?&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://wordaligned.org/images/perec-flowchart.jpg&quot; alt=&quot;Flowchart&quot;/&gt;&lt;/p&gt;
-&lt;p&gt;The story takes the form of a &lt;a href=&quot;https://en.wikipedia.org/wiki/Flowchart&quot;&gt;flow chart&lt;/a&gt;. It&amp;#8217;s no coincidence it was written when computers were becoming a part of office and laboratory work, and when flow charts became a popular way to represent the algorithms they were programmed with. 1967 is also the year Perec joined Oulipo, a literary organisation whose members seek to create works based around mathematical constraints and structures. The loops and branches of Perec&amp;#8217;s flow chart perfectly embody the frustrating routines of office politics.&lt;/p&gt;
-&lt;p&gt;Fifty years on, I&amp;#8217;ve &lt;a href=&quot;https://github.com/wordaligned/pay-rise-please&quot; title=&quot;Pay rise please, on Github&quot;&gt;created a version&lt;/a&gt; to run on Alexa, which you can &lt;a href=&quot;https://www.amazon.co.uk/Mr-Pay-rise-please/dp/B07417SK8N&quot; title=&quot;Pay rise please, on Amazon&quot;&gt;download from Amazon&lt;/a&gt;. It may not get me a pay rise, but I should qualify for a &lt;a href=&quot;https://developer.amazon.com/alexa-skills-kit&quot;&gt;freebie Echo Dot&lt;/a&gt;.&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://wordaligned.org/images/perec512.jpg&quot; alt=&quot;Georges Perec&quot;/&gt;&lt;/p&gt;</description>
-<dc:date>2017-07-25</dc:date>
-<guid>http://wordaligned.org/articles/pay-rise-please</guid>
-<author>tag@wordaligned.org (Thomas Guest)</author>
-<link>http://wordaligned.org/articles/pay-rise-please</link>
-<category>Self</category>
-<category>Perec</category>
-<category>Oulipo</category>
-<category>Javascript</category>
 </item>
 
 </channel>
