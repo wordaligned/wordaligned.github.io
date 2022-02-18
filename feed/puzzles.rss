@@ -64,10 +64,22 @@ the evolution of standard Python functions which sort and compare.&lt;/p&gt;
 &lt;td&gt;In general, the key and reverse conversion processes are much faster than specifying an equivalent cmp function&lt;/td&gt;
 &lt;/tr&gt;
 &lt;tr&gt;
+&lt;td&gt;2.4&lt;/td&gt;
+&lt;td&gt;2004&lt;/td&gt;
+&lt;td&gt;heapq.nlargest, heapq.nsmallest&lt;/td&gt;
+&lt;td&gt;Heapq extended&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
 &lt;td&gt;2.5&lt;/td&gt;
 &lt;td&gt;2006&lt;/td&gt;
-&lt;td&gt;max([key]), min([key])&lt;/td&gt;
+&lt;td&gt;max([key]), min([key]), heapq.nlargest(&amp;#8230;[, key]), heapq.smallest(&amp;#8230;[, key])&lt;/td&gt;
 &lt;td&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;2.6&lt;/td&gt;
+&lt;td&gt;2008&lt;/td&gt;
+&lt;td&gt;heapq.merge&lt;/td&gt;
+&lt;td&gt;Heapq extended again&lt;/td&gt;
 &lt;/tr&gt;
 &lt;tr&gt;
 &lt;td&gt;3.0&lt;/td&gt;
@@ -76,10 +88,16 @@ the evolution of standard Python functions which sort and compare.&lt;/p&gt;
 &lt;td&gt;No more &lt;code&gt;cmp&lt;/code&gt;&lt;/td&gt;
 &lt;/tr&gt;
 &lt;tr&gt;
+&lt;td&gt;3.5&lt;/td&gt;
+&lt;td&gt;2015&lt;/td&gt;
+&lt;td&gt;heapq.merge(&amp;#8230;, key)&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
 &lt;td&gt;3.10&lt;/td&gt;
 &lt;td&gt;2021&lt;/td&gt;
 &lt;td&gt;bisect.bisect(&amp;#8230;, key) etc&lt;/td&gt;
-&lt;td&gt;That leaves &lt;code&gt;heapq&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;That leaves the low-level &lt;code&gt;heapq&lt;/code&gt; functions&lt;/td&gt;
 &lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
@@ -96,15 +114,23 @@ elements, &lt;code&gt;key&lt;/code&gt; takes a single element and returns a sort
 The &lt;code&gt;key&lt;/code&gt; argument was added alongside &lt;code&gt;cmp&lt;/code&gt; in &lt;code&gt;list.sort&lt;/code&gt; and the new &lt;code&gt;sorted&lt;/code&gt;
 builtin function; and &lt;code&gt;key&lt;/code&gt; was the only way to customise the grouping in
 &lt;code&gt;itertools.groupby&lt;/code&gt;.&lt;/p&gt;
-&lt;p&gt;2.5 added &lt;code&gt;key&lt;/code&gt; to &lt;code&gt;min&lt;/code&gt; and &lt;code&gt;max&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;2.5 added &lt;code&gt;key&lt;/code&gt; to &lt;code&gt;min&lt;/code&gt; and &lt;code&gt;max&lt;/code&gt;, and also to &lt;code&gt;heapq.nlargest&lt;/code&gt;, &lt;code&gt;heapq.nsmallest&lt;/code&gt;.
+Although these &lt;code&gt;heapq&lt;/code&gt; functions now accept a &lt;code&gt;key&lt;/code&gt;, the lower level heap functions
+to heapify, push, pop and replace do not.&lt;/p&gt;
+&lt;p&gt;2.6 introduced &lt;code&gt;heapq.merge&lt;/code&gt;, a handy function to merge sorted inputs
+using a heap, but with no option to specify a sort key.&lt;/p&gt;
 &lt;p&gt;3.0 got rid of &lt;code&gt;cmp&lt;/code&gt;, making &lt;code&gt;key&lt;/code&gt; the only way to customise
 sorting. To migrate from Python 2 to 3 any &lt;code&gt;cmp&lt;/code&gt; functions need
 converting to &lt;code&gt;key&lt;/code&gt; functions. As with Python 2.5, at 3.0 you could
 apply a key to &lt;code&gt;list.sort&lt;/code&gt;, &lt;code&gt;sorted&lt;/code&gt;, &lt;code&gt;min&lt;/code&gt;, &lt;code&gt;max&lt;/code&gt;,
-&lt;code&gt;itertools.groupby&lt;/code&gt; &amp;#8212; but not to &lt;code&gt;bisect&lt;/code&gt; or &lt;code&gt;heapq&lt;/code&gt;.&lt;/p&gt;
+&lt;code&gt;itertools.groupby&lt;/code&gt;, &lt;code&gt;heapq.nlargest&lt;/code&gt;, &lt;code&gt;heapq.nsmallest&lt;/code&gt; &amp;#8212; but not to
+&lt;code&gt;bisect&lt;/code&gt; or other &lt;code&gt;heapq&lt;/code&gt; functions.&lt;/p&gt;
+&lt;p&gt;3.5 added &lt;code&gt;key&lt;/code&gt; to &lt;code&gt;heapq.merge&lt;/code&gt;, aligning it with &lt;code&gt;heapq.nlargest&lt;/code&gt;
+and &lt;code&gt;heapq.nsmallest&lt;/code&gt;, though it remained impossible to use a sort key
+with the lower level heap functions.&lt;/p&gt;
 &lt;p&gt;The next change came in 3.10, when the &lt;code&gt;key&lt;/code&gt; parameter was
 added to the &lt;code&gt;bisect&lt;/code&gt; module. As far as I can tell that means the only part of
-standard Python which doesn&amp;#8217;t let you customise ordering is the &lt;code&gt;heapq&lt;/code&gt; module.&lt;/p&gt;
+standard Python which doesn&amp;#8217;t let you fully customise ordering is the &lt;code&gt;heapq&lt;/code&gt; module.&lt;/p&gt;
 &lt;h2 id=&quot;bisect-with-a-search-key&quot;&gt;Bisect with a search key&lt;/h2&gt;
 &lt;p&gt;So, to return to the original puzzle, consider our example
 sorted+rotated list:&lt;/p&gt;

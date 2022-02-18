@@ -82,10 +82,22 @@ the evolution of standard Python functions which sort and compare.</p>
 <td>In general, the key and reverse conversion processes are much faster than specifying an equivalent cmp function</td>
 </tr>
 <tr>
+<td>2.4</td>
+<td>2004</td>
+<td>heapq.nlargest, heapq.nsmallest</td>
+<td>Heapq extended</td>
+</tr>
+<tr>
 <td>2.5</td>
 <td>2006</td>
-<td>max([key]), min([key])</td>
+<td>max([key]), min([key]), heapq.nlargest(&#8230;[, key]), heapq.smallest(&#8230;[, key])</td>
 <td></td>
+</tr>
+<tr>
+<td>2.6</td>
+<td>2008</td>
+<td>heapq.merge</td>
+<td>Heapq extended again</td>
 </tr>
 <tr>
 <td>3.0</td>
@@ -94,10 +106,16 @@ the evolution of standard Python functions which sort and compare.</p>
 <td>No more <code>cmp</code></td>
 </tr>
 <tr>
+<td>3.5</td>
+<td>2015</td>
+<td>heapq.merge(&#8230;, key)</td>
+<td></td>
+</tr>
+<tr>
 <td>3.10</td>
 <td>2021</td>
 <td>bisect.bisect(&#8230;, key) etc</td>
-<td>That leaves <code>heapq</code></td>
+<td>That leaves the low-level <code>heapq</code> functions</td>
 </tr>
 </tbody>
 </table>
@@ -114,15 +132,23 @@ elements, <code>key</code> takes a single element and returns a sort rank for th
 The <code>key</code> argument was added alongside <code>cmp</code> in <code>list.sort</code> and the new <code>sorted</code>
 builtin function; and <code>key</code> was the only way to customise the grouping in
 <code>itertools.groupby</code>.</p>
-<p>2.5 added <code>key</code> to <code>min</code> and <code>max</code>.</p>
+<p>2.5 added <code>key</code> to <code>min</code> and <code>max</code>, and also to <code>heapq.nlargest</code>, <code>heapq.nsmallest</code>.
+Although these <code>heapq</code> functions now accept a <code>key</code>, the lower level heap functions
+to heapify, push, pop and replace do not.</p>
+<p>2.6 introduced <code>heapq.merge</code>, a handy function to merge sorted inputs
+using a heap, but with no option to specify a sort key.</p>
 <p>3.0 got rid of <code>cmp</code>, making <code>key</code> the only way to customise
 sorting. To migrate from Python 2 to 3 any <code>cmp</code> functions need
 converting to <code>key</code> functions. As with Python 2.5, at 3.0 you could
 apply a key to <code>list.sort</code>, <code>sorted</code>, <code>min</code>, <code>max</code>,
-<code>itertools.groupby</code> &#8212; but not to <code>bisect</code> or <code>heapq</code>.</p>
+<code>itertools.groupby</code>, <code>heapq.nlargest</code>, <code>heapq.nsmallest</code> &#8212; but not to
+<code>bisect</code> or other <code>heapq</code> functions.</p>
+<p>3.5 added <code>key</code> to <code>heapq.merge</code>, aligning it with <code>heapq.nlargest</code>
+and <code>heapq.nsmallest</code>, though it remained impossible to use a sort key
+with the lower level heap functions.</p>
 <p>The next change came in 3.10, when the <code>key</code> parameter was
 added to the <code>bisect</code> module. As far as I can tell that means the only part of
-standard Python which doesn&#8217;t let you customise ordering is the <code>heapq</code> module.</p>
+standard Python which doesn&#8217;t let you fully customise ordering is the <code>heapq</code> module.</p>
 <h2 id="bisect-with-a-search-key">Bisect with a search key</h2>
 <p>So, to return to the original puzzle, consider our example
 sorted+rotated list:</p>
