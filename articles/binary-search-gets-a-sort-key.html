@@ -1,0 +1,233 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<link rel="icon" href="/images/favicon.png" type="image/png"/>
+<link href="/styles/application.css" media="all" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="/scripts/prettify.js"></script>
+<script type="text/javascript" src="/scripts/lang-lisp.js"></script>
+<title>Binary search gets a sort key</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="author" content="Thomas Guest" />
+<meta name="description" content="A Word Aligned article posted 2022-02-15, tagged Python, Puzzles." />
+<meta name="keywords" content="Python, Puzzles" />
+<link rel="alternate" type="application/rss+xml" title="Feed" href="http://feeds.wordaligned.org/wordaligned" />
+</head>
+
+<body onload="prettyPrint()">
+<div id="container">
+  <div id="header">
+<h1><span><a accesskey="h" href="/">Word Aligned</a></span></h1>
+<h2>space sensitive programming</h2>
+<a class="button" href="http://feeds.wordaligned.org/wordaligned" title="Subscribe to Word Aligned"><img style="float: right;" src="/images/feed.png" alt="Feed Logo" height="28" width="28"/></a>
+</div>
+
+  <div id="page">
+    <div id="content">
+      <div class="atomentry" id="binary-search-gets-a-sort-key">
+<h2 class="title"><a href="/articles/binary-search-gets-a-sort-key">Binary search gets a sort key</a></h2>
+<p class="meta"><abbr class="published" title="2022-02-15">2022-02-15</abbr> &bull; <a href="/tag/python" rel="tag">Python</a>, <a href="/tag/puzzles" rel="tag">Puzzles</a> &bull; <a href="/articles/binary-search-gets-a-sort-key#disqus_thread">Comments</a></p>
+<p>Suppose you have an list of distinct elements which has been sorted
+and rotated. How would you look up an element within that list?</p>
+<p>For example, the list:</p>
+<pre><code>[7, 11, 13, 19, 2, 3, 5]
+</code></pre>
+<p>is sorted (the first 7 primes, in order) and rotated (to put 7 first).</p>
+<p>With this list as input, then:</p>
+<ul>
+<li>look up <code>13</code> returns <code>2</code> since <code>13</code> is at index <code>2</code></li>
+<li>look up <code>2</code> returns <code>4</code></li>
+<li>look up <code>4</code> returns the sentinel value <code>-1</code></li>
+</ul>
+<p>The obvious technique is to just search the list:</p>
+<pre><code>def lookup(values, v):
+    try:
+        return values.index(v)
+    except IndexError:
+        return -1
+</code></pre>
+<p>This is a linear algorithm which processes the entire list. Is there a way
+to take advantage of its sorted+rotated-ness?</p>
+<p>If the list <strong>was</strong> sorted then we could apply a binary search for a
+logarithmic lookup. And in fact, by applying a custom ordering, the
+list <strong>is</strong> sorted.</p>
+<p>How can we apply a custom ordering in Python?</p>
+<p>The way to do this has changed as Python has developed. The table below shows
+the evolution of standard Python functions which sort and compare.</p>
+<table>
+<thead>
+<tr>
+<th>Version</th>
+<th>Year</th>
+<th>Functions</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2.0</td>
+<td>2000</td>
+<td>max, min, list.sort([cmp]), bisect.bisect</td>
+<td>Note that [cmp] slows the sorting process down considerably</td>
+</tr>
+<tr>
+<td>2.3</td>
+<td>2003</td>
+<td>heapq</td>
+<td>Also known as the priority queue algorithm</td>
+</tr>
+<tr>
+<td>2.4</td>
+<td>2004</td>
+<td>sorted(iterable[, cmp[, key[, reverse]]]), list.sort([cmp[, key[, reverse]]]), itertools.groupby(iterable[, key)</td>
+<td>In general, the key and reverse conversion processes are much faster than specifying an equivalent cmp function</td>
+</tr>
+<tr>
+<td>2.5</td>
+<td>2006</td>
+<td>max([key]), min([key])</td>
+<td></td>
+</tr>
+<tr>
+<td>3.0</td>
+<td>2008</td>
+<td>sorted(iterable, key[, reverse]), list.sort(key[, reverse])</td>
+<td>No more <code>cmp</code></td>
+</tr>
+<tr>
+<td>3.10</td>
+<td>2021</td>
+<td>bisect.bisect(&#8230;, key) etc</td>
+<td>That leaves <code>heapq</code></td>
+</tr>
+</tbody>
+</table>
+<p>The earliest versions of Python allowed you to sort lists, and
+the sort was customised using a <code>cmp</code> function &#8212; though the documentation
+warned there would be a performance penalty[*]. The builtin <code>min</code> and <code>max</code>
+functions could not be cutomised, and nor could the comparison used in
+the <code>bisect</code> module &#8212; which is Python&#8217;s binary search implementation.</p>
+<p>At 2.3 the <code>heapq</code> module appeared, but, like <code>bisect</code>, there was no way
+to customise the ordering of heap elements.</p>
+<p>2.4 introduced the <code>key</code> argument to customise ordering,
+noting this should be preferred to <code>cmp</code>. Unlike <code>cmp</code> which compares two
+elements, <code>key</code> takes a single element and returns a sort rank for that element.
+The <code>key</code> argument was added alongside <code>cmp</code> in <code>list.sort</code> and the new <code>sorted</code>
+builtin function; and <code>key</code> was the only way to customise the grouping in
+<code>itertools.groupby</code>.</p>
+<p>2.5 added <code>key</code> to <code>min</code> and <code>max</code>.</p>
+<p>3.0 got rid of <code>cmp</code>, making <code>key</code> the only way to customise
+sorting. To migrate from Python 2 to 3 any <code>cmp</code> functions need
+converting to <code>key</code> functions. As with Python 2.5, at 3.0 you could
+apply a key to <code>list.sort</code>, <code>sorted</code>, <code>min</code>, <code>max</code>,
+<code>itertools.groupby</code> &#8212; but not to <code>bisect</code> or <code>heapq</code>.</p>
+<p>The next change came in 3.10, when the <code>key</code> parameter was
+added to the <code>bisect</code> module. As far as I can tell that means the only part of
+standard Python which doesn&#8217;t let you customise ordering is the <code>heapq</code> module.</p>
+<h2 id="bisect-with-a-search-key">Bisect with a search key</h2>
+<p>So, to return to the original puzzle, consider our example
+sorted+rotated list:</p>
+<pre><code>&gt;&gt;&gt; values = [7, 11, 13, 19, 2, 3, 5]
+</code></pre>
+<p>The first four elements are greater than or equal to the first
+element, 7. The last three elements are less than 7.</p>
+<pre><code>&gt;&gt;&gt; [v &lt; values[0] for v in values]
+[False, False, False, False, True, True, True]
+</code></pre>
+<p>Since <code>False</code> &lt; <code>True</code> the result of the list comprehension above is sorted.
+Extending this idea, the following comprehension is also sorted.</p>
+<pre><code>&gt;&gt;&gt; [(v &lt; values[0], v) for v in values]
+[(False, 7), (False, 11), (False, 13), (False, 19), (True, 2), (True, 3), (True, 5)]
+</code></pre>
+<p>Now we have a logarithmic lookup using binary search:</p>
+<pre><code>from bisect import bisect_left
+
+def lookup(values, v):
+    key = lambda x: (x &lt; values[0], x)
+    i = bisect_left(values, key(v), key=key)
+    return i if (i &lt; len(values) and values[i] == v) else -1
+</code></pre>
+<h2 id="dont-search-for-v-search-for-its-key">Don&#8217;t search for v, search for its key</h2>
+<p>I was surprised to realise the value <code>v</code> being looked up has to have the <code>key</code>
+function applied <strong>before</strong> calling <code>bisect_left</code>. That is, to find where <code>v</code>
+should go in <code>values</code> to maintain the sort order, we pass <code>key(v)</code> to <code>bisect_left</code>.
+This doesn&#8217;t match the interface to binary search in other languages. It also means
+in our example we have to handle empty lists as a special case.</p>
+<pre><code>def lookup(values, v):
+    if not values: return -1
+    key = lambda x: (x &lt; values[0], x)
+    i = bisect_left(values, key(v), key=key)
+    return i if (i &lt; len(values) and values[i] == v) else -1
+</code></pre>
+<p>[*] Before the introduction of the sort <code>key</code>, the standard pattern was
+<a href="https://docs.python.org/3/howto/sorting.html#the-old-way-using-decorate-sort-undecorate">decorate-sort-undecorate</a>.</p>
+</div>
+
+<div class="comments"><hr/><div id="disqus_thread"></div><script type="text/javascript" src="http://disqus.com/forums/wordaligned/embed.js"></script></div>
+      
+<div id="comments"><script type="text/javascript">
+//<![CDATA[
+(function() {
+    var links = document.getElementsByTagName('a');
+    var query = '?';
+    for(var i = 0; i < links.length; i++) {
+        if(links[i].href.indexOf('#disqus_thread') >= 0) {
+            query += 'url' + i + '=' + encodeURIComponent(links[i].href) + '&amp;';
+        }
+    }
+    document.write('<script type="text/javascript" src="http://disqus.com/forums/wordaligned/get_num_replies.js' + query + '"></' + 'script>');
+})();
+//]]>
+</script></div>
+
+    </div>
+    <div id="sidebar">
+      
+<div class="sidebar-node">
+<h3>Tagged</h3>
+<ul id="categories"><li><a href="/tag/python" rel="tag">Python</a></li>
+<li><a href="/tag/puzzles" rel="tag">Puzzles</a></li></ul>
+
+</div>
+
+<div class="sidebar-node">
+<h3>Chain</h3>
+<ul>
+
+<li><a accesskey="p" href="/articles/on-exactitude-in-programming" title="Previous article">&raquo; On Exactitude in Programming</a></li>
+</ul>
+
+
+</div>
+
+<div class="sidebar-node">
+<h3>Feeds</h3>
+
+<ul>
+<li><a href="http://feeds.wordaligned.org/wordaligned"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Articles</a></li>
+<li><a href="http://feeds.wordaligned.org/wordaligned/comments"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Comments</a></li>
+</ul>
+
+
+</div>
+
+    </div>
+  </div>
+  <div id="footer">
+<hr />
+<p><a href="http://tag.wordaligned.org">Thomas Guest</a></p>
+</div>
+
+</div>
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-3373724-1']);
+  _gaq.push(['_trackPageview']);
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ga);
+  })();
+</script>
+</body>
+
+</html>
