@@ -7,76 +7,145 @@
 <dc:creator>tag@wordaligned.org</dc:creator>
 <language>en-gb</language>
 <item>
-<title>Tripped up by Rstrip</title>
-<description>&lt;p&gt;Here&amp;#8217;s a simple function which is supposed to strip any &lt;code&gt;&quot;.jpg&quot;&lt;/code&gt; extension
-from a file name.&lt;/p&gt;
-&lt;div class=&quot;typocode&quot;&gt;
+<title>Binary search gets a sort key</title>
+<description>&lt;p&gt;Suppose you have an list of distinct elements which has been sorted
+and rotated. How would you look up an element within that list?&lt;/p&gt;
+&lt;p&gt;For example, the list:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[7, 11, 13, 19, 2, 3, 5]
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;is sorted (the first 7 primes, in order) and rotated (to put 7 first).&lt;/p&gt;
+&lt;p&gt;With this list as input, then:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;look up &lt;code&gt;13&lt;/code&gt; returns &lt;code&gt;2&lt;/code&gt; since &lt;code&gt;13&lt;/code&gt; is at index &lt;code&gt;2&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;look up &lt;code&gt;2&lt;/code&gt; returns &lt;code&gt;4&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;look up &lt;code&gt;4&lt;/code&gt; returns the sentinel value &lt;code&gt;-1&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;The obvious technique is to just search the list:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;def lookup(values, v):
+    try:
+        return values.index(v)
+    except IndexError:
+        return -1
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;This is a linear algorithm which processes the entire list. Is there a way
+to take advantage of its sorted+rotated-ness?&lt;/p&gt;
+&lt;p&gt;If the list &lt;strong&gt;was&lt;/strong&gt; sorted then we could apply a binary search for a
+logarithmic lookup. And in fact, by applying a custom ordering, the
+list &lt;strong&gt;is&lt;/strong&gt; sorted.&lt;/p&gt;
+&lt;p&gt;How can we apply a custom ordering in Python?&lt;/p&gt;
+&lt;p&gt;The way to do this has changed as Python has developed. The table below shows
+the evolution of standard Python functions which sort and compare.&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Version&lt;/th&gt;
+&lt;th&gt;Year&lt;/th&gt;
+&lt;th&gt;Functions&lt;/th&gt;
+&lt;th&gt;Notes&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;2.0&lt;/td&gt;
+&lt;td&gt;2000&lt;/td&gt;
+&lt;td&gt;max, min, list.sort([cmp]), bisect.bisect&lt;/td&gt;
+&lt;td&gt;Note that [cmp] slows the sorting process down considerably&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;2.3&lt;/td&gt;
+&lt;td&gt;2003&lt;/td&gt;
+&lt;td&gt;heapq&lt;/td&gt;
+&lt;td&gt;Also known as the priority queue algorithm&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;2.4&lt;/td&gt;
+&lt;td&gt;2004&lt;/td&gt;
+&lt;td&gt;sorted(iterable[, cmp[, key[, reverse]]]), list.sort([cmp[, key[, reverse]]]), itertools.groupby(iterable[, key)&lt;/td&gt;
+&lt;td&gt;In general, the key and reverse conversion processes are much faster than specifying an equivalent cmp function&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;2.5&lt;/td&gt;
+&lt;td&gt;2006&lt;/td&gt;
+&lt;td&gt;max([key]), min([key])&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;3.0&lt;/td&gt;
+&lt;td&gt;2008&lt;/td&gt;
+&lt;td&gt;sorted(iterable, key[, reverse]), list.sort(key[, reverse])&lt;/td&gt;
+&lt;td&gt;No more &lt;code&gt;cmp&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;3.10&lt;/td&gt;
+&lt;td&gt;2021&lt;/td&gt;
+&lt;td&gt;bisect.bisect(&amp;#8230;, key) etc&lt;/td&gt;
+&lt;td&gt;That leaves &lt;code&gt;heapq&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;The earliest versions of Python allowed you to sort lists, and
+the sort was customised using a &lt;code&gt;cmp&lt;/code&gt; function &amp;#8212; though the documentation
+warned there would be a performance penalty[*]. The builtin &lt;code&gt;min&lt;/code&gt; and &lt;code&gt;max&lt;/code&gt;
+functions could not be cutomised, and nor could the comparison used in
+the &lt;code&gt;bisect&lt;/code&gt; module &amp;#8212; which is Python&amp;#8217;s binary search implementation.&lt;/p&gt;
+&lt;p&gt;At 2.3 the &lt;code&gt;heapq&lt;/code&gt; module appeared, but, like &lt;code&gt;bisect&lt;/code&gt;, there was no way
+to customise the ordering of heap elements.&lt;/p&gt;
+&lt;p&gt;2.4 introduced the &lt;code&gt;key&lt;/code&gt; argument to customise ordering,
+noting this should be preferred to &lt;code&gt;cmp&lt;/code&gt;. Unlike &lt;code&gt;cmp&lt;/code&gt; which compares two
+elements, &lt;code&gt;key&lt;/code&gt; takes a single element and returns a sort rank for that element.
+The &lt;code&gt;key&lt;/code&gt; argument was added alongside &lt;code&gt;cmp&lt;/code&gt; in &lt;code&gt;list.sort&lt;/code&gt; and the new &lt;code&gt;sorted&lt;/code&gt;
+builtin function; and &lt;code&gt;key&lt;/code&gt; was the only way to customise the grouping in
+&lt;code&gt;itertools.groupby&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;2.5 added &lt;code&gt;key&lt;/code&gt; to &lt;code&gt;min&lt;/code&gt; and &lt;code&gt;max&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;3.0 got rid of &lt;code&gt;cmp&lt;/code&gt;, making &lt;code&gt;key&lt;/code&gt; the only way to customise
+sorting. To migrate from Python 2 to 3 any &lt;code&gt;cmp&lt;/code&gt; functions need
+converting to &lt;code&gt;key&lt;/code&gt; functions. As with Python 2.5, at 3.0 you could
+apply a key to &lt;code&gt;list.sort&lt;/code&gt;, &lt;code&gt;sorted&lt;/code&gt;, &lt;code&gt;min&lt;/code&gt;, &lt;code&gt;max&lt;/code&gt;,
+&lt;code&gt;itertools.groupby&lt;/code&gt; &amp;#8212; but not to &lt;code&gt;bisect&lt;/code&gt; or &lt;code&gt;heapq&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;The next change came in 3.10, when the &lt;code&gt;key&lt;/code&gt; parameter was
+added to the &lt;code&gt;bisect&lt;/code&gt; module. As far as I can tell that means the only part of
+standard Python which doesn&amp;#8217;t let you customise ordering is the &lt;code&gt;heapq&lt;/code&gt; module.&lt;/p&gt;
+&lt;h2 id=&quot;bisect-with-a-search-key&quot;&gt;Bisect with a search key&lt;/h2&gt;
+&lt;p&gt;So, to return to the original puzzle, consider our example
+sorted+rotated list:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;&amp;gt;&amp;gt;&amp;gt; values = [7, 11, 13, 19, 2, 3, 5]
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The first four elements are greater than or equal to the first
+element, 7. The last three elements are less than 7.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;&amp;gt;&amp;gt;&amp;gt; [v &amp;lt; values[0] for v in values]
+[False, False, False, False, True, True, True]
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Since &lt;code&gt;False&lt;/code&gt; &amp;lt; &lt;code&gt;True&lt;/code&gt; the result of the list comprehension above is sorted.
+Extending this idea, the following comprehension is also sorted.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;&amp;gt;&amp;gt;&amp;gt; [(v &amp;lt; values[0], v) for v in values]
+[(False, 7), (False, 11), (False, 13), (False, 19), (True, 2), (True, 3), (True, 5)]
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Now we have a logarithmic lookup using binary search:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;from bisect import bisect_left
 
-&lt;pre class=&quot;prettyprint&quot;&gt;def photo_name(photo_file):
-    &quot;Return the name of the photo&quot;
-    return photo_file.rstrip(&amp;#x27;.jpg&amp;#x27;)
-
-assert photo_name(&amp;#x27;cat.jpg&amp;#x27;) == &amp;#x27;cat&amp;#x27;
-assert photo_name(&amp;#x27;selfie.jpg&amp;#x27;) == &amp;#x27;selfie&amp;#x27;
-assert photo_name(&amp;#x27;emoji.gif&amp;#x27;) == &amp;#x27;emoji.gif&amp;#x27; # A GIF is not a photo
-
-&lt;/pre&gt;
-
-&lt;/div&gt;
-
-&lt;p&gt;As shown, it passes a few simple tests.&lt;/p&gt;
-&lt;p&gt;Unfortunately it turns out to be broken.&lt;/p&gt;
-&lt;div class=&quot;typocode&quot;&gt;
-
-&lt;pre class=&quot;prettyprint&quot;&gt;&amp;gt;&amp;gt;&amp;gt; photo_name(&amp;#x27;dog.jpg&amp;#x27;)
-&amp;#x27;do&amp;#x27;
-&amp;gt;&amp;gt;&amp;gt; photo_name(&amp;#x27;tile.png&amp;#x27;)
-&amp;#x27;tile.pn&amp;#x27;
-
-&lt;/pre&gt;
-
-&lt;/div&gt;
-
-&lt;p&gt;There&amp;#8217;s no mystery here. A check of the &lt;a href=&quot;https://docs.python.org/3/library/stdtypes.html#str.rstrip&quot;&gt;documentation&lt;/a&gt; shows
-that the optional &lt;code&gt;chars&lt;/code&gt; parameter to &lt;code&gt;str.rstrip&lt;/code&gt; specifies a &lt;strong&gt;set&lt;/strong&gt; of
-trailing characters to be removed from the source string.&lt;/p&gt;
-&lt;p&gt;So, in the example above, &lt;code&gt;&#x27;.jpg&#x27;&lt;/code&gt; means: strip trailing
-characters in the set &lt;code&gt;{&#x27;.&#x27;, &#x27;j&#x27;, &#x27;p&#x27;, &#x27;g&#x27;}&lt;/code&gt;. In the case of
-&lt;code&gt;&#x27;dog.jpg&#x27;&lt;/code&gt; that includes the final &lt;code&gt;&#x27;g&#x27;&lt;/code&gt; of &lt;code&gt;&#x27;dog&#x27;&lt;/code&gt;. Similarly
-the final &lt;code&gt;&#x27;g&#x27;&lt;/code&gt; of &lt;code&gt;&#x27;tile.png&#x27;&lt;/code&gt; gets stripped.&lt;/p&gt;
-&lt;p&gt;That said, it&amp;#8217;s a common misunderstanding, and one which has been made
-for the eighteen years since the optional &lt;code&gt;chars&lt;/code&gt; argument got added
-to &lt;code&gt;rstrip&lt;/code&gt;. At Python 3.9 the &lt;a href=&quot;https://docs.python.org/3/library/stdtypes.html#str.rstrip&quot;&gt;documentation&lt;/a&gt; takes care to
-explain:&lt;/p&gt;
-&lt;blockquote&gt;
-&lt;p&gt;The &lt;code&gt;chars&lt;/code&gt; argument is a string specifying the set of
-characters to be removed. If omitted or &lt;code&gt;None&lt;/code&gt;, the &lt;code&gt;chars&lt;/code&gt; argument
-defaults to removing whitespace. The &lt;code&gt;chars&lt;/code&gt; argument is not a suffix;
-rather, all combinations of its values are stripped.&lt;/p&gt;
-&lt;/blockquote&gt;
-&lt;p&gt;and points out that the new &lt;code&gt;removesuffix&lt;/code&gt; method might be what you&amp;#8217;re really after.&lt;/p&gt;
-&lt;p&gt;Out of interest I tracked the documentation back to Python 2.3, when the
-&lt;a href=&quot;https://docs.python.org/release/2.3/lib/string-methods.html&quot;&gt;function description&lt;/a&gt; was less clear.&lt;/p&gt;
-&lt;blockquote&gt;
-&lt;p&gt;If given and not None, &lt;code&gt;chars&lt;/code&gt; must be a string; the
-characters in the string will be stripped from the end of the string
-this method is called on. Changed in version 2.2.2: Support for the
-&lt;code&gt;chars&lt;/code&gt; argument.&lt;/p&gt;
-&lt;/blockquote&gt;
-&lt;p&gt;Luckily misuse of &lt;code&gt;rstrip&lt;/code&gt; to remove extensions will usually get
-spotted soon enough, even if &amp;#8212; as shown &amp;#8212; it evades can cursory inspection and testing.&lt;/p&gt;
-&lt;p&gt;It&amp;#8217;s worth reviewing why the confusion persists.&lt;/p&gt;
-&lt;ol&gt;
-&lt;li&gt;&lt;code&gt;str.rstrip()&lt;/code&gt; to remove trailing whitespace is a common thing to want to do&lt;/li&gt;
-&lt;li&gt;removing a suffix is also a common thing to want to do&lt;/li&gt;
-&lt;li&gt;removing a set of trailing chars from a string is less common (except the special case of stripping whitespace)&lt;/li&gt;
-&lt;li&gt;the &lt;code&gt;chars&lt;/code&gt; parameter to &lt;code&gt;str.rstrip()&lt;/code&gt; is &lt;strong&gt;not&lt;/strong&gt; a set, it is an ordered sequence&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;s.rstrip(&#x27;.jpg&#x27;)&lt;/code&gt; (for example) &lt;em&gt;will&lt;/em&gt; remove any &lt;code&gt;&#x27;.jpg&#x27;&lt;/code&gt; suffix from &lt;code&gt;s&lt;/code&gt;, so it sort-of works&lt;/li&gt;
-&lt;/ol&gt;</description>
-<dc:date>2021-05-14</dc:date>
-<guid>http://wordaligned.org/articles/tripped-up-by-rstrip</guid>
+def lookup(values, v):
+    key = lambda x: (x &amp;lt; values[0], x)
+    i = bisect_left(values, key(v), key=key)
+    return i if (i &amp;lt; len(values) and values[i] == v) else -1
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2 id=&quot;dont-search-for-v-search-for-its-key&quot;&gt;Don&amp;#8217;t search for v, search for its key&lt;/h2&gt;
+&lt;p&gt;I was surprised to realise the value &lt;code&gt;v&lt;/code&gt; being looked up has to have the &lt;code&gt;key&lt;/code&gt;
+function applied &lt;strong&gt;before&lt;/strong&gt; calling &lt;code&gt;bisect_left&lt;/code&gt;. That is, to find where &lt;code&gt;v&lt;/code&gt;
+should go in &lt;code&gt;values&lt;/code&gt; to maintain the sort order, we pass &lt;code&gt;key(v)&lt;/code&gt; to &lt;code&gt;bisect_left&lt;/code&gt;.
+This doesn&amp;#8217;t match the interface to binary search in other languages. It also means
+in our example we have to handle empty lists as a special case.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;def lookup(values, v):
+    if not values: return -1
+    key = lambda x: (x &amp;lt; values[0], x)
+    i = bisect_left(values, key(v), key=key)
+    return i if (i &amp;lt; len(values) and values[i] == v) else -1
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;[*] Before the introduction of the sort &lt;code&gt;key&lt;/code&gt;, the standard pattern was
+&lt;a href=&quot;https://docs.python.org/3/howto/sorting.html#the-old-way-using-decorate-sort-undecorate&quot;&gt;decorate-sort-undecorate&lt;/a&gt;.&lt;/p&gt;</description>
+<dc:date>2022-02-15</dc:date>
+<guid>http://wordaligned.org/articles/binary-search-gets-a-sort-key</guid>
 <author>tag@wordaligned.org (Thomas Guest)</author>
-<link>http://wordaligned.org/articles/tripped-up-by-rstrip</link>
+<link>http://wordaligned.org/articles/binary-search-gets-a-sort-key</link>
 <category>Python</category>
 </item>
 

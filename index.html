@@ -11,7 +11,7 @@
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
 <meta name="author" content="Thomas Guest" />
 <meta name="description" content="A collection of articles on software development written by Thomas Guest." />
-<meta name="keywords" content="IDE, Unix, Arc, Pi, Build, ImageMagick, Apple, Accidents, php, Tests, lighttpd, Design, Scrum, Knuth, Recursion, Curl, Hoare, Content, Primes, Algorithms, Perec, Bugs, C++, Zlib, Javascript, PIL, Animation, Web-applications, Editors, Swansea, Bristol, SICP, Etc, Streams, Functional Programming, CLRS, Documentation, Steganography, Torvalds, Oulipo, Puzzles, Graphics, Teamwork, Characters, Cycling, Scheme, Pictures, Agile, Shell, Trac, Subversion, Two Wheels, Lcs, Esr, Markdown, Awk, Charts, OCR, Talks, Web Applications, Erlang, Haskell, Recommended, Virtualization, Turing, Boost, Perl, ACCU, Crabs, Ruby on Rails, Unicode, Spolsky, Missiles, Python, Tesseract, DocBook, Syntax, Java, Dynamic Languages, Iphone, CVS, Github, Europython, Books, Chess, Disqus, Regex, Self, Ruby, C, Google, Drawing, Go, Windows, Android, Lisp, openid, Emacs, Decorators, Reviews, Fractals, Conferences, cvs2svn" />
+<meta name="keywords" content="Reviews, ACCU, Self, Conferences, Accidents, Tests, Bristol, Puzzles, Primes, Perec, Perl, OCR, Design, Missiles, Recursion, Python, Build, Ruby, Characters, Turing, Lisp, Web Applications, Algorithms, Markdown, Charts, SICP, ImageMagick, Agile, Steganography, Teamwork, IDE, lighttpd, Decorators, Two Wheels, Boost, Dynamic Languages, Go, Ruby on Rails, Europython, Oulipo, Recommended, Github, Spolsky, Syntax, Javascript, Awk, CVS, Pi, Etc, Swansea, Scrum, cvs2svn, Arc, Content, Books, Apple, Java, php, Web-applications, Iphone, Esr, Emacs, openid, Bugs, Android, Curl, Regex, Shell, Windows, Streams, Animation, Virtualization, Knuth, Editors, Unicode, Scheme, Lcs, Pictures, Tesseract, Erlang, Google, PIL, Subversion, Disqus, Crabs, Zlib, Haskell, Talks, Cycling, Fractals, Torvalds, Hoare, Functional Programming, C++, Trac, Graphics, CLRS, C, Documentation, Drawing, Chess, Unix, DocBook" />
 <link rel="alternate" type="application/rss+xml" title="Feed" href="http://feeds.wordaligned.org/wordaligned" />
 </head>
 
@@ -25,83 +25,143 @@
 
   <div id="page">
     <div id="content">
-      <div class="atomentry" id="tripped-up-by-rstrip">
-<h2 class="title"><a href="/articles/tripped-up-by-rstrip">Tripped up by Rstrip</a></h2>
-<p class="meta"><abbr class="published" title="2021-05-14">2021-05-14</abbr> &bull; <a href="/tag/python" rel="tag">Python</a> &bull; <a href="/articles/tripped-up-by-rstrip#disqus_thread">Comments</a></p>
-<p>Here&#8217;s a simple function which is supposed to strip any <code>".jpg"</code> extension
-from a file name.</p>
-<div class="typocode">
+      <div class="atomentry" id="binary-search-gets-a-sort-key">
+<h2 class="title"><a href="/articles/binary-search-gets-a-sort-key">Binary search gets a sort key</a></h2>
+<p class="meta"><abbr class="published" title="2022-02-15">2022-02-15</abbr> &bull; <a href="/tag/python" rel="tag">Python</a>, <a href="/tag/puzzles" rel="tag">Puzzles</a> &bull; <a href="/articles/binary-search-gets-a-sort-key#disqus_thread">Comments</a></p>
+<p>Suppose you have an list of distinct elements which has been sorted
+and rotated. How would you look up an element within that list?</p>
+<p>For example, the list:</p>
+<pre><code>[7, 11, 13, 19, 2, 3, 5]
+</code></pre>
+<p>is sorted (the first 7 primes, in order) and rotated (to put 7 first).</p>
+<p>With this list as input, then:</p>
+<ul>
+<li>look up <code>13</code> returns <code>2</code> since <code>13</code> is at index <code>2</code></li>
+<li>look up <code>2</code> returns <code>4</code></li>
+<li>look up <code>4</code> returns the sentinel value <code>-1</code></li>
+</ul>
+<p>The obvious technique is to just search the list:</p>
+<pre><code>def lookup(values, v):
+    try:
+        return values.index(v)
+    except IndexError:
+        return -1
+</code></pre>
+<p>This is a linear algorithm which processes the entire list. Is there a way
+to take advantage of its sorted+rotated-ness?</p>
+<p>If the list <strong>was</strong> sorted then we could apply a binary search for a
+logarithmic lookup. And in fact, by applying a custom ordering, the
+list <strong>is</strong> sorted.</p>
+<p>How can we apply a custom ordering in Python?</p>
+<p>The way to do this has changed as Python has developed. The table below shows
+the evolution of standard Python functions which sort and compare.</p>
+<table>
+<thead>
+<tr>
+<th>Version</th>
+<th>Year</th>
+<th>Functions</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2.0</td>
+<td>2000</td>
+<td>max, min, list.sort(<a href="http://docs.python.org/3.0/whatsnew/3.0.html#ordering-comparisons">cmp</a>), bisect.bisect</td>
+<td>Note that <a href="http://docs.python.org/3.0/whatsnew/3.0.html#ordering-comparisons">cmp</a> slows the sorting process down considerably</td>
+</tr>
+<tr>
+<td>2.3</td>
+<td>2003</td>
+<td>heapq</td>
+<td>Also known as the priority queue algorithm</td>
+</tr>
+<tr>
+<td>2.4</td>
+<td>2004</td>
+<td>sorted(iterable[, cmp[, key[, reverse]]]), list.sort([cmp[, key[, reverse]]]), itertools.groupby(iterable[, key)</td>
+<td>In general, the key and reverse conversion processes are much faster than specifying an equivalent cmp function</td>
+</tr>
+<tr>
+<td>2.5</td>
+<td>2006</td>
+<td>max([key]), min([key])</td>
+<td></td>
+</tr>
+<tr>
+<td>3.0</td>
+<td>2008</td>
+<td>sorted(iterable, key[, reverse]), list.sort(key[, reverse])</td>
+<td>No more <code>cmp</code></td>
+</tr>
+<tr>
+<td>3.10</td>
+<td>2021</td>
+<td>bisect.bisect(&#8230;, key) etc</td>
+<td>That leaves <code>heapq</code></td>
+</tr>
+</tbody>
+</table>
+<p>The earliest versions of Python allowed you to sort lists, and
+the sort was customised using a <code>cmp</code> function &#8212; though the documentation
+warned there would be a performance penalty[*]. The builtin <code>min</code> and <code>max</code>
+functions could not be cutomised, and nor could the comparison used in
+the <code>bisect</code> module &#8212; which is Python&#8217;s binary search implementation.</p>
+<p>At 2.3 the <code>heapq</code> module appeared, but, like <code>bisect</code>, there was no way
+to customise the ordering of heap elements.</p>
+<p>2.4 introduced the <code>key</code> argument to customise ordering,
+noting this should be preferred to <code>cmp</code>. Unlike <code>cmp</code> which compares two
+elements, <code>key</code> takes a single element and returns a sort rank for that element.
+The <code>key</code> argument was added alongside <code>cmp</code> in <code>list.sort</code> and the new <code>sorted</code>
+builtin function; and <code>key</code> was the only way to customise the grouping in
+<code>itertools.groupby</code>.</p>
+<p>2.5 added <code>key</code> to <code>min</code> and <code>max</code>.</p>
+<p>3.0 got rid of <code>cmp</code>, making <code>key</code> the only way to customise
+sorting. To migrate from Python 2 to 3 any <code>cmp</code> functions need
+converting to <code>key</code> functions. As with Python 2.5, at 3.0 you could
+apply a key to <code>list.sort</code>, <code>sorted</code>, <code>min</code>, <code>max</code>,
+<code>itertools.groupby</code> &#8212; but not to <code>bisect</code> or <code>heapq</code>.</p>
+<p>The next change came in 3.10, when the <code>key</code> parameter was
+added to the <code>bisect</code> module. As far as I can tell that means the only part of
+standard Python which doesn&#8217;t let you customise ordering is the <code>heapq</code> module.</p>
+<h2 id="bisect-with-a-search-key">Bisect with a search key</h2>
+<p>So, to return to the original puzzle, consider our example
+sorted+rotated list:</p>
+<pre><code>&gt;&gt;&gt; values = [7, 11, 13, 19, 2, 3, 5]
+</code></pre>
+<p>The first four elements are greater than or equal to the first
+element, 7. The last three elements are less than 7.</p>
+<pre><code>&gt;&gt;&gt; [v &lt; values[0] for v in values]
+[False, False, False, False, True, True, True]
+</code></pre>
+<p>Since <code>False</code> &lt; <code>True</code> the result of the list comprehension above is sorted.
+Extending this idea, the following comprehension is also sorted.</p>
+<pre><code>&gt;&gt;&gt; [(v &lt; values[0], v) for v in values]
+[(False, 7), (False, 11), (False, 13), (False, 19), (True, 2), (True, 3), (True, 5)]
+</code></pre>
+<p>Now we have a logarithmic lookup using binary search:</p>
+<pre><code>from bisect import bisect_left
 
-<pre class="prettyprint">def photo_name(photo_file):
-    "Return the name of the photo"
-    return photo_file.rstrip(&#x27;.jpg&#x27;)
-
-assert photo_name(&#x27;cat.jpg&#x27;) == &#x27;cat&#x27;
-assert photo_name(&#x27;selfie.jpg&#x27;) == &#x27;selfie&#x27;
-assert photo_name(&#x27;emoji.gif&#x27;) == &#x27;emoji.gif&#x27; # A GIF is not a photo
-
-</pre>
-
-</div>
-
-<p>As shown, it passes a few simple tests.</p>
-<p>Unfortunately it turns out to be broken.</p>
-<div class="typocode">
-
-<pre class="prettyprint">&gt;&gt;&gt; photo_name(&#x27;dog.jpg&#x27;)
-&#x27;do&#x27;
-&gt;&gt;&gt; photo_name(&#x27;tile.png&#x27;)
-&#x27;tile.pn&#x27;
-
-</pre>
-
-</div>
-
-<p>There&#8217;s no mystery here. A check of the <a href="https://docs.python.org/3/library/stdtypes.html#str.rstrip">documentation</a> shows
-that the optional <code>chars</code> parameter to <code>str.rstrip</code> specifies a <strong>set</strong> of
-trailing characters to be removed from the source string.</p>
-<p>So, in the example above, <code>'.jpg'</code> means: strip trailing
-characters in the set <code>{'.', 'j', 'p', 'g'}</code>. In the case of
-<code>'dog.jpg'</code> that includes the final <code>'g'</code> of <code>'dog'</code>. Similarly
-the final <code>'g'</code> of <code>'tile.png'</code> gets stripped.</p>
-<p>That said, it&#8217;s a common misunderstanding, and one which has been made
-for the eighteen years since the optional <code>chars</code> argument got added
-to <code>rstrip</code>. At Python 3.9 the <a href="https://docs.python.org/3/library/stdtypes.html#str.rstrip">documentation</a> takes care to
-explain:</p>
-<blockquote>
-<p>The <code>chars</code> argument is a string specifying the set of
-characters to be removed. If omitted or <code>None</code>, the <code>chars</code> argument
-defaults to removing whitespace. The <code>chars</code> argument is not a suffix;
-rather, all combinations of its values are stripped.</p>
-</blockquote>
-<p>and points out that the new <code>removesuffix</code> method might be what you&#8217;re really after.</p>
-<p>Out of interest I tracked the documentation back to Python 2.3, when the
-<a href="https://docs.python.org/release/2.3/lib/string-methods.html">function description</a> was less clear.</p>
-<blockquote>
-<p>If given and not None, <code>chars</code> must be a string; the
-characters in the string will be stripped from the end of the string
-this method is called on. Changed in version 2.2.2: Support for the
-<code>chars</code> argument.</p>
-</blockquote>
-<p>Luckily misuse of <code>rstrip</code> to remove extensions will usually get
-spotted soon enough, even if &#8212; as shown &#8212; it evades can cursory inspection and testing.</p>
-<p>It&#8217;s worth reviewing why the confusion persists.</p>
-<ol>
-<li><code>str.rstrip()</code> to remove trailing whitespace is a common thing to want to do</li>
-<li>removing a suffix is also a common thing to want to do</li>
-<li>removing a set of trailing chars from a string is less common (except the special case of stripping whitespace)</li>
-<li>the <code>chars</code> parameter to <code>str.rstrip()</code> is <strong>not</strong> a set, it is an ordered sequence</li>
-<li><code>s.rstrip('.jpg')</code> (for example) <em>will</em> remove any <code>'.jpg'</code> suffix from <code>s</code>, so it sort-of works</li>
-</ol>
-
-</div>
-
-
-<div class="atomentry" id="why-mvp1-is-wrong">
-<h2 class="title"><a href="/articles/why-mvp1-is-wrong">Why MVP1 is wrong</a></h2>
-<p class="meta"><abbr class="published" title="2021-03-17">2021-03-17</abbr> &bull; <a href="/tag/design" rel="tag">Design</a> &bull; <a href="/articles/why-mvp1-is-wrong#disqus_thread">Comments</a></p>
-<p>We&#8217;re working on MVP1, short for Minimum Viable Product One &#8212; the first version of our new App. The term <a href="https://en.wikipedia.org/wiki/Minimum_viable_product">MVP</a> applies. You put something (product) which works (viable) in front of a user as quickly as possible (minimum). Then you improve it based on their response.</p>
-<p>MVP1 is an oxymoron. It implies there&#8217;ll be an MVP2, a <strong>second</strong> minimum viable product. But there can only be a single minimum. By including an update based on user feedback version two is no longer minimal, it&#8217;s simply a viable product. So the 1 in MVP1 is redundant, making the very title, MVP1, non-minimal!</p>
+def lookup(values, v):
+    key = lambda x: (x &lt; values[0], x)
+    i = bisect_left(values, key(v), key=key)
+    return i if (i &lt; len(values) and values[i] == v) else -1
+</code></pre>
+<h2 id="dont-search-for-v-search-for-its-key">Don&#8217;t search for v, search for its key</h2>
+<p>I was surprised to realise the value <code>v</code> being looked up has to have the <code>key</code>
+function applied <strong>before</strong> calling <code>bisect_left</code>. That is, to find where <code>v</code>
+should go in <code>values</code> to maintain the sort order, we pass <code>key(v)</code> to <code>bisect_left</code>.
+This doesn&#8217;t match the interface to binary search in other languages. It also means
+in our example we have to handle empty lists as a special case.</p>
+<pre><code>def lookup(values, v):
+    if not values: return -1
+    key = lambda x: (x &lt; values[0], x)
+    i = bisect_left(values, key(v), key=key)
+    return i if (i &lt; len(values) and values[i] == v) else -1
+</code></pre>
+<p>[*] Before the introduction of the sort <code>key</code>, the standard pattern was
+<a href="https://docs.python.org/3/howto/sorting.html#the-old-way-using-decorate-sort-undecorate">decorate-sort-undecorate</a>.</p>
 
 </div>
 
@@ -614,6 +674,20 @@ fruitbowl = {
 </div>
 
 
+<div class="atomentry" id="bugwards-compatible">
+<h2 class="title"><a href="/articles/bugwards-compatible">Bugwards Compatible</a></h2>
+<p class="meta"><abbr class="published" title="2018-02-02">2018-02-02</abbr> &bull; <a href="/tag/tests" rel="tag">Tests</a> &bull; <a href="/articles/bugwards-compatible#disqus_thread">Comments</a></p>
+<p><a href="https://twitter.com/chrisoldwood">Chris Oldwood</a> recently tweeted about &#8220;TFW you write some tests for a bit of legacy code before making a change and you unearth a bunch of bugs&#8221;</p>
+<div><blockquote class="twitter-tweet" data-lang="en"><p lang="en" dir="ltr">TFW you write some tests for a bit of legacy code before making a change and you unearth a bunch of bugs.</p>&mdash; Chris Oldwood (@chrisoldwood) <a href="https://twitter.com/chrisoldwood/status/959576034059448321?ref_src=twsrc%5Etfw">February 2, 2018</a></blockquote><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script></div>
+
+<p>He doesn&#8217;t elaborate on what exactly &#8220;that feeling&#8221; is, but I&#8217;ll bet it&#8217;s not surprise. Writing tests for code almost invariably shakes something out &#8212; perhaps some undocumented assumptions about the inputs; perhaps a failure to match the documented behaviour; perhaps an access violation which will crash the application.</p>
+<p>&#8220;That feeling&#8221; can include relief: the code is legacy code and evidently the bugs have gone unnoticed or at least unreported. Often, any such relief may be accompanied by a sense of wonder. The bugs may be so severe &#8212; the code so broken &#8212; that the maintainer questions how it <strong>ever</strong> worked.</p>
+<p>&#8220;That feeling&#8221; may also be dismay, since the legacy code requires changing. If the existing behaviour is buggy but predictable it could well be that clients have adapted to this behaviour and wouldn&#8217;t welcome a fix. In other words, the change will have to be both backwards and <strong>bugwards compatible</strong>. Chris will have to tread carefully.</p>
+<p>Such delicate decisions are not limited to the code&#8217;s runtime behaviour. It might seem that, once the code is under test, Chris can <a href="http://wiki.c2.com/?RefactorMercilessly">refactor mercilessly</a> &#8212; renaming variables, updating idioms, tidying layout. Again, tread carefully! Make sure the code <strong>is</strong> under test. Be aware of the differences which reviewers must evaluate. Consider the wider context. Respect the original authors.</p>
+
+</div>
+
+
 <div class="extended">
 <p><a href="/articles/">Visit the Word Aligned archives...</a></p>
 </div>
@@ -660,7 +734,7 @@ fruitbowl = {
 <ul id="categories"><li><a href="/tag/python" rel="tag">Python</a> <em>(129)</em></li>
 <li><a href="/tag/c++" rel="tag">C++</a> <em>(71)</em></li>
 <li><a href="/tag/self" rel="tag">Self</a> <em>(70)</em></li>
-<li><a href="/tag/puzzles" rel="tag">Puzzles</a> <em>(40)</em></li>
+<li><a href="/tag/puzzles" rel="tag">Puzzles</a> <em>(41)</em></li>
 <li><a href="/tag/accu" rel="tag">ACCU</a> <em>(33)</em></li>
 <li><a href="/tag/subversion" rel="tag">Subversion</a> <em>(27)</em></li>
 <li><a href="/tag/web-applications" rel="tag">Web Applications</a> <em>(27)</em></li>
@@ -689,7 +763,7 @@ fruitbowl = {
 <div class="sidebar-node">
 <h3>Chain</h3>
 <ul>
-<li><a accesskey="p" href="/articles/tripped-up-by-rstrip" title="First article">&raquo; Tripped up by Rstrip</a></li>
+<li><a accesskey="p" href="/articles/binary-search-gets-a-sort-key" title="First article">&raquo; Binary search gets a sort key</a></li>
 
 </ul>
 

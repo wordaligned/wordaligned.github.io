@@ -7,6 +7,149 @@
 <dc:creator>tag@wordaligned.org</dc:creator>
 <language>en-gb</language>
 <item>
+<title>Binary search gets a sort key</title>
+<description>&lt;p&gt;Suppose you have an list of distinct elements which has been sorted
+and rotated. How would you look up an element within that list?&lt;/p&gt;
+&lt;p&gt;For example, the list:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[7, 11, 13, 19, 2, 3, 5]
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;is sorted (the first 7 primes, in order) and rotated (to put 7 first).&lt;/p&gt;
+&lt;p&gt;With this list as input, then:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;look up &lt;code&gt;13&lt;/code&gt; returns &lt;code&gt;2&lt;/code&gt; since &lt;code&gt;13&lt;/code&gt; is at index &lt;code&gt;2&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;look up &lt;code&gt;2&lt;/code&gt; returns &lt;code&gt;4&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;look up &lt;code&gt;4&lt;/code&gt; returns the sentinel value &lt;code&gt;-1&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;The obvious technique is to just search the list:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;def lookup(values, v):
+    try:
+        return values.index(v)
+    except IndexError:
+        return -1
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;This is a linear algorithm which processes the entire list. Is there a way
+to take advantage of its sorted+rotated-ness?&lt;/p&gt;
+&lt;p&gt;If the list &lt;strong&gt;was&lt;/strong&gt; sorted then we could apply a binary search for a
+logarithmic lookup. And in fact, by applying a custom ordering, the
+list &lt;strong&gt;is&lt;/strong&gt; sorted.&lt;/p&gt;
+&lt;p&gt;How can we apply a custom ordering in Python?&lt;/p&gt;
+&lt;p&gt;The way to do this has changed as Python has developed. The table below shows
+the evolution of standard Python functions which sort and compare.&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Version&lt;/th&gt;
+&lt;th&gt;Year&lt;/th&gt;
+&lt;th&gt;Functions&lt;/th&gt;
+&lt;th&gt;Notes&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;2.0&lt;/td&gt;
+&lt;td&gt;2000&lt;/td&gt;
+&lt;td&gt;max, min, list.sort([cmp]), bisect.bisect&lt;/td&gt;
+&lt;td&gt;Note that [cmp] slows the sorting process down considerably&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;2.3&lt;/td&gt;
+&lt;td&gt;2003&lt;/td&gt;
+&lt;td&gt;heapq&lt;/td&gt;
+&lt;td&gt;Also known as the priority queue algorithm&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;2.4&lt;/td&gt;
+&lt;td&gt;2004&lt;/td&gt;
+&lt;td&gt;sorted(iterable[, cmp[, key[, reverse]]]), list.sort([cmp[, key[, reverse]]]), itertools.groupby(iterable[, key)&lt;/td&gt;
+&lt;td&gt;In general, the key and reverse conversion processes are much faster than specifying an equivalent cmp function&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;2.5&lt;/td&gt;
+&lt;td&gt;2006&lt;/td&gt;
+&lt;td&gt;max([key]), min([key])&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;3.0&lt;/td&gt;
+&lt;td&gt;2008&lt;/td&gt;
+&lt;td&gt;sorted(iterable, key[, reverse]), list.sort(key[, reverse])&lt;/td&gt;
+&lt;td&gt;No more &lt;code&gt;cmp&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;3.10&lt;/td&gt;
+&lt;td&gt;2021&lt;/td&gt;
+&lt;td&gt;bisect.bisect(&amp;#8230;, key) etc&lt;/td&gt;
+&lt;td&gt;That leaves &lt;code&gt;heapq&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;The earliest versions of Python allowed you to sort lists, and
+the sort was customised using a &lt;code&gt;cmp&lt;/code&gt; function &amp;#8212; though the documentation
+warned there would be a performance penalty[*]. The builtin &lt;code&gt;min&lt;/code&gt; and &lt;code&gt;max&lt;/code&gt;
+functions could not be cutomised, and nor could the comparison used in
+the &lt;code&gt;bisect&lt;/code&gt; module &amp;#8212; which is Python&amp;#8217;s binary search implementation.&lt;/p&gt;
+&lt;p&gt;At 2.3 the &lt;code&gt;heapq&lt;/code&gt; module appeared, but, like &lt;code&gt;bisect&lt;/code&gt;, there was no way
+to customise the ordering of heap elements.&lt;/p&gt;
+&lt;p&gt;2.4 introduced the &lt;code&gt;key&lt;/code&gt; argument to customise ordering,
+noting this should be preferred to &lt;code&gt;cmp&lt;/code&gt;. Unlike &lt;code&gt;cmp&lt;/code&gt; which compares two
+elements, &lt;code&gt;key&lt;/code&gt; takes a single element and returns a sort rank for that element.
+The &lt;code&gt;key&lt;/code&gt; argument was added alongside &lt;code&gt;cmp&lt;/code&gt; in &lt;code&gt;list.sort&lt;/code&gt; and the new &lt;code&gt;sorted&lt;/code&gt;
+builtin function; and &lt;code&gt;key&lt;/code&gt; was the only way to customise the grouping in
+&lt;code&gt;itertools.groupby&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;2.5 added &lt;code&gt;key&lt;/code&gt; to &lt;code&gt;min&lt;/code&gt; and &lt;code&gt;max&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;3.0 got rid of &lt;code&gt;cmp&lt;/code&gt;, making &lt;code&gt;key&lt;/code&gt; the only way to customise
+sorting. To migrate from Python 2 to 3 any &lt;code&gt;cmp&lt;/code&gt; functions need
+converting to &lt;code&gt;key&lt;/code&gt; functions. As with Python 2.5, at 3.0 you could
+apply a key to &lt;code&gt;list.sort&lt;/code&gt;, &lt;code&gt;sorted&lt;/code&gt;, &lt;code&gt;min&lt;/code&gt;, &lt;code&gt;max&lt;/code&gt;,
+&lt;code&gt;itertools.groupby&lt;/code&gt; &amp;#8212; but not to &lt;code&gt;bisect&lt;/code&gt; or &lt;code&gt;heapq&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;The next change came in 3.10, when the &lt;code&gt;key&lt;/code&gt; parameter was
+added to the &lt;code&gt;bisect&lt;/code&gt; module. As far as I can tell that means the only part of
+standard Python which doesn&amp;#8217;t let you customise ordering is the &lt;code&gt;heapq&lt;/code&gt; module.&lt;/p&gt;
+&lt;h2 id=&quot;bisect-with-a-search-key&quot;&gt;Bisect with a search key&lt;/h2&gt;
+&lt;p&gt;So, to return to the original puzzle, consider our example
+sorted+rotated list:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;&amp;gt;&amp;gt;&amp;gt; values = [7, 11, 13, 19, 2, 3, 5]
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The first four elements are greater than or equal to the first
+element, 7. The last three elements are less than 7.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;&amp;gt;&amp;gt;&amp;gt; [v &amp;lt; values[0] for v in values]
+[False, False, False, False, True, True, True]
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Since &lt;code&gt;False&lt;/code&gt; &amp;lt; &lt;code&gt;True&lt;/code&gt; the result of the list comprehension above is sorted.
+Extending this idea, the following comprehension is also sorted.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;&amp;gt;&amp;gt;&amp;gt; [(v &amp;lt; values[0], v) for v in values]
+[(False, 7), (False, 11), (False, 13), (False, 19), (True, 2), (True, 3), (True, 5)]
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Now we have a logarithmic lookup using binary search:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;from bisect import bisect_left
+
+def lookup(values, v):
+    key = lambda x: (x &amp;lt; values[0], x)
+    i = bisect_left(values, key(v), key=key)
+    return i if (i &amp;lt; len(values) and values[i] == v) else -1
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2 id=&quot;dont-search-for-v-search-for-its-key&quot;&gt;Don&amp;#8217;t search for v, search for its key&lt;/h2&gt;
+&lt;p&gt;I was surprised to realise the value &lt;code&gt;v&lt;/code&gt; being looked up has to have the &lt;code&gt;key&lt;/code&gt;
+function applied &lt;strong&gt;before&lt;/strong&gt; calling &lt;code&gt;bisect_left&lt;/code&gt;. That is, to find where &lt;code&gt;v&lt;/code&gt;
+should go in &lt;code&gt;values&lt;/code&gt; to maintain the sort order, we pass &lt;code&gt;key(v)&lt;/code&gt; to &lt;code&gt;bisect_left&lt;/code&gt;.
+This doesn&amp;#8217;t match the interface to binary search in other languages. It also means
+in our example we have to handle empty lists as a special case.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;def lookup(values, v):
+    if not values: return -1
+    key = lambda x: (x &amp;lt; values[0], x)
+    i = bisect_left(values, key(v), key=key)
+    return i if (i &amp;lt; len(values) and values[i] == v) else -1
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;[*] Before the introduction of the sort &lt;code&gt;key&lt;/code&gt;, the standard pattern was
+&lt;a href=&quot;https://docs.python.org/3/howto/sorting.html#the-old-way-using-decorate-sort-undecorate&quot;&gt;decorate-sort-undecorate&lt;/a&gt;.&lt;/p&gt;</description>
+<dc:date>2022-02-15</dc:date>
+<guid>http://wordaligned.org/articles/binary-search-gets-a-sort-key</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>http://wordaligned.org/articles/binary-search-gets-a-sort-key</link>
+<category>Puzzles</category>
+</item>
+
+<item>
 <title>Fearless Debugging</title>
 <description>&lt;h2 id=&quot;jurassic-jigsaw&quot;&gt;Jurassic Jigsaw&lt;/h2&gt;
 &lt;p&gt;My thanks to &lt;a href=&quot;http://was.tl&quot;&gt;Eric Wastl&lt;/a&gt; for another excellent &lt;a href=&quot;https://adventofcode.com/&quot;&gt;Advent of Code&lt;/a&gt;. I&amp;#8217;ve now &lt;a href=&quot;https://github.com/wordaligned/advent-of-code-2020&quot;&gt;worked through all 25 puzzles&lt;/a&gt;, some simple, some tough, some familiar, some new; all beautifully set and highly enjoyable.&lt;/p&gt;
@@ -2122,51 +2265,6 @@ ValueError: max() arg is an empty sequence
 <guid>http://wordaligned.org/articles/ordered-sublists-a-brute-force-approach</guid>
 <author>tag@wordaligned.org (Thomas Guest)</author>
 <link>http://wordaligned.org/articles/ordered-sublists-a-brute-force-approach</link>
-<category>Puzzles</category>
-</item>
-
-<item>
-<title>A race within a race</title>
-<description>&lt;p&gt;In 2003 the route of the Bristol half marathon took runners out of the city, following the Portway along the base of the Avon Gorge before turning 180&amp;deg; and taking them straight back again. So runners heading out along one side of the road got to watch the faster runners in front of them, heading back.&lt;/p&gt;
-&lt;p&gt;&lt;a style=&quot;align:top;&quot; href=&quot;http://www.runnerslife.co.uk/Guest-Runners/Nick-Rose&quot;&gt;&lt;img width=&quot;150&quot; height=&quot;200&quot; src=&quot;http://wordaligned.org/images/nick-rose-then.jpg&quot; alt=&quot;Nick Rose then&quot;/&gt;&lt;/a&gt;
-&lt;a style=&quot;align:top;&quot; href=&quot;http://www.upandrunning.co.uk/shops/bristol.php&quot;&gt;&lt;img width=&quot;150&quot; height=&quot;200&quot; src=&quot;http://wordaligned.org/images/nick-rose-now.jpg&quot; alt=&quot;Nick Rose now&quot;/&gt;&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;The beauty of the Avon Gorge was probably lost on most competitors, myself included. What did impress me, though, was the sight of Nick Rose sprinting back along the Portway, his white hair swept back by his astonishing speed. Despite being 13 years older than me he completed the 13 mile race 13 minutes ahead of me. (I did beat &lt;a href=&quot;http://en.wikipedia.org/wiki/Steve_Cram&quot;&gt;Steve Cram&lt;/a&gt; though!)&lt;/p&gt;
-&lt;p&gt;&lt;span id=&quot;continue-reading&quot;/&gt;&lt;/p&gt;
-&lt;p&gt;The &lt;a href=&quot;http://www.bristolhalfmarathon.com/about/race-history/&quot;&gt;2003 Bristol half marathon&lt;/a&gt; featured a &lt;strong&gt;race within a race&lt;/strong&gt;, the &amp;#8220;Legends Challenge&amp;#8221;, which reunited veteran British athletes Nick Rose, Steve Cram, Tim Hutchings, Hugh Jones, Steve Jones and Mike McLeod to compete against each other for the first time since the 1984 Los Angeles Olympics. Nick Rose won this race within a race, aged 52, in 16&lt;sup&gt;th&lt;/sup&gt; place overall, with a time of just 1:11:08. This inspiring result set me wondering about another slice of the results: starting with a list of runners ordered by their finishing time in a race, select, in order, a sublist of runners who are getting younger. &lt;strong&gt;What is the longest such sublist?&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;Unfortunately I don&amp;#8217;t have access to the full results for the Bristol 2003 half marathon. Instead, here are the top 20 finishers in the 2008 &lt;a href=&quot;http://www.nycmarathon.org&quot;&gt;New York marathon&lt;/a&gt;&lt;a id=&quot;fn1link&quot; href=&quot;http://wordaligned.org/articles/a-race-within-a-race#fn1&quot;&gt;&lt;sup&gt;&lt;a href=&quot;https://blog.codeship.com/building-minimal-docker-containers-for-go-applications/&quot;&gt;1&lt;/a&gt;&lt;/sup&gt;&lt;/a&gt;.&lt;/p&gt;
-&lt;ol&gt;
-&lt;li&gt;MARILSON GOMES DOS SANTOS, 31, M, 2:08:43&lt;/li&gt;
-&lt;li&gt;ABDERRAHIM GOUMRI, 32, M, 2:09:07&lt;/li&gt;
-&lt;li&gt;DANIEL RONO, 30, M, 2:11:22&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;PAUL TERGAT, 39&lt;/strong&gt;, M, 2:13:10&lt;/li&gt;
-&lt;li&gt;ABDERRAHIME BOURAMDANE, 30, M, 2:13:33&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;ABDI ABDIRAHMAN, 31&lt;/strong&gt;, M, 2:14:17&lt;/li&gt;
-&lt;li&gt;JOSH ROHATINSKY, 26, M, 2:14:23&lt;/li&gt;
-&lt;li&gt;JASON LEHMKUHLE, 31, M, 2:14:30&lt;/li&gt;
-&lt;li&gt;HOSEA ROTICH, 29, M, 2:15:25&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;BOLOTA ASMEROM, 30&lt;/strong&gt;, M, 2:16:37&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;LUKE HUMPHREY, 27&lt;/strong&gt;, M, 2:18:38&lt;/li&gt;
-&lt;li&gt;HENDRICK RAMAALA, 36, M, 2:19:11&lt;/li&gt;
-&lt;li&gt;MOHAMMED AWOL, 30, M, 2:19:13&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;KASSAHUN KABISO, 25&lt;/strong&gt;, M, 2:19:54&lt;/li&gt;
-&lt;li&gt;JACOB FREY, 27, M, 2:20:17&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;GENNA TUFA, 24&lt;/strong&gt;, M, 2:20:23&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;KYLE SHACKLETON, 22&lt;/strong&gt;, M, 2:20:38&lt;/li&gt;
-&lt;li&gt;TEKLU TEFERA DENEKE, 29, M, 2:20:47&lt;/li&gt;
-&lt;li&gt;BOAZ CHEBOIYWO, 30, M, 2:21:40&lt;/li&gt;
-&lt;li&gt;DERESSE DENIBOBA, 26, M, 2:21:54&lt;/li&gt;
-&lt;/ol&gt;
-&lt;p&gt;As you can see Paul Tergat, 39, finished ahead of the younger runner Abdi Abdirahman, 31, who beat Bolota Asmerom, 30, etc., giving a sublist of 7 runners which fits our criteria. Certainly this isn&amp;#8217;t the only such sublist of this small sample, but is there a longer one?&lt;/p&gt;
-&lt;p&gt;After a few minutes we may convince ourselves we&amp;#8217;ve found an optimal solution. How would you approach this problem for the full results list, ending with YURIKO OKADA, 59, F, 9:59:58 in 38096&lt;sup&gt;th&lt;/sup&gt; place?&lt;/p&gt;
-&lt;p&gt;&lt;a href=&quot;http://www.nyc-architecture.com/BRI/BR-010.htm&quot; title=&quot;How many runners?&quot;&gt;&lt;img width=&quot;300&quot; src=&quot;http://www.nyc-architecture.com/BRI/Verrazano-Narrows_Bridge_New_York_City_Marathon_2.jpg&quot; alt=&quot;How many runners?&quot;/&gt;&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;I&amp;#8217;ll be discussing this problem in the next few posts, so please make sure you&amp;#8217;re &lt;a href=&quot;http://feeds.wordaligned.org/wordaligned&quot;&gt;subscribed&lt;/a&gt; to read on. In the meanwhile, here&amp;#8217;s a picture of the Avon Gorge taken from the western pier of the Clifton Suspension bridge. You can see the Portway down at the bottom. Nick Rose is a past winner of the Bristol Half Marathon. In 1979 &lt;a href=&quot;http://www.nationmaster.com/encyclopedia/Half-marathon#World_record_progression_-_Men&quot;&gt;he set a world record time&lt;/a&gt; for the distance of 1:02:36, and his &lt;a href=&quot;http://hem.bredband.net/athletics/atb-m59.htm&quot;&gt;personal best of 1:01:03&lt;/a&gt; still stands as a British record. He lives in Bristol, now working at &lt;a href=&quot;http://www.upandrunning.co.uk/shops/bristol.php&quot;&gt;&amp;#8220;Up and Running&amp;#8221;&lt;/a&gt; in Westbury Park, and he continues to participate in the sport.&lt;/p&gt;
-&lt;p&gt;&lt;a href=&quot;http://www.flickr.com/photos/thomasguest/3163729064/&quot; title=&quot;Avon Gorge and Clifton Suspension Bridge by Thomas Guest, on Flickr&quot;&gt;&lt;img src=&quot;http://farm4.static.flickr.com/3120/3163729064_6f0feec1b8.jpg&quot; width=&quot;500&quot; height=&quot;154&quot; alt=&quot;Avon Gorge and Clifton Suspension Bridge&quot; /&gt;&lt;/a&gt;&lt;/p&gt;
-&lt;hr /&gt;
-&lt;p&gt;&lt;a id=&quot;fn1&quot; href=&quot;http://wordaligned.org/articles/a-race-within-a-race#fn1link&quot;&gt;&lt;a href=&quot;https://blog.codeship.com/building-minimal-docker-containers-for-go-applications/&quot;&gt;1&lt;/a&gt;&lt;/a&gt; I&amp;#8217;m using capital letters since these names are scraped directly from the &lt;a href=&quot;http://www.nycmarathon.org&quot;&gt;New York Marathon website&lt;/a&gt;, which uses capital letters almost exclusively, except for non-ascii athletes such as CORN&amp;eacute; VAN OIRSCHOT.&lt;/p&gt;</description>
-<dc:date>2009-03-04</dc:date>
-<guid>http://wordaligned.org/articles/a-race-within-a-race</guid>
-<author>tag@wordaligned.org (Thomas Guest)</author>
-<link>http://wordaligned.org/articles/a-race-within-a-race</link>
 <category>Puzzles</category>
 </item>
 
