@@ -2,7 +2,7 @@
 <rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" >
 <channel>
 <title>Word Aligned</title>
-<link>http://wordaligned.org</link>
+<link>https://wordaligned.org</link>
 <description>tales from the code face</description>
 <dc:creator>tag@wordaligned.org</dc:creator>
 <language>en-gb</language>
@@ -12,7 +12,7 @@
 &lt;blockquote&gt;
 &lt;p&gt;Find the smallest number that can be expressed as the sum of 5, 17, 563, 641 consecutive prime numbers, and is itself a prime number.&lt;/p&gt;
 &lt;/blockquote&gt;
-&lt;p&gt;&lt;img src=&quot;http://wordaligned.org/images/primes.png&quot; alt=&quot;Small primes graphic&quot;/&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https://wordaligned.org/images/primes.png&quot; alt=&quot;Small primes graphic&quot;/&gt;&lt;/p&gt;
 &lt;p&gt;Here, the prime numbers are an infinite steam:&lt;/p&gt;
 &lt;div class=&quot;typocode&quot;&gt;
 
@@ -105,7 +105,7 @@ def stream_merge(*ss):
 &lt;p&gt;the primes remain when you remove these composites from the series of natural numbers.&lt;/p&gt;
 &lt;/li&gt;
 &lt;/ol&gt;
-&lt;p&gt;This scheme is hardly original &amp;#8212; it&amp;#8217;s a variant of &lt;a href=&quot;http://en.wikipedia.org/wiki/Sieve_of_Eratosthenes&quot;&gt;Eratosthenes&amp;#8217; sieve&lt;/a&gt; &amp;#8212; but if you look carefully you&amp;#8217;ll notice the self-reference. Unfortunately recursive definitions of infinite series don&amp;#8217;t work well with Python&lt;a id=&quot;fn1link&quot; href=&quot;http://wordaligned.org/articles/python-streams-vs-unix-pipes#fn1&quot;&gt;&lt;sup&gt;&lt;a href=&quot;https://blog.codeship.com/building-minimal-docker-containers-for-go-applications/&quot;&gt;1&lt;/a&gt;&lt;/sup&gt;&lt;/a&gt;, hence &lt;code&gt;primes()&lt;/code&gt; requires a little more finesse. We&amp;#8217;ll take a look at it later.&lt;/p&gt;
+&lt;p&gt;This scheme is hardly original &amp;#8212; it&amp;#8217;s a variant of &lt;a href=&quot;http://en.wikipedia.org/wiki/Sieve_of_Eratosthenes&quot;&gt;Eratosthenes&amp;#8217; sieve&lt;/a&gt; &amp;#8212; but if you look carefully you&amp;#8217;ll notice the self-reference. Unfortunately recursive definitions of infinite series don&amp;#8217;t work well with Python&lt;a id=&quot;fn1link&quot; href=&quot;https://wordaligned.org/articles/python-streams-vs-unix-pipes#fn1&quot;&gt;&lt;sup&gt;&lt;a href=&quot;https://blog.codeship.com/building-minimal-docker-containers-for-go-applications/&quot;&gt;1&lt;/a&gt;&lt;/sup&gt;&lt;/a&gt;, hence &lt;code&gt;primes()&lt;/code&gt; requires a little more finesse. We&amp;#8217;ll take a look at it later.&lt;/p&gt;
 &lt;p&gt;Moving on, to solve the original puzzle we need a consecutive sum filter. This will transform a stream of numbers into a stream of consecutive sums of these numbers:&lt;/p&gt;
 &lt;div class=&quot;typocode&quot;&gt;
 
@@ -161,7 +161,7 @@ def stream_merge(*ss):
 &lt;/div&gt;
 
 &lt;p&gt;Here&amp;#8217;s a picture of how these stream tools link up to solve this particular puzzle. The great thing is that we can reconnect these same tools to solve a wide range of puzzles, and indeed more practical &lt;a href=&quot;http://www.dabeaz.com/generators/&quot;&gt;processing tasks&lt;/a&gt;. To use the common analogy, we direct data streams along pipes.&lt;/p&gt;
-&lt;p&gt;&lt;img alt=&quot;Stream connections&quot; src=&quot;http://wordaligned.org/images/pipeline.png&quot;/&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img alt=&quot;Stream connections&quot; src=&quot;https://wordaligned.org/images/pipeline.png&quot;/&gt;&lt;/p&gt;
 &lt;h3 id=&quot;infinite-series-in-other-languages&quot;&gt;Infinite series in Other Languages&lt;/h3&gt;
 &lt;p&gt;Python is the language I find most convenient most of the time, which explains why I reached for it first. It&amp;#8217;s an increasingly popular language, which helps explain why I didn&amp;#8217;t need to write the tricky parts of my solution from scratch: they&amp;#8217;d already been done. Python is also a language which makes compromises. Having used Python to find a solution to the puzzle I wondered if there wasn&amp;#8217;t some other language better suited to this kind of problem.&lt;/p&gt;
 &lt;p&gt;&lt;a href=&quot;http://haskell.org&quot;&gt;Haskell&lt;/a&gt; makes no compromises when it comes to functional programming. Its lazy evaluation and inductive recursion make it a perfect fit for this kind of puzzle &amp;#8212; but my  approach of teeing, filtering and merging made me consider the Unix Shell. Now, I use Bash every day and page through its manual at least once a week. Scripting appeals and I&amp;#8217;m comfortable at the command line. How hard could it be to solve this puzzle using Bash? After all, I already knew the answer!&lt;/p&gt;
@@ -206,7 +206,7 @@ $ jot 5 | psum | tee pipe | tail -n +2 | paste - pipe
 
 &lt;/div&gt;
 
-&lt;p&gt;Here, &lt;code&gt;jot 5&lt;/code&gt; generates the sequence 1, 2, 3, 4, 5, which &lt;code&gt;psum&lt;/code&gt; progressively accumulates to 1, 3, 6, 10, 15. We then &lt;code&gt;tee&lt;/code&gt; this partial sum series through two pipes: the first, &lt;code&gt;pipe&lt;/code&gt;, is an explicitly created named pipe created by &lt;code&gt;mkfifo&lt;/code&gt;, the second is implicitly created by the pipeline operator, &lt;code&gt;|&lt;/code&gt;. The remainder of the command line delays one series by one (note that &lt;code&gt;tail&lt;/code&gt; numbers lines from &lt;code&gt;1&lt;/code&gt;, not &lt;code&gt;0&lt;/code&gt;, so &lt;code&gt;tail -n +1&lt;/code&gt; is the identity filter) then pastes the two series back together&lt;a id=&quot;fn2link&quot; href=&quot;http://wordaligned.org/articles/python-streams-vs-unix-pipes#fn2&quot;&gt;&lt;sup&gt;&lt;a href=&quot;http://devcenter.wercker.com/docs/quickstarts/advanced/building-minimal-containers-with-go&quot;&gt;2&lt;/a&gt;&lt;/sup&gt;&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Here, &lt;code&gt;jot 5&lt;/code&gt; generates the sequence 1, 2, 3, 4, 5, which &lt;code&gt;psum&lt;/code&gt; progressively accumulates to 1, 3, 6, 10, 15. We then &lt;code&gt;tee&lt;/code&gt; this partial sum series through two pipes: the first, &lt;code&gt;pipe&lt;/code&gt;, is an explicitly created named pipe created by &lt;code&gt;mkfifo&lt;/code&gt;, the second is implicitly created by the pipeline operator, &lt;code&gt;|&lt;/code&gt;. The remainder of the command line delays one series by one (note that &lt;code&gt;tail&lt;/code&gt; numbers lines from &lt;code&gt;1&lt;/code&gt;, not &lt;code&gt;0&lt;/code&gt;, so &lt;code&gt;tail -n +1&lt;/code&gt; is the identity filter) then pastes the two series back together&lt;a id=&quot;fn2link&quot; href=&quot;https://wordaligned.org/articles/python-streams-vs-unix-pipes#fn2&quot;&gt;&lt;sup&gt;&lt;a href=&quot;http://devcenter.wercker.com/docs/quickstarts/advanced/building-minimal-containers-with-go&quot;&gt;2&lt;/a&gt;&lt;/sup&gt;&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;By appending a single &lt;code&gt;awk&lt;/code&gt; action to the pipeline we get a consecutive sum series.&lt;/p&gt;
 &lt;div class=&quot;typocode&quot;&gt;
 
@@ -301,7 +301,7 @@ $ yes 1 | psum | sdiff 1
 &lt;/div&gt;
 
 &lt;h3 id=&quot;merging-streams&quot;&gt;Merging Streams&lt;/h3&gt;
-&lt;p&gt;The Unix shell merges streams rather more succinctly than Python. &lt;code&gt;Sort -m&lt;/code&gt; does the job directly. Note that a standard &lt;code&gt;sort&lt;/code&gt; cannot yield any output until all its inputs are exhausted, since the final input item might turn out to be the one which should appear first in the output. Merge sort, &lt;code&gt;sort -m&lt;/code&gt;, can and does produce output without delay&lt;a id=&quot;fn3link&quot; href=&quot;http://wordaligned.org/articles/python-streams-vs-unix-pipes#fn3&quot;&gt;&lt;sup&gt;[3]&lt;/sup&gt;&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;The Unix shell merges streams rather more succinctly than Python. &lt;code&gt;Sort -m&lt;/code&gt; does the job directly. Note that a standard &lt;code&gt;sort&lt;/code&gt; cannot yield any output until all its inputs are exhausted, since the final input item might turn out to be the one which should appear first in the output. Merge sort, &lt;code&gt;sort -m&lt;/code&gt;, can and does produce output without delay&lt;a id=&quot;fn3link&quot; href=&quot;https://wordaligned.org/articles/python-streams-vs-unix-pipes#fn3&quot;&gt;&lt;sup&gt;[3]&lt;/sup&gt;&lt;/a&gt;.&lt;/p&gt;
 &lt;div class=&quot;typocode&quot;&gt;
 
 &lt;pre class=&quot;prettyprint&quot;&gt;$ yes | sort
@@ -349,7 +349,7 @@ for p in primes():
 &lt;p&gt;This is a subtle little program which makes clever use of Python&amp;#8217;s native hashed array container, the dictionary. In this case dictionary values are the primes less than &lt;code&gt;n&lt;/code&gt; and the keys are composite multiples of these primes. The loop invariant, roughly speaking, is that the dictionary values are the primes less than &lt;code&gt;n&lt;/code&gt;, and the corresponding keys are the lowest multiples of these primes greater than or equal to &lt;code&gt;n&lt;/code&gt;. It&amp;#8217;s a lazy, recursion-free take of Eratosthenes&amp;#8217; sieve.&lt;/p&gt;
 &lt;p&gt;For the purposes of this article the important things about this program are:&lt;/p&gt;
 &lt;ul&gt;
-&lt;li&gt;it generates an infinite series of numbers to standard output&lt;a id=&quot;fn4link&quot; href=&quot;http://wordaligned.org/articles/python-streams-vs-unix-pipes#fn4&quot;&gt;&lt;sup&gt;[4]&lt;/sup&gt;&lt;/a&gt;, making it a good source for a shell pipeline&lt;/li&gt;
+&lt;li&gt;it generates an infinite series of numbers to standard output&lt;a id=&quot;fn4link&quot; href=&quot;https://wordaligned.org/articles/python-streams-vs-unix-pipes#fn4&quot;&gt;&lt;sup&gt;[4]&lt;/sup&gt;&lt;/a&gt;, making it a good source for a shell pipeline&lt;/li&gt;
 &lt;li&gt;by making it executable and adding the usual shebang incantation, we can invoke this Python program seamlessly from the shell.&lt;/li&gt;
 &lt;/ul&gt;
 &lt;h3 id=&quot;pipe-connection&quot;&gt;Pipe Connection&lt;/h3&gt;
@@ -412,7 +412,7 @@ $ sort -mn c.{1,5,17,563,641} | uniq -c | grep &quot;5 &quot;
 
 &lt;/div&gt;
 
-&lt;p&gt;Here, we use a standard &lt;a href=&quot;http://wordaligned.org/articles/shell-script-sets&quot;&gt;shell script set intersection&lt;/a&gt; recipe: &lt;code&gt;uniq -c&lt;/code&gt; groups and counts repeated elements, and the &lt;code&gt;grep&lt;/code&gt; pattern matches those numbers common to all five input streams.&lt;/p&gt;
+&lt;p&gt;Here, we use a standard &lt;a href=&quot;https://wordaligned.org/articles/shell-script-sets&quot;&gt;shell script set intersection&lt;/a&gt; recipe: &lt;code&gt;uniq -c&lt;/code&gt; groups and counts repeated elements, and the &lt;code&gt;grep&lt;/code&gt; pattern matches those numbers common to all five input streams.&lt;/p&gt;
 &lt;p&gt;Now we can kick off the processes which will feed into the consecutive sum streams, which &lt;code&gt;sort&lt;/code&gt; is waiting on.&lt;/p&gt;
 &lt;div class=&quot;typocode&quot;&gt;
 
@@ -422,7 +422,7 @@ $ sort -mn c.{1,5,17,563,641} | uniq -c | grep &quot;5 &quot;
 
 &lt;/div&gt;
 
-&lt;p&gt;Sure enough, after about 15 seconds elapsed time&lt;a id=&quot;fn5link&quot; href=&quot;http://wordaligned.org/articles/python-streams-vs-unix-pipes#fn5&quot;&gt;&lt;sup&gt;[5]&lt;/sup&gt;&lt;/a&gt;, out pops the result:&lt;/p&gt;
+&lt;p&gt;Sure enough, after about 15 seconds elapsed time&lt;a id=&quot;fn5link&quot; href=&quot;https://wordaligned.org/articles/python-streams-vs-unix-pipes#fn5&quot;&gt;&lt;sup&gt;[5]&lt;/sup&gt;&lt;/a&gt;, out pops the result:&lt;/p&gt;
 &lt;div class=&quot;typocode&quot;&gt;
 
 &lt;pre class=&quot;prettyprint&quot;&gt;$ sort -mn c.{1,5,17,563,641} | uniq -c | grep &quot;5 &quot;
@@ -520,11 +520,11 @@ main = print $ head $ \
 &lt;/div&gt;
 
 &lt;hr /&gt;
-&lt;p&gt;&lt;a id=&quot;fn1&quot; href=&quot;http://wordaligned.org/articles/python-streams-vs-unix-pipes#fn1link&quot;&gt;&lt;a href=&quot;https://blog.codeship.com/building-minimal-docker-containers-for-go-applications/&quot;&gt;1&lt;/a&gt;&lt;/a&gt; CPython, more precisely &amp;#8212; I don&amp;#8217;t think anything in the Python language itself prohibits tail recursion. Even using CPython, yet another &lt;a href=&quot;http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/496691&quot;&gt;recipe&lt;/a&gt; from the online Python Cookbook explores the idea of an &lt;code&gt;@tail_recursion&lt;/code&gt; decorator.&lt;/p&gt;
-&lt;p&gt;&lt;a id=&quot;fn2&quot; href=&quot;http://wordaligned.org/articles/python-streams-vs-unix-pipes#fn2link&quot;&gt;&lt;a href=&quot;http://devcenter.wercker.com/docs/quickstarts/advanced/building-minimal-containers-with-go&quot;&gt;2&lt;/a&gt;&lt;/a&gt; &lt;code&gt;Tail&lt;/code&gt; is more commonly used to yield a fixed number of lines from the end of the file: by prefixing the line count argument with a &lt;code&gt;+&lt;/code&gt; sign, it skips lines from the head of the file. The GNU version of &lt;code&gt;head&lt;/code&gt; can similarly be used with a &lt;code&gt;-&lt;/code&gt; prefix to skip lines at the tail of a file. The notation is {compact,powerful,subtle,implementation dependent}.&lt;/p&gt;
-&lt;p&gt;&lt;a id=&quot;fn3&quot; href=&quot;http://wordaligned.org/articles/python-streams-vs-unix-pipes#fn3link&quot;&gt;[3]&lt;/a&gt; &lt;code&gt;Sort -m&lt;/code&gt; is a sort which doesn&amp;#8217;t really sort &amp;#8212; its inputs should already be sorted &amp;#8212; rather like the &lt;code&gt;+n&lt;/code&gt; option turning &lt;code&gt;tail&lt;/code&gt; on its head.&lt;/p&gt;
-&lt;p&gt;&lt;a id=&quot;fn4&quot; href=&quot;http://wordaligned.org/articles/python-streams-vs-unix-pipes#fn4link&quot;&gt;[4]&lt;/a&gt; The series is infinite in theory only: at time &lt;code&gt;n&lt;/code&gt; the number of items in the &lt;code&gt;has_prime_factors&lt;/code&gt; dictionary equals the number of primes less than &lt;code&gt;n&lt;/code&gt;, and each key in this dictionary is larger than &lt;code&gt;n&lt;/code&gt;. So resource use increases steadily as &lt;code&gt;n&lt;/code&gt; increases.&lt;/p&gt;
-&lt;p&gt;&lt;a id=&quot;fn5&quot; href=&quot;http://wordaligned.org/articles/python-streams-vs-unix-pipes#fn5link&quot;&gt;[5]&lt;/a&gt; I used a MacBook laptop used to run these scripts. &lt;/p&gt;
+&lt;p&gt;&lt;a id=&quot;fn1&quot; href=&quot;https://wordaligned.org/articles/python-streams-vs-unix-pipes#fn1link&quot;&gt;&lt;a href=&quot;https://blog.codeship.com/building-minimal-docker-containers-for-go-applications/&quot;&gt;1&lt;/a&gt;&lt;/a&gt; CPython, more precisely &amp;#8212; I don&amp;#8217;t think anything in the Python language itself prohibits tail recursion. Even using CPython, yet another &lt;a href=&quot;http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/496691&quot;&gt;recipe&lt;/a&gt; from the online Python Cookbook explores the idea of an &lt;code&gt;@tail_recursion&lt;/code&gt; decorator.&lt;/p&gt;
+&lt;p&gt;&lt;a id=&quot;fn2&quot; href=&quot;https://wordaligned.org/articles/python-streams-vs-unix-pipes#fn2link&quot;&gt;&lt;a href=&quot;http://devcenter.wercker.com/docs/quickstarts/advanced/building-minimal-containers-with-go&quot;&gt;2&lt;/a&gt;&lt;/a&gt; &lt;code&gt;Tail&lt;/code&gt; is more commonly used to yield a fixed number of lines from the end of the file: by prefixing the line count argument with a &lt;code&gt;+&lt;/code&gt; sign, it skips lines from the head of the file. The GNU version of &lt;code&gt;head&lt;/code&gt; can similarly be used with a &lt;code&gt;-&lt;/code&gt; prefix to skip lines at the tail of a file. The notation is {compact,powerful,subtle,implementation dependent}.&lt;/p&gt;
+&lt;p&gt;&lt;a id=&quot;fn3&quot; href=&quot;https://wordaligned.org/articles/python-streams-vs-unix-pipes#fn3link&quot;&gt;[3]&lt;/a&gt; &lt;code&gt;Sort -m&lt;/code&gt; is a sort which doesn&amp;#8217;t really sort &amp;#8212; its inputs should already be sorted &amp;#8212; rather like the &lt;code&gt;+n&lt;/code&gt; option turning &lt;code&gt;tail&lt;/code&gt; on its head.&lt;/p&gt;
+&lt;p&gt;&lt;a id=&quot;fn4&quot; href=&quot;https://wordaligned.org/articles/python-streams-vs-unix-pipes#fn4link&quot;&gt;[4]&lt;/a&gt; The series is infinite in theory only: at time &lt;code&gt;n&lt;/code&gt; the number of items in the &lt;code&gt;has_prime_factors&lt;/code&gt; dictionary equals the number of primes less than &lt;code&gt;n&lt;/code&gt;, and each key in this dictionary is larger than &lt;code&gt;n&lt;/code&gt;. So resource use increases steadily as &lt;code&gt;n&lt;/code&gt; increases.&lt;/p&gt;
+&lt;p&gt;&lt;a id=&quot;fn5&quot; href=&quot;https://wordaligned.org/articles/python-streams-vs-unix-pipes#fn5link&quot;&gt;[5]&lt;/a&gt; I used a MacBook laptop used to run these scripts. &lt;/p&gt;
 &lt;pre&gt;
   Model Name:               MacBook
   Model Identifier:         MacBook1,1
@@ -537,9 +537,9 @@ main = print $ head $ \
   Bus Speed:                667 MHz
 &lt;/pre&gt;</description>
 <dc:date>2016-07-28</dc:date>
-<guid>http://wordaligned.org/articles/python-streams-vs-unix-pipes</guid>
+<guid>https://wordaligned.org/articles/python-streams-vs-unix-pipes</guid>
 <author>tag@wordaligned.org (Thomas Guest)</author>
-<link>http://wordaligned.org/articles/python-streams-vs-unix-pipes</link>
+<link>https://wordaligned.org/articles/python-streams-vs-unix-pipes</link>
 <category>Shell</category>
 </item>
 
@@ -582,9 +582,9 @@ $ find / -maxdepth 1 -name &#x27;server.log.*&#x27; | xargs rm -f
 &lt;p&gt;&lt;a href=&quot;http://www.flickr.com/photos/sarahandmikeprobably/3356749485/&quot;&gt;&lt;img src=&quot;http://farm4.static.flickr.com/3660/3356749485_66f532e6c0.jpg&quot; alt=&quot;74/365: Falling Cards, by Sarah and Mike ...probably&quot;/&gt;&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;Done!&lt;/p&gt;</description>
 <dc:date>2010-05-19</dc:date>
-<guid>http://wordaligned.org/articles/man-man</guid>
+<guid>https://wordaligned.org/articles/man-man</guid>
 <author>tag@wordaligned.org (Thomas Guest)</author>
-<link>http://wordaligned.org/articles/man-man</link>
+<link>https://wordaligned.org/articles/man-man</link>
 <category>Shell</category>
 </item>
 
@@ -592,7 +592,7 @@ $ find / -maxdepth 1 -name &#x27;server.log.*&#x27; | xargs rm -f
 <title>DEFLATE: run-length encoding, but better</title>
 <description>&lt;h3 id=&quot;run-length-encoding&quot;&gt;Run-length encoding&lt;/h3&gt;
 &lt;p&gt;&lt;a href=&quot;http://en.wikipedia.org/wiki/Run-length_encoding&quot;&gt;Run-length encoding&lt;/a&gt; is a simple compression scheme in which runs of equal values are represented by the value and a repeat count. For example, a supermarket cashier might process this line of shopping&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://wordaligned.org/images/fruit-line.png&quot; alt=&quot;Fruit salad&quot;/&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https://wordaligned.org/images/fruit-line.png&quot; alt=&quot;Fruit salad&quot;/&gt;&lt;/p&gt;
 &lt;p&gt;as&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;4 bananas&lt;/li&gt;
@@ -628,16 +628,16 @@ tails
 
 &lt;/div&gt;
 
-&lt;p&gt;&lt;img src=&quot;http://wordaligned.org/images/tails.jpg&quot; alt=&quot;tails&quot;/&gt;
-&lt;img src=&quot;http://wordaligned.org/images/tails.jpg&quot; alt=&quot;tails&quot;/&gt;
-&lt;img src=&quot;http://wordaligned.org/images/tails.jpg&quot; alt=&quot;tails&quot;/&gt;
-&lt;img src=&quot;http://wordaligned.org/images/heads.jpg&quot; alt=&quot;heads&quot;/&gt;
-&lt;img src=&quot;http://wordaligned.org/images/tails.jpg&quot; alt=&quot;tails&quot;/&gt;
-&lt;img src=&quot;http://wordaligned.org/images/heads.jpg&quot; alt=&quot;heads&quot;/&gt;
-&lt;img src=&quot;http://wordaligned.org/images/heads.jpg&quot; alt=&quot;heads&quot;/&gt;
-&lt;img src=&quot;http://wordaligned.org/images/heads.jpg&quot; alt=&quot;heads&quot;/&gt;
-&lt;img src=&quot;http://wordaligned.org/images/tails.jpg&quot; alt=&quot;tails&quot;/&gt;
-&lt;img src=&quot;http://wordaligned.org/images/tails.jpg&quot; alt=&quot;tails&quot;/&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https://wordaligned.org/images/tails.jpg&quot; alt=&quot;tails&quot;/&gt;
+&lt;img src=&quot;https://wordaligned.org/images/tails.jpg&quot; alt=&quot;tails&quot;/&gt;
+&lt;img src=&quot;https://wordaligned.org/images/tails.jpg&quot; alt=&quot;tails&quot;/&gt;
+&lt;img src=&quot;https://wordaligned.org/images/heads.jpg&quot; alt=&quot;heads&quot;/&gt;
+&lt;img src=&quot;https://wordaligned.org/images/tails.jpg&quot; alt=&quot;tails&quot;/&gt;
+&lt;img src=&quot;https://wordaligned.org/images/heads.jpg&quot; alt=&quot;heads&quot;/&gt;
+&lt;img src=&quot;https://wordaligned.org/images/heads.jpg&quot; alt=&quot;heads&quot;/&gt;
+&lt;img src=&quot;https://wordaligned.org/images/heads.jpg&quot; alt=&quot;heads&quot;/&gt;
+&lt;img src=&quot;https://wordaligned.org/images/tails.jpg&quot; alt=&quot;tails&quot;/&gt;
+&lt;img src=&quot;https://wordaligned.org/images/tails.jpg&quot; alt=&quot;tails&quot;/&gt;&lt;/p&gt;
 &lt;p&gt;&lt;span id=&quot;continue-reading&quot;/&gt;&lt;/p&gt;
 &lt;p&gt;Passing a fresh sample from this same stream through our run-length encoder we get:&lt;/p&gt;
 &lt;div class=&quot;typocode&quot;&gt;
@@ -725,7 +725,7 @@ Now compress the decompressed stream, and explore a few items.
 &lt;/div&gt;
 
 &lt;h3 id=&quot;deflate&quot;&gt;DEFLATE&lt;/h3&gt;
-&lt;p&gt;&lt;img style=&quot;border: 2px solid #ccc;&quot; src=&quot;http://wordaligned.org/images/chessboard-monochrome.png&quot; alt=&quot;Chessboard&quot;/&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img style=&quot;border: 2px solid #ccc;&quot; src=&quot;https://wordaligned.org/images/chessboard-monochrome.png&quot; alt=&quot;Chessboard&quot;/&gt;&lt;/p&gt;
 &lt;p&gt;The Wikipedia page on &lt;a href=&quot;http://en.wikipedia.org/wiki/Run-length_encoding&quot;&gt;run-length encoding&lt;/a&gt; identifies monochrome images as good candidates for run-length compression. The white and black pixels typically group into long runs. Indeed, any simple image using a limited palette should reduce well using this compression scheme.&lt;/p&gt;
 &lt;p&gt;The chessboard above is 256&amp;times;256 pixels, each square being 32&amp;times;32 pixels. We &lt;em&gt;could&lt;/em&gt; run-length encode this 64K pixel image as 256&amp;times;8 = 2K runs of 32 pixels, a decent saving. (Actually, we should do slightly better, noting that there are runs of length 64 at the chessboard rank boundaries, but  you get the idea.)&lt;/p&gt;
 &lt;pre&gt;
@@ -795,7 +795,7 @@ inflate:         distance 33
 &lt;/div&gt;
 
 &lt;p&gt;I&amp;#8217;ve attempted to show the first few stages of the genesis of the uncompressed stream in the picture below. The way the stream recursively inflates itself is quite beautiful.&lt;/p&gt;
-&lt;p&gt;&lt;img style=&quot;border: 2px solid #ccc;&quot; src=&quot;http://wordaligned.org/images/inflate.png&quot; alt=&quot;Inflating pixels&quot;/&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img style=&quot;border: 2px solid #ccc;&quot; src=&quot;https://wordaligned.org/images/inflate.png&quot; alt=&quot;Inflating pixels&quot;/&gt;&lt;/p&gt;
 &lt;ol&gt;
 &lt;li&gt;put 00&lt;/li&gt;
 &lt;li&gt;put ff&lt;/li&gt;
@@ -821,7 +821,7 @@ Vary: Accept-Encoding
 Content-Length: 20
 &lt;/pre&gt;
 
-&lt;p&gt;The Word Aligned &lt;a href=&quot;http://wordaligned.org/&quot;&gt;front page&lt;/a&gt; contains about 75Kb of HTML, which gzips to just 16Kb &amp;#8212; a decent saving. Relevant lines from the &lt;a href=&quot;http://redmine.lighttpd.net/projects/lighttpd/wiki/Docs:ModCompress&quot;&gt;lighttpd configuration file&lt;/a&gt; read:&lt;/p&gt;
+&lt;p&gt;The Word Aligned &lt;a href=&quot;https://wordaligned.org/&quot;&gt;front page&lt;/a&gt; contains about 75Kb of HTML, which gzips to just 16Kb &amp;#8212; a decent saving. Relevant lines from the &lt;a href=&quot;http://redmine.lighttpd.net/projects/lighttpd/wiki/Docs:ModCompress&quot;&gt;lighttpd configuration file&lt;/a&gt; read:&lt;/p&gt;
 &lt;div class=&quot;typocode&quot;&gt;&lt;div class=&quot;codetitle&quot;&gt;lighttpd mod_compress&lt;/div&gt;
 
 &lt;pre class=&quot;prettyprint&quot;&gt;server.modules = (
@@ -842,23 +842,23 @@ compress.filetype  = (&quot;text/plain&quot;, &quot;text/html&quot;, &quot;text/
 &lt;p&gt;I have probably spent more time studying data compression patents than actually implementing data compression algorithms. I maintain a list of several hundred patents on lossless data compression algorithms, and I made sure that &lt;em&gt;gzip&lt;/em&gt; isn&amp;#8217;t covered by any of them. In particular, the &lt;code&gt;--fast&lt;/code&gt; option of gzip is not as fast it could, precisely to avoid a patented technique.  &amp;#8212; Jean-Loup Gailly, &lt;a href=&quot;http://www.gzip.org/#faq11&quot;&gt;Gzip FAQ&lt;/a&gt;&lt;/p&gt;
 &lt;/blockquote&gt;</description>
 <dc:date>2009-05-21</dc:date>
-<guid>http://wordaligned.org/articles/deflate-runlength-encoding-but-better</guid>
+<guid>https://wordaligned.org/articles/deflate-runlength-encoding-but-better</guid>
 <author>tag@wordaligned.org (Thomas Guest)</author>
-<link>http://wordaligned.org/articles/deflate-runlength-encoding-but-better</link>
+<link>https://wordaligned.org/articles/deflate-runlength-encoding-but-better</link>
 <category>Shell</category>
 </item>
 
 <item>
 <title>Fixing header file dependencies</title>
 <description>&lt;h3 id=&quot;depends&quot;&gt;DEPENDS&lt;/h3&gt;
-&lt;p&gt;&lt;img src=&quot;http://wordaligned.org/images/dependencies.png&quot; alt=&quot;Dependencies&quot;/&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https://wordaligned.org/images/dependencies.png&quot; alt=&quot;Dependencies&quot;/&gt;&lt;/p&gt;
 &lt;p&gt;Without care C++ header files can &lt;a href=&quot;http://yosefk.com/c++fqa/defective.html#defect-3&quot; title=&quot;Have you read the C++ FQA yet?&quot;&gt;deteriorate&lt;/a&gt;, so I was interested to find some sensible advice in the &lt;a href=&quot;http://google-styleguide.googlecode.com/svn/trunk/cppguide.xml#names_and_Order_of_Includes&quot; title=&quot;Google style guide advice on dependencies&quot;&gt;Google C++ Style Guide&lt;/a&gt;.&lt;/p&gt;
 &lt;blockquote&gt;&lt;h4&gt;Names and Orders of Includes&lt;/h4&gt;&lt;p&gt;Use standard order for readability and to avoid hidden dependencies: C library, C++ library, other libraries&amp;#8217; &lt;code&gt;.h&lt;/code&gt;, your project&amp;#8217;s &lt;code&gt;.h&lt;/code&gt;.&lt;/p&gt;&lt;p&gt;&amp;#8230;&lt;/p&gt;&lt;p&gt;The preferred ordering reduces hidden dependencies. We want every header file to be compilable on its own. The easiest way to achieve this is to make sure that every one of them is the first &lt;code&gt;.h&lt;/code&gt; file #included in some &lt;code&gt;.cc&lt;/code&gt;.&lt;/p&gt;&lt;/blockquote&gt;
 
 &lt;p&gt;I agree, hidden dependencies are bad, and I&amp;#8217;m not about to quibble with the &amp;#8220;standard order&amp;#8221; defined by the &lt;a href=&quot;http://google-styleguide.googlecode.com/svn/trunk/cppguide.xml&quot;&gt;guide&lt;/a&gt;, even if I&amp;#8217;m used to a slightly different ordering. Certainly headers should be compilable on their own; but I suggest the easiest way to achieve this is, well, &lt;strong&gt;to compile them on their own&lt;/strong&gt;. &lt;/p&gt;
 &lt;p&gt;&lt;span id=&quot;continue-reading&quot;/&gt;&lt;/p&gt;
 &lt;h3 id=&quot;readme&quot;&gt;README&lt;/h3&gt;
-&lt;p&gt;You don&amp;#8217;t need a project file or even a makefile if you want to compile something. It&amp;#8217;s easy to create a script which confirms a header has no hidden dependencies by including and compiling it&lt;a id=&quot;fn1link&quot; href=&quot;http://wordaligned.org/articles/fixing-header-file-dependencies#fn1&quot;&gt;&lt;sup&gt;&lt;a href=&quot;https://blog.codeship.com/building-minimal-docker-containers-for-go-applications/&quot;&gt;1&lt;/a&gt;&lt;/sup&gt;&lt;/a&gt;. Create a file called &lt;code&gt;check-header&lt;/code&gt; and paste in the following:&lt;/p&gt;
+&lt;p&gt;You don&amp;#8217;t need a project file or even a makefile if you want to compile something. It&amp;#8217;s easy to create a script which confirms a header has no hidden dependencies by including and compiling it&lt;a id=&quot;fn1link&quot; href=&quot;https://wordaligned.org/articles/fixing-header-file-dependencies#fn1&quot;&gt;&lt;sup&gt;&lt;a href=&quot;https://blog.codeship.com/building-minimal-docker-containers-for-go-applications/&quot;&gt;1&lt;/a&gt;&lt;/sup&gt;&lt;/a&gt;. Create a file called &lt;code&gt;check-header&lt;/code&gt; and paste in the following:&lt;/p&gt;
 &lt;div class=&quot;typocode&quot;&gt;&lt;div class=&quot;codetitle&quot;&gt;check-header&lt;/div&gt;
 
 &lt;pre class=&quot;prettyprint&quot;&gt;#!/bin/bash
@@ -901,7 +901,7 @@ $ echo $?
 &lt;/div&gt;
 
 &lt;h3 id=&quot;install&quot;&gt;INSTALL&lt;/h3&gt;
-&lt;p&gt;It gets tiresome to run this command on one header at a time. Happily we can use it in a compound command to check all the headers in the current directory&lt;a id=&quot;fn2link&quot; href=&quot;http://wordaligned.org/articles/fixing-header-file-dependencies#fn2&quot;&gt;&lt;sup&gt;&lt;a href=&quot;http://devcenter.wercker.com/docs/quickstarts/advanced/building-minimal-containers-with-go&quot;&gt;2&lt;/a&gt;&lt;/sup&gt;&lt;/a&gt;:&lt;/p&gt;
+&lt;p&gt;It gets tiresome to run this command on one header at a time. Happily we can use it in a compound command to check all the headers in the current directory&lt;a id=&quot;fn2link&quot; href=&quot;https://wordaligned.org/articles/fixing-header-file-dependencies#fn2&quot;&gt;&lt;sup&gt;&lt;a href=&quot;http://devcenter.wercker.com/docs/quickstarts/advanced/building-minimal-containers-with-go&quot;&gt;2&lt;/a&gt;&lt;/sup&gt;&lt;/a&gt;:&lt;/p&gt;
 &lt;div class=&quot;typocode&quot;&gt;
 
 &lt;pre class=&quot;prettyprint&quot;&gt;$ for header in *.h; do check-header $header; done
@@ -932,26 +932,26 @@ $ echo $?
 &lt;p&gt;&amp;#8230;&lt;/p&gt;
 &lt;p&gt;You can significantly minimize the number of header files you need to include in your own header files by using forward declarations. For example, if your header file uses the &lt;code&gt;File&lt;/code&gt; class in ways that do not require access to the declaration of the &lt;code&gt;File&lt;/code&gt; class, your header file can just forward declare &lt;code&gt;class File;&lt;/code&gt; instead of having to &lt;code&gt;#include &quot;file/base/file.h&quot;&lt;/code&gt;.&lt;/p&gt;
 &lt;/blockquote&gt;
-&lt;div class=&quot;amazon&quot;&gt;&lt;a href=&quot;http://www.amazon.com/gp/product/0321113586?ie=UTF8&amp;amp;tag=wordalig-20&quot;&gt;&lt;img  src=&quot;http://wordaligned.org/images/books/cpp-coding-standards.jpg&quot; alt=&quot;Book cover&quot;/&gt;&lt;/a&gt;&lt;/div&gt;
+&lt;div class=&quot;amazon&quot;&gt;&lt;a href=&quot;http://www.amazon.com/gp/product/0321113586?ie=UTF8&amp;amp;tag=wordalig-20&quot;&gt;&lt;img  src=&quot;https://wordaligned.org/images/books/cpp-coding-standards.jpg&quot; alt=&quot;Book cover&quot;/&gt;&lt;/a&gt;&lt;/div&gt;
 
-&lt;p&gt;I don&amp;#8217;t think many of us would dispute this advice, though &lt;a href=&quot;http://wordaligned.org/articles/retro-fitting-coding-standards.html#tocask-the-experts&quot;&gt;I&amp;#8217;m not sure it belongs in a style guide&lt;/a&gt; &amp;#8212; it&amp;#8217;s just good C++ practice, the stuff you should be getting &lt;a href=&quot;http://www.amazon.com/gp/product/0321113586?ie=UTF8&amp;amp;tag=wordalig-20&quot; title=&quot;Amazon affiliates link to C++ Coding Standards by Sutter and Alexandrescu&quot;&gt;from a book&lt;/a&gt;. What I&amp;#8217;d like is a refactoring tool which does it for me, something like Eclipse&amp;#8217;s &lt;a href=&quot;http://help.eclipse.org/ganymede/index.jsp?topic=/org.eclipse.jdt.doc.user/gettingStarted/qs-OrganizeImports.htm&quot;&gt;&amp;#8220;organize imports&amp;#8221;&lt;/a&gt;. A script might be able to do some of this, but it will have to be considerably more complex than &lt;code&gt;check-header&lt;/code&gt;, and without access to the compiler internals it will be limited in power.&lt;/p&gt;
+&lt;p&gt;I don&amp;#8217;t think many of us would dispute this advice, though &lt;a href=&quot;https://wordaligned.org/articles/retro-fitting-coding-standards.html#tocask-the-experts&quot;&gt;I&amp;#8217;m not sure it belongs in a style guide&lt;/a&gt; &amp;#8212; it&amp;#8217;s just good C++ practice, the stuff you should be getting &lt;a href=&quot;http://www.amazon.com/gp/product/0321113586?ie=UTF8&amp;amp;tag=wordalig-20&quot; title=&quot;Amazon affiliates link to C++ Coding Standards by Sutter and Alexandrescu&quot;&gt;from a book&lt;/a&gt;. What I&amp;#8217;d like is a refactoring tool which does it for me, something like Eclipse&amp;#8217;s &lt;a href=&quot;http://help.eclipse.org/ganymede/index.jsp?topic=/org.eclipse.jdt.doc.user/gettingStarted/qs-OrganizeImports.htm&quot;&gt;&amp;#8220;organize imports&amp;#8221;&lt;/a&gt;. A script might be able to do some of this, but it will have to be considerably more complex than &lt;code&gt;check-header&lt;/code&gt;, and without access to the compiler internals it will be limited in power.&lt;/p&gt;
 &lt;hr /&gt;
-&lt;p&gt;&lt;a id=&quot;fn1&quot; href=&quot;http://wordaligned.org/articles/fixing-header-file-dependencies#fn1link&quot;&gt;&lt;a href=&quot;https://blog.codeship.com/building-minimal-docker-containers-for-go-applications/&quot;&gt;1&lt;/a&gt;&lt;/a&gt; While writing this article I discovered &lt;a href=&quot;http://gcc.gnu.org/&quot;&gt;GCC&lt;/a&gt; allows you to precompile header files, reducing the need to create even a minimal script like &lt;code&gt;check-header&lt;/code&gt;. Running &lt;code&gt;gcc $CPPFLAGS header.h&lt;/code&gt; generates &lt;code&gt;header.gch&lt;/code&gt; for a valid and self-contained header file, and compiler diagnostics otherwise. As the &lt;a href=&quot;http://gcc.gnu.org/onlinedocs/gcc/Precompiled-Headers.html&quot;&gt;documentation&lt;/a&gt; says:&lt;/p&gt;
+&lt;p&gt;&lt;a id=&quot;fn1&quot; href=&quot;https://wordaligned.org/articles/fixing-header-file-dependencies#fn1link&quot;&gt;&lt;a href=&quot;https://blog.codeship.com/building-minimal-docker-containers-for-go-applications/&quot;&gt;1&lt;/a&gt;&lt;/a&gt; While writing this article I discovered &lt;a href=&quot;http://gcc.gnu.org/&quot;&gt;GCC&lt;/a&gt; allows you to precompile header files, reducing the need to create even a minimal script like &lt;code&gt;check-header&lt;/code&gt;. Running &lt;code&gt;gcc $CPPFLAGS header.h&lt;/code&gt; generates &lt;code&gt;header.gch&lt;/code&gt; for a valid and self-contained header file, and compiler diagnostics otherwise. As the &lt;a href=&quot;http://gcc.gnu.org/onlinedocs/gcc/Precompiled-Headers.html&quot;&gt;documentation&lt;/a&gt; says:&lt;/p&gt;
 &lt;blockquote&gt;
 &lt;p&gt;There are many other possibilities, limited only by your imagination, good sense, and the constraints of your build system.&lt;/p&gt;
 &lt;/blockquote&gt;
-&lt;p&gt;&lt;a id=&quot;fn2&quot; href=&quot;http://wordaligned.org/articles/fixing-header-file-dependencies#fn2link&quot;&gt;&lt;a href=&quot;http://devcenter.wercker.com/docs/quickstarts/advanced/building-minimal-containers-with-go&quot;&gt;2&lt;/a&gt;&lt;/a&gt; It would be better to tweak &lt;code&gt;check-header&lt;/code&gt; to work on a list of input files.&lt;/p&gt;</description>
+&lt;p&gt;&lt;a id=&quot;fn2&quot; href=&quot;https://wordaligned.org/articles/fixing-header-file-dependencies#fn2link&quot;&gt;&lt;a href=&quot;http://devcenter.wercker.com/docs/quickstarts/advanced/building-minimal-containers-with-go&quot;&gt;2&lt;/a&gt;&lt;/a&gt; It would be better to tweak &lt;code&gt;check-header&lt;/code&gt; to work on a list of input files.&lt;/p&gt;</description>
 <dc:date>2008-07-02</dc:date>
-<guid>http://wordaligned.org/articles/fixing-header-file-dependencies</guid>
+<guid>https://wordaligned.org/articles/fixing-header-file-dependencies</guid>
 <author>tag@wordaligned.org (Thomas Guest)</author>
-<link>http://wordaligned.org/articles/fixing-header-file-dependencies</link>
+<link>https://wordaligned.org/articles/fixing-header-file-dependencies</link>
 <category>Shell</category>
 </item>
 
 <item>
 <title>Curling for web sites</title>
 <description>&lt;p&gt;I wanted information about ISO 3166-1 alpha-2 country codes. Google found me the definitive link (&lt;a href=&quot;http://www.iso.org/iso/country_codes/iso_3166_code_lists.htm&quot; title=&quot;ISO 3166 country code lists&quot;&gt;http://www.iso.org/iso/country_codes/iso_3166_code_lists.htm&lt;/a&gt;) but clicking on it showed the ISO website to be temporarily down for maintenance.&lt;/p&gt;
-&lt;p&gt;&lt;a href=&quot;http://www.iso.org/error/sitedown.html&quot; title=&quot;ISO site down page&quot;&gt;&lt;img style=&quot;border: 2px solid orange;&quot; src=&quot;http://wordaligned.org/images/iso-down.png&quot; alt=&quot;ISO website out of action&quot; /&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;http://www.iso.org/error/sitedown.html&quot; title=&quot;ISO site down page&quot;&gt;&lt;img style=&quot;border: 2px solid orange;&quot; src=&quot;https://wordaligned.org/images/iso-down.png&quot; alt=&quot;ISO website out of action&quot; /&gt;&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;Rather than check back again every few minutes or hunt for stale information in the google cache, I got &lt;code&gt;curl&lt;/code&gt; and &lt;code&gt;bash&lt;/code&gt; to notify me when the site went live.&lt;/p&gt;
 &lt;pre&gt;
 $ url=http://www.iso.org/iso/country_codes/iso_3166_code_lists.htm
@@ -1000,9 +1000,9 @@ done; open $url ) &amp;amp;
 
 &lt;p&gt;If you need to kill the job, &lt;code&gt;kill %1&lt;/code&gt; does the trick.&lt;/p&gt;</description>
 <dc:date>2008-05-27</dc:date>
-<guid>http://wordaligned.org/articles/curling-for-web-sites</guid>
+<guid>https://wordaligned.org/articles/curling-for-web-sites</guid>
 <author>tag@wordaligned.org (Thomas Guest)</author>
-<link>http://wordaligned.org/articles/curling-for-web-sites</link>
+<link>https://wordaligned.org/articles/curling-for-web-sites</link>
 <category>Shell</category>
 </item>
 
@@ -1122,7 +1122,7 @@ def take_some(pred, xs):
 
 &lt;h3 id=&quot;the-real-bug-fix&quot;&gt;The real bug fix&lt;/h3&gt;
 &lt;p&gt;Actually, the real bug, which I admitted to at the outset, is in our thinking. This code abuses the iterator-building-blocks paradigm at the heart of the &lt;a href=&quot;http://docs.python.org/lib/module-itertools.html&quot;&gt;itertools module&lt;/a&gt;. &lt;code&gt;Takewhile&lt;/code&gt; converts one stream into another stream; the original stream has gone and if we wanted it we should have teed it first.&lt;/p&gt;
-&lt;p&gt;&lt;a href=&quot;http://wordaligned.org/tag/shell/&quot; title=&quot;Articles about shell&quot;&gt;&lt;img style=&quot;float:right;&quot; src=&quot;http://wordaligned.org/images/buttons/crab.jpg&quot; alt=&quot;Picture of a crab&quot;/&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;https://wordaligned.org/tag/shell/&quot; title=&quot;Articles about shell&quot;&gt;&lt;img style=&quot;float:right;&quot; src=&quot;https://wordaligned.org/images/buttons/crab.jpg&quot; alt=&quot;Picture of a crab&quot;/&gt;&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;The Unix shell embeds this concept at the core of the language to great effect. &lt;span /&gt;Once again our building block is the stream but our connector, the pipeline operator, |, doesn&amp;#8217;t allow this kind of abuse; all you can do is put a stream to its left and another to its right. The syntax won&amp;#8217;t allow you to get the head and tail of the same stream in a single pipeline.&lt;/p&gt;
 &lt;p&gt;Here&amp;#8217;s an awkless variant of the recent &lt;a href=&quot;http://www.google.com/search?q=shell+history+meme&quot;&gt;shell history meme&lt;/a&gt; which shows a shell pipeline in action.&lt;/p&gt;
 &lt;div class=&quot;typocode&quot;&gt;
@@ -1164,7 +1164,7 @@ def take_some(pred, xs):
 &lt;p&gt;By way of an apology for wasting your time, here are some solid gold links.&lt;/p&gt;
 &lt;ol&gt;
 &lt;li&gt;
-&lt;p&gt;&lt;a href=&quot;http://www.dabeaz.com/generators/&quot;&gt;&amp;#8220;Generator Tricks for Systems Programmers&amp;#8221;&lt;/a&gt;, a presentation made by David M. Beazley at PyCon&amp;#8217;08. I wasn&amp;#8217;t there, but for once &lt;a href=&quot;http://www.dabeaz.com/generators/Generators.pdf&quot;&gt;the slides (PDF)&lt;/a&gt; standalone well, and despite the title it&amp;#8217;s neither tricksy nor just for systems programmers. Experienced Python programmers might choose to skip over the first few slides; by the end of the presentation, the material gets much more advanced&lt;a id=&quot;fn1link&quot; href=&quot;http://wordaligned.org/articles/takewhile-drops-one#fn1&quot;&gt;&lt;sup&gt;&lt;a href=&quot;https://blog.codeship.com/building-minimal-docker-containers-for-go-applications/&quot;&gt;1&lt;/a&gt;&lt;/sup&gt;&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;http://www.dabeaz.com/generators/&quot;&gt;&amp;#8220;Generator Tricks for Systems Programmers&amp;#8221;&lt;/a&gt;, a presentation made by David M. Beazley at PyCon&amp;#8217;08. I wasn&amp;#8217;t there, but for once &lt;a href=&quot;http://www.dabeaz.com/generators/Generators.pdf&quot;&gt;the slides (PDF)&lt;/a&gt; standalone well, and despite the title it&amp;#8217;s neither tricksy nor just for systems programmers. Experienced Python programmers might choose to skip over the first few slides; by the end of the presentation, the material gets much more advanced&lt;a id=&quot;fn1link&quot; href=&quot;https://wordaligned.org/articles/takewhile-drops-one#fn1&quot;&gt;&lt;sup&gt;&lt;a href=&quot;https://blog.codeship.com/building-minimal-docker-containers-for-go-applications/&quot;&gt;1&lt;/a&gt;&lt;/sup&gt;&lt;/a&gt;.&lt;/p&gt;
 &lt;/li&gt;
 &lt;li&gt;
 &lt;p&gt;&lt;a href=&quot;http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/276960&quot;&gt;&amp;#8220;Shell-like data processing&amp;#8221;&lt;/a&gt; by Maxim Krikun in the online Python Cookbook, which overloads the bitwise or operator, &lt;code&gt;|&lt;/code&gt;, to implement a Pythonic pipeline, an idea you can find  extended in &lt;a href=&quot;http://egofile.com/blog/python/pipes.html&quot;&gt;&amp;#8220;Assembly Line Syntax&amp;#8221;&lt;/a&gt; by Patrick Roberts and &lt;a href=&quot;http://www.voidspace.org.uk/python/weblog/arch_d7_2008_03_22.shtml#e954&quot;&gt;revised by Michael Foord&lt;/a&gt;, this time using the right shift operator as a connector.&lt;/p&gt;
@@ -1238,13 +1238,13 @@ class grep(object):
 &lt;/div&gt;
 
 &lt;hr /&gt;
-&lt;p&gt;&lt;a id=&quot;fn1&quot; href=&quot;http://wordaligned.org/articles/takewhile-drops-one#fn1link&quot;&gt;&lt;a href=&quot;https://blog.codeship.com/building-minimal-docker-containers-for-go-applications/&quot;&gt;1&lt;/a&gt;&lt;/a&gt; It could be that I&amp;#8217;m reading too much into the pipe metaphor, but I&amp;#8217;m intrigued by the caption to the photo on &lt;a href=&quot;http://www.dabeaz.com&quot;&gt;David M. Beazley&amp;#8217;s homepage&lt;/a&gt;. What can he mean?&lt;/p&gt;
+&lt;p&gt;&lt;a id=&quot;fn1&quot; href=&quot;https://wordaligned.org/articles/takewhile-drops-one#fn1link&quot;&gt;&lt;a href=&quot;https://blog.codeship.com/building-minimal-docker-containers-for-go-applications/&quot;&gt;1&lt;/a&gt;&lt;/a&gt; It could be that I&amp;#8217;m reading too much into the pipe metaphor, but I&amp;#8217;m intrigued by the caption to the photo on &lt;a href=&quot;http://www.dabeaz.com&quot;&gt;David M. Beazley&amp;#8217;s homepage&lt;/a&gt;. What can he mean?&lt;/p&gt;
 &lt;blockquote&gt;&lt;p&gt;&lt;a href=&quot;http://www.dabeaz.com&quot; title=&quot;Is David working on Tubes?&quot;&gt;&lt;img src=&quot;http://www.dabeaz.com/images/Davetubes.jpg&quot; alt=&quot;David Beazley&quot;/&gt;&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;Dave working on his latest project &amp;#8212; &amp;#8220;you know, it&amp;#8217;s a series of tubes.&amp;#8221;&lt;/p&gt;&lt;/blockquote&gt;</description>
 <dc:date>2008-04-23</dc:date>
-<guid>http://wordaligned.org/articles/takewhile-drops-one</guid>
+<guid>https://wordaligned.org/articles/takewhile-drops-one</guid>
 <author>tag@wordaligned.org (Thomas Guest)</author>
-<link>http://wordaligned.org/articles/takewhile-drops-one</link>
+<link>https://wordaligned.org/articles/takewhile-drops-one</link>
 <category>Shell</category>
 </item>
 
@@ -1328,9 +1328,9 @@ static void clear_message()
 &lt;p&gt;Note that &lt;code&gt;nm&lt;/code&gt; has nothing to say about the preprocessor definition, MSG_BUF_SIZE, which vanishes well before the object file gets written. Since MSG_BUF_SIZE can&amp;#8217;t be changed at run time or even after compilation, it won&amp;#8217;t stop us from safely using more than one library instance. &lt;code&gt;Nm&lt;/code&gt; does tell us about &lt;code&gt;g_libname&lt;/code&gt;, a string constant has been placed in the data section of the object file. Like MSG_BUF_SIZE, multiple library instances can safely share this read-only data.&lt;/p&gt;
 &lt;p&gt;Just because something can be done doesn&amp;#8217;t make it &lt;a href=&quot;http://accu.org/index.php/journals/1411&quot;&gt;good practice&lt;/a&gt;. I don&amp;#8217;t think there&amp;#8217;s enough information here to definitively rule against these two &amp;#8220;safe&amp;#8221; globals, but they certainly look suspect. At the very least, the scope of the library name string should be reduced. It would be better to review use of constant data throughout the library; by passing this data in, perhaps as an initialisation parameter, the library may become more flexible and easier to test.&lt;/p&gt;</description>
 <dc:date>2008-04-08</dc:date>
-<guid>http://wordaligned.org/articles/hunting-down-globals-with-nm</guid>
+<guid>https://wordaligned.org/articles/hunting-down-globals-with-nm</guid>
 <author>tag@wordaligned.org (Thomas Guest)</author>
-<link>http://wordaligned.org/articles/hunting-down-globals-with-nm</link>
+<link>https://wordaligned.org/articles/hunting-down-globals-with-nm</link>
 <category>Shell</category>
 </item>
 
@@ -1518,11 +1518,11 @@ print &quot;\n&quot;.join(map(repr, top_ten))
 &lt;p&gt;Functional programming turns out to have much to offer in this new, parallel world &amp;#8212; &lt;a href=&quot;http://labs.google.com/papers/mapreduce.html&quot;&gt;Google&amp;#8217;s Map-Reduce framework&lt;/a&gt;, for example &amp;#8212; and it&amp;#8217;s nice to know the fundamental ideas are far from being new: rather, their time has come.&lt;/p&gt;
 &lt;h3 id=&quot;choosing-an-algorithm&quot;&gt;Choosing an algorithm&lt;/h3&gt;
 &lt;p&gt;When discussing algorithms it&amp;#8217;s all too easy to fret about what happens when inputs grow massive. If we&amp;#8217;ve used the standard libraries then resource use for sorting &amp;#8212; both memory and CPU cycles &amp;#8212; may not be a concern. The code in this article demonstrates highly efficient general purpose sorting routines; and in any final system it&amp;#8217;s likely we could use full- and partial- sorting interchangeably without noticeably affecting overall performance. &lt;/p&gt;
-&lt;p&gt;What is always a concern, though, is &lt;a href=&quot;http://wordaligned.org/articles/readable-code.html&quot;&gt;readability&lt;/a&gt;. If it&amp;#8217;s the largest few elements of a collection we want, calling &lt;code&gt;std::partial_sort()&lt;/code&gt; in C++ or &lt;code&gt;heapq.nlargest()&lt;/code&gt; in Python nicely expresses that desire.&lt;/p&gt;</description>
+&lt;p&gt;What is always a concern, though, is &lt;a href=&quot;https://wordaligned.org/articles/readable-code.html&quot;&gt;readability&lt;/a&gt;. If it&amp;#8217;s the largest few elements of a collection we want, calling &lt;code&gt;std::partial_sort()&lt;/code&gt; in C++ or &lt;code&gt;heapq.nlargest()&lt;/code&gt; in Python nicely expresses that desire.&lt;/p&gt;</description>
 <dc:date>2008-02-19</dc:date>
-<guid>http://wordaligned.org/articles/top-ten-tags</guid>
+<guid>https://wordaligned.org/articles/top-ten-tags</guid>
 <author>tag@wordaligned.org (Thomas Guest)</author>
-<link>http://wordaligned.org/articles/top-ten-tags</link>
+<link>https://wordaligned.org/articles/top-ten-tags</link>
 <category>Shell</category>
 </item>
 
@@ -1592,7 +1592,7 @@ rsync -avz www wordaligned@wordaligned.org:~
 &lt;p&gt;&lt;code&gt;Rsync&lt;/code&gt; comes with many more options, but they&amp;#8217;re all well documented. A simple &lt;code&gt;-a&lt;/code&gt; is usually all that&amp;#8217;s required.&lt;/p&gt;
 &lt;h4 id=&quot;more-thoughts-on-file-shifting&quot;&gt;More Thoughts on File Shifting&lt;/h4&gt;
 &lt;p&gt;At the start of this note I unfairly dismissed GUI driven file system tools. The truth is that I do often use them. &lt;span /&gt;I&amp;#8217;m generally unprincipled and promiscuous when it comes to tool selection: whatever works and is to hand will do. Thus, while both &lt;code&gt;lftp&lt;/code&gt; and &lt;code&gt;rsync&lt;/code&gt; come with a plethora of options &amp;#8212; &lt;code&gt;lftp&lt;/code&gt; does everything any GUI driven FTP client can do, and probably more, and &lt;code&gt;rsync&lt;/code&gt; similarly defeats graphical file browsers &amp;#8212; &lt;span /&gt;the irony is that I only use them for basic stuff, and may well resort to something with a GUI when attempting something out of the ordinary. A bit of interactive pointing and clicking often appeals more than paging through a rather dry manual.&lt;/p&gt;
-&lt;p&gt;What &lt;code&gt;scp&lt;/code&gt; and &lt;code&gt;rsync&lt;/code&gt; won&amp;#8217;t do is find a directory on a remote file system; you can&amp;#8217;t use TAB completion at the far end &lt;a href=&quot;http://wordaligned.org/articles/file-shifting-using-lftp-and-rsync#footnote1&quot;&gt;&lt;sup&gt;&lt;a href=&quot;https://blog.codeship.com/building-minimal-docker-containers-for-go-applications/&quot;&gt;1&lt;/a&gt;&lt;/sup&gt;&lt;/a&gt;. An interactive &lt;code&gt;lftp&lt;/code&gt; session &lt;em&gt;does&lt;/em&gt; support basic TAB completion on a remote filesystem, but not more powerful tools like &lt;code&gt;find&lt;/code&gt; or &lt;code&gt;locate&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;What &lt;code&gt;scp&lt;/code&gt; and &lt;code&gt;rsync&lt;/code&gt; won&amp;#8217;t do is find a directory on a remote file system; you can&amp;#8217;t use TAB completion at the far end &lt;a href=&quot;https://wordaligned.org/articles/file-shifting-using-lftp-and-rsync#footnote1&quot;&gt;&lt;sup&gt;&lt;a href=&quot;https://blog.codeship.com/building-minimal-docker-containers-for-go-applications/&quot;&gt;1&lt;/a&gt;&lt;/sup&gt;&lt;/a&gt;. An interactive &lt;code&gt;lftp&lt;/code&gt; session &lt;em&gt;does&lt;/em&gt; support basic TAB completion on a remote filesystem, but not more powerful tools like &lt;code&gt;find&lt;/code&gt; or &lt;code&gt;locate&lt;/code&gt;.&lt;/p&gt;
 &lt;p&gt;In general you can reduce this problem by adopting a disciplined approach to structuring your workspace on whatever platforms you use. If you find yourself typing a command-line like:&lt;/p&gt;
 &lt;div class=&quot;typocode&quot;&gt;
 
@@ -1603,7 +1603,7 @@ rsync -avz www wordaligned@wordaligned.org:~
 &lt;/div&gt;
 
 &lt;p&gt;then I&amp;#8217;d suggest something has gone wrong.&lt;/p&gt;
-&lt;p&gt;One way to combat this disorganisation is to place your &lt;a href=&quot;http://wordaligned.org/articles/personal-version-control.html&quot;&gt;home directory under version control&lt;/a&gt;. Make sure the version control system you use for this is flexible enough to allow you to rename entries, though. If you do adopt this model, your version control system becomes the home for all your files, and transfers between machines become a matter of check-in, check-out.&lt;/p&gt;
+&lt;p&gt;One way to combat this disorganisation is to place your &lt;a href=&quot;https://wordaligned.org/articles/personal-version-control.html&quot;&gt;home directory under version control&lt;/a&gt;. Make sure the version control system you use for this is flexible enough to allow you to rename entries, though. If you do adopt this model, your version control system becomes the home for all your files, and transfers between machines become a matter of check-in, check-out.&lt;/p&gt;
 &lt;p&gt;I use &lt;a href=&quot;http://subversion.tigris.org&quot;&gt;Subversion&lt;/a&gt; in this way, to a degree. There are plenty of files, though, which I don&amp;#8217;t version control &amp;#8212; in general, large files or files which only make sense on certain platforms. I&amp;#8217;ve often found it useful to make these available for access via a webserver, either somewhere on a Wiki, or just served by a &lt;a href=&quot;http://www.lighttpd.net&quot;&gt;lighttpd&lt;/a&gt; instance with &lt;a href=&quot;http://trac.lighttpd.net/trac/wiki/Docs%3AModDirlisting&quot;&gt;directory listing enabled&lt;/a&gt;.&lt;/p&gt;
 &lt;hr /&gt;
 &lt;p&gt;&lt;a id=&quot;footnote1&quot;&gt;&lt;a href=&quot;https://blog.codeship.com/building-minimal-docker-containers-for-go-applications/&quot;&gt;1&lt;/a&gt;&lt;/a&gt;
@@ -1612,9 +1612,9 @@ I had a suspicion when I wrote this I&amp;#8217;d turn out to be wrong! &lt;a hr
 &lt;p&gt;I&amp;#8217;m actually using bash completion on Ubuntu and I get remote-side tab completion with scp, it&amp;#8217;s great.&lt;/p&gt;
 &lt;/blockquote&gt;</description>
 <dc:date>2008-01-06</dc:date>
-<guid>http://wordaligned.org/articles/file-shifting-using-lftp-and-rsync</guid>
+<guid>https://wordaligned.org/articles/file-shifting-using-lftp-and-rsync</guid>
 <author>tag@wordaligned.org (Thomas Guest)</author>
-<link>http://wordaligned.org/articles/file-shifting-using-lftp-and-rsync</link>
+<link>https://wordaligned.org/articles/file-shifting-using-lftp-and-rsync</link>
 <category>Shell</category>
 </item>
 
@@ -1683,9 +1683,9 @@ shuffle tentative changes in this way, you probably ought to be
 committing them on a private code branch where Subversion
 can manage them for you.&lt;/p&gt;</description>
 <dc:date>2007-10-03</dc:date>
-<guid>http://wordaligned.org/articles/svn-help-patch</guid>
+<guid>https://wordaligned.org/articles/svn-help-patch</guid>
 <author>tag@wordaligned.org (Thomas Guest)</author>
-<link>http://wordaligned.org/articles/svn-help-patch</link>
+<link>https://wordaligned.org/articles/svn-help-patch</link>
 <category>Shell</category>
 </item>
 
@@ -1695,7 +1695,7 @@ can manage them for you.&lt;/p&gt;</description>
 &lt;p&gt;The organisers had kept the prices &lt;em&gt;very&lt;/em&gt; low, a decision which must have helped encourage a stronger turn out than they&amp;#8217;d even hoped for. They had no problem accomodating the excess numbers: everything ran on time without anyone appearing over-stressed.&lt;/p&gt;
 &lt;p&gt;I liked the venue, even if it suffered the same over-heating problem I recall from more than one &lt;a href=&quot;http://accu.org&quot;&gt;ACCU&lt;/a&gt; conference. One nice side-effect of the combination of a generous gap in the schedule and proximity to the &lt;a href=&quot;http://www.bmag.org.uk/&quot;&gt;Birmingham Museum and Art Gallery&lt;/a&gt; was that I could cool off by visiting the Paula Rego exhibition (even if it meant going past a puerile rugby world cup roadshow).&lt;/p&gt;
 &lt;p&gt;&lt;img src=&quot;http://www.bmag.org.uk/images/events/regol.jpg&quot; alt=&quot;Paula Rego picture&quot; /&gt;&lt;/p&gt;
-&lt;p&gt;I half wish I&amp;#8217;d got my act together a little sooner and put forward a presentation myself. On the other hand, that would have meant missing someone else&amp;#8217;s session. In the event, I managed to squeeze in a 5 minute &lt;a href=&quot;http://wordaligned.org/articles/pitching-python-in-three-syllables.html&quot;&gt;lightning talk&lt;/a&gt;, which solved the problem of missing action elsewhere and meant I could reach everyone at once &amp;#8212; and I didn&amp;#8217;t even have to fret about that other perennial conference problem, of trying to connect a laptop to a projector (no time for that in 5 mins).&lt;/p&gt;
+&lt;p&gt;I half wish I&amp;#8217;d got my act together a little sooner and put forward a presentation myself. On the other hand, that would have meant missing someone else&amp;#8217;s session. In the event, I managed to squeeze in a 5 minute &lt;a href=&quot;https://wordaligned.org/articles/pitching-python-in-three-syllables.html&quot;&gt;lightning talk&lt;/a&gt;, which solved the problem of missing action elsewhere and meant I could reach everyone at once &amp;#8212; and I didn&amp;#8217;t even have to fret about that other perennial conference problem, of trying to connect a laptop to a projector (no time for that in 5 mins).&lt;/p&gt;
 &lt;p&gt;I&amp;#8217;ve invented some statistics about the conference.&lt;/p&gt;
 &lt;ol&gt;
 &lt;li&gt;123% better attended than first predicted&lt;/li&gt;
@@ -1708,9 +1708,9 @@ can manage them for you.&lt;/p&gt;</description>
 &lt;li&gt;&lt;a href=&quot;http://beautifulcode.oreillynet.com/&quot;&gt;Beautiful Code&lt;/a&gt;, a book I&amp;#8217;d hoped to browse at the book-stand before buying, was 100% sold out just 10% into the conference&lt;/li&gt;
 &lt;/ol&gt;</description>
 <dc:date>2007-09-10</dc:date>
-<guid>http://wordaligned.org/articles/pyconuk-stats-pics-probs</guid>
+<guid>https://wordaligned.org/articles/pyconuk-stats-pics-probs</guid>
 <author>tag@wordaligned.org (Thomas Guest)</author>
-<link>http://wordaligned.org/articles/pyconuk-stats-pics-probs</link>
+<link>https://wordaligned.org/articles/pyconuk-stats-pics-probs</link>
 <category>Shell</category>
 </item>
 
@@ -1731,9 +1731,9 @@ can manage them for you.&lt;/p&gt;</description>
 &lt;p&gt;There followed a thorough written test, a whiteboard session and some technical Q &amp;amp; A&amp;#8217;s. At the end I was invited to regrade myself on the Granny&amp;#8212;Stroustrup scale. I think the idea was that I should humbly knock myself down a point or two. I didn&amp;#8217;t, but as it happens, I was offered the job, accepted it, and a very good job it turned out to be.&lt;/p&gt;
 &lt;p&gt;Eventually I found myself on the other side of the table in the technical expert role. The Granny&amp;#8212;Stroustrup rating questions were dropped from the process.&lt;/p&gt;</description>
 <dc:date>2007-09-05</dc:date>
-<guid>http://wordaligned.org/articles/the-granny-stroustrup-scale</guid>
+<guid>https://wordaligned.org/articles/the-granny-stroustrup-scale</guid>
 <author>tag@wordaligned.org (Thomas Guest)</author>
-<link>http://wordaligned.org/articles/the-granny-stroustrup-scale</link>
+<link>https://wordaligned.org/articles/the-granny-stroustrup-scale</link>
 <category>Shell</category>
 </item>
 
@@ -1962,7 +1962,7 @@ $ wc -l S1
 &lt;li&gt;smallest element of a set&lt;/li&gt;
 &lt;/ul&gt;
 &lt;h3 id=&quot;extending-the-toolset&quot;&gt;Extending the Toolset&lt;/h3&gt;
-&lt;p&gt;The command shell is a powerful, dynamic and extensible programming environment. Even these simple one-line scripts can be stored as functions which can be sourced when a new shell is started; you can add command-line help to them, you can find them using tab-completion, you can keep them in your source control system. In this way you can create your own customised shell working environment and port it from platform to platform just by &lt;a href=&quot;http://wordaligned.org/articles/personal-version-control.html&quot;&gt;checking it out&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;The command shell is a powerful, dynamic and extensible programming environment. Even these simple one-line scripts can be stored as functions which can be sourced when a new shell is started; you can add command-line help to them, you can find them using tab-completion, you can keep them in your source control system. In this way you can create your own customised shell working environment and port it from platform to platform just by &lt;a href=&quot;https://wordaligned.org/articles/personal-version-control.html&quot;&gt;checking it out&lt;/a&gt;.&lt;/p&gt;
 &lt;h3 id=&quot;a-scripts-got-to-know-its-limitations&quot;&gt;A Script&amp;#8217;s Got to Know its Limitations&lt;/h3&gt;
 &lt;p&gt;Apache server logs are no more and no less than line oriented text. Each record in the log is terminated by a newline character, and each field within each record is delimited in an obvious way: by brackets, spaces, quotation marks, whatever &amp;#8212; who needs XML? This is the kind of format shell scripts handle well. Conversely, anything more complicated, XML for example, or records which span multiple lines, is likely to push the shell tools too far. Maybe &lt;code&gt;awk&lt;/code&gt; could cope, but I don&amp;#8217;t think many people bother learning &lt;code&gt;awk&lt;/code&gt; these days: it&amp;#8217;s better to use one of the popular high-level languages when basic shell commands won&amp;#8217;t do.&lt;/p&gt;
 &lt;p&gt;Shell scripts tend not to fail safely. For example, the following command is meant to clear out files in a temporary directory:&lt;/p&gt;
@@ -1987,16 +1987,16 @@ $ sort -t. +0n -1n +1n -2n +2n -3n +3n IP
 
 &lt;/div&gt;
 
-&lt;p&gt;If you want to know how this works you&amp;#8217;ll have to read the manual. The code, on its own, is &lt;a href=&quot;http://wordaligned.org/articles/readable-code.html&quot;&gt;unreadable&lt;/a&gt;. If you don&amp;#8217;t know where the manual is, just open a shell window and type &lt;code&gt;man&lt;/code&gt;. If the output from this command doesn&amp;#8217;t help, try &lt;code&gt;man man&lt;/code&gt;, and if you don&amp;#8217;t know how to open a shell window, I&amp;#8217;m surprised you&amp;#8217;re even reading this sentence!&lt;/p&gt;
+&lt;p&gt;If you want to know how this works you&amp;#8217;ll have to read the manual. The code, on its own, is &lt;a href=&quot;https://wordaligned.org/articles/readable-code.html&quot;&gt;unreadable&lt;/a&gt;. If you don&amp;#8217;t know where the manual is, just open a shell window and type &lt;code&gt;man&lt;/code&gt;. If the output from this command doesn&amp;#8217;t help, try &lt;code&gt;man man&lt;/code&gt;, and if you don&amp;#8217;t know how to open a shell window, I&amp;#8217;m surprised you&amp;#8217;re even reading this sentence!&lt;/p&gt;
 &lt;h3 id=&quot;conclusion&quot;&gt;Conclusion&lt;/h3&gt;
 &lt;p&gt;Modern graphical development environments tend to hide the shell and the command line, probably with good reason, and I don&amp;#8217;t suppose this article will persuade anyone they&amp;#8217;re worth hunting out. And yet the Unix shell embodies so much which is modern and, I suspect, future, best practice.&lt;/p&gt;
 &lt;p&gt;&lt;span /&gt;For me, it&amp;#8217;s not just what the shell tools can do, it&amp;#8217;s the example they set. Look again at some of the recipes presented in this article and you&amp;#8217;ll see container operations without explicit loops. You&amp;#8217;ll see flexible and generic algorithms. You&amp;#8217;ll see functional programming. You&amp;#8217;ll see programs which can parallel-process data without a thread or a mutex in sight; no chance of shared memory corruption or race conditions here. The original design of the shell tools may have become somewhat polluted &amp;#8212; we&amp;#8217;ve already seen that &lt;code&gt;sort&lt;/code&gt; does some of what &lt;code&gt;uniq&lt;/code&gt; can do &amp;#8212; but I think the intent shines through as clearly as ever: &lt;span /&gt;we have a compact suite of tools, each with its own responsibility, which cooperate using simple interfaces. We would do well to emulate this model in our own software designs.&lt;/p&gt;
 &lt;h3 id=&quot;credits&quot;&gt;Credits&lt;/h3&gt;
 &lt;p&gt;I would like to thank the Overload editorial team for their help with this article. I would also like to thank &lt;a href=&quot;http://drj11.wordpress.com/&quot;&gt;David Jones&lt;/a&gt; and Don for their suggestions.&lt;/p&gt;</description>
 <dc:date>2007-08-18</dc:date>
-<guid>http://wordaligned.org/articles/shell-script-sets</guid>
+<guid>https://wordaligned.org/articles/shell-script-sets</guid>
 <author>tag@wordaligned.org (Thomas Guest)</author>
-<link>http://wordaligned.org/articles/shell-script-sets</link>
+<link>https://wordaligned.org/articles/shell-script-sets</link>
 <category>Shell</category>
 </item>
 
@@ -2130,9 +2130,9 @@ manual.  I&amp;#8217;m no expert, but regard this as sound advice.&lt;/p&gt;
 development in general, I recommend &lt;a href=&quot;http://www.catb.org/~esr/writings/taoup/&quot;&gt;&amp;#8220;The Art of Unix Programming&amp;#8221;&lt;/a&gt; by
 &lt;a href=&quot;http://www.catb.org/~esr&quot;&gt;Eric S. Raymond&lt;/a&gt;.&lt;/p&gt;</description>
 <dc:date>2007-03-05</dc:date>
-<guid>http://wordaligned.org/articles/shells-logs-and-pipes</guid>
+<guid>https://wordaligned.org/articles/shells-logs-and-pipes</guid>
 <author>tag@wordaligned.org (Thomas Guest)</author>
-<link>http://wordaligned.org/articles/shells-logs-and-pipes</link>
+<link>https://wordaligned.org/articles/shells-logs-and-pipes</link>
 <category>Shell</category>
 </item>
 
@@ -2178,9 +2178,9 @@ pattern I want to look for and hit return. The &lt;code&gt;-n&lt;/code&gt; argum
 causes line numbers to be generated in the grep-find results, meaning
 I can jump (&lt;code&gt;CTRL-X-TICK&lt;/code&gt;) to the right place in a matching file.&lt;/p&gt;</description>
 <dc:date>2006-08-14</dc:date>
-<guid>http://wordaligned.org/articles/ignoring-svn-directories</guid>
+<guid>https://wordaligned.org/articles/ignoring-svn-directories</guid>
 <author>tag@wordaligned.org (Thomas Guest)</author>
-<link>http://wordaligned.org/articles/ignoring-svn-directories</link>
+<link>https://wordaligned.org/articles/ignoring-svn-directories</link>
 <category>Shell</category>
 </item>
 
@@ -2220,7 +2220,7 @@ you install it.&lt;/p&gt;
 &lt;h4 id=&quot;system-testing-a-hook-script&quot;&gt;System Testing a Hook Script&lt;/h4&gt;
 &lt;p&gt;I&amp;#8217;ve used a couple of strategies:&lt;/p&gt;
 &lt;ol&gt;
-&lt;li&gt;Set up a throw away &lt;a href=&quot;http://wordaligned.org/articles/creating-a-temporary-subversion-repository.html&quot;&gt;temporary repository&lt;/a&gt; and use this as a
+&lt;li&gt;Set up a throw away &lt;a href=&quot;https://wordaligned.org/articles/creating-a-temporary-subversion-repository.html&quot;&gt;temporary repository&lt;/a&gt; and use this as a
   &lt;a href=&quot;http://en.wikipedia.org/wiki/Sandbox_%28software_development%29&quot;&gt;sandbox&lt;/a&gt; in which
   to develop your hook script.&lt;/li&gt;
 &lt;li&gt;Find a way to test your &lt;a href=&quot;http://svnbook.red-bean.com/en/1.2/svn.reposadmin.create.html#svn.reposadmin.create.hooks&quot;&gt;hook script&lt;/a&gt; on the live
@@ -2373,9 +2373,9 @@ if __name__ == &quot;__main__&quot;:
 
 &lt;/div&gt;</description>
 <dc:date>2006-08-09</dc:date>
-<guid>http://wordaligned.org/articles/a-subversion-pre-commit-hook</guid>
+<guid>https://wordaligned.org/articles/a-subversion-pre-commit-hook</guid>
 <author>tag@wordaligned.org (Thomas Guest)</author>
-<link>http://wordaligned.org/articles/a-subversion-pre-commit-hook</link>
+<link>https://wordaligned.org/articles/a-subversion-pre-commit-hook</link>
 <category>Shell</category>
 </item>
 

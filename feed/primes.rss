@@ -2,7 +2,7 @@
 <rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" >
 <channel>
 <title>Word Aligned</title>
-<link>http://wordaligned.org</link>
+<link>https://wordaligned.org</link>
 <description>tales from the code face</description>
 <dc:creator>tag@wordaligned.org</dc:creator>
 <language>en-gb</language>
@@ -12,7 +12,7 @@
 &lt;blockquote&gt;
 &lt;p&gt;Find the smallest number that can be expressed as the sum of 5, 17, 563, 641 consecutive prime numbers, and is itself a prime number.&lt;/p&gt;
 &lt;/blockquote&gt;
-&lt;p&gt;&lt;img src=&quot;http://wordaligned.org/images/primes.png&quot; alt=&quot;Small primes graphic&quot;/&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https://wordaligned.org/images/primes.png&quot; alt=&quot;Small primes graphic&quot;/&gt;&lt;/p&gt;
 &lt;p&gt;Here, the prime numbers are an infinite steam:&lt;/p&gt;
 &lt;div class=&quot;typocode&quot;&gt;
 
@@ -105,7 +105,7 @@ def stream_merge(*ss):
 &lt;p&gt;the primes remain when you remove these composites from the series of natural numbers.&lt;/p&gt;
 &lt;/li&gt;
 &lt;/ol&gt;
-&lt;p&gt;This scheme is hardly original &amp;#8212; it&amp;#8217;s a variant of &lt;a href=&quot;http://en.wikipedia.org/wiki/Sieve_of_Eratosthenes&quot;&gt;Eratosthenes&amp;#8217; sieve&lt;/a&gt; &amp;#8212; but if you look carefully you&amp;#8217;ll notice the self-reference. Unfortunately recursive definitions of infinite series don&amp;#8217;t work well with Python&lt;a id=&quot;fn1link&quot; href=&quot;http://wordaligned.org/articles/python-streams-vs-unix-pipes#fn1&quot;&gt;&lt;sup&gt;&lt;a href=&quot;https://blog.codeship.com/building-minimal-docker-containers-for-go-applications/&quot;&gt;1&lt;/a&gt;&lt;/sup&gt;&lt;/a&gt;, hence &lt;code&gt;primes()&lt;/code&gt; requires a little more finesse. We&amp;#8217;ll take a look at it later.&lt;/p&gt;
+&lt;p&gt;This scheme is hardly original &amp;#8212; it&amp;#8217;s a variant of &lt;a href=&quot;http://en.wikipedia.org/wiki/Sieve_of_Eratosthenes&quot;&gt;Eratosthenes&amp;#8217; sieve&lt;/a&gt; &amp;#8212; but if you look carefully you&amp;#8217;ll notice the self-reference. Unfortunately recursive definitions of infinite series don&amp;#8217;t work well with Python&lt;a id=&quot;fn1link&quot; href=&quot;https://wordaligned.org/articles/python-streams-vs-unix-pipes#fn1&quot;&gt;&lt;sup&gt;&lt;a href=&quot;https://blog.codeship.com/building-minimal-docker-containers-for-go-applications/&quot;&gt;1&lt;/a&gt;&lt;/sup&gt;&lt;/a&gt;, hence &lt;code&gt;primes()&lt;/code&gt; requires a little more finesse. We&amp;#8217;ll take a look at it later.&lt;/p&gt;
 &lt;p&gt;Moving on, to solve the original puzzle we need a consecutive sum filter. This will transform a stream of numbers into a stream of consecutive sums of these numbers:&lt;/p&gt;
 &lt;div class=&quot;typocode&quot;&gt;
 
@@ -161,7 +161,7 @@ def stream_merge(*ss):
 &lt;/div&gt;
 
 &lt;p&gt;Here&amp;#8217;s a picture of how these stream tools link up to solve this particular puzzle. The great thing is that we can reconnect these same tools to solve a wide range of puzzles, and indeed more practical &lt;a href=&quot;http://www.dabeaz.com/generators/&quot;&gt;processing tasks&lt;/a&gt;. To use the common analogy, we direct data streams along pipes.&lt;/p&gt;
-&lt;p&gt;&lt;img alt=&quot;Stream connections&quot; src=&quot;http://wordaligned.org/images/pipeline.png&quot;/&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img alt=&quot;Stream connections&quot; src=&quot;https://wordaligned.org/images/pipeline.png&quot;/&gt;&lt;/p&gt;
 &lt;h3 id=&quot;infinite-series-in-other-languages&quot;&gt;Infinite series in Other Languages&lt;/h3&gt;
 &lt;p&gt;Python is the language I find most convenient most of the time, which explains why I reached for it first. It&amp;#8217;s an increasingly popular language, which helps explain why I didn&amp;#8217;t need to write the tricky parts of my solution from scratch: they&amp;#8217;d already been done. Python is also a language which makes compromises. Having used Python to find a solution to the puzzle I wondered if there wasn&amp;#8217;t some other language better suited to this kind of problem.&lt;/p&gt;
 &lt;p&gt;&lt;a href=&quot;http://haskell.org&quot;&gt;Haskell&lt;/a&gt; makes no compromises when it comes to functional programming. Its lazy evaluation and inductive recursion make it a perfect fit for this kind of puzzle &amp;#8212; but my  approach of teeing, filtering and merging made me consider the Unix Shell. Now, I use Bash every day and page through its manual at least once a week. Scripting appeals and I&amp;#8217;m comfortable at the command line. How hard could it be to solve this puzzle using Bash? After all, I already knew the answer!&lt;/p&gt;
@@ -206,7 +206,7 @@ $ jot 5 | psum | tee pipe | tail -n +2 | paste - pipe
 
 &lt;/div&gt;
 
-&lt;p&gt;Here, &lt;code&gt;jot 5&lt;/code&gt; generates the sequence 1, 2, 3, 4, 5, which &lt;code&gt;psum&lt;/code&gt; progressively accumulates to 1, 3, 6, 10, 15. We then &lt;code&gt;tee&lt;/code&gt; this partial sum series through two pipes: the first, &lt;code&gt;pipe&lt;/code&gt;, is an explicitly created named pipe created by &lt;code&gt;mkfifo&lt;/code&gt;, the second is implicitly created by the pipeline operator, &lt;code&gt;|&lt;/code&gt;. The remainder of the command line delays one series by one (note that &lt;code&gt;tail&lt;/code&gt; numbers lines from &lt;code&gt;1&lt;/code&gt;, not &lt;code&gt;0&lt;/code&gt;, so &lt;code&gt;tail -n +1&lt;/code&gt; is the identity filter) then pastes the two series back together&lt;a id=&quot;fn2link&quot; href=&quot;http://wordaligned.org/articles/python-streams-vs-unix-pipes#fn2&quot;&gt;&lt;sup&gt;&lt;a href=&quot;http://devcenter.wercker.com/docs/quickstarts/advanced/building-minimal-containers-with-go&quot;&gt;2&lt;/a&gt;&lt;/sup&gt;&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Here, &lt;code&gt;jot 5&lt;/code&gt; generates the sequence 1, 2, 3, 4, 5, which &lt;code&gt;psum&lt;/code&gt; progressively accumulates to 1, 3, 6, 10, 15. We then &lt;code&gt;tee&lt;/code&gt; this partial sum series through two pipes: the first, &lt;code&gt;pipe&lt;/code&gt;, is an explicitly created named pipe created by &lt;code&gt;mkfifo&lt;/code&gt;, the second is implicitly created by the pipeline operator, &lt;code&gt;|&lt;/code&gt;. The remainder of the command line delays one series by one (note that &lt;code&gt;tail&lt;/code&gt; numbers lines from &lt;code&gt;1&lt;/code&gt;, not &lt;code&gt;0&lt;/code&gt;, so &lt;code&gt;tail -n +1&lt;/code&gt; is the identity filter) then pastes the two series back together&lt;a id=&quot;fn2link&quot; href=&quot;https://wordaligned.org/articles/python-streams-vs-unix-pipes#fn2&quot;&gt;&lt;sup&gt;&lt;a href=&quot;http://devcenter.wercker.com/docs/quickstarts/advanced/building-minimal-containers-with-go&quot;&gt;2&lt;/a&gt;&lt;/sup&gt;&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;By appending a single &lt;code&gt;awk&lt;/code&gt; action to the pipeline we get a consecutive sum series.&lt;/p&gt;
 &lt;div class=&quot;typocode&quot;&gt;
 
@@ -301,7 +301,7 @@ $ yes 1 | psum | sdiff 1
 &lt;/div&gt;
 
 &lt;h3 id=&quot;merging-streams&quot;&gt;Merging Streams&lt;/h3&gt;
-&lt;p&gt;The Unix shell merges streams rather more succinctly than Python. &lt;code&gt;Sort -m&lt;/code&gt; does the job directly. Note that a standard &lt;code&gt;sort&lt;/code&gt; cannot yield any output until all its inputs are exhausted, since the final input item might turn out to be the one which should appear first in the output. Merge sort, &lt;code&gt;sort -m&lt;/code&gt;, can and does produce output without delay&lt;a id=&quot;fn3link&quot; href=&quot;http://wordaligned.org/articles/python-streams-vs-unix-pipes#fn3&quot;&gt;&lt;sup&gt;[3]&lt;/sup&gt;&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;The Unix shell merges streams rather more succinctly than Python. &lt;code&gt;Sort -m&lt;/code&gt; does the job directly. Note that a standard &lt;code&gt;sort&lt;/code&gt; cannot yield any output until all its inputs are exhausted, since the final input item might turn out to be the one which should appear first in the output. Merge sort, &lt;code&gt;sort -m&lt;/code&gt;, can and does produce output without delay&lt;a id=&quot;fn3link&quot; href=&quot;https://wordaligned.org/articles/python-streams-vs-unix-pipes#fn3&quot;&gt;&lt;sup&gt;[3]&lt;/sup&gt;&lt;/a&gt;.&lt;/p&gt;
 &lt;div class=&quot;typocode&quot;&gt;
 
 &lt;pre class=&quot;prettyprint&quot;&gt;$ yes | sort
@@ -349,7 +349,7 @@ for p in primes():
 &lt;p&gt;This is a subtle little program which makes clever use of Python&amp;#8217;s native hashed array container, the dictionary. In this case dictionary values are the primes less than &lt;code&gt;n&lt;/code&gt; and the keys are composite multiples of these primes. The loop invariant, roughly speaking, is that the dictionary values are the primes less than &lt;code&gt;n&lt;/code&gt;, and the corresponding keys are the lowest multiples of these primes greater than or equal to &lt;code&gt;n&lt;/code&gt;. It&amp;#8217;s a lazy, recursion-free take of Eratosthenes&amp;#8217; sieve.&lt;/p&gt;
 &lt;p&gt;For the purposes of this article the important things about this program are:&lt;/p&gt;
 &lt;ul&gt;
-&lt;li&gt;it generates an infinite series of numbers to standard output&lt;a id=&quot;fn4link&quot; href=&quot;http://wordaligned.org/articles/python-streams-vs-unix-pipes#fn4&quot;&gt;&lt;sup&gt;[4]&lt;/sup&gt;&lt;/a&gt;, making it a good source for a shell pipeline&lt;/li&gt;
+&lt;li&gt;it generates an infinite series of numbers to standard output&lt;a id=&quot;fn4link&quot; href=&quot;https://wordaligned.org/articles/python-streams-vs-unix-pipes#fn4&quot;&gt;&lt;sup&gt;[4]&lt;/sup&gt;&lt;/a&gt;, making it a good source for a shell pipeline&lt;/li&gt;
 &lt;li&gt;by making it executable and adding the usual shebang incantation, we can invoke this Python program seamlessly from the shell.&lt;/li&gt;
 &lt;/ul&gt;
 &lt;h3 id=&quot;pipe-connection&quot;&gt;Pipe Connection&lt;/h3&gt;
@@ -412,7 +412,7 @@ $ sort -mn c.{1,5,17,563,641} | uniq -c | grep &quot;5 &quot;
 
 &lt;/div&gt;
 
-&lt;p&gt;Here, we use a standard &lt;a href=&quot;http://wordaligned.org/articles/shell-script-sets&quot;&gt;shell script set intersection&lt;/a&gt; recipe: &lt;code&gt;uniq -c&lt;/code&gt; groups and counts repeated elements, and the &lt;code&gt;grep&lt;/code&gt; pattern matches those numbers common to all five input streams.&lt;/p&gt;
+&lt;p&gt;Here, we use a standard &lt;a href=&quot;https://wordaligned.org/articles/shell-script-sets&quot;&gt;shell script set intersection&lt;/a&gt; recipe: &lt;code&gt;uniq -c&lt;/code&gt; groups and counts repeated elements, and the &lt;code&gt;grep&lt;/code&gt; pattern matches those numbers common to all five input streams.&lt;/p&gt;
 &lt;p&gt;Now we can kick off the processes which will feed into the consecutive sum streams, which &lt;code&gt;sort&lt;/code&gt; is waiting on.&lt;/p&gt;
 &lt;div class=&quot;typocode&quot;&gt;
 
@@ -422,7 +422,7 @@ $ sort -mn c.{1,5,17,563,641} | uniq -c | grep &quot;5 &quot;
 
 &lt;/div&gt;
 
-&lt;p&gt;Sure enough, after about 15 seconds elapsed time&lt;a id=&quot;fn5link&quot; href=&quot;http://wordaligned.org/articles/python-streams-vs-unix-pipes#fn5&quot;&gt;&lt;sup&gt;[5]&lt;/sup&gt;&lt;/a&gt;, out pops the result:&lt;/p&gt;
+&lt;p&gt;Sure enough, after about 15 seconds elapsed time&lt;a id=&quot;fn5link&quot; href=&quot;https://wordaligned.org/articles/python-streams-vs-unix-pipes#fn5&quot;&gt;&lt;sup&gt;[5]&lt;/sup&gt;&lt;/a&gt;, out pops the result:&lt;/p&gt;
 &lt;div class=&quot;typocode&quot;&gt;
 
 &lt;pre class=&quot;prettyprint&quot;&gt;$ sort -mn c.{1,5,17,563,641} | uniq -c | grep &quot;5 &quot;
@@ -520,11 +520,11 @@ main = print $ head $ \
 &lt;/div&gt;
 
 &lt;hr /&gt;
-&lt;p&gt;&lt;a id=&quot;fn1&quot; href=&quot;http://wordaligned.org/articles/python-streams-vs-unix-pipes#fn1link&quot;&gt;&lt;a href=&quot;https://blog.codeship.com/building-minimal-docker-containers-for-go-applications/&quot;&gt;1&lt;/a&gt;&lt;/a&gt; CPython, more precisely &amp;#8212; I don&amp;#8217;t think anything in the Python language itself prohibits tail recursion. Even using CPython, yet another &lt;a href=&quot;http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/496691&quot;&gt;recipe&lt;/a&gt; from the online Python Cookbook explores the idea of an &lt;code&gt;@tail_recursion&lt;/code&gt; decorator.&lt;/p&gt;
-&lt;p&gt;&lt;a id=&quot;fn2&quot; href=&quot;http://wordaligned.org/articles/python-streams-vs-unix-pipes#fn2link&quot;&gt;&lt;a href=&quot;http://devcenter.wercker.com/docs/quickstarts/advanced/building-minimal-containers-with-go&quot;&gt;2&lt;/a&gt;&lt;/a&gt; &lt;code&gt;Tail&lt;/code&gt; is more commonly used to yield a fixed number of lines from the end of the file: by prefixing the line count argument with a &lt;code&gt;+&lt;/code&gt; sign, it skips lines from the head of the file. The GNU version of &lt;code&gt;head&lt;/code&gt; can similarly be used with a &lt;code&gt;-&lt;/code&gt; prefix to skip lines at the tail of a file. The notation is {compact,powerful,subtle,implementation dependent}.&lt;/p&gt;
-&lt;p&gt;&lt;a id=&quot;fn3&quot; href=&quot;http://wordaligned.org/articles/python-streams-vs-unix-pipes#fn3link&quot;&gt;[3]&lt;/a&gt; &lt;code&gt;Sort -m&lt;/code&gt; is a sort which doesn&amp;#8217;t really sort &amp;#8212; its inputs should already be sorted &amp;#8212; rather like the &lt;code&gt;+n&lt;/code&gt; option turning &lt;code&gt;tail&lt;/code&gt; on its head.&lt;/p&gt;
-&lt;p&gt;&lt;a id=&quot;fn4&quot; href=&quot;http://wordaligned.org/articles/python-streams-vs-unix-pipes#fn4link&quot;&gt;[4]&lt;/a&gt; The series is infinite in theory only: at time &lt;code&gt;n&lt;/code&gt; the number of items in the &lt;code&gt;has_prime_factors&lt;/code&gt; dictionary equals the number of primes less than &lt;code&gt;n&lt;/code&gt;, and each key in this dictionary is larger than &lt;code&gt;n&lt;/code&gt;. So resource use increases steadily as &lt;code&gt;n&lt;/code&gt; increases.&lt;/p&gt;
-&lt;p&gt;&lt;a id=&quot;fn5&quot; href=&quot;http://wordaligned.org/articles/python-streams-vs-unix-pipes#fn5link&quot;&gt;[5]&lt;/a&gt; I used a MacBook laptop used to run these scripts. &lt;/p&gt;
+&lt;p&gt;&lt;a id=&quot;fn1&quot; href=&quot;https://wordaligned.org/articles/python-streams-vs-unix-pipes#fn1link&quot;&gt;&lt;a href=&quot;https://blog.codeship.com/building-minimal-docker-containers-for-go-applications/&quot;&gt;1&lt;/a&gt;&lt;/a&gt; CPython, more precisely &amp;#8212; I don&amp;#8217;t think anything in the Python language itself prohibits tail recursion. Even using CPython, yet another &lt;a href=&quot;http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/496691&quot;&gt;recipe&lt;/a&gt; from the online Python Cookbook explores the idea of an &lt;code&gt;@tail_recursion&lt;/code&gt; decorator.&lt;/p&gt;
+&lt;p&gt;&lt;a id=&quot;fn2&quot; href=&quot;https://wordaligned.org/articles/python-streams-vs-unix-pipes#fn2link&quot;&gt;&lt;a href=&quot;http://devcenter.wercker.com/docs/quickstarts/advanced/building-minimal-containers-with-go&quot;&gt;2&lt;/a&gt;&lt;/a&gt; &lt;code&gt;Tail&lt;/code&gt; is more commonly used to yield a fixed number of lines from the end of the file: by prefixing the line count argument with a &lt;code&gt;+&lt;/code&gt; sign, it skips lines from the head of the file. The GNU version of &lt;code&gt;head&lt;/code&gt; can similarly be used with a &lt;code&gt;-&lt;/code&gt; prefix to skip lines at the tail of a file. The notation is {compact,powerful,subtle,implementation dependent}.&lt;/p&gt;
+&lt;p&gt;&lt;a id=&quot;fn3&quot; href=&quot;https://wordaligned.org/articles/python-streams-vs-unix-pipes#fn3link&quot;&gt;[3]&lt;/a&gt; &lt;code&gt;Sort -m&lt;/code&gt; is a sort which doesn&amp;#8217;t really sort &amp;#8212; its inputs should already be sorted &amp;#8212; rather like the &lt;code&gt;+n&lt;/code&gt; option turning &lt;code&gt;tail&lt;/code&gt; on its head.&lt;/p&gt;
+&lt;p&gt;&lt;a id=&quot;fn4&quot; href=&quot;https://wordaligned.org/articles/python-streams-vs-unix-pipes#fn4link&quot;&gt;[4]&lt;/a&gt; The series is infinite in theory only: at time &lt;code&gt;n&lt;/code&gt; the number of items in the &lt;code&gt;has_prime_factors&lt;/code&gt; dictionary equals the number of primes less than &lt;code&gt;n&lt;/code&gt;, and each key in this dictionary is larger than &lt;code&gt;n&lt;/code&gt;. So resource use increases steadily as &lt;code&gt;n&lt;/code&gt; increases.&lt;/p&gt;
+&lt;p&gt;&lt;a id=&quot;fn5&quot; href=&quot;https://wordaligned.org/articles/python-streams-vs-unix-pipes#fn5link&quot;&gt;[5]&lt;/a&gt; I used a MacBook laptop used to run these scripts. &lt;/p&gt;
 &lt;pre&gt;
   Model Name:               MacBook
   Model Identifier:         MacBook1,1
@@ -537,9 +537,9 @@ main = print $ head $ \
   Bus Speed:                667 MHz
 &lt;/pre&gt;</description>
 <dc:date>2016-07-28</dc:date>
-<guid>http://wordaligned.org/articles/python-streams-vs-unix-pipes</guid>
+<guid>https://wordaligned.org/articles/python-streams-vs-unix-pipes</guid>
 <author>tag@wordaligned.org (Thomas Guest)</author>
-<link>http://wordaligned.org/articles/python-streams-vs-unix-pipes</link>
+<link>https://wordaligned.org/articles/python-streams-vs-unix-pipes</link>
 <category>Primes</category>
 </item>
 

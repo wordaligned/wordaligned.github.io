@@ -2,7 +2,7 @@
 <rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" >
 <channel>
 <title>Word Aligned</title>
-<link>http://wordaligned.org</link>
+<link>https://wordaligned.org</link>
 <description>tales from the code face</description>
 <dc:creator>tag@wordaligned.org</dc:creator>
 <language>en-gb</language>
@@ -55,11 +55,11 @@
 &lt;/blockquote&gt;
 &lt;p&gt;Python may aspire to offer a single obvious way to do something. It fails splendidly, being more duct tape than hammer.&lt;/p&gt;
 &lt;hr /&gt;
-&lt;p&gt;I presented this blog post as a &lt;a href=&quot;https://www.meetup.com/PyDiff/events/249220768&quot;&gt;lightning talk at PyDiff&lt;/a&gt; a couple of days ago. The &lt;a href=&quot;http://wordaligned.org/docs/timtowtdi&quot;&gt;slides are here&lt;/a&gt;. The talk was recorded too: &lt;a href=&quot;https://cardiff.cloud.panopto.eu/Panopto/Pages/Viewer.aspx?id=324c4015-51ed-4bd7-a1c7-a8c50089e746&quot;&gt;I appear about 24 minutes in&lt;/a&gt;.&lt;/p&gt;</description>
+&lt;p&gt;I presented this blog post as a &lt;a href=&quot;https://www.meetup.com/PyDiff/events/249220768&quot;&gt;lightning talk at PyDiff&lt;/a&gt; a couple of days ago. The &lt;a href=&quot;https://wordaligned.org/docs/timtowtdi&quot;&gt;slides are here&lt;/a&gt;. The talk was recorded too: &lt;a href=&quot;https://cardiff.cloud.panopto.eu/Panopto/Pages/Viewer.aspx?id=324c4015-51ed-4bd7-a1c7-a8c50089e746&quot;&gt;I appear about 24 minutes in&lt;/a&gt;.&lt;/p&gt;</description>
 <dc:date>2018-04-19</dc:date>
-<guid>http://wordaligned.org/articles/timtowtdi-vs-tsboapooowtdi</guid>
+<guid>https://wordaligned.org/articles/timtowtdi-vs-tsboapooowtdi</guid>
 <author>tag@wordaligned.org (Thomas Guest)</author>
-<link>http://wordaligned.org/articles/timtowtdi-vs-tsboapooowtdi</link>
+<link>https://wordaligned.org/articles/timtowtdi-vs-tsboapooowtdi</link>
 <category>Perl</category>
 </item>
 
@@ -78,27 +78,27 @@
 &lt;p&gt;Some of this fussiness may well be a reaction against &lt;a href=&quot;http://news.bbc.co.uk/1/hi/7457287.stm&quot;&gt;corporate double-speak&lt;/a&gt;. Still, I wouldn&amp;#8217;t have expected programmers to be 1) so particular and 2) so certain they&amp;#8217;re right. Maybe this attitude comes from all those years of writing code. Programming languages are strict about what they&amp;#8217;ll accept: after all, they have standards!&lt;/p&gt;
 &lt;p&gt;&lt;a href=&quot;http://www.flickr.com/photos/thomasguest/5142421926/&quot; title=&quot;The C++ Standard vs Perl in a Nutshell by Thomas Guest, on Flickr&quot;&gt;&lt;img src=&quot;http://farm2.static.flickr.com/1072/5142421926_6b76c52749_m.jpg&quot; width=&quot;240&quot; height=&quot;183&quot; alt=&quot;The C++ Standard vs Perl in a Nutshell&quot; /&gt;&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;&lt;span id=&quot;continue-reading&quot;/&gt;&lt;/p&gt;
-&lt;p&gt;Some programming languages are more pedantic than others. Paul Graham memorably characterises C++ as a pernickety aunt&lt;a id=&quot;fn1link&quot; href=&quot;http://wordaligned.org/articles/define-pedantic#fn1&quot;&gt;&lt;sup&gt;&lt;a href=&quot;https://blog.codeship.com/building-minimal-docker-containers-for-go-applications/&quot;&gt;1&lt;/a&gt;&lt;/sup&gt;&lt;/a&gt;. By contrast, Perl won&amp;#8217;t pick nits. Designed by Larry Wall to be his software &lt;a href=&quot;http://www.wall.org/~larry/pm.html&quot; title=&quot;Perl, the first postmodern computer language. Larry Wall&quot;&gt;butler&lt;/a&gt;, Perl interprets your ill-expressed wishes with discretion and assurance. Hence you can end up with a Perl program which gets on with its job but which no-one fully understands.&lt;/p&gt;
+&lt;p&gt;Some programming languages are more pedantic than others. Paul Graham memorably characterises C++ as a pernickety aunt&lt;a id=&quot;fn1link&quot; href=&quot;https://wordaligned.org/articles/define-pedantic#fn1&quot;&gt;&lt;sup&gt;&lt;a href=&quot;https://blog.codeship.com/building-minimal-docker-containers-for-go-applications/&quot;&gt;1&lt;/a&gt;&lt;/sup&gt;&lt;/a&gt;. By contrast, Perl won&amp;#8217;t pick nits. Designed by Larry Wall to be his software &lt;a href=&quot;http://www.wall.org/~larry/pm.html&quot; title=&quot;Perl, the first postmodern computer language. Larry Wall&quot;&gt;butler&lt;/a&gt;, Perl interprets your ill-expressed wishes with discretion and assurance. Hence you can end up with a Perl program which gets on with its job but which no-one fully understands.&lt;/p&gt;
 &lt;p&gt;Pedants, by definition, take things too far, but pedantry in programming isn&amp;#8217;t all bad. GCC has a useful &lt;a href=&quot;http://gcc.gnu.org/onlinedocs/gcc/Standards.html&quot;&gt;&lt;code&gt;-pedantic&lt;/code&gt;&lt;/a&gt; flag. It helps you write portable programs. Perl has a &lt;a href=&quot;http://perldoc.perl.org/strict.html&quot;&gt;&lt;code&gt;use strict&lt;/code&gt;&lt;/a&gt; pragma which recasts the butler as a personal trainer. &lt;/p&gt;
 &lt;p&gt;When it comes to correctness, attention to detail matters. What if this input parameter goes negative? Will that file be closed when an exception is thrown? Can your algorithm handle an empty container?&lt;/p&gt;
-&lt;p&gt;I recently fixed a defect in some (of my own) code which assumed conformant input. When faced with garbage-in this code failed even to generate garbage-out, instead getting caught in an infinite loop. Should a pedantic program insist on correct inputs or should it consider how to handle all possible inputs? &lt;a href=&quot;http://wordaligned.org/articles/define-pedantic#definition&quot;&gt;Define pedantic&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;I recently fixed a defect in some (of my own) code which assumed conformant input. When faced with garbage-in this code failed even to generate garbage-out, instead getting caught in an infinite loop. Should a pedantic program insist on correct inputs or should it consider how to handle all possible inputs? &lt;a href=&quot;https://wordaligned.org/articles/define-pedantic#definition&quot;&gt;Define pedantic&lt;/a&gt;.&lt;/p&gt;
 &lt;hr /&gt;
-&lt;p&gt;&lt;a id=&quot;fn1&quot; href=&quot;http://wordaligned.org/articles/define-pedantic#fn1link&quot;&gt;&lt;a href=&quot;https://blog.codeship.com/building-minimal-docker-containers-for-go-applications/&quot;&gt;1&lt;/a&gt;&lt;/a&gt;: It turns out my memory is at fault here. When I checked the reference I discovered Paul Graham makes no explicit mention of C++. &lt;/p&gt;
+&lt;p&gt;&lt;a id=&quot;fn1&quot; href=&quot;https://wordaligned.org/articles/define-pedantic#fn1link&quot;&gt;&lt;a href=&quot;https://blog.codeship.com/building-minimal-docker-containers-for-go-applications/&quot;&gt;1&lt;/a&gt;&lt;/a&gt;: It turns out my memory is at fault here. When I checked the reference I discovered Paul Graham makes no explicit mention of C++. &lt;/p&gt;
 &lt;blockquote&gt;
 &lt;p&gt;We need a language that lets us scribble and smudge and smear, not a language where you have to sit with a teacup of types balanced on your knee and make polite conversation with a strict old aunt of a compiler. &amp;#8212; Paul Graham, &lt;a href=&quot;http://www.paulgraham.com/hp.html&quot; title=&quot;Hackers and Painters&quot;&gt;Hackers and Painters&lt;/a&gt;&lt;/p&gt;
 &lt;/blockquote&gt;
 &lt;p&gt;You might have guessed which language he&amp;#8217;s promoting for scribbling but there&amp;#8217;s no mention of Lisp either in this particular essay. In fact only one programming language earns a name-check. I&amp;#8217;ll let you find out which one for yourselves.&lt;/p&gt;</description>
 <dc:date>2010-11-02</dc:date>
-<guid>http://wordaligned.org/articles/define-pedantic</guid>
+<guid>https://wordaligned.org/articles/define-pedantic</guid>
 <author>tag@wordaligned.org (Thomas Guest)</author>
-<link>http://wordaligned.org/articles/define-pedantic</link>
+<link>https://wordaligned.org/articles/define-pedantic</link>
 <category>Perl</category>
 </item>
 
 <item>
 <title>Power programming</title>
 <description>&lt;h3 id=&quot;powerful-or-dangerous&quot;&gt;Powerful or dangerous?&lt;/h3&gt;
-&lt;p&gt;Recently I &lt;a href=&quot;http://wordaligned.org/articles/next-permutation.html&quot; title=&quot;Next permutation: when C++ gets it right&quot;&gt;wrote about&lt;/a&gt; one of the &lt;a href=&quot;http://code.google.com/codejam/&quot;&gt;Google Code Jam&lt;/a&gt; challenges, where, perhaps surprisingly, the best answer &amp;#8212; the most elegant and obviously correct answer, requiring the fewest lines of code, with virtually zero space overhead, and running the quickest &amp;#8212; the very best answer was coded in C++.&lt;/p&gt;
+&lt;p&gt;Recently I &lt;a href=&quot;https://wordaligned.org/articles/next-permutation.html&quot; title=&quot;Next permutation: when C++ gets it right&quot;&gt;wrote about&lt;/a&gt; one of the &lt;a href=&quot;http://code.google.com/codejam/&quot;&gt;Google Code Jam&lt;/a&gt; challenges, where, perhaps surprisingly, the best answer &amp;#8212; the most elegant and obviously correct answer, requiring the fewest lines of code, with virtually zero space overhead, and running the quickest &amp;#8212; the very best answer was coded in C++.&lt;/p&gt;
 &lt;p&gt;Why should this be surprising? C++ is a powerful language.&lt;/p&gt;
 &lt;blockquote&gt;
 &lt;p&gt;In my experience there is almost no limit to the damage that a sufficiently ingenious fool can do with C++. But there is also almost no limit to the degree of complexity that a skillful library designer can hide behind a simple, safe, and elegant C++ interface. &lt;/p&gt;
@@ -122,12 +122,12 @@
 )
 &lt;/pre&gt;&lt;p&gt;&amp;mdash; &lt;a href=&quot;http://code.google.com/codejam/contest/dashboard?c=186264#&quot;&gt;Decision Trees, Google Code Jam 2009&lt;/a&gt;&lt;/p&gt;&lt;/blockquote&gt;
 
-&lt;p&gt;&lt;a href=&quot;http://www.zazzle.com/cute_beaver_magnet-147411069592023743&quot;&gt;&lt;img src=&quot;http://wordaligned.org/images/cute-beaver.png&quot; alt=&quot;Cute beaver!&quot; width=&quot;227px&quot; height=&quot;193px&quot; style=&quot;float:right;margin:25px 25px&quot;/&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;http://www.zazzle.com/cute_beaver_magnet-147411069592023743&quot;&gt;&lt;img src=&quot;https://wordaligned.org/images/cute-beaver.png&quot; alt=&quot;Cute beaver!&quot; width=&quot;227px&quot; height=&quot;193px&quot; style=&quot;float:right;margin:25px 25px&quot;/&gt;&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;The challenge goes on to describe the structure more formally, then steps through an example calculation. What is the probability, &lt;code&gt;p&lt;/code&gt;, that a beaver is cute?&lt;/p&gt;
 &lt;blockquote&gt;
 &lt;p&gt;For example, a beaver is an animal that has two features: &lt;code&gt;furry&lt;/code&gt; and &lt;code&gt;freshwater&lt;/code&gt;. We start at the root with &lt;code&gt;p&lt;/code&gt; equal to &lt;code&gt;1&lt;/code&gt;. We multiply &lt;code&gt;p&lt;/code&gt; by &lt;code&gt;0.2&lt;/code&gt;, the weight of the root and move into the first sub-tree because the beaver has the &lt;code&gt;furry&lt;/code&gt; feature. There, we multiply &lt;code&gt;p&lt;/code&gt; by &lt;code&gt;0.81&lt;/code&gt;, which makes &lt;code&gt;p&lt;/code&gt; equal to &lt;code&gt;0.162&lt;/code&gt;. From there we move further down into the second sub-tree because the beaver does not have the fast feature. Finally, we multiply &lt;code&gt;p&lt;/code&gt; by &lt;code&gt;0.2&lt;/code&gt; and end up with &lt;code&gt;0.0324&lt;/code&gt; &amp;#8212; the probability that the beaver is cute. &lt;/p&gt;
 &lt;/blockquote&gt;
-&lt;p&gt;&lt;img src=&quot;http://wordaligned.org/images/decision-tree.png&quot; alt=&quot;Decision tree calculation&quot;/&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https://wordaligned.org/images/decision-tree.png&quot; alt=&quot;Decision tree calculation&quot;/&gt;&lt;/p&gt;
 &lt;p&gt;The challenge itself involves processing input comprising a number of test cases. Each test case consists of a decision tree followed by a number of animals. A solution should parse the input and output the calculated cuteness probabilities.&lt;/p&gt;
 &lt;p&gt;&lt;span id=&quot;continue-reading&quot;/&gt;&lt;/p&gt;
 &lt;h3 id=&quot;cuteness-calculator&quot;&gt;Cuteness calculator&lt;/h3&gt;
@@ -327,7 +327,7 @@ eval&quot;\$_=&amp;lt;&amp;gt;;say$_;&quot;x&amp;lt;&amp;gt;for 1..&amp;lt;&amp;
 &lt;li&gt;Lisp&lt;/li&gt;
 &lt;li&gt;C++&lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;These languages are very different but they share features too. They are all mature, popular and well-supported&lt;a id=&quot;fn1link&quot; href=&quot;http://wordaligned.org/articles/power-programming#fn1&quot;&gt;&lt;sup&gt;&lt;a href=&quot;https://blog.codeship.com/building-minimal-docker-containers-for-go-applications/&quot;&gt;1&lt;/a&gt;&lt;/sup&gt;&lt;/a&gt;. Each is a powerful general purpose programming language. &lt;span /&gt;But ultimately, the power of the programmer is what matters.&lt;/p&gt;
+&lt;p&gt;These languages are very different but they share features too. They are all mature, popular and well-supported&lt;a id=&quot;fn1link&quot; href=&quot;https://wordaligned.org/articles/power-programming#fn1&quot;&gt;&lt;sup&gt;&lt;a href=&quot;https://blog.codeship.com/building-minimal-docker-containers-for-go-applications/&quot;&gt;1&lt;/a&gt;&lt;/sup&gt;&lt;/a&gt;. Each is a powerful general purpose programming language. &lt;span /&gt;But ultimately, the power of the programmer is what matters.&lt;/p&gt;
 &lt;h3 id=&quot;appendix-a-first-impressions-of-arc&quot;&gt;Appendix A: First impressions of Arc&lt;/h3&gt;
 &lt;p&gt;Here&amp;#8217;s another revision of the Arc solution, this time decomposed into subfunctions. I found no complete formal documentation of &lt;a href=&quot;http://arclanguage.org&quot; title=&quot;Arc, a new dialect of Lisp&quot;&gt;Arc&lt;/a&gt;. You&amp;#8217;ll have to read the source and follow the forum, and to actually run any code you&amp;#8217;ll have to download a an old version of MzScheme. The official line is: by all means have a play, but expect things to change. That said, the language looks delightful, practical, and quite &lt;a href=&quot;http://www.paulgraham.com/arcll1.html&quot; title=&quot;No onions in the varnish, says Paul Graham&quot;&gt;onion free&lt;/a&gt;. The &lt;a href=&quot;http://ycombinator.com/arc/tut.txt&quot;&gt;tutorial&lt;/a&gt; made me smile. Recommended reading.&lt;/p&gt;
 &lt;pre class=&quot;prettyprint lang-lisp&quot;&gt;
@@ -495,11 +495,11 @@ main(sys.stdin)
 
 &lt;hr /&gt;
 &lt;h3 id=&quot;notes&quot;&gt;Notes&lt;/h3&gt;
-&lt;p&gt;&lt;a id=&quot;fn1&quot; href=&quot;http://wordaligned.org/articles/power-programming#fn1link&quot;&gt;&lt;a href=&quot;https://blog.codeship.com/building-minimal-docker-containers-for-go-applications/&quot;&gt;1&lt;/a&gt;&lt;/a&gt; (Arc may not be mature, popular or well-supported; but Lisp certainly is.)&lt;/p&gt;</description>
+&lt;p&gt;&lt;a id=&quot;fn1&quot; href=&quot;https://wordaligned.org/articles/power-programming#fn1link&quot;&gt;&lt;a href=&quot;https://blog.codeship.com/building-minimal-docker-containers-for-go-applications/&quot;&gt;1&lt;/a&gt;&lt;/a&gt; (Arc may not be mature, popular or well-supported; but Lisp certainly is.)&lt;/p&gt;</description>
 <dc:date>2010-01-26</dc:date>
-<guid>http://wordaligned.org/articles/power-programming</guid>
+<guid>https://wordaligned.org/articles/power-programming</guid>
 <author>tag@wordaligned.org (Thomas Guest)</author>
-<link>http://wordaligned.org/articles/power-programming</link>
+<link>https://wordaligned.org/articles/power-programming</link>
 <category>Perl</category>
 </item>
 
@@ -525,7 +525,7 @@ main(sys.stdin)
 &lt;h3 id=&quot;doing-words&quot;&gt;Doing words&lt;/h3&gt;
 &lt;p&gt;&lt;strong&gt;B&lt;/strong&gt; and &lt;strong&gt;C&lt;/strong&gt; are both strong, active verbs. Nothing beats being and seeing. Writers like verbs. Verbs make things happen, just like programming languages. Maybe &lt;strong&gt;Lisp&lt;/strong&gt; and &lt;strong&gt;Scheme&lt;/strong&gt; sound a bit geeky, sleazy even, but I like them. They&amp;#8217;re great names. Ever wonder how &lt;strong&gt;Bash&lt;/strong&gt; bludgeoned its way to shell domination? &lt;strong&gt;Squeak&lt;/strong&gt; is a great play on &lt;strong&gt;Smalltalk&lt;/strong&gt;. Knitters &lt;a href=&quot;http://dictionary.reference.com/browse/purl&quot;&gt;&lt;strong&gt;perl&lt;/strong&gt;&lt;/a&gt;.&lt;/p&gt;
 &lt;h3 id=&quot;etc&quot;&gt;Etc&lt;/h3&gt;
-&lt;p&gt;&lt;a href=&quot;http://www.lancearmstrong.com/&quot;&gt;&lt;img style=&quot;float:right;&quot; src=&quot;http://wordaligned.org/images/lance-armstrong.jpg&quot; alt=&quot;Lance Armstrong, champion cyclist&quot;/&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;http://www.lancearmstrong.com/&quot;&gt;&lt;img style=&quot;float:right;&quot; src=&quot;https://wordaligned.org/images/lance-armstrong.jpg&quot; alt=&quot;Lance Armstrong, champion cyclist&quot;/&gt;&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;Adjectives and adverbs are poorly represented. &lt;strong&gt;Groovy&lt;/strong&gt; comes to mind, but not a lot else. Plenty of language names are (or once were) acronyms and abbreviations: as names, I prefer the ones you can read over the mouthfuls of consonants. On this basis, &lt;strong&gt;Fortran&lt;/strong&gt; pips &lt;strong&gt;PL/I&lt;/strong&gt;, and &lt;strong&gt;Sequel&lt;/strong&gt; beats &lt;strong&gt;Ess Queue El&lt;/strong&gt;.&lt;/p&gt;
 &lt;p&gt;We&amp;#8217;ve listed some great computer languages with great names. Can a good name shape a language&amp;#8217;s success? Well, certainly it can&amp;#8217;t hurt. Names matter. Lance Armstrong is surely the name of a champion, the kind of guy who can beat testicular cancer and win the world&amp;#8217;s toughest endurance event 7 times in a row. Check out his &lt;a href=&quot;http://www.lancearmstrong.com/&quot;&gt;flash heavy website&lt;/a&gt;. Whereas the more gently named Tim Henman never quite fulfilled his tennis potential, and I can&amp;#8217;t even connect to &lt;a href=&quot;http://www.timhenman.org&quot;&gt;www.timhenman.org&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;Conversely, can a poor name stand in the way of success? &lt;strong&gt;ABC&lt;/strong&gt; has become (part of Python&amp;#8217;s) history. I think it&amp;#8217;s fair to say that, at this point, the weakly-named &lt;strong&gt;D&lt;/strong&gt; has gained respect rather than presence. On the other hand, &lt;strong&gt;JavaScript&lt;/strong&gt; is a poor name too, and &lt;strong&gt;ECMAScript&lt;/strong&gt; is worse, but it&amp;#8217;s a fine language which can claim to be more widely deployed than any other.&lt;/p&gt;
@@ -533,9 +533,9 @@ main(sys.stdin)
 &lt;div id=&quot;feedback_div&quot;&gt;&lt;ol id=&quot;feedback&quot; class=&quot;feedback&quot;&gt;&lt;li class=&quot;feedbackitem&quot;&gt;&lt;div class=&quot;author&quot;&gt;&lt;cite&gt;Jez&lt;/cite&gt; 2009-01-23&lt;/div&gt;&lt;div class=&quot;content&quot;&gt;&lt;p&gt;Names are important.  Choosing a good name for something is very difficult, and I know from past experience that you don&amp;#8217;t usually get a second go.  The humorous code name you chose almost certainly won&amp;#8217;t get changed later, and you&amp;#8217;ll be talking about &amp;#8220;using the Linguini server to add the zubins&amp;#8221; for ever.  Yes, that&amp;#8217;s a real example.&lt;/p&gt;&lt;p&gt;One of my favourite cartoons, The Secret Show, is a comedy spy thriller.  The agency head takes security &lt;i&gt;very&lt;/i&gt; seriously, and so his name is changed daily.  He&amp;#8217;s constantly undermined by being assigned ridiculous names - Mimzy Woowoo, Pimlico Buttonfluff, Princess Fairycakes, and so on.  In one episode his new name is Rock Justice, and his chest swells with pride.  Sadly though, it was just a dream.&lt;/p&gt;&lt;/div&gt;&lt;/li&gt;&lt;li class=&quot;feedbackitem&quot; id=&quot;feedback-1000&quot;&gt;&lt;div class=&quot;author&quot;&gt;&lt;cite&gt;matt burns&lt;/cite&gt; 2009-01-28&lt;/div&gt;&lt;div class=&quot;content&quot;&gt;&lt;p&gt;I&amp;#8217;m sure I&amp;#8217;m not alone in pronouncing things incorrectly due to many of the things I learn being done so by reading.&lt;/p&gt;&lt;p&gt;C# was one example because for quite a while I pronounced it &amp;#8220;see hash&amp;#8221; in my head until I descovered it should be &amp;#8220;see sharp&amp;#8221;. I still occasionally slip out with kay-sh instead of cah-sh for cache.&lt;/p&gt;&lt;p&gt;I didn&amp;#8217;t know that # and &amp;#x266f; were different symbols but now I do I feel less stupid.&lt;/p&gt;&lt;p&gt;(Wikipedia does mention that the language is actually C&amp;#x266f; but the # character is merely used to represent the &amp;#x266f; for simplicity.)&lt;/p&gt;&lt;/div&gt;&lt;/li&gt;&lt;li class=&quot;feedbackitem&quot;&gt; 
 &lt;div class=&quot;author&quot;&gt;&lt;cite&gt;Thomas Guest&lt;/cite&gt; 2009-02-02&lt;/div&gt;&lt;div class=&quot;content&quot;&gt;&lt;p&gt;You&amp;#8217;re definitely not alone, Matt. One thing which bugs me is when a name is spelled in a way which makes guessing its pronunciation hard.&lt;/p&gt;&lt;p&gt;The Cuil search engine, for example, which we&amp;#8217;re meant to pronounce &amp;#8220;cool&amp;#8221;.&lt;/p&gt;&lt;p&gt;Much as I like lighttpd, how are you supposed to say it? Lighty, apparently.&lt;/p&gt;&lt;p&gt;And it&amp;#8217;s &amp;#8220;Val-grinned&amp;#8221;, not &amp;#8220;Val-grind&amp;#8221;. Don&amp;#8217;t feed bad, &lt;a href=&quot;http://valgrind.org/docs/manual/faq.html#faq.pronounce&quot;&gt;everyone gets it wrong at first&lt;/a&gt;.&lt;/p&gt;&lt;/div&gt;&lt;/li&gt;&lt;/ol&gt;&lt;/div&gt;</description>
 <dc:date>2009-01-21</dc:date>
-<guid>http://wordaligned.org/articles/complangname</guid>
+<guid>https://wordaligned.org/articles/complangname</guid>
 <author>tag@wordaligned.org (Thomas Guest)</author>
-<link>http://wordaligned.org/articles/complangname</link>
+<link>https://wordaligned.org/articles/complangname</link>
 <category>Perl</category>
 </item>
 
@@ -589,9 +589,9 @@ SyntaxError: invalid syntax
 &lt;p&gt;Which is why, incidentally, Arc &lt;a href=&quot;http://arclanguage.org/item?id=391&quot;&gt;only supports Ascii&lt;/a&gt;. MzScheme, which the current version of Arc compiles to, has some more advanced plan for dealing with characters. But it would probably have taken me a couple days to figure out how to interact with it, and I don&amp;#8217;t want to spend even one day dealing with character sets.&lt;/p&gt;
 &lt;/blockquote&gt;
 &lt;p&gt;Sad to say, it would take me more than a couple of days to figure out MzScheme&amp;#8217;s advanced character plan, so I&amp;#8217;m not qualified to comment on Paul Graham&amp;#8217;s decision. Many others did, at the time, and if you follow the link in the blockquote above, you&amp;#8217;ll find a few words of explanation which I&amp;#8217;ll paraphrase here: Arc is not about the details of character sets, it&amp;#8217;s a high-level language, for writing short programs.&lt;/p&gt;
-&lt;p&gt;I class Python as &lt;a href=&quot;http://wordaligned.org/articles/pitching-python-in-three-syllables.html&quot;&gt;a high-level language&lt;/a&gt; too, and regard its power and accessibility as the source of its popularity. Python is also a mainstream language and one increasingly used at the heart of internationalised applications. I agree with James Bennett: &lt;a href=&quot;http://www.b-list.org/weblog/2008/dec/05/python-3000/&quot;&gt;Unicode support is fundamental and necessary&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;I class Python as &lt;a href=&quot;https://wordaligned.org/articles/pitching-python-in-three-syllables.html&quot;&gt;a high-level language&lt;/a&gt; too, and regard its power and accessibility as the source of its popularity. Python is also a mainstream language and one increasingly used at the heart of internationalised applications. I agree with James Bennett: &lt;a href=&quot;http://www.b-list.org/weblog/2008/dec/05/python-3000/&quot;&gt;Unicode support is fundamental and necessary&lt;/a&gt;.&lt;/p&gt;
 &lt;h3 id=&quot;unicode-and-word-aligned&quot;&gt;Unicode and Word Aligned&lt;/h3&gt;
-&lt;p&gt;Anyone who&amp;#8217;s visited &lt;a href=&quot;http://wordaligned.org/&quot;&gt;Word Aligned&lt;/a&gt; before will know that most of the example code here is in Python. I&amp;#8217;m aware that on several occasions I&amp;#8217;ve waved away Unicode issues (an anagram solver which fails to identify &amp;#8220;face&amp;#8221; as an anagram of &amp;#8220;caf&amp;eacute;&amp;#8221;, for example).&lt;/p&gt;
+&lt;p&gt;Anyone who&amp;#8217;s visited &lt;a href=&quot;https://wordaligned.org/&quot;&gt;Word Aligned&lt;/a&gt; before will know that most of the example code here is in Python. I&amp;#8217;m aware that on several occasions I&amp;#8217;ve waved away Unicode issues (an anagram solver which fails to identify &amp;#8220;face&amp;#8221; as an anagram of &amp;#8220;caf&amp;eacute;&amp;#8221;, for example).&lt;/p&gt;
 &lt;p&gt;Like Paul Graham, I can justify my decision. I want the code presented on this site to work, but not just so you can cut and paste it. I&amp;#8217;m not a library provider. I use Python here primarily because it&amp;#8217;s succinct and accessible. &lt;strong&gt;I want you to read it!&lt;/strong&gt; Sometimes blurring the distinction between characters and bytes makes for short and sweet examples.&lt;/p&gt;
 &lt;p&gt;If I switch to Python 3.0, will I still be able to cut these corners? Or will my code become more fiddly because it must deal more explicitly with character encoding issues? The truth is, I don&amp;#8217;t know yet, I&amp;#8217;ve only written one Python 3.0 program.&lt;/p&gt;
 &lt;div class=&quot;typocode&quot;&gt;&lt;div class=&quot;codetitle&quot;&gt;My first Python 3.0 program&lt;/div&gt;
@@ -613,9 +613,9 @@ SyntaxError: invalid syntax
 
 &lt;/div&gt;</description>
 <dc:date>2009-01-01</dc:date>
-<guid>http://wordaligned.org/articles/perl-6-python-3</guid>
+<guid>https://wordaligned.org/articles/perl-6-python-3</guid>
 <author>tag@wordaligned.org (Thomas Guest)</author>
-<link>http://wordaligned.org/articles/perl-6-python-3</link>
+<link>https://wordaligned.org/articles/perl-6-python-3</link>
 <category>Perl</category>
 </item>
 
@@ -708,15 +708,15 @@ parrot(&#x27;a million&#x27;, &#x27;bereft of life&#x27;, &#x27;jump&#x27;)
 &lt;/blockquote&gt;
 &lt;p&gt;I can see where he&amp;#8217;s coming from, but I disagree. In my opinion the Python documentation is well-organised, accessible and accurate. The documentation for some modules may be rather thin, but that&amp;#8217;s the strongest criticism I would make. I do struggle to single out an entertaining excerpt, though: the documentation aims to inform, and at that it does well.&lt;/p&gt;
 &lt;h3 id=&quot;looking-further&quot;&gt;Looking further&lt;/h3&gt;
-&lt;div class=&quot;amazon&quot;&gt;&lt;a href=&quot;http://www.amazon.com/gp/product/0596007973?ie=UTF8&amp;amp;tag=wordalig-20&quot;&gt;&lt;img src=&quot;http://wordaligned.org/images/books/python-cookbook.jpg&quot; alt=&quot;Python Cookbook cover&quot;/&gt;&lt;/a&gt;&lt;/div&gt;
+&lt;div class=&quot;amazon&quot;&gt;&lt;a href=&quot;http://www.amazon.com/gp/product/0596007973?ie=UTF8&amp;amp;tag=wordalig-20&quot;&gt;&lt;img src=&quot;https://wordaligned.org/images/books/python-cookbook.jpg&quot; alt=&quot;Python Cookbook cover&quot;/&gt;&lt;/a&gt;&lt;/div&gt;
 
-&lt;p&gt;If you&amp;#8217;re prepared to venture away from &lt;a href=&quot;http://docs.python.org&quot;&gt;docs.python.org&lt;/a&gt;, you&amp;#8217;ll find the Python community is served by some &lt;a href=&quot;http://diveintomark.org&quot; title=&quot;Mark Pilgrim&quot;&gt;talented&lt;/a&gt; &lt;a href=&quot;http://www.dabeaz.com&quot; title=&quot;David Beazley&quot;&gt;and&lt;/a&gt; &lt;a href=&quot;http://www.aleax.it/python_mat_en.html&quot; title=&quot;Alex Martelli&quot;&gt;entertaining&lt;/a&gt; writers. I&amp;#8217;ve &lt;a href=&quot;http://wordaligned.org/articles/essential-python-reading-list.html&quot; title=&quot;My essential Python reading list&quot;&gt;mentioned&lt;/a&gt; the &lt;a href=&quot;http://www.amazon.com/gp/product/0596007973?ie=UTF8&amp;amp;tag=wordalig-20&quot;&gt;Python Cookbook&lt;/a&gt; before: the entire text can now be found &lt;a href=&quot;http://www.ubookcase.com/book/Oreilly/Python.Cookbook.2nd.edition&quot;&gt;online&lt;/a&gt;, but I recommend getting hold of hard-copy so you can sit down and read it from cover to cover &amp;#8212; definite armchair material. Many programmers contributed recipes to the book but it&amp;#8217;s pulled together by some skillful editing and by the fine essays which introduce each chapter.&lt;/p&gt;
+&lt;p&gt;If you&amp;#8217;re prepared to venture away from &lt;a href=&quot;http://docs.python.org&quot;&gt;docs.python.org&lt;/a&gt;, you&amp;#8217;ll find the Python community is served by some &lt;a href=&quot;http://diveintomark.org&quot; title=&quot;Mark Pilgrim&quot;&gt;talented&lt;/a&gt; &lt;a href=&quot;http://www.dabeaz.com&quot; title=&quot;David Beazley&quot;&gt;and&lt;/a&gt; &lt;a href=&quot;http://www.aleax.it/python_mat_en.html&quot; title=&quot;Alex Martelli&quot;&gt;entertaining&lt;/a&gt; writers. I&amp;#8217;ve &lt;a href=&quot;https://wordaligned.org/articles/essential-python-reading-list.html&quot; title=&quot;My essential Python reading list&quot;&gt;mentioned&lt;/a&gt; the &lt;a href=&quot;http://www.amazon.com/gp/product/0596007973?ie=UTF8&amp;amp;tag=wordalig-20&quot;&gt;Python Cookbook&lt;/a&gt; before: the entire text can now be found &lt;a href=&quot;http://www.ubookcase.com/book/Oreilly/Python.Cookbook.2nd.edition&quot;&gt;online&lt;/a&gt;, but I recommend getting hold of hard-copy so you can sit down and read it from cover to cover &amp;#8212; definite armchair material. Many programmers contributed recipes to the book but it&amp;#8217;s pulled together by some skillful editing and by the fine essays which introduce each chapter.&lt;/p&gt;
 &lt;p&gt;&lt;a href=&quot;http://www.flickr.com/photos/codebear/7409127/&quot;&gt;&lt;img style=&quot;float:left;&quot; src=&quot;http://static.flickr.com/4/7409127_53df0dd56c_s.jpg&quot; alt=&quot;Tim Peters by codebear&quot;/&gt;&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;Tim Peters introduces the chapter on &lt;a href=&quot;http://www.ubookcase.com/book/Oreilly/Python.Cookbook.2nd.edition/0596007973/ch05-77003.html&quot;&gt;Searching and Sorting&lt;/a&gt; and if you scratch at Python a little harder you&amp;#8217;ll find plenty more written by him. &lt;a href=&quot;http://svn.python.org/projects/python/trunk/Objects/listsort.txt&quot;&gt;Here are his notes&lt;/a&gt; on Python&amp;#8217;s hybrid sort algorithm. &lt;a href=&quot;http://svn.python.org/projects/python/trunk/Objects/listobject.c&quot;&gt;Here&amp;#8217;s&lt;/a&gt; the implementation. Enjoy!&lt;/p&gt;</description>
 <dc:date>2008-08-27</dc:date>
-<guid>http://wordaligned.org/articles/entertaining-documentation</guid>
+<guid>https://wordaligned.org/articles/entertaining-documentation</guid>
 <author>tag@wordaligned.org (Thomas Guest)</author>
-<link>http://wordaligned.org/articles/entertaining-documentation</link>
+<link>https://wordaligned.org/articles/entertaining-documentation</link>
 <category>Perl</category>
 </item>
 
@@ -752,7 +752,7 @@ client sites&amp;#8230; well, I don&amp;#8217;t WANT a language that is QUITE
 so dynamic, thank you very much.&lt;/p&gt;
 &lt;/blockquote&gt;
 
-&lt;p&gt;I&amp;#8217;ve heard this opinion before, nudged even further along the static-dynamic scale. Some argue Python is &lt;a href=&quot;http://wordaligned.org/articles/pitching-python-in-three-syllables.html&quot;&gt;too dynamic&lt;/a&gt; for large applications; that you&amp;#8217;re better off with something more disciplined, statically typed, enterprise ready, something with decent IDEs to keep your code in shape &amp;#8212; something like Java.&lt;/p&gt;
+&lt;p&gt;I&amp;#8217;ve heard this opinion before, nudged even further along the static-dynamic scale. Some argue Python is &lt;a href=&quot;https://wordaligned.org/articles/pitching-python-in-three-syllables.html&quot;&gt;too dynamic&lt;/a&gt; for large applications; that you&amp;#8217;re better off with something more disciplined, statically typed, enterprise ready, something with decent IDEs to keep your code in shape &amp;#8212; something like Java.&lt;/p&gt;
 &lt;h3 id=&quot;too-big&quot;&gt;Too Big&lt;/h3&gt;
 &lt;p&gt;In &lt;a href=&quot;http://steve-yegge.blogspot.com/2007/12/codes-worst-enemy.html&quot;&gt;&amp;#8220;Code&amp;#8217;s Worst Enemy&amp;#8221;&lt;/a&gt; Steve Yegge rants about his own large application:&lt;/p&gt;
 &lt;blockquote&gt;
@@ -771,17 +771,17 @@ so dynamic, thank you very much.&lt;/p&gt;
 &lt;p&gt;Or is &lt;strong&gt;size the enemy&lt;/strong&gt;? Do we need a language so powerful it &lt;a href=&quot;http://blog.plover.com/prog/design-patterns.html&quot;&gt;absorbs design patterns&lt;/a&gt;, so dynamic we never need repeat ourselves, so succinct we can &lt;a href=&quot;http://www.paulgraham.com/head.html&quot;&gt;fit the code in our heads&lt;/a&gt;?&lt;/p&gt;
 &lt;p&gt;I&amp;#8217;d say the latter. A dynamic language might be too slow (for a few parts of a system) but it can&amp;#8217;t be too dynamic. Meta-programming requires taste and restraint, of course, not to mention boundaries; and we mustn&amp;#8217;t expect any one programming language to fix our design. For any large system, I&amp;#8217;d expect multiple components, layers of abstraction &amp;#8212; and layers of languages.&lt;/p&gt;</description>
 <dc:date>2007-12-20</dc:date>
-<guid>http://wordaligned.org/articles/too-big-or-too-clever</guid>
+<guid>https://wordaligned.org/articles/too-big-or-too-clever</guid>
 <author>tag@wordaligned.org (Thomas Guest)</author>
-<link>http://wordaligned.org/articles/too-big-or-too-clever</link>
+<link>https://wordaligned.org/articles/too-big-or-too-clever</link>
 <category>Perl</category>
 </item>
 
 <item>
 <title>Maybe we live in a scripting universe</title>
-<description>&lt;p&gt;Although Perl was &lt;a href=&quot;http://wordaligned.org/articles/perlish-wisdom.html#excerpt0&quot;&gt;the first high-level language I fell for&lt;/a&gt; I rarely use it these days. It&amp;#8217;s true, some well-worn Perl scripts still lurk in my &lt;code&gt;~/bin&lt;/code&gt; but, despite their manipulexity and whipuptitude, I make little effort to maintain them.&lt;/p&gt;
+<description>&lt;p&gt;Although Perl was &lt;a href=&quot;https://wordaligned.org/articles/perlish-wisdom.html#excerpt0&quot;&gt;the first high-level language I fell for&lt;/a&gt; I rarely use it these days. It&amp;#8217;s true, some well-worn Perl scripts still lurk in my &lt;code&gt;~/bin&lt;/code&gt; but, despite their manipulexity and whipuptitude, I make little effort to maintain them.&lt;/p&gt;
 &lt;p&gt;&lt;img src=&quot;http://www.joinc.co.kr/modules/moniwiki/wiki.php/Site/Perl/PerlPresentFuture?action=download&amp;amp;value=10.png&quot; alt=&quot;Graph plotting manipulexity against whipuptitude&quot;/&gt;&lt;/p&gt;
-&lt;p&gt;As a consequence I haven&amp;#8217;t really tracked the development of Perl 6. Standing on the sidelines it sometimes seems &lt;a href=&quot;http://wordaligned.org/articles/a-yen-for-more-symbols.html&quot;&gt;like a joke&lt;/a&gt;: but &lt;span /&gt;Perl has always had a great sense of humour; and, like all great humour, it deserves taking seriously.&lt;/p&gt;
+&lt;p&gt;As a consequence I haven&amp;#8217;t really tracked the development of Perl 6. Standing on the sidelines it sometimes seems &lt;a href=&quot;https://wordaligned.org/articles/a-yen-for-more-symbols.html&quot;&gt;like a joke&lt;/a&gt;: but &lt;span /&gt;Perl has always had a great sense of humour; and, like all great humour, it deserves taking seriously.&lt;/p&gt;
 &lt;p&gt;&lt;span id=&quot;continue-reading&quot;/&gt;&lt;/p&gt;
 &lt;h3 id=&quot;wall-on-perl&quot;&gt;Wall on Perl&lt;/h3&gt;
 &lt;p&gt;The language&amp;#8217;s creator, &lt;a href=&quot;http://www.wall.org/~larry/&quot;&gt;Larry Wall&lt;/a&gt;, very definitely merits attention. Given Perl&amp;#8217;s heritage, it&amp;#8217;s hardly surprising his 11th State of the Onion address about &lt;a href=&quot;http://www.perl.com/pub/a/2007/12/06/soto-11.html&quot; title=&quot;Programming is Hard, Let&#x27;s go Scripting&quot;&gt;scripting, programming and the future of Perl&lt;/a&gt; is crammed with &lt;a href=&quot;http://sial.org/howto/perl/one-liner&quot;&gt;one-liners&lt;/a&gt;. I can&amp;#8217;t resist quoting a few:&lt;/p&gt;
@@ -791,7 +791,7 @@ so dynamic, thank you very much.&lt;/p&gt;
 &lt;p&gt;Keep common things short, but not too short. In this case, 0 is too short.&lt;/p&gt;
 &lt;p&gt;I&amp;#8217;ve looked a bit at Microsoft&amp;#8217;s Monad, and I&amp;#8217;m pleased to note that it has object pipes like Perl 6. I just hope they don&amp;#8217;t patent it.&lt;/p&gt;
 &lt;/blockquote&gt;
-&lt;p&gt;Wall&amp;#8217;s linguistic facility shines through every level of his &lt;a href=&quot;http://www.perl.com/pub/a/2007/12/06/soto-11.html&quot; title=&quot;Programming is Hard, Let&#x27;s go Scripting&quot;&gt;address&lt;/a&gt;. I hadn&amp;#8217;t realised he studied linguistics at grad school. It seems obvious now. Programming, scripting, reading, writing &amp;#8212; &lt;a href=&quot;http://wordaligned.org/articles/why-software-development-isnt-like-construction.html#a-better-metaphor&quot;&gt;all language&lt;/a&gt;. Wall again:&lt;/p&gt;
+&lt;p&gt;Wall&amp;#8217;s linguistic facility shines through every level of his &lt;a href=&quot;http://www.perl.com/pub/a/2007/12/06/soto-11.html&quot; title=&quot;Programming is Hard, Let&#x27;s go Scripting&quot;&gt;address&lt;/a&gt;. I hadn&amp;#8217;t realised he studied linguistics at grad school. It seems obvious now. Programming, scripting, reading, writing &amp;#8212; &lt;a href=&quot;https://wordaligned.org/articles/why-software-development-isnt-like-construction.html#a-better-metaphor&quot;&gt;all language&lt;/a&gt;. Wall again:&lt;/p&gt;
 &lt;blockquote&gt;
 &lt;p&gt;I view a string as a Text, with a capital T.&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;Text&lt;/strong&gt;&lt;/p&gt;
@@ -818,11 +818,11 @@ so dynamic, thank you very much.&lt;/p&gt;
 &lt;blockquote&gt;
 &lt;p&gt;Perl and Ruby take their functional programming support rather more seriously than Python does.&lt;/p&gt;
 &lt;/blockquote&gt;
-&lt;p&gt;I don&amp;#8217;t know enough about Perl and Ruby to disagree with any authority. I do know Python&amp;#8217;s support for functional programming has been steadily improving from one minor revision of the language to the next, with (e.g.) core language features like decorators and generator expressions, and library support for &lt;a href=&quot;http://docs.python.org/lib/module-itertools.html&quot;&gt;lazily evaluated sequences&lt;/a&gt; and &lt;a href=&quot;http://docs.python.org/lib/module-functools.html&quot;&gt;partial function application&lt;/a&gt;. The next major revision, Python 3000, continues this evolution, even if anonymous functions remain under-emphasised and &lt;a href=&quot;http://wordaligned.org/articles/paralipsis.html&quot;&gt;reduce&lt;/a&gt; is to be axed from the language core.&lt;/p&gt;</description>
+&lt;p&gt;I don&amp;#8217;t know enough about Perl and Ruby to disagree with any authority. I do know Python&amp;#8217;s support for functional programming has been steadily improving from one minor revision of the language to the next, with (e.g.) core language features like decorators and generator expressions, and library support for &lt;a href=&quot;http://docs.python.org/lib/module-itertools.html&quot;&gt;lazily evaluated sequences&lt;/a&gt; and &lt;a href=&quot;http://docs.python.org/lib/module-functools.html&quot;&gt;partial function application&lt;/a&gt;. The next major revision, Python 3000, continues this evolution, even if anonymous functions remain under-emphasised and &lt;a href=&quot;https://wordaligned.org/articles/paralipsis.html&quot;&gt;reduce&lt;/a&gt; is to be axed from the language core.&lt;/p&gt;</description>
 <dc:date>2007-12-18</dc:date>
-<guid>http://wordaligned.org/articles/maybe-we-live-in-a-scripting-universe</guid>
+<guid>https://wordaligned.org/articles/maybe-we-live-in-a-scripting-universe</guid>
 <author>tag@wordaligned.org (Thomas Guest)</author>
-<link>http://wordaligned.org/articles/maybe-we-live-in-a-scripting-universe</link>
+<link>https://wordaligned.org/articles/maybe-we-live-in-a-scripting-universe</link>
 <category>Perl</category>
 </item>
 
@@ -844,9 +844,9 @@ my @tile_values = &amp;lt; A B C D E F &amp;gt; &amp;#x00a5; (1, 3, 4, 2, 1, 4)
 &lt;li&gt;I won&amp;#8217;t even try to list the exciting mathematical symbols and the possibilities they open up. Let&amp;#8217;s just say we&amp;#8217;d all use container operations if &amp;#x2200; U+2200 FOR ALL were available&lt;/li&gt;
 &lt;/ul&gt;</description>
 <dc:date>2007-09-13</dc:date>
-<guid>http://wordaligned.org/articles/a-yen-for-more-symbols</guid>
+<guid>https://wordaligned.org/articles/a-yen-for-more-symbols</guid>
 <author>tag@wordaligned.org (Thomas Guest)</author>
-<link>http://wordaligned.org/articles/a-yen-for-more-symbols</link>
+<link>https://wordaligned.org/articles/a-yen-for-more-symbols</link>
 <category>Perl</category>
 </item>
 
@@ -911,9 +911,9 @@ my @tile_values = &amp;lt; A B C D E F &amp;gt; &amp;#x00a5; (1, 3, 4, 2, 1, 4)
 &lt;li&gt;Birmingham New Street opened in 1854.&lt;/li&gt;
 &lt;/ol&gt;</description>
 <dc:date>2007-09-09</dc:date>
-<guid>http://wordaligned.org/articles/pitching-python-in-three-syllables</guid>
+<guid>https://wordaligned.org/articles/pitching-python-in-three-syllables</guid>
 <author>tag@wordaligned.org (Thomas Guest)</author>
-<link>http://wordaligned.org/articles/pitching-python-in-three-syllables</link>
+<link>https://wordaligned.org/articles/pitching-python-in-three-syllables</link>
 <category>Perl</category>
 </item>
 
@@ -931,9 +931,9 @@ my @tile_values = &amp;lt; A B C D E F &amp;gt; &amp;#x00a5; (1, 3, 4, 2, 1, 4)
 &lt;/blockquote&gt;
 &lt;p&gt;&lt;span /&gt;I do think, thanks.&lt;/p&gt;</description>
 <dc:date>2007-08-09</dc:date>
-<guid>http://wordaligned.org/articles/how-green-you-are</guid>
+<guid>https://wordaligned.org/articles/how-green-you-are</guid>
 <author>tag@wordaligned.org (Thomas Guest)</author>
-<link>http://wordaligned.org/articles/how-green-you-are</link>
+<link>https://wordaligned.org/articles/how-green-you-are</link>
 <category>Perl</category>
 </item>
 
@@ -948,9 +948,9 @@ my @tile_values = &amp;lt; A B C D E F &amp;gt; &amp;#x00a5; (1, 3, 4, 2, 1, 4)
 &lt;p&gt;Ultimately, though, there were things I never quite got and probably never will get. I never managed to build complex structures without referring to the manual. Oh, and I never really got to grips with the Perl documentation system. I never found an editor mode I was completely happy with &amp;#8212; or perhaps the overloaded syntax just started to grate. Finger saving tricks turned out to be expensive in the long run.&lt;/p&gt;
 &lt;p&gt;Adopting Perl changed me, though. I prefer powerful languages with comprehensive libraries. Wrestling with build systems seems too much pain for too little gain. And explicit type declarations make software frigid.&lt;/p&gt;</description>
 <dc:date>2007-05-10</dc:date>
-<guid>http://wordaligned.org/articles/perlish-wisdom</guid>
+<guid>https://wordaligned.org/articles/perlish-wisdom</guid>
 <author>tag@wordaligned.org (Thomas Guest)</author>
-<link>http://wordaligned.org/articles/perlish-wisdom</link>
+<link>https://wordaligned.org/articles/perlish-wisdom</link>
 <category>Perl</category>
 </item>
 
@@ -1084,9 +1084,9 @@ manual.  I&amp;#8217;m no expert, but regard this as sound advice.&lt;/p&gt;
 development in general, I recommend &lt;a href=&quot;http://www.catb.org/~esr/writings/taoup/&quot;&gt;&amp;#8220;The Art of Unix Programming&amp;#8221;&lt;/a&gt; by
 &lt;a href=&quot;http://www.catb.org/~esr&quot;&gt;Eric S. Raymond&lt;/a&gt;.&lt;/p&gt;</description>
 <dc:date>2007-03-05</dc:date>
-<guid>http://wordaligned.org/articles/shells-logs-and-pipes</guid>
+<guid>https://wordaligned.org/articles/shells-logs-and-pipes</guid>
 <author>tag@wordaligned.org (Thomas Guest)</author>
-<link>http://wordaligned.org/articles/shells-logs-and-pipes</link>
+<link>https://wordaligned.org/articles/shells-logs-and-pipes</link>
 <category>Perl</category>
 </item>
 

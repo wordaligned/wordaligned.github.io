@@ -2,16 +2,16 @@
 <rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" >
 <channel>
 <title>Word Aligned</title>
-<link>http://wordaligned.org</link>
+<link>https://wordaligned.org</link>
 <description>tales from the code face</description>
 <dc:creator>tag@wordaligned.org</dc:creator>
 <language>en-gb</language>
 <item>
 <title>Stop the clock, squash the bug</title>
 <description>&lt;p&gt;Which clock is the best?&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://wordaligned.org/images/stopped-clock.gif&quot; alt=&quot;Stopped clock&quot;/&gt;
-&lt;img src=&quot;http://wordaligned.org/images/slow-clock.gif&quot; alt=&quot;Slow clock&quot;/&gt;
-&lt;img src=&quot;http://wordaligned.org/images/fast-clock.gif&quot; alt=&quot;Fast clock&quot;/&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https://wordaligned.org/images/stopped-clock.gif&quot; alt=&quot;Stopped clock&quot;/&gt;
+&lt;img src=&quot;https://wordaligned.org/images/slow-clock.gif&quot; alt=&quot;Slow clock&quot;/&gt;
+&lt;img src=&quot;https://wordaligned.org/images/fast-clock.gif&quot; alt=&quot;Fast clock&quot;/&gt;&lt;/p&gt;
 &lt;p&gt;We can easily rule the one which has stopped &amp;#8230; &lt;/p&gt;
 &lt;p&gt;Or can we? In &amp;#8220;The Rectory Umbrella&amp;#8221; Lewis Carroll &lt;a href=&quot;http://www.gavagai.de/themen/HHPT02.htm&quot;&gt;argues otherwise&lt;/a&gt;.&lt;/p&gt;
 &lt;blockquote&gt;
@@ -23,11 +23,11 @@ I have two clocks: one doesn&amp;#8217;t go at all, and the other loses a minute
 &lt;p&gt;&lt;span id=&quot;continue-reading&quot;/&gt;&lt;/p&gt;
 &lt;p&gt;It&amp;#8217;s an amusing diversion, but not really that puzzling: &lt;em&gt;of course&lt;/em&gt; the clock which loses time is of more practical use, even if, somewhat paradoxically, the less time it loses the less often it tells the right time. A clock which loses just a second a day only tells the right time every 118 years or so.&lt;/p&gt;
 &lt;h3 id=&quot;software-bugs&quot;&gt;Software Bugs&lt;/h3&gt;
-&lt;p&gt;&lt;img style=&quot;float:right;&quot; src=&quot;http://wordaligned.org/images/buttons/spider.jpg&quot; alt=&quot;Bug&quot;/&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img style=&quot;float:right;&quot; src=&quot;https://wordaligned.org/images/buttons/spider.jpg&quot; alt=&quot;Bug&quot;/&gt;&lt;/p&gt;
 &lt;p&gt;I mention these defective clocks because I&amp;#8217;m thinking about bugs in software and how we go about finding and fixing them. &lt;/p&gt;
 &lt;p&gt;Code which is obviously wrong is easier to spot than code which is almost right, and spotting bugs is the precursor to fixing them. This implies &amp;#8212; building on Carroll&amp;#8217;s terminology &amp;#8212; that we&amp;#8217;re unlikely to ship many stopped clocks but if we&amp;#8217;re not careful we may end up delivering a few which lose time. And, in general, code which is obviously wrong is easier to fix than code which is almost right. A badly-broken function clearly needs a rethink; whereas one which &lt;em&gt;almost&lt;/em&gt; works may simply get tweaked until it &lt;em&gt;appears&lt;/em&gt; to work, often resulting in a more subtle bug.&lt;/p&gt;
 &lt;h3 id=&quot;leaks-and-races&quot;&gt;Leaks and Races&lt;/h3&gt;
-&lt;p&gt;C and C++ provide a good example of what I&amp;#8217;m talking about. Consider a program which misuses memory. An attempt to allocate workspace of 4294967295 bytes fails instantly&lt;a id=&quot;fn1link&quot; href=&quot;http://wordaligned.org/articles/stop-the-clock-squash-the-bug#fn1&quot;&gt;&lt;sup&gt;&lt;a href=&quot;https://blog.codeship.com/building-minimal-docker-containers-for-go-applications/&quot;&gt;1&lt;/a&gt;&lt;/sup&gt;&lt;/a&gt;; a slow memory leak, like a slow running clock, may cause no perceptible damage for an extended period.&lt;/p&gt;
+&lt;p&gt;C and C++ provide a good example of what I&amp;#8217;m talking about. Consider a program which misuses memory. An attempt to allocate workspace of 4294967295 bytes fails instantly&lt;a id=&quot;fn1link&quot; href=&quot;https://wordaligned.org/articles/stop-the-clock-squash-the-bug#fn1&quot;&gt;&lt;sup&gt;&lt;a href=&quot;https://blog.codeship.com/building-minimal-docker-containers-for-go-applications/&quot;&gt;1&lt;/a&gt;&lt;/sup&gt;&lt;/a&gt;; a slow memory leak, like a slow running clock, may cause no perceptible damage for an extended period.&lt;/p&gt;
 &lt;p&gt;&lt;a href=&quot;http://valgrind.org&quot;&gt;Decent tools&lt;/a&gt; detect memory leaks. Race conditions in multi-threaded code are harder to track and may prove elusive during system testing. More than once I&amp;#8217;ve left a program running under a debugger, being fed random inputs, in the hope some rare and apparently random condition will trigger a break in execution. Give me truly broken code any day!&lt;/p&gt;
 &lt;h3 id=&quot;75-correct-vs-50-correct&quot;&gt;75% correct vs 50% correct&lt;/h3&gt;
 &lt;p&gt;Here are two implementations of a C function to find an integer midway between a pair of ordered, positive integer values, truncating downwards. Before reading on, ask yourself which is better.&lt;/p&gt;
@@ -57,7 +57,7 @@ int midpoint2(int low, int high)
 &lt;li&gt;in a sense, &lt;code&gt;midpoint2&lt;/code&gt; is more broken than &lt;code&gt;midpoint1&lt;/code&gt;: over the range of possible low and high inputs, the sum overflows and triggers the defect 50% of the time.&lt;/li&gt;
 &lt;/ul&gt;
 &lt;h3 id=&quot;probabilistic-algorithms&quot;&gt;Probabilistic algorithms&lt;/h3&gt;
-&lt;p&gt;Computers are supposed to be predictable and we typically aim for correct programs. There&amp;#8217;s no reason why we shouldn&amp;#8217;t consider aiming for programs which are good enough, though, and indeed many programs which are good enough to be useful are also flawed. Google adverts, for example, analyse the contents of web pages and serve up related links. The algorithm used is secret, clever and quick, but often results in &lt;a href=&quot;http://wordaligned.org/articles/mistargeted-ads.html&quot;&gt;semantic blunders&lt;/a&gt; and, on occasion, &lt;a href=&quot;http://www.bofh.org.uk/articles/2008/04/15/ads-are-gone&quot;&gt;offensive mistakes&lt;/a&gt;. Few could deny how useful to Google this program has been, though.&lt;/p&gt;
+&lt;p&gt;Computers are supposed to be predictable and we typically aim for correct programs. There&amp;#8217;s no reason why we shouldn&amp;#8217;t consider aiming for programs which are good enough, though, and indeed many programs which are good enough to be useful are also flawed. Google adverts, for example, analyse the contents of web pages and serve up related links. The algorithm used is secret, clever and quick, but often results in &lt;a href=&quot;https://wordaligned.org/articles/mistargeted-ads.html&quot;&gt;semantic blunders&lt;/a&gt; and, on occasion, &lt;a href=&quot;http://www.bofh.org.uk/articles/2008/04/15/ads-are-gone&quot;&gt;offensive mistakes&lt;/a&gt;. Few could deny how useful to Google this program has been, though.&lt;/p&gt;
 &lt;p&gt;Here&amp;#8217;s a more interesting example of an algorithm which, like a losing clock, is nearly right.&lt;/p&gt;
 &lt;div class=&quot;typocode&quot;&gt;
 
@@ -97,7 +97,7 @@ False
 
 &lt;/div&gt;
 
-&lt;p&gt;&lt;code&gt;Exhaustive_is_fprime&lt;/code&gt; is expensive to run and will (very) occasionally return &lt;code&gt;True&lt;/code&gt; for a composite number&lt;a id=&quot;fn2link&quot; href=&quot;http://wordaligned.org/articles/stop-the-clock-squash-the-bug#fn2&quot;&gt;&lt;sup&gt;&lt;a href=&quot;http://devcenter.wercker.com/docs/quickstarts/advanced/building-minimal-containers-with-go&quot;&gt;2&lt;/a&gt;&lt;/sup&gt;&lt;/a&gt;. If you want to know more, &lt;a href=&quot;http://www.google.com/search?q=carmichael+numbers&quot;&gt;search for Carmichael numbers&lt;/a&gt;. &lt;/p&gt;
+&lt;p&gt;&lt;code&gt;Exhaustive_is_fprime&lt;/code&gt; is expensive to run and will (very) occasionally return &lt;code&gt;True&lt;/code&gt; for a composite number&lt;a id=&quot;fn2link&quot; href=&quot;https://wordaligned.org/articles/stop-the-clock-squash-the-bug#fn2&quot;&gt;&lt;sup&gt;&lt;a href=&quot;http://devcenter.wercker.com/docs/quickstarts/advanced/building-minimal-containers-with-go&quot;&gt;2&lt;/a&gt;&lt;/sup&gt;&lt;/a&gt;. If you want to know more, &lt;a href=&quot;http://www.google.com/search?q=carmichael+numbers&quot;&gt;search for Carmichael numbers&lt;/a&gt;. &lt;/p&gt;
 &lt;p&gt;The point I&amp;#8217;m making is that code which is almost right can be dangerous. We are tempted to fix it by adjusting the existing implementation, even if, as in this case, a complete overhaul is required. By contrast, we all know what needs doing with code which is plainly wrong.&lt;/p&gt;
 &lt;h3 id=&quot;defensive-programming&quot;&gt;Defensive programming&lt;/h3&gt;
 &lt;p&gt;We&amp;#8217;ve all seen nervous functions which go beyond their stated interface in an attempt to protect themselves from careless users.&lt;/p&gt;
@@ -154,7 +154,7 @@ int nervy_maximum_value(int const * items, size_t count)
 &lt;p&gt;Did you spot the subtle bug in &lt;code&gt;nervy_maximum_value&lt;/code&gt;? It uses &lt;code&gt;-INT_MAX&lt;/code&gt; instead of &lt;code&gt;INT_MIN&lt;/code&gt; which will cause trouble if clients code against this undocumented behaviour; if &lt;code&gt;nervy_maximum_value&lt;/code&gt; is subsequently fixed, this client code back-fires.&lt;/p&gt;
 &lt;p&gt;Note that I&amp;#8217;m not against the use of assertions to check pre-conditions, and a simple &lt;code&gt;assert(items != NULL &amp;amp;&amp;amp; count != 0)&lt;/code&gt; works well in &lt;code&gt;maximum_value&lt;/code&gt;; it&amp;#8217;s writing code which swallows these failed pre-conditions I consider wrong.&lt;/p&gt;
 &lt;h3 id=&quot;defect-halflife&quot;&gt;Defect halflife&lt;/h3&gt;
-&lt;p&gt;The occurrence of defects in complex software systems can be modelled in the same way as radioactive decay. I haven&amp;#8217;t studied this theory and my physics is rusty&lt;a id=&quot;fn3link&quot; href=&quot;http://wordaligned.org/articles/stop-the-clock-squash-the-bug#fn3&quot;&gt;&lt;sup&gt;[3]&lt;/sup&gt;&lt;/a&gt;, but the basic idea is that the population of bugs in some software is rather like a population of radioactive particles. Any given bug fires (any given particle decays) at random, so we can&amp;#8217;t predict when this event will happen, but it is equally likely to fire at any particular time. This gives each defect an average lifetime: a small lifetime for howling defects, such as dereferencing NULL pointers, and a longer one for more subtle problems, such as accumulated rounding errors. Assuming we fix a bug once it occurs, the population of defects decays exponentially, and we get the classic tailing-off curve.&lt;/p&gt;
+&lt;p&gt;The occurrence of defects in complex software systems can be modelled in the same way as radioactive decay. I haven&amp;#8217;t studied this theory and my physics is rusty&lt;a id=&quot;fn3link&quot; href=&quot;https://wordaligned.org/articles/stop-the-clock-squash-the-bug#fn3&quot;&gt;&lt;sup&gt;[3]&lt;/sup&gt;&lt;/a&gt;, but the basic idea is that the population of bugs in some software is rather like a population of radioactive particles. Any given bug fires (any given particle decays) at random, so we can&amp;#8217;t predict when this event will happen, but it is equally likely to fire at any particular time. This gives each defect an average lifetime: a small lifetime for howling defects, such as dereferencing NULL pointers, and a longer one for more subtle problems, such as accumulated rounding errors. Assuming we fix a bug once it occurs, the population of defects decays exponentially, and we get the classic tailing-off curve.&lt;/p&gt;
 &lt;p&gt;&lt;img src=&quot;http://chart.apis.google.com/chart?
 cht=lc
 &amp;amp;chtt=Exponential+Defect+Decay
@@ -165,7 +165,7 @@ cht=lc
 &amp;amp;chco=ff0000
 &amp;amp;chm=B,dddddd,0,0,0
 &amp;amp;chls=3,1,0&quot; alt=&quot;Classic exponential decay curve&quot;/&gt;&lt;/p&gt;
-&lt;p&gt;&lt;span /&gt;Anyone who has ever tried to release a software product knows how it feels to slide down the slope of this curve. We system test, find bugs, fix them, repeat. At the start it can be exhilarating as bugs with short half-lives fall out and get squashed, but the end game is demoralising as defects get reported which then cannot be reproduced, and we find ourselves clawing out progress. When we eventually draw the line and ship the product we do so suspecting the worst problems are yet to be found. To put it more succinctly&lt;a id=&quot;fn4link&quot; href=&quot;http://wordaligned.org/articles/stop-the-clock-squash-the-bug#fn4&quot;&gt;&lt;sup&gt;[4]&lt;/sup&gt;&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;span /&gt;Anyone who has ever tried to release a software product knows how it feels to slide down the slope of this curve. We system test, find bugs, fix them, repeat. At the start it can be exhilarating as bugs with short half-lives fall out and get squashed, but the end game is demoralising as defects get reported which then cannot be reproduced, and we find ourselves clawing out progress. When we eventually draw the line and ship the product we do so suspecting the worst problems are yet to be found. To put it more succinctly&lt;a id=&quot;fn4link&quot; href=&quot;https://wordaligned.org/articles/stop-the-clock-squash-the-bug#fn4&quot;&gt;&lt;sup&gt;[4]&lt;/sup&gt;&lt;/a&gt;.&lt;/p&gt;
 &lt;blockquote&gt;
 &lt;p&gt;Ship happens!&lt;/p&gt;
 &lt;/blockquote&gt;
@@ -173,9 +173,9 @@ cht=lc
 &lt;h3 id=&quot;how-did-that-code-ever-work&quot;&gt;How did that code ever work?&lt;/h3&gt;
 &lt;p&gt;Have you ever fixed a defect and wondered how the code ever even appeared to work before your fix? It&amp;#8217;s an important question and one which requires investigation. Perhaps the bug you&amp;#8217;ve fixed is compensated for by defensive programming elsewhere. Or perhaps there are vast routes through the code which have yet to be exercised.&lt;/p&gt;
 &lt;h3 id=&quot;conclusions&quot;&gt;Conclusions&lt;/h3&gt;
-&lt;p&gt;&lt;img src=&quot;http://wordaligned.org/images/stopped-clock.gif&quot; alt=&quot;Stopped clock&quot;/&gt;
-&lt;img src=&quot;http://wordaligned.org/images/slow-clock.gif&quot; alt=&quot;Slow clock&quot;/&gt;
-&lt;img src=&quot;http://wordaligned.org/images/fast-clock.gif&quot; alt=&quot;Fast clock&quot;/&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https://wordaligned.org/images/stopped-clock.gif&quot; alt=&quot;Stopped clock&quot;/&gt;
+&lt;img src=&quot;https://wordaligned.org/images/slow-clock.gif&quot; alt=&quot;Slow clock&quot;/&gt;
+&lt;img src=&quot;https://wordaligned.org/images/fast-clock.gif&quot; alt=&quot;Fast clock&quot;/&gt;&lt;/p&gt;
 &lt;p&gt;None of these clocks is much good. The first has stopped, the second loses a second every minute, the third gains a second every minute. At least it&amp;#8217;s easy to see the problem with the first: we won&amp;#8217;t be tempted to patch it.&lt;/p&gt;
 &lt;p&gt;We should never expect our code to work first time and we should be suspicious if it appears to do so. Defensive programming seems to mean different things to different people. If I&amp;#8217;ve misused the term here, I&amp;#8217;m sorry. Our best defence is to assume code is broken until we&amp;#8217;ve tested it, to assume it will break in future if our tests are not automated, and to fail hard and fast when we detect errors.&lt;/p&gt;
 &lt;h3 id=&quot;source-code&quot;&gt;Source code&lt;/h3&gt;
@@ -240,25 +240,25 @@ False fprimes set([101101])
 &lt;/pre&gt;
 
 &lt;hr /&gt;
-&lt;p&gt;&lt;a id=&quot;fn1&quot; href=&quot;http://wordaligned.org/articles/stop-the-clock-squash-the-bug#fn1link&quot;&gt;&lt;a href=&quot;https://blog.codeship.com/building-minimal-docker-containers-for-go-applications/&quot;&gt;1&lt;/a&gt;&lt;/a&gt; In the first version of this article I wrote that an attempt to allocate 4294967295 bytes would cause the program to crash, which isn&amp;#8217;t quite right. &lt;code&gt;Malloc&lt;/code&gt; returns NULL in the event of failure; standard C++ operator new behaviour is to throw a &lt;code&gt;bad_alloc&lt;/code&gt; exception. My thanks to R Samuel Klatchko for the &lt;a href=&quot;http://www.haloscan.com/comments/wordaligned/stop_the_clock_squash_the_bug/#16928&quot;&gt;correction&lt;/a&gt;.&lt;/p&gt;
-&lt;p&gt;&lt;a id=&quot;fn2&quot; href=&quot;http://wordaligned.org/articles/stop-the-clock-squash-the-bug#fn2link&quot;&gt;&lt;a href=&quot;http://devcenter.wercker.com/docs/quickstarts/advanced/building-minimal-containers-with-go&quot;&gt;2&lt;/a&gt;&lt;/a&gt;
+&lt;p&gt;&lt;a id=&quot;fn1&quot; href=&quot;https://wordaligned.org/articles/stop-the-clock-squash-the-bug#fn1link&quot;&gt;&lt;a href=&quot;https://blog.codeship.com/building-minimal-docker-containers-for-go-applications/&quot;&gt;1&lt;/a&gt;&lt;/a&gt; In the first version of this article I wrote that an attempt to allocate 4294967295 bytes would cause the program to crash, which isn&amp;#8217;t quite right. &lt;code&gt;Malloc&lt;/code&gt; returns NULL in the event of failure; standard C++ operator new behaviour is to throw a &lt;code&gt;bad_alloc&lt;/code&gt; exception. My thanks to R Samuel Klatchko for the &lt;a href=&quot;http://www.haloscan.com/comments/wordaligned/stop_the_clock_squash_the_bug/#16928&quot;&gt;correction&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;a id=&quot;fn2&quot; href=&quot;https://wordaligned.org/articles/stop-the-clock-squash-the-bug#fn2link&quot;&gt;&lt;a href=&quot;http://devcenter.wercker.com/docs/quickstarts/advanced/building-minimal-containers-with-go&quot;&gt;2&lt;/a&gt;&lt;/a&gt;
 &lt;a href=&quot;http://mitpress.mit.edu/sicp&quot;&gt;&amp;#8220;Structure and Interpretation of Computer Programs&amp;#8221;&lt;/a&gt; discusses Carmichael numbers in a &lt;a href=&quot;http://mitpress.mit.edu/sicp/full-text/book/book-Z-H-11.html#call_footnote_Temp_80&quot;&gt;footnote&lt;/a&gt;&lt;/p&gt;
 &lt;blockquote&gt;
 &lt;p&gt;Numbers that fool the Fermat test are called &lt;em&gt;Carmichael numbers&lt;/em&gt;, and little is known about them other than that they are extremely rare. There are 255 Carmichael numbers below 100,000,000. The smallest few are 561, 1105, 1729, 2465, 2821, and 6601. In testing primality of very large numbers chosen at random, the chance of stumbling upon a value that fools the Fermat test is less than the chance that cosmic radiation will cause the computer to make an error in carrying out a &amp;#8220;correct&amp;#8221; algorithm. Considering an algorithm to be inadequate for the first reason but not for the second illustrates the difference between mathematics and engineering.&lt;/p&gt;
 &lt;/blockquote&gt;
-&lt;p&gt;&lt;a id=&quot;fn3&quot; href=&quot;http://wordaligned.org/articles/stop-the-clock-squash-the-bug#fn3link&quot;&gt;[3]&lt;/a&gt;
+&lt;p&gt;&lt;a id=&quot;fn3&quot; href=&quot;https://wordaligned.org/articles/stop-the-clock-squash-the-bug#fn3link&quot;&gt;[3]&lt;/a&gt;
 Being lazy and online I thought I&amp;#8217;d search for a nice radioactive decay graphic rather than draw my own. I found a real gem on the &lt;a href=&quot;http://www.colorado.edu/physics/2000/isotopes/radioactive_decay3.html&quot;&gt;University of Colarado site&lt;/a&gt;, where Kyla and Bob discuss radioactive decay.&lt;/p&gt;
 &lt;blockquote&gt;&lt;p&gt;&lt;img src=&quot;http://www.colorado.edu/physics/2000/images/kyla-set/kyla3.jpg&quot; alt=&quot;Kyla&quot; style=&quot;float:left;&quot;/&gt;&lt;/p&gt;&lt;p&gt;Hmmm&amp;#8230;so a lot of decays happen really fast when there are lots of atoms, and then things slow down when there aren&amp;#8217;t so many. The halflife is always the same, but the &lt;i&gt;half&lt;/i&gt; gets smaller and smaller.&lt;/p&gt;
 &lt;p&gt;&lt;img src=&quot;http://www.colorado.edu/physics/2000/images/bob-set/bob2.jpg&quot; alt=&quot;Bob&quot; style=&quot;float:left;&quot;/&gt;&lt;/p&gt;&lt;p&gt;That&amp;#8217;s exactly right.  Here&amp;#8217;s another applet that illustrates radioactive decay in action.&lt;/p&gt;
 &lt;/blockquote&gt;
 
 &lt;p&gt;&lt;a href=&quot;http://www.colorado.edu/physics/2000/isotopes/radioactive_decay3.html&quot;&gt;Visit the site&lt;/a&gt; to play with the applet Bob mentions. You&amp;#8217;ll find more Kyla and Bob pictures there too.&lt;/p&gt;
-&lt;p&gt;&lt;a id=&quot;fn4&quot; href=&quot;http://wordaligned.org/articles/stop-the-clock-squash-the-bug#fn4link&quot;&gt;[4]&lt;/a&gt;
+&lt;p&gt;&lt;a id=&quot;fn4&quot; href=&quot;https://wordaligned.org/articles/stop-the-clock-squash-the-bug#fn4link&quot;&gt;[4]&lt;/a&gt;
 I&amp;#8217;m unable to provide a definitive attribution for the &amp;#8220;Ship happens!&amp;#8221; quotation. I first heard it from &lt;a href=&quot;http://erdani.org&quot;&gt;Andrei Alexandrescu&lt;/a&gt; at an &lt;a href=&quot;http://accu.org/index.php/conferences&quot;&gt;ACCU conference&lt;/a&gt;, who in turn thinks he got it from Erich Gamma. I haven&amp;#8217;t managed to contact Erich Gamma. Matthew B. Doar &lt;a href=&quot;http://www.haloscan.com/comments/wordaligned/stop_the_clock_squash_the_bug/#17002&quot;&gt;reports&lt;/a&gt; using the term back in 2002, and it appears as a &lt;a href=&quot;http://www.oreilly.com/catalog/practicalde/toc.html&quot;&gt;section heading&lt;/a&gt; in his book &lt;a href=&quot;http://www.oreilly.com/catalog/practicalde&quot;&gt;&amp;#8220;Practical Development Environments&amp;#8221;&lt;/a&gt;.&lt;/p&gt;</description>
 <dc:date>2008-04-16</dc:date>
-<guid>http://wordaligned.org/articles/stop-the-clock-squash-the-bug</guid>
+<guid>https://wordaligned.org/articles/stop-the-clock-squash-the-bug</guid>
 <author>tag@wordaligned.org (Thomas Guest)</author>
-<link>http://wordaligned.org/articles/stop-the-clock-squash-the-bug</link>
+<link>https://wordaligned.org/articles/stop-the-clock-squash-the-bug</link>
 <category>SICP</category>
 </item>
 
@@ -266,9 +266,9 @@ I&amp;#8217;m unable to provide a definitive attribution for the &amp;#8220;Ship
 <title>Animated pair streams</title>
 <description>&lt;h3 id=&quot;name-that-series&quot;&gt;Name that Series&lt;/h3&gt;
 &lt;p&gt;What&amp;#8217;s going on in the animation below?&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://wordaligned.org/files/animated-pair-stream.gif&quot; alt=&quot;Pair stream slideshow&quot;/&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https://wordaligned.org/files/animated-pair-stream.gif&quot; alt=&quot;Pair stream slideshow&quot;/&gt;&lt;/p&gt;
 &lt;h3 id=&quot;bounded-pairs&quot;&gt;Bounded Pairs&lt;/h3&gt;
-&lt;p&gt;While you&amp;#8217;re waiting for the graphic to load, recall a problem we encountered while hunting for &lt;a href=&quot;http://wordaligned.org/articles/the-maximum-subsequence-problem.html#programming-pearl&quot;&gt;maximum subsequences&lt;/a&gt;:&lt;/p&gt;
+&lt;p&gt;While you&amp;#8217;re waiting for the graphic to load, recall a problem we encountered while hunting for &lt;a href=&quot;https://wordaligned.org/articles/the-maximum-subsequence-problem.html#programming-pearl&quot;&gt;maximum subsequences&lt;/a&gt;:&lt;/p&gt;
 &lt;blockquote&gt;
 &lt;p&gt;Given a number n, generate all the pairs (i, j) such that i and j are in the range 0 to n and j is greater than i.&lt;/p&gt;
 &lt;/blockquote&gt;
@@ -337,7 +337,7 @@ True
 &lt;p&gt;&lt;span id=&quot;continue-reading&quot;/&gt;&lt;/p&gt;
 &lt;h3 id=&quot;streams-of-pairs&quot;&gt;Streams of Pairs&lt;/h3&gt;
 &lt;p&gt;&lt;code&gt;Generate_pairs()&lt;/code&gt; yields results row by row. Here&amp;#8217;s a slideshow for the case when &lt;code&gt;S&lt;/code&gt; and &lt;code&gt;T&lt;/code&gt; have 5 and 20 elements respectively. Brightness indicates age, so the white circle represents the current head of the generated sequence, and the greying circles represent previous elements &amp;#8212; the older the greyer. Remember, it&amp;#8217;s up to clients just how many grey pairs to hold: the generator only ever yields a shiny white new pair.&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://wordaligned.org/files/animated-pair-list.gif&quot; alt=&quot;Pair list slideshow&quot;/&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https://wordaligned.org/files/animated-pair-list.gif&quot; alt=&quot;Pair list slideshow&quot;/&gt;&lt;/p&gt;
 &lt;p&gt;A text representation would be as follows, where, as usual, we read top to bottom, left to right.&lt;/p&gt;
 &lt;pre&gt;
 S&lt;sub&gt;0&lt;/sub&gt;T&lt;sub&gt;0&lt;/sub&gt;, S&lt;sub&gt;0&lt;/sub&gt;T&lt;sub&gt;1&lt;/sub&gt;, S&lt;sub&gt;0&lt;/sub&gt;T&lt;sub&gt;2&lt;/sub&gt; ...                             S&lt;sub&gt;0&lt;/sub&gt;T&lt;sub&gt;20&lt;/sub&gt;
@@ -373,7 +373,7 @@ S&lt;sub&gt;0&lt;/sub&gt;T&lt;sub&gt;0&lt;/sub&gt;, S&lt;sub&gt;0&lt;/sub&gt;T&l
 
 &lt;/div&gt;
 
-&lt;p&gt;(The problem here is that &lt;code&gt;interleave()&lt;/code&gt; stops as soon as either of the the input streams is exhausted, which isn&amp;#8217;t an issue for infinite streams, but isn&amp;#8217;t ideal in the case when either of the inputs are bounded. You get the idea. I&amp;#8217;ll provide better implementation &lt;a href=&quot;http://wordaligned.org/articles/animated-pair-streams#tying-up&quot;&gt;later&lt;/a&gt;.)&lt;/p&gt;
+&lt;p&gt;(The problem here is that &lt;code&gt;interleave()&lt;/code&gt; stops as soon as either of the the input streams is exhausted, which isn&amp;#8217;t an issue for infinite streams, but isn&amp;#8217;t ideal in the case when either of the inputs are bounded. You get the idea. I&amp;#8217;ll provide better implementation &lt;a href=&quot;https://wordaligned.org/articles/animated-pair-streams#tying-up&quot;&gt;later&lt;/a&gt;.)&lt;/p&gt;
 &lt;p&gt;We can now code our pairs generator:&lt;/p&gt;
 &lt;div class=&quot;typocode&quot;&gt;&lt;div class=&quot;codetitle&quot;&gt;Pairs generator&lt;/div&gt;
 
@@ -398,7 +398,7 @@ def pairs(s, t):
 &lt;/div&gt;
 
 &lt;p&gt;Here&amp;#8217;s a slideshow of this algorithm in action.&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://wordaligned.org/files/animated-pair-stream.gif&quot; alt=&quot;Pair stream slideshow&quot;/&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https://wordaligned.org/files/animated-pair-stream.gif&quot; alt=&quot;Pair stream slideshow&quot;/&gt;&lt;/p&gt;
 &lt;p&gt;Even though Python (CPython, to be specific) and recursion don&amp;#8217;t generally get along well (unlike in a proper functional programming language), this implementation doesn&amp;#8217;t &lt;em&gt;appear&lt;/em&gt; to fall foul of CPython&amp;#8217;s maximum recursion limits &lt;strong&gt;even though pairs() repeatedly calls itself&lt;/strong&gt;.&lt;/p&gt;
 &lt;div class=&quot;typocode&quot;&gt;&lt;div class=&quot;codetitle&quot;&gt;No maximum recursion depth exceeded error here!&lt;/div&gt;
 
@@ -456,7 +456,7 @@ def pairs(s, t):
 
 &lt;h3 id=&quot;double-trouble&quot;&gt;Double Trouble&lt;/h3&gt;
 &lt;p&gt;Let&amp;#8217;s look a little further into the stream. Here&amp;#8217;s the genesis of the first 120 pairs.&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://wordaligned.org/files/animated-pair-stream-120.gif&quot; alt=&quot;Pair stream slideshow&quot;/&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https://wordaligned.org/files/animated-pair-stream-120.gif&quot; alt=&quot;Pair stream slideshow&quot;/&gt;&lt;/p&gt;
 &lt;p&gt;Now the pattern becomes clear. Evidently the interleave strategy gives a heavy bias towards advancing rightwards; downwards motion is relatively slow.&lt;/p&gt;
 &lt;p&gt;Let&amp;#8217;s filter out the &lt;code&gt;i == j&lt;/code&gt; diagonal to try and quantify this.&lt;/p&gt;
 &lt;div class=&quot;typocode&quot;&gt;
@@ -493,11 +493,11 @@ D&lt;sub&gt;i+1&lt;/sub&gt; = 1 + 2&amp;times;D&lt;sub&gt;i&lt;/sub&gt;
 
 &lt;p&gt;This relation derives directly from the recursive definition of &lt;code&gt;pairs()&lt;/code&gt;: yield a single element, then alternate the rest of yourself with the generated top row.&lt;/p&gt;
 &lt;p&gt;Here are some slides showing the points at which the first 5 diagonal elements appear. Watch the recursive pattern emerge.&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://wordaligned.org/files/pairs-1.png&quot; alt=&quot;diagonal pairs image&quot;/&gt;
-&lt;img src=&quot;http://wordaligned.org/files/pairs-3.png&quot; alt=&quot;diagonal pairs image&quot;/&gt;
-&lt;img src=&quot;http://wordaligned.org/files/pairs-7.png&quot; alt=&quot;diagonal pairs image&quot;/&gt;
-&lt;img src=&quot;http://wordaligned.org/files/pairs-15.png&quot; alt=&quot;diagonal pairs image&quot;/&gt;
-&lt;img src=&quot;http://wordaligned.org/files/pairs-31.png&quot; alt=&quot;diagonal pairs image&quot;/&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https://wordaligned.org/files/pairs-1.png&quot; alt=&quot;diagonal pairs image&quot;/&gt;
+&lt;img src=&quot;https://wordaligned.org/files/pairs-3.png&quot; alt=&quot;diagonal pairs image&quot;/&gt;
+&lt;img src=&quot;https://wordaligned.org/files/pairs-7.png&quot; alt=&quot;diagonal pairs image&quot;/&gt;
+&lt;img src=&quot;https://wordaligned.org/files/pairs-15.png&quot; alt=&quot;diagonal pairs image&quot;/&gt;
+&lt;img src=&quot;https://wordaligned.org/files/pairs-31.png&quot; alt=&quot;diagonal pairs image&quot;/&gt;&lt;/p&gt;
 &lt;p&gt;The solution to the recurrence relation is &lt;code&gt;D&lt;sub&gt;i&lt;/sub&gt; = 2&lt;sup&gt;i&lt;/sup&gt; &amp;minus; 1&lt;/code&gt;. These diagonal advances correspond to recursive calls to &lt;code&gt;pairs()&lt;/code&gt;. So if our Python session has a recursion limit set to 1000 (try &lt;code&gt;sys.getrecursionlimit()&lt;/code&gt;), and our pairs generator were to yield a result every nanosecond, and we had a machine with infinite memory, it would take quite a few millenia before we run into this limit.&lt;/p&gt;
 &lt;div class=&quot;typocode&quot;&gt;&lt;div class=&quot;codetitle&quot;&gt;How many millenia until we hit the recursion limit?&lt;/div&gt;
 
@@ -669,9 +669,9 @@ if __name__ == &amp;#x27;__main__&amp;#x27;:
 &lt;h3 id=&quot;credits&quot;&gt;Credits&lt;/h3&gt;
 &lt;p&gt;The inspiration for this article comes directly from &lt;a href=&quot;http://mitpress.mit.edu/sicp/full-text/book/book-Z-H-24.html#%_sec_Temp_476&quot;&gt;&amp;#8220;Structure and Interpretation of Computer Programs&amp;#8221;&lt;/a&gt;, which presents some great examples of how to develop and use these pair streams.&lt;/p&gt;</description>
 <dc:date>2008-01-13</dc:date>
-<guid>http://wordaligned.org/articles/animated-pair-streams</guid>
+<guid>https://wordaligned.org/articles/animated-pair-streams</guid>
 <author>tag@wordaligned.org (Thomas Guest)</author>
-<link>http://wordaligned.org/articles/animated-pair-streams</link>
+<link>https://wordaligned.org/articles/animated-pair-streams</link>
 <category>SICP</category>
 </item>
 
@@ -689,7 +689,7 @@ this post. I found it easiest to describe the different shades of
 meaning with a diagram.&lt;/p&gt;
 &lt;p&gt;&lt;span id=&quot;continue-reading&quot;/&gt;&lt;/p&gt;
 &lt;h2 id=&quot;the-different-shades-of-meaning&quot;&gt;The Different Shades of Meaning&lt;/h2&gt;
-&lt;p&gt;&lt;img src=&quot;http://wordaligned.org/images/ex4.45.jpg&quot; width=&quot;100%&quot; alt=&quot;The cat, the class, the student, the professor&quot;/&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https://wordaligned.org/images/ex4.45.jpg&quot; width=&quot;100%&quot; alt=&quot;The cat, the class, the student, the professor&quot;/&gt;&lt;/p&gt;
 &lt;h2 id=&quot;drawing-as-a-design-tool&quot;&gt;Drawing as a Design Tool&lt;/h2&gt;
 &lt;p&gt;I use drawings all the time when I&amp;#8217;m writing software. Pencil and
 paper are good enough for many jobs; whiteboard and pen are perfect
@@ -814,15 +814,15 @@ in presentations. Building these pictures is, however, a painful process.&lt;/p&
 
 &lt;/div&gt;</description>
 <dc:date>2007-03-04</dc:date>
-<guid>http://wordaligned.org/articles/drawing-software-designs</guid>
+<guid>https://wordaligned.org/articles/drawing-software-designs</guid>
 <author>tag@wordaligned.org (Thomas Guest)</author>
-<link>http://wordaligned.org/articles/drawing-software-designs</link>
+<link>https://wordaligned.org/articles/drawing-software-designs</link>
 <category>SICP</category>
 </item>
 
 <item>
 <title>Readable Code</title>
-<description>&lt;p&gt;In an &lt;a href=&quot;http://wordaligned.org/articles/my-test-first-ruby-program.html&quot;&gt;earlier post&lt;/a&gt; I described how I got started with &lt;a href=&quot;http://www.ruby-lang.org&quot; title=&quot;Ruby home&quot;&gt;Ruby&lt;/a&gt;
+<description>&lt;p&gt;In an &lt;a href=&quot;https://wordaligned.org/articles/my-test-first-ruby-program.html&quot;&gt;earlier post&lt;/a&gt; I described how I got started with &lt;a href=&quot;http://www.ruby-lang.org&quot; title=&quot;Ruby home&quot;&gt;Ruby&lt;/a&gt;
 not by studying the language, but by reading then adapting some
 existing code. Of course I was lucky in that the code I started from
 was good. (At least I&amp;#8217;m pretty sure it was: it came from a trusted
@@ -928,9 +928,9 @@ for machines to execute.&lt;/p&gt;
 &lt;/blockquote&gt;
 &lt;p&gt;Happy reading!&lt;/p&gt;</description>
 <dc:date>2006-08-06</dc:date>
-<guid>http://wordaligned.org/articles/readable-code</guid>
+<guid>https://wordaligned.org/articles/readable-code</guid>
 <author>tag@wordaligned.org (Thomas Guest)</author>
-<link>http://wordaligned.org/articles/readable-code</link>
+<link>https://wordaligned.org/articles/readable-code</link>
 <category>SICP</category>
 </item>
 

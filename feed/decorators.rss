@@ -2,7 +2,7 @@
 <rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" >
 <channel>
 <title>Word Aligned</title>
-<link>http://wordaligned.org</link>
+<link>https://wordaligned.org</link>
 <description>tales from the code face</description>
 <dc:creator>tag@wordaligned.org</dc:creator>
 <language>en-gb</language>
@@ -36,7 +36,7 @@
 
 &lt;/div&gt;
 
-&lt;p&gt;When you no longer want calls traced you can remove the &lt;code&gt;print&lt;/code&gt; statement or even comment it out. This approach works well enough for a while but you soon discover there are more functions you want to trace; and you&amp;#8217;ll eventually end up with lots of functions being traced and lots of commented-out tracing code. You might even end up with &lt;a href=&quot;http://wordaligned.org/articles/code-in-comments.html&quot;&gt;broken commented-out code&lt;/a&gt;:&lt;/p&gt;
+&lt;p&gt;When you no longer want calls traced you can remove the &lt;code&gt;print&lt;/code&gt; statement or even comment it out. This approach works well enough for a while but you soon discover there are more functions you want to trace; and you&amp;#8217;ll eventually end up with lots of functions being traced and lots of commented-out tracing code. You might even end up with &lt;a href=&quot;https://wordaligned.org/articles/code-in-comments.html&quot;&gt;broken commented-out code&lt;/a&gt;:&lt;/p&gt;
 &lt;div class=&quot;typocode&quot;&gt;&lt;div class=&quot;codetitle&quot;&gt;broken comment&lt;/div&gt;
 
 &lt;pre class=&quot;prettyprint&quot;&gt;def dot(vec1, vec2):
@@ -140,7 +140,7 @@ j((&amp;#x27;green&amp;#x27;, &amp;#x27;eggs&amp;#x27;), &amp;#x27;spam&amp;#x27
 &lt;p&gt;This does something like what we want, but note a couple of problems:&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;the second call to &lt;code&gt;g&lt;/code&gt; uses keyword argument syntax, and the output &lt;code&gt;g(&#x27;spam&#x27;, 42)&lt;/code&gt; is exactly what we saw echoed by the previous call to &lt;code&gt;g&lt;/code&gt; even though the arguments have been swapped around. We&amp;#8217;d better try and echo argument names as well as their values (just as we did when we first modified &lt;code&gt;dot&lt;/code&gt; to echo calls).&lt;/li&gt;
-&lt;li&gt;the output doesn&amp;#8217;t show the (defaulted) arguments passed to &lt;code&gt;h&lt;/code&gt; &lt;a href=&quot;http://wordaligned.org/articles/echo#footnote1&quot; id=&quot;fn1link&quot;&gt;&lt;sup&gt;&lt;a href=&quot;https://blog.codeship.com/building-minimal-docker-containers-for-go-applications/&quot;&gt;1&lt;/a&gt;&lt;/sup&gt;&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;the output doesn&amp;#8217;t show the (defaulted) arguments passed to &lt;code&gt;h&lt;/code&gt; &lt;a href=&quot;https://wordaligned.org/articles/echo#footnote1&quot; id=&quot;fn1link&quot;&gt;&lt;sup&gt;&lt;a href=&quot;https://blog.codeship.com/building-minimal-docker-containers-for-go-applications/&quot;&gt;1&lt;/a&gt;&lt;/sup&gt;&lt;/a&gt;.&lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;There&amp;#8217;s another more subtle problem too.&lt;/p&gt;
 &lt;div class=&quot;typocode&quot;&gt;
@@ -213,7 +213,7 @@ f((&amp;#x27;spam&amp;#x27;, &amp;#x27;spam&amp;#x27;, &amp;#x27;spam!&amp;#x27;
 &lt;/div&gt;
 
 &lt;h3 id=&quot;improving-echo&quot;&gt;Improving echo&lt;/h3&gt;
-&lt;p&gt;Here&amp;#8217;s a version of &lt;code&gt;echo&lt;/code&gt; which fixes the remaining problems: that is, it prints out argument names as well as argument values, and it also prints out any arguments defaulted in the call to the wrapped function. This version is a little longer and considerably more fiddly &lt;a href=&quot;http://wordaligned.org/articles/echo#footnote2&quot; id=&quot;fn2link&quot;&gt;&lt;sup&gt;&lt;a href=&quot;http://devcenter.wercker.com/docs/quickstarts/advanced/building-minimal-containers-with-go&quot;&gt;2&lt;/a&gt;&lt;/sup&gt;&lt;/a&gt;, since we need to dig deeper into the function&amp;#8217;s code, but it follows the same basic pattern as its predecessors.&lt;/p&gt;
+&lt;p&gt;Here&amp;#8217;s a version of &lt;code&gt;echo&lt;/code&gt; which fixes the remaining problems: that is, it prints out argument names as well as argument values, and it also prints out any arguments defaulted in the call to the wrapped function. This version is a little longer and considerably more fiddly &lt;a href=&quot;https://wordaligned.org/articles/echo#footnote2&quot; id=&quot;fn2link&quot;&gt;&lt;sup&gt;&lt;a href=&quot;http://devcenter.wercker.com/docs/quickstarts/advanced/building-minimal-containers-with-go&quot;&gt;2&lt;/a&gt;&lt;/sup&gt;&lt;/a&gt;, since we need to dig deeper into the function&amp;#8217;s code, but it follows the same basic pattern as its predecessors.&lt;/p&gt;
 &lt;p&gt;While we&amp;#8217;re improving things, note that we&amp;#8217;ve also parameterised the
 &lt;code&gt;write&lt;/code&gt; function, rather than naively hijacking &lt;code&gt;sys.stdout&lt;/code&gt; to print out function calls.&lt;/p&gt;
 &lt;div class=&quot;typocode&quot;&gt;&lt;div class=&quot;codetitle&quot;&gt;Echo a function, Take 3&lt;/div&gt;
@@ -393,7 +393,7 @@ def echo_module(mod, write=sys.stdout.write):
 &lt;/div&gt;
 
 &lt;h3 id=&quot;work-in-progress&quot;&gt;Work in progress&lt;/h3&gt;
-&lt;p&gt;I&amp;#8217;ve used the &lt;code&gt;echo&lt;/code&gt; library successfully on a number of occasions. Usually, I simply want to capture all function calls made to a module. Echoing the module generates a log file which I can then examine offline using the standard &lt;a href=&quot;http://wordaligned.org/articles/shell-script-sets.html&quot;&gt;Unix shell tools&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;I&amp;#8217;ve used the &lt;code&gt;echo&lt;/code&gt; library successfully on a number of occasions. Usually, I simply want to capture all function calls made to a module. Echoing the module generates a log file which I can then examine offline using the standard &lt;a href=&quot;https://wordaligned.org/articles/shell-script-sets.html&quot;&gt;Unix shell tools&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;I&amp;#8217;ve resisted the urge to add options to fine-tune exactly which functions get echoed, or to control whether or not private methods get echoed &amp;#8212; I prefer to generate a surplus of information then filter it as needed. (Though note that the code, as it stands, &lt;em&gt;doesn&amp;#8217;t&lt;/em&gt; echo nested functions and classes.)&lt;/p&gt;
 &lt;p&gt;I discovered that if a class customises the special &lt;code&gt;__repr__&lt;/code&gt; method, then trying to echo calls to this method leads to recursion and a runtime error. As a consequence, &lt;code&gt;echo&lt;/code&gt; avoids echoing &lt;code&gt;__repr__&lt;/code&gt; and, for good measure, &lt;code&gt;__str__&lt;/code&gt; as well. I suspect that &lt;code&gt;echo&lt;/code&gt; would lead to similar problems if applied to another introspective module. Echoing &lt;code&gt;doctest&lt;/code&gt; wouldn&amp;#8217;t be very clever, and echoing echo itself is surely doomed.&lt;/p&gt;
 &lt;h3 id=&quot;source-code&quot;&gt;Source Code&lt;/h3&gt;
@@ -408,14 +408,14 @@ def echo_module(mod, write=sys.stdout.write):
 &lt;p&gt;For some readers, Python&amp;#8217;s ability to tamper with classes and functions in ways unforeseen by their original implementer may seem dangerous, and I regard this a fair reaction. I&amp;#8217;ve heard it argued that languages like Java and C++ are better suited for large projects, primarily because such languages simply don&amp;#8217;t allow you to write code such as &lt;code&gt;change_everything(world)&lt;/code&gt; &amp;#8212; which is really what &lt;code&gt;echo_module(module)&lt;/code&gt; does.&lt;/p&gt;
 &lt;p&gt;Meta-programming techniques like these need taste and restraint. As we&amp;#8217;ve shown, in Python, the &lt;code&gt;@&lt;/code&gt; symbol is pure syntactic sugar; sweet as it may seem, we should use it to improve, not impair.&lt;/p&gt;
 &lt;hr /&gt;
-&lt;p&gt;&lt;a href=&quot;http://wordaligned.org/articles/echo#fn1link&quot; id=&quot;footnote1&quot;&gt;&lt;a href=&quot;https://blog.codeship.com/building-minimal-docker-containers-for-go-applications/&quot;&gt;1&lt;/a&gt;&lt;/a&gt;
+&lt;p&gt;&lt;a href=&quot;https://wordaligned.org/articles/echo#fn1link&quot; id=&quot;footnote1&quot;&gt;&lt;a href=&quot;https://blog.codeship.com/building-minimal-docker-containers-for-go-applications/&quot;&gt;1&lt;/a&gt;&lt;/a&gt;
 Strictly speaking, the default arguments aren&amp;#8217;t &amp;#8220;passed&amp;#8221; to the function; they&amp;#8217;re stored by the function object when the function code is parsed.&lt;/p&gt;
-&lt;p&gt;&lt;a href=&quot;http://wordaligned.org/articles/echo#fn2link&quot; id=&quot;footnote2&quot;&gt;&lt;a href=&quot;http://devcenter.wercker.com/docs/quickstarts/advanced/building-minimal-containers-with-go&quot;&gt;2&lt;/a&gt;&lt;/a&gt;
+&lt;p&gt;&lt;a href=&quot;https://wordaligned.org/articles/echo#fn2link&quot; id=&quot;footnote2&quot;&gt;&lt;a href=&quot;http://devcenter.wercker.com/docs/quickstarts/advanced/building-minimal-containers-with-go&quot;&gt;2&lt;/a&gt;&lt;/a&gt;
 I suspect that inside this rather contorted function a simpler version is begging to get out. I&amp;#8217;d be pleased to accept any suggestions.&lt;/p&gt;</description>
 <dc:date>2008-03-10</dc:date>
-<guid>http://wordaligned.org/articles/echo</guid>
+<guid>https://wordaligned.org/articles/echo</guid>
 <author>tag@wordaligned.org (Thomas Guest)</author>
-<link>http://wordaligned.org/articles/echo</link>
+<link>https://wordaligned.org/articles/echo</link>
 <category>Decorators</category>
 </item>
 
