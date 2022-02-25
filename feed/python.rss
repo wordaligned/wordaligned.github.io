@@ -7,6 +7,133 @@
 <dc:creator>tag@wordaligned.org</dc:creator>
 <language>en-gb</language>
 <item>
+<title>Priority queues in Python</title>
+<description>&lt;p&gt;In the previous article I noted that Python&amp;#8217;s
+&lt;a href=&quot;https://docs.python.org/3/library/heapq.html&quot;&gt;heapq&lt;/a&gt; module is the
+only part of standard Python I could think of which deals with sorting,
+but which doesn&amp;#8217;t give you full control over the sort order.&lt;/p&gt;
+&lt;p&gt;That means you need to take care when using a heapq as a priority queue.&lt;/p&gt;
+&lt;p&gt;For example, the &lt;a href=&quot;https://en.wikipedia.org/wiki/A*_search_algorithm&quot;&gt;A* search
+algorithm&lt;/a&gt; is a
+&lt;strong&gt;best first&lt;/strong&gt; path finder. It maintains a priority queue of possible
+steps to take, ordered by an estimate of the total distance of the
+path routed through these steps. At each stage it pops the next step
+&amp;#8212; the one with the shortest estimated total distance &amp;#8212; from the queue,
+then updates based on the new position.&lt;/p&gt;
+&lt;div class=&quot;typocode&quot;&gt;
+
+&lt;pre class=&quot;prettyprint&quot;&gt;import heapq
+
+def a_star(start, heuristic, moves):
+    &quot;&quot;&quot;A* graph search
+
+    - start: initial state
+    - heuristic(s): estimates path length from state s to finish. 
+                    heuristic(s) == 0 =&amp;gt; finished
+    - moves(s): neighbours of s
+
+    Returns the shortest path to the finish and its cost, on success.
+    None otherwise.
+    &quot;&quot;&quot;
+    costs = {start: 0}
+    prev = {start: None}
+    frontier = [(heuristic(start), start)]
+    heapq.heapify(frontier)
+
+    def path(s):
+        return [] if s is None else path(prev[s]) + [s]
+
+    while frontier:
+        priority, state = heapq.heappop(frontier)
+        if heuristic(state) == 0:
+            return costs[state], path(state)
+        for n in moves(state):
+            n_cost = costs[state] + 1
+            if n not in costs or n_cost &amp;lt; costs[n]:
+                costs[n] = n_cost
+                heapq.heappush(frontier, (n_cost + heuristic(n), n))
+                prev[n] = state
+
+&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;The code above is a Python A* implementation. For simplicity, we&amp;#8217;ll
+assume the cost of each step is 1. It&amp;#8217;s easy enough to adapt the function
+if this isn&amp;#8217;t the case.&lt;/p&gt;
+&lt;p&gt;The priority queue here is named &lt;code&gt;frontier&lt;/code&gt;, the collection of states
+we need to explore. The sequence &lt;code&gt;heapify&lt;/code&gt;, &lt;code&gt;heappop&lt;/code&gt;, &lt;code&gt;heappush&lt;/code&gt;
+maintains the priority ordering. (The call to &lt;code&gt;heapify&lt;/code&gt; isn&amp;#8217;t even
+needed since a list with one element is already a heap.)  So, each
+time we pop a state from the queue, we get the one with the lowest
+estimated cost. Then, based on the moves we can make from this new
+step, we update our internal records of costs and previous nodes.&lt;/p&gt;
+&lt;p&gt;Note that the items on the queue are &lt;code&gt;(cost, state)&lt;/code&gt; pairs. The costs
+will be numbers, typically positive integers &amp;#8212; the exact values depend
+on the heuristic function.&lt;/p&gt;
+&lt;p&gt;Exactly what gets used as &lt;code&gt;state&lt;/code&gt; is up to the caller
+which supplies &lt;code&gt;start&lt;/code&gt;, the initial state, and &lt;code&gt;moves&lt;/code&gt;, which steps
+from a state to its neighbours.&lt;/p&gt;
+&lt;p&gt;However, if items on the queue are tied on &lt;code&gt;cost&lt;/code&gt;, the heapq may need to
+compare &lt;code&gt;state&lt;/code&gt; values. If the states have no defined ordering
+this results in a runtime error.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;&amp;gt;&amp;gt;&amp;gt; class State: pass
+... 
+&amp;gt;&amp;gt;&amp;gt; x1, x2 = State(), State()
+&amp;gt;&amp;gt;&amp;gt; (1, x1) &amp;lt; (2, x2)
+True
+&amp;gt;&amp;gt;&amp;gt; (1, x1) &amp;lt; (1, x2)
+Traceback (most recent call last):
+  File &quot;&amp;lt;stdin&amp;gt;&quot;, line 1, in &amp;lt;module&amp;gt;
+TypeError: &#x27;&amp;lt;&#x27; not supported between instances of &#x27;State&#x27; and &#x27;State&#x27;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;We cannot supply a sort key to the &lt;code&gt;heapq&lt;/code&gt; functions. Does this mean
+clients must ensure state objects &amp;#8212; whatever they actually are &amp;#8212; can be
+compared? As the code stands, yes, but the &lt;a href=&quot;https://docs.python.org/3/library/heapq.html#priority-queue-implementation-notes&quot;&gt;module documentation&lt;/a&gt; has advice on handling this situatation:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;[&amp;#8230;] store entries as 3-element list including the priority, an
+entry count, and the task. The entry count serves as a tie-breaker
+so that two tasks with the same priority are returned in the order
+they were added. And since no two entry counts are the same, the
+tuple comparison will never attempt to directly compare two tasks.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;This strategy gives a more usable &lt;code&gt;a_star&lt;/code&gt;.&lt;/p&gt;
+&lt;div class=&quot;typocode&quot;&gt;
+
+&lt;pre class=&quot;prettyprint&quot;&gt;import heapq
+import itertools
+
+def a_star(start, heuristic, moves):
+    costs = {start: 0}
+    prev = {start: None}
+    seq = itertools.count().__next__
+    frontier = [(heuristic(start), seq(), start)]
+
+    def path(s):
+        return [] if s is None else path(prev[s]) + [s]
+
+    while frontier:
+        _, _, state = heapq.heappop(frontier)
+        if heuristic(state) == 0:
+            return costs[state], path(state)
+        for n in moves(state):
+            n_cost = costs[state] + 1
+            if n not in costs or n_cost &amp;lt; costs[n]:
+                costs[n] = n_cost
+                heapq.heappush(frontier, (n_cost + heuristic(n), seq(), n))
+                prev[n] = state
+
+&lt;/pre&gt;
+
+&lt;/div&gt;</description>
+<dc:date>2022-02-25</dc:date>
+<guid>https://wordaligned.org/articles/priority-queues-in-python</guid>
+<author>tag@wordaligned.org (Thomas Guest)</author>
+<link>https://wordaligned.org/articles/priority-queues-in-python</link>
+<category>Python</category>
+</item>
+
+<item>
 <title>Binary search gets a sort key</title>
 <description>&lt;p&gt;Suppose you have an list of distinct elements which has been sorted
 and rotated. How would you look up an element within that list?&lt;/p&gt;
@@ -2188,80 +2315,6 @@ turn off 991,989 through 994,998
 <guid>https://wordaligned.org/articles/sledgehammers-vs-nut-crackers</guid>
 <author>tag@wordaligned.org (Thomas Guest)</author>
 <link>https://wordaligned.org/articles/sledgehammers-vs-nut-crackers</link>
-<category>Python</category>
-</item>
-
-<item>
-<title>Why zip when you can map?</title>
-<description>&lt;p&gt;&lt;a href=&quot;http://en.wikipedia.org/wiki/Zipper&quot;&gt;&lt;img src=&quot;https://wordaligned.org/images/zip.jpg&quot; title=&quot;Why zip?&quot; alt=&quot;Why zip?&quot;/&gt;&lt;/a&gt;
-&lt;a href=&quot;http://www.strava.com/activities/158661061&quot;&gt;&lt;img src=&quot;https://wordaligned.org/images/dundry-thunder.jpg&quot; alt=&quot;when you can map?&quot; title=&quot;when you can map!&quot;/&gt;&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;You&amp;#8217;ve got a couple of parallel lists you&amp;#8217;d like to combine and output, a line for each pair. Here&amp;#8217;s one way to do it: use &lt;code&gt;zip&lt;/code&gt; to do the combining.&lt;/p&gt;
-&lt;div class=&quot;typocode&quot;&gt;
-
-&lt;pre class=&quot;prettyprint&quot;&gt;&amp;gt;&amp;gt;&amp;gt; times = [42.12, 42.28, 42.34, 42.40, 42.45]
-&amp;gt;&amp;gt;&amp;gt; names = [&amp;#x27;Hickman&amp;#x27;, &amp;#x27;Guest&amp;#x27;, &amp;#x27;Burns&amp;#x27;, &amp;#x27;Williams&amp;#x27;]
-&amp;gt;&amp;gt;&amp;gt; fmt = &amp;#x27;{:20} {:.2f}&amp;#x27;.format
-&amp;gt;&amp;gt;&amp;gt; print(&amp;#x27;\n&amp;#x27;.join(fmt(n, t) for n, t in zip(names, times)))
-Hickman              42.12
-Guest                42.28
-Burns                42.34
-Williams             42.40
-
-&lt;/pre&gt;
-
-&lt;/div&gt;
-
-&lt;p&gt;Slightly more succinctly:&lt;/p&gt;
-&lt;div class=&quot;typocode&quot;&gt;
-
-&lt;pre class=&quot;prettyprint&quot;&gt;&amp;gt;&amp;gt;&amp;gt; print(&amp;#x27;\n&amp;#x27;.join(fmt(*nt) for nt in zip(names, times)))
-...
-
-&lt;/pre&gt;
-
-&lt;/div&gt;
-
-&lt;p&gt;If you look at the generator expression passed into &lt;code&gt;str.join&lt;/code&gt;, you can see we&amp;#8217;re just mapping &lt;code&gt;fmt&lt;/code&gt; to the zipped &lt;code&gt;names&lt;/code&gt; and &lt;code&gt;times&lt;/code&gt; lists.&lt;/p&gt;
-&lt;p&gt;Well, sort of.&lt;/p&gt;
-&lt;div class=&quot;typocode&quot;&gt;
-
-&lt;pre class=&quot;prettyprint&quot;&gt;&amp;gt;&amp;gt;&amp;gt; print(&amp;#x27;\n&amp;#x27;.join(map(fmt, zip(names, times))))
-Traceback (most recent call last):
-...
-IndexError: tuple index out of range
-
-&lt;/pre&gt;
-
-&lt;/div&gt;
-
-&lt;p&gt;To fix this, we &lt;strong&gt;could&lt;/strong&gt; use &lt;code&gt;itertools.starmap&lt;/code&gt; which effectively unpacks the zipped pairs.&lt;/p&gt;
-&lt;div class=&quot;typocode&quot;&gt;
-
-&lt;pre class=&quot;prettyprint&quot;&gt;&amp;gt;&amp;gt;&amp;gt; from itertools import starmap
-&amp;gt;&amp;gt;&amp;gt; print(&amp;#x27;\n&amp;#x27;.join(starmap(fmt, zip(names, times))))
-Hickman              42.12
-Guest                42.28
-Burns                42.34
-Williams             42.40
-
-&lt;/pre&gt;
-
-&lt;/div&gt;
-
-&lt;p&gt;This latest version looks clean enough but there&amp;#8217;s something odd about zipping two lists together only to unpack the resulting 2-tuples for consumption by the format function.&lt;/p&gt;
-&lt;p&gt;Don&amp;#8217;t forget, &lt;code&gt;map&lt;/code&gt; happily accepts more than one sequence! There&amp;#8217;s no need to &lt;code&gt;zip&lt;/code&gt; after all.&lt;/p&gt;
-&lt;div class=&quot;typocode&quot;&gt;&lt;div class=&quot;codetitle&quot;&gt;Don&amp;#8217;t zip, map!&lt;/div&gt;
-
-&lt;pre class=&quot;prettyprint&quot;&gt;&amp;gt;&amp;gt;&amp;gt; print(&amp;#x27;\n&amp;#x27;.join(map(fmt, names, times)))
-...
-
-&lt;/pre&gt;
-
-&lt;/div&gt;</description>
-<dc:date>2014-12-16</dc:date>
-<guid>https://wordaligned.org/articles/why-zip-when-you-can-map</guid>
-<author>tag@wordaligned.org (Thomas Guest)</author>
-<link>https://wordaligned.org/articles/why-zip-when-you-can-map</link>
 <category>Python</category>
 </item>
 

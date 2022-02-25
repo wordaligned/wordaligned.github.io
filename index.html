@@ -11,7 +11,7 @@
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
 <meta name="author" content="Thomas Guest" />
 <meta name="description" content="A collection of articles on software development written by Thomas Guest." />
-<meta name="keywords" content="Go, lighttpd, Streams, Ruby on Rails, Dynamic Languages, Content, Graphics, CLRS, Conferences, Web Applications, Shell, Drawing, Java, Recursion, Charts, Python, Subversion, Apple, PIL, Puzzles, Steganography, Syntax, Books, Web-applications, Swansea, Documentation, Regex, Hoare, Google, Chess, Lcs, Editors, Windows, Self, Arc, Fractals, php, Javascript, Boost, Recommended, Scheme, Agile, Android, Haskell, Two Wheels, Awk, Talks, Scrum, Primes, openid, C++, Zlib, Virtualization, Etc, Accidents, Perec, Disqus, Pi, Europython, Perl, Spolsky, Github, Design, Bristol, SICP, ACCU, Tesseract, Esr, Curl, Algorithms, Torvalds, Ruby, Trac, Emacs, Oulipo, Crabs, Unix, Turing, Markdown, Unicode, CVS, Build, OCR, cvs2svn, IDE, C, ImageMagick, Functional Programming, Animation, Characters, Cycling, DocBook, Missiles, Pictures, Reviews, Tests, Bugs, Iphone, Teamwork, Lisp, Knuth, Erlang, Decorators" />
+<meta name="keywords" content="Recursion, Content, Swansea, Agile, php, Arc, lighttpd, Oulipo, Steganography, Curl, cvs2svn, Europython, Bristol, Zlib, Virtualization, Scrum, Two Wheels, Android, Cycling, Pictures, Esr, Recommended, Windows, Pi, Perec, Functional Programming, Etc, Teamwork, Documentation, Unicode, Awk, Accidents, Hoare, SICP, Haskell, Puzzles, Knuth, CLRS, Java, Lisp, CVS, Build, Tesseract, Drawing, Design, Iphone, Decorators, Trac, openid, Books, Missiles, ImageMagick, Graphics, Google, Perl, Disqus, Charts, Dynamic Languages, Boost, Ruby, Apple, Bugs, Markdown, Streams, OCR, C++, Reviews, Crabs, Scheme, Shell, Animation, Primes, Syntax, IDE, Javascript, Emacs, ACCU, Self, Lcs, Tests, Ruby on Rails, Github, PIL, DocBook, Talks, Chess, Web Applications, Conferences, Editors, Subversion, Erlang, Python, Fractals, Characters, Web-applications, Turing, Algorithms, Go, Regex, C, Unix, Spolsky, Torvalds" />
 <link rel="alternate" type="application/rss+xml" title="Feed" href="http://feeds.wordaligned.org/wordaligned" />
 </head>
 
@@ -25,7 +25,132 @@
 
   <div id="page">
     <div id="content">
-      <div class="atomentry" id="binary-search-gets-a-sort-key">
+      <div class="atomentry" id="priority-queues-in-python">
+<h2 class="title"><a href="/articles/priority-queues-in-python">Priority queues in Python</a></h2>
+<p class="meta"><abbr class="published" title="2022-02-25">2022-02-25</abbr> &bull; <a href="/tag/python" rel="tag">Python</a> &bull; <a href="/articles/priority-queues-in-python#disqus_thread">Comments</a></p>
+<p>In the previous article I noted that Python&#8217;s
+<a href="https://docs.python.org/3/library/heapq.html">heapq</a> module is the
+only part of standard Python I could think of which deals with sorting,
+but which doesn&#8217;t give you full control over the sort order.</p>
+<p>That means you need to take care when using a heapq as a priority queue.</p>
+<p>For example, the <a href="https://en.wikipedia.org/wiki/A*_search_algorithm">A* search
+algorithm</a> is a
+<strong>best first</strong> path finder. It maintains a priority queue of possible
+steps to take, ordered by an estimate of the total distance of the
+path routed through these steps. At each stage it pops the next step
+&#8212; the one with the shortest estimated total distance &#8212; from the queue,
+then updates based on the new position.</p>
+<div class="typocode">
+
+<pre class="prettyprint">import heapq
+
+def a_star(start, heuristic, moves):
+    """A* graph search
+
+    - start: initial state
+    - heuristic(s): estimates path length from state s to finish. 
+                    heuristic(s) == 0 =&gt; finished
+    - moves(s): neighbours of s
+
+    Returns the shortest path to the finish and its cost, on success.
+    None otherwise.
+    """
+    costs = {start: 0}
+    prev = {start: None}
+    frontier = [(heuristic(start), start)]
+    heapq.heapify(frontier)
+
+    def path(s):
+        return [] if s is None else path(prev[s]) + [s]
+
+    while frontier:
+        priority, state = heapq.heappop(frontier)
+        if heuristic(state) == 0:
+            return costs[state], path(state)
+        for n in moves(state):
+            n_cost = costs[state] + 1
+            if n not in costs or n_cost &lt; costs[n]:
+                costs[n] = n_cost
+                heapq.heappush(frontier, (n_cost + heuristic(n), n))
+                prev[n] = state
+
+</pre>
+
+</div>
+
+<p>The code above is a Python A* implementation. For simplicity, we&#8217;ll
+assume the cost of each step is 1. It&#8217;s easy enough to adapt the function
+if this isn&#8217;t the case.</p>
+<p>The priority queue here is named <code>frontier</code>, the collection of states
+we need to explore. The sequence <code>heapify</code>, <code>heappop</code>, <code>heappush</code>
+maintains the priority ordering. (The call to <code>heapify</code> isn&#8217;t even
+needed since a list with one element is already a heap.)  So, each
+time we pop a state from the queue, we get the one with the lowest
+estimated cost. Then, based on the moves we can make from this new
+step, we update our internal records of costs and previous nodes.</p>
+<p>Note that the items on the queue are <code>(cost, state)</code> pairs. The costs
+will be numbers, typically positive integers &#8212; the exact values depend
+on the heuristic function.</p>
+<p>Exactly what gets used as <code>state</code> is up to the caller
+which supplies <code>start</code>, the initial state, and <code>moves</code>, which steps
+from a state to its neighbours.</p>
+<p>However, if items on the queue are tied on <code>cost</code>, the heapq may need to
+compare <code>state</code> values. If the states have no defined ordering
+this results in a runtime error.</p>
+<pre><code>&gt;&gt;&gt; class State: pass
+... 
+&gt;&gt;&gt; x1, x2 = State(), State()
+&gt;&gt;&gt; (1, x1) &lt; (2, x2)
+True
+&gt;&gt;&gt; (1, x1) &lt; (1, x2)
+Traceback (most recent call last):
+  File "&lt;stdin&gt;", line 1, in &lt;module&gt;
+TypeError: '&lt;' not supported between instances of 'State' and 'State'
+</code></pre>
+<p>We cannot supply a sort key to the <code>heapq</code> functions. Does this mean
+clients must ensure state objects &#8212; whatever they actually are &#8212; can be
+compared? As the code stands, yes, but the <a href="https://docs.python.org/3/library/heapq.html#priority-queue-implementation-notes">module documentation</a> has advice on handling this situatation:</p>
+<blockquote>
+<p>[&#8230;] store entries as 3-element list including the priority, an
+entry count, and the task. The entry count serves as a tie-breaker
+so that two tasks with the same priority are returned in the order
+they were added. And since no two entry counts are the same, the
+tuple comparison will never attempt to directly compare two tasks.</p>
+</blockquote>
+<p>This strategy gives a more usable <code>a_star</code>.</p>
+<div class="typocode">
+
+<pre class="prettyprint">import heapq
+import itertools
+
+def a_star(start, heuristic, moves):
+    costs = {start: 0}
+    prev = {start: None}
+    seq = itertools.count().__next__
+    frontier = [(heuristic(start), seq(), start)]
+
+    def path(s):
+        return [] if s is None else path(prev[s]) + [s]
+
+    while frontier:
+        _, _, state = heapq.heappop(frontier)
+        if heuristic(state) == 0:
+            return costs[state], path(state)
+        for n in moves(state):
+            n_cost = costs[state] + 1
+            if n not in costs or n_cost &lt; costs[n]:
+                costs[n] = n_cost
+                heapq.heappush(frontier, (n_cost + heuristic(n), seq(), n))
+                prev[n] = state
+
+</pre>
+
+</div>
+
+</div>
+
+
+<div class="atomentry" id="binary-search-gets-a-sort-key">
 <h2 class="title"><a href="/articles/binary-search-gets-a-sort-key">Binary search gets a sort key</a></h2>
 <p class="meta"><abbr class="published" title="2022-02-15">2022-02-15</abbr> &bull; <a href="/tag/python" rel="tag">Python</a>, <a href="/tag/puzzles" rel="tag">Puzzles</a> &bull; <a href="/articles/binary-search-gets-a-sort-key#disqus_thread">Comments</a></p>
 <p>Suppose you have an list of distinct elements which has been sorted
@@ -700,20 +825,6 @@ fruitbowl = {
 </div>
 
 
-<div class="atomentry" id="bugwards-compatible">
-<h2 class="title"><a href="/articles/bugwards-compatible">Bugwards Compatible</a></h2>
-<p class="meta"><abbr class="published" title="2018-02-02">2018-02-02</abbr> &bull; <a href="/tag/tests" rel="tag">Tests</a> &bull; <a href="/articles/bugwards-compatible#disqus_thread">Comments</a></p>
-<p><a href="https://twitter.com/chrisoldwood">Chris Oldwood</a> recently tweeted about &#8220;TFW you write some tests for a bit of legacy code before making a change and you unearth a bunch of bugs&#8221;</p>
-<div><blockquote class="twitter-tweet" data-lang="en"><p lang="en" dir="ltr">TFW you write some tests for a bit of legacy code before making a change and you unearth a bunch of bugs.</p>&mdash; Chris Oldwood (@chrisoldwood) <a href="https://twitter.com/chrisoldwood/status/959576034059448321?ref_src=twsrc%5Etfw">February 2, 2018</a></blockquote><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script></div>
-
-<p>He doesn&#8217;t elaborate on what exactly &#8220;that feeling&#8221; is, but I&#8217;ll bet it&#8217;s not surprise. Writing tests for code almost invariably shakes something out &#8212; perhaps some undocumented assumptions about the inputs; perhaps a failure to match the documented behaviour; perhaps an access violation which will crash the application.</p>
-<p>&#8220;That feeling&#8221; can include relief: the code is legacy code and evidently the bugs have gone unnoticed or at least unreported. Often, any such relief may be accompanied by a sense of wonder. The bugs may be so severe &#8212; the code so broken &#8212; that the maintainer questions how it <strong>ever</strong> worked.</p>
-<p>&#8220;That feeling&#8221; may also be dismay, since the legacy code requires changing. If the existing behaviour is buggy but predictable it could well be that clients have adapted to this behaviour and wouldn&#8217;t welcome a fix. In other words, the change will have to be both backwards and <strong>bugwards compatible</strong>. Chris will have to tread carefully.</p>
-<p>Such delicate decisions are not limited to the code&#8217;s runtime behaviour. It might seem that, once the code is under test, Chris can <a href="http://wiki.c2.com/?RefactorMercilessly">refactor mercilessly</a> &#8212; renaming variables, updating idioms, tidying layout. Again, tread carefully! Make sure the code <strong>is</strong> under test. Be aware of the differences which reviewers must evaluate. Consider the wider context. Respect the original authors.</p>
-
-</div>
-
-
 <div class="extended">
 <p><a href="/articles/">Visit the Word Aligned archives...</a></p>
 </div>
@@ -754,7 +865,7 @@ fruitbowl = {
 
 <div class="sidebar-node">
 <h3>Top Tags</h3>
-<ul id="categories"><li><a href="/tag/python" rel="tag">Python</a> <em>(129)</em></li>
+<ul id="categories"><li><a href="/tag/python" rel="tag">Python</a> <em>(130)</em></li>
 <li><a href="/tag/c++" rel="tag">C++</a> <em>(71)</em></li>
 <li><a href="/tag/self" rel="tag">Self</a> <em>(70)</em></li>
 <li><a href="/tag/puzzles" rel="tag">Puzzles</a> <em>(41)</em></li>
@@ -786,7 +897,7 @@ fruitbowl = {
 <div class="sidebar-node">
 <h3>Chain</h3>
 <ul>
-<li><a accesskey="p" href="/articles/binary-search-gets-a-sort-key" title="First article">&raquo; Binary search gets a sort key</a></li>
+<li><a accesskey="p" href="/articles/priority-queues-in-python" title="First article">&raquo; Priority queues in Python</a></li>
 
 </ul>
 
