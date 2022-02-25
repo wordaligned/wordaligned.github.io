@@ -1,0 +1,213 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<link rel="icon" href="/images/favicon.png" type="image/png"/>
+<link href="/styles/application.css" media="all" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="/scripts/prettify.js"></script>
+<script type="text/javascript" src="/scripts/lang-lisp.js"></script>
+<title>Priority queues in Python</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="author" content="Thomas Guest" />
+<meta name="description" content="A Word Aligned article posted 2022-02-25, tagged Python." />
+<meta name="keywords" content="Python" />
+<link rel="alternate" type="application/rss+xml" title="Feed" href="http://feeds.wordaligned.org/wordaligned" />
+</head>
+
+<body onload="prettyPrint()">
+<div id="container">
+  <div id="header">
+<h1><span><a accesskey="h" href="/">Word Aligned</a></span></h1>
+<h2>space sensitive programming</h2>
+<a class="button" href="http://feeds.wordaligned.org/wordaligned" title="Subscribe to Word Aligned"><img style="float: right;" src="/images/feed.png" alt="Feed Logo" height="28" width="28"/></a>
+</div>
+
+  <div id="page">
+    <div id="content">
+      <div class="atomentry" id="priority-queues-in-python">
+<h2 class="title"><a href="/articles/priority-queues-in-python">Priority queues in Python</a></h2>
+<p class="meta"><abbr class="published" title="2022-02-25">2022-02-25</abbr> &bull; <a href="/tag/python" rel="tag">Python</a> &bull; <a href="/articles/priority-queues-in-python#disqus_thread">Comments</a></p>
+<p>In the previous article I noted that Python&#8217;s
+<a href="https://docs.python.org/3/library/heapq.html">heapq</a> module is the
+only part of standard Python I could think of which deals with sorting,
+but which doesn&#8217;t give you full control over the sort order.</p>
+<p>That means you need to take care when using a heapq as a priority queue.</p>
+<p>For example, the <a href="https://en.wikipedia.org/wiki/A*_search_algorithm">A* search
+algorithm</a> is a
+<strong>best first</strong> path finder. It maintains a priority queue of possible
+steps to take, ordered by an estimate of the total distance of the
+path routed through these steps. At each stage it pops the next step
+&#8212; the one with the shortest estimated total distance &#8212; from the queue,
+then updates based on the new position.</p>
+<div class="typocode">
+
+<pre class="prettyprint">import heapq
+
+def a_star(start, heuristic, moves):
+    """A* graph search
+
+    - start: initial state
+    - heuristic(s): estimates path length from state s to finish. 
+                    heuristic(s) == 0 =&gt; finished
+    - moves(s): neighbours of s
+
+    Returns the shortest path to the finish and its cost, on success.
+    None otherwise.
+    """
+    costs = {start: 0}
+    prev = {start: None}
+    frontier = [(heuristic(start), start)]
+    heapq.heapify(frontier)
+
+    def path(s):
+        return [] if s is None else path(prev[s]) + [s]
+
+    while frontier:
+        priority, state = heapq.heappop(frontier)
+        if heuristic(state) == 0:
+            return costs[state], path(state)
+        for n in moves(state):
+            n_cost = costs[state] + 1
+            if n not in costs or n_cost &lt; costs[n]:
+                costs[n] = n_cost
+                heapq.heappush(frontier, (n_cost + heuristic(n), n))
+                prev[n] = state
+
+</pre>
+
+</div>
+
+<p>The code above is a Python A* implementation. For simplicity, we&#8217;ll
+assume the cost of each step is 1. It&#8217;s easy enough to adapt the function
+if this isn&#8217;t the case.</p>
+<p>The priority queue here is named <code>frontier</code>, the collection of states
+we need to explore. The sequence <code>heapify</code>, <code>heappop</code>, <code>heappush</code>
+maintains the priority ordering. (The call to <code>heapify</code> isn&#8217;t even
+needed since a list with one element is already a heap.)  So, each
+time we pop a state from the queue, we get the one with the lowest
+estimated cost. Then, based on the moves we can make from this new
+step, we update our internal records of costs and previous nodes.</p>
+<p>Note that the items on the queue are <code>(cost, state)</code> pairs. The costs
+will be numbers, typically positive integers &#8212; the exact values depend
+on the heuristic function.</p>
+<p>Exactly what gets used as <code>state</code> is up to the caller
+which supplies <code>start</code>, the initial state, and <code>moves</code>, which steps
+from a state to its neighbours.</p>
+<p>However, if items on the queue are tied on <code>cost</code>, the heapq may need to
+compare <code>state</code> values. If the states have no defined ordering
+this results in a runtime error.</p>
+<pre><code>&gt;&gt;&gt; class State: pass
+... 
+&gt;&gt;&gt; x1, x2 = State(), State()
+&gt;&gt;&gt; (1, x1) &lt; (2, x2)
+True
+&gt;&gt;&gt; (1, x1) &lt; (1, x2)
+Traceback (most recent call last):
+  File "&lt;stdin&gt;", line 1, in &lt;module&gt;
+TypeError: '&lt;' not supported between instances of 'State' and 'State'
+</code></pre>
+<p>We cannot supply a sort key to the <code>heapq</code> functions. Does this mean
+clients must ensure state objects &#8212; whatever they actually are &#8212; can be
+compared? As the code stands, yes, but the <a href="https://docs.python.org/3/library/heapq.html#priority-queue-implementation-notes">module documentation</a> has advice on handling this situatation:</p>
+<blockquote>
+<p>[&#8230;] store entries as 3-element list including the priority, an
+entry count, and the task. The entry count serves as a tie-breaker
+so that two tasks with the same priority are returned in the order
+they were added. And since no two entry counts are the same, the
+tuple comparison will never attempt to directly compare two tasks.</p>
+</blockquote>
+<p>This strategy gives a more usable <code>a_star</code>.</p>
+<div class="typocode">
+
+<pre class="prettyprint">import heapq
+import itertools
+
+def a_star(start, heuristic, moves):
+    costs = {start: 0}
+    prev = {start: None}
+    seq = itertools.count().__next__
+    frontier = [(heuristic(start), seq(), start)]
+
+    def path(s):
+        return [] if s is None else path(prev[s]) + [s]
+
+    while frontier:
+        _, _, state = heapq.heappop(frontier)
+        if heuristic(state) == 0:
+            return costs[state], path(state)
+        for n in moves(state):
+            n_cost = costs[state] + 1
+            if n not in costs or n_cost &lt; costs[n]:
+                costs[n] = n_cost
+                heapq.heappush(frontier, (n_cost + heuristic(n), seq(), n))
+                prev[n] = state
+
+</pre>
+
+</div>
+</div>
+
+
+      
+<div id="disqus_thread"></div>
+<script>
+    (function() { // DON'T EDIT BELOW THIS LINE
+    var d = document, s = d.createElement('script');
+    s.src = 'https://wordaligned.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+    })();
+</script>
+<script id="dsq-count-scr" src="//wordaligned.disqus.com/count.js" async></script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+    </div>
+    <div id="sidebar">
+      
+<div class="sidebar-node">
+<h3>Tagged</h3>
+<ul id="categories"><li><a href="/tag/python" rel="tag">Python</a></li></ul>
+
+</div>
+
+<div class="sidebar-node">
+<h3>Chain</h3>
+<ul>
+
+<li><a accesskey="p" href="/articles/binary-search-gets-a-sort-key" title="Previous article">&raquo; Binary search gets a sort key</a></li>
+</ul>
+
+
+</div>
+
+<div class="sidebar-node">
+<h3>Feeds</h3>
+
+<ul>
+<li><a href="http://feeds.wordaligned.org/wordaligned"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Articles</a></li>
+<li><a href="http://feeds.wordaligned.org/wordaligned/comments"><img src="/images/buttons/feed-icon-14x14.png" alt="feed icon"/> Comments</a></li>
+</ul>
+
+
+</div>
+
+    </div>
+  </div>
+  <div id="footer">
+<hr />
+<p><a href="http://tag.wordaligned.org">Thomas Guest</a></p>
+</div>
+
+</div>
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-3373724-1']);
+  _gaq.push(['_trackPageview']);
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ga);
+  })();
+</script>
+</body>
+
+</html>
