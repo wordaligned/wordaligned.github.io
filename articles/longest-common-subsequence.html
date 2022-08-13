@@ -26,7 +26,7 @@
       <div class="atomentry" id="longest-common-subsequence">
 <h2 class="title"><a href="/articles/longest-common-subsequence">Longest common subsequence</a></h2>
 <p class="meta"><abbr class="published" title="2009-03-11">2009-03-11</abbr> &bull; <a href="/tag/algorithms" rel="tag">Algorithms</a>, <a href="/tag/python" rel="tag">Python</a>, <a href="/tag/c++" rel="tag">C++</a>, <a href="/tag/lcs" rel="tag">Lcs</a>, <a href="/tag/clrs" rel="tag">CLRS</a>, <a href="/tag/animation" rel="tag">Animation</a> &bull; <a href="/articles/longest-common-subsequence#disqus_thread">Comments</a></p>
-<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.1/jquery.min.js"></script>
+<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.3.1/jquery.min.js"></script>
 <script type="text/javascript">
 function reset(i) {
     jQuery("div.lcs" + i).hide();
@@ -196,7 +196,7 @@ function animatelcs(i) {
 </div>
 
 <p><button id="animatelcs1" onclick="animatelcs(1);">Calculate LCS</button></p>
-<p>I pinched the idea for this animation from Ned Batchelder&#8217;s <a href="http://nedbatchelder.com/blog/200805/css_homer_animated.html">clever visualisation</a> of Rom&aacute;n Cort&eacute;s&#8217; brilliant <a href="http://www.romancortes.com/blog/homer-css/">CSS Homer Simpson</a>. It depends on Javascript, CSS and a font containing upwards, leftwards and north west <a href="http://www.alanwood.net/unicode/arrows.html">arrows</a>.  If it doesn&#8217;t work in your user agent, <a href="http://www.mozilla.org/firefox" title="Try Firefox!">my apologies</a>. If you&#8217;d like to find out why I&#8217;m comparing humans with chimpanzees, read on!</p>
+<p>I pinched the idea for this animation from Ned Batchelder&#8217;s <a href="//nedbatchelder.com/blog/200805/css_homer_animated.html">clever visualisation</a> of Rom&aacute;n Cort&eacute;s&#8217; brilliant <a href="http://www.romancortes.com/blog/homer-css/">CSS Homer Simpson</a>. It depends on Javascript, CSS and a font containing upwards, leftwards and north west arrows.  If it doesn&#8217;t work, my apologies. If you&#8217;d like to find out why I&#8217;m comparing humans with chimpanzees, read on!</p>
 <p><span id="continue-reading"/></p>
 <h3 id="retracing-our-steps">Retracing our steps</h3>
 <p>Taking a brief step back, this article is the third of a series. In the first episode <a href="/articles/a-race-within-a-race.html">we posed a puzzle</a>:</p>
@@ -224,7 +224,7 @@ function animatelcs(i) {
 <p>Let&#8217;s note up front that there may not be a unique LCS of two sequences (as a trivial example, &#8220;A&#8221; and &#8220;B&#8221; are both LCSes of &#8220;AB&#8221;, &#8220;BA&#8221;), which is why we&#8217;ll talk about <strong>a</strong> longest common subsequence rather than <strong>the</strong> longest common subsequence.</p>
 <p>We can also rule out a simple divide and conquer scheme. We can&#8217;t just split both inputs in half and join together the LCSes of the beginnings and endings to form an answer. Consider finding the LCS of &#8220;123ABC&#8221;, &#8220;DEF123&#8221; for example &#8212; concatenating the LCSes of &#8220;123&#8221;, &#8220;DEF&#8221; and &#8220;ABC&#8221;, &#8220;123&#8221; gives the empty string, which is clearly wrong. (We&#8217;ll see later that a more sophisticated divide and conquer scheme <strong>does</strong> exist, but it comes at a cost.)</p>
 <h3 id="a-recursive-approach">A recursive approach</h3>
-<p>An elegant recursive approach to solving this problem is based around the observation that the LCS of two sequences can be built from the LCSes of prefixes of these sequences. In algorithm speak, the longest common subsequence problem has <a href="http://en.wikipedia.org/wiki/Optimal_substructure">optimal substructure</a>.</p>
+<p>An elegant recursive approach to solving this problem is based around the observation that the LCS of two sequences can be built from the LCSes of prefixes of these sequences. In algorithm speak, the longest common subsequence problem has <a href="//en.wikipedia.org/wiki/Optimal_substructure">optimal substructure</a>.</p>
 <div class="typocode">
 
 <pre class="prettyprint">def lcs(xs, ys):
@@ -313,7 +313,7 @@ lcs, calls = count_lcs_calls(lcs)
 
 </div>
 
-<p><a href="http://en.wikipedia.org/wiki/Pascal's_triangle"><img style="float:right" src="http://upload.wikimedia.org/wikipedia/commons/0/0d/PascalTriangleAnimated2.gif" alt="Pascal's triangle"/></a></p>
+<p><a href="http://en.wikipedia.org/wiki/Pascal's_triangle"><img style="float:right" src="//upload.wikimedia.org/wikipedia/commons/0/0d/PascalTriangleAnimated2.gif" alt="Pascal's triangle"/></a></p>
 <p>Here, we show the LCS of &#8220;MAN&#8221; and &#8220;PIG is the empty sequence. The next command prints the call counts to standard output, showing that e.g. we calculate <code>lcs('MA', 'PI')</code> twice and <code>lcs('M', 'P')</code> six times. It should be no surprise to see these call counts appearing in Pascal&#8217;s triangle.</p>
 <p>At the other extreme, given identical inputs the recursion zips straight through the identical prefixes, and no call is repeated.</p>
 <div class="typocode">
@@ -358,7 +358,7 @@ KeyboardInterrupt
 </div>
 
 <h3 id="dynamic-programming">Dynamic programming</h3>
-<p>We&#8217;ve already seen the LCS of two sequences can be built from the LCSes of prefixes of these subsequences; that is, an optimal solution to the problem can be built from optimal solutions to subproblems, a property known as <strong>optimal substructure</strong>. Our code experiment above shows that the subproblems repeat, possibly many times. This second property, of <strong>overlapping subproblems</strong>, means we have a classic example of a problem we can solve using <a href="http://en.wikipedia.org/wiki/Dynamic_Programming">dynamic programming</a>. There are a couple of standard ways to progress:</p>
+<p>We&#8217;ve already seen the LCS of two sequences can be built from the LCSes of prefixes of these subsequences; that is, an optimal solution to the problem can be built from optimal solutions to subproblems, a property known as <strong>optimal substructure</strong>. Our code experiment above shows that the subproblems repeat, possibly many times. This second property, of <strong>overlapping subproblems</strong>, means we have a classic example of a problem we can solve using <a href="//en.wikipedia.org/wiki/Dynamic_Programming">dynamic programming</a>. There are a couple of standard ways to progress:</p>
 <ul>
 <li>memoization</li>
 <li>converting from top-down to bottom-up</li>
@@ -388,7 +388,7 @@ KeyboardInterrupt
 
 </div>
 
-<p>We can use this to <a href="http://docs.python.org/py3k/reference/compound_stmts.html#function">decorate</a> our longest common subsequence function. I&#8217;ve also taken the opportunity to bypass some of the list splitting, creating an inner function which uses indices into the original <code>xs</code> and <code>ys</code> inputs.</p>
+<p>We can use this to <a href="//docs.python.org/py3k/reference/compound_stmts.html#function">decorate</a> our longest common subsequence function. I&#8217;ve also taken the opportunity to bypass some of the list splitting, creating an inner function which uses indices into the original <code>xs</code> and <code>ys</code> inputs.</p>
 <div class="typocode">
 
 <pre class="prettyprint">def lcs(xs, ys):
